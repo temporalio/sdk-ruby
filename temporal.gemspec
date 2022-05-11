@@ -13,4 +13,6 @@ Gem::Specification.new do |spec|
 
   spec.require_paths = ['lib']
   spec.files         = Dir["{lib}/**/*.*"] + %w(temporal.gemspec Gemfile LICENSE README.md)
+
+  spec.add_development_dependency 'rspec'
 end
