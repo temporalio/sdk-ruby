@@ -12,7 +12,11 @@ Gem::Specification.new do |spec|
   spec.email         = ['anthony@temporal.io']
 
   spec.require_paths = ['lib']
-  spec.files         = Dir["{lib}/**/*.*"] + %w(temporal.gemspec Gemfile LICENSE README.md)
+  spec.files         = Dir['{lib}/**/*.*'] + %w[temporal.gemspec Gemfile LICENSE README.md]
+
+  spec.required_ruby_version = '>= 2.7.0'
 
   spec.add_development_dependency 'rspec'
+  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'rubocop-rspec'
 end
