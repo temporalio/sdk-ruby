@@ -16,7 +16,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7.0'
 
-  spec.add_development_dependency 'rspec'
-  spec.add_development_dependency 'rubocop'
-  spec.add_development_dependency 'rubocop-rspec'
+  spec.add_development_dependency 'rspec' # specs
+  spec.add_development_dependency 'rubocop' # linter
+  spec.add_development_dependency 'rubocop-rspec' # spec linter
+  spec.add_development_dependency 'steep' # type checker
 end
