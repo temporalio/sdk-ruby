@@ -1,0 +1,3 @@
+module Temporal
+  VERSION: String
+end
