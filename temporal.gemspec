@@ -16,6 +16,10 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7.0'
 
+  spec.add_dependency 'rutie', '~> 0.0.4' # Rust bindings
+  spec.add_dependency 'google-protobuf', '~> 3.21.1' # Protobuf
+
+  spec.add_development_dependency 'rake' # rake tasks
   spec.add_development_dependency 'rspec' # specs
   spec.add_development_dependency 'rubocop' # linter
   spec.add_development_dependency 'rubocop-rspec' # spec linter

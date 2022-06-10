@@ -15,3 +15,6 @@ _yardoc/
 .rspec_status
 
 .idea/*
+
+# Rust builds
+bridge/target
