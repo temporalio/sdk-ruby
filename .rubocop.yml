@@ -2,6 +2,9 @@ AllCops:
   NewCops: enable
   TargetRubyVersion: 2.7
   SuggestExtensions: false
+  Exclude:
+    - lib/gen/**/*
+    - vendor/**/*
 
 Gemspec/RequireMFA:
   Enabled: false
@@ -14,4 +17,7 @@ Style/FrozenStringLiteralComment:
 
 Style/BlockComments:
   Exclude:
-    - 'spec/spec_helper.rb'
+    - spec/spec_helper.rb
+
+Metrics/ClassLength:
+  Max: 400
