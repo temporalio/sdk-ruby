@@ -51,7 +51,7 @@ methods!(
             .process(Request::Rpc { connection: connection.clone(), method: rpc, bytes: request })
             .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))));
 
-        if let Response::Rpc { bytes }) = response.unwrap() {
+        if let Response::Rpc { bytes } = response.unwrap() {
             let enc = Encoding::find("UTF-8").unwrap();
             return RString::from_bytes(&bytes, &enc);
         } else {
