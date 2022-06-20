@@ -1,38 +1,30 @@
-# require "rbconfig"
-# require "bundler/gem_tasks"
-# require "rake/testtask"
+require 'bundler/gem_tasks'
 
-# Mac OS with rbenv users keep leaving behind build artifacts from
-#   when they tried to build against a statically linked Ruby and then
-#   try against a dynamically linked one causing errors in the build result.
-# desc 'Preventative work'
-# task :tidy_up do
-#   sh 'cargo clean'
-# end
+namespace :bridge do
+  desc 'Build SDK Core Bridge'
+  task :build do
+    sh 'cd bridge && cargo build --release'
+  end
 
-desc 'Build SDK Core Bridge'
-task :build_bridge do
-  # case RbConfig::CONFIG['host_os']
-  # when /darwin|mac os/
-    sh 'cd bridge && cargo rustc --release -- -C link-args=-Wl,-undefined,dynamic_lookup'
-  # else
-  #   sh 'cargo build --release'
-  # end
+  # Mac OS with rbenv users keep leaving behind build artifacts from
+  #   when they tried to build against a statically linked Ruby and then
+  #   try against a dynamically linked one causing errors in the build result
+  desc 'Clean up previous build artefacts'
+  task :clean do
+    sh 'cd bridge && cargo clean'
+  end
 end
 
-# task :save_env do
-#   sh 'env | sort > env3'
-# end
+namespace :proto do
+  PROTO_ROOT = 'bridge/sdk-core/protos/api_upstream'.freeze
+  PROTO_OUT = 'lib/gen'.freeze
 
-# desc 'bundle install'
-# task :bundle_install do
-#   sh 'bundle install'
-# end
+  desc 'Generate API protobufs'
+  task :generate do
+    Dir.mkdir(PROTO_OUT) unless Dir.exist?(PROTO_OUT)
 
-# Rake::TestTask.new(test: [:tidy_up, :bundle_install, :build_lib]) do |t|
-#   t.libs << "test"
-#   t.libs << "lib"
-#   t.test_files = FileList["test/**/*_test.rb"]
-# end
-
-# task :default => :test
+    Dir.glob("#{PROTO_ROOT}/**/*.proto").map { |f| File.dirname(f) }.uniq.sort.each do |dir|
+      sh "bundle exec protoc --proto_path=#{PROTO_ROOT} --ruby_out=#{PROTO_OUT} #{dir}/*.proto"
+    end
+  end
+end
