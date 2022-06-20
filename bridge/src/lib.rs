@@ -38,7 +38,7 @@ methods!(
                     .get_nested_class("Connection")
                     .wrap_data(connection, &*CONNECTION_WRAPPER);
         } else {
-            panic!("unexpected response");
+            panic!("Unexpected response type. Expected Response::Connection");
         }
     }
 
@@ -55,7 +55,7 @@ methods!(
             let enc = Encoding::find("UTF-8").unwrap();
             return RString::from_bytes(&bytes, &enc);
         } else {
-            panic!("unexpected response");
+            panic!("Unexpected response type. Expected Response::Rpc");
         }
     }
 );

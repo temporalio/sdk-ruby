@@ -48,7 +48,7 @@ impl std::error::Error for ReactorError {}
 
 pub type ReactorResult = Result<Response, ReactorError>;
 
-// A request wrapper which includes a channel for sending back the response
+/// A request wrapper which includes a channel for sending back the response
 #[derive(Debug)]
 struct Envelope {
     request: Request,
@@ -74,7 +74,7 @@ async fn handle_request(request: Request, channel: oneshot::Sender<ReactorResult
     }
 }
 
-fn start_loop(thread_count: usize, receiver: &mut mpsc::UnboundedReceiver<Envelope>) {
+fn start_loop(thread_count: usize, mut receiver: mpsc::UnboundedReceiver<Envelope>) {
     let runtime = Builder::new_multi_thread()
         .worker_threads(thread_count)
         .enable_all()
@@ -89,8 +89,8 @@ fn start_loop(thread_count: usize, receiver: &mut mpsc::UnboundedReceiver<Envelo
     });
 }
 
-// A Reactor is responsible for processing requests asynchronously using an event loop
-// while exposing a synchronous interface to the callers
+/// Responsible for processing requests asynchronously using an event loop
+/// while exposing a synchronous interface to the callers
 
 #[derive(Clone)]
 pub struct Reactor {
@@ -99,9 +99,9 @@ pub struct Reactor {
 
 impl Reactor {
     pub fn new(thread_count: usize) -> Reactor {
-        let (tx, mut rx) = mpsc::unbounded_channel::<Envelope>();
+        let (tx, rx) = mpsc::unbounded_channel::<Envelope>();
 
-        std::thread::spawn(move || start_loop(thread_count, &mut rx));
+        std::thread::spawn(move || start_loop(thread_count, rx));
 
         Reactor { sender: tx }
     }
@@ -109,16 +109,13 @@ impl Reactor {
     pub fn process(&self, request: Request) -> ReactorResult {
         // Create a one-off channel to communicate the result back
         let (tx, rx) = oneshot::channel();
-        let envelope = Envelope { request: request, channel: tx };
+        let envelope = Envelope { request, channel: tx };
 
-        match self.sender.send(envelope) {
-            Ok(()) => println!("task sent"),
-            Err(_) => panic!("The shared runtime has shut down."),
-        }
+        self.sender.send(envelope).expect("The shared runtime has shut down.");
 
         // Block until a result is sent back (the timing is determined by the task handler)
         let response = rx.blocking_recv();
 
-        response.unwrap()
+        response.expect("Error while receiving a message from the reactor")
     }
 }
