@@ -1,0 +1,610 @@
+module Temporal
+  module Api
+    module Workflow
+      module V1
+        class WorkflowExecutionInfo < ::Protobuf::Message
+          attr_accessor execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          def execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                        | ...
+
+          def execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          attr_accessor type(): ::Temporal::Api::Common::V1::WorkflowType?
+
+          def type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+                   | ...
+
+          def type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
+
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+          def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor close_time(): ::Google::Protobuf::Timestamp?
+
+          def close_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def close_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor status(): ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+
+          def status=: (::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                     | ...
+
+          def status!: () -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus?
+
+          attr_accessor history_length(): ::Integer
+
+          def history_length!: () -> ::Integer?
+
+          attr_accessor parent_namespace_id(): ::String
+
+          def parent_namespace_id!: () -> ::String?
+
+          attr_accessor parent_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          def parent_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                               | ...
+
+          def parent_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          attr_accessor execution_time(): ::Google::Protobuf::Timestamp?
+
+          def execution_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                             | ...
+
+          def execution_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                   | ...
+
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+
+          attr_accessor auto_reset_points(): ::Temporal::Api::Workflow::V1::ResetPoints?
+
+          def auto_reset_points=: [M < ::Temporal::Api::Workflow::V1::ResetPoints::_ToProto] (M?) -> M?
+                                | ...
+
+          def auto_reset_points!: () -> ::Temporal::Api::Workflow::V1::ResetPoints?
+
+          attr_accessor task_queue(): ::String
+
+          def task_queue!: () -> ::String?
+
+          attr_accessor state_transition_count(): ::Integer
+
+          def state_transition_count!: () -> ::Integer?
+
+          def initialize: (?execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init, ?history_length: ::Integer, ?parent_namespace_id: ::String, ?parent_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?execution_time: ::Google::Protobuf::Timestamp::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?auto_reset_points: ::Temporal::Api::Workflow::V1::ResetPoints::init?, ?task_queue: ::String, ?state_transition_count: ::Integer) -> void
+
+          def []: (:execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:type) -> ::Temporal::Api::Common::V1::WorkflowType?
+                | (:start_time) -> ::Google::Protobuf::Timestamp?
+                | (:close_time) -> ::Google::Protobuf::Timestamp?
+                | (:status) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                | (:history_length) -> ::Integer
+                | (:parent_namespace_id) -> ::String
+                | (:parent_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:execution_time) -> ::Google::Protobuf::Timestamp?
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                | (:auto_reset_points) -> ::Temporal::Api::Workflow::V1::ResetPoints?
+                | (:task_queue) -> ::String
+                | (:state_transition_count) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:execution, M?) -> M?
+                 | (:type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:type, M?) -> M?
+                 | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
+                 | (:close_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:close_time, M?) -> M?
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                 | (:history_length, ::Integer) -> ::Integer
+                 | (:parent_namespace_id, ::String) -> ::String
+                 | (:parent_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:parent_execution, M?) -> M?
+                 | (:execution_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:execution_time, M?) -> M?
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:auto_reset_points, ::Temporal::Api::Workflow::V1::ResetPoints?) -> ::Temporal::Api::Workflow::V1::ResetPoints?
+                 | [M < ::Temporal::Api::Workflow::V1::ResetPoints::_ToProto] (:auto_reset_points, M?) -> M?
+                 | (:task_queue, ::String) -> ::String
+                 | (:state_transition_count, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionInfo, WorkflowExecutionInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionInfo, WorkflowExecutionInfo | _ToProto]
+
+          type array = ::Array[WorkflowExecutionInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionInfo | _ToProto]
+        end
+
+        class WorkflowExecutionConfig < ::Protobuf::Message
+          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+
+          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+                         | ...
+
+          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+
+          attr_accessor workflow_execution_timeout(): ::Google::Protobuf::Duration?
+
+          def workflow_execution_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                         | ...
+
+          def workflow_execution_timeout!: () -> ::Google::Protobuf::Duration?
+
+          attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
+
+          def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                   | ...
+
+          def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
+
+          attr_accessor default_workflow_task_timeout(): ::Google::Protobuf::Duration?
+
+          def default_workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                            | ...
+
+          def default_workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
+
+          def initialize: (?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?default_workflow_task_timeout: ::Google::Protobuf::Duration::init?) -> void
+
+          def []: (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
+                | (:default_workflow_task_timeout) -> ::Google::Protobuf::Duration?
+                | (::Symbol) -> untyped
+
+          def []=: (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
+                 | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
+                 | (:default_workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:default_workflow_task_timeout, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionConfig
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionConfig | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionConfig, WorkflowExecutionConfig | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionConfig, WorkflowExecutionConfig | _ToProto]
+
+          type array = ::Array[WorkflowExecutionConfig | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionConfig | _ToProto]
+        end
+
+        class PendingActivityInfo < ::Protobuf::Message
+          attr_accessor activity_id(): ::String
+
+          def activity_id!: () -> ::String?
+
+          attr_accessor activity_type(): ::Temporal::Api::Common::V1::ActivityType?
+
+          def activity_type=: [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (M?) -> M?
+                            | ...
+
+          def activity_type!: () -> ::Temporal::Api::Common::V1::ActivityType?
+
+          attr_accessor state(): ::Temporal::Api::Enums::V1::PendingActivityState
+
+          def state=: (::Temporal::Api::Enums::V1::PendingActivityState::values) -> ::Temporal::Api::Enums::V1::PendingActivityState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::PendingActivityState?
+
+          attr_accessor heartbeat_details(): ::Temporal::Api::Common::V1::Payloads?
+
+          def heartbeat_details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                                | ...
+
+          def heartbeat_details!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          attr_accessor last_heartbeat_time(): ::Google::Protobuf::Timestamp?
+
+          def last_heartbeat_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                  | ...
+
+          def last_heartbeat_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor last_started_time(): ::Google::Protobuf::Timestamp?
+
+          def last_started_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                | ...
+
+          def last_started_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor attempt(): ::Integer
+
+          def attempt!: () -> ::Integer?
+
+          attr_accessor maximum_attempts(): ::Integer
+
+          def maximum_attempts!: () -> ::Integer?
+
+          attr_accessor scheduled_time(): ::Google::Protobuf::Timestamp?
+
+          def scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                             | ...
+
+          def scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor expiration_time(): ::Google::Protobuf::Timestamp?
+
+          def expiration_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                              | ...
+
+          def expiration_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor last_failure(): ::Temporal::Api::Failure::V1::Failure?
+
+          def last_failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                           | ...
+
+          def last_failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+          attr_accessor last_worker_identity(): ::String
+
+          def last_worker_identity!: () -> ::String?
+
+          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?state: ::Temporal::Api::Enums::V1::PendingActivityState::init, ?heartbeat_details: ::Temporal::Api::Common::V1::Payloads::init?, ?last_heartbeat_time: ::Google::Protobuf::Timestamp::init?, ?last_started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?maximum_attempts: ::Integer, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?expiration_time: ::Google::Protobuf::Timestamp::init?, ?last_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_worker_identity: ::String) -> void
+
+          def []: (:activity_id) -> ::String
+                | (:activity_type) -> ::Temporal::Api::Common::V1::ActivityType?
+                | (:state) -> ::Temporal::Api::Enums::V1::PendingActivityState
+                | (:heartbeat_details) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:last_heartbeat_time) -> ::Google::Protobuf::Timestamp?
+                | (:last_started_time) -> ::Google::Protobuf::Timestamp?
+                | (:attempt) -> ::Integer
+                | (:maximum_attempts) -> ::Integer
+                | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
+                | (:expiration_time) -> ::Google::Protobuf::Timestamp?
+                | (:last_failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (:last_worker_identity) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:activity_id, ::String) -> ::String
+                 | (:activity_type, ::Temporal::Api::Common::V1::ActivityType?) -> ::Temporal::Api::Common::V1::ActivityType?
+                 | [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
+                 | (:state, ::Temporal::Api::Enums::V1::PendingActivityState) -> ::Temporal::Api::Enums::V1::PendingActivityState
+                 | (:state, ::Temporal::Api::Enums::V1::PendingActivityState::values) -> ::Temporal::Api::Enums::V1::PendingActivityState::values
+                 | (:heartbeat_details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:heartbeat_details, M?) -> M?
+                 | (:last_heartbeat_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_heartbeat_time, M?) -> M?
+                 | (:last_started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_started_time, M?) -> M?
+                 | (:attempt, ::Integer) -> ::Integer
+                 | (:maximum_attempts, ::Integer) -> ::Integer
+                 | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
+                 | (:expiration_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:expiration_time, M?) -> M?
+                 | (:last_failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:last_failure, M?) -> M?
+                 | (:last_worker_identity, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PendingActivityInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PendingActivityInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PendingActivityInfo, PendingActivityInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PendingActivityInfo, PendingActivityInfo | _ToProto]
+
+          type array = ::Array[PendingActivityInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PendingActivityInfo | _ToProto]
+        end
+
+        class PendingChildExecutionInfo < ::Protobuf::Message
+          attr_accessor workflow_id(): ::String
+
+          def workflow_id!: () -> ::String?
+
+          attr_accessor run_id(): ::String
+
+          def run_id!: () -> ::String?
+
+          attr_accessor workflow_type_name(): ::String
+
+          def workflow_type_name!: () -> ::String?
+
+          attr_accessor initiated_id(): ::Integer
+
+          def initiated_id!: () -> ::Integer?
+
+          # Default: PARENT_CLOSE_POLICY_TERMINATE.
+          #
+          attr_accessor parent_close_policy(): ::Temporal::Api::Enums::V1::ParentClosePolicy
+
+          # Default: PARENT_CLOSE_POLICY_TERMINATE.
+          #
+          def parent_close_policy=: (::Temporal::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporal::Api::Enums::V1::ParentClosePolicy::values
+                                  | ...
+
+          def parent_close_policy!: () -> ::Temporal::Api::Enums::V1::ParentClosePolicy?
+
+          def initialize: (?workflow_id: ::String, ?run_id: ::String, ?workflow_type_name: ::String, ?initiated_id: ::Integer, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init) -> void
+
+          def []: (:workflow_id) -> ::String
+                | (:run_id) -> ::String
+                | (:workflow_type_name) -> ::String
+                | (:initiated_id) -> ::Integer
+                | (:parent_close_policy) -> ::Temporal::Api::Enums::V1::ParentClosePolicy
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_id, ::String) -> ::String
+                 | (:run_id, ::String) -> ::String
+                 | (:workflow_type_name, ::String) -> ::String
+                 | (:initiated_id, ::Integer) -> ::Integer
+                 | (:parent_close_policy, ::Temporal::Api::Enums::V1::ParentClosePolicy) -> ::Temporal::Api::Enums::V1::ParentClosePolicy
+                 | (:parent_close_policy, ::Temporal::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporal::Api::Enums::V1::ParentClosePolicy::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PendingChildExecutionInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PendingChildExecutionInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PendingChildExecutionInfo, PendingChildExecutionInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PendingChildExecutionInfo, PendingChildExecutionInfo | _ToProto]
+
+          type array = ::Array[PendingChildExecutionInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PendingChildExecutionInfo | _ToProto]
+        end
+
+        class PendingWorkflowTaskInfo < ::Protobuf::Message
+          attr_accessor state(): ::Temporal::Api::Enums::V1::PendingWorkflowTaskState
+
+          def state=: (::Temporal::Api::Enums::V1::PendingWorkflowTaskState::values) -> ::Temporal::Api::Enums::V1::PendingWorkflowTaskState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::PendingWorkflowTaskState?
+
+          attr_accessor scheduled_time(): ::Google::Protobuf::Timestamp?
+
+          def scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                             | ...
+
+          def scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # original_scheduled_time is the scheduled time of the first workflow task during workflow task heartbeat.
+          #  Heartbeat workflow task is done by RespondWorkflowTaskComplete with ForceCreateNewWorkflowTask == true and no command
+          #  In this case, OriginalScheduledTime won't change. Then when current time - original_scheduled_time exceeds
+          #  some threshold, the workflow task will be forced timeout.
+          #
+          attr_accessor original_scheduled_time(): ::Google::Protobuf::Timestamp?
+
+          # original_scheduled_time is the scheduled time of the first workflow task during workflow task heartbeat.
+          #  Heartbeat workflow task is done by RespondWorkflowTaskComplete with ForceCreateNewWorkflowTask == true and no command
+          #  In this case, OriginalScheduledTime won't change. Then when current time - original_scheduled_time exceeds
+          #  some threshold, the workflow task will be forced timeout.
+          #
+          def original_scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                      | ...
+
+          def original_scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor started_time(): ::Google::Protobuf::Timestamp?
+
+          def started_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                           | ...
+
+          def started_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor attempt(): ::Integer
+
+          def attempt!: () -> ::Integer?
+
+          def initialize: (?state: ::Temporal::Api::Enums::V1::PendingWorkflowTaskState::init, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?original_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer) -> void
+
+          def []: (:state) -> ::Temporal::Api::Enums::V1::PendingWorkflowTaskState
+                | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
+                | (:original_scheduled_time) -> ::Google::Protobuf::Timestamp?
+                | (:started_time) -> ::Google::Protobuf::Timestamp?
+                | (:attempt) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:state, ::Temporal::Api::Enums::V1::PendingWorkflowTaskState) -> ::Temporal::Api::Enums::V1::PendingWorkflowTaskState
+                 | (:state, ::Temporal::Api::Enums::V1::PendingWorkflowTaskState::values) -> ::Temporal::Api::Enums::V1::PendingWorkflowTaskState::values
+                 | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
+                 | (:original_scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_scheduled_time, M?) -> M?
+                 | (:started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:started_time, M?) -> M?
+                 | (:attempt, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PendingWorkflowTaskInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PendingWorkflowTaskInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PendingWorkflowTaskInfo, PendingWorkflowTaskInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PendingWorkflowTaskInfo, PendingWorkflowTaskInfo | _ToProto]
+
+          type array = ::Array[PendingWorkflowTaskInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PendingWorkflowTaskInfo | _ToProto]
+        end
+
+        class ResetPoints < ::Protobuf::Message
+          attr_accessor points(): ::Temporal::Api::Workflow::V1::ResetPointInfo::field_array
+
+          def points=: (::Temporal::Api::Workflow::V1::ResetPointInfo::array) -> ::Temporal::Api::Workflow::V1::ResetPointInfo::array
+                     | ...
+
+          def points!: () -> ::Temporal::Api::Workflow::V1::ResetPointInfo::field_array?
+
+          def initialize: (?points: ::Temporal::Api::Workflow::V1::ResetPointInfo::array) -> void
+
+          def []: (:points) -> ::Temporal::Api::Workflow::V1::ResetPointInfo::field_array
+                | (::Symbol) -> untyped
+
+          def []=: (:points, ::Temporal::Api::Workflow::V1::ResetPointInfo::field_array) -> ::Temporal::Api::Workflow::V1::ResetPointInfo::field_array
+                 | (:points, ::Temporal::Api::Workflow::V1::ResetPointInfo::array) -> ::Temporal::Api::Workflow::V1::ResetPointInfo::array
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ResetPoints
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ResetPoints | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ResetPoints, ResetPoints | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ResetPoints, ResetPoints | _ToProto]
+
+          type array = ::Array[ResetPoints | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ResetPoints | _ToProto]
+        end
+
+        class ResetPointInfo < ::Protobuf::Message
+          attr_accessor binary_checksum(): ::String
+
+          def binary_checksum!: () -> ::String?
+
+          attr_accessor run_id(): ::String
+
+          def run_id!: () -> ::String?
+
+          attr_accessor first_workflow_task_completed_id(): ::Integer
+
+          def first_workflow_task_completed_id!: () -> ::Integer?
+
+          attr_accessor create_time(): ::Google::Protobuf::Timestamp?
+
+          def create_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def create_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # (-- api-linter: core::0214::resource-expiry=disabled
+          #      aip.dev/not-precedent: TTL is not defined for ResetPointInfo. --)
+          #  The time that the run is deleted due to retention.
+          #
+          attr_accessor expire_time(): ::Google::Protobuf::Timestamp?
+
+          # (-- api-linter: core::0214::resource-expiry=disabled
+          #      aip.dev/not-precedent: TTL is not defined for ResetPointInfo. --)
+          #  The time that the run is deleted due to retention.
+          #
+          def expire_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def expire_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # false if the reset point has pending childWFs/reqCancels/signalExternals.
+          #
+          attr_accessor resettable(): bool
+
+          def resettable!: () -> bool?
+
+          def initialize: (?binary_checksum: ::String, ?run_id: ::String, ?first_workflow_task_completed_id: ::Integer, ?create_time: ::Google::Protobuf::Timestamp::init?, ?expire_time: ::Google::Protobuf::Timestamp::init?, ?resettable: bool) -> void
+
+          def []: (:binary_checksum) -> ::String
+                | (:run_id) -> ::String
+                | (:first_workflow_task_completed_id) -> ::Integer
+                | (:create_time) -> ::Google::Protobuf::Timestamp?
+                | (:expire_time) -> ::Google::Protobuf::Timestamp?
+                | (:resettable) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:binary_checksum, ::String) -> ::String
+                 | (:run_id, ::String) -> ::String
+                 | (:first_workflow_task_completed_id, ::Integer) -> ::Integer
+                 | (:create_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:create_time, M?) -> M?
+                 | (:expire_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:expire_time, M?) -> M?
+                 | (:resettable, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def resettable?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> ResetPointInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ResetPointInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ResetPointInfo, ResetPointInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ResetPointInfo, ResetPointInfo | _ToProto]
+
+          type array = ::Array[ResetPointInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ResetPointInfo | _ToProto]
+        end
+      end
+    end
+  end
+end

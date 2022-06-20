@@ -1,0 +1,7 @@
+module Temporal
+  class Connection
+    attr_reader core_connection: Temporal::Bridge::Connection
+
+    def initialize: (String) -> void
+  end
+end

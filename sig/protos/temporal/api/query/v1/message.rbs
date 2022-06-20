@@ -1,0 +1,170 @@
+module Temporal
+  module Api
+    module Query
+      module V1
+        # See https://docs.temporal.io/docs/concepts/queries/
+        #
+        class WorkflowQuery < ::Protobuf::Message
+          # The workflow-author-defined identifier of the query. Typically a function name.
+          #
+          attr_accessor query_type(): ::String
+
+          def query_type!: () -> ::String?
+
+          # Serialized arguments that will be provided to the query handler.
+          #
+          attr_accessor query_args(): ::Temporal::Api::Common::V1::Payloads?
+
+          # Serialized arguments that will be provided to the query handler.
+          #
+          def query_args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                         | ...
+
+          def query_args!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          # Headers that were passed by the caller of the query and copied by temporal 
+          #  server into the workflow task.
+          #
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          # Headers that were passed by the caller of the query and copied by temporal 
+          #  server into the workflow task.
+          #
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          def initialize: (?query_type: ::String, ?query_args: ::Temporal::Api::Common::V1::Payloads::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+
+          def []: (:query_type) -> ::String
+                | (:query_args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (::Symbol) -> untyped
+
+          def []=: (:query_type, ::String) -> ::String
+                 | (:query_args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:query_args, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowQuery
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowQuery | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowQuery, WorkflowQuery | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowQuery, WorkflowQuery | _ToProto]
+
+          type array = ::Array[WorkflowQuery | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowQuery | _ToProto]
+        end
+
+        # Answer to a `WorkflowQuery`
+        #
+        class WorkflowQueryResult < ::Protobuf::Message
+          # Did the query succeed or fail?
+          #
+          attr_accessor result_type(): ::Temporal::Api::Enums::V1::QueryResultType
+
+          # Did the query succeed or fail?
+          #
+          def result_type=: (::Temporal::Api::Enums::V1::QueryResultType::values) -> ::Temporal::Api::Enums::V1::QueryResultType::values
+                          | ...
+
+          def result_type!: () -> ::Temporal::Api::Enums::V1::QueryResultType?
+
+          # Set when the query succeeds with the results
+          #
+          attr_accessor answer(): ::Temporal::Api::Common::V1::Payloads?
+
+          # Set when the query succeeds with the results
+          #
+          def answer=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                     | ...
+
+          def answer!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          # Mutually exclusive with `answer`. Set when the query fails.
+          #
+          attr_accessor error_message(): ::String
+
+          def error_message!: () -> ::String?
+
+          def initialize: (?result_type: ::Temporal::Api::Enums::V1::QueryResultType::init, ?answer: ::Temporal::Api::Common::V1::Payloads::init?, ?error_message: ::String) -> void
+
+          def []: (:result_type) -> ::Temporal::Api::Enums::V1::QueryResultType
+                | (:answer) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:error_message) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:result_type, ::Temporal::Api::Enums::V1::QueryResultType) -> ::Temporal::Api::Enums::V1::QueryResultType
+                 | (:result_type, ::Temporal::Api::Enums::V1::QueryResultType::values) -> ::Temporal::Api::Enums::V1::QueryResultType::values
+                 | (:answer, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:answer, M?) -> M?
+                 | (:error_message, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowQueryResult
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowQueryResult | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowQueryResult, WorkflowQueryResult | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowQueryResult, WorkflowQueryResult | _ToProto]
+
+          type array = ::Array[WorkflowQueryResult | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowQueryResult | _ToProto]
+        end
+
+        class QueryRejected < ::Protobuf::Message
+          attr_accessor status(): ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+
+          def status=: (::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                     | ...
+
+          def status!: () -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus?
+
+          def initialize: (?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
+
+          def []: (:status) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                | (::Symbol) -> untyped
+
+          def []=: (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> QueryRejected
+          end
+
+          # The type of `#initialize` parameter.
+          type init = QueryRejected | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[QueryRejected, QueryRejected | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QueryRejected, QueryRejected | _ToProto]
+
+          type array = ::Array[QueryRejected | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, QueryRejected | _ToProto]
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,172 @@
+module Temporal
+  module Api
+    module Version
+      module V1
+        # ReleaseInfo contains information about specific version of temporal.
+        #
+        class ReleaseInfo < ::Protobuf::Message
+          attr_accessor version(): ::String
+
+          def version!: () -> ::String?
+
+          attr_accessor release_time(): ::Google::Protobuf::Timestamp?
+
+          def release_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                           | ...
+
+          def release_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor notes(): ::String
+
+          def notes!: () -> ::String?
+
+          def initialize: (?version: ::String, ?release_time: ::Google::Protobuf::Timestamp::init?, ?notes: ::String) -> void
+
+          def []: (:version) -> ::String
+                | (:release_time) -> ::Google::Protobuf::Timestamp?
+                | (:notes) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:version, ::String) -> ::String
+                 | (:release_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:release_time, M?) -> M?
+                 | (:notes, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ReleaseInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ReleaseInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ReleaseInfo, ReleaseInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ReleaseInfo, ReleaseInfo | _ToProto]
+
+          type array = ::Array[ReleaseInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ReleaseInfo | _ToProto]
+        end
+
+        # Alert contains notification and severity.
+        #
+        class Alert < ::Protobuf::Message
+          attr_accessor message(): ::String
+
+          def message!: () -> ::String?
+
+          attr_accessor severity(): ::Temporal::Api::Enums::V1::Severity
+
+          def severity=: (::Temporal::Api::Enums::V1::Severity::values) -> ::Temporal::Api::Enums::V1::Severity::values
+                       | ...
+
+          def severity!: () -> ::Temporal::Api::Enums::V1::Severity?
+
+          def initialize: (?message: ::String, ?severity: ::Temporal::Api::Enums::V1::Severity::init) -> void
+
+          def []: (:message) -> ::String
+                | (:severity) -> ::Temporal::Api::Enums::V1::Severity
+                | (::Symbol) -> untyped
+
+          def []=: (:message, ::String) -> ::String
+                 | (:severity, ::Temporal::Api::Enums::V1::Severity) -> ::Temporal::Api::Enums::V1::Severity
+                 | (:severity, ::Temporal::Api::Enums::V1::Severity::values) -> ::Temporal::Api::Enums::V1::Severity::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Alert
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Alert | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Alert, Alert | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Alert, Alert | _ToProto]
+
+          type array = ::Array[Alert | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Alert | _ToProto]
+        end
+
+        # VersionInfo contains details about current and recommended release versions as well as alerts and upgrade instructions.
+        #
+        class VersionInfo < ::Protobuf::Message
+          attr_accessor current(): ::Temporal::Api::Version::V1::ReleaseInfo?
+
+          def current=: [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
+                      | ...
+
+          def current!: () -> ::Temporal::Api::Version::V1::ReleaseInfo?
+
+          attr_accessor recommended(): ::Temporal::Api::Version::V1::ReleaseInfo?
+
+          def recommended=: [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
+                          | ...
+
+          def recommended!: () -> ::Temporal::Api::Version::V1::ReleaseInfo?
+
+          attr_accessor instructions(): ::String
+
+          def instructions!: () -> ::String?
+
+          attr_accessor alerts(): ::Temporal::Api::Version::V1::Alert::field_array
+
+          def alerts=: (::Temporal::Api::Version::V1::Alert::array) -> ::Temporal::Api::Version::V1::Alert::array
+                     | ...
+
+          def alerts!: () -> ::Temporal::Api::Version::V1::Alert::field_array?
+
+          attr_accessor last_update_time(): ::Google::Protobuf::Timestamp?
+
+          def last_update_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                               | ...
+
+          def last_update_time!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?current: ::Temporal::Api::Version::V1::ReleaseInfo::init?, ?recommended: ::Temporal::Api::Version::V1::ReleaseInfo::init?, ?instructions: ::String, ?alerts: ::Temporal::Api::Version::V1::Alert::array, ?last_update_time: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:current) -> ::Temporal::Api::Version::V1::ReleaseInfo?
+                | (:recommended) -> ::Temporal::Api::Version::V1::ReleaseInfo?
+                | (:instructions) -> ::String
+                | (:alerts) -> ::Temporal::Api::Version::V1::Alert::field_array
+                | (:last_update_time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:current, ::Temporal::Api::Version::V1::ReleaseInfo?) -> ::Temporal::Api::Version::V1::ReleaseInfo?
+                 | [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (:current, M?) -> M?
+                 | (:recommended, ::Temporal::Api::Version::V1::ReleaseInfo?) -> ::Temporal::Api::Version::V1::ReleaseInfo?
+                 | [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (:recommended, M?) -> M?
+                 | (:instructions, ::String) -> ::String
+                 | (:alerts, ::Temporal::Api::Version::V1::Alert::field_array) -> ::Temporal::Api::Version::V1::Alert::field_array
+                 | (:alerts, ::Temporal::Api::Version::V1::Alert::array) -> ::Temporal::Api::Version::V1::Alert::array
+                 | (:last_update_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_update_time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> VersionInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = VersionInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[VersionInfo, VersionInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, VersionInfo, VersionInfo | _ToProto]
+
+          type array = ::Array[VersionInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, VersionInfo | _ToProto]
+        end
+      end
+    end
+  end
+end

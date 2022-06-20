@@ -1,0 +1,236 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        # Whenever this list of events is changed do change the function shouldBufferEvent in mutableStateBuilder.go to make sure to do the correct event ordering
+        #
+        class EventType < ::Protobuf::Enum
+          type names = :EVENT_TYPE_UNSPECIFIED | :EVENT_TYPE_WORKFLOW_EXECUTION_STARTED | :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED | :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED | :EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT | :EVENT_TYPE_WORKFLOW_TASK_SCHEDULED | :EVENT_TYPE_WORKFLOW_TASK_STARTED | :EVENT_TYPE_WORKFLOW_TASK_COMPLETED | :EVENT_TYPE_WORKFLOW_TASK_TIMED_OUT | :EVENT_TYPE_WORKFLOW_TASK_FAILED | :EVENT_TYPE_ACTIVITY_TASK_SCHEDULED | :EVENT_TYPE_ACTIVITY_TASK_STARTED | :EVENT_TYPE_ACTIVITY_TASK_COMPLETED | :EVENT_TYPE_ACTIVITY_TASK_FAILED | :EVENT_TYPE_ACTIVITY_TASK_TIMED_OUT | :EVENT_TYPE_ACTIVITY_TASK_CANCEL_REQUESTED | :EVENT_TYPE_ACTIVITY_TASK_CANCELED | :EVENT_TYPE_TIMER_STARTED | :EVENT_TYPE_TIMER_FIRED | :EVENT_TYPE_TIMER_CANCELED | :EVENT_TYPE_WORKFLOW_EXECUTION_CANCEL_REQUESTED | :EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED | :EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED | :EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED | :EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_CANCEL_REQUESTED | :EVENT_TYPE_MARKER_RECORDED | :EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED | :EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED | :EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW | :EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED | :EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_FAILED | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_COMPLETED | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_FAILED | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_CANCELED | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TIMED_OUT | :EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TERMINATED | :EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED | :EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED | :EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_SIGNALED | :EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES
+
+          type strings = "EVENT_TYPE_UNSPECIFIED" | "EVENT_TYPE_WORKFLOW_EXECUTION_STARTED" | "EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED" | "EVENT_TYPE_WORKFLOW_EXECUTION_FAILED" | "EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT" | "EVENT_TYPE_WORKFLOW_TASK_SCHEDULED" | "EVENT_TYPE_WORKFLOW_TASK_STARTED" | "EVENT_TYPE_WORKFLOW_TASK_COMPLETED" | "EVENT_TYPE_WORKFLOW_TASK_TIMED_OUT" | "EVENT_TYPE_WORKFLOW_TASK_FAILED" | "EVENT_TYPE_ACTIVITY_TASK_SCHEDULED" | "EVENT_TYPE_ACTIVITY_TASK_STARTED" | "EVENT_TYPE_ACTIVITY_TASK_COMPLETED" | "EVENT_TYPE_ACTIVITY_TASK_FAILED" | "EVENT_TYPE_ACTIVITY_TASK_TIMED_OUT" | "EVENT_TYPE_ACTIVITY_TASK_CANCEL_REQUESTED" | "EVENT_TYPE_ACTIVITY_TASK_CANCELED" | "EVENT_TYPE_TIMER_STARTED" | "EVENT_TYPE_TIMER_FIRED" | "EVENT_TYPE_TIMER_CANCELED" | "EVENT_TYPE_WORKFLOW_EXECUTION_CANCEL_REQUESTED" | "EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED" | "EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED" | "EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED" | "EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_CANCEL_REQUESTED" | "EVENT_TYPE_MARKER_RECORDED" | "EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED" | "EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED" | "EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW" | "EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED" | "EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_FAILED" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_COMPLETED" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_FAILED" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_CANCELED" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TIMED_OUT" | "EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TERMINATED" | "EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED" | "EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED" | "EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_SIGNALED" | "EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES"
+
+          type tags = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          # Place holder and should never appear in a Workflow execution history
+          #
+          EVENT_TYPE_UNSPECIFIED: EventType
+
+          # Workflow execution has been triggered/started
+          #  It contains Workflow execution inputs, as well as Workflow timeout configurations
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_STARTED: EventType
+
+          # Workflow execution has successfully completed and contains Workflow execution results
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED: EventType
+
+          # Workflow execution has unsuccessfully completed and contains the Workflow execution error
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_FAILED: EventType
+
+          # Workflow execution has timed out by the Temporal Server
+          #  Usually due to the Workflow having not been completed within timeout settings
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT: EventType
+
+          # Workflow Task has been scheduled and the SDK client should now be able to process any new history events
+          #
+          EVENT_TYPE_WORKFLOW_TASK_SCHEDULED: EventType
+
+          # Workflow Task has started and the SDK client has picked up the Workflow Task and is processing new history events
+          #
+          EVENT_TYPE_WORKFLOW_TASK_STARTED: EventType
+
+          # Workflow Task has completed
+          #  The SDK client picked up the Workflow Task and processed new history events
+          #  SDK client may or may not ask the Temporal Server to do additional work, such as:
+          #  EVENT_TYPE_ACTIVITY_TASK_SCHEDULED
+          #  EVENT_TYPE_TIMER_STARTED
+          #  EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES
+          #  EVENT_TYPE_MARKER_RECORDED
+          #  EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED
+          #  EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED
+          #  EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED
+          #  EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED
+          #  EVENT_TYPE_WORKFLOW_EXECUTION_FAILED
+          #  EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED
+          #  EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW
+          #
+          EVENT_TYPE_WORKFLOW_TASK_COMPLETED: EventType
+
+          # Workflow Task encountered a timeout
+          #  Either an SDK client with a local cache was not available at the time, or it took too long for the SDK client to process the task
+          #
+          EVENT_TYPE_WORKFLOW_TASK_TIMED_OUT: EventType
+
+          # Workflow Task encountered a failure
+          #  Usually this means that the Workflow was non-deterministic
+          #  However, the Workflow reset functionality also uses this event
+          #
+          EVENT_TYPE_WORKFLOW_TASK_FAILED: EventType
+
+          # Activity Task was scheduled
+          #  The SDK client should pick up this activity task and execute
+          #  This event type contains activity inputs, as well as activity timeout configurations
+          #
+          EVENT_TYPE_ACTIVITY_TASK_SCHEDULED: EventType
+
+          # Activity Task has started executing
+          #  The SDK client has picked up the Activity Task and is processing the Activity invocation
+          #
+          EVENT_TYPE_ACTIVITY_TASK_STARTED: EventType
+
+          # Activity Task has finished successfully
+          #  The SDK client has picked up and successfully completed the Activity Task
+          #  This event type contains Activity execution results
+          #
+          EVENT_TYPE_ACTIVITY_TASK_COMPLETED: EventType
+
+          # Activity Task has finished unsuccessfully
+          #  The SDK picked up the Activity Task but unsuccessfully completed it
+          #  This event type contains Activity execution errors
+          #
+          EVENT_TYPE_ACTIVITY_TASK_FAILED: EventType
+
+          # Activity has timed out according to the Temporal Server
+          #  Activity did not complete within the timeout settings
+          #
+          EVENT_TYPE_ACTIVITY_TASK_TIMED_OUT: EventType
+
+          # A request to cancel the Activity has occurred
+          #  The SDK client will be able to confirm cancellation of an Activity during an Activity heartbeat
+          #
+          EVENT_TYPE_ACTIVITY_TASK_CANCEL_REQUESTED: EventType
+
+          # Activity has been cancelled
+          #
+          EVENT_TYPE_ACTIVITY_TASK_CANCELED: EventType
+
+          # A timer has started
+          #
+          EVENT_TYPE_TIMER_STARTED: EventType
+
+          # A timer has fired
+          #
+          EVENT_TYPE_TIMER_FIRED: EventType
+
+          # A time has been cancelled
+          #
+          EVENT_TYPE_TIMER_CANCELED: EventType
+
+          # A request has been made to cancel the Workflow execution
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_CANCEL_REQUESTED: EventType
+
+          # SDK client has confirmed the cancellation request and the Workflow execution has been cancelled
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED: EventType
+
+          # Workflow has requested that the Temporal Server try to cancel another Workflow
+          #
+          EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED: EventType
+
+          # Temporal Server could not cancel the targeted Workflow
+          #  This is usually because the target Workflow could not be found
+          #
+          EVENT_TYPE_REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED: EventType
+
+          # Temporal Server has successfully requested the cancellation of the target Workflow
+          #
+          EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_CANCEL_REQUESTED: EventType
+
+          # A marker has been recorded.
+          #  This event type is transparent to the Temporal Server
+          #  The Server will only store it and will not try to understand it.
+          #
+          EVENT_TYPE_MARKER_RECORDED: EventType
+
+          # Workflow has received a Signal event
+          #  The event type contains the Signal name, as well as a Signal payload
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_SIGNALED: EventType
+
+          # Workflow execution has been forcefully terminated
+          #  This is usually because the terminate Workflow API was called
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED: EventType
+
+          # Workflow has successfully completed and a new Workflow has been started within the same transaction
+          #  Contains last Workflow execution results as well as new Workflow execution inputs
+          #
+          EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW: EventType
+
+          # Temporal Server will try to start a child Workflow
+          #
+          EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED: EventType
+
+          # Child Workflow execution cannot be started/triggered
+          #  Usually due to a child Workflow ID collision
+          #
+          EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_FAILED: EventType
+
+          # Child Workflow execution has successfully started/triggered
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_STARTED: EventType
+
+          # Child Workflow execution has successfully completed
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_COMPLETED: EventType
+
+          # Child Workflow execution has unsuccessfully completed
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_FAILED: EventType
+
+          # Child Workflow execution has been cancelled
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_CANCELED: EventType
+
+          # Child Workflow execution has timed out by the Temporal Server
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TIMED_OUT: EventType
+
+          # Child Workflow execution has been terminated
+          #
+          EVENT_TYPE_CHILD_WORKFLOW_EXECUTION_TERMINATED: EventType
+
+          # Temporal Server will try to Signal the targeted Workflow
+          #  Contains the Signal name, as well as a Signal payload
+          #
+          EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED: EventType
+
+          # Temporal Server cannot Signal the targeted Workflow
+          #  Usually because the Workflow could not be found
+          #
+          EVENT_TYPE_SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED: EventType
+
+          # Temporal Server has successfully Signaled the targeted Workflow
+          #
+          EVENT_TYPE_EXTERNAL_WORKFLOW_EXECUTION_SIGNALED: EventType
+
+          # Workflow search attributes should be updated and synchronized with the visibility store
+          #
+          EVENT_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES: EventType
+
+          # The type of `#initialize` parameter.
+          type init = EventType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[EventType, EventType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EventType, EventType | values]
+
+          type array = ::Array[EventType | values]
+
+          type hash[KEY] = ::Hash[KEY, EventType | values]
+        end
+      end
+    end
+  end
+end

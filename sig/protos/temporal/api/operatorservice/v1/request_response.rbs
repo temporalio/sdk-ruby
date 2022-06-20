@@ -1,0 +1,286 @@
+module Temporal
+  module Api
+    module Operatorservice
+      module V1
+        # (-- Search Attribute --)
+        #
+        class AddSearchAttributesRequest < ::Protobuf::Message
+          # Mapping between search attribute name and its IndexedValueType.
+          #
+          attr_accessor search_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+
+          # Mapping between search attribute name and its IndexedValueType.
+          #
+          def search_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+
+          def initialize: (?search_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> void
+
+          def []: (:search_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:search_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:search_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> AddSearchAttributesRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = AddSearchAttributesRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[AddSearchAttributesRequest, AddSearchAttributesRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, AddSearchAttributesRequest, AddSearchAttributesRequest | _ToProto]
+
+          type array = ::Array[AddSearchAttributesRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, AddSearchAttributesRequest | _ToProto]
+        end
+
+        class AddSearchAttributesResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> AddSearchAttributesResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = AddSearchAttributesResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[AddSearchAttributesResponse, AddSearchAttributesResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, AddSearchAttributesResponse, AddSearchAttributesResponse | _ToProto]
+
+          type array = ::Array[AddSearchAttributesResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, AddSearchAttributesResponse | _ToProto]
+        end
+
+        class RemoveSearchAttributesRequest < ::Protobuf::Message
+          # Search attribute names to delete.
+          #
+          attr_accessor search_attributes(): ::Protobuf::field_array[::String]
+
+          # Search attribute names to delete.
+          #
+          def search_attributes=: (::Array[::String]) -> ::Array[::String]
+                                | ...
+
+          def search_attributes!: () -> ::Protobuf::field_array[::String]?
+
+          def initialize: (?search_attributes: ::Array[::String]) -> void
+
+          def []: (:search_attributes) -> ::Protobuf::field_array[::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:search_attributes, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
+                 | (:search_attributes, ::Array[::String]) -> ::Array[::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> RemoveSearchAttributesRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = RemoveSearchAttributesRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RemoveSearchAttributesRequest, RemoveSearchAttributesRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RemoveSearchAttributesRequest, RemoveSearchAttributesRequest | _ToProto]
+
+          type array = ::Array[RemoveSearchAttributesRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, RemoveSearchAttributesRequest | _ToProto]
+        end
+
+        class RemoveSearchAttributesResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> RemoveSearchAttributesResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = RemoveSearchAttributesResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RemoveSearchAttributesResponse, RemoveSearchAttributesResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RemoveSearchAttributesResponse, RemoveSearchAttributesResponse | _ToProto]
+
+          type array = ::Array[RemoveSearchAttributesResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, RemoveSearchAttributesResponse | _ToProto]
+        end
+
+        class ListSearchAttributesRequest < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> ListSearchAttributesRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListSearchAttributesRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListSearchAttributesRequest, ListSearchAttributesRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListSearchAttributesRequest, ListSearchAttributesRequest | _ToProto]
+
+          type array = ::Array[ListSearchAttributesRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListSearchAttributesRequest | _ToProto]
+        end
+
+        class ListSearchAttributesResponse < ::Protobuf::Message
+          # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
+          #
+          attr_accessor custom_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+
+          # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
+          #
+          def custom_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                                | ...
+
+          def custom_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+
+          # Mapping between system (predefined) search attribute name to its IndexedValueType.
+          #
+          attr_accessor system_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+
+          # Mapping between system (predefined) search attribute name to its IndexedValueType.
+          #
+          def system_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                                | ...
+
+          def system_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+
+          # Mapping from the attribute name to the visibility storage native type.
+          #
+          attr_accessor storage_schema(): ::Protobuf::field_hash[::String, ::String]
+
+          # Mapping from the attribute name to the visibility storage native type.
+          #
+          def storage_schema=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                             | ...
+
+          def storage_schema!: () -> ::Protobuf::field_hash[::String, ::String]?
+
+          def initialize: (?custom_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String], ?system_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String], ?storage_schema: ::Hash[::String, ::String]) -> void
+
+          def []: (:custom_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (:system_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (:storage_schema) -> ::Protobuf::field_hash[::String, ::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:custom_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:custom_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (:system_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:system_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (:storage_schema, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
+                 | (:storage_schema, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListSearchAttributesResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListSearchAttributesResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListSearchAttributesResponse, ListSearchAttributesResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListSearchAttributesResponse, ListSearchAttributesResponse | _ToProto]
+
+          type array = ::Array[ListSearchAttributesResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListSearchAttributesResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0135::request-unknown-fields=disabled
+        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+        #  (-- api-linter: core::0135::request-name-required=disabled
+        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+        #
+        class DeleteNamespaceRequest < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?namespace: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DeleteNamespaceRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteNamespaceRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteNamespaceRequest, DeleteNamespaceRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteNamespaceRequest, DeleteNamespaceRequest | _ToProto]
+
+          type array = ::Array[DeleteNamespaceRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteNamespaceRequest | _ToProto]
+        end
+
+        class DeleteNamespaceResponse < ::Protobuf::Message
+          # Temporary namespace name that is used during reclaim resources step.
+          #
+          attr_accessor deleted_namespace(): ::String
+
+          def deleted_namespace!: () -> ::String?
+
+          def initialize: (?deleted_namespace: ::String) -> void
+
+          def []: (:deleted_namespace) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:deleted_namespace, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DeleteNamespaceResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteNamespaceResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteNamespaceResponse, DeleteNamespaceResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteNamespaceResponse, DeleteNamespaceResponse | _ToProto]
+
+          type array = ::Array[DeleteNamespaceResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteNamespaceResponse | _ToProto]
+        end
+      end
+    end
+  end
+end

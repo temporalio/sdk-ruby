@@ -1,0 +1,116 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        class EncodingType < ::Protobuf::Enum
+          type names = :ENCODING_TYPE_UNSPECIFIED | :ENCODING_TYPE_PROTO3 | :ENCODING_TYPE_JSON
+
+          type strings = "ENCODING_TYPE_UNSPECIFIED" | "ENCODING_TYPE_PROTO3" | "ENCODING_TYPE_JSON"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          ENCODING_TYPE_UNSPECIFIED: EncodingType
+
+          ENCODING_TYPE_PROTO3: EncodingType
+
+          ENCODING_TYPE_JSON: EncodingType
+
+          # The type of `#initialize` parameter.
+          type init = EncodingType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[EncodingType, EncodingType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EncodingType, EncodingType | values]
+
+          type array = ::Array[EncodingType | values]
+
+          type hash[KEY] = ::Hash[KEY, EncodingType | values]
+        end
+
+        class IndexedValueType < ::Protobuf::Enum
+          type names = :INDEXED_VALUE_TYPE_UNSPECIFIED | :INDEXED_VALUE_TYPE_TEXT | :INDEXED_VALUE_TYPE_KEYWORD | :INDEXED_VALUE_TYPE_INT | :INDEXED_VALUE_TYPE_DOUBLE | :INDEXED_VALUE_TYPE_BOOL | :INDEXED_VALUE_TYPE_DATETIME
+
+          type strings = "INDEXED_VALUE_TYPE_UNSPECIFIED" | "INDEXED_VALUE_TYPE_TEXT" | "INDEXED_VALUE_TYPE_KEYWORD" | "INDEXED_VALUE_TYPE_INT" | "INDEXED_VALUE_TYPE_DOUBLE" | "INDEXED_VALUE_TYPE_BOOL" | "INDEXED_VALUE_TYPE_DATETIME"
+
+          type tags = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          INDEXED_VALUE_TYPE_UNSPECIFIED: IndexedValueType
+
+          INDEXED_VALUE_TYPE_TEXT: IndexedValueType
+
+          INDEXED_VALUE_TYPE_KEYWORD: IndexedValueType
+
+          INDEXED_VALUE_TYPE_INT: IndexedValueType
+
+          INDEXED_VALUE_TYPE_DOUBLE: IndexedValueType
+
+          INDEXED_VALUE_TYPE_BOOL: IndexedValueType
+
+          INDEXED_VALUE_TYPE_DATETIME: IndexedValueType
+
+          # The type of `#initialize` parameter.
+          type init = IndexedValueType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[IndexedValueType, IndexedValueType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, IndexedValueType, IndexedValueType | values]
+
+          type array = ::Array[IndexedValueType | values]
+
+          type hash[KEY] = ::Hash[KEY, IndexedValueType | values]
+        end
+
+        class Severity < ::Protobuf::Enum
+          type names = :SEVERITY_UNSPECIFIED | :SEVERITY_HIGH | :SEVERITY_MEDIUM | :SEVERITY_LOW
+
+          type strings = "SEVERITY_UNSPECIFIED" | "SEVERITY_HIGH" | "SEVERITY_MEDIUM" | "SEVERITY_LOW"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          SEVERITY_UNSPECIFIED: Severity
+
+          SEVERITY_HIGH: Severity
+
+          SEVERITY_MEDIUM: Severity
+
+          SEVERITY_LOW: Severity
+
+          # The type of `#initialize` parameter.
+          type init = Severity | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Severity, Severity | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Severity, Severity | values]
+
+          type array = ::Array[Severity | values]
+
+          type hash[KEY] = ::Hash[KEY, Severity | values]
+        end
+      end
+    end
+  end
+end

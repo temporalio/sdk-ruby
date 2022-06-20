@@ -1,0 +1,89 @@
+module Temporal
+  module Api
+    module Replication
+      module V1
+        class ClusterReplicationConfig < ::Protobuf::Message
+          attr_accessor cluster_name(): ::String
+
+          def cluster_name!: () -> ::String?
+
+          def initialize: (?cluster_name: ::String) -> void
+
+          def []: (:cluster_name) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:cluster_name, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ClusterReplicationConfig
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ClusterReplicationConfig | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ClusterReplicationConfig, ClusterReplicationConfig | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ClusterReplicationConfig, ClusterReplicationConfig | _ToProto]
+
+          type array = ::Array[ClusterReplicationConfig | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ClusterReplicationConfig | _ToProto]
+        end
+
+        class NamespaceReplicationConfig < ::Protobuf::Message
+          attr_accessor active_cluster_name(): ::String
+
+          def active_cluster_name!: () -> ::String?
+
+          attr_accessor clusters(): ::Temporal::Api::Replication::V1::ClusterReplicationConfig::field_array
+
+          def clusters=: (::Temporal::Api::Replication::V1::ClusterReplicationConfig::array) -> ::Temporal::Api::Replication::V1::ClusterReplicationConfig::array
+                       | ...
+
+          def clusters!: () -> ::Temporal::Api::Replication::V1::ClusterReplicationConfig::field_array?
+
+          attr_accessor state(): ::Temporal::Api::Enums::V1::ReplicationState
+
+          def state=: (::Temporal::Api::Enums::V1::ReplicationState::values) -> ::Temporal::Api::Enums::V1::ReplicationState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::ReplicationState?
+
+          def initialize: (?active_cluster_name: ::String, ?clusters: ::Temporal::Api::Replication::V1::ClusterReplicationConfig::array, ?state: ::Temporal::Api::Enums::V1::ReplicationState::init) -> void
+
+          def []: (:active_cluster_name) -> ::String
+                | (:clusters) -> ::Temporal::Api::Replication::V1::ClusterReplicationConfig::field_array
+                | (:state) -> ::Temporal::Api::Enums::V1::ReplicationState
+                | (::Symbol) -> untyped
+
+          def []=: (:active_cluster_name, ::String) -> ::String
+                 | (:clusters, ::Temporal::Api::Replication::V1::ClusterReplicationConfig::field_array) -> ::Temporal::Api::Replication::V1::ClusterReplicationConfig::field_array
+                 | (:clusters, ::Temporal::Api::Replication::V1::ClusterReplicationConfig::array) -> ::Temporal::Api::Replication::V1::ClusterReplicationConfig::array
+                 | (:state, ::Temporal::Api::Enums::V1::ReplicationState) -> ::Temporal::Api::Enums::V1::ReplicationState
+                 | (:state, ::Temporal::Api::Enums::V1::ReplicationState::values) -> ::Temporal::Api::Enums::V1::ReplicationState::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceReplicationConfig
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceReplicationConfig | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceReplicationConfig, NamespaceReplicationConfig | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceReplicationConfig, NamespaceReplicationConfig | _ToProto]
+
+          type array = ::Array[NamespaceReplicationConfig | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceReplicationConfig | _ToProto]
+        end
+      end
+    end
+  end
+end

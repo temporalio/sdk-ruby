@@ -1,0 +1,371 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        # Defines how new runs of a workflow with a particular ID may or may not be allowed. Note that
+        #  it is *never* valid to have two actively running instances of the same workflow id.
+        #
+        class WorkflowIdReusePolicy < ::Protobuf::Enum
+          type names = :WORKFLOW_ID_REUSE_POLICY_UNSPECIFIED | :WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE | :WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY | :WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE | :WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING
+
+          type strings = "WORKFLOW_ID_REUSE_POLICY_UNSPECIFIED" | "WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE" | "WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY" | "WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE" | "WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING"
+
+          type tags = 0 | 1 | 2 | 3 | 4
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          WORKFLOW_ID_REUSE_POLICY_UNSPECIFIED: WorkflowIdReusePolicy
+
+          # Allow starting a workflow execution using the same workflow id.
+          #
+          WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE: WorkflowIdReusePolicy
+
+          # Allow starting a workflow execution using the same workflow id, only when the last
+          #  execution's final state is one of [terminated, cancelled, timed out, failed].
+          #
+          WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY: WorkflowIdReusePolicy
+
+          # Do not permit re-use of the workflow id for this workflow. Future start workflow requests
+          #  could potentially change the policy, allowing re-use of the workflow id.
+          #
+          WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE: WorkflowIdReusePolicy
+
+          # If a workflow is running using the same workflow ID, terminate it and start a new one.
+          #  If no running workflow, then the behavior is the same as ALLOW_DUPLICATE
+          #
+          WORKFLOW_ID_REUSE_POLICY_TERMINATE_IF_RUNNING: WorkflowIdReusePolicy
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowIdReusePolicy | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowIdReusePolicy, WorkflowIdReusePolicy | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowIdReusePolicy, WorkflowIdReusePolicy | values]
+
+          type array = ::Array[WorkflowIdReusePolicy | values]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowIdReusePolicy | values]
+        end
+
+        # Defines how child workflows will react to their parent completing
+        #
+        class ParentClosePolicy < ::Protobuf::Enum
+          type names = :PARENT_CLOSE_POLICY_UNSPECIFIED | :PARENT_CLOSE_POLICY_TERMINATE | :PARENT_CLOSE_POLICY_ABANDON | :PARENT_CLOSE_POLICY_REQUEST_CANCEL
+
+          type strings = "PARENT_CLOSE_POLICY_UNSPECIFIED" | "PARENT_CLOSE_POLICY_TERMINATE" | "PARENT_CLOSE_POLICY_ABANDON" | "PARENT_CLOSE_POLICY_REQUEST_CANCEL"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          PARENT_CLOSE_POLICY_UNSPECIFIED: ParentClosePolicy
+
+          # The child workflow will also terminate
+          #
+          PARENT_CLOSE_POLICY_TERMINATE: ParentClosePolicy
+
+          # The child workflow will do nothing
+          #
+          PARENT_CLOSE_POLICY_ABANDON: ParentClosePolicy
+
+          # Cancellation will be requested of the child workflow
+          #
+          PARENT_CLOSE_POLICY_REQUEST_CANCEL: ParentClosePolicy
+
+          # The type of `#initialize` parameter.
+          type init = ParentClosePolicy | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ParentClosePolicy, ParentClosePolicy | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ParentClosePolicy, ParentClosePolicy | values]
+
+          type array = ::Array[ParentClosePolicy | values]
+
+          type hash[KEY] = ::Hash[KEY, ParentClosePolicy | values]
+        end
+
+        class ContinueAsNewInitiator < ::Protobuf::Enum
+          type names = :CONTINUE_AS_NEW_INITIATOR_UNSPECIFIED | :CONTINUE_AS_NEW_INITIATOR_WORKFLOW | :CONTINUE_AS_NEW_INITIATOR_RETRY | :CONTINUE_AS_NEW_INITIATOR_CRON_SCHEDULE
+
+          type strings = "CONTINUE_AS_NEW_INITIATOR_UNSPECIFIED" | "CONTINUE_AS_NEW_INITIATOR_WORKFLOW" | "CONTINUE_AS_NEW_INITIATOR_RETRY" | "CONTINUE_AS_NEW_INITIATOR_CRON_SCHEDULE"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          CONTINUE_AS_NEW_INITIATOR_UNSPECIFIED: ContinueAsNewInitiator
+
+          # The workflow itself requested to continue as new
+          #
+          CONTINUE_AS_NEW_INITIATOR_WORKFLOW: ContinueAsNewInitiator
+
+          # The workflow continued as new because it is retrying
+          #
+          CONTINUE_AS_NEW_INITIATOR_RETRY: ContinueAsNewInitiator
+
+          # The workflow continued as new because cron has triggered a new execution
+          #
+          CONTINUE_AS_NEW_INITIATOR_CRON_SCHEDULE: ContinueAsNewInitiator
+
+          # The type of `#initialize` parameter.
+          type init = ContinueAsNewInitiator | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ContinueAsNewInitiator, ContinueAsNewInitiator | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ContinueAsNewInitiator, ContinueAsNewInitiator | values]
+
+          type array = ::Array[ContinueAsNewInitiator | values]
+
+          type hash[KEY] = ::Hash[KEY, ContinueAsNewInitiator | values]
+        end
+
+        # (-- api-linter: core::0216::synonyms=disabled
+        #      aip.dev/not-precedent: There is WorkflowExecutionState already in another package. --)
+        #
+        class WorkflowExecutionStatus < ::Protobuf::Enum
+          type names = :WORKFLOW_EXECUTION_STATUS_UNSPECIFIED | :WORKFLOW_EXECUTION_STATUS_RUNNING | :WORKFLOW_EXECUTION_STATUS_COMPLETED | :WORKFLOW_EXECUTION_STATUS_FAILED | :WORKFLOW_EXECUTION_STATUS_CANCELED | :WORKFLOW_EXECUTION_STATUS_TERMINATED | :WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW | :WORKFLOW_EXECUTION_STATUS_TIMED_OUT
+
+          type strings = "WORKFLOW_EXECUTION_STATUS_UNSPECIFIED" | "WORKFLOW_EXECUTION_STATUS_RUNNING" | "WORKFLOW_EXECUTION_STATUS_COMPLETED" | "WORKFLOW_EXECUTION_STATUS_FAILED" | "WORKFLOW_EXECUTION_STATUS_CANCELED" | "WORKFLOW_EXECUTION_STATUS_TERMINATED" | "WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW" | "WORKFLOW_EXECUTION_STATUS_TIMED_OUT"
+
+          type tags = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          WORKFLOW_EXECUTION_STATUS_UNSPECIFIED: WorkflowExecutionStatus
+
+          # Value 1 is hardcoded in SQL persistence.
+          #
+          WORKFLOW_EXECUTION_STATUS_RUNNING: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_COMPLETED: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_FAILED: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_CANCELED: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_TERMINATED: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW: WorkflowExecutionStatus
+
+          WORKFLOW_EXECUTION_STATUS_TIMED_OUT: WorkflowExecutionStatus
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionStatus | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionStatus, WorkflowExecutionStatus | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionStatus, WorkflowExecutionStatus | values]
+
+          type array = ::Array[WorkflowExecutionStatus | values]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionStatus | values]
+        end
+
+        class PendingActivityState < ::Protobuf::Enum
+          type names = :PENDING_ACTIVITY_STATE_UNSPECIFIED | :PENDING_ACTIVITY_STATE_SCHEDULED | :PENDING_ACTIVITY_STATE_STARTED | :PENDING_ACTIVITY_STATE_CANCEL_REQUESTED
+
+          type strings = "PENDING_ACTIVITY_STATE_UNSPECIFIED" | "PENDING_ACTIVITY_STATE_SCHEDULED" | "PENDING_ACTIVITY_STATE_STARTED" | "PENDING_ACTIVITY_STATE_CANCEL_REQUESTED"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          PENDING_ACTIVITY_STATE_UNSPECIFIED: PendingActivityState
+
+          PENDING_ACTIVITY_STATE_SCHEDULED: PendingActivityState
+
+          PENDING_ACTIVITY_STATE_STARTED: PendingActivityState
+
+          PENDING_ACTIVITY_STATE_CANCEL_REQUESTED: PendingActivityState
+
+          # The type of `#initialize` parameter.
+          type init = PendingActivityState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PendingActivityState, PendingActivityState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PendingActivityState, PendingActivityState | values]
+
+          type array = ::Array[PendingActivityState | values]
+
+          type hash[KEY] = ::Hash[KEY, PendingActivityState | values]
+        end
+
+        class PendingWorkflowTaskState < ::Protobuf::Enum
+          type names = :PENDING_WORKFLOW_TASK_STATE_UNSPECIFIED | :PENDING_WORKFLOW_TASK_STATE_SCHEDULED | :PENDING_WORKFLOW_TASK_STATE_STARTED
+
+          type strings = "PENDING_WORKFLOW_TASK_STATE_UNSPECIFIED" | "PENDING_WORKFLOW_TASK_STATE_SCHEDULED" | "PENDING_WORKFLOW_TASK_STATE_STARTED"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          PENDING_WORKFLOW_TASK_STATE_UNSPECIFIED: PendingWorkflowTaskState
+
+          PENDING_WORKFLOW_TASK_STATE_SCHEDULED: PendingWorkflowTaskState
+
+          PENDING_WORKFLOW_TASK_STATE_STARTED: PendingWorkflowTaskState
+
+          # The type of `#initialize` parameter.
+          type init = PendingWorkflowTaskState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PendingWorkflowTaskState, PendingWorkflowTaskState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PendingWorkflowTaskState, PendingWorkflowTaskState | values]
+
+          type array = ::Array[PendingWorkflowTaskState | values]
+
+          type hash[KEY] = ::Hash[KEY, PendingWorkflowTaskState | values]
+        end
+
+        class HistoryEventFilterType < ::Protobuf::Enum
+          type names = :HISTORY_EVENT_FILTER_TYPE_UNSPECIFIED | :HISTORY_EVENT_FILTER_TYPE_ALL_EVENT | :HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT
+
+          type strings = "HISTORY_EVENT_FILTER_TYPE_UNSPECIFIED" | "HISTORY_EVENT_FILTER_TYPE_ALL_EVENT" | "HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          HISTORY_EVENT_FILTER_TYPE_UNSPECIFIED: HistoryEventFilterType
+
+          HISTORY_EVENT_FILTER_TYPE_ALL_EVENT: HistoryEventFilterType
+
+          HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT: HistoryEventFilterType
+
+          # The type of `#initialize` parameter.
+          type init = HistoryEventFilterType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[HistoryEventFilterType, HistoryEventFilterType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, HistoryEventFilterType, HistoryEventFilterType | values]
+
+          type array = ::Array[HistoryEventFilterType | values]
+
+          type hash[KEY] = ::Hash[KEY, HistoryEventFilterType | values]
+        end
+
+        class RetryState < ::Protobuf::Enum
+          type names = :RETRY_STATE_UNSPECIFIED | :RETRY_STATE_IN_PROGRESS | :RETRY_STATE_NON_RETRYABLE_FAILURE | :RETRY_STATE_TIMEOUT | :RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED | :RETRY_STATE_RETRY_POLICY_NOT_SET | :RETRY_STATE_INTERNAL_SERVER_ERROR | :RETRY_STATE_CANCEL_REQUESTED
+
+          type strings = "RETRY_STATE_UNSPECIFIED" | "RETRY_STATE_IN_PROGRESS" | "RETRY_STATE_NON_RETRYABLE_FAILURE" | "RETRY_STATE_TIMEOUT" | "RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED" | "RETRY_STATE_RETRY_POLICY_NOT_SET" | "RETRY_STATE_INTERNAL_SERVER_ERROR" | "RETRY_STATE_CANCEL_REQUESTED"
+
+          type tags = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          RETRY_STATE_UNSPECIFIED: RetryState
+
+          RETRY_STATE_IN_PROGRESS: RetryState
+
+          RETRY_STATE_NON_RETRYABLE_FAILURE: RetryState
+
+          RETRY_STATE_TIMEOUT: RetryState
+
+          RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED: RetryState
+
+          RETRY_STATE_RETRY_POLICY_NOT_SET: RetryState
+
+          RETRY_STATE_INTERNAL_SERVER_ERROR: RetryState
+
+          RETRY_STATE_CANCEL_REQUESTED: RetryState
+
+          # The type of `#initialize` parameter.
+          type init = RetryState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RetryState, RetryState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RetryState, RetryState | values]
+
+          type array = ::Array[RetryState | values]
+
+          type hash[KEY] = ::Hash[KEY, RetryState | values]
+        end
+
+        class TimeoutType < ::Protobuf::Enum
+          type names = :TIMEOUT_TYPE_UNSPECIFIED | :TIMEOUT_TYPE_START_TO_CLOSE | :TIMEOUT_TYPE_SCHEDULE_TO_START | :TIMEOUT_TYPE_SCHEDULE_TO_CLOSE | :TIMEOUT_TYPE_HEARTBEAT
+
+          type strings = "TIMEOUT_TYPE_UNSPECIFIED" | "TIMEOUT_TYPE_START_TO_CLOSE" | "TIMEOUT_TYPE_SCHEDULE_TO_START" | "TIMEOUT_TYPE_SCHEDULE_TO_CLOSE" | "TIMEOUT_TYPE_HEARTBEAT"
+
+          type tags = 0 | 1 | 2 | 3 | 4
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          TIMEOUT_TYPE_UNSPECIFIED: TimeoutType
+
+          TIMEOUT_TYPE_START_TO_CLOSE: TimeoutType
+
+          TIMEOUT_TYPE_SCHEDULE_TO_START: TimeoutType
+
+          TIMEOUT_TYPE_SCHEDULE_TO_CLOSE: TimeoutType
+
+          TIMEOUT_TYPE_HEARTBEAT: TimeoutType
+
+          # The type of `#initialize` parameter.
+          type init = TimeoutType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TimeoutType, TimeoutType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TimeoutType, TimeoutType | values]
+
+          type array = ::Array[TimeoutType | values]
+
+          type hash[KEY] = ::Hash[KEY, TimeoutType | values]
+        end
+      end
+    end
+  end
+end

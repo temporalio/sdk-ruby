@@ -1,0 +1,22 @@
+module Temporal
+  module Api
+    module WorkflowService
+      module V1
+        # WorkflowService API defines how Temporal SDKs and other clients interact with the Temporal server
+        #  to create and interact with workflows and activities.
+        #
+        #  Users are expected to call `StartWorkflowExecution` to create a new workflow execution.
+        #
+        #  To drive workflows, a worker using a Temporal SDK must exist which regularly polls for workflow
+        #  and activity tasks from the service. For each workflow task, the sdk must process the
+        #  (incremental or complete) event history and respond back with any newly generated commands.
+        #
+        #  For each activity task, the worker is expected to execute the user's code which implements that
+        #  activity, responding with completion or failure.
+        #
+        class WorkflowService < ::Protobuf::Rpc::Service
+        end
+      end
+    end
+  end
+end

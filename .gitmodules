@@ -1,3 +1,6 @@
 [submodule "bridge/sdk-core"]
 	path = bridge/sdk-core
 	url = git@github.com:temporalio/sdk-core.git
+[submodule "vendor/rbs/gem_rbs_collection"]
+	path = vendor/rbs/gem_rbs_collection
+	url = https://github.com/ruby/gem_rbs_collection.git

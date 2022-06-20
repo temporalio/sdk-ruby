@@ -1,0 +1,2700 @@
+module Google
+  module Protobuf
+    # The protocol compiler can output a FileDescriptorSet containing the .proto
+    #  files it parses.
+    #
+    class FileDescriptorSet < ::Protobuf::Message
+      attr_accessor file(): ::Google::Protobuf::FileDescriptorProto::field_array
+
+      def file=: (::Google::Protobuf::FileDescriptorProto::array) -> ::Google::Protobuf::FileDescriptorProto::array
+               | ...
+
+      def file!: () -> ::Google::Protobuf::FileDescriptorProto::field_array?
+
+      def initialize: (?file: ::Google::Protobuf::FileDescriptorProto::array) -> void
+
+      def []: (:file) -> ::Google::Protobuf::FileDescriptorProto::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:file, ::Google::Protobuf::FileDescriptorProto::field_array) -> ::Google::Protobuf::FileDescriptorProto::field_array
+             | (:file, ::Google::Protobuf::FileDescriptorProto::array) -> ::Google::Protobuf::FileDescriptorProto::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> FileDescriptorSet
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FileDescriptorSet | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FileDescriptorSet, FileDescriptorSet | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FileDescriptorSet, FileDescriptorSet | _ToProto]
+
+      type array = ::Array[FileDescriptorSet | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FileDescriptorSet | _ToProto]
+    end
+
+    # Describes a complete .proto file.
+    #
+    class FileDescriptorProto < ::Protobuf::Message
+      # file name, relative to root of source tree
+      #
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      # e.g. "foo", "foo.bar", etc.
+      #
+      attr_accessor package(): ::String
+
+      def package!: () -> ::String?
+
+      # Names of files imported by this file.
+      #
+      attr_accessor dependency(): ::Protobuf::field_array[::String]
+
+      # Names of files imported by this file.
+      #
+      def dependency=: (::Array[::String]) -> ::Array[::String]
+                     | ...
+
+      def dependency!: () -> ::Protobuf::field_array[::String]?
+
+      # Indexes of the public imported files in the dependency list above.
+      #
+      attr_accessor public_dependency(): ::Protobuf::field_array[::Integer]
+
+      # Indexes of the public imported files in the dependency list above.
+      #
+      def public_dependency=: (::Array[::Integer]) -> ::Array[::Integer]
+                            | ...
+
+      def public_dependency!: () -> ::Protobuf::field_array[::Integer]?
+
+      # Indexes of the weak imported files in the dependency list.
+      #  For Google-internal migration only. Do not use.
+      #
+      attr_accessor weak_dependency(): ::Protobuf::field_array[::Integer]
+
+      # Indexes of the weak imported files in the dependency list.
+      #  For Google-internal migration only. Do not use.
+      #
+      def weak_dependency=: (::Array[::Integer]) -> ::Array[::Integer]
+                          | ...
+
+      def weak_dependency!: () -> ::Protobuf::field_array[::Integer]?
+
+      # All top-level definitions in this file.
+      #
+      attr_accessor message_type(): ::Google::Protobuf::DescriptorProto::field_array
+
+      # All top-level definitions in this file.
+      #
+      def message_type=: (::Google::Protobuf::DescriptorProto::array) -> ::Google::Protobuf::DescriptorProto::array
+                       | ...
+
+      def message_type!: () -> ::Google::Protobuf::DescriptorProto::field_array?
+
+      attr_accessor enum_type(): ::Google::Protobuf::EnumDescriptorProto::field_array
+
+      def enum_type=: (::Google::Protobuf::EnumDescriptorProto::array) -> ::Google::Protobuf::EnumDescriptorProto::array
+                    | ...
+
+      def enum_type!: () -> ::Google::Protobuf::EnumDescriptorProto::field_array?
+
+      attr_accessor service(): ::Google::Protobuf::ServiceDescriptorProto::field_array
+
+      def service=: (::Google::Protobuf::ServiceDescriptorProto::array) -> ::Google::Protobuf::ServiceDescriptorProto::array
+                  | ...
+
+      def service!: () -> ::Google::Protobuf::ServiceDescriptorProto::field_array?
+
+      attr_accessor extension(): ::Google::Protobuf::FieldDescriptorProto::field_array
+
+      def extension=: (::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+                    | ...
+
+      def extension!: () -> ::Google::Protobuf::FieldDescriptorProto::field_array?
+
+      attr_accessor options(): ::Google::Protobuf::FileOptions?
+
+      def options=: [M < ::Google::Protobuf::FileOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::FileOptions?
+
+      # This field contains optional information about the original source code.
+      #  You may safely remove this entire field without harming runtime
+      #  functionality of the descriptors -- the information is needed only by
+      #  development tools.
+      #
+      attr_accessor source_code_info(): ::Google::Protobuf::SourceCodeInfo?
+
+      # This field contains optional information about the original source code.
+      #  You may safely remove this entire field without harming runtime
+      #  functionality of the descriptors -- the information is needed only by
+      #  development tools.
+      #
+      def source_code_info=: [M < ::Google::Protobuf::SourceCodeInfo::_ToProto] (M?) -> M?
+                           | ...
+
+      def source_code_info!: () -> ::Google::Protobuf::SourceCodeInfo?
+
+      # The syntax of the proto file.
+      #  The supported values are "proto2" and "proto3".
+      #
+      attr_accessor syntax(): ::String
+
+      def syntax!: () -> ::String?
+
+      def initialize: (?name: ::String, ?package: ::String, ?dependency: ::Array[::String], ?public_dependency: ::Array[::Integer], ?weak_dependency: ::Array[::Integer], ?message_type: ::Google::Protobuf::DescriptorProto::array, ?enum_type: ::Google::Protobuf::EnumDescriptorProto::array, ?service: ::Google::Protobuf::ServiceDescriptorProto::array, ?extension: ::Google::Protobuf::FieldDescriptorProto::array, ?options: ::Google::Protobuf::FileOptions::init?, ?source_code_info: ::Google::Protobuf::SourceCodeInfo::init?, ?syntax: ::String) -> void
+
+      def []: (:name) -> ::String
+            | (:package) -> ::String
+            | (:dependency) -> ::Protobuf::field_array[::String]
+            | (:public_dependency) -> ::Protobuf::field_array[::Integer]
+            | (:weak_dependency) -> ::Protobuf::field_array[::Integer]
+            | (:message_type) -> ::Google::Protobuf::DescriptorProto::field_array
+            | (:enum_type) -> ::Google::Protobuf::EnumDescriptorProto::field_array
+            | (:service) -> ::Google::Protobuf::ServiceDescriptorProto::field_array
+            | (:extension) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+            | (:options) -> ::Google::Protobuf::FileOptions?
+            | (:source_code_info) -> ::Google::Protobuf::SourceCodeInfo?
+            | (:syntax) -> ::String
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:package, ::String) -> ::String
+             | (:dependency, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
+             | (:dependency, ::Array[::String]) -> ::Array[::String]
+             | (:public_dependency, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+             | (:public_dependency, ::Array[::Integer]) -> ::Array[::Integer]
+             | (:weak_dependency, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+             | (:weak_dependency, ::Array[::Integer]) -> ::Array[::Integer]
+             | (:message_type, ::Google::Protobuf::DescriptorProto::field_array) -> ::Google::Protobuf::DescriptorProto::field_array
+             | (:message_type, ::Google::Protobuf::DescriptorProto::array) -> ::Google::Protobuf::DescriptorProto::array
+             | (:enum_type, ::Google::Protobuf::EnumDescriptorProto::field_array) -> ::Google::Protobuf::EnumDescriptorProto::field_array
+             | (:enum_type, ::Google::Protobuf::EnumDescriptorProto::array) -> ::Google::Protobuf::EnumDescriptorProto::array
+             | (:service, ::Google::Protobuf::ServiceDescriptorProto::field_array) -> ::Google::Protobuf::ServiceDescriptorProto::field_array
+             | (:service, ::Google::Protobuf::ServiceDescriptorProto::array) -> ::Google::Protobuf::ServiceDescriptorProto::array
+             | (:extension, ::Google::Protobuf::FieldDescriptorProto::field_array) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+             | (:extension, ::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+             | (:options, ::Google::Protobuf::FileOptions?) -> ::Google::Protobuf::FileOptions?
+             | [M < ::Google::Protobuf::FileOptions::_ToProto] (:options, M?) -> M?
+             | (:source_code_info, ::Google::Protobuf::SourceCodeInfo?) -> ::Google::Protobuf::SourceCodeInfo?
+             | [M < ::Google::Protobuf::SourceCodeInfo::_ToProto] (:source_code_info, M?) -> M?
+             | (:syntax, ::String) -> ::String
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> FileDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FileDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FileDescriptorProto, FileDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FileDescriptorProto, FileDescriptorProto | _ToProto]
+
+      type array = ::Array[FileDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FileDescriptorProto | _ToProto]
+    end
+
+    # Describes a message type.
+    #
+    class DescriptorProto < ::Protobuf::Message
+      class ExtensionRange < ::Protobuf::Message
+        # Inclusive.
+        #
+        attr_accessor start(): ::Integer
+
+        def start!: () -> ::Integer?
+
+        # Exclusive.
+        #
+        attr_accessor end(): ::Integer
+
+        def end!: () -> ::Integer?
+
+        attr_accessor options(): ::Google::Protobuf::ExtensionRangeOptions?
+
+        def options=: [M < ::Google::Protobuf::ExtensionRangeOptions::_ToProto] (M?) -> M?
+                    | ...
+
+        def options!: () -> ::Google::Protobuf::ExtensionRangeOptions?
+
+        def initialize: (?start: ::Integer, ?end: ::Integer, ?options: ::Google::Protobuf::ExtensionRangeOptions::init?) -> void
+
+        def []: (:start) -> ::Integer
+              | (:end) -> ::Integer
+              | (:options) -> ::Google::Protobuf::ExtensionRangeOptions?
+              | (::Symbol) -> untyped
+
+        def []=: (:start, ::Integer) -> ::Integer
+               | (:end, ::Integer) -> ::Integer
+               | (:options, ::Google::Protobuf::ExtensionRangeOptions?) -> ::Google::Protobuf::ExtensionRangeOptions?
+               | [M < ::Google::Protobuf::ExtensionRangeOptions::_ToProto] (:options, M?) -> M?
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> ExtensionRange
+        end
+
+        # The type of `#initialize` parameter.
+        type init = ExtensionRange | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[ExtensionRange, ExtensionRange | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ExtensionRange, ExtensionRange | _ToProto]
+
+        type array = ::Array[ExtensionRange | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, ExtensionRange | _ToProto]
+      end
+
+      # Range of reserved tag numbers. Reserved tag numbers may not be used by
+      #  fields or extension ranges in the same message. Reserved ranges may
+      #  not overlap.
+      #
+      class ReservedRange < ::Protobuf::Message
+        # Inclusive.
+        #
+        attr_accessor start(): ::Integer
+
+        def start!: () -> ::Integer?
+
+        # Exclusive.
+        #
+        attr_accessor end(): ::Integer
+
+        def end!: () -> ::Integer?
+
+        def initialize: (?start: ::Integer, ?end: ::Integer) -> void
+
+        def []: (:start) -> ::Integer
+              | (:end) -> ::Integer
+              | (::Symbol) -> untyped
+
+        def []=: (:start, ::Integer) -> ::Integer
+               | (:end, ::Integer) -> ::Integer
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> ReservedRange
+        end
+
+        # The type of `#initialize` parameter.
+        type init = ReservedRange | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[ReservedRange, ReservedRange | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ReservedRange, ReservedRange | _ToProto]
+
+        type array = ::Array[ReservedRange | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, ReservedRange | _ToProto]
+      end
+
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor field(): ::Google::Protobuf::FieldDescriptorProto::field_array
+
+      def field=: (::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+                | ...
+
+      def field!: () -> ::Google::Protobuf::FieldDescriptorProto::field_array?
+
+      attr_accessor extension(): ::Google::Protobuf::FieldDescriptorProto::field_array
+
+      def extension=: (::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+                    | ...
+
+      def extension!: () -> ::Google::Protobuf::FieldDescriptorProto::field_array?
+
+      attr_accessor nested_type(): ::Google::Protobuf::DescriptorProto::field_array
+
+      def nested_type=: (::Google::Protobuf::DescriptorProto::array) -> ::Google::Protobuf::DescriptorProto::array
+                      | ...
+
+      def nested_type!: () -> ::Google::Protobuf::DescriptorProto::field_array?
+
+      attr_accessor enum_type(): ::Google::Protobuf::EnumDescriptorProto::field_array
+
+      def enum_type=: (::Google::Protobuf::EnumDescriptorProto::array) -> ::Google::Protobuf::EnumDescriptorProto::array
+                    | ...
+
+      def enum_type!: () -> ::Google::Protobuf::EnumDescriptorProto::field_array?
+
+      attr_accessor extension_range(): ::Google::Protobuf::DescriptorProto::ExtensionRange::field_array
+
+      def extension_range=: (::Google::Protobuf::DescriptorProto::ExtensionRange::array) -> ::Google::Protobuf::DescriptorProto::ExtensionRange::array
+                          | ...
+
+      def extension_range!: () -> ::Google::Protobuf::DescriptorProto::ExtensionRange::field_array?
+
+      attr_accessor oneof_decl(): ::Google::Protobuf::OneofDescriptorProto::field_array
+
+      def oneof_decl=: (::Google::Protobuf::OneofDescriptorProto::array) -> ::Google::Protobuf::OneofDescriptorProto::array
+                     | ...
+
+      def oneof_decl!: () -> ::Google::Protobuf::OneofDescriptorProto::field_array?
+
+      attr_accessor options(): ::Google::Protobuf::MessageOptions?
+
+      def options=: [M < ::Google::Protobuf::MessageOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::MessageOptions?
+
+      attr_accessor reserved_range(): ::Google::Protobuf::DescriptorProto::ReservedRange::field_array
+
+      def reserved_range=: (::Google::Protobuf::DescriptorProto::ReservedRange::array) -> ::Google::Protobuf::DescriptorProto::ReservedRange::array
+                         | ...
+
+      def reserved_range!: () -> ::Google::Protobuf::DescriptorProto::ReservedRange::field_array?
+
+      # Reserved field names, which may not be used by fields in the same message.
+      #  A given name may only be reserved once.
+      #
+      attr_accessor reserved_name(): ::Protobuf::field_array[::String]
+
+      # Reserved field names, which may not be used by fields in the same message.
+      #  A given name may only be reserved once.
+      #
+      def reserved_name=: (::Array[::String]) -> ::Array[::String]
+                        | ...
+
+      def reserved_name!: () -> ::Protobuf::field_array[::String]?
+
+      def initialize: (?name: ::String, ?field: ::Google::Protobuf::FieldDescriptorProto::array, ?extension: ::Google::Protobuf::FieldDescriptorProto::array, ?nested_type: ::Google::Protobuf::DescriptorProto::array, ?enum_type: ::Google::Protobuf::EnumDescriptorProto::array, ?extension_range: ::Google::Protobuf::DescriptorProto::ExtensionRange::array, ?oneof_decl: ::Google::Protobuf::OneofDescriptorProto::array, ?options: ::Google::Protobuf::MessageOptions::init?, ?reserved_range: ::Google::Protobuf::DescriptorProto::ReservedRange::array, ?reserved_name: ::Array[::String]) -> void
+
+      def []: (:name) -> ::String
+            | (:field) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+            | (:extension) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+            | (:nested_type) -> ::Google::Protobuf::DescriptorProto::field_array
+            | (:enum_type) -> ::Google::Protobuf::EnumDescriptorProto::field_array
+            | (:extension_range) -> ::Google::Protobuf::DescriptorProto::ExtensionRange::field_array
+            | (:oneof_decl) -> ::Google::Protobuf::OneofDescriptorProto::field_array
+            | (:options) -> ::Google::Protobuf::MessageOptions?
+            | (:reserved_range) -> ::Google::Protobuf::DescriptorProto::ReservedRange::field_array
+            | (:reserved_name) -> ::Protobuf::field_array[::String]
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:field, ::Google::Protobuf::FieldDescriptorProto::field_array) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+             | (:field, ::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+             | (:extension, ::Google::Protobuf::FieldDescriptorProto::field_array) -> ::Google::Protobuf::FieldDescriptorProto::field_array
+             | (:extension, ::Google::Protobuf::FieldDescriptorProto::array) -> ::Google::Protobuf::FieldDescriptorProto::array
+             | (:nested_type, ::Google::Protobuf::DescriptorProto::field_array) -> ::Google::Protobuf::DescriptorProto::field_array
+             | (:nested_type, ::Google::Protobuf::DescriptorProto::array) -> ::Google::Protobuf::DescriptorProto::array
+             | (:enum_type, ::Google::Protobuf::EnumDescriptorProto::field_array) -> ::Google::Protobuf::EnumDescriptorProto::field_array
+             | (:enum_type, ::Google::Protobuf::EnumDescriptorProto::array) -> ::Google::Protobuf::EnumDescriptorProto::array
+             | (:extension_range, ::Google::Protobuf::DescriptorProto::ExtensionRange::field_array) -> ::Google::Protobuf::DescriptorProto::ExtensionRange::field_array
+             | (:extension_range, ::Google::Protobuf::DescriptorProto::ExtensionRange::array) -> ::Google::Protobuf::DescriptorProto::ExtensionRange::array
+             | (:oneof_decl, ::Google::Protobuf::OneofDescriptorProto::field_array) -> ::Google::Protobuf::OneofDescriptorProto::field_array
+             | (:oneof_decl, ::Google::Protobuf::OneofDescriptorProto::array) -> ::Google::Protobuf::OneofDescriptorProto::array
+             | (:options, ::Google::Protobuf::MessageOptions?) -> ::Google::Protobuf::MessageOptions?
+             | [M < ::Google::Protobuf::MessageOptions::_ToProto] (:options, M?) -> M?
+             | (:reserved_range, ::Google::Protobuf::DescriptorProto::ReservedRange::field_array) -> ::Google::Protobuf::DescriptorProto::ReservedRange::field_array
+             | (:reserved_range, ::Google::Protobuf::DescriptorProto::ReservedRange::array) -> ::Google::Protobuf::DescriptorProto::ReservedRange::array
+             | (:reserved_name, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
+             | (:reserved_name, ::Array[::String]) -> ::Array[::String]
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> DescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = DescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[DescriptorProto, DescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescriptorProto, DescriptorProto | _ToProto]
+
+      type array = ::Array[DescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, DescriptorProto | _ToProto]
+    end
+
+    class ExtensionRangeOptions < ::Protobuf::Message
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ExtensionRangeOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ExtensionRangeOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ExtensionRangeOptions, ExtensionRangeOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ExtensionRangeOptions, ExtensionRangeOptions | _ToProto]
+
+      type array = ::Array[ExtensionRangeOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ExtensionRangeOptions | _ToProto]
+    end
+
+    # Describes a field within a message.
+    #
+    class FieldDescriptorProto < ::Protobuf::Message
+      class Type < ::Protobuf::Enum
+        type names = :TYPE_DOUBLE | :TYPE_FLOAT | :TYPE_INT64 | :TYPE_UINT64 | :TYPE_INT32 | :TYPE_FIXED64 | :TYPE_FIXED32 | :TYPE_BOOL | :TYPE_STRING | :TYPE_GROUP | :TYPE_MESSAGE | :TYPE_BYTES | :TYPE_UINT32 | :TYPE_ENUM | :TYPE_SFIXED32 | :TYPE_SFIXED64 | :TYPE_SINT32 | :TYPE_SINT64
+
+        type strings = "TYPE_DOUBLE" | "TYPE_FLOAT" | "TYPE_INT64" | "TYPE_UINT64" | "TYPE_INT32" | "TYPE_FIXED64" | "TYPE_FIXED32" | "TYPE_BOOL" | "TYPE_STRING" | "TYPE_GROUP" | "TYPE_MESSAGE" | "TYPE_BYTES" | "TYPE_UINT32" | "TYPE_ENUM" | "TYPE_SFIXED32" | "TYPE_SFIXED64" | "TYPE_SINT32" | "TYPE_SINT64"
+
+        type tags = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        # 0 is reserved for errors.
+        #  Order is weird for historical reasons.
+        #
+        TYPE_DOUBLE: Type
+
+        TYPE_FLOAT: Type
+
+        # Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
+        #  negative values are likely.
+        #
+        TYPE_INT64: Type
+
+        TYPE_UINT64: Type
+
+        # Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
+        #  negative values are likely.
+        #
+        TYPE_INT32: Type
+
+        TYPE_FIXED64: Type
+
+        TYPE_FIXED32: Type
+
+        TYPE_BOOL: Type
+
+        TYPE_STRING: Type
+
+        # Tag-delimited aggregate.
+        #  Group type is deprecated and not supported in proto3. However, Proto3
+        #  implementations should still be able to parse the group wire format and
+        #  treat group fields as unknown fields.
+        #
+        TYPE_GROUP: Type
+
+        # Length-delimited aggregate.
+        #
+        TYPE_MESSAGE: Type
+
+        # New in version 2.
+        #
+        TYPE_BYTES: Type
+
+        TYPE_UINT32: Type
+
+        TYPE_ENUM: Type
+
+        TYPE_SFIXED32: Type
+
+        TYPE_SFIXED64: Type
+
+        # Uses ZigZag encoding.
+        #
+        TYPE_SINT32: Type
+
+        # Uses ZigZag encoding.
+        #
+        TYPE_SINT64: Type
+
+        # The type of `#initialize` parameter.
+        type init = Type | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Type, Type | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Type, Type | values]
+
+        type array = ::Array[Type | values]
+
+        type hash[KEY] = ::Hash[KEY, Type | values]
+      end
+
+      class Label < ::Protobuf::Enum
+        type names = :LABEL_OPTIONAL | :LABEL_REQUIRED | :LABEL_REPEATED
+
+        type strings = "LABEL_OPTIONAL" | "LABEL_REQUIRED" | "LABEL_REPEATED"
+
+        type tags = 1 | 2 | 3
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        # 0 is reserved for errors
+        #
+        LABEL_OPTIONAL: Label
+
+        LABEL_REQUIRED: Label
+
+        LABEL_REPEATED: Label
+
+        # The type of `#initialize` parameter.
+        type init = Label | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Label, Label | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Label, Label | values]
+
+        type array = ::Array[Label | values]
+
+        type hash[KEY] = ::Hash[KEY, Label | values]
+      end
+
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor number(): ::Integer
+
+      def number!: () -> ::Integer?
+
+      attr_accessor label(): ::Google::Protobuf::FieldDescriptorProto::Label
+
+      def label=: (::Google::Protobuf::FieldDescriptorProto::Label::values) -> ::Google::Protobuf::FieldDescriptorProto::Label::values
+                | ...
+
+      def label!: () -> ::Google::Protobuf::FieldDescriptorProto::Label?
+
+      # If type_name is set, this need not be set.  If both this and type_name
+      #  are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+      #
+      attr_accessor type(): ::Google::Protobuf::FieldDescriptorProto::Type
+
+      # If type_name is set, this need not be set.  If both this and type_name
+      #  are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
+      #
+      def type=: (::Google::Protobuf::FieldDescriptorProto::Type::values) -> ::Google::Protobuf::FieldDescriptorProto::Type::values
+               | ...
+
+      def type!: () -> ::Google::Protobuf::FieldDescriptorProto::Type?
+
+      # For message and enum types, this is the name of the type.  If the name
+      #  starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
+      #  rules are used to find the type (i.e. first the nested types within this
+      #  message are searched, then within the parent, on up to the root
+      #  namespace).
+      #
+      attr_accessor type_name(): ::String
+
+      def type_name!: () -> ::String?
+
+      # For extensions, this is the name of the type being extended.  It is
+      #  resolved in the same manner as type_name.
+      #
+      attr_accessor extendee(): ::String
+
+      def extendee!: () -> ::String?
+
+      # For numeric types, contains the original text representation of the value.
+      #  For booleans, "true" or "false".
+      #  For strings, contains the default text contents (not escaped in any way).
+      #  For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
+      #  TODO(kenton):  Base-64 encode?
+      #
+      attr_accessor default_value(): ::String
+
+      def default_value!: () -> ::String?
+
+      # If set, gives the index of a oneof in the containing type's oneof_decl
+      #  list.  This field is a member of that oneof.
+      #
+      attr_accessor oneof_index(): ::Integer
+
+      def oneof_index!: () -> ::Integer?
+
+      # JSON name of this field. The value is set by protocol compiler. If the
+      #  user has set a "json_name" option on this field, that option's value
+      #  will be used. Otherwise, it's deduced from the field's name by converting
+      #  it to camelCase.
+      #
+      attr_accessor json_name(): ::String
+
+      def json_name!: () -> ::String?
+
+      attr_accessor options(): ::Google::Protobuf::FieldOptions?
+
+      def options=: [M < ::Google::Protobuf::FieldOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::FieldOptions?
+
+      # If true, this is a proto3 "optional". When a proto3 field is optional, it
+      #  tracks presence regardless of field type.
+      #
+      #  When proto3_optional is true, this field must be belong to a oneof to
+      #  signal to old proto3 clients that presence is tracked for this field. This
+      #  oneof is known as a "synthetic" oneof, and this field must be its sole
+      #  member (each proto3 optional field gets its own synthetic oneof). Synthetic
+      #  oneofs exist in the descriptor only, and do not generate any API. Synthetic
+      #  oneofs must be ordered after all "real" oneofs.
+      #
+      #  For message fields, proto3_optional doesn't create any semantic change,
+      #  since non-repeated message fields always track presence. However it still
+      #  indicates the semantic detail of whether the user wrote "optional" or not.
+      #  This can be useful for round-tripping the .proto file. For consistency we
+      #  give message fields a synthetic oneof also, even though it is not required
+      #  to track presence. This is especially important because the parser can't
+      #  tell if a field is a message or an enum, so it must always create a
+      #  synthetic oneof.
+      #
+      #  Proto2 optional fields do not set this flag, because they already indicate
+      #  optional with `LABEL_OPTIONAL`.
+      #
+      attr_accessor proto3_optional(): bool
+
+      def proto3_optional!: () -> bool?
+
+      def initialize: (?name: ::String, ?number: ::Integer, ?label: ::Google::Protobuf::FieldDescriptorProto::Label::init, ?type: ::Google::Protobuf::FieldDescriptorProto::Type::init, ?type_name: ::String, ?extendee: ::String, ?default_value: ::String, ?oneof_index: ::Integer, ?json_name: ::String, ?options: ::Google::Protobuf::FieldOptions::init?, ?proto3_optional: bool) -> void
+
+      def []: (:name) -> ::String
+            | (:number) -> ::Integer
+            | (:label) -> ::Google::Protobuf::FieldDescriptorProto::Label
+            | (:type) -> ::Google::Protobuf::FieldDescriptorProto::Type
+            | (:type_name) -> ::String
+            | (:extendee) -> ::String
+            | (:default_value) -> ::String
+            | (:oneof_index) -> ::Integer
+            | (:json_name) -> ::String
+            | (:options) -> ::Google::Protobuf::FieldOptions?
+            | (:proto3_optional) -> bool
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:number, ::Integer) -> ::Integer
+             | (:label, ::Google::Protobuf::FieldDescriptorProto::Label) -> ::Google::Protobuf::FieldDescriptorProto::Label
+             | (:label, ::Google::Protobuf::FieldDescriptorProto::Label::values) -> ::Google::Protobuf::FieldDescriptorProto::Label::values
+             | (:type, ::Google::Protobuf::FieldDescriptorProto::Type) -> ::Google::Protobuf::FieldDescriptorProto::Type
+             | (:type, ::Google::Protobuf::FieldDescriptorProto::Type::values) -> ::Google::Protobuf::FieldDescriptorProto::Type::values
+             | (:type_name, ::String) -> ::String
+             | (:extendee, ::String) -> ::String
+             | (:default_value, ::String) -> ::String
+             | (:oneof_index, ::Integer) -> ::Integer
+             | (:json_name, ::String) -> ::String
+             | (:options, ::Google::Protobuf::FieldOptions?) -> ::Google::Protobuf::FieldOptions?
+             | [M < ::Google::Protobuf::FieldOptions::_ToProto] (:options, M?) -> M?
+             | (:proto3_optional, bool) -> bool
+             | (::Symbol, untyped) -> untyped
+
+      def proto3_optional?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> FieldDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FieldDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FieldDescriptorProto, FieldDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FieldDescriptorProto, FieldDescriptorProto | _ToProto]
+
+      type array = ::Array[FieldDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FieldDescriptorProto | _ToProto]
+    end
+
+    # Describes a oneof.
+    #
+    class OneofDescriptorProto < ::Protobuf::Message
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor options(): ::Google::Protobuf::OneofOptions?
+
+      def options=: [M < ::Google::Protobuf::OneofOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::OneofOptions?
+
+      def initialize: (?name: ::String, ?options: ::Google::Protobuf::OneofOptions::init?) -> void
+
+      def []: (:name) -> ::String
+            | (:options) -> ::Google::Protobuf::OneofOptions?
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:options, ::Google::Protobuf::OneofOptions?) -> ::Google::Protobuf::OneofOptions?
+             | [M < ::Google::Protobuf::OneofOptions::_ToProto] (:options, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> OneofDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = OneofDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[OneofDescriptorProto, OneofDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, OneofDescriptorProto, OneofDescriptorProto | _ToProto]
+
+      type array = ::Array[OneofDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, OneofDescriptorProto | _ToProto]
+    end
+
+    # Describes an enum type.
+    #
+    class EnumDescriptorProto < ::Protobuf::Message
+      # Range of reserved numeric values. Reserved values may not be used by
+      #  entries in the same enum. Reserved ranges may not overlap.
+      #
+      #  Note that this is distinct from DescriptorProto.ReservedRange in that it
+      #  is inclusive such that it can appropriately represent the entire int32
+      #  domain.
+      #
+      class EnumReservedRange < ::Protobuf::Message
+        # Inclusive.
+        #
+        attr_accessor start(): ::Integer
+
+        def start!: () -> ::Integer?
+
+        # Inclusive.
+        #
+        attr_accessor end(): ::Integer
+
+        def end!: () -> ::Integer?
+
+        def initialize: (?start: ::Integer, ?end: ::Integer) -> void
+
+        def []: (:start) -> ::Integer
+              | (:end) -> ::Integer
+              | (::Symbol) -> untyped
+
+        def []=: (:start, ::Integer) -> ::Integer
+               | (:end, ::Integer) -> ::Integer
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> EnumReservedRange
+        end
+
+        # The type of `#initialize` parameter.
+        type init = EnumReservedRange | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[EnumReservedRange, EnumReservedRange | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EnumReservedRange, EnumReservedRange | _ToProto]
+
+        type array = ::Array[EnumReservedRange | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, EnumReservedRange | _ToProto]
+      end
+
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor value(): ::Google::Protobuf::EnumValueDescriptorProto::field_array
+
+      def value=: (::Google::Protobuf::EnumValueDescriptorProto::array) -> ::Google::Protobuf::EnumValueDescriptorProto::array
+                | ...
+
+      def value!: () -> ::Google::Protobuf::EnumValueDescriptorProto::field_array?
+
+      attr_accessor options(): ::Google::Protobuf::EnumOptions?
+
+      def options=: [M < ::Google::Protobuf::EnumOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::EnumOptions?
+
+      # Range of reserved numeric values. Reserved numeric values may not be used
+      #  by enum values in the same enum declaration. Reserved ranges may not
+      #  overlap.
+      #
+      attr_accessor reserved_range(): ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::field_array
+
+      # Range of reserved numeric values. Reserved numeric values may not be used
+      #  by enum values in the same enum declaration. Reserved ranges may not
+      #  overlap.
+      #
+      def reserved_range=: (::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::array) -> ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::array
+                         | ...
+
+      def reserved_range!: () -> ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::field_array?
+
+      # Reserved enum value names, which may not be reused. A given name may only
+      #  be reserved once.
+      #
+      attr_accessor reserved_name(): ::Protobuf::field_array[::String]
+
+      # Reserved enum value names, which may not be reused. A given name may only
+      #  be reserved once.
+      #
+      def reserved_name=: (::Array[::String]) -> ::Array[::String]
+                        | ...
+
+      def reserved_name!: () -> ::Protobuf::field_array[::String]?
+
+      def initialize: (?name: ::String, ?value: ::Google::Protobuf::EnumValueDescriptorProto::array, ?options: ::Google::Protobuf::EnumOptions::init?, ?reserved_range: ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::array, ?reserved_name: ::Array[::String]) -> void
+
+      def []: (:name) -> ::String
+            | (:value) -> ::Google::Protobuf::EnumValueDescriptorProto::field_array
+            | (:options) -> ::Google::Protobuf::EnumOptions?
+            | (:reserved_range) -> ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::field_array
+            | (:reserved_name) -> ::Protobuf::field_array[::String]
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:value, ::Google::Protobuf::EnumValueDescriptorProto::field_array) -> ::Google::Protobuf::EnumValueDescriptorProto::field_array
+             | (:value, ::Google::Protobuf::EnumValueDescriptorProto::array) -> ::Google::Protobuf::EnumValueDescriptorProto::array
+             | (:options, ::Google::Protobuf::EnumOptions?) -> ::Google::Protobuf::EnumOptions?
+             | [M < ::Google::Protobuf::EnumOptions::_ToProto] (:options, M?) -> M?
+             | (:reserved_range, ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::field_array) -> ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::field_array
+             | (:reserved_range, ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::array) -> ::Google::Protobuf::EnumDescriptorProto::EnumReservedRange::array
+             | (:reserved_name, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
+             | (:reserved_name, ::Array[::String]) -> ::Array[::String]
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> EnumDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = EnumDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[EnumDescriptorProto, EnumDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EnumDescriptorProto, EnumDescriptorProto | _ToProto]
+
+      type array = ::Array[EnumDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, EnumDescriptorProto | _ToProto]
+    end
+
+    # Describes a value within an enum.
+    #
+    class EnumValueDescriptorProto < ::Protobuf::Message
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor number(): ::Integer
+
+      def number!: () -> ::Integer?
+
+      attr_accessor options(): ::Google::Protobuf::EnumValueOptions?
+
+      def options=: [M < ::Google::Protobuf::EnumValueOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::EnumValueOptions?
+
+      def initialize: (?name: ::String, ?number: ::Integer, ?options: ::Google::Protobuf::EnumValueOptions::init?) -> void
+
+      def []: (:name) -> ::String
+            | (:number) -> ::Integer
+            | (:options) -> ::Google::Protobuf::EnumValueOptions?
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:number, ::Integer) -> ::Integer
+             | (:options, ::Google::Protobuf::EnumValueOptions?) -> ::Google::Protobuf::EnumValueOptions?
+             | [M < ::Google::Protobuf::EnumValueOptions::_ToProto] (:options, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> EnumValueDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = EnumValueDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[EnumValueDescriptorProto, EnumValueDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EnumValueDescriptorProto, EnumValueDescriptorProto | _ToProto]
+
+      type array = ::Array[EnumValueDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, EnumValueDescriptorProto | _ToProto]
+    end
+
+    # Describes a service.
+    #
+    class ServiceDescriptorProto < ::Protobuf::Message
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      attr_accessor method(): ::Google::Protobuf::MethodDescriptorProto::field_array
+
+      def method=: (::Google::Protobuf::MethodDescriptorProto::array) -> ::Google::Protobuf::MethodDescriptorProto::array
+                 | ...
+
+      def method!: () -> ::Google::Protobuf::MethodDescriptorProto::field_array?
+
+      attr_accessor options(): ::Google::Protobuf::ServiceOptions?
+
+      def options=: [M < ::Google::Protobuf::ServiceOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::ServiceOptions?
+
+      def initialize: (?name: ::String, ?method: ::Google::Protobuf::MethodDescriptorProto::array, ?options: ::Google::Protobuf::ServiceOptions::init?) -> void
+
+      def []: (:name) -> ::String
+            | (:method) -> ::Google::Protobuf::MethodDescriptorProto::field_array
+            | (:options) -> ::Google::Protobuf::ServiceOptions?
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:method, ::Google::Protobuf::MethodDescriptorProto::field_array) -> ::Google::Protobuf::MethodDescriptorProto::field_array
+             | (:method, ::Google::Protobuf::MethodDescriptorProto::array) -> ::Google::Protobuf::MethodDescriptorProto::array
+             | (:options, ::Google::Protobuf::ServiceOptions?) -> ::Google::Protobuf::ServiceOptions?
+             | [M < ::Google::Protobuf::ServiceOptions::_ToProto] (:options, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ServiceDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ServiceDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ServiceDescriptorProto, ServiceDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ServiceDescriptorProto, ServiceDescriptorProto | _ToProto]
+
+      type array = ::Array[ServiceDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ServiceDescriptorProto | _ToProto]
+    end
+
+    # Describes a method of a service.
+    #
+    class MethodDescriptorProto < ::Protobuf::Message
+      attr_accessor name(): ::String
+
+      def name!: () -> ::String?
+
+      # Input and output type names.  These are resolved in the same way as
+      #  FieldDescriptorProto.type_name, but must refer to a message type.
+      #
+      attr_accessor input_type(): ::String
+
+      def input_type!: () -> ::String?
+
+      attr_accessor output_type(): ::String
+
+      def output_type!: () -> ::String?
+
+      attr_accessor options(): ::Google::Protobuf::MethodOptions?
+
+      def options=: [M < ::Google::Protobuf::MethodOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def options!: () -> ::Google::Protobuf::MethodOptions?
+
+      # Identifies if client streams multiple client messages
+      #
+      attr_accessor client_streaming(): bool
+
+      def client_streaming!: () -> bool?
+
+      # Identifies if server streams multiple server messages
+      #
+      attr_accessor server_streaming(): bool
+
+      def server_streaming!: () -> bool?
+
+      def initialize: (?name: ::String, ?input_type: ::String, ?output_type: ::String, ?options: ::Google::Protobuf::MethodOptions::init?, ?client_streaming: bool, ?server_streaming: bool) -> void
+
+      def []: (:name) -> ::String
+            | (:input_type) -> ::String
+            | (:output_type) -> ::String
+            | (:options) -> ::Google::Protobuf::MethodOptions?
+            | (:client_streaming) -> bool
+            | (:server_streaming) -> bool
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::String) -> ::String
+             | (:input_type, ::String) -> ::String
+             | (:output_type, ::String) -> ::String
+             | (:options, ::Google::Protobuf::MethodOptions?) -> ::Google::Protobuf::MethodOptions?
+             | [M < ::Google::Protobuf::MethodOptions::_ToProto] (:options, M?) -> M?
+             | (:client_streaming, bool) -> bool
+             | (:server_streaming, bool) -> bool
+             | (::Symbol, untyped) -> untyped
+
+      def client_streaming?: () -> bool
+
+      def server_streaming?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> MethodDescriptorProto
+      end
+
+      # The type of `#initialize` parameter.
+      type init = MethodDescriptorProto | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[MethodDescriptorProto, MethodDescriptorProto | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, MethodDescriptorProto, MethodDescriptorProto | _ToProto]
+
+      type array = ::Array[MethodDescriptorProto | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, MethodDescriptorProto | _ToProto]
+    end
+
+    # ===================================================================
+    #  Options
+    #
+    #
+    #  Each of the definitions above may have "options" attached.  These are
+    #  just annotations which may cause code to be generated slightly differently
+    #  or may contain hints for code that manipulates protocol messages.
+    #
+    #  Clients may define custom options as extensions of the *Options messages.
+    #  These extensions may not yet be known at parsing time, so the parser cannot
+    #  store the values in them.  Instead it stores them in a field in the *Options
+    #  message called uninterpreted_option. This field must have the same name
+    #  across all *Options messages. We then use this field to populate the
+    #  extensions when we build a descriptor, at which point all protos have been
+    #  parsed and so all extensions are known.
+    #
+    #  Extension numbers for custom options may be chosen as follows:
+    #  * For options which will only be used within a single application or
+    #    organization, or for experimental options, use field numbers 50000
+    #    through 99999.  It is up to you to ensure that you do not use the
+    #    same number for multiple options.
+    #  * For options which will be published and used publicly by multiple
+    #    independent entities, e-mail protobuf-global-extension-registry@google.com
+    #    to reserve extension numbers. Simply provide your project name (e.g.
+    #    Objective-C plugin) and your project website (if available) -- there's no
+    #    need to explain how you intend to use them. Usually you only need one
+    #    extension number. You can declare multiple options with only one extension
+    #    number by putting them in a sub-message. See the Custom Options section of
+    #    the docs for examples:
+    #    https://developers.google.com/protocol-buffers/docs/proto#options
+    #    If this turns out to be popular, a web service will be set up
+    #    to automatically assign option numbers.
+    #
+    class FileOptions < ::Protobuf::Message
+      # Generated classes can be optimized for speed or code size.
+      #
+      class OptimizeMode < ::Protobuf::Enum
+        type names = :SPEED | :CODE_SIZE | :LITE_RUNTIME
+
+        type strings = "SPEED" | "CODE_SIZE" | "LITE_RUNTIME"
+
+        type tags = 1 | 2 | 3
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        # Generate complete code for parsing, serialization,
+        #
+        SPEED: OptimizeMode
+
+        # etc.
+        #
+        # Use ReflectionOps to implement these methods.
+        #
+        CODE_SIZE: OptimizeMode
+
+        # Generate code using MessageLite and the lite runtime.
+        #
+        LITE_RUNTIME: OptimizeMode
+
+        # The type of `#initialize` parameter.
+        type init = OptimizeMode | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[OptimizeMode, OptimizeMode | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, OptimizeMode, OptimizeMode | values]
+
+        type array = ::Array[OptimizeMode | values]
+
+        type hash[KEY] = ::Hash[KEY, OptimizeMode | values]
+      end
+
+      # Sets the Java package where classes generated from this .proto will be
+      #  placed.  By default, the proto package is used, but this is often
+      #  inappropriate because proto packages do not normally start with backwards
+      #  domain names.
+      #
+      attr_accessor java_package(): ::String
+
+      def java_package!: () -> ::String?
+
+      # Controls the name of the wrapper Java class generated for the .proto file.
+      #  That class will always contain the .proto file's getDescriptor() method as
+      #  well as any top-level extensions defined in the .proto file.
+      #  If java_multiple_files is disabled, then all the other classes from the
+      #  .proto file will be nested inside the single wrapper outer class.
+      #
+      attr_accessor java_outer_classname(): ::String
+
+      def java_outer_classname!: () -> ::String?
+
+      # If enabled, then the Java code generator will generate a separate .java
+      #  file for each top-level message, enum, and service defined in the .proto
+      #  file.  Thus, these types will *not* be nested inside the wrapper class
+      #  named by java_outer_classname.  However, the wrapper class will still be
+      #  generated to contain the file's getDescriptor() method as well as any
+      #  top-level extensions defined in the file.
+      #
+      attr_accessor java_multiple_files(): bool
+
+      def java_multiple_files!: () -> bool?
+
+      # This option does nothing.
+      #
+      # ----
+      #
+      # Protobuf options:
+      #
+      # - `deprecated = true`
+      #
+      attr_accessor java_generate_equals_and_hash(): bool
+
+      def java_generate_equals_and_hash!: () -> bool?
+
+      # If set true, then the Java2 code generator will generate code that
+      #  throws an exception whenever an attempt is made to assign a non-UTF-8
+      #  byte sequence to a string field.
+      #  Message reflection will do the same.
+      #  However, an extension field still accepts non-UTF-8 byte sequences.
+      #  This option has no effect on when used with the lite runtime.
+      #
+      attr_accessor java_string_check_utf8(): bool
+
+      def java_string_check_utf8!: () -> bool?
+
+      attr_accessor optimize_for(): ::Google::Protobuf::FileOptions::OptimizeMode
+
+      def optimize_for=: (::Google::Protobuf::FileOptions::OptimizeMode::values) -> ::Google::Protobuf::FileOptions::OptimizeMode::values
+                       | ...
+
+      def optimize_for!: () -> ::Google::Protobuf::FileOptions::OptimizeMode?
+
+      # Sets the Go package where structs generated from this .proto will be
+      #  placed. If omitted, the Go package will be derived from the following:
+      #    - The basename of the package import path, if provided.
+      #    - Otherwise, the package statement in the .proto file, if present.
+      #    - Otherwise, the basename of the .proto file, without extension.
+      #
+      attr_accessor go_package(): ::String
+
+      def go_package!: () -> ::String?
+
+      # Should generic services be generated in each language?  "Generic" services
+      #  are not specific to any particular RPC system.  They are generated by the
+      #  main code generators in each language (without additional plugins).
+      #  Generic services were the only kind of service generation supported by
+      #  early versions of google.protobuf.
+      #
+      #  Generic services are now considered deprecated in favor of using plugins
+      #  that generate code specific to your particular RPC system.  Therefore,
+      #  these default to false.  Old code which depends on generic services should
+      #  explicitly set them to true.
+      #
+      attr_accessor cc_generic_services(): bool
+
+      def cc_generic_services!: () -> bool?
+
+      attr_accessor java_generic_services(): bool
+
+      def java_generic_services!: () -> bool?
+
+      attr_accessor py_generic_services(): bool
+
+      def py_generic_services!: () -> bool?
+
+      attr_accessor php_generic_services(): bool
+
+      def php_generic_services!: () -> bool?
+
+      # Is this file deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for everything in the file, or it will be completely ignored; in the very
+      #  least, this is a formalization for deprecating files.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # Enables the use of arenas for the proto messages in this file. This applies
+      #  only to generated classes for C++.
+      #
+      attr_accessor cc_enable_arenas(): bool
+
+      def cc_enable_arenas!: () -> bool?
+
+      # Sets the objective c class prefix which is prepended to all objective c
+      #  generated classes from this .proto. There is no default.
+      #
+      attr_accessor objc_class_prefix(): ::String
+
+      def objc_class_prefix!: () -> ::String?
+
+      # Namespace for generated classes; defaults to the package.
+      #
+      attr_accessor csharp_namespace(): ::String
+
+      def csharp_namespace!: () -> ::String?
+
+      # By default Swift generators will take the proto package and CamelCase it
+      #  replacing '.' with underscore and use that to prefix the types/symbols
+      #  defined. When this options is provided, they will use this value instead
+      #  to prefix the types/symbols defined.
+      #
+      attr_accessor swift_prefix(): ::String
+
+      def swift_prefix!: () -> ::String?
+
+      # Sets the php class prefix which is prepended to all php generated classes
+      #  from this .proto. Default is empty.
+      #
+      attr_accessor php_class_prefix(): ::String
+
+      def php_class_prefix!: () -> ::String?
+
+      # Use this option to change the namespace of php generated classes. Default
+      #  is empty. When this option is empty, the package name will be used for
+      #  determining the namespace.
+      #
+      attr_accessor php_namespace(): ::String
+
+      def php_namespace!: () -> ::String?
+
+      # Use this option to change the namespace of php generated metadata classes.
+      #  Default is empty. When this option is empty, the proto file name will be
+      #  used for determining the namespace.
+      #
+      attr_accessor php_metadata_namespace(): ::String
+
+      def php_metadata_namespace!: () -> ::String?
+
+      # Use this option to change the package of ruby generated classes. Default
+      #  is empty. When this option is not set, the package name will be used for
+      #  determining the ruby package.
+      #
+      attr_accessor ruby_package(): ::String
+
+      def ruby_package!: () -> ::String?
+
+      # The parser stores options it doesn't recognize here.
+      #  See the documentation for the "Options" section above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here.
+      #  See the documentation for the "Options" section above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?java_package: ::String, ?java_outer_classname: ::String, ?java_multiple_files: bool, ?java_generate_equals_and_hash: bool, ?java_string_check_utf8: bool, ?optimize_for: ::Google::Protobuf::FileOptions::OptimizeMode::init, ?go_package: ::String, ?cc_generic_services: bool, ?java_generic_services: bool, ?py_generic_services: bool, ?php_generic_services: bool, ?deprecated: bool, ?cc_enable_arenas: bool, ?objc_class_prefix: ::String, ?csharp_namespace: ::String, ?swift_prefix: ::String, ?php_class_prefix: ::String, ?php_namespace: ::String, ?php_metadata_namespace: ::String, ?ruby_package: ::String, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:java_package) -> ::String
+            | (:java_outer_classname) -> ::String
+            | (:java_multiple_files) -> bool
+            | (:java_generate_equals_and_hash) -> bool
+            | (:java_string_check_utf8) -> bool
+            | (:optimize_for) -> ::Google::Protobuf::FileOptions::OptimizeMode
+            | (:go_package) -> ::String
+            | (:cc_generic_services) -> bool
+            | (:java_generic_services) -> bool
+            | (:py_generic_services) -> bool
+            | (:php_generic_services) -> bool
+            | (:deprecated) -> bool
+            | (:cc_enable_arenas) -> bool
+            | (:objc_class_prefix) -> ::String
+            | (:csharp_namespace) -> ::String
+            | (:swift_prefix) -> ::String
+            | (:php_class_prefix) -> ::String
+            | (:php_namespace) -> ::String
+            | (:php_metadata_namespace) -> ::String
+            | (:ruby_package) -> ::String
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:java_package, ::String) -> ::String
+             | (:java_outer_classname, ::String) -> ::String
+             | (:java_multiple_files, bool) -> bool
+             | (:java_generate_equals_and_hash, bool) -> bool
+             | (:java_string_check_utf8, bool) -> bool
+             | (:optimize_for, ::Google::Protobuf::FileOptions::OptimizeMode) -> ::Google::Protobuf::FileOptions::OptimizeMode
+             | (:optimize_for, ::Google::Protobuf::FileOptions::OptimizeMode::values) -> ::Google::Protobuf::FileOptions::OptimizeMode::values
+             | (:go_package, ::String) -> ::String
+             | (:cc_generic_services, bool) -> bool
+             | (:java_generic_services, bool) -> bool
+             | (:py_generic_services, bool) -> bool
+             | (:php_generic_services, bool) -> bool
+             | (:deprecated, bool) -> bool
+             | (:cc_enable_arenas, bool) -> bool
+             | (:objc_class_prefix, ::String) -> ::String
+             | (:csharp_namespace, ::String) -> ::String
+             | (:swift_prefix, ::String) -> ::String
+             | (:php_class_prefix, ::String) -> ::String
+             | (:php_namespace, ::String) -> ::String
+             | (:php_metadata_namespace, ::String) -> ::String
+             | (:ruby_package, ::String) -> ::String
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def java_multiple_files?: () -> bool
+
+      def java_generate_equals_and_hash?: () -> bool
+
+      def java_string_check_utf8?: () -> bool
+
+      def cc_generic_services?: () -> bool
+
+      def java_generic_services?: () -> bool
+
+      def py_generic_services?: () -> bool
+
+      def php_generic_services?: () -> bool
+
+      def deprecated?: () -> bool
+
+      def cc_enable_arenas?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> FileOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FileOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FileOptions, FileOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FileOptions, FileOptions | _ToProto]
+
+      type array = ::Array[FileOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FileOptions | _ToProto]
+    end
+
+    class MessageOptions < ::Protobuf::Message
+      # Set true to use the old proto1 MessageSet wire format for extensions.
+      #  This is provided for backwards-compatibility with the MessageSet wire
+      #  format.  You should not use this for any other reason:  It's less
+      #  efficient, has fewer features, and is more complicated.
+      #
+      #  The message must be defined exactly as follows:
+      #    message Foo {
+      #      option message_set_wire_format = true;
+      #      extensions 4 to max;
+      #    }
+      #  Note that the message cannot have any defined fields; MessageSets only
+      #  have extensions.
+      #
+      #  All extensions of your type must be singular messages; e.g. they cannot
+      #  be int32s, enums, or repeated messages.
+      #
+      #  Because this is an option, the above two restrictions are not enforced by
+      #  the protocol compiler.
+      #
+      attr_accessor message_set_wire_format(): bool
+
+      def message_set_wire_format!: () -> bool?
+
+      # Disables the generation of the standard "descriptor()" accessor, which can
+      #  conflict with a field of the same name.  This is meant to make migration
+      #  from proto1 easier; new code should avoid fields named "descriptor".
+      #
+      attr_accessor no_standard_descriptor_accessor(): bool
+
+      def no_standard_descriptor_accessor!: () -> bool?
+
+      # Is this message deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for the message, or it will be completely ignored; in the very least,
+      #  this is a formalization for deprecating messages.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # Whether the message is an automatically generated map entry type for the
+      #  maps field.
+      #
+      #  For maps fields:
+      #      map<KeyType, ValueType> map_field = 1;
+      #  The parsed descriptor looks like:
+      #      message MapFieldEntry {
+      #          option map_entry = true;
+      #          optional KeyType key = 1;
+      #          optional ValueType value = 2;
+      #      }
+      #      repeated MapFieldEntry map_field = 1;
+      #
+      #  Implementations may choose not to generate the map_entry=true message, but
+      #  use a native map in the target language to hold the keys and values.
+      #  The reflection APIs in such implementations still need to work as
+      #  if the field is a repeated message field.
+      #
+      #  NOTE: Do not set the option in .proto files. Always use the maps syntax
+      #  instead. The option should only be implicitly set by the proto compiler
+      #  parser.
+      #
+      attr_accessor map_entry(): bool
+
+      def map_entry!: () -> bool?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?message_set_wire_format: bool, ?no_standard_descriptor_accessor: bool, ?deprecated: bool, ?map_entry: bool, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:message_set_wire_format) -> bool
+            | (:no_standard_descriptor_accessor) -> bool
+            | (:deprecated) -> bool
+            | (:map_entry) -> bool
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:message_set_wire_format, bool) -> bool
+             | (:no_standard_descriptor_accessor, bool) -> bool
+             | (:deprecated, bool) -> bool
+             | (:map_entry, bool) -> bool
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def message_set_wire_format?: () -> bool
+
+      def no_standard_descriptor_accessor?: () -> bool
+
+      def deprecated?: () -> bool
+
+      def map_entry?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> MessageOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = MessageOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[MessageOptions, MessageOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, MessageOptions, MessageOptions | _ToProto]
+
+      type array = ::Array[MessageOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, MessageOptions | _ToProto]
+    end
+
+    class FieldOptions < ::Protobuf::Message
+      class CType < ::Protobuf::Enum
+        type names = :STRING | :CORD | :STRING_PIECE
+
+        type strings = "STRING" | "CORD" | "STRING_PIECE"
+
+        type tags = 0 | 1 | 2
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        # Default mode.
+        #
+        STRING: CType
+
+        CORD: CType
+
+        STRING_PIECE: CType
+
+        # The type of `#initialize` parameter.
+        type init = CType | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[CType, CType | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CType, CType | values]
+
+        type array = ::Array[CType | values]
+
+        type hash[KEY] = ::Hash[KEY, CType | values]
+      end
+
+      class JSType < ::Protobuf::Enum
+        type names = :JS_NORMAL | :JS_STRING | :JS_NUMBER
+
+        type strings = "JS_NORMAL" | "JS_STRING" | "JS_NUMBER"
+
+        type tags = 0 | 1 | 2
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        # Use the default type.
+        #
+        JS_NORMAL: JSType
+
+        # Use JavaScript strings.
+        #
+        JS_STRING: JSType
+
+        # Use JavaScript numbers.
+        #
+        JS_NUMBER: JSType
+
+        # The type of `#initialize` parameter.
+        type init = JSType | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[JSType, JSType | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, JSType, JSType | values]
+
+        type array = ::Array[JSType | values]
+
+        type hash[KEY] = ::Hash[KEY, JSType | values]
+      end
+
+      # The ctype option instructs the C++ code generator to use a different
+      #  representation of the field than it normally would.  See the specific
+      #  options below.  This option is not yet implemented in the open source
+      #  release -- sorry, we'll try to include it in a future version!
+      #
+      attr_accessor ctype(): ::Google::Protobuf::FieldOptions::CType
+
+      # The ctype option instructs the C++ code generator to use a different
+      #  representation of the field than it normally would.  See the specific
+      #  options below.  This option is not yet implemented in the open source
+      #  release -- sorry, we'll try to include it in a future version!
+      #
+      def ctype=: (::Google::Protobuf::FieldOptions::CType::values) -> ::Google::Protobuf::FieldOptions::CType::values
+                | ...
+
+      def ctype!: () -> ::Google::Protobuf::FieldOptions::CType?
+
+      # The packed option can be enabled for repeated primitive fields to enable
+      #  a more efficient representation on the wire. Rather than repeatedly
+      #  writing the tag and type for each element, the entire array is encoded as
+      #  a single length-delimited blob. In proto3, only explicit setting it to
+      #  false will avoid using packed encoding.
+      #
+      attr_accessor packed(): bool
+
+      def packed!: () -> bool?
+
+      # The jstype option determines the JavaScript type used for values of the
+      #  field.  The option is permitted only for 64 bit integral and fixed types
+      #  (int64, uint64, sint64, fixed64, sfixed64).  A field with jstype JS_STRING
+      #  is represented as JavaScript string, which avoids loss of precision that
+      #  can happen when a large value is converted to a floating point JavaScript.
+      #  Specifying JS_NUMBER for the jstype causes the generated JavaScript code to
+      #  use the JavaScript "number" type.  The behavior of the default option
+      #  JS_NORMAL is implementation dependent.
+      #
+      #  This option is an enum to permit additional types to be added, e.g.
+      #  goog.math.Integer.
+      #
+      attr_accessor jstype(): ::Google::Protobuf::FieldOptions::JSType
+
+      # The jstype option determines the JavaScript type used for values of the
+      #  field.  The option is permitted only for 64 bit integral and fixed types
+      #  (int64, uint64, sint64, fixed64, sfixed64).  A field with jstype JS_STRING
+      #  is represented as JavaScript string, which avoids loss of precision that
+      #  can happen when a large value is converted to a floating point JavaScript.
+      #  Specifying JS_NUMBER for the jstype causes the generated JavaScript code to
+      #  use the JavaScript "number" type.  The behavior of the default option
+      #  JS_NORMAL is implementation dependent.
+      #
+      #  This option is an enum to permit additional types to be added, e.g.
+      #  goog.math.Integer.
+      #
+      def jstype=: (::Google::Protobuf::FieldOptions::JSType::values) -> ::Google::Protobuf::FieldOptions::JSType::values
+                 | ...
+
+      def jstype!: () -> ::Google::Protobuf::FieldOptions::JSType?
+
+      # Should this field be parsed lazily?  Lazy applies only to message-type
+      #  fields.  It means that when the outer message is initially parsed, the
+      #  inner message's contents will not be parsed but instead stored in encoded
+      #  form.  The inner message will actually be parsed when it is first accessed.
+      #
+      #  This is only a hint.  Implementations are free to choose whether to use
+      #  eager or lazy parsing regardless of the value of this option.  However,
+      #  setting this option true suggests that the protocol author believes that
+      #  using lazy parsing on this field is worth the additional bookkeeping
+      #  overhead typically needed to implement it.
+      #
+      #  This option does not affect the public interface of any generated code;
+      #  all method signatures remain the same.  Furthermore, thread-safety of the
+      #  interface is not affected by this option; const methods remain safe to
+      #  call from multiple threads concurrently, while non-const methods continue
+      #  to require exclusive access.
+      #
+      #
+      #  Note that implementations may choose not to check required fields within
+      #  a lazy sub-message.  That is, calling IsInitialized() on the outer message
+      #  may return true even if the inner message has missing required fields.
+      #  This is necessary because otherwise the inner message would have to be
+      #  parsed in order to perform the check, defeating the purpose of lazy
+      #  parsing.  An implementation which chooses not to check required fields
+      #  must be consistent about it.  That is, for any particular sub-message, the
+      #  implementation must either *always* check its required fields, or *never*
+      #  check its required fields, regardless of whether or not the message has
+      #  been parsed.
+      #
+      attr_accessor lazy(): bool
+
+      def lazy!: () -> bool?
+
+      # Is this field deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for accessors, or it will be completely ignored; in the very least, this
+      #  is a formalization for deprecating fields.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # For Google-internal migration only. Do not use.
+      #
+      attr_accessor weak(): bool
+
+      def weak!: () -> bool?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?ctype: ::Google::Protobuf::FieldOptions::CType::init, ?packed: bool, ?jstype: ::Google::Protobuf::FieldOptions::JSType::init, ?lazy: bool, ?deprecated: bool, ?weak: bool, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:ctype) -> ::Google::Protobuf::FieldOptions::CType
+            | (:packed) -> bool
+            | (:jstype) -> ::Google::Protobuf::FieldOptions::JSType
+            | (:lazy) -> bool
+            | (:deprecated) -> bool
+            | (:weak) -> bool
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:ctype, ::Google::Protobuf::FieldOptions::CType) -> ::Google::Protobuf::FieldOptions::CType
+             | (:ctype, ::Google::Protobuf::FieldOptions::CType::values) -> ::Google::Protobuf::FieldOptions::CType::values
+             | (:packed, bool) -> bool
+             | (:jstype, ::Google::Protobuf::FieldOptions::JSType) -> ::Google::Protobuf::FieldOptions::JSType
+             | (:jstype, ::Google::Protobuf::FieldOptions::JSType::values) -> ::Google::Protobuf::FieldOptions::JSType::values
+             | (:lazy, bool) -> bool
+             | (:deprecated, bool) -> bool
+             | (:weak, bool) -> bool
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def packed?: () -> bool
+
+      def lazy?: () -> bool
+
+      def deprecated?: () -> bool
+
+      def weak?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> FieldOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FieldOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FieldOptions, FieldOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FieldOptions, FieldOptions | _ToProto]
+
+      type array = ::Array[FieldOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FieldOptions | _ToProto]
+    end
+
+    class OneofOptions < ::Protobuf::Message
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> OneofOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = OneofOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[OneofOptions, OneofOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, OneofOptions, OneofOptions | _ToProto]
+
+      type array = ::Array[OneofOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, OneofOptions | _ToProto]
+    end
+
+    class EnumOptions < ::Protobuf::Message
+      # Set this option to true to allow mapping different tag names to the same
+      #  value.
+      #
+      attr_accessor allow_alias(): bool
+
+      def allow_alias!: () -> bool?
+
+      # Is this enum deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for the enum, or it will be completely ignored; in the very least, this
+      #  is a formalization for deprecating enums.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?allow_alias: bool, ?deprecated: bool, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:allow_alias) -> bool
+            | (:deprecated) -> bool
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:allow_alias, bool) -> bool
+             | (:deprecated, bool) -> bool
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def allow_alias?: () -> bool
+
+      def deprecated?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> EnumOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = EnumOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[EnumOptions, EnumOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EnumOptions, EnumOptions | _ToProto]
+
+      type array = ::Array[EnumOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, EnumOptions | _ToProto]
+    end
+
+    class EnumValueOptions < ::Protobuf::Message
+      # Is this enum value deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for the enum value, or it will be completely ignored; in the very least,
+      #  this is a formalization for deprecating enum values.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?deprecated: bool, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:deprecated) -> bool
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:deprecated, bool) -> bool
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def deprecated?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> EnumValueOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = EnumValueOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[EnumValueOptions, EnumValueOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, EnumValueOptions, EnumValueOptions | _ToProto]
+
+      type array = ::Array[EnumValueOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, EnumValueOptions | _ToProto]
+    end
+
+    class ServiceOptions < ::Protobuf::Message
+      # Is this service deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for the service, or it will be completely ignored; in the very least,
+      #  this is a formalization for deprecating services.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?deprecated: bool, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:deprecated) -> bool
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:deprecated, bool) -> bool
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def deprecated?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> ServiceOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ServiceOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ServiceOptions, ServiceOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ServiceOptions, ServiceOptions | _ToProto]
+
+      type array = ::Array[ServiceOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ServiceOptions | _ToProto]
+    end
+
+    class MethodOptions < ::Protobuf::Message
+      # Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
+      #  or neither? HTTP based RPC implementation may choose GET verb for safe
+      #  methods, and PUT verb for idempotent methods instead of the default POST.
+      #
+      class IdempotencyLevel < ::Protobuf::Enum
+        type names = :IDEMPOTENCY_UNKNOWN | :NO_SIDE_EFFECTS | :IDEMPOTENT
+
+        type strings = "IDEMPOTENCY_UNKNOWN" | "NO_SIDE_EFFECTS" | "IDEMPOTENT"
+
+        type tags = 0 | 1 | 2
+
+        type values = names | strings | tags
+
+        attr_reader name(): names
+
+        attr_reader tag(): tags
+
+        IDEMPOTENCY_UNKNOWN: IdempotencyLevel
+
+        # implies idempotent
+        #
+        NO_SIDE_EFFECTS: IdempotencyLevel
+
+        # idempotent, but may have side effects
+        #
+        IDEMPOTENT: IdempotencyLevel
+
+        # The type of `#initialize` parameter.
+        type init = IdempotencyLevel | values
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[IdempotencyLevel, IdempotencyLevel | values]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, IdempotencyLevel, IdempotencyLevel | values]
+
+        type array = ::Array[IdempotencyLevel | values]
+
+        type hash[KEY] = ::Hash[KEY, IdempotencyLevel | values]
+      end
+
+      # Is this method deprecated?
+      #  Depending on the target platform, this can emit Deprecated annotations
+      #  for the method, or it will be completely ignored; in the very least,
+      #  this is a formalization for deprecating methods.
+      #
+      attr_accessor deprecated(): bool
+
+      def deprecated!: () -> bool?
+
+      attr_accessor idempotency_level(): ::Google::Protobuf::MethodOptions::IdempotencyLevel
+
+      def idempotency_level=: (::Google::Protobuf::MethodOptions::IdempotencyLevel::values) -> ::Google::Protobuf::MethodOptions::IdempotencyLevel::values
+                            | ...
+
+      def idempotency_level!: () -> ::Google::Protobuf::MethodOptions::IdempotencyLevel?
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
+
+      # The parser stores options it doesn't recognize here. See above.
+      #
+      def uninterpreted_option=: (::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+                               | ...
+
+      def uninterpreted_option!: () -> ::Google::Protobuf::UninterpretedOption::field_array?
+
+      def initialize: (?deprecated: bool, ?idempotency_level: ::Google::Protobuf::MethodOptions::IdempotencyLevel::init, ?uninterpreted_option: ::Google::Protobuf::UninterpretedOption::array) -> void
+
+      def []: (:deprecated) -> bool
+            | (:idempotency_level) -> ::Google::Protobuf::MethodOptions::IdempotencyLevel
+            | (:uninterpreted_option) -> ::Google::Protobuf::UninterpretedOption::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:deprecated, bool) -> bool
+             | (:idempotency_level, ::Google::Protobuf::MethodOptions::IdempotencyLevel) -> ::Google::Protobuf::MethodOptions::IdempotencyLevel
+             | (:idempotency_level, ::Google::Protobuf::MethodOptions::IdempotencyLevel::values) -> ::Google::Protobuf::MethodOptions::IdempotencyLevel::values
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::field_array) -> ::Google::Protobuf::UninterpretedOption::field_array
+             | (:uninterpreted_option, ::Google::Protobuf::UninterpretedOption::array) -> ::Google::Protobuf::UninterpretedOption::array
+             | (::Symbol, untyped) -> untyped
+
+      def deprecated?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> MethodOptions
+      end
+
+      # The type of `#initialize` parameter.
+      type init = MethodOptions | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[MethodOptions, MethodOptions | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, MethodOptions, MethodOptions | _ToProto]
+
+      type array = ::Array[MethodOptions | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, MethodOptions | _ToProto]
+    end
+
+    # A message representing a option the parser does not recognize. This only
+    #  appears in options protos created by the compiler::Parser class.
+    #  DescriptorPool resolves these when building Descriptor objects. Therefore,
+    #  options protos in descriptor objects (e.g. returned by Descriptor::options(),
+    #  or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
+    #  in them.
+    #
+    class UninterpretedOption < ::Protobuf::Message
+      # The name of the uninterpreted option.  Each string represents a segment in
+      #  a dot-separated name.  is_extension is true iff a segment represents an
+      #  extension (denoted with parentheses in options specs in .proto files).
+      #  E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
+      #  "foo.(bar.baz).qux".
+      #
+      class NamePart < ::Protobuf::Message
+        attr_accessor name_part(): ::String
+
+        def name_part!: () -> ::String?
+
+        attr_accessor is_extension(): bool
+
+        def is_extension!: () -> bool?
+
+        def initialize: (?name_part: ::String, ?is_extension: bool) -> void
+
+        def []: (:name_part) -> ::String
+              | (:is_extension) -> bool
+              | (::Symbol) -> untyped
+
+        def []=: (:name_part, ::String) -> ::String
+               | (:is_extension, bool) -> bool
+               | (::Symbol, untyped) -> untyped
+
+        def is_extension?: () -> bool
+
+        interface _ToProto
+          def to_proto: () -> NamePart
+        end
+
+        # The type of `#initialize` parameter.
+        type init = NamePart | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[NamePart, NamePart | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamePart, NamePart | _ToProto]
+
+        type array = ::Array[NamePart | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, NamePart | _ToProto]
+      end
+
+      attr_accessor name(): ::Google::Protobuf::UninterpretedOption::NamePart::field_array
+
+      def name=: (::Google::Protobuf::UninterpretedOption::NamePart::array) -> ::Google::Protobuf::UninterpretedOption::NamePart::array
+               | ...
+
+      def name!: () -> ::Google::Protobuf::UninterpretedOption::NamePart::field_array?
+
+      # The value of the uninterpreted option, in whatever type the tokenizer
+      #  identified it as during parsing. Exactly one of these should be set.
+      #
+      attr_accessor identifier_value(): ::String
+
+      def identifier_value!: () -> ::String?
+
+      attr_accessor positive_int_value(): ::Integer
+
+      def positive_int_value!: () -> ::Integer?
+
+      attr_accessor negative_int_value(): ::Integer
+
+      def negative_int_value!: () -> ::Integer?
+
+      attr_accessor double_value(): ::Float
+
+      def double_value!: () -> ::Float?
+
+      attr_accessor string_value(): ::String
+
+      def string_value!: () -> ::String?
+
+      attr_accessor aggregate_value(): ::String
+
+      def aggregate_value!: () -> ::String?
+
+      def initialize: (?name: ::Google::Protobuf::UninterpretedOption::NamePart::array, ?identifier_value: ::String, ?positive_int_value: ::Integer, ?negative_int_value: ::Integer, ?double_value: ::Float, ?string_value: ::String, ?aggregate_value: ::String) -> void
+
+      def []: (:name) -> ::Google::Protobuf::UninterpretedOption::NamePart::field_array
+            | (:identifier_value) -> ::String
+            | (:positive_int_value) -> ::Integer
+            | (:negative_int_value) -> ::Integer
+            | (:double_value) -> ::Float
+            | (:string_value) -> ::String
+            | (:aggregate_value) -> ::String
+            | (::Symbol) -> untyped
+
+      def []=: (:name, ::Google::Protobuf::UninterpretedOption::NamePart::field_array) -> ::Google::Protobuf::UninterpretedOption::NamePart::field_array
+             | (:name, ::Google::Protobuf::UninterpretedOption::NamePart::array) -> ::Google::Protobuf::UninterpretedOption::NamePart::array
+             | (:identifier_value, ::String) -> ::String
+             | (:positive_int_value, ::Integer) -> ::Integer
+             | (:negative_int_value, ::Integer) -> ::Integer
+             | (:double_value, ::Float) -> ::Float
+             | (:string_value, ::String) -> ::String
+             | (:aggregate_value, ::String) -> ::String
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> UninterpretedOption
+      end
+
+      # The type of `#initialize` parameter.
+      type init = UninterpretedOption | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[UninterpretedOption, UninterpretedOption | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UninterpretedOption, UninterpretedOption | _ToProto]
+
+      type array = ::Array[UninterpretedOption | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, UninterpretedOption | _ToProto]
+    end
+
+    # Encapsulates information about the original source file from which a
+    #  FileDescriptorProto was generated.
+    #
+    class SourceCodeInfo < ::Protobuf::Message
+      class Location < ::Protobuf::Message
+        # Identifies which part of the FileDescriptorProto was defined at this
+        #  location.
+        #
+        #  Each element is a field number or an index.  They form a path from
+        #  the root FileDescriptorProto to the place where the definition.  For
+        #  example, this path:
+        #    [ 4, 3, 2, 7, 1 ]
+        #  refers to:
+        #    file.message_type(3)  // 4, 3
+        #        .field(7)         // 2, 7
+        #        .name()           // 1
+        #  This is because FileDescriptorProto.message_type has field number 4:
+        #    repeated DescriptorProto message_type = 4;
+        #  and DescriptorProto.field has field number 2:
+        #    repeated FieldDescriptorProto field = 2;
+        #  and FieldDescriptorProto.name has field number 1:
+        #    optional string name = 1;
+        #
+        #  Thus, the above path gives the location of a field name.  If we removed
+        #  the last element:
+        #    [ 4, 3, 2, 7 ]
+        #  this path refers to the whole field declaration (from the beginning
+        #  of the label to the terminating semicolon).
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        attr_accessor path(): ::Protobuf::field_array[::Integer]
+
+        # Identifies which part of the FileDescriptorProto was defined at this
+        #  location.
+        #
+        #  Each element is a field number or an index.  They form a path from
+        #  the root FileDescriptorProto to the place where the definition.  For
+        #  example, this path:
+        #    [ 4, 3, 2, 7, 1 ]
+        #  refers to:
+        #    file.message_type(3)  // 4, 3
+        #        .field(7)         // 2, 7
+        #        .name()           // 1
+        #  This is because FileDescriptorProto.message_type has field number 4:
+        #    repeated DescriptorProto message_type = 4;
+        #  and DescriptorProto.field has field number 2:
+        #    repeated FieldDescriptorProto field = 2;
+        #  and FieldDescriptorProto.name has field number 1:
+        #    optional string name = 1;
+        #
+        #  Thus, the above path gives the location of a field name.  If we removed
+        #  the last element:
+        #    [ 4, 3, 2, 7 ]
+        #  this path refers to the whole field declaration (from the beginning
+        #  of the label to the terminating semicolon).
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        def path=: (::Array[::Integer]) -> ::Array[::Integer]
+                 | ...
+
+        def path!: () -> ::Protobuf::field_array[::Integer]?
+
+        # Always has exactly three or four elements: start line, start column,
+        #  end line (optional, otherwise assumed same as start line), end column.
+        #  These are packed into a single field for efficiency.  Note that line
+        #  and column numbers are zero-based -- typically you will want to add
+        #  1 to each before displaying to a user.
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        attr_accessor span(): ::Protobuf::field_array[::Integer]
+
+        # Always has exactly three or four elements: start line, start column,
+        #  end line (optional, otherwise assumed same as start line), end column.
+        #  These are packed into a single field for efficiency.  Note that line
+        #  and column numbers are zero-based -- typically you will want to add
+        #  1 to each before displaying to a user.
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        def span=: (::Array[::Integer]) -> ::Array[::Integer]
+                 | ...
+
+        def span!: () -> ::Protobuf::field_array[::Integer]?
+
+        # If this SourceCodeInfo represents a complete declaration, these are any
+        #  comments appearing before and after the declaration which appear to be
+        #  attached to the declaration.
+        #
+        #  A series of line comments appearing on consecutive lines, with no other
+        #  tokens appearing on those lines, will be treated as a single comment.
+        #
+        #  leading_detached_comments will keep paragraphs of comments that appear
+        #  before (but not connected to) the current element. Each paragraph,
+        #  separated by empty lines, will be one comment element in the repeated
+        #  field.
+        #
+        #  Only the comment content is provided; comment markers (e.g. //) are
+        #  stripped out.  For block comments, leading whitespace and an asterisk
+        #  will be stripped from the beginning of each line other than the first.
+        #  Newlines are included in the output.
+        #
+        #  Examples:
+        #
+        #    optional int32 foo = 1;  // Comment attached to foo.
+        #    // Comment attached to bar.
+        #    optional int32 bar = 2;
+        #
+        #    optional string baz = 3;
+        #    // Comment attached to baz.
+        #    // Another line attached to baz.
+        #
+        #    // Comment attached to qux.
+        #    //
+        #    // Another line attached to qux.
+        #    optional double qux = 4;
+        #
+        #    // Detached comment for corge. This is not leading or trailing comments
+        #    // to qux or corge because there are blank lines separating it from
+        #    // both.
+        #
+        #    // Detached comment for corge paragraph 2.
+        #
+        #    optional string corge = 5;
+        #    /* Block comment attached
+        #     * to corge.  Leading asterisks
+        #     * will be removed. */
+        #    /* Block comment attached to
+        #     * grault. */
+        #    optional int32 grault = 6;
+        #
+        #    // ignored detached comments.
+        #
+        attr_accessor leading_comments(): ::String
+
+        def leading_comments!: () -> ::String?
+
+        attr_accessor trailing_comments(): ::String
+
+        def trailing_comments!: () -> ::String?
+
+        attr_accessor leading_detached_comments(): ::Protobuf::field_array[::String]
+
+        def leading_detached_comments=: (::Array[::String]) -> ::Array[::String]
+                                      | ...
+
+        def leading_detached_comments!: () -> ::Protobuf::field_array[::String]?
+
+        def initialize: (?path: ::Array[::Integer], ?span: ::Array[::Integer], ?leading_comments: ::String, ?trailing_comments: ::String, ?leading_detached_comments: ::Array[::String]) -> void
+
+        def []: (:path) -> ::Protobuf::field_array[::Integer]
+              | (:span) -> ::Protobuf::field_array[::Integer]
+              | (:leading_comments) -> ::String
+              | (:trailing_comments) -> ::String
+              | (:leading_detached_comments) -> ::Protobuf::field_array[::String]
+              | (::Symbol) -> untyped
+
+        def []=: (:path, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+               | (:path, ::Array[::Integer]) -> ::Array[::Integer]
+               | (:span, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+               | (:span, ::Array[::Integer]) -> ::Array[::Integer]
+               | (:leading_comments, ::String) -> ::String
+               | (:trailing_comments, ::String) -> ::String
+               | (:leading_detached_comments, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
+               | (:leading_detached_comments, ::Array[::String]) -> ::Array[::String]
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Location
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Location | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Location, Location | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Location, Location | _ToProto]
+
+        type array = ::Array[Location | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Location | _ToProto]
+      end
+
+      # A Location identifies a piece of source code in a .proto file which
+      #  corresponds to a particular definition.  This information is intended
+      #  to be useful to IDEs, code indexers, documentation generators, and similar
+      #  tools.
+      #
+      #  For example, say we have a file like:
+      #    message Foo {
+      #      optional string foo = 1;
+      #    }
+      #  Let's look at just the field definition:
+      #    optional string foo = 1;
+      #    ^       ^^     ^^  ^  ^^^
+      #    a       bc     de  f  ghi
+      #  We have the following locations:
+      #    span   path               represents
+      #    [a,i)  [ 4, 0, 2, 0 ]     The whole field definition.
+      #    [a,b)  [ 4, 0, 2, 0, 4 ]  The label (optional).
+      #    [c,d)  [ 4, 0, 2, 0, 5 ]  The type (string).
+      #    [e,f)  [ 4, 0, 2, 0, 1 ]  The name (foo).
+      #    [g,h)  [ 4, 0, 2, 0, 3 ]  The number (1).
+      #
+      #  Notes:
+      #  - A location may refer to a repeated field itself (i.e. not to any
+      #    particular index within it).  This is used whenever a set of elements are
+      #    logically enclosed in a single code segment.  For example, an entire
+      #    extend block (possibly containing multiple extension definitions) will
+      #    have an outer location whose path refers to the "extensions" repeated
+      #    field without an index.
+      #  - Multiple locations may have the same path.  This happens when a single
+      #    logical declaration is spread out across multiple places.  The most
+      #    obvious example is the "extend" block again -- there may be multiple
+      #    extend blocks in the same scope, each of which will have the same path.
+      #  - A location's span is not always a subset of its parent's span.  For
+      #    example, the "extendee" of an extension declaration appears at the
+      #    beginning of the "extend" block and is shared by all extensions within
+      #    the block.
+      #  - Just because a location's span is a subset of some other location's span
+      #    does not mean that it is a descendant.  For example, a "group" defines
+      #    both a type and a field in a single declaration.  Thus, the locations
+      #    corresponding to the type and field and their components will overlap.
+      #  - Code which tries to interpret locations should probably be designed to
+      #    ignore those that it doesn't understand, as more types of locations could
+      #    be recorded in the future.
+      #
+      attr_accessor location(): ::Google::Protobuf::SourceCodeInfo::Location::field_array
+
+      # A Location identifies a piece of source code in a .proto file which
+      #  corresponds to a particular definition.  This information is intended
+      #  to be useful to IDEs, code indexers, documentation generators, and similar
+      #  tools.
+      #
+      #  For example, say we have a file like:
+      #    message Foo {
+      #      optional string foo = 1;
+      #    }
+      #  Let's look at just the field definition:
+      #    optional string foo = 1;
+      #    ^       ^^     ^^  ^  ^^^
+      #    a       bc     de  f  ghi
+      #  We have the following locations:
+      #    span   path               represents
+      #    [a,i)  [ 4, 0, 2, 0 ]     The whole field definition.
+      #    [a,b)  [ 4, 0, 2, 0, 4 ]  The label (optional).
+      #    [c,d)  [ 4, 0, 2, 0, 5 ]  The type (string).
+      #    [e,f)  [ 4, 0, 2, 0, 1 ]  The name (foo).
+      #    [g,h)  [ 4, 0, 2, 0, 3 ]  The number (1).
+      #
+      #  Notes:
+      #  - A location may refer to a repeated field itself (i.e. not to any
+      #    particular index within it).  This is used whenever a set of elements are
+      #    logically enclosed in a single code segment.  For example, an entire
+      #    extend block (possibly containing multiple extension definitions) will
+      #    have an outer location whose path refers to the "extensions" repeated
+      #    field without an index.
+      #  - Multiple locations may have the same path.  This happens when a single
+      #    logical declaration is spread out across multiple places.  The most
+      #    obvious example is the "extend" block again -- there may be multiple
+      #    extend blocks in the same scope, each of which will have the same path.
+      #  - A location's span is not always a subset of its parent's span.  For
+      #    example, the "extendee" of an extension declaration appears at the
+      #    beginning of the "extend" block and is shared by all extensions within
+      #    the block.
+      #  - Just because a location's span is a subset of some other location's span
+      #    does not mean that it is a descendant.  For example, a "group" defines
+      #    both a type and a field in a single declaration.  Thus, the locations
+      #    corresponding to the type and field and their components will overlap.
+      #  - Code which tries to interpret locations should probably be designed to
+      #    ignore those that it doesn't understand, as more types of locations could
+      #    be recorded in the future.
+      #
+      def location=: (::Google::Protobuf::SourceCodeInfo::Location::array) -> ::Google::Protobuf::SourceCodeInfo::Location::array
+                   | ...
+
+      def location!: () -> ::Google::Protobuf::SourceCodeInfo::Location::field_array?
+
+      def initialize: (?location: ::Google::Protobuf::SourceCodeInfo::Location::array) -> void
+
+      def []: (:location) -> ::Google::Protobuf::SourceCodeInfo::Location::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:location, ::Google::Protobuf::SourceCodeInfo::Location::field_array) -> ::Google::Protobuf::SourceCodeInfo::Location::field_array
+             | (:location, ::Google::Protobuf::SourceCodeInfo::Location::array) -> ::Google::Protobuf::SourceCodeInfo::Location::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> SourceCodeInfo
+      end
+
+      # The type of `#initialize` parameter.
+      type init = SourceCodeInfo | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[SourceCodeInfo, SourceCodeInfo | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SourceCodeInfo, SourceCodeInfo | _ToProto]
+
+      type array = ::Array[SourceCodeInfo | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, SourceCodeInfo | _ToProto]
+    end
+
+    # Describes the relationship between generated code and its original source
+    #  file. A GeneratedCodeInfo message is associated with only one generated
+    #  source file, but may contain references to different source .proto files.
+    #
+    class GeneratedCodeInfo < ::Protobuf::Message
+      class Annotation < ::Protobuf::Message
+        # Identifies the element in the original source .proto file. This field
+        #  is formatted the same as SourceCodeInfo.Location.path.
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        attr_accessor path(): ::Protobuf::field_array[::Integer]
+
+        # Identifies the element in the original source .proto file. This field
+        #  is formatted the same as SourceCodeInfo.Location.path.
+        #
+        # ----
+        #
+        # Protobuf options:
+        #
+        # - `packed = true`
+        #
+        def path=: (::Array[::Integer]) -> ::Array[::Integer]
+                 | ...
+
+        def path!: () -> ::Protobuf::field_array[::Integer]?
+
+        # Identifies the filesystem path to the original source .proto.
+        #
+        attr_accessor source_file(): ::String
+
+        def source_file!: () -> ::String?
+
+        # Identifies the starting offset in bytes in the generated code
+        #  that relates to the identified object.
+        #
+        attr_accessor begin(): ::Integer
+
+        def begin!: () -> ::Integer?
+
+        # Identifies the ending offset in bytes in the generated code that
+        #  relates to the identified offset. The end offset should be one past
+        #  the last relevant byte (so the length of the text = end - begin).
+        #
+        attr_accessor end(): ::Integer
+
+        def end!: () -> ::Integer?
+
+        def initialize: (?path: ::Array[::Integer], ?source_file: ::String, ?begin: ::Integer, ?end: ::Integer) -> void
+
+        def []: (:path) -> ::Protobuf::field_array[::Integer]
+              | (:source_file) -> ::String
+              | (:begin) -> ::Integer
+              | (:end) -> ::Integer
+              | (::Symbol) -> untyped
+
+        def []=: (:path, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+               | (:path, ::Array[::Integer]) -> ::Array[::Integer]
+               | (:source_file, ::String) -> ::String
+               | (:begin, ::Integer) -> ::Integer
+               | (:end, ::Integer) -> ::Integer
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Annotation
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Annotation | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Annotation, Annotation | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Annotation, Annotation | _ToProto]
+
+        type array = ::Array[Annotation | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Annotation | _ToProto]
+      end
+
+      # An Annotation connects some span of text in generated code to an element
+      #  of its generating .proto file.
+      #
+      attr_accessor annotation(): ::Google::Protobuf::GeneratedCodeInfo::Annotation::field_array
+
+      # An Annotation connects some span of text in generated code to an element
+      #  of its generating .proto file.
+      #
+      def annotation=: (::Google::Protobuf::GeneratedCodeInfo::Annotation::array) -> ::Google::Protobuf::GeneratedCodeInfo::Annotation::array
+                     | ...
+
+      def annotation!: () -> ::Google::Protobuf::GeneratedCodeInfo::Annotation::field_array?
+
+      def initialize: (?annotation: ::Google::Protobuf::GeneratedCodeInfo::Annotation::array) -> void
+
+      def []: (:annotation) -> ::Google::Protobuf::GeneratedCodeInfo::Annotation::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:annotation, ::Google::Protobuf::GeneratedCodeInfo::Annotation::field_array) -> ::Google::Protobuf::GeneratedCodeInfo::Annotation::field_array
+             | (:annotation, ::Google::Protobuf::GeneratedCodeInfo::Annotation::array) -> ::Google::Protobuf::GeneratedCodeInfo::Annotation::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> GeneratedCodeInfo
+      end
+
+      # The type of `#initialize` parameter.
+      type init = GeneratedCodeInfo | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[GeneratedCodeInfo, GeneratedCodeInfo | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, GeneratedCodeInfo, GeneratedCodeInfo | _ToProto]
+
+      type array = ::Array[GeneratedCodeInfo | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, GeneratedCodeInfo | _ToProto]
+    end
+  end
+end

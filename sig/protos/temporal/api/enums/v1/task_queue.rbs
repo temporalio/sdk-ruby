@@ -1,0 +1,92 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        class TaskQueueKind < ::Protobuf::Enum
+          type names = :TASK_QUEUE_KIND_UNSPECIFIED | :TASK_QUEUE_KIND_NORMAL | :TASK_QUEUE_KIND_STICKY
+
+          type strings = "TASK_QUEUE_KIND_UNSPECIFIED" | "TASK_QUEUE_KIND_NORMAL" | "TASK_QUEUE_KIND_STICKY"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          TASK_QUEUE_KIND_UNSPECIFIED: TaskQueueKind
+
+          # Tasks from a normal workflow task queue always include complete workflow history
+          #
+          #  The task queue specified by the user is always a normal task queue. There can be as many
+          #  workers as desired for a single normal task queue. All those workers may pick up tasks from
+          #  that queue.
+          #
+          TASK_QUEUE_KIND_NORMAL: TaskQueueKind
+
+          # A sticky queue only includes new history since the last workflow task, and they are
+          #  per-worker.
+          #
+          #  Sticky queues are created dynamically by each worker during their start up. They only exist
+          #  for the lifetime of the worker process. Tasks in a sticky task queue are only available to
+          #  the worker that created the sticky queue.
+          #
+          #  Sticky queues are only for workflow tasks. There are no sticky task queues for activities.
+          #
+          TASK_QUEUE_KIND_STICKY: TaskQueueKind
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueueKind | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueueKind, TaskQueueKind | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueueKind, TaskQueueKind | values]
+
+          type array = ::Array[TaskQueueKind | values]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueueKind | values]
+        end
+
+        class TaskQueueType < ::Protobuf::Enum
+          type names = :TASK_QUEUE_TYPE_UNSPECIFIED | :TASK_QUEUE_TYPE_WORKFLOW | :TASK_QUEUE_TYPE_ACTIVITY
+
+          type strings = "TASK_QUEUE_TYPE_UNSPECIFIED" | "TASK_QUEUE_TYPE_WORKFLOW" | "TASK_QUEUE_TYPE_ACTIVITY"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          TASK_QUEUE_TYPE_UNSPECIFIED: TaskQueueType
+
+          # Workflow type of task queue.
+          #
+          TASK_QUEUE_TYPE_WORKFLOW: TaskQueueType
+
+          # Activity type of task queue.
+          #
+          TASK_QUEUE_TYPE_ACTIVITY: TaskQueueType
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueueType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueueType, TaskQueueType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueueType, TaskQueueType | values]
+
+          type array = ::Array[TaskQueueType | values]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueueType | values]
+        end
+      end
+    end
+  end
+end

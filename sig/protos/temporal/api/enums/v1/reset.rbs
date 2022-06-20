@@ -1,0 +1,42 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        # TODO: What is this?
+        #
+        class ResetReapplyType < ::Protobuf::Enum
+          type names = :RESET_REAPPLY_TYPE_UNSPECIFIED | :RESET_REAPPLY_TYPE_SIGNAL | :RESET_REAPPLY_TYPE_NONE
+
+          type strings = "RESET_REAPPLY_TYPE_UNSPECIFIED" | "RESET_REAPPLY_TYPE_SIGNAL" | "RESET_REAPPLY_TYPE_NONE"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          RESET_REAPPLY_TYPE_UNSPECIFIED: ResetReapplyType
+
+          RESET_REAPPLY_TYPE_SIGNAL: ResetReapplyType
+
+          RESET_REAPPLY_TYPE_NONE: ResetReapplyType
+
+          # The type of `#initialize` parameter.
+          type init = ResetReapplyType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ResetReapplyType, ResetReapplyType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ResetReapplyType, ResetReapplyType | values]
+
+          type array = ::Array[ResetReapplyType | values]
+
+          type hash[KEY] = ::Hash[KEY, ResetReapplyType | values]
+        end
+      end
+    end
+  end
+end
