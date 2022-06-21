@@ -52,7 +52,7 @@ methods!(
             .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))));
 
         if let Response::Rpc { bytes } = response.unwrap() {
-            let enc = Encoding::find("UTF-8").unwrap();
+            let enc = Encoding::find("ASCII-8BIT").unwrap();
             return RString::from_bytes(&bytes, &enc);
         } else {
             panic!("Unexpected response type. Expected Response::Rpc");
