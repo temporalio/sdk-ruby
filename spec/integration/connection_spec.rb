@@ -9,7 +9,10 @@ describe Temporal::Connection do
 
   # TODO: Unlike Ruby's native GRPC client the Temporal::Connection doesn't play well with
   #       the GRPC server in a thread. Needs an investigation of potential thread blocking
-  before(:all) { @pid = fork { MockServer.run(mock_address) } }
+  before(:all) do
+    @pid = fork { MockServer.run(mock_address) }
+    sleep 0.1 # wait for the server to boot up
+  end
   after(:all) { Process.kill('QUIT', @pid) }
 
   MockServer.rpc_descs.each do |rpc, desc|
