@@ -2,8 +2,9 @@ require 'bundler/gem_tasks'
 require 'rbs_protobuf'
 
 PROTO_ROOT = 'bridge/sdk-core/protos/api_upstream'.freeze
-PROTO_OUT = 'lib/gen'.freeze
-SIG_OUT = 'sig/protos'.freeze
+PROTOBUF_PATH = 'lib/gen'.freeze
+RBS_SIG_PATH = 'sig/protos'.freeze
+GRPC_PATH = 'spec/support/grpc'.freeze
 
 namespace :bridge do
   desc 'Build SDK Core Bridge'
@@ -23,12 +24,17 @@ end
 namespace :proto do
   desc 'Generate API protobufs'
   task :generate do
-    Dir.mkdir(PROTO_OUT) unless Dir.exist?(PROTO_OUT)
-    Dir.mkdir(SIG_OUT) unless Dir.exist?(SIG_OUT)
+    Dir.mkdir(PROTOBUF_PATH) unless Dir.exist?(PROTOBUF_PATH)
+    Dir.mkdir(RBS_SIG_PATH) unless Dir.exist?(RBS_SIG_PATH)
+    Dir.mkdir(GRPC_PATH) unless Dir.exist?(GRPC_PATH)
 
     Dir.glob("#{PROTO_ROOT}/**/*.proto").map { |f| File.dirname(f) }.uniq.sort.each do |dir|
-      sh 'RBS_PROTOBUF_BACKEND=protobuf RBS_PROTOBUF_EXTENSION=true bundle exec protoc' \
-         " --proto_path=#{PROTO_ROOT} --ruby_out=#{PROTO_OUT} --rbs_out=#{SIG_OUT} #{dir}/*.proto"
+      sh 'RBS_PROTOBUF_BACKEND=protobuf RBS_PROTOBUF_EXTENSION=true' \
+         ' bundle exec grpc_tools_ruby_protoc' \
+         " --proto_path=#{PROTO_ROOT}" \
+         " --ruby_out=#{PROTOBUF_PATH}" \
+         " --grpc_out=#{GRPC_PATH}" \
+         " --rbs_out=#{RBS_SIG_PATH} #{dir}/*.proto"
     end
   end
 end

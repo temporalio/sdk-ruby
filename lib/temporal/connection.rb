@@ -7,6 +7,13 @@ module Temporal
       @core_connection = Temporal::Bridge::Connection.connect(host)
     end
 
+    def register_namespace(request)
+      encoded = Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest.encode(request)
+      response = core_connection.call(:register_namespace, encoded)
+
+      Temporal::Api::WorkflowService::V1::RegisterNamespaceResponse.decode(response)
+    end
+
     def describe_namespace(request)
       encoded = Temporal::Api::WorkflowService::V1::DescribeNamespaceRequest.encode(request)
       response = core_connection.call(:describe_namespace, encoded)
