@@ -7,13 +7,8 @@ describe Temporal::Connection do
 
   subject { described_class.new("http://#{mock_address}") }
 
-  # TODO: Unlike Ruby's native GRPC client the Temporal::Connection doesn't play well with
-  #       the GRPC server in a thread. Needs an investigation of potential thread blocking
-  before(:all) do
-    @pid = fork { MockServer.run(mock_address) }
-    sleep 0.1 # wait for the server to boot up
-  end
-  after(:all) { Process.kill('QUIT', @pid) }
+  before(:all) { @server_thread = Thread.new { MockServer.run(mock_address) } }
+  after(:all) { @server_thread.kill }
 
   MockServer.rpc_descs.each do |rpc, desc|
     rpc = ::GRPC::GenericService.underscore(rpc.to_s)

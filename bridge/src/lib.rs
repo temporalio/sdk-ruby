@@ -7,7 +7,7 @@ mod reactor;
 
 use connection::Connection;
 use once_cell::sync::OnceCell;
-use rutie::{Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM};
+use rutie::{Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread};
 use reactor::{Reactor, Request, Response};
 
 fn reactor() -> &'static Reactor {
@@ -27,9 +27,12 @@ methods!(
 
     fn create_connection(host: RString) -> AnyObject {
         let host = host.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
-        let response = reactor()
-            .process(Request::Connect { host: host })
-            .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))));
+
+        let response = Thread::call_without_gvl(move || {
+            reactor()
+                .process(Request::Connect { host: host.clone() })
+                .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))))
+        }, Some(|| {}));
 
         if let Response::Connection { connection } = response.unwrap() {
             return
@@ -46,10 +49,12 @@ methods!(
         let rpc = rpc.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let request = request.map_err(|e| VM::raise_ex(e)).unwrap().to_string().as_bytes().to_vec();
 
-        let connection = rtself.get_data(&*CONNECTION_WRAPPER);
-        let response = reactor()
-            .process(Request::Rpc { connection: connection.clone(), method: rpc, bytes: request })
-            .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))));
+        let response = Thread::call_without_gvl(move || {
+            let connection = rtself.get_data(&*CONNECTION_WRAPPER);
+            reactor()
+                .process(Request::Rpc { connection: connection.clone(), method: rpc.clone(), bytes: request.clone() })
+                .map_err(|e| VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(&e.to_string()))))
+        }, Some(|| {}));
 
         if let Response::Rpc { bytes } = response.unwrap() {
             let enc = Encoding::find("ASCII-8BIT").unwrap();
