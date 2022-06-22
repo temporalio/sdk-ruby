@@ -7,8 +7,13 @@ describe Temporal::Connection do
 
   subject { described_class.new("http://#{mock_address}") }
 
-  before(:all) { @server_thread = Thread.new { MockServer.run(mock_address) } }
-  after(:all) { @server_thread.kill }
+  # TODO: For some reason the Bridge doesn't play well with the server in the same
+  #       process throwing SegFaults in cases. Needs further investigation
+  before(:all) do
+    @pid = fork { MockServer.run(mock_address) }
+    sleep 0.1 # wait for the server to boot up
+  end
+  after(:all) { Process.kill('QUIT', @pid) }
 
   MockServer.rpc_descs.each do |rpc, desc|
     rpc = ::GRPC::GenericService.underscore(rpc.to_s)
