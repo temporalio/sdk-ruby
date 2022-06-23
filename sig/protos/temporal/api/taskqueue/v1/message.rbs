@@ -1,0 +1,330 @@
+module Temporal
+  module Api
+    module Taskqueue
+      module V1
+        # See https://docs.temporal.io/docs/concepts/task-queues/
+        #
+        class TaskQueue < ::Protobuf::Message
+          attr_accessor name(): ::String
+
+          def name!: () -> ::String?
+
+          # Default: TASK_QUEUE_KIND_NORMAL.
+          #
+          attr_accessor kind(): ::Temporal::Api::Enums::V1::TaskQueueKind
+
+          # Default: TASK_QUEUE_KIND_NORMAL.
+          #
+          def kind=: (::Temporal::Api::Enums::V1::TaskQueueKind::values) -> ::Temporal::Api::Enums::V1::TaskQueueKind::values
+                   | ...
+
+          def kind!: () -> ::Temporal::Api::Enums::V1::TaskQueueKind?
+
+          def initialize: (?name: ::String, ?kind: ::Temporal::Api::Enums::V1::TaskQueueKind::init) -> void
+
+          def []: (:name) -> ::String
+                | (:kind) -> ::Temporal::Api::Enums::V1::TaskQueueKind
+                | (::Symbol) -> untyped
+
+          def []=: (:name, ::String) -> ::String
+                 | (:kind, ::Temporal::Api::Enums::V1::TaskQueueKind) -> ::Temporal::Api::Enums::V1::TaskQueueKind
+                 | (:kind, ::Temporal::Api::Enums::V1::TaskQueueKind::values) -> ::Temporal::Api::Enums::V1::TaskQueueKind::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TaskQueue
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueue | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueue, TaskQueue | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueue, TaskQueue | _ToProto]
+
+          type array = ::Array[TaskQueue | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueue | _ToProto]
+        end
+
+        # Only applies to activity task queues
+        #
+        class TaskQueueMetadata < ::Protobuf::Message
+          # Allows throttling dispatch of tasks from this queue
+          #
+          attr_accessor max_tasks_per_second(): ::Google::Protobuf::DoubleValue?
+
+          # Allows throttling dispatch of tasks from this queue
+          #
+          def max_tasks_per_second=: [M < ::Google::Protobuf::DoubleValue::_ToProto] (M?) -> M?
+                                   | ...
+
+          def max_tasks_per_second!: () -> ::Google::Protobuf::DoubleValue?
+
+          def initialize: (?max_tasks_per_second: ::Google::Protobuf::DoubleValue::init?) -> void
+
+          def []: (:max_tasks_per_second) -> ::Google::Protobuf::DoubleValue?
+                | (::Symbol) -> untyped
+
+          def []=: (:max_tasks_per_second, ::Google::Protobuf::DoubleValue?) -> ::Google::Protobuf::DoubleValue?
+                 | [M < ::Google::Protobuf::DoubleValue::_ToProto] (:max_tasks_per_second, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TaskQueueMetadata
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueueMetadata | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueueMetadata, TaskQueueMetadata | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueueMetadata, TaskQueueMetadata | _ToProto]
+
+          type array = ::Array[TaskQueueMetadata | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueueMetadata | _ToProto]
+        end
+
+        class TaskQueueStatus < ::Protobuf::Message
+          attr_accessor backlog_count_hint(): ::Integer
+
+          def backlog_count_hint!: () -> ::Integer?
+
+          attr_accessor read_level(): ::Integer
+
+          def read_level!: () -> ::Integer?
+
+          attr_accessor ack_level(): ::Integer
+
+          def ack_level!: () -> ::Integer?
+
+          attr_accessor rate_per_second(): ::Float
+
+          def rate_per_second!: () -> ::Float?
+
+          attr_accessor task_id_block(): ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+
+          def task_id_block=: [M < ::Temporal::Api::Taskqueue::V1::TaskIdBlock::_ToProto] (M?) -> M?
+                            | ...
+
+          def task_id_block!: () -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+
+          def initialize: (?backlog_count_hint: ::Integer, ?read_level: ::Integer, ?ack_level: ::Integer, ?rate_per_second: ::Float, ?task_id_block: ::Temporal::Api::Taskqueue::V1::TaskIdBlock::init?) -> void
+
+          def []: (:backlog_count_hint) -> ::Integer
+                | (:read_level) -> ::Integer
+                | (:ack_level) -> ::Integer
+                | (:rate_per_second) -> ::Float
+                | (:task_id_block) -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+                | (::Symbol) -> untyped
+
+          def []=: (:backlog_count_hint, ::Integer) -> ::Integer
+                 | (:read_level, ::Integer) -> ::Integer
+                 | (:ack_level, ::Integer) -> ::Integer
+                 | (:rate_per_second, ::Float) -> ::Float
+                 | (:task_id_block, ::Temporal::Api::Taskqueue::V1::TaskIdBlock?) -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskIdBlock::_ToProto] (:task_id_block, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TaskQueueStatus
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueueStatus | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueueStatus, TaskQueueStatus | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueueStatus, TaskQueueStatus | _ToProto]
+
+          type array = ::Array[TaskQueueStatus | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueueStatus | _ToProto]
+        end
+
+        class TaskIdBlock < ::Protobuf::Message
+          attr_accessor start_id(): ::Integer
+
+          def start_id!: () -> ::Integer?
+
+          attr_accessor end_id(): ::Integer
+
+          def end_id!: () -> ::Integer?
+
+          def initialize: (?start_id: ::Integer, ?end_id: ::Integer) -> void
+
+          def []: (:start_id) -> ::Integer
+                | (:end_id) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:start_id, ::Integer) -> ::Integer
+                 | (:end_id, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TaskIdBlock
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TaskIdBlock | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskIdBlock, TaskIdBlock | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskIdBlock, TaskIdBlock | _ToProto]
+
+          type array = ::Array[TaskIdBlock | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TaskIdBlock | _ToProto]
+        end
+
+        class TaskQueuePartitionMetadata < ::Protobuf::Message
+          attr_accessor key(): ::String
+
+          def key!: () -> ::String?
+
+          attr_accessor owner_host_name(): ::String
+
+          def owner_host_name!: () -> ::String?
+
+          def initialize: (?key: ::String, ?owner_host_name: ::String) -> void
+
+          def []: (:key) -> ::String
+                | (:owner_host_name) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:key, ::String) -> ::String
+                 | (:owner_host_name, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TaskQueuePartitionMetadata
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TaskQueuePartitionMetadata | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TaskQueuePartitionMetadata, TaskQueuePartitionMetadata | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TaskQueuePartitionMetadata, TaskQueuePartitionMetadata | _ToProto]
+
+          type array = ::Array[TaskQueuePartitionMetadata | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TaskQueuePartitionMetadata | _ToProto]
+        end
+
+        class PollerInfo < ::Protobuf::Message
+          # Unix Nano
+          #
+          attr_accessor last_access_time(): ::Google::Protobuf::Timestamp?
+
+          # Unix Nano
+          #
+          def last_access_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                               | ...
+
+          def last_access_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          attr_accessor rate_per_second(): ::Float
+
+          def rate_per_second!: () -> ::Float?
+
+          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float) -> void
+
+          def []: (:last_access_time) -> ::Google::Protobuf::Timestamp?
+                | (:identity) -> ::String
+                | (:rate_per_second) -> ::Float
+                | (::Symbol) -> untyped
+
+          def []=: (:last_access_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_access_time, M?) -> M?
+                 | (:identity, ::String) -> ::String
+                 | (:rate_per_second, ::Float) -> ::Float
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PollerInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PollerInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PollerInfo, PollerInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PollerInfo, PollerInfo | _ToProto]
+
+          type array = ::Array[PollerInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PollerInfo | _ToProto]
+        end
+
+        class StickyExecutionAttributes < ::Protobuf::Message
+          attr_accessor worker_task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+
+          def worker_task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+                                | ...
+
+          def worker_task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+
+          # (-- api-linter: core::0140::prepositions=disabled
+          #      aip.dev/not-precedent: "to" is used to indicate interval. --)
+          #
+          attr_accessor schedule_to_start_timeout(): ::Google::Protobuf::Duration?
+
+          # (-- api-linter: core::0140::prepositions=disabled
+          #      aip.dev/not-precedent: "to" is used to indicate interval. --)
+          #
+          def schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
+
+          def initialize: (?worker_task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?) -> void
+
+          def []: (:worker_task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
+                | (::Symbol) -> untyped
+
+          def []=: (:worker_task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:worker_task_queue, M?) -> M?
+                 | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StickyExecutionAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StickyExecutionAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StickyExecutionAttributes, StickyExecutionAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StickyExecutionAttributes, StickyExecutionAttributes | _ToProto]
+
+          type array = ::Array[StickyExecutionAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StickyExecutionAttributes | _ToProto]
+        end
+      end
+    end
+  end
+end

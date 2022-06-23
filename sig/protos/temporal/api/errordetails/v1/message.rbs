@@ -1,0 +1,382 @@
+module Temporal
+  module Api
+    module Errordetails
+      module V1
+        class NotFoundFailure < ::Protobuf::Message
+          attr_accessor current_cluster(): ::String
+
+          def current_cluster!: () -> ::String?
+
+          attr_accessor active_cluster(): ::String
+
+          def active_cluster!: () -> ::String?
+
+          def initialize: (?current_cluster: ::String, ?active_cluster: ::String) -> void
+
+          def []: (:current_cluster) -> ::String
+                | (:active_cluster) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:current_cluster, ::String) -> ::String
+                 | (:active_cluster, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NotFoundFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NotFoundFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NotFoundFailure, NotFoundFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NotFoundFailure, NotFoundFailure | _ToProto]
+
+          type array = ::Array[NotFoundFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NotFoundFailure | _ToProto]
+        end
+
+        class WorkflowExecutionAlreadyStartedFailure < ::Protobuf::Message
+          attr_accessor start_request_id(): ::String
+
+          def start_request_id!: () -> ::String?
+
+          attr_accessor run_id(): ::String
+
+          def run_id!: () -> ::String?
+
+          def initialize: (?start_request_id: ::String, ?run_id: ::String) -> void
+
+          def []: (:start_request_id) -> ::String
+                | (:run_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:start_request_id, ::String) -> ::String
+                 | (:run_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionAlreadyStartedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionAlreadyStartedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionAlreadyStartedFailure, WorkflowExecutionAlreadyStartedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionAlreadyStartedFailure, WorkflowExecutionAlreadyStartedFailure | _ToProto]
+
+          type array = ::Array[WorkflowExecutionAlreadyStartedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionAlreadyStartedFailure | _ToProto]
+        end
+
+        class NamespaceNotActiveFailure < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          attr_accessor current_cluster(): ::String
+
+          def current_cluster!: () -> ::String?
+
+          attr_accessor active_cluster(): ::String
+
+          def active_cluster!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?current_cluster: ::String, ?active_cluster: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:current_cluster) -> ::String
+                | (:active_cluster) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:current_cluster, ::String) -> ::String
+                 | (:active_cluster, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceNotActiveFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceNotActiveFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceNotActiveFailure, NamespaceNotActiveFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceNotActiveFailure, NamespaceNotActiveFailure | _ToProto]
+
+          type array = ::Array[NamespaceNotActiveFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceNotActiveFailure | _ToProto]
+        end
+
+        class ClientVersionNotSupportedFailure < ::Protobuf::Message
+          attr_accessor client_version(): ::String
+
+          def client_version!: () -> ::String?
+
+          attr_accessor client_name(): ::String
+
+          def client_name!: () -> ::String?
+
+          attr_accessor supported_versions(): ::String
+
+          def supported_versions!: () -> ::String?
+
+          def initialize: (?client_version: ::String, ?client_name: ::String, ?supported_versions: ::String) -> void
+
+          def []: (:client_version) -> ::String
+                | (:client_name) -> ::String
+                | (:supported_versions) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:client_version, ::String) -> ::String
+                 | (:client_name, ::String) -> ::String
+                 | (:supported_versions, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ClientVersionNotSupportedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ClientVersionNotSupportedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ClientVersionNotSupportedFailure, ClientVersionNotSupportedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ClientVersionNotSupportedFailure, ClientVersionNotSupportedFailure | _ToProto]
+
+          type array = ::Array[ClientVersionNotSupportedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ClientVersionNotSupportedFailure | _ToProto]
+        end
+
+        class ServerVersionNotSupportedFailure < ::Protobuf::Message
+          attr_accessor server_version(): ::String
+
+          def server_version!: () -> ::String?
+
+          attr_accessor client_supported_server_versions(): ::String
+
+          def client_supported_server_versions!: () -> ::String?
+
+          def initialize: (?server_version: ::String, ?client_supported_server_versions: ::String) -> void
+
+          def []: (:server_version) -> ::String
+                | (:client_supported_server_versions) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:server_version, ::String) -> ::String
+                 | (:client_supported_server_versions, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ServerVersionNotSupportedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ServerVersionNotSupportedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ServerVersionNotSupportedFailure, ServerVersionNotSupportedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ServerVersionNotSupportedFailure, ServerVersionNotSupportedFailure | _ToProto]
+
+          type array = ::Array[ServerVersionNotSupportedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ServerVersionNotSupportedFailure | _ToProto]
+        end
+
+        class NamespaceAlreadyExistsFailure < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> NamespaceAlreadyExistsFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceAlreadyExistsFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
+
+          type array = ::Array[NamespaceAlreadyExistsFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceAlreadyExistsFailure | _ToProto]
+        end
+
+        class CancellationAlreadyRequestedFailure < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> CancellationAlreadyRequestedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CancellationAlreadyRequestedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CancellationAlreadyRequestedFailure, CancellationAlreadyRequestedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancellationAlreadyRequestedFailure, CancellationAlreadyRequestedFailure | _ToProto]
+
+          type array = ::Array[CancellationAlreadyRequestedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CancellationAlreadyRequestedFailure | _ToProto]
+        end
+
+        class QueryFailedFailure < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> QueryFailedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = QueryFailedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[QueryFailedFailure, QueryFailedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QueryFailedFailure, QueryFailedFailure | _ToProto]
+
+          type array = ::Array[QueryFailedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, QueryFailedFailure | _ToProto]
+        end
+
+        class PermissionDeniedFailure < ::Protobuf::Message
+          attr_accessor reason(): ::String
+
+          def reason!: () -> ::String?
+
+          def initialize: (?reason: ::String) -> void
+
+          def []: (:reason) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:reason, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PermissionDeniedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PermissionDeniedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PermissionDeniedFailure, PermissionDeniedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PermissionDeniedFailure, PermissionDeniedFailure | _ToProto]
+
+          type array = ::Array[PermissionDeniedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PermissionDeniedFailure | _ToProto]
+        end
+
+        class ResourceExhaustedFailure < ::Protobuf::Message
+          attr_accessor cause(): ::Temporal::Api::Enums::V1::ResourceExhaustedCause
+
+          def cause=: (::Temporal::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values
+                    | ...
+
+          def cause!: () -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause?
+
+          def initialize: (?cause: ::Temporal::Api::Enums::V1::ResourceExhaustedCause::init) -> void
+
+          def []: (:cause) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause
+                | (::Symbol) -> untyped
+
+          def []=: (:cause, ::Temporal::Api::Enums::V1::ResourceExhaustedCause) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause
+                 | (:cause, ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ResourceExhaustedFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ResourceExhaustedFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ResourceExhaustedFailure, ResourceExhaustedFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ResourceExhaustedFailure, ResourceExhaustedFailure | _ToProto]
+
+          type array = ::Array[ResourceExhaustedFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ResourceExhaustedFailure | _ToProto]
+        end
+
+        class SystemWorkflowFailure < ::Protobuf::Message
+          # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
+          #  Looking up the info of the system workflow run may help identify the issue causing the failure.
+          #
+          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
+          #  Looking up the info of the system workflow run may help identify the issue causing the failure.
+          #
+          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                                 | ...
+
+          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # Serialized error returned by the system workflow performing the underlying operation.
+          #
+          attr_accessor workflow_error(): ::String
+
+          def workflow_error!: () -> ::String?
+
+          def initialize: (?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_error: ::String) -> void
+
+          def []: (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:workflow_error) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:workflow_error, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> SystemWorkflowFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SystemWorkflowFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SystemWorkflowFailure, SystemWorkflowFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SystemWorkflowFailure, SystemWorkflowFailure | _ToProto]
+
+          type array = ::Array[SystemWorkflowFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SystemWorkflowFailure | _ToProto]
+        end
+      end
+    end
+  end
+end

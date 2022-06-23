@@ -1,0 +1,108 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        class NamespaceState < ::Protobuf::Enum
+          type names = :NAMESPACE_STATE_UNSPECIFIED | :NAMESPACE_STATE_REGISTERED | :NAMESPACE_STATE_DEPRECATED | :NAMESPACE_STATE_DELETED
+
+          type strings = "NAMESPACE_STATE_UNSPECIFIED" | "NAMESPACE_STATE_REGISTERED" | "NAMESPACE_STATE_DEPRECATED" | "NAMESPACE_STATE_DELETED"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          NAMESPACE_STATE_UNSPECIFIED: NamespaceState
+
+          NAMESPACE_STATE_REGISTERED: NamespaceState
+
+          NAMESPACE_STATE_DEPRECATED: NamespaceState
+
+          NAMESPACE_STATE_DELETED: NamespaceState
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceState, NamespaceState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceState, NamespaceState | values]
+
+          type array = ::Array[NamespaceState | values]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceState | values]
+        end
+
+        class ArchivalState < ::Protobuf::Enum
+          type names = :ARCHIVAL_STATE_UNSPECIFIED | :ARCHIVAL_STATE_DISABLED | :ARCHIVAL_STATE_ENABLED
+
+          type strings = "ARCHIVAL_STATE_UNSPECIFIED" | "ARCHIVAL_STATE_DISABLED" | "ARCHIVAL_STATE_ENABLED"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          ARCHIVAL_STATE_UNSPECIFIED: ArchivalState
+
+          ARCHIVAL_STATE_DISABLED: ArchivalState
+
+          ARCHIVAL_STATE_ENABLED: ArchivalState
+
+          # The type of `#initialize` parameter.
+          type init = ArchivalState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ArchivalState, ArchivalState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ArchivalState, ArchivalState | values]
+
+          type array = ::Array[ArchivalState | values]
+
+          type hash[KEY] = ::Hash[KEY, ArchivalState | values]
+        end
+
+        class ReplicationState < ::Protobuf::Enum
+          type names = :REPLICATION_STATE_UNSPECIFIED | :REPLICATION_STATE_NORMAL | :REPLICATION_STATE_HANDOVER
+
+          type strings = "REPLICATION_STATE_UNSPECIFIED" | "REPLICATION_STATE_NORMAL" | "REPLICATION_STATE_HANDOVER"
+
+          type tags = 0 | 1 | 2
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          REPLICATION_STATE_UNSPECIFIED: ReplicationState
+
+          REPLICATION_STATE_NORMAL: ReplicationState
+
+          REPLICATION_STATE_HANDOVER: ReplicationState
+
+          # The type of `#initialize` parameter.
+          type init = ReplicationState | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ReplicationState, ReplicationState | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ReplicationState, ReplicationState | values]
+
+          type array = ::Array[ReplicationState | values]
+
+          type hash[KEY] = ::Hash[KEY, ReplicationState | values]
+        end
+      end
+    end
+  end
+end

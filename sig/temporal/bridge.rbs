@@ -1,0 +1,18 @@
+BRIDGE_DIR: String
+
+class Rutie
+  def initialize: (Symbol, release: String | Symbol) -> void
+  def init: (String, String) -> void
+end
+
+module Temporal
+  module Bridge
+    class Error < StandardError
+    end
+
+    class Connection
+      def self.connect: (String) -> Temporal::Bridge::Connection
+      def call: (Symbol, String) -> String
+    end
+  end
+end

@@ -1,0 +1,155 @@
+module Temporal
+  module Api
+    module Filter
+      module V1
+        class WorkflowExecutionFilter < ::Protobuf::Message
+          attr_accessor workflow_id(): ::String
+
+          def workflow_id!: () -> ::String?
+
+          attr_accessor run_id(): ::String
+
+          def run_id!: () -> ::String?
+
+          def initialize: (?workflow_id: ::String, ?run_id: ::String) -> void
+
+          def []: (:workflow_id) -> ::String
+                | (:run_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_id, ::String) -> ::String
+                 | (:run_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionFilter
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionFilter | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionFilter, WorkflowExecutionFilter | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionFilter, WorkflowExecutionFilter | _ToProto]
+
+          type array = ::Array[WorkflowExecutionFilter | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionFilter | _ToProto]
+        end
+
+        class WorkflowTypeFilter < ::Protobuf::Message
+          attr_accessor name(): ::String
+
+          def name!: () -> ::String?
+
+          def initialize: (?name: ::String) -> void
+
+          def []: (:name) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:name, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowTypeFilter
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowTypeFilter | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowTypeFilter, WorkflowTypeFilter | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowTypeFilter, WorkflowTypeFilter | _ToProto]
+
+          type array = ::Array[WorkflowTypeFilter | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowTypeFilter | _ToProto]
+        end
+
+        class StartTimeFilter < ::Protobuf::Message
+          attr_accessor earliest_time(): ::Google::Protobuf::Timestamp?
+
+          def earliest_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                            | ...
+
+          def earliest_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor latest_time(): ::Google::Protobuf::Timestamp?
+
+          def latest_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def latest_time!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?earliest_time: ::Google::Protobuf::Timestamp::init?, ?latest_time: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:earliest_time) -> ::Google::Protobuf::Timestamp?
+                | (:latest_time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:earliest_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:earliest_time, M?) -> M?
+                 | (:latest_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:latest_time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StartTimeFilter
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StartTimeFilter | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartTimeFilter, StartTimeFilter | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartTimeFilter, StartTimeFilter | _ToProto]
+
+          type array = ::Array[StartTimeFilter | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StartTimeFilter | _ToProto]
+        end
+
+        class StatusFilter < ::Protobuf::Message
+          attr_accessor status(): ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+
+          def status=: (::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                     | ...
+
+          def status!: () -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus?
+
+          def initialize: (?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
+
+          def []: (:status) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                | (::Symbol) -> untyped
+
+          def []=: (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StatusFilter
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StatusFilter | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StatusFilter, StatusFilter | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StatusFilter, StatusFilter | _ToProto]
+
+          type array = ::Array[StatusFilter | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StatusFilter | _ToProto]
+        end
+      end
+    end
+  end
+end

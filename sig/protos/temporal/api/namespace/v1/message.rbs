@@ -1,0 +1,357 @@
+module Temporal
+  module Api
+    module Namespace
+      module V1
+        class NamespaceInfo < ::Protobuf::Message
+          attr_accessor name(): ::String
+
+          def name!: () -> ::String?
+
+          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
+
+          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
+
+          attr_accessor description(): ::String
+
+          def description!: () -> ::String?
+
+          attr_accessor owner_email(): ::String
+
+          def owner_email!: () -> ::String?
+
+          # A key-value map for any customized purpose.
+          #
+          attr_accessor data(): ::Protobuf::field_hash[::String, ::String]
+
+          # A key-value map for any customized purpose.
+          #
+          def data=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                   | ...
+
+          def data!: () -> ::Protobuf::field_hash[::String, ::String]?
+
+          attr_accessor id(): ::String
+
+          def id!: () -> ::String?
+
+          def initialize: (?name: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?id: ::String) -> void
+
+          def []: (:name) -> ::String
+                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (:description) -> ::String
+                | (:owner_email) -> ::String
+                | (:data) -> ::Protobuf::field_hash[::String, ::String]
+                | (:id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:name, ::String) -> ::String
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (:description, ::String) -> ::String
+                 | (:owner_email, ::String) -> ::String
+                 | (:data, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
+                 | (:data, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                 | (:id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceInfo, NamespaceInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceInfo, NamespaceInfo | _ToProto]
+
+          type array = ::Array[NamespaceInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceInfo | _ToProto]
+        end
+
+        class NamespaceConfig < ::Protobuf::Message
+          attr_accessor workflow_execution_retention_ttl(): ::Google::Protobuf::Duration?
+
+          def workflow_execution_retention_ttl=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                               | ...
+
+          def workflow_execution_retention_ttl!: () -> ::Google::Protobuf::Duration?
+
+          attr_accessor bad_binaries(): ::Temporal::Api::Namespace::V1::BadBinaries?
+
+          def bad_binaries=: [M < ::Temporal::Api::Namespace::V1::BadBinaries::_ToProto] (M?) -> M?
+                           | ...
+
+          def bad_binaries!: () -> ::Temporal::Api::Namespace::V1::BadBinaries?
+
+          # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
+          #
+          attr_accessor history_archival_state(): ::Temporal::Api::Enums::V1::ArchivalState
+
+          # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
+          #
+          def history_archival_state=: (::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                                     | ...
+
+          def history_archival_state!: () -> ::Temporal::Api::Enums::V1::ArchivalState?
+
+          attr_accessor history_archival_uri(): ::String
+
+          def history_archival_uri!: () -> ::String?
+
+          # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
+          #
+          attr_accessor visibility_archival_state(): ::Temporal::Api::Enums::V1::ArchivalState
+
+          # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
+          #
+          def visibility_archival_state=: (::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                                        | ...
+
+          def visibility_archival_state!: () -> ::Temporal::Api::Enums::V1::ArchivalState?
+
+          attr_accessor visibility_archival_uri(): ::String
+
+          def visibility_archival_uri!: () -> ::String?
+
+          def initialize: (?workflow_execution_retention_ttl: ::Google::Protobuf::Duration::init?, ?bad_binaries: ::Temporal::Api::Namespace::V1::BadBinaries::init?, ?history_archival_state: ::Temporal::Api::Enums::V1::ArchivalState::init, ?history_archival_uri: ::String, ?visibility_archival_state: ::Temporal::Api::Enums::V1::ArchivalState::init, ?visibility_archival_uri: ::String) -> void
+
+          def []: (:workflow_execution_retention_ttl) -> ::Google::Protobuf::Duration?
+                | (:bad_binaries) -> ::Temporal::Api::Namespace::V1::BadBinaries?
+                | (:history_archival_state) -> ::Temporal::Api::Enums::V1::ArchivalState
+                | (:history_archival_uri) -> ::String
+                | (:visibility_archival_state) -> ::Temporal::Api::Enums::V1::ArchivalState
+                | (:visibility_archival_uri) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_execution_retention_ttl, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_retention_ttl, M?) -> M?
+                 | (:bad_binaries, ::Temporal::Api::Namespace::V1::BadBinaries?) -> ::Temporal::Api::Namespace::V1::BadBinaries?
+                 | [M < ::Temporal::Api::Namespace::V1::BadBinaries::_ToProto] (:bad_binaries, M?) -> M?
+                 | (:history_archival_state, ::Temporal::Api::Enums::V1::ArchivalState) -> ::Temporal::Api::Enums::V1::ArchivalState
+                 | (:history_archival_state, ::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                 | (:history_archival_uri, ::String) -> ::String
+                 | (:visibility_archival_state, ::Temporal::Api::Enums::V1::ArchivalState) -> ::Temporal::Api::Enums::V1::ArchivalState
+                 | (:visibility_archival_state, ::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                 | (:visibility_archival_uri, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceConfig
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceConfig | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceConfig, NamespaceConfig | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceConfig, NamespaceConfig | _ToProto]
+
+          type array = ::Array[NamespaceConfig | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceConfig | _ToProto]
+        end
+
+        class BadBinaries < ::Protobuf::Message
+          attr_accessor binaries(): ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+
+          def binaries=: (::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]
+                       | ...
+
+          def binaries!: () -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]?
+
+          def initialize: (?binaries: ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> void
+
+          def []: (:binaries) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:binaries, ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+                 | (:binaries, ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> BadBinaries
+          end
+
+          # The type of `#initialize` parameter.
+          type init = BadBinaries | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[BadBinaries, BadBinaries | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, BadBinaries, BadBinaries | _ToProto]
+
+          type array = ::Array[BadBinaries | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, BadBinaries | _ToProto]
+        end
+
+        class BadBinaryInfo < ::Protobuf::Message
+          attr_accessor reason(): ::String
+
+          def reason!: () -> ::String?
+
+          attr_accessor operator(): ::String
+
+          def operator!: () -> ::String?
+
+          attr_accessor create_time(): ::Google::Protobuf::Timestamp?
+
+          def create_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def create_time!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?reason: ::String, ?operator: ::String, ?create_time: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:reason) -> ::String
+                | (:operator) -> ::String
+                | (:create_time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:reason, ::String) -> ::String
+                 | (:operator, ::String) -> ::String
+                 | (:create_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:create_time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> BadBinaryInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = BadBinaryInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[BadBinaryInfo, BadBinaryInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, BadBinaryInfo, BadBinaryInfo | _ToProto]
+
+          type array = ::Array[BadBinaryInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, BadBinaryInfo | _ToProto]
+        end
+
+        class UpdateNamespaceInfo < ::Protobuf::Message
+          attr_accessor description(): ::String
+
+          def description!: () -> ::String?
+
+          attr_accessor owner_email(): ::String
+
+          def owner_email!: () -> ::String?
+
+          # A key-value map for any customized purpose.
+          #
+          attr_accessor data(): ::Protobuf::field_hash[::String, ::String]
+
+          # A key-value map for any customized purpose.
+          #
+          def data=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                   | ...
+
+          def data!: () -> ::Protobuf::field_hash[::String, ::String]?
+
+          # New namespace state, server will reject if transition is not allowed.
+          #  Allowed transitions are:
+          #   Registered -> [ Deleted | Deprecated | Handover ]
+          #   Handover -> [ Registered ]
+          #  Default is NAMESPACE_STATE_UNSPECIFIED which is do not change state.
+          #
+          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
+
+          # New namespace state, server will reject if transition is not allowed.
+          #  Allowed transitions are:
+          #   Registered -> [ Deleted | Deprecated | Handover ]
+          #   Handover -> [ Registered ]
+          #  Default is NAMESPACE_STATE_UNSPECIFIED which is do not change state.
+          #
+          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
+
+          def initialize: (?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?state: ::Temporal::Api::Enums::V1::NamespaceState::init) -> void
+
+          def []: (:description) -> ::String
+                | (:owner_email) -> ::String
+                | (:data) -> ::Protobuf::field_hash[::String, ::String]
+                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (::Symbol) -> untyped
+
+          def []=: (:description, ::String) -> ::String
+                 | (:owner_email, ::String) -> ::String
+                 | (:data, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
+                 | (:data, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> UpdateNamespaceInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateNamespaceInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateNamespaceInfo, UpdateNamespaceInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateNamespaceInfo, UpdateNamespaceInfo | _ToProto]
+
+          type array = ::Array[UpdateNamespaceInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateNamespaceInfo | _ToProto]
+        end
+
+        class NamespaceFilter < ::Protobuf::Message
+          # By default namespaces in NAMESPACE_STATE_DELETED state are not included.
+          #  Setting include_deleted to true will include deleted namespaces.
+          #  Note: Namespace is in NAMESPACE_STATE_DELETED state when it was deleted from the system but associated data is not deleted yet.
+          #
+          attr_accessor include_deleted(): bool
+
+          def include_deleted!: () -> bool?
+
+          def initialize: (?include_deleted: bool) -> void
+
+          def []: (:include_deleted) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:include_deleted, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def include_deleted?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> NamespaceFilter
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceFilter | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceFilter, NamespaceFilter | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceFilter, NamespaceFilter | _ToProto]
+
+          type array = ::Array[NamespaceFilter | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceFilter | _ToProto]
+        end
+      end
+    end
+  end
+end

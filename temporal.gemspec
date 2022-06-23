@@ -16,6 +16,15 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.7.0'
 
+  spec.add_dependency 'google-protobuf', '~> 3.21.1' # Protobuf
+  spec.add_dependency 'rutie', '~> 0.0.4' # Rust bindings
+
+  spec.add_development_dependency 'grpc' # Ruby GRPC for the mock server
+  spec.add_development_dependency 'grpc-tools' # GRPC generator for the mock server
+  spec.add_development_dependency 'protobuf' # Ruby implementation of protobufs (for rbs_protobuf)
+  spec.add_development_dependency 'pry' # Debugger
+  spec.add_development_dependency 'rake' # rake tasks
+  spec.add_development_dependency 'rbs_protobuf' # RBS generator for protobufs
   spec.add_development_dependency 'rspec' # specs
   spec.add_development_dependency 'rubocop' # linter
   spec.add_development_dependency 'rubocop-rspec' # spec linter

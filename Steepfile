@@ -5,10 +5,12 @@ target :lib do
 
   check 'lib'
 
-  # ignore 'lib/templates/*.rb'
+  repo_path 'vendor/rbs/gem_rbs_collection/gems'
+  library 'protobuf'
+
+  ignore 'lib/gen/*.rb'
 
   # library 'pathname', 'set'       # Standard libraries
-  # library 'strong_json'           # Gems
 
   # configure_code_diagnostics(D::Ruby.strict)       # `strict` diagnostics setting
   # configure_code_diagnostics(D::Ruby.lenient)      # `lenient` diagnostics setting
