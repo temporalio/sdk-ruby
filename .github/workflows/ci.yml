@@ -23,7 +23,7 @@ jobs:
           ruby-version: 3.0
           bundler-cache: true
       - run: bundle install
-      - run: bundle exec rake bridge:build
+      - run: bundle exec rake bridge:release
       - run: bundle exec steep check
       - run: bundle exec rubocop
       - run: bundle exec rspec
