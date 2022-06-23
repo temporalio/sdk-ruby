@@ -9,6 +9,11 @@ GRPC_PATH = 'spec/support/grpc'.freeze
 namespace :bridge do
   desc 'Build SDK Core Bridge'
   task :build do
+    sh 'cd bridge && cargo build'
+  end
+
+  desc 'Release SDK Core Bridge'
+  task :release do
     sh 'cd bridge && cargo build --release'
   end
 

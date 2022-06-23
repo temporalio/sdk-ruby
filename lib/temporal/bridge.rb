@@ -7,6 +7,6 @@ module Temporal
     # TODO: Expand this into more specific error types
     class Error < StandardError; end
 
-    Rutie.new(:bridge).init('init_bridge', BRIDGE_DIR)
+    Rutie.new(:bridge, release: ENV['DEBUG'] ? :debug : :release).init('init_bridge', BRIDGE_DIR)
   end
 end

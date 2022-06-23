@@ -30,8 +30,20 @@ will also need to install the `rustfmt` component:
 > rustup component add rustfmt
 ```
 
-Now you should be able to compile the Bridge:
+Now you should be able to compile a dev build of the Bridge:
 
 ```sh
 > bundle exec rake bridge:build
+```
+
+You can then run all the specs against a dev build using:
+
+```sh
+> DEBUG=true bundle exec rspec
+```
+
+And open an IRB session using:
+
+```sh
+> DEBUG=true bundle console
 ```
