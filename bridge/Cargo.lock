@@ -127,6 +127,7 @@ dependencies = [
  "temporal-sdk-core",
  "temporal-sdk-core-api",
  "temporal-sdk-core-protos",
+ "thiserror",
  "tokio",
  "tonic",
  "url",
