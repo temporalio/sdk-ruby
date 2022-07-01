@@ -3,74 +3,36 @@ use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
     ConfiguredClient, WorkflowServiceClientWithMetrics
 };
+use thiserror::Error;
 use tokio::runtime::{Builder, Runtime};
 use tonic::Request;
 use url::Url;
 
 pub type Client = RetryClient<ConfiguredClient<WorkflowServiceClientWithMetrics>>;
 
-#[derive(Debug)]
+#[derive(Error, Debug)]
 pub enum ConnectionError {
-    InvalidUrl(url::ParseError),
-    InvalidProtobuf(prost::DecodeError),
-    InvalidConnectionOptions(ClientOptionsBuilderError),
+    #[error(transparent)]
+    InvalidUrl(#[from] url::ParseError),
+
+    #[error(transparent)]
+    InvalidProtobuf(#[from] prost::DecodeError),
+
+    #[error(transparent)]
+    InvalidConnectionOptions(#[from] ClientOptionsBuilderError),
+
+    #[error("provided RPC call is not supported by the API")]
     InvalidRpc,
-    UnableToConnect(ClientInitError),
-    UnableToInitializeRuntime(std::io::Error),
-    RequestError(tonic::Status),
-}
 
-impl std::fmt::Display for ConnectionError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ConnectionError::InvalidUrl(error) => write!(f, "{}", error),
-            ConnectionError::InvalidProtobuf(error) => write!(f, "{}", error),
-            ConnectionError::InvalidConnectionOptions(error) => write!(f, "{}", error),
-            ConnectionError::InvalidRpc => write!(f, "Invalid RPC call"),
-            ConnectionError::UnableToConnect(error) => write!(f, "{}", error),
-            ConnectionError::UnableToInitializeRuntime(error) => write!(f, "{}", error),
-            ConnectionError::RequestError(status) => write!(f, "{}", status)
-        }
-    }
-}
+    #[error(transparent)]
+    UnableToConnect(#[from] ClientInitError),
 
-impl From<url::ParseError> for ConnectionError {
-    fn from(err: url::ParseError) -> Self {
-        ConnectionError::InvalidUrl(err)
-    }
-}
+    #[error(transparent)]
+    UnableToInitializeRuntime(#[from] std::io::Error),
 
-impl From<prost::DecodeError> for ConnectionError {
-    fn from(err: prost::DecodeError) -> Self {
-        ConnectionError::InvalidProtobuf(err)
-    }
+    #[error(transparent)]
+    RequestError(#[from] tonic::Status),
 }
-
-impl From<ClientOptionsBuilderError> for ConnectionError {
-    fn from(err: ClientOptionsBuilderError) -> Self {
-        ConnectionError::InvalidConnectionOptions(err)
-    }
-}
-
-impl From<ClientInitError> for ConnectionError {
-    fn from(err: ClientInitError) -> Self {
-        ConnectionError::UnableToConnect(err)
-    }
-}
-
-impl From<std::io::Error> for ConnectionError {
-    fn from(err: std::io::Error) -> Self {
-        ConnectionError::UnableToInitializeRuntime(err)
-    }
-}
-
-impl From<tonic::Status> for ConnectionError {
-    fn from(err: tonic::Status) -> Self {
-        ConnectionError::RequestError(err)
-    }
-}
-
-impl std::error::Error for ConnectionError {}
 
 fn rpc_req<P: prost::Message + Default>(bytes: Vec<u8>) -> Result<tonic::Request<P>, prost::DecodeError> {
     let proto = P::decode(&*bytes)?;
