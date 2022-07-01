@@ -21,8 +21,8 @@ pub enum ConnectionError {
     #[error(transparent)]
     InvalidConnectionOptions(#[from] ClientOptionsBuilderError),
 
-    #[error("provided RPC call is not supported by the API")]
-    InvalidRpc,
+    #[error("`{0}` RPC call is not supported by the API")]
+    InvalidRpc(String),
 
     #[error(transparent)]
     UnableToConnect(#[from] ClientInitError),
@@ -120,7 +120,7 @@ impl Connection {
             "get_cluster_info" => rpc_call!(self.client, self.runtime, get_cluster_info, bytes),
             "get_system_info" => rpc_call!(self.client, self.runtime, get_system_info, bytes),
             "list_task_queue_partitions" => rpc_call!(self.client, self.runtime, list_task_queue_partitions, bytes),
-            _ => return Err(ConnectionError::InvalidRpc)
+            _ => return Err(ConnectionError::InvalidRpc(rpc.to_string()))
         }
     }
 }
