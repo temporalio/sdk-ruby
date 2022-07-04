@@ -25,11 +25,11 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn create(runtime: Arc<Runtime>, client: &Client) -> Result<Worker, WorkerError> {
+    pub fn create(runtime: Arc<Runtime>, client: &Client, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
         let reactor = Reactor::new(runtime);
         let config = WorkerConfigBuilder::default()
-            .namespace("ruby-samples")
-            .task_queue("general")
+            .namespace(namespace)
+            .task_queue(task_queue)
             .build()?;
 
         let request = Request::InitWorker { config, client: client.clone() };

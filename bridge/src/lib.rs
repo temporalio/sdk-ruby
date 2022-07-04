@@ -91,10 +91,12 @@ methods!(
         NilClass::new()
     }
 
-    fn create_worker(connection: AnyObject) -> AnyObject {
+    fn create_worker(connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
+        let namespace = namespace.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
+        let task_queue = task_queue.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::create(runtime().clone(), &connection.client);
+        let worker = Worker::create(runtime().clone(), &connection.client, &namespace, &task_queue);
 
         Module::from_existing("Temporal")
             .get_nested_module("Bridge")

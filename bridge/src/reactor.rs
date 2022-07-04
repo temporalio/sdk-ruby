@@ -1,5 +1,5 @@
 use crate::connection::Client;
-use temporal_sdk_core::api::Worker;
+use temporal_sdk_core::api::{errors, Worker};
 use temporal_sdk_core_protos::coresdk::activity_task::ActivityTask;
 use thiserror::Error;
 use tokio::runtime::{Runtime};
@@ -27,8 +27,8 @@ pub enum Response {
 
 #[derive(Error, Debug)]
 pub enum ReactorError {
-    #[error("Unable to poll for activity task")]
-    UnableToPollActivityTask,
+    #[error(transparent)]
+    UnableToPollActivityTask(errors::PollActivityError),
 }
 
 impl std::fmt::Debug for Response {
@@ -63,7 +63,7 @@ async fn handle_request(request: Request, channel: oneshot::Sender<ReactorResult
         Request::PollActivityTask { worker } => {
             let result = (&*worker).poll_activity_task().await
                 .map(|task| Response::ActivityTask { task })
-                .map_err(|_e| ReactorError::UnableToPollActivityTask);
+                .map_err(|e| ReactorError::UnableToPollActivityTask(e));
 
             channel.send(result).expect("Reactor was unable to send a response via channel");
         },
