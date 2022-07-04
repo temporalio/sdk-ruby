@@ -5,7 +5,26 @@ extern crate lazy_static;
 mod connection;
 
 use connection::Connection;
+use once_cell::sync::OnceCell;
 use rutie::{Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread};
+use std::sync::Arc;
+use tokio::runtime::{Builder, Runtime};
+
+const RUNTIME_THREAD_COUNT: u8 = 2;
+
+fn runtime() -> &'static Arc<Runtime> {
+    static INSTANCE: OnceCell<Arc<Runtime>> = OnceCell::new();
+    INSTANCE.get_or_init(|| {
+        Arc::new(
+            Builder::new_multi_thread()
+                .worker_threads(RUNTIME_THREAD_COUNT.into())
+                .enable_all()
+                .thread_name("core")
+                .build()
+                .unwrap()
+        )
+    })
+}
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
 
@@ -19,7 +38,7 @@ methods!(
         let host = host.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
 
         let result = Thread::call_without_gvl(move || {
-            Connection::connect(host.clone())
+            Connection::connect(runtime().clone(), host.clone())
         }, Some(|| {}));
 
         let connection = result.map_err(|e| {
