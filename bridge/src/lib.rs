@@ -3,6 +3,8 @@ extern crate rutie;
 extern crate lazy_static;
 
 mod connection;
+mod reactor;
+mod worker;
 
 use connection::Connection;
 use once_cell::sync::OnceCell;
@@ -12,6 +14,7 @@ use rutie::{
 };
 use std::sync::Arc;
 use tokio::runtime::{Builder, Runtime};
+use worker::Worker;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
@@ -35,6 +38,7 @@ fn raise_bridge_exception(message: &str) {
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
+wrappable_struct!(Worker, WorkerWrapper, WORKER_WRAPPER);
 
 class!(TemporalBridge);
 
@@ -86,6 +90,29 @@ methods!(
 
         NilClass::new()
     }
+
+    fn create_worker(connection: AnyObject) -> AnyObject {
+        let connection = connection.unwrap();
+        let connection = connection.get_data(&*CONNECTION_WRAPPER);
+        let worker = Worker::create(runtime().clone(), &connection.client);
+
+        Module::from_existing("Temporal")
+            .get_nested_module("Bridge")
+            .get_nested_class("Worker")
+            .wrap_data(worker.unwrap(), &*WORKER_WRAPPER)
+    }
+
+    fn worker_poll_activity_task() -> RString {
+        let result = Thread::call_without_gvl(move || {
+            let worker = rtself.get_data_mut(&*WORKER_WRAPPER);
+            worker.poll_activity_task()
+        }, Some(|| {}));
+
+        let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        let enc = Encoding::find("ASCII-8BIT").unwrap();
+        RString::from_bytes(&response, &enc)
+    }
 );
 
 #[no_mangle]
@@ -96,6 +123,11 @@ pub extern "C" fn init_bridge() {
         module.define_nested_class("Connection", None).define(|klass| {
             klass.def_self("connect", create_connection);
             klass.def("call", call_rpc);
+        });
+
+        module.define_nested_class("Worker", None).define(|klass| {
+            klass.def_self("create", create_worker);
+            klass.def("poll_activity_task", worker_poll_activity_task);
         });
     });
 }
