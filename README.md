@@ -1,5 +1,7 @@
 # Temporal Ruby SDK
 
+![CI status](https://github.com/temporalio/sdk-ruby/actions/workflows/ci.yml/badge.svg?branch=main)
+
 Temporal is a distributed, scalable, durable, and highly available orchestration engine used to
 execute asynchronous long-running business logic in a scalable and resilient way.
 
