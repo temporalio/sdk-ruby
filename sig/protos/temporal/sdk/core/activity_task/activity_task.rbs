@@ -1,0 +1,370 @@
+module Coresdk
+  module Activity_task
+    class ActivityCancelReason < ::Protobuf::Enum
+      type names = :NOT_FOUND | :CANCELLED | :TIMED_OUT
+
+      type strings = "NOT_FOUND" | "CANCELLED" | "TIMED_OUT"
+
+      type tags = 0 | 1 | 2
+
+      type values = names | strings | tags
+
+      attr_reader name(): names
+
+      attr_reader tag(): tags
+
+      # / The activity no longer exists according to server (may be already completed)
+      #
+      NOT_FOUND: ActivityCancelReason
+
+      # / Activity was explicitly cancelled
+      #
+      CANCELLED: ActivityCancelReason
+
+      # / Activity timed out
+      #
+      TIMED_OUT: ActivityCancelReason
+
+      # The type of `#initialize` parameter.
+      type init = ActivityCancelReason | values
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ActivityCancelReason, ActivityCancelReason | values]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityCancelReason, ActivityCancelReason | values]
+
+      type array = ::Array[ActivityCancelReason | values]
+
+      type hash[KEY] = ::Hash[KEY, ActivityCancelReason | values]
+    end
+
+    class ActivityTask < ::Protobuf::Message
+      # / A unique identifier for this task
+      #
+      attr_accessor task_token(): ::String
+
+      def task_token!: () -> ::String?
+
+      # / Start activity execution.
+      #
+      attr_accessor start(): ::Coresdk::Activity_task::Start?
+
+      # / Start activity execution.
+      #
+      def start=: [M < ::Coresdk::Activity_task::Start::_ToProto] (M?) -> M?
+                | ...
+
+      def start!: () -> ::Coresdk::Activity_task::Start?
+
+      # / Attempt to cancel activity execution.
+      #
+      attr_accessor cancel(): ::Coresdk::Activity_task::Cancel?
+
+      # / Attempt to cancel activity execution.
+      #
+      def cancel=: [M < ::Coresdk::Activity_task::Cancel::_ToProto] (M?) -> M?
+                 | ...
+
+      def cancel!: () -> ::Coresdk::Activity_task::Cancel?
+
+      def initialize: (?task_token: ::String, ?start: ::Coresdk::Activity_task::Start::init?, ?cancel: ::Coresdk::Activity_task::Cancel::init?) -> void
+
+      def []: (:task_token) -> ::String
+            | (:start) -> ::Coresdk::Activity_task::Start?
+            | (:cancel) -> ::Coresdk::Activity_task::Cancel?
+            | (::Symbol) -> untyped
+
+      def []=: (:task_token, ::String) -> ::String
+             | (:start, ::Coresdk::Activity_task::Start?) -> ::Coresdk::Activity_task::Start?
+             | [M < ::Coresdk::Activity_task::Start::_ToProto] (:start, M?) -> M?
+             | (:cancel, ::Coresdk::Activity_task::Cancel?) -> ::Coresdk::Activity_task::Cancel?
+             | [M < ::Coresdk::Activity_task::Cancel::_ToProto] (:cancel, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ActivityTask
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ActivityTask | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ActivityTask, ActivityTask | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityTask, ActivityTask | _ToProto]
+
+      type array = ::Array[ActivityTask | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ActivityTask | _ToProto]
+    end
+
+    # Begin executing an activity
+    #
+    class Start < ::Protobuf::Message
+      # The namespace the workflow lives in
+      #
+      attr_accessor workflow_namespace(): ::String
+
+      def workflow_namespace!: () -> ::String?
+
+      # The workflow's type name or function identifier
+      #
+      attr_accessor workflow_type(): ::String
+
+      def workflow_type!: () -> ::String?
+
+      # The workflow execution which requested this activity
+      #
+      attr_accessor workflow_execution(): ::Coresdk::Common::WorkflowExecution?
+
+      # The workflow execution which requested this activity
+      #
+      def workflow_execution=: [M < ::Coresdk::Common::WorkflowExecution::_ToProto] (M?) -> M?
+                             | ...
+
+      def workflow_execution!: () -> ::Coresdk::Common::WorkflowExecution?
+
+      # The activity's ID
+      #
+      attr_accessor activity_id(): ::String
+
+      def activity_id!: () -> ::String?
+
+      # The activity's type name or function identifier
+      #
+      attr_accessor activity_type(): ::String
+
+      def activity_type!: () -> ::String?
+
+      attr_accessor header_fields(): ::Coresdk::Common::Payload::field_hash[::String]
+
+      def header_fields=: (::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+                        | ...
+
+      def header_fields!: () -> ::Coresdk::Common::Payload::field_hash[::String]?
+
+      # Arguments to the activity
+      #
+      attr_accessor input(): ::Coresdk::Common::Payload::field_array
+
+      # Arguments to the activity
+      #
+      def input=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+                | ...
+
+      def input!: () -> ::Coresdk::Common::Payload::field_array?
+
+      # The last details that were recorded by a heartbeat when this task was generated
+      #
+      attr_accessor heartbeat_details(): ::Coresdk::Common::Payload::field_array
+
+      # The last details that were recorded by a heartbeat when this task was generated
+      #
+      def heartbeat_details=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+                            | ...
+
+      def heartbeat_details!: () -> ::Coresdk::Common::Payload::field_array?
+
+      # When the task was *first* scheduled
+      #
+      attr_accessor scheduled_time(): ::Google::Protobuf::Timestamp?
+
+      # When the task was *first* scheduled
+      #
+      def scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+      def scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+      # When this current attempt at the task was scheduled
+      #
+      attr_accessor current_attempt_scheduled_time(): ::Google::Protobuf::Timestamp?
+
+      # When this current attempt at the task was scheduled
+      #
+      def current_attempt_scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                         | ...
+
+      def current_attempt_scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+      # When this attempt was started, which is to say when core received it by polling.
+      #
+      attr_accessor started_time(): ::Google::Protobuf::Timestamp?
+
+      # When this attempt was started, which is to say when core received it by polling.
+      #
+      def started_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                       | ...
+
+      def started_time!: () -> ::Google::Protobuf::Timestamp?
+
+      attr_accessor attempt(): ::Integer
+
+      def attempt!: () -> ::Integer?
+
+      # Timeout from the first schedule time to completion
+      #
+      attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
+
+      # Timeout from the first schedule time to completion
+      #
+      def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                    | ...
+
+      def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+      # Timeout from starting an attempt to reporting its result
+      #
+      attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
+
+      # Timeout from starting an attempt to reporting its result
+      #
+      def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                 | ...
+
+      def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+      # If set a heartbeat must be reported within this interval
+      #
+      attr_accessor heartbeat_timeout(): ::Google::Protobuf::Duration?
+
+      # If set a heartbeat must be reported within this interval
+      #
+      def heartbeat_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                            | ...
+
+      def heartbeat_timeout!: () -> ::Google::Protobuf::Duration?
+
+      # This is an actual retry policy the service uses. It can be different from the one provided
+      #  (or not) during activity scheduling as the service can override the provided one in case its
+      #  values are not specified or exceed configured system limits.
+      #
+      attr_accessor retry_policy(): ::Coresdk::Common::RetryPolicy?
+
+      # This is an actual retry policy the service uses. It can be different from the one provided
+      #  (or not) during activity scheduling as the service can override the provided one in case its
+      #  values are not specified or exceed configured system limits.
+      #
+      def retry_policy=: [M < ::Coresdk::Common::RetryPolicy::_ToProto] (M?) -> M?
+                       | ...
+
+      def retry_policy!: () -> ::Coresdk::Common::RetryPolicy?
+
+      # Set to true if this is a local activity. Note that heartbeating does not apply to local
+      #  activities.
+      #
+      attr_accessor is_local(): bool
+
+      def is_local!: () -> bool?
+
+      def initialize: (?workflow_namespace: ::String, ?workflow_type: ::String, ?workflow_execution: ::Coresdk::Common::WorkflowExecution::init?, ?activity_id: ::String, ?activity_type: ::String, ?header_fields: ::Coresdk::Common::Payload::hash[::String], ?input: ::Coresdk::Common::Payload::array, ?heartbeat_details: ::Coresdk::Common::Payload::array, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?current_attempt_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Coresdk::Common::RetryPolicy::init?, ?is_local: bool) -> void
+
+      def []: (:workflow_namespace) -> ::String
+            | (:workflow_type) -> ::String
+            | (:workflow_execution) -> ::Coresdk::Common::WorkflowExecution?
+            | (:activity_id) -> ::String
+            | (:activity_type) -> ::String
+            | (:header_fields) -> ::Coresdk::Common::Payload::field_hash[::String]
+            | (:input) -> ::Coresdk::Common::Payload::field_array
+            | (:heartbeat_details) -> ::Coresdk::Common::Payload::field_array
+            | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
+            | (:current_attempt_scheduled_time) -> ::Google::Protobuf::Timestamp?
+            | (:started_time) -> ::Google::Protobuf::Timestamp?
+            | (:attempt) -> ::Integer
+            | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
+            | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
+            | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
+            | (:retry_policy) -> ::Coresdk::Common::RetryPolicy?
+            | (:is_local) -> bool
+            | (::Symbol) -> untyped
+
+      def []=: (:workflow_namespace, ::String) -> ::String
+             | (:workflow_type, ::String) -> ::String
+             | (:workflow_execution, ::Coresdk::Common::WorkflowExecution?) -> ::Coresdk::Common::WorkflowExecution?
+             | [M < ::Coresdk::Common::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+             | (:activity_id, ::String) -> ::String
+             | (:activity_type, ::String) -> ::String
+             | (:header_fields, ::Coresdk::Common::Payload::field_hash[::String]) -> ::Coresdk::Common::Payload::field_hash[::String]
+             | (:header_fields, ::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+             | (:input, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
+             | (:input, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+             | (:heartbeat_details, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
+             | (:heartbeat_details, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+             | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
+             | (:current_attempt_scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:current_attempt_scheduled_time, M?) -> M?
+             | (:started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:started_time, M?) -> M?
+             | (:attempt, ::Integer) -> ::Integer
+             | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
+             | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
+             | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
+             | (:retry_policy, ::Coresdk::Common::RetryPolicy?) -> ::Coresdk::Common::RetryPolicy?
+             | [M < ::Coresdk::Common::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+             | (:is_local, bool) -> bool
+             | (::Symbol, untyped) -> untyped
+
+      def is_local?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> Start
+      end
+
+      # The type of `#initialize` parameter.
+      type init = Start | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[Start, Start | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Start, Start | _ToProto]
+
+      type array = ::Array[Start | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, Start | _ToProto]
+    end
+
+    # / Attempt to cancel a running activity
+    #
+    class Cancel < ::Protobuf::Message
+      attr_accessor reason(): ::Coresdk::Activity_task::ActivityCancelReason
+
+      def reason=: (::Coresdk::Activity_task::ActivityCancelReason::values) -> ::Coresdk::Activity_task::ActivityCancelReason::values
+                 | ...
+
+      def reason!: () -> ::Coresdk::Activity_task::ActivityCancelReason?
+
+      def initialize: (?reason: ::Coresdk::Activity_task::ActivityCancelReason::init) -> void
+
+      def []: (:reason) -> ::Coresdk::Activity_task::ActivityCancelReason
+            | (::Symbol) -> untyped
+
+      def []=: (:reason, ::Coresdk::Activity_task::ActivityCancelReason) -> ::Coresdk::Activity_task::ActivityCancelReason
+             | (:reason, ::Coresdk::Activity_task::ActivityCancelReason::values) -> ::Coresdk::Activity_task::ActivityCancelReason::values
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> Cancel
+      end
+
+      # The type of `#initialize` parameter.
+      type init = Cancel | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[Cancel, Cancel | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancel, Cancel | _ToProto]
+
+      type array = ::Array[Cancel | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, Cancel | _ToProto]
+    end
+  end
+end

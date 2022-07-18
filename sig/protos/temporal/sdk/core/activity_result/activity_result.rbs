@@ -1,0 +1,348 @@
+module Coresdk
+  module Activity_result
+    # *
+    #  Used to report activity completions to core
+    #
+    class ActivityExecutionResult < ::Protobuf::Message
+      attr_accessor completed(): ::Coresdk::Activity_result::Success?
+
+      def completed=: [M < ::Coresdk::Activity_result::Success::_ToProto] (M?) -> M?
+                    | ...
+
+      def completed!: () -> ::Coresdk::Activity_result::Success?
+
+      attr_accessor failed(): ::Coresdk::Activity_result::Failure?
+
+      def failed=: [M < ::Coresdk::Activity_result::Failure::_ToProto] (M?) -> M?
+                 | ...
+
+      def failed!: () -> ::Coresdk::Activity_result::Failure?
+
+      attr_accessor cancelled(): ::Coresdk::Activity_result::Cancellation?
+
+      def cancelled=: [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (M?) -> M?
+                    | ...
+
+      def cancelled!: () -> ::Coresdk::Activity_result::Cancellation?
+
+      attr_accessor will_complete_async(): ::Coresdk::Activity_result::WillCompleteAsync?
+
+      def will_complete_async=: [M < ::Coresdk::Activity_result::WillCompleteAsync::_ToProto] (M?) -> M?
+                              | ...
+
+      def will_complete_async!: () -> ::Coresdk::Activity_result::WillCompleteAsync?
+
+      def initialize: (?completed: ::Coresdk::Activity_result::Success::init?, ?failed: ::Coresdk::Activity_result::Failure::init?, ?cancelled: ::Coresdk::Activity_result::Cancellation::init?, ?will_complete_async: ::Coresdk::Activity_result::WillCompleteAsync::init?) -> void
+
+      def []: (:completed) -> ::Coresdk::Activity_result::Success?
+            | (:failed) -> ::Coresdk::Activity_result::Failure?
+            | (:cancelled) -> ::Coresdk::Activity_result::Cancellation?
+            | (:will_complete_async) -> ::Coresdk::Activity_result::WillCompleteAsync?
+            | (::Symbol) -> untyped
+
+      def []=: (:completed, ::Coresdk::Activity_result::Success?) -> ::Coresdk::Activity_result::Success?
+             | [M < ::Coresdk::Activity_result::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Coresdk::Activity_result::Failure?) -> ::Coresdk::Activity_result::Failure?
+             | [M < ::Coresdk::Activity_result::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Coresdk::Activity_result::Cancellation?) -> ::Coresdk::Activity_result::Cancellation?
+             | [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:will_complete_async, ::Coresdk::Activity_result::WillCompleteAsync?) -> ::Coresdk::Activity_result::WillCompleteAsync?
+             | [M < ::Coresdk::Activity_result::WillCompleteAsync::_ToProto] (:will_complete_async, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ActivityExecutionResult
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ActivityExecutionResult | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ActivityExecutionResult, ActivityExecutionResult | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityExecutionResult, ActivityExecutionResult | _ToProto]
+
+      type array = ::Array[ActivityExecutionResult | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ActivityExecutionResult | _ToProto]
+    end
+
+    # Used to report activity resolutions to lang. IE: This is what the activities are resolved with
+    #  in the workflow.
+    #
+    class ActivityResolution < ::Protobuf::Message
+      attr_accessor completed(): ::Coresdk::Activity_result::Success?
+
+      def completed=: [M < ::Coresdk::Activity_result::Success::_ToProto] (M?) -> M?
+                    | ...
+
+      def completed!: () -> ::Coresdk::Activity_result::Success?
+
+      attr_accessor failed(): ::Coresdk::Activity_result::Failure?
+
+      def failed=: [M < ::Coresdk::Activity_result::Failure::_ToProto] (M?) -> M?
+                 | ...
+
+      def failed!: () -> ::Coresdk::Activity_result::Failure?
+
+      attr_accessor cancelled(): ::Coresdk::Activity_result::Cancellation?
+
+      def cancelled=: [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (M?) -> M?
+                    | ...
+
+      def cancelled!: () -> ::Coresdk::Activity_result::Cancellation?
+
+      attr_accessor backoff(): ::Coresdk::Activity_result::DoBackoff?
+
+      def backoff=: [M < ::Coresdk::Activity_result::DoBackoff::_ToProto] (M?) -> M?
+                  | ...
+
+      def backoff!: () -> ::Coresdk::Activity_result::DoBackoff?
+
+      def initialize: (?completed: ::Coresdk::Activity_result::Success::init?, ?failed: ::Coresdk::Activity_result::Failure::init?, ?cancelled: ::Coresdk::Activity_result::Cancellation::init?, ?backoff: ::Coresdk::Activity_result::DoBackoff::init?) -> void
+
+      def []: (:completed) -> ::Coresdk::Activity_result::Success?
+            | (:failed) -> ::Coresdk::Activity_result::Failure?
+            | (:cancelled) -> ::Coresdk::Activity_result::Cancellation?
+            | (:backoff) -> ::Coresdk::Activity_result::DoBackoff?
+            | (::Symbol) -> untyped
+
+      def []=: (:completed, ::Coresdk::Activity_result::Success?) -> ::Coresdk::Activity_result::Success?
+             | [M < ::Coresdk::Activity_result::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Coresdk::Activity_result::Failure?) -> ::Coresdk::Activity_result::Failure?
+             | [M < ::Coresdk::Activity_result::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Coresdk::Activity_result::Cancellation?) -> ::Coresdk::Activity_result::Cancellation?
+             | [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:backoff, ::Coresdk::Activity_result::DoBackoff?) -> ::Coresdk::Activity_result::DoBackoff?
+             | [M < ::Coresdk::Activity_result::DoBackoff::_ToProto] (:backoff, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ActivityResolution
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ActivityResolution | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ActivityResolution, ActivityResolution | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityResolution, ActivityResolution | _ToProto]
+
+      type array = ::Array[ActivityResolution | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ActivityResolution | _ToProto]
+    end
+
+    # * Used to report successful completion either when executing or resolving
+    #
+    class Success < ::Protobuf::Message
+      attr_accessor result(): ::Coresdk::Common::Payload?
+
+      def result=: [M < ::Coresdk::Common::Payload::_ToProto] (M?) -> M?
+                 | ...
+
+      def result!: () -> ::Coresdk::Common::Payload?
+
+      def initialize: (?result: ::Coresdk::Common::Payload::init?) -> void
+
+      def []: (:result) -> ::Coresdk::Common::Payload?
+            | (::Symbol) -> untyped
+
+      def []=: (:result, ::Coresdk::Common::Payload?) -> ::Coresdk::Common::Payload?
+             | [M < ::Coresdk::Common::Payload::_ToProto] (:result, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> Success
+      end
+
+      # The type of `#initialize` parameter.
+      type init = Success | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[Success, Success | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Success, Success | _ToProto]
+
+      type array = ::Array[Success | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, Success | _ToProto]
+    end
+
+    # * Used to report activity failure either when executing or resolving
+    #
+    class Failure < ::Protobuf::Message
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                  | ...
+
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (::Symbol) -> untyped
+
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> Failure
+      end
+
+      # The type of `#initialize` parameter.
+      type init = Failure | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[Failure, Failure | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Failure, Failure | _ToProto]
+
+      type array = ::Array[Failure | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, Failure | _ToProto]
+    end
+
+    # *
+    #  Used to report cancellation from both Core and Lang.
+    #  When Lang reports a cancelled activity, it must put a CancelledFailure in the failure field.
+    #  When Core reports a cancelled activity, it must put an ActivityFailure with CancelledFailure
+    #  as the cause in the failure field.
+    #
+    class Cancellation < ::Protobuf::Message
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                  | ...
+
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (::Symbol) -> untyped
+
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> Cancellation
+      end
+
+      # The type of `#initialize` parameter.
+      type init = Cancellation | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[Cancellation, Cancellation | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancellation, Cancellation | _ToProto]
+
+      type array = ::Array[Cancellation | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, Cancellation | _ToProto]
+    end
+
+    # *
+    #  Used in ActivityExecutionResult to notify Core that this Activity will complete asynchronously.
+    #  Core will forget about this Activity and free up resources used to track this Activity.
+    #
+    class WillCompleteAsync < ::Protobuf::Message
+      def initialize: () -> void
+
+      interface _ToProto
+        def to_proto: () -> WillCompleteAsync
+      end
+
+      # The type of `#initialize` parameter.
+      type init = WillCompleteAsync | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[WillCompleteAsync, WillCompleteAsync | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WillCompleteAsync, WillCompleteAsync | _ToProto]
+
+      type array = ::Array[WillCompleteAsync | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, WillCompleteAsync | _ToProto]
+    end
+
+    # *
+    #  Issued when a local activity needs to retry but also wants to back off more than would be
+    #  reasonable to WFT heartbeat for. Lang is expected to schedule a timer for the duration
+    #  and then start a local activity of the same type & same inputs with the provided attempt number
+    #  after the timer has elapsed.
+    #
+    #  This exists because Core does not have a concept of starting commands by itself, they originate
+    #  from lang. So expecting lang to start the timer / next pass of the activity fits more smoothly.
+    #
+    class DoBackoff < ::Protobuf::Message
+      # The attempt number that lang should provide when scheduling the retry. If the LA failed
+      #  on attempt 4 and we told lang to back off with a timer, this number will be 5.
+      #
+      attr_accessor attempt(): ::Integer
+
+      def attempt!: () -> ::Integer?
+
+      attr_accessor backoff_duration(): ::Google::Protobuf::Duration?
+
+      def backoff_duration=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                           | ...
+
+      def backoff_duration!: () -> ::Google::Protobuf::Duration?
+
+      # The time the first attempt of this local activity was scheduled. Must be passed with attempt
+      #  to the retry LA.
+      #
+      attr_accessor original_schedule_time(): ::Google::Protobuf::Timestamp?
+
+      # The time the first attempt of this local activity was scheduled. Must be passed with attempt
+      #  to the retry LA.
+      #
+      def original_schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                 | ...
+
+      def original_schedule_time!: () -> ::Google::Protobuf::Timestamp?
+
+      def initialize: (?attempt: ::Integer, ?backoff_duration: ::Google::Protobuf::Duration::init?, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?) -> void
+
+      def []: (:attempt) -> ::Integer
+            | (:backoff_duration) -> ::Google::Protobuf::Duration?
+            | (:original_schedule_time) -> ::Google::Protobuf::Timestamp?
+            | (::Symbol) -> untyped
+
+      def []=: (:attempt, ::Integer) -> ::Integer
+             | (:backoff_duration, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:backoff_duration, M?) -> M?
+             | (:original_schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_schedule_time, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> DoBackoff
+      end
+
+      # The type of `#initialize` parameter.
+      type init = DoBackoff | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[DoBackoff, DoBackoff | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DoBackoff, DoBackoff | _ToProto]
+
+      type array = ::Array[DoBackoff | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, DoBackoff | _ToProto]
+    end
+  end
+end

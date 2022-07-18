@@ -1,0 +1,1543 @@
+module Coresdk
+  module Bridge
+    class LogLevel < ::Protobuf::Enum
+      type names = :LOG_LEVEL_UNSPECIFIED | :OFF | :ERROR | :WARN | :INFO | :DEBUG | :TRACE
+
+      type strings = "LOG_LEVEL_UNSPECIFIED" | "OFF" | "ERROR" | "WARN" | "INFO" | "DEBUG" | "TRACE"
+
+      type tags = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+      type values = names | strings | tags
+
+      attr_reader name(): names
+
+      attr_reader tag(): tags
+
+      LOG_LEVEL_UNSPECIFIED: LogLevel
+
+      OFF: LogLevel
+
+      ERROR: LogLevel
+
+      WARN: LogLevel
+
+      INFO: LogLevel
+
+      DEBUG: LogLevel
+
+      TRACE: LogLevel
+
+      # The type of `#initialize` parameter.
+      type init = LogLevel | values
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[LogLevel, LogLevel | values]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LogLevel, LogLevel | values]
+
+      type array = ::Array[LogLevel | values]
+
+      type hash[KEY] = ::Hash[KEY, LogLevel | values]
+    end
+
+    class InitTelemetryRequest < ::Protobuf::Message
+      class ConsoleLoggerOptions < ::Protobuf::Message
+        def initialize: () -> void
+
+        interface _ToProto
+          def to_proto: () -> ConsoleLoggerOptions
+        end
+
+        # The type of `#initialize` parameter.
+        type init = ConsoleLoggerOptions | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[ConsoleLoggerOptions, ConsoleLoggerOptions | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ConsoleLoggerOptions, ConsoleLoggerOptions | _ToProto]
+
+        type array = ::Array[ConsoleLoggerOptions | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, ConsoleLoggerOptions | _ToProto]
+      end
+
+      class ForwardLoggerOptions < ::Protobuf::Message
+        attr_accessor level(): ::Coresdk::Bridge::LogLevel
+
+        def level=: (::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+                  | ...
+
+        def level!: () -> ::Coresdk::Bridge::LogLevel?
+
+        def initialize: (?level: ::Coresdk::Bridge::LogLevel::init) -> void
+
+        def []: (:level) -> ::Coresdk::Bridge::LogLevel
+              | (::Symbol) -> untyped
+
+        def []=: (:level, ::Coresdk::Bridge::LogLevel) -> ::Coresdk::Bridge::LogLevel
+               | (:level, ::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> ForwardLoggerOptions
+        end
+
+        # The type of `#initialize` parameter.
+        type init = ForwardLoggerOptions | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[ForwardLoggerOptions, ForwardLoggerOptions | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ForwardLoggerOptions, ForwardLoggerOptions | _ToProto]
+
+        type array = ::Array[ForwardLoggerOptions | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, ForwardLoggerOptions | _ToProto]
+      end
+
+      class OtelCollectorOptions < ::Protobuf::Message
+        attr_accessor url(): ::String
+
+        def url!: () -> ::String?
+
+        attr_accessor headers(): ::Protobuf::field_hash[::String, ::String]
+
+        def headers=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                    | ...
+
+        def headers!: () -> ::Protobuf::field_hash[::String, ::String]?
+
+        def initialize: (?url: ::String, ?headers: ::Hash[::String, ::String]) -> void
+
+        def []: (:url) -> ::String
+              | (:headers) -> ::Protobuf::field_hash[::String, ::String]
+              | (::Symbol) -> untyped
+
+        def []=: (:url, ::String) -> ::String
+               | (:headers, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
+               | (:headers, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> OtelCollectorOptions
+        end
+
+        # The type of `#initialize` parameter.
+        type init = OtelCollectorOptions | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[OtelCollectorOptions, OtelCollectorOptions | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, OtelCollectorOptions, OtelCollectorOptions | _ToProto]
+
+        type array = ::Array[OtelCollectorOptions | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, OtelCollectorOptions | _ToProto]
+      end
+
+      class PrometheusOptions < ::Protobuf::Message
+        attr_accessor export_bind_address(): ::String
+
+        def export_bind_address!: () -> ::String?
+
+        def initialize: (?export_bind_address: ::String) -> void
+
+        def []: (:export_bind_address) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:export_bind_address, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> PrometheusOptions
+        end
+
+        # The type of `#initialize` parameter.
+        type init = PrometheusOptions | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[PrometheusOptions, PrometheusOptions | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PrometheusOptions, PrometheusOptions | _ToProto]
+
+        type array = ::Array[PrometheusOptions | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, PrometheusOptions | _ToProto]
+      end
+
+      attr_accessor tracing_filter(): ::String
+
+      def tracing_filter!: () -> ::String?
+
+      attr_accessor console(): ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+
+      def console=: [M < ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def console!: () -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+
+      attr_accessor forward(): ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+
+      def forward=: [M < ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (M?) -> M?
+                  | ...
+
+      def forward!: () -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+
+      attr_accessor otel_tracing(): ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+
+      def otel_tracing=: [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
+                       | ...
+
+      def otel_tracing!: () -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+
+      attr_accessor otel_metrics(): ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+
+      def otel_metrics=: [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
+                       | ...
+
+      def otel_metrics!: () -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+
+      attr_accessor prometheus(): ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+
+      def prometheus=: [M < ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (M?) -> M?
+                     | ...
+
+      def prometheus!: () -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+
+      def initialize: (?tracing_filter: ::String, ?console: ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::init?, ?forward: ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::init?, ?otel_tracing: ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?otel_metrics: ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?prometheus: ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::init?) -> void
+
+      def []: (:tracing_filter) -> ::String
+            | (:console) -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+            | (:forward) -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+            | (:otel_tracing) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+            | (:otel_metrics) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+            | (:prometheus) -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+            | (::Symbol) -> untyped
+
+      def []=: (:tracing_filter, ::String) -> ::String
+             | (:console, ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+             | [M < ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (:console, M?) -> M?
+             | (:forward, ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+             | [M < ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (:forward, M?) -> M?
+             | (:otel_tracing, ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+             | [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_tracing, M?) -> M?
+             | (:otel_metrics, ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+             | [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_metrics, M?) -> M?
+             | (:prometheus, ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+             | [M < ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (:prometheus, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> InitTelemetryRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = InitTelemetryRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[InitTelemetryRequest, InitTelemetryRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, InitTelemetryRequest, InitTelemetryRequest | _ToProto]
+
+      type array = ::Array[InitTelemetryRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, InitTelemetryRequest | _ToProto]
+    end
+
+    class CreateClientRequest < ::Protobuf::Message
+      class TlsConfig < ::Protobuf::Message
+        attr_accessor server_root_ca_cert(): ::String
+
+        def server_root_ca_cert!: () -> ::String?
+
+        attr_accessor domain(): ::String
+
+        def domain!: () -> ::String?
+
+        attr_accessor client_cert(): ::String
+
+        def client_cert!: () -> ::String?
+
+        attr_accessor client_private_key(): ::String
+
+        def client_private_key!: () -> ::String?
+
+        def initialize: (?server_root_ca_cert: ::String, ?domain: ::String, ?client_cert: ::String, ?client_private_key: ::String) -> void
+
+        def []: (:server_root_ca_cert) -> ::String
+              | (:domain) -> ::String
+              | (:client_cert) -> ::String
+              | (:client_private_key) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:server_root_ca_cert, ::String) -> ::String
+               | (:domain, ::String) -> ::String
+               | (:client_cert, ::String) -> ::String
+               | (:client_private_key, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> TlsConfig
+        end
+
+        # The type of `#initialize` parameter.
+        type init = TlsConfig | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[TlsConfig, TlsConfig | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TlsConfig, TlsConfig | _ToProto]
+
+        type array = ::Array[TlsConfig | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, TlsConfig | _ToProto]
+      end
+
+      class RetryConfig < ::Protobuf::Message
+        attr_accessor initial_interval(): ::Google::Protobuf::Duration?
+
+        def initial_interval=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                             | ...
+
+        def initial_interval!: () -> ::Google::Protobuf::Duration?
+
+        attr_accessor randomization_factor(): ::Google::Protobuf::DoubleValue?
+
+        def randomization_factor=: [M < ::Google::Protobuf::DoubleValue::_ToProto] (M?) -> M?
+                                 | ...
+
+        def randomization_factor!: () -> ::Google::Protobuf::DoubleValue?
+
+        attr_accessor multiplier(): ::Google::Protobuf::DoubleValue?
+
+        def multiplier=: [M < ::Google::Protobuf::DoubleValue::_ToProto] (M?) -> M?
+                       | ...
+
+        def multiplier!: () -> ::Google::Protobuf::DoubleValue?
+
+        attr_accessor max_interval(): ::Google::Protobuf::Duration?
+
+        def max_interval=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                         | ...
+
+        def max_interval!: () -> ::Google::Protobuf::Duration?
+
+        attr_accessor max_elapsed_time(): ::Google::Protobuf::Duration?
+
+        def max_elapsed_time=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                             | ...
+
+        def max_elapsed_time!: () -> ::Google::Protobuf::Duration?
+
+        attr_accessor max_retries(): ::Google::Protobuf::UInt32Value?
+
+        def max_retries=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                        | ...
+
+        def max_retries!: () -> ::Google::Protobuf::UInt32Value?
+
+        def initialize: (?initial_interval: ::Google::Protobuf::Duration::init?, ?randomization_factor: ::Google::Protobuf::DoubleValue::init?, ?multiplier: ::Google::Protobuf::DoubleValue::init?, ?max_interval: ::Google::Protobuf::Duration::init?, ?max_elapsed_time: ::Google::Protobuf::Duration::init?, ?max_retries: ::Google::Protobuf::UInt32Value::init?) -> void
+
+        def []: (:initial_interval) -> ::Google::Protobuf::Duration?
+              | (:randomization_factor) -> ::Google::Protobuf::DoubleValue?
+              | (:multiplier) -> ::Google::Protobuf::DoubleValue?
+              | (:max_interval) -> ::Google::Protobuf::Duration?
+              | (:max_elapsed_time) -> ::Google::Protobuf::Duration?
+              | (:max_retries) -> ::Google::Protobuf::UInt32Value?
+              | (::Symbol) -> untyped
+
+        def []=: (:initial_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+               | [M < ::Google::Protobuf::Duration::_ToProto] (:initial_interval, M?) -> M?
+               | (:randomization_factor, ::Google::Protobuf::DoubleValue?) -> ::Google::Protobuf::DoubleValue?
+               | [M < ::Google::Protobuf::DoubleValue::_ToProto] (:randomization_factor, M?) -> M?
+               | (:multiplier, ::Google::Protobuf::DoubleValue?) -> ::Google::Protobuf::DoubleValue?
+               | [M < ::Google::Protobuf::DoubleValue::_ToProto] (:multiplier, M?) -> M?
+               | (:max_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+               | [M < ::Google::Protobuf::Duration::_ToProto] (:max_interval, M?) -> M?
+               | (:max_elapsed_time, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+               | [M < ::Google::Protobuf::Duration::_ToProto] (:max_elapsed_time, M?) -> M?
+               | (:max_retries, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+               | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_retries, M?) -> M?
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> RetryConfig
+        end
+
+        # The type of `#initialize` parameter.
+        type init = RetryConfig | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[RetryConfig, RetryConfig | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RetryConfig, RetryConfig | _ToProto]
+
+        type array = ::Array[RetryConfig | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, RetryConfig | _ToProto]
+      end
+
+      attr_accessor target_url(): ::String
+
+      def target_url!: () -> ::String?
+
+      attr_accessor namespace(): ::String
+
+      def namespace!: () -> ::String?
+
+      attr_accessor client_name(): ::String
+
+      def client_name!: () -> ::String?
+
+      attr_accessor client_version(): ::String
+
+      def client_version!: () -> ::String?
+
+      attr_accessor identity(): ::String
+
+      def identity!: () -> ::String?
+
+      attr_accessor worker_binary_id(): ::String
+
+      def worker_binary_id!: () -> ::String?
+
+      attr_accessor tls_config(): ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+
+      def tls_config=: [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (M?) -> M?
+                     | ...
+
+      def tls_config!: () -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+
+      attr_accessor retry_config(): ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+
+      def retry_config=: [M < ::Coresdk::Bridge::CreateClientRequest::RetryConfig::_ToProto] (M?) -> M?
+                       | ...
+
+      def retry_config!: () -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+
+      def initialize: (?target_url: ::String, ?namespace: ::String, ?client_name: ::String, ?client_version: ::String, ?identity: ::String, ?worker_binary_id: ::String, ?tls_config: ::Coresdk::Bridge::CreateClientRequest::TlsConfig::init?, ?retry_config: ::Coresdk::Bridge::CreateClientRequest::RetryConfig::init?) -> void
+
+      def []: (:target_url) -> ::String
+            | (:namespace) -> ::String
+            | (:client_name) -> ::String
+            | (:client_version) -> ::String
+            | (:identity) -> ::String
+            | (:worker_binary_id) -> ::String
+            | (:tls_config) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+            | (:retry_config) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+            | (::Symbol) -> untyped
+
+      def []=: (:target_url, ::String) -> ::String
+             | (:namespace, ::String) -> ::String
+             | (:client_name, ::String) -> ::String
+             | (:client_version, ::String) -> ::String
+             | (:identity, ::String) -> ::String
+             | (:worker_binary_id, ::String) -> ::String
+             | (:tls_config, ::Coresdk::Bridge::CreateClientRequest::TlsConfig?) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+             | [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (:tls_config, M?) -> M?
+             | (:retry_config, ::Coresdk::Bridge::CreateClientRequest::RetryConfig?) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+             | [M < ::Coresdk::Bridge::CreateClientRequest::RetryConfig::_ToProto] (:retry_config, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> CreateClientRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CreateClientRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CreateClientRequest, CreateClientRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CreateClientRequest, CreateClientRequest | _ToProto]
+
+      type array = ::Array[CreateClientRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CreateClientRequest | _ToProto]
+    end
+
+    class InitResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::InitResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::InitResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::InitResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::InitResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::InitResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::InitResponse::Error?) -> ::Coresdk::Bridge::InitResponse::Error?
+             | [M < ::Coresdk::Bridge::InitResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> InitResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = InitResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[InitResponse, InitResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, InitResponse, InitResponse | _ToProto]
+
+      type array = ::Array[InitResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, InitResponse | _ToProto]
+    end
+
+    class CreateWorkerRequest < ::Protobuf::Message
+      attr_accessor task_queue(): ::String
+
+      def task_queue!: () -> ::String?
+
+      attr_accessor max_cached_workflows(): ::Google::Protobuf::UInt32Value?
+
+      def max_cached_workflows=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                               | ...
+
+      def max_cached_workflows!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor max_outstanding_workflow_tasks(): ::Google::Protobuf::UInt32Value?
+
+      def max_outstanding_workflow_tasks=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                                         | ...
+
+      def max_outstanding_workflow_tasks!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor max_outstanding_activities(): ::Google::Protobuf::UInt32Value?
+
+      def max_outstanding_activities=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                                     | ...
+
+      def max_outstanding_activities!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor max_outstanding_local_activities(): ::Google::Protobuf::UInt32Value?
+
+      def max_outstanding_local_activities=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                                           | ...
+
+      def max_outstanding_local_activities!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor max_concurrent_wft_polls(): ::Google::Protobuf::UInt32Value?
+
+      def max_concurrent_wft_polls=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                                   | ...
+
+      def max_concurrent_wft_polls!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor nonsticky_to_sticky_poll_ratio(): ::Google::Protobuf::FloatValue?
+
+      def nonsticky_to_sticky_poll_ratio=: [M < ::Google::Protobuf::FloatValue::_ToProto] (M?) -> M?
+                                         | ...
+
+      def nonsticky_to_sticky_poll_ratio!: () -> ::Google::Protobuf::FloatValue?
+
+      attr_accessor max_concurrent_at_polls(): ::Google::Protobuf::UInt32Value?
+
+      def max_concurrent_at_polls=: [M < ::Google::Protobuf::UInt32Value::_ToProto] (M?) -> M?
+                                  | ...
+
+      def max_concurrent_at_polls!: () -> ::Google::Protobuf::UInt32Value?
+
+      attr_accessor no_remote_activities(): bool
+
+      def no_remote_activities!: () -> bool?
+
+      attr_accessor sticky_queue_schedule_to_start_timeout(): ::Google::Protobuf::Duration?
+
+      def sticky_queue_schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                                 | ...
+
+      def sticky_queue_schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
+
+      attr_accessor max_heartbeat_throttle_interval(): ::Google::Protobuf::Duration?
+
+      def max_heartbeat_throttle_interval=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                          | ...
+
+      def max_heartbeat_throttle_interval!: () -> ::Google::Protobuf::Duration?
+
+      attr_accessor default_heartbeat_throttle_interval(): ::Google::Protobuf::Duration?
+
+      def default_heartbeat_throttle_interval=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                              | ...
+
+      def default_heartbeat_throttle_interval!: () -> ::Google::Protobuf::Duration?
+
+      def initialize: (?task_queue: ::String, ?max_cached_workflows: ::Google::Protobuf::UInt32Value::init?, ?max_outstanding_workflow_tasks: ::Google::Protobuf::UInt32Value::init?, ?max_outstanding_activities: ::Google::Protobuf::UInt32Value::init?, ?max_outstanding_local_activities: ::Google::Protobuf::UInt32Value::init?, ?max_concurrent_wft_polls: ::Google::Protobuf::UInt32Value::init?, ?nonsticky_to_sticky_poll_ratio: ::Google::Protobuf::FloatValue::init?, ?max_concurrent_at_polls: ::Google::Protobuf::UInt32Value::init?, ?no_remote_activities: bool, ?sticky_queue_schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?max_heartbeat_throttle_interval: ::Google::Protobuf::Duration::init?, ?default_heartbeat_throttle_interval: ::Google::Protobuf::Duration::init?) -> void
+
+      def []: (:task_queue) -> ::String
+            | (:max_cached_workflows) -> ::Google::Protobuf::UInt32Value?
+            | (:max_outstanding_workflow_tasks) -> ::Google::Protobuf::UInt32Value?
+            | (:max_outstanding_activities) -> ::Google::Protobuf::UInt32Value?
+            | (:max_outstanding_local_activities) -> ::Google::Protobuf::UInt32Value?
+            | (:max_concurrent_wft_polls) -> ::Google::Protobuf::UInt32Value?
+            | (:nonsticky_to_sticky_poll_ratio) -> ::Google::Protobuf::FloatValue?
+            | (:max_concurrent_at_polls) -> ::Google::Protobuf::UInt32Value?
+            | (:no_remote_activities) -> bool
+            | (:sticky_queue_schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
+            | (:max_heartbeat_throttle_interval) -> ::Google::Protobuf::Duration?
+            | (:default_heartbeat_throttle_interval) -> ::Google::Protobuf::Duration?
+            | (::Symbol) -> untyped
+
+      def []=: (:task_queue, ::String) -> ::String
+             | (:max_cached_workflows, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_cached_workflows, M?) -> M?
+             | (:max_outstanding_workflow_tasks, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_outstanding_workflow_tasks, M?) -> M?
+             | (:max_outstanding_activities, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_outstanding_activities, M?) -> M?
+             | (:max_outstanding_local_activities, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_outstanding_local_activities, M?) -> M?
+             | (:max_concurrent_wft_polls, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_concurrent_wft_polls, M?) -> M?
+             | (:nonsticky_to_sticky_poll_ratio, ::Google::Protobuf::FloatValue?) -> ::Google::Protobuf::FloatValue?
+             | [M < ::Google::Protobuf::FloatValue::_ToProto] (:nonsticky_to_sticky_poll_ratio, M?) -> M?
+             | (:max_concurrent_at_polls, ::Google::Protobuf::UInt32Value?) -> ::Google::Protobuf::UInt32Value?
+             | [M < ::Google::Protobuf::UInt32Value::_ToProto] (:max_concurrent_at_polls, M?) -> M?
+             | (:no_remote_activities, bool) -> bool
+             | (:sticky_queue_schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:sticky_queue_schedule_to_start_timeout, M?) -> M?
+             | (:max_heartbeat_throttle_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:max_heartbeat_throttle_interval, M?) -> M?
+             | (:default_heartbeat_throttle_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+             | [M < ::Google::Protobuf::Duration::_ToProto] (:default_heartbeat_throttle_interval, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      def no_remote_activities?: () -> bool
+
+      interface _ToProto
+        def to_proto: () -> CreateWorkerRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CreateWorkerRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CreateWorkerRequest, CreateWorkerRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CreateWorkerRequest, CreateWorkerRequest | _ToProto]
+
+      type array = ::Array[CreateWorkerRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CreateWorkerRequest | _ToProto]
+    end
+
+    class RegisterWorkerResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::RegisterWorkerResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::RegisterWorkerResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::RegisterWorkerResponse::Error?) -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+             | [M < ::Coresdk::Bridge::RegisterWorkerResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> RegisterWorkerResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = RegisterWorkerResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[RegisterWorkerResponse, RegisterWorkerResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RegisterWorkerResponse, RegisterWorkerResponse | _ToProto]
+
+      type array = ::Array[RegisterWorkerResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, RegisterWorkerResponse | _ToProto]
+    end
+
+    class PollWorkflowActivationRequest < ::Protobuf::Message
+      def initialize: () -> void
+
+      interface _ToProto
+        def to_proto: () -> PollWorkflowActivationRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = PollWorkflowActivationRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[PollWorkflowActivationRequest, PollWorkflowActivationRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PollWorkflowActivationRequest, PollWorkflowActivationRequest | _ToProto]
+
+      type array = ::Array[PollWorkflowActivationRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, PollWorkflowActivationRequest | _ToProto]
+    end
+
+    class PollWorkflowActivationResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        attr_accessor shutdown(): bool
+
+        def shutdown!: () -> bool?
+
+        def initialize: (?message: ::String, ?shutdown: bool) -> void
+
+        def []: (:message) -> ::String
+              | (:shutdown) -> bool
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (:shutdown, bool) -> bool
+               | (::Symbol, untyped) -> untyped
+
+        def shutdown?: () -> bool
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor activation(): ::Coresdk::Workflow_activation::WorkflowActivation?
+
+      def activation=: [M < ::Coresdk::Workflow_activation::WorkflowActivation::_ToProto] (M?) -> M?
+                     | ...
+
+      def activation!: () -> ::Coresdk::Workflow_activation::WorkflowActivation?
+
+      attr_accessor error(): ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+
+      def initialize: (?activation: ::Coresdk::Workflow_activation::WorkflowActivation::init?, ?error: ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::init?) -> void
+
+      def []: (:activation) -> ::Coresdk::Workflow_activation::WorkflowActivation?
+            | (:error) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:activation, ::Coresdk::Workflow_activation::WorkflowActivation?) -> ::Coresdk::Workflow_activation::WorkflowActivation?
+             | [M < ::Coresdk::Workflow_activation::WorkflowActivation::_ToProto] (:activation, M?) -> M?
+             | (:error, ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+             | [M < ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> PollWorkflowActivationResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = PollWorkflowActivationResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[PollWorkflowActivationResponse, PollWorkflowActivationResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PollWorkflowActivationResponse, PollWorkflowActivationResponse | _ToProto]
+
+      type array = ::Array[PollWorkflowActivationResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, PollWorkflowActivationResponse | _ToProto]
+    end
+
+    class PollActivityTaskRequest < ::Protobuf::Message
+      def initialize: () -> void
+
+      interface _ToProto
+        def to_proto: () -> PollActivityTaskRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = PollActivityTaskRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[PollActivityTaskRequest, PollActivityTaskRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PollActivityTaskRequest, PollActivityTaskRequest | _ToProto]
+
+      type array = ::Array[PollActivityTaskRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, PollActivityTaskRequest | _ToProto]
+    end
+
+    class PollActivityTaskResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        attr_accessor shutdown(): bool
+
+        def shutdown!: () -> bool?
+
+        def initialize: (?message: ::String, ?shutdown: bool) -> void
+
+        def []: (:message) -> ::String
+              | (:shutdown) -> bool
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (:shutdown, bool) -> bool
+               | (::Symbol, untyped) -> untyped
+
+        def shutdown?: () -> bool
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor task(): ::Coresdk::Activity_task::ActivityTask?
+
+      def task=: [M < ::Coresdk::Activity_task::ActivityTask::_ToProto] (M?) -> M?
+               | ...
+
+      def task!: () -> ::Coresdk::Activity_task::ActivityTask?
+
+      attr_accessor error(): ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::PollActivityTaskResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+
+      def initialize: (?task: ::Coresdk::Activity_task::ActivityTask::init?, ?error: ::Coresdk::Bridge::PollActivityTaskResponse::Error::init?) -> void
+
+      def []: (:task) -> ::Coresdk::Activity_task::ActivityTask?
+            | (:error) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:task, ::Coresdk::Activity_task::ActivityTask?) -> ::Coresdk::Activity_task::ActivityTask?
+             | [M < ::Coresdk::Activity_task::ActivityTask::_ToProto] (:task, M?) -> M?
+             | (:error, ::Coresdk::Bridge::PollActivityTaskResponse::Error?) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+             | [M < ::Coresdk::Bridge::PollActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> PollActivityTaskResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = PollActivityTaskResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[PollActivityTaskResponse, PollActivityTaskResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PollActivityTaskResponse, PollActivityTaskResponse | _ToProto]
+
+      type array = ::Array[PollActivityTaskResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, PollActivityTaskResponse | _ToProto]
+    end
+
+    class CompleteWorkflowActivationRequest < ::Protobuf::Message
+      attr_accessor completion(): ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+
+      def completion=: [M < ::Coresdk::Workflow_completion::WorkflowActivationCompletion::_ToProto] (M?) -> M?
+                     | ...
+
+      def completion!: () -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+
+      def initialize: (?completion: ::Coresdk::Workflow_completion::WorkflowActivationCompletion::init?) -> void
+
+      def []: (:completion) -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+            | (::Symbol) -> untyped
+
+      def []=: (:completion, ::Coresdk::Workflow_completion::WorkflowActivationCompletion?) -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+             | [M < ::Coresdk::Workflow_completion::WorkflowActivationCompletion::_ToProto] (:completion, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> CompleteWorkflowActivationRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CompleteWorkflowActivationRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CompleteWorkflowActivationRequest, CompleteWorkflowActivationRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteWorkflowActivationRequest, CompleteWorkflowActivationRequest | _ToProto]
+
+      type array = ::Array[CompleteWorkflowActivationRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CompleteWorkflowActivationRequest | _ToProto]
+    end
+
+    class CompleteWorkflowActivationResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?) -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+             | [M < ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> CompleteWorkflowActivationResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CompleteWorkflowActivationResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CompleteWorkflowActivationResponse, CompleteWorkflowActivationResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteWorkflowActivationResponse, CompleteWorkflowActivationResponse | _ToProto]
+
+      type array = ::Array[CompleteWorkflowActivationResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CompleteWorkflowActivationResponse | _ToProto]
+    end
+
+    class CompleteActivityTaskRequest < ::Protobuf::Message
+      attr_accessor completion(): ::Coresdk::ActivityTaskCompletion?
+
+      def completion=: [M < ::Coresdk::ActivityTaskCompletion::_ToProto] (M?) -> M?
+                     | ...
+
+      def completion!: () -> ::Coresdk::ActivityTaskCompletion?
+
+      def initialize: (?completion: ::Coresdk::ActivityTaskCompletion::init?) -> void
+
+      def []: (:completion) -> ::Coresdk::ActivityTaskCompletion?
+            | (::Symbol) -> untyped
+
+      def []=: (:completion, ::Coresdk::ActivityTaskCompletion?) -> ::Coresdk::ActivityTaskCompletion?
+             | [M < ::Coresdk::ActivityTaskCompletion::_ToProto] (:completion, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> CompleteActivityTaskRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CompleteActivityTaskRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CompleteActivityTaskRequest, CompleteActivityTaskRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteActivityTaskRequest, CompleteActivityTaskRequest | _ToProto]
+
+      type array = ::Array[CompleteActivityTaskRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CompleteActivityTaskRequest | _ToProto]
+    end
+
+    class CompleteActivityTaskResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?) -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+             | [M < ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> CompleteActivityTaskResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = CompleteActivityTaskResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[CompleteActivityTaskResponse, CompleteActivityTaskResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteActivityTaskResponse, CompleteActivityTaskResponse | _ToProto]
+
+      type array = ::Array[CompleteActivityTaskResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, CompleteActivityTaskResponse | _ToProto]
+    end
+
+    class RecordActivityHeartbeatRequest < ::Protobuf::Message
+      attr_accessor heartbeat(): ::Coresdk::ActivityHeartbeat?
+
+      def heartbeat=: [M < ::Coresdk::ActivityHeartbeat::_ToProto] (M?) -> M?
+                    | ...
+
+      def heartbeat!: () -> ::Coresdk::ActivityHeartbeat?
+
+      def initialize: (?heartbeat: ::Coresdk::ActivityHeartbeat::init?) -> void
+
+      def []: (:heartbeat) -> ::Coresdk::ActivityHeartbeat?
+            | (::Symbol) -> untyped
+
+      def []=: (:heartbeat, ::Coresdk::ActivityHeartbeat?) -> ::Coresdk::ActivityHeartbeat?
+             | [M < ::Coresdk::ActivityHeartbeat::_ToProto] (:heartbeat, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> RecordActivityHeartbeatRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = RecordActivityHeartbeatRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[RecordActivityHeartbeatRequest, RecordActivityHeartbeatRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RecordActivityHeartbeatRequest, RecordActivityHeartbeatRequest | _ToProto]
+
+      type array = ::Array[RecordActivityHeartbeatRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, RecordActivityHeartbeatRequest | _ToProto]
+    end
+
+    class RecordActivityHeartbeatResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?) -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+             | [M < ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> RecordActivityHeartbeatResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = RecordActivityHeartbeatResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[RecordActivityHeartbeatResponse, RecordActivityHeartbeatResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RecordActivityHeartbeatResponse, RecordActivityHeartbeatResponse | _ToProto]
+
+      type array = ::Array[RecordActivityHeartbeatResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, RecordActivityHeartbeatResponse | _ToProto]
+    end
+
+    class RequestWorkflowEvictionRequest < ::Protobuf::Message
+      attr_accessor run_id(): ::String
+
+      def run_id!: () -> ::String?
+
+      def initialize: (?run_id: ::String) -> void
+
+      def []: (:run_id) -> ::String
+            | (::Symbol) -> untyped
+
+      def []=: (:run_id, ::String) -> ::String
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> RequestWorkflowEvictionRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = RequestWorkflowEvictionRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[RequestWorkflowEvictionRequest, RequestWorkflowEvictionRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestWorkflowEvictionRequest, RequestWorkflowEvictionRequest | _ToProto]
+
+      type array = ::Array[RequestWorkflowEvictionRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, RequestWorkflowEvictionRequest | _ToProto]
+    end
+
+    class RequestWorkflowEvictionResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?) -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+             | [M < ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> RequestWorkflowEvictionResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = RequestWorkflowEvictionResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[RequestWorkflowEvictionResponse, RequestWorkflowEvictionResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestWorkflowEvictionResponse, RequestWorkflowEvictionResponse | _ToProto]
+
+      type array = ::Array[RequestWorkflowEvictionResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, RequestWorkflowEvictionResponse | _ToProto]
+    end
+
+    class ShutdownWorkerRequest < ::Protobuf::Message
+      def initialize: () -> void
+
+      interface _ToProto
+        def to_proto: () -> ShutdownWorkerRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ShutdownWorkerRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ShutdownWorkerRequest, ShutdownWorkerRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ShutdownWorkerRequest, ShutdownWorkerRequest | _ToProto]
+
+      type array = ::Array[ShutdownWorkerRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ShutdownWorkerRequest | _ToProto]
+    end
+
+    class ShutdownWorkerResponse < ::Protobuf::Message
+      class Error < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        def initialize: (?message: ::String) -> void
+
+        def []: (:message) -> ::String
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> Error
+        end
+
+        # The type of `#initialize` parameter.
+        type init = Error | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[Error, Error | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Error, Error | _ToProto]
+
+        type array = ::Array[Error | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, Error | _ToProto]
+      end
+
+      attr_accessor error(): ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+
+      def error=: [M < ::Coresdk::Bridge::ShutdownWorkerResponse::Error::_ToProto] (M?) -> M?
+                | ...
+
+      def error!: () -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+
+      def initialize: (?error: ::Coresdk::Bridge::ShutdownWorkerResponse::Error::init?) -> void
+
+      def []: (:error) -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+            | (::Symbol) -> untyped
+
+      def []=: (:error, ::Coresdk::Bridge::ShutdownWorkerResponse::Error?) -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+             | [M < ::Coresdk::Bridge::ShutdownWorkerResponse::Error::_ToProto] (:error, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ShutdownWorkerResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ShutdownWorkerResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ShutdownWorkerResponse, ShutdownWorkerResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ShutdownWorkerResponse, ShutdownWorkerResponse | _ToProto]
+
+      type array = ::Array[ShutdownWorkerResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ShutdownWorkerResponse | _ToProto]
+    end
+
+    class FetchBufferedLogsRequest < ::Protobuf::Message
+      def initialize: () -> void
+
+      interface _ToProto
+        def to_proto: () -> FetchBufferedLogsRequest
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FetchBufferedLogsRequest | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FetchBufferedLogsRequest, FetchBufferedLogsRequest | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FetchBufferedLogsRequest, FetchBufferedLogsRequest | _ToProto]
+
+      type array = ::Array[FetchBufferedLogsRequest | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FetchBufferedLogsRequest | _ToProto]
+    end
+
+    class FetchBufferedLogsResponse < ::Protobuf::Message
+      class LogEntry < ::Protobuf::Message
+        attr_accessor message(): ::String
+
+        def message!: () -> ::String?
+
+        attr_accessor timestamp(): ::Google::Protobuf::Timestamp?
+
+        def timestamp=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                      | ...
+
+        def timestamp!: () -> ::Google::Protobuf::Timestamp?
+
+        attr_accessor level(): ::Coresdk::Bridge::LogLevel
+
+        def level=: (::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+                  | ...
+
+        def level!: () -> ::Coresdk::Bridge::LogLevel?
+
+        def initialize: (?message: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?level: ::Coresdk::Bridge::LogLevel::init) -> void
+
+        def []: (:message) -> ::String
+              | (:timestamp) -> ::Google::Protobuf::Timestamp?
+              | (:level) -> ::Coresdk::Bridge::LogLevel
+              | (::Symbol) -> untyped
+
+        def []=: (:message, ::String) -> ::String
+               | (:timestamp, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+               | [M < ::Google::Protobuf::Timestamp::_ToProto] (:timestamp, M?) -> M?
+               | (:level, ::Coresdk::Bridge::LogLevel) -> ::Coresdk::Bridge::LogLevel
+               | (:level, ::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+               | (::Symbol, untyped) -> untyped
+
+        interface _ToProto
+          def to_proto: () -> LogEntry
+        end
+
+        # The type of `#initialize` parameter.
+        type init = LogEntry | _ToProto
+
+        # The type of `repeated` field.
+        type field_array = ::Protobuf::Field::FieldArray[LogEntry, LogEntry | _ToProto]
+
+        # The type of `map` field.
+        type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LogEntry, LogEntry | _ToProto]
+
+        type array = ::Array[LogEntry | _ToProto]
+
+        type hash[KEY] = ::Hash[KEY, LogEntry | _ToProto]
+      end
+
+      attr_accessor entries(): ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+
+      def entries=: (::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array
+                  | ...
+
+      def entries!: () -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array?
+
+      def initialize: (?entries: ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> void
+
+      def []: (:entries) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+            | (::Symbol) -> untyped
+
+      def []=: (:entries, ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+             | (:entries, ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> FetchBufferedLogsResponse
+      end
+
+      # The type of `#initialize` parameter.
+      type init = FetchBufferedLogsResponse | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[FetchBufferedLogsResponse, FetchBufferedLogsResponse | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FetchBufferedLogsResponse, FetchBufferedLogsResponse | _ToProto]
+
+      type array = ::Array[FetchBufferedLogsResponse | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, FetchBufferedLogsResponse | _ToProto]
+    end
+  end
+end
