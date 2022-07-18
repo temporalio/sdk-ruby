@@ -3,7 +3,6 @@ extern crate rutie;
 extern crate lazy_static;
 
 mod connection;
-mod reactor;
 mod worker;
 
 use connection::Connection;
@@ -12,29 +11,66 @@ use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
     NilClass
 };
+use std::cell::RefCell;
 use std::sync::Arc;
-use tokio::runtime::{Builder, Runtime};
-use worker::Worker;
+use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
+use std::time::Duration;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
+use tokio::runtime::{Builder, Runtime};
+use worker::{Response, Worker, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn runtime() -> &'static Arc<Runtime> {
-    static INSTANCE: OnceCell<Arc<Runtime>> = OnceCell::new();
-    INSTANCE.get_or_init(|| {
+    static RUNTIME: OnceCell<Arc<Runtime>> = OnceCell::new();
+    RUNTIME.get_or_init(|| {
         Arc::new(
             Builder::new_multi_thread()
                 .worker_threads(RUNTIME_THREAD_COUNT.into())
                 .enable_all()
                 .thread_name("core")
                 .build()
-                .unwrap()
+                .expect("Unable to start a runtime")
         )
     })
 }
 
 fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
+}
+
+fn run_callback_loop(receiver: &mut Receiver<Response>) {
+    let timeout = Duration::from_secs(5);
+
+    while let Ok(msg) = Thread::call_without_gvl(|| { receiver.recv_timeout(timeout) }, Some(|| {})) {
+        match msg {
+            Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
+            Response::Error { error, callback } => callback(Err(error)),
+            _ => panic!("Unsupported response type"),
+        }
+    }
+}
+
+fn start_callback_loop() -> &'static SyncSender<Response> {
+    static CALLBACK_SENDER: OnceCell<SyncSender<Response>> = OnceCell::new();
+    CALLBACK_SENDER.get_or_init(|| {
+        let (tx, rx): (SyncSender<Response>, Receiver<Response>) = sync_channel(1);
+        let rx = RefCell::new(rx);
+
+        // Ruby callbacks can only be executed from a Ruby thread, therefore
+        // we're using rutie::Thread here instead of the std::thread
+        Thread::new(move || {
+            run_callback_loop(&mut rx.borrow_mut());
+            NilClass::new()
+        });
+
+        tx
+    })
+}
+
+fn wrap_bytes(bytes: &Vec<u8>) -> AnyObject {
+    let enc = Encoding::find("ASCII-8BIT").unwrap();
+    RString::from_bytes(bytes, &enc).to_any_object()
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
@@ -92,11 +128,12 @@ methods!(
     }
 
     fn create_worker(connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
+        let callback_sender = start_callback_loop();
         let namespace = namespace.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let task_queue = task_queue.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::create(runtime().clone(), &connection.client, &namespace, &task_queue);
+        let worker = Worker::create(runtime().clone(), &connection.client, callback_sender.clone(), &namespace, &task_queue);
 
         Module::from_existing("Temporal")
             .get_nested_module("Bridge")
@@ -104,16 +141,24 @@ methods!(
             .wrap_data(worker.unwrap(), &*WORKER_WRAPPER)
     }
 
-    fn worker_poll_activity_task() -> RString {
-        let result = Thread::call_without_gvl(move || {
-            let worker = rtself.get_data_mut(&*WORKER_WRAPPER);
-            worker.poll_activity_task()
-        }, Some(|| {}));
+    fn worker_poll_activity_task() -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #poll_activity_task without a block");
+        }
 
-        let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+        let ruby_callback = VM::block_proc();
 
-        let enc = Encoding::find("ASCII-8BIT").unwrap();
-        RString::from_bytes(&response, &enc)
+        let callback = move |result: WorkerResult| {
+            let bytes = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+            ruby_callback.call(&[wrap_bytes(&bytes)]);
+        };
+
+        let worker = rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.poll_activity_task(callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
     }
 );
 
