@@ -1,10 +1,11 @@
 use std::convert::TryFrom;
+use std::sync::Arc;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
     ConfiguredClient, WorkflowServiceClientWithMetrics
 };
 use thiserror::Error;
-use tokio::runtime::{Builder, Runtime};
+use tokio::runtime::{Runtime};
 use tonic::Request;
 use url::Url;
 
@@ -50,10 +51,9 @@ macro_rules! rpc_call {
 }
 
 // A Connection is a Client wrapper for making RPC calls
-#[derive(Debug)]
 pub struct Connection {
-    client: Client,
-    runtime: Runtime
+    pub client: Client,
+    runtime: Arc<Runtime>
 }
 
 async fn create_client(host: String) -> Result<Client, ConnectionError> {
@@ -71,8 +71,7 @@ async fn create_client(host: String) -> Result<Client, ConnectionError> {
 
 impl Connection {
     // TODO: Change the interface to accept a full configuration
-    pub fn connect(host: String) -> Result<Self, ConnectionError> {
-        let runtime = Builder::new_current_thread().enable_all().build()?;
+    pub fn connect(runtime: Arc<Runtime>, host: String) -> Result<Self, ConnectionError> {
         let client = runtime.block_on(create_client(host))?;
 
         Ok(Connection { client: client, runtime })
