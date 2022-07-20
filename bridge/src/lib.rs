@@ -14,7 +14,6 @@ use rutie::{
 use std::cell::RefCell;
 use std::sync::Arc;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
-use std::time::Duration;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
 use tokio::runtime::{Builder, Runtime};
 use worker::{Response, Worker, WorkerResult};
@@ -39,10 +38,10 @@ fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
 }
 
-fn run_callback_loop(receiver: &mut Receiver<Response>) {
-    let timeout = Duration::from_secs(5);
+fn run_callback_loop(sender: SyncSender<Response>, receiver: &mut Receiver<Response>) {
+    let unblock = || { sender.send(Response::Empty {}).expect("Unable to close callback loop"); };
 
-    while let Ok(msg) = Thread::call_without_gvl(|| { receiver.recv_timeout(timeout) }, Some(|| {})) {
+    while let Ok(msg) = Thread::call_without_gvl(|| { receiver.recv() }, Some(unblock)) {
         match msg {
             Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
             Response::Error { error, callback } => callback(Err(error)),
@@ -56,15 +55,16 @@ fn start_callback_loop() -> &'static SyncSender<Response> {
     CALLBACK_SENDER.get_or_init(|| {
         let (tx, rx): (SyncSender<Response>, Receiver<Response>) = sync_channel(1);
         let rx = RefCell::new(rx);
+        let return_tx = tx.clone();
 
         // Ruby callbacks can only be executed from a Ruby thread, therefore
         // we're using rutie::Thread here instead of the std::thread
         Thread::new(move || {
-            run_callback_loop(&mut rx.borrow_mut());
+            run_callback_loop(tx.clone(), &mut rx.borrow_mut());
             NilClass::new()
         });
 
-        tx
+        return_tx
     })
 }
 
