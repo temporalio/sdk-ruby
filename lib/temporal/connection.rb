@@ -1,10 +1,12 @@
 require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/bridge'
+require 'temporal/runtime'
 
 module Temporal
   class Connection
     def initialize(host)
-      @core_connection = Temporal::Bridge::Connection.connect(host)
+      runtime = Temporal::Runtime.instance
+      @core_connection = Temporal::Bridge::Connection.connect(runtime.core_runtime, host)
     end
 
     def register_namespace(request)

@@ -3,36 +3,22 @@ extern crate rutie;
 extern crate lazy_static;
 
 mod connection;
+mod runtime;
 mod worker;
 
 use connection::Connection;
 use once_cell::sync::OnceCell;
+use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
     NilClass
 };
 use std::cell::RefCell;
-use std::sync::Arc;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
-use tokio::runtime::{Builder, Runtime};
 use worker::{Response, Worker, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
-
-fn runtime() -> &'static Arc<Runtime> {
-    static RUNTIME: OnceCell<Arc<Runtime>> = OnceCell::new();
-    RUNTIME.get_or_init(|| {
-        Arc::new(
-            Builder::new_multi_thread()
-                .worker_threads(RUNTIME_THREAD_COUNT.into())
-                .enable_all()
-                .thread_name("core")
-                .build()
-                .expect("Unable to start a runtime")
-        )
-    })
-}
 
 fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
@@ -74,6 +60,7 @@ fn wrap_bytes(bytes: &Vec<u8>) -> AnyObject {
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
+wrappable_struct!(Runtime, RuntimeWrapper, RUNTIME_WRAPPER);
 wrappable_struct!(Worker, WorkerWrapper, WORKER_WRAPPER);
 
 class!(TemporalBridge);
@@ -82,11 +69,13 @@ methods!(
     TemporalBridge,
     rtself,
 
-    fn create_connection(host: RString) -> AnyObject {
+    fn create_connection(runtime: AnyObject, host: RString) -> AnyObject {
         let host = host.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
+        let runtime = runtime.unwrap();
+        let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
 
         let result = Thread::call_without_gvl(move || {
-            Connection::connect(runtime().clone(), host.clone())
+            Connection::connect(runtime.tokio_runtime.clone(), host.clone())
         }, Some(|| {}));
 
         let connection = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
@@ -127,13 +116,24 @@ methods!(
         NilClass::new()
     }
 
-    fn create_worker(connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
+    fn init_runtime() -> AnyObject {
+        let runtime = Runtime::new(RUNTIME_THREAD_COUNT);
+
+        Module::from_existing("Temporal")
+            .get_nested_module("Bridge")
+            .get_nested_class("Runtime")
+            .wrap_data(runtime, &*RUNTIME_WRAPPER)
+    }
+
+    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
         let callback_sender = start_callback_loop();
         let namespace = namespace.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let task_queue = task_queue.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
+        let runtime = runtime.unwrap();
+        let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::create(runtime().clone(), &connection.client, callback_sender.clone(), &namespace, &task_queue);
+        let worker = Worker::create(runtime.tokio_runtime.clone(), &connection.client, callback_sender.clone(), &namespace, &task_queue);
 
         Module::from_existing("Temporal")
             .get_nested_module("Bridge")
@@ -166,6 +166,10 @@ methods!(
 pub extern "C" fn init_bridge() {
     Module::from_existing("Temporal").get_nested_module("Bridge").define(|module| {
         module.def_self("init_telemetry", init_telemetry);
+
+        module.define_nested_class("Runtime", None).define(|klass| {
+            klass.def_self("init", init_runtime);
+        });
 
         module.define_nested_class("Connection", None).define(|klass| {
             klass.def_self("connect", create_connection);

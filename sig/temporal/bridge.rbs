@@ -11,8 +11,12 @@ module Temporal
     end
 
     class Connection
-      def self.connect: (String) -> Temporal::Bridge::Connection
+      def self.connect: (Runtime, String) -> Temporal::Bridge::Connection
       def call: (Symbol, String) -> String
+    end
+
+    class Runtime
+      def self.init: () -> Temporal::Bridge::Runtime
     end
   end
 end

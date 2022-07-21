@@ -1,0 +1,8 @@
+module Temporal
+  class Runtime
+    attr_reader core_runtime: Temporal::Bridge::Runtime
+
+    def self.instance: () -> Runtime
+    def initialize: () -> void
+  end
+end
