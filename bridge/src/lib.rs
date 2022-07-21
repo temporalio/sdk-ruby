@@ -106,13 +106,7 @@ methods!(
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::create(
-            runtime.tokio_runtime.clone(),
-            &connection.client,
-            runtime.callback_tx.clone(),
-            &namespace,
-            &task_queue
-        );
+        let worker = Worker::create(runtime, &connection.client, &namespace, &task_queue);
 
         Module::from_existing("Temporal")
             .get_nested_module("Bridge")

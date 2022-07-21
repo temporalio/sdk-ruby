@@ -7,7 +7,7 @@ use tokio::runtime::{Builder, Runtime as TokioRuntime};
 pub struct Runtime {
     pub tokio_runtime: Arc<TokioRuntime>,
     pub callback_tx: Sender<Response>,
-    pub callback_rx: Receiver<Response>,
+    callback_rx: Receiver<Response>,
 }
 
 impl Runtime {
