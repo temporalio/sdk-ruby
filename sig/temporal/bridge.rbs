@@ -17,6 +17,7 @@ module Temporal
 
     class Runtime
       def self.init: () -> Temporal::Bridge::Runtime
+      def run_callback_loop: () -> void
     end
   end
 end

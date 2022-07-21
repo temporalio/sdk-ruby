@@ -4,5 +4,6 @@ module Temporal
 
     def self.instance: () -> Runtime
     def initialize: () -> void
+    def ensure_callback_loop: () -> void
   end
 end

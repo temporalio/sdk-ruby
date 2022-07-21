@@ -7,14 +7,11 @@ mod runtime;
 mod worker;
 
 use connection::Connection;
-use once_cell::sync::OnceCell;
 use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
     NilClass
 };
-use std::cell::RefCell;
-use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
 use worker::{Response, Worker, WorkerResult};
 
@@ -22,36 +19,6 @@ const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
-}
-
-fn run_callback_loop(sender: SyncSender<Response>, receiver: &mut Receiver<Response>) {
-    let unblock = || { sender.send(Response::Empty {}).expect("Unable to close callback loop"); };
-
-    while let Ok(msg) = Thread::call_without_gvl(|| { receiver.recv() }, Some(unblock)) {
-        match msg {
-            Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
-            Response::Error { error, callback } => callback(Err(error)),
-            _ => panic!("Unsupported response type"),
-        }
-    }
-}
-
-fn start_callback_loop() -> &'static SyncSender<Response> {
-    static CALLBACK_SENDER: OnceCell<SyncSender<Response>> = OnceCell::new();
-    CALLBACK_SENDER.get_or_init(|| {
-        let (tx, rx): (SyncSender<Response>, Receiver<Response>) = sync_channel(1);
-        let rx = RefCell::new(rx);
-        let return_tx = tx.clone();
-
-        // Ruby callbacks can only be executed from a Ruby thread, therefore
-        // we're using rutie::Thread here instead of the std::thread
-        Thread::new(move || {
-            run_callback_loop(tx.clone(), &mut rx.borrow_mut());
-            NilClass::new()
-        });
-
-        return_tx
-    })
 }
 
 fn wrap_bytes(bytes: &Vec<u8>) -> AnyObject {
@@ -125,15 +92,39 @@ methods!(
             .wrap_data(runtime, &*RUNTIME_WRAPPER)
     }
 
+    fn run_callback_loop() -> NilClass {
+        let runtime = rtself.get_data_mut(&*RUNTIME_WRAPPER);
+
+        let poll = || { runtime.callback_rx.recv() };
+        let unblock = || {
+            runtime.callback_tx.send(Response::Empty {}).expect("Unable to close callback loop");
+        };
+
+        while let Ok(msg) = Thread::call_without_gvl(poll, Some(unblock)) {
+            match msg {
+                Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
+                Response::Error { error, callback } => callback(Err(error)),
+                _ => panic!("Unsupported response type"),
+            }
+        };
+
+        NilClass::new()
+    }
+
     fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
-        let callback_sender = start_callback_loop();
         let namespace = namespace.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let task_queue = task_queue.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::create(runtime.tokio_runtime.clone(), &connection.client, callback_sender.clone(), &namespace, &task_queue);
+        let worker = Worker::create(
+            runtime.tokio_runtime.clone(),
+            &connection.client,
+            runtime.callback_tx.clone(),
+            &namespace,
+            &task_queue
+        );
 
         Module::from_existing("Temporal")
             .get_nested_module("Bridge")
@@ -169,6 +160,7 @@ pub extern "C" fn init_bridge() {
 
         module.define_nested_class("Runtime", None).define(|klass| {
             klass.def_self("init", init_runtime);
+            klass.def("run_callback_loop", run_callback_loop);
         });
 
         module.define_nested_class("Connection", None).define(|klass| {

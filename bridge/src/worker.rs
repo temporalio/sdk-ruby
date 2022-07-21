@@ -2,7 +2,7 @@ use crate::connection::Client;
 use once_cell::sync::OnceCell;
 use prost::Message;
 use std::sync::Arc;
-use std::sync::mpsc::SyncSender;
+use std::sync::mpsc::Sender;
 use temporal_sdk_core::api::{Worker as WorkerTrait};
 use temporal_sdk_core_api::worker::{WorkerConfigBuilder, WorkerConfigBuilderError};
 use thiserror::Error;
@@ -46,7 +46,7 @@ pub enum Response {
 pub type WorkerResult = Result<Vec<u8>, WorkerError>;
 type WorkerCallback = Box<dyn FnOnce(WorkerResult) + Send + 'static>;
 
-async fn handle_request(request: Request, outer_channel: SyncSender<Response>) {
+async fn handle_request(request: Request, outer_channel: Sender<Response>) {
     match request {
         Request::PollActivityTask { core_worker, callback } => {
             let task = core_worker.poll_activity_task().await;
@@ -68,7 +68,7 @@ async fn handle_request(request: Request, outer_channel: SyncSender<Response>) {
     }
 }
 
-fn run_reactor_loop(runtime: Arc<Runtime>, mut receiver: tokio_mpsc::UnboundedReceiver<Request>, outer_sender: SyncSender<Response>) {
+fn run_reactor_loop(runtime: Arc<Runtime>, mut receiver: tokio_mpsc::UnboundedReceiver<Request>, outer_sender: Sender<Response>) {
     runtime.block_on(async move {
         while let Some(request) = receiver.recv().await {
             tokio::spawn(handle_request(request, outer_sender.clone()));
@@ -76,7 +76,7 @@ fn run_reactor_loop(runtime: Arc<Runtime>, mut receiver: tokio_mpsc::UnboundedRe
     });
 }
 
-fn reactor(runtime: Arc<Runtime>, outer_sender: SyncSender<Response>) -> &'static tokio_mpsc::UnboundedSender<Request> {
+fn reactor(runtime: Arc<Runtime>, outer_sender: Sender<Response>) -> &'static tokio_mpsc::UnboundedSender<Request> {
     static REACTOR: OnceCell<tokio_mpsc::UnboundedSender<Request>> = OnceCell::new();
     REACTOR.get_or_init(|| {
         let (tx, rx) = tokio_mpsc::unbounded_channel::<Request>();
@@ -95,7 +95,7 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn create(runtime: Arc<Runtime>, client: &Client, callback_sender: SyncSender<Response>, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
+    pub fn create(runtime: Arc<Runtime>, client: &Client, callback_sender: Sender<Response>, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
         let config = WorkerConfigBuilder::default()
             .namespace(namespace)
             .task_queue(task_queue)

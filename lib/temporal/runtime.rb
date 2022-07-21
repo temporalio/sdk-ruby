@@ -10,5 +10,13 @@ module Temporal
     def initialize
       @core_runtime = Temporal::Bridge::Runtime.init
     end
+
+    def ensure_callback_loop
+      return unless @thread
+
+      @thread = Thread.new do
+        core_runtime.run_callback_loop
+      end
+    end
   end
 end

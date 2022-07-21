@@ -4,6 +4,8 @@ require 'temporal/runtime'
 
 module Temporal
   class Connection
+    attr_reader :core_connection
+
     def initialize(host)
       runtime = Temporal::Runtime.instance
       @core_connection = Temporal::Bridge::Connection.connect(runtime.core_runtime, host)
@@ -288,9 +290,5 @@ module Temporal
 
       Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse.decode(response)
     end
-
-    private
-
-    attr_reader :core_connection
   end
 end
