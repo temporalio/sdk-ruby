@@ -13,7 +13,7 @@ use rutie::{
     NilClass
 };
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
-use worker::{Response, Worker, WorkerResult};
+use worker::{Worker, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
@@ -94,19 +94,7 @@ methods!(
 
     fn run_callback_loop() -> NilClass {
         let runtime = rtself.get_data_mut(&*RUNTIME_WRAPPER);
-
-        let poll = || { runtime.callback_rx.recv() };
-        let unblock = || {
-            runtime.callback_tx.send(Response::Empty {}).expect("Unable to close callback loop");
-        };
-
-        while let Ok(msg) = Thread::call_without_gvl(poll, Some(unblock)) {
-            match msg {
-                Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
-                Response::Error { error, callback } => callback(Err(error)),
-                _ => panic!("Unsupported response type"),
-            }
-        };
+        runtime.run_callback_loop();
 
         NilClass::new()
     }

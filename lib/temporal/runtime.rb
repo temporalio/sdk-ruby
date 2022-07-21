@@ -12,7 +12,7 @@ module Temporal
     end
 
     def ensure_callback_loop
-      return unless @thread
+      return if @thread
 
       @thread = Thread.new do
         core_runtime.run_callback_loop
