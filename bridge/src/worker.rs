@@ -58,12 +58,7 @@ impl Worker {
             let task = core_worker.poll_activity_task().await;
 
             let callback: Callback = match task {
-                Ok(task) => {
-                    let mut bytes: Vec<u8> = Vec::with_capacity(task.encoded_len());
-                    task.encode(&mut bytes).expect("Unable to encode activity task protobuf");
-
-                    Box::new(move || callback(Ok(bytes)))
-                },
+                Ok(task) => Box::new(move || callback(Ok(task.encode_to_vec()))),
                 Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollActivityTask(e))))
             };
 
