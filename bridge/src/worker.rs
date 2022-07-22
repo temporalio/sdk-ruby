@@ -55,10 +55,13 @@ impl Worker {
         let callback_tx = self.callback_tx.clone();
 
         self.tokio_runtime.spawn(async move {
-            let task = core_worker.poll_activity_task().await;
+            let result = core_worker.poll_activity_task().await;
 
-            let callback: Callback = match task {
-                Ok(task) => Box::new(move || callback(Ok(task.encode_to_vec()))),
+            let callback: Callback = match result {
+                Ok(task) => {
+                    let bytes = task.encode_to_vec();
+                    Box::new(move || callback(Ok(bytes)))
+                },
                 Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollActivityTask(e))))
             };
 
