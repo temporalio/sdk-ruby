@@ -65,7 +65,7 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn create(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
+    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
         let config = WorkerConfigBuilder::default()
             .namespace(namespace)
             .task_queue(task_queue)
