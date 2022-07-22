@@ -120,7 +120,6 @@ name = "bridge"
 version = "0.0.1"
 dependencies = [
  "lazy_static",
- "once_cell",
  "prost",
  "rutie",
  "temporal-client",
