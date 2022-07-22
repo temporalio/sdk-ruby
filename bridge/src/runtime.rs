@@ -29,14 +29,13 @@ impl Runtime {
     pub fn run_callback_loop(&self) {
         let poll = || { self.callback_rx.recv() };
         let unblock = || {
-            self.callback_tx.send(Response::Empty {}).expect("Unable to close callback loop");
+            self.callback_tx.send(Response::Shutdown {}).expect("Unable to close callback loop");
         };
 
         while let Ok(msg) = Thread::call_without_gvl(poll, Some(unblock)) {
             match msg {
-                Response::ActivityTask { bytes, callback } => callback(Ok(bytes)),
-                Response::Error { error, callback } => callback(Err(error)),
-                _ => panic!("Unsupported response type"),
+                Response::Callback(callback) => callback(),
+                Response::Shutdown => break,
             }
         };
     }

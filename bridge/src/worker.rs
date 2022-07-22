@@ -24,19 +24,12 @@ pub enum WorkerError {
 }
 
 pub enum Response {
-    Empty,
-    Error {
-        error: WorkerError,
-        callback: WorkerCallback,
-    },
-    ActivityTask {
-        bytes: Vec<u8>,
-        callback: WorkerCallback,
-    }
+    Callback(WorkerCallback),
+    Shutdown,
 }
 
 pub type WorkerResult = Result<Vec<u8>, WorkerError>;
-type WorkerCallback = Box<dyn FnOnce(WorkerResult) + Send + 'static>;
+type WorkerCallback = Box<dyn FnOnce() + Send + 'static>;
 
 pub struct Worker {
     core_worker: Arc<temporal_sdk_core::Worker>,
@@ -66,24 +59,21 @@ impl Worker {
     pub fn poll_activity_task<F>(&self, callback: F) -> Result<(), WorkerError> where F: FnOnce(WorkerResult) + Send + 'static {
         let core_worker = self.core_worker.clone();
         let callback_tx = self.callback_tx.clone();
-        let callback = Box::new(callback);
 
         self.tokio_runtime.spawn(async move {
             let task = core_worker.poll_activity_task().await;
 
-            let response = match task {
+            let response: WorkerCallback = match task {
                 Ok(task) => {
                     let mut bytes: Vec<u8> = Vec::with_capacity(task.encoded_len());
                     task.encode(&mut bytes).expect("Unable to encode activity task protobuf");
 
-                    Response::ActivityTask { bytes, callback }
+                    Box::new(move || callback(Ok(bytes)))
                 },
-                Err(e) => {
-                    Response::Error { error: WorkerError::UnableToPollActivityTask(e), callback }
-                }
+                Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollActivityTask(e))))
             };
 
-            callback_tx.send(response).expect("Unable to send a callback");
+            callback_tx.send(Response::Callback(response)).expect("Unable to send a callback");
         });
 
         Ok(())
