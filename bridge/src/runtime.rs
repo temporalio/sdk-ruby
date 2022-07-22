@@ -1,18 +1,24 @@
-use crate::worker::Response;
 use rutie::Thread;
 use std::sync::Arc;
 use std::sync::mpsc::{channel, Sender, Receiver};
 use tokio::runtime::{Builder, Runtime as TokioRuntime};
 
+pub type Callback = Box<dyn FnOnce() + Send + 'static>;
+
+pub enum Command {
+    RunCallback(Callback),
+    Shutdown,
+}
+
 pub struct Runtime {
     pub tokio_runtime: Arc<TokioRuntime>,
-    pub callback_tx: Sender<Response>,
-    callback_rx: Receiver<Response>,
+    pub callback_tx: Sender<Command>,
+    callback_rx: Receiver<Command>,
 }
 
 impl Runtime {
     pub fn new(thread_count: u8) -> Self {
-        let (tx, rx): (Sender<Response>, Receiver<Response>) = channel();
+        let (tx, rx): (Sender<Command>, Receiver<Command>) = channel();
         let tokio_runtime = Arc::new(
             Builder::new_multi_thread()
                 .worker_threads(thread_count.into())
@@ -27,15 +33,14 @@ impl Runtime {
 
     // This function is expected to be called from a Ruby thread
     pub fn run_callback_loop(&self) {
-        let poll = || { self.callback_rx.recv() };
         let unblock = || {
-            self.callback_tx.send(Response::Shutdown {}).expect("Unable to close callback loop");
+            self.callback_tx.send(Command::Shutdown {}).expect("Unable to close callback loop");
         };
 
-        while let Ok(msg) = Thread::call_without_gvl(poll, Some(unblock)) {
+        while let Ok(msg) = Thread::call_without_gvl(|| self.callback_rx.recv(), Some(unblock)) {
             match msg {
-                Response::Callback(callback) => callback(),
-                Response::Shutdown => break,
+                Command::RunCallback(callback) => callback(),
+                Command::Shutdown => break,
             }
         };
     }

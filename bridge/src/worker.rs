@@ -1,5 +1,5 @@
 use crate::connection::Client;
-use crate::runtime::Runtime;
+use crate::runtime::{Callback, Command, Runtime};
 use prost::Message;
 use std::sync::Arc;
 use std::sync::mpsc::Sender;
@@ -23,18 +23,12 @@ pub enum WorkerError {
     ChannelClosed(),
 }
 
-pub enum Response {
-    Callback(WorkerCallback),
-    Shutdown,
-}
-
 pub type WorkerResult = Result<Vec<u8>, WorkerError>;
-type WorkerCallback = Box<dyn FnOnce() + Send + 'static>;
 
 pub struct Worker {
     core_worker: Arc<temporal_sdk_core::Worker>,
     tokio_runtime: Arc<TokioRuntime>,
-    callback_tx: Sender<Response>,
+    callback_tx: Sender<Command>,
 }
 
 impl Worker {
@@ -63,7 +57,7 @@ impl Worker {
         self.tokio_runtime.spawn(async move {
             let task = core_worker.poll_activity_task().await;
 
-            let response: WorkerCallback = match task {
+            let callback: Callback = match task {
                 Ok(task) => {
                     let mut bytes: Vec<u8> = Vec::with_capacity(task.encoded_len());
                     task.encode(&mut bytes).expect("Unable to encode activity task protobuf");
@@ -73,7 +67,7 @@ impl Worker {
                 Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollActivityTask(e))))
             };
 
-            callback_tx.send(Response::Callback(response)).expect("Unable to send a callback");
+            callback_tx.send(Command::RunCallback(callback)).expect("Unable to send a callback");
         });
 
         Ok(())
