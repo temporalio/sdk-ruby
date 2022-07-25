@@ -1,0 +1,12 @@
+module Singleton
+end
+
+module Temporal
+  class Runtime
+    attr_reader core_runtime: Temporal::Bridge::Runtime
+
+    def self.instance: () -> Runtime
+    def initialize: () -> void
+    def ensure_callback_loop: () -> void
+  end
+end
