@@ -896,12 +896,12 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor task(): ::Coresdk::Activity_task::ActivityTask?
+      attr_accessor task(): ::Coresdk::ActivityTask::ActivityTask?
 
-      def task=: [M < ::Coresdk::Activity_task::ActivityTask::_ToProto] (M?) -> M?
+      def task=: [M < ::Coresdk::ActivityTask::ActivityTask::_ToProto] (M?) -> M?
                | ...
 
-      def task!: () -> ::Coresdk::Activity_task::ActivityTask?
+      def task!: () -> ::Coresdk::ActivityTask::ActivityTask?
 
       attr_accessor error(): ::Coresdk::Bridge::PollActivityTaskResponse::Error?
 
@@ -910,14 +910,14 @@ module Coresdk
 
       def error!: () -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
 
-      def initialize: (?task: ::Coresdk::Activity_task::ActivityTask::init?, ?error: ::Coresdk::Bridge::PollActivityTaskResponse::Error::init?) -> void
+      def initialize: (?task: ::Coresdk::ActivityTask::ActivityTask::init?, ?error: ::Coresdk::Bridge::PollActivityTaskResponse::Error::init?) -> void
 
-      def []: (:task) -> ::Coresdk::Activity_task::ActivityTask?
+      def []: (:task) -> ::Coresdk::ActivityTask::ActivityTask?
             | (:error) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:task, ::Coresdk::Activity_task::ActivityTask?) -> ::Coresdk::Activity_task::ActivityTask?
-             | [M < ::Coresdk::Activity_task::ActivityTask::_ToProto] (:task, M?) -> M?
+      def []=: (:task, ::Coresdk::ActivityTask::ActivityTask?) -> ::Coresdk::ActivityTask::ActivityTask?
+             | [M < ::Coresdk::ActivityTask::ActivityTask::_ToProto] (:task, M?) -> M?
              | (:error, ::Coresdk::Bridge::PollActivityTaskResponse::Error?) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
              | [M < ::Coresdk::Bridge::PollActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
