@@ -1,0 +1,40 @@
+module Temporal
+  class Worker
+    class Reactor
+      include Singleton
+      extend SingleForwardable
+
+      def self.instance: () -> Reactor
+      def self.execute: () { (Reactor) -> void } -> void
+      def self.attach: () -> void
+
+      def initialize: () -> void
+      def execute: () { (Reactor) -> void } -> void
+      def async: () { (untyped) -> void } -> Promise
+      def await: () { (untyped) -> void } -> untyped
+      def attach: () -> void
+
+      private
+
+      type command = Command::Start | Command::Resume
+
+      @queue: Thread::Queue
+      @fibers: Set[Fiber]
+      @thread: Thread?
+      @running: bool
+      @mutex: Thread::Mutex
+
+      attr_reader queue: Thread::Queue
+      attr_reader thread: Thread?
+      attr_reader fibers: Set[Fiber]
+      attr_reader mutex: Thread::Mutex
+
+      def running?: () -> bool
+      def run_loop: () -> void
+      def handle: (command) -> void
+      def run_in_fiber: (^() -> void) -> void
+      def enqueue: () { () -> void } -> void
+      def resume: (Fiber, untyped) -> void
+    end
+  end
+end

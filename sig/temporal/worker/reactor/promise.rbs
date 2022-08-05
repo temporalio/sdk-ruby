@@ -1,0 +1,25 @@
+module Temporal
+  class Worker
+    class Reactor
+      class Promise
+        class AlreadyFulfilledError < StandardError
+        end
+
+        def initialize: () -> void
+        def fulfilled?: () -> bool
+        def result: () -> Object?
+        def wait: () -> void
+        def set: (Object | Exception) -> void
+
+        private
+
+        @result: Object?
+        @exception: Exception
+        @fulfilled: bool
+        @fiber: Fiber?
+
+        def resume_fiber: () -> void
+      end
+    end
+  end
+end
