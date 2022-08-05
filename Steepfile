@@ -6,7 +6,8 @@ target :lib do
   check 'lib'
 
   repo_path 'vendor/rbs/gem_rbs_collection/gems'
-  library 'protobuf', 'json', 'securerandom', 'socket'
+  library 'protobuf', 'json', 'securerandom', 'socket',
+          'fiber', 'forwardable', 'set', 'singleton'
 
   ignore 'lib/gen/*.rb'
 

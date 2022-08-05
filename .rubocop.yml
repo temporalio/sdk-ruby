@@ -70,4 +70,4 @@ Metrics/ParameterLists:
   Max: 15
 
 Metrics/PerceivedComplexity:
-  Max: 25
+  Max: 15
