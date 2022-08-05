@@ -1,0 +1,24 @@
+module Temporal
+  class Worker
+    class AlreadyStarted < StandardError
+    end
+
+    def initialize: (Temporal::Connection, String | Symbol, String | Symbol) -> void
+    def run: () -> void
+    def start: () -> void
+    def shutdown: () -> void
+
+    private
+
+    type resolver = ^(?Object) -> void
+
+    @core_worker: Temporal::Bridge::Worker
+    @running: bool
+
+    attr_reader core_worker: Temporal::Bridge::Worker
+
+    def running?: () -> bool
+    def poll_activity_task: (resolver) -> void
+    def process_activity_task: (Coresdk::ActivityTask::ActivityTask, resolver) -> void
+  end
+end

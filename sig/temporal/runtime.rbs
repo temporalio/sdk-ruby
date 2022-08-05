@@ -1,10 +1,8 @@
-module Singleton
-end
-
 module Temporal
   class Runtime
     attr_reader core_runtime: Temporal::Bridge::Runtime
 
+    @core_runtime: Temporal::Bridge::Runtime
     @thread: Thread
 
     def self.instance: () -> Runtime
