@@ -4,8 +4,8 @@ require 'temporal/async_reactor'
 describe Temporal::AsyncReactor do
   let(:reactor) { described_class.new }
 
-  describe "#sync" do
-    it "blocks on sync blocks" do
+  describe '#sync' do
+    it 'blocks on sync blocks' do
       called = []
       reactor.async do
         reactor.sync do
@@ -16,18 +16,21 @@ describe Temporal::AsyncReactor do
           called << 2
         end
       end
-      expect(called).to eq [1,2]
+      expect(called).to eq [1, 2]
     end
   end
 
-  describe "#async" do
-    it "runs async blocks" do
+  describe '#async' do
+    it 'runs async blocks' do
       called = []
       start = Time.now
 
       reactor.async do
         10.times do |i|
-          reactor.async { sleep(1); called << i }
+          reactor.async do
+            sleep(1)
+            called << i
+          end
         end
       end
       elapsed = Time.now - start

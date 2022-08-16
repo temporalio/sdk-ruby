@@ -31,7 +31,7 @@ module Temporal
       @running = true
 
       reactor.async do
-        # TODO Maybe for unit tests to not run the loop but only run once?
+        # TODO: Maybe for unit tests to not run the loop but only run once?
         while running?
           activity_task = reactor.sync { poll_activity_task }
 
@@ -44,6 +44,7 @@ module Temporal
     # TODO: Do we need to clear any tasks here?
     def terminate
       reactor.terminate
+      executor.terminate
       @running = false
     end
 

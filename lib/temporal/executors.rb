@@ -8,6 +8,7 @@ module Temporal
       def post(&block)
         block.call
       end
+
       def shutdown; end
     end
 
@@ -18,7 +19,7 @@ module Temporal
       @pool = pool
     end
 
-    def shutdown
+    def terminate
       pool.shutdown
     end
 
