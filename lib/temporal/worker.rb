@@ -6,7 +6,7 @@ require 'temporal/executors'
 
 module Temporal
   class Worker
-    class AlreadyStarted < StandardError; end
+    class AlreadyStartedError < StandardError; end
 
     # TODO: Would be better to inject the core worker here to not rely on the strong
     # dependency here. Would make testing easier
@@ -23,13 +23,13 @@ module Temporal
         namespace,
         task_queue
       )
+      @mutex = Mutex.new
     end
 
     # TODO: Handle signal traps
     #
     def run
-      @running = true
-
+      running!
       reactor.async do
         # TODO: Maybe for unit tests to not run the loop but only run once?
         while running?
@@ -54,6 +54,14 @@ module Temporal
 
     def running?
       @running
+    end
+
+    def running!
+      @mutex.synchronize do
+        raise AlreadyStartedError if running?
+
+        @running = true
+      end
     end
 
     def poll_activity_task
