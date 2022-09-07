@@ -29,15 +29,19 @@ module Temporal
           Fiber.yield
         end
 
-        def set(value)
+        def resolve(value)
           raise AlreadyFulfilledError if fulfilled?
 
-          if value.is_a?(Exception)
-            @exception = value
-          else
-            @result = value
-          end
+          @result = value
+          @fulfilled = true
 
+          resume_fiber
+        end
+
+        def reject(exception)
+          raise AlreadyFulfilledError if fulfilled?
+
+          @exception = exception
           @fulfilled = true
 
           resume_fiber

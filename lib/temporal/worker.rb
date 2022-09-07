@@ -60,9 +60,8 @@ module Temporal
     def process_activity_task(task, resolver)
       puts "Processing #{task.start&.workflow_execution&.run_id} | #{task&.start&.activity_id}"
 
-      # TODO: Will be replaced with an actual processing login using a thread loop
+      # TODO: Will be replaced with an actual processing logic using a thread loop
       Thread.new do
-        sleep 2
         puts "Processed #{task.start&.workflow_execution&.run_id} | #{task.start&.activity_id}"
         resolver.call
       end

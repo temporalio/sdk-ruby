@@ -42,10 +42,13 @@ module Temporal
             resume(fiber, value)
           end
 
+          # Async block is expected to handle an async invocation of the resolver block
           block.call(resolver)
 
           value = Fiber.yield
-          promise.set(value)
+          promise.resolve(value)
+        rescue StandardError => error
+          promise.reject(error)
         end
 
         promise
