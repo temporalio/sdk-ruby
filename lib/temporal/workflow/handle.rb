@@ -9,28 +9,29 @@ module Temporal
         @run_id = run_id
       end
 
-      def result(follow_runs: false, timeout: nil)
-        client.await_workflow_result(id, run_id, timeout: timeout)
+      # TODO: Add timeout and follow_runs
+      def result
+        client.await_workflow_result(id, run_id)
       end
 
       def describe
         client.describe_workflow(id, run_id)
       end
 
-      def cancel
-        client.cancel_workflow(id, run_id)
+      def cancel(reason = nil)
+        client.cancel_workflow(id, run_id, reason: reason)
       end
 
-      def query(query)
-        client.query_workflow(id, run_id, query: query)
+      def query(query, *args)
+        client.query_workflow(id, run_id, query: query, args: args)
       end
 
-      def signal(signal, input = nil)
-        client.signal_workflow(id, run_id, signal: signal, input: input)
+      def signal(signal, *args)
+        client.signal_workflow(id, run_id, signal: signal, args: args)
       end
 
-      def terminate(reason = nil, details = nil)
-        client.terminate_workflow(id, run_id, reason: reason, details: details)
+      def terminate(reason = nil, args = nil)
+        client.terminate_workflow(id, run_id, reason: reason, args: args)
       end
 
       private
