@@ -10,7 +10,7 @@ describe Temporal::RetryPolicy do
         backoff: 1.5,
         max_interval: 5,
         max_attempts: 3,
-        non_retriable_errors: [StandardError]
+        non_retriable_errors: [StandardError],
       }
     end
 
@@ -20,7 +20,7 @@ describe Temporal::RetryPolicy do
         backoff: 2.0,
         max_interval: 10,
         max_attempts: 0,
-        non_retriable_errors: nil
+        non_retriable_errors: nil,
       }
     end
 

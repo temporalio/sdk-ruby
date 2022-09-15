@@ -1,17 +1,19 @@
 module Temporal
   class Workflow
     class Handle
-      attr_reader :id, :run_id
+      attr_reader :id, :run_id, :result_run_id, :first_execution_run_id
 
-      def initialize(client, id, run_id = nil)
+      def initialize(client, id, run_id: nil, result_run_id: nil, first_execution_run_id: nil)
         @client = client
         @id = id
         @run_id = run_id
+        @result_run_id = result_run_id
+        @first_execution_run_id = first_execution_run_id
       end
 
       # TODO: Add timeout and follow_runs
       def result
-        client.await_workflow_result(id, run_id)
+        client.await_workflow_result(id, result_run_id)
       end
 
       def describe
@@ -19,7 +21,12 @@ module Temporal
       end
 
       def cancel(reason = nil)
-        client.cancel_workflow(id, run_id, reason: reason)
+        client.cancel_workflow(
+          id,
+          run_id: run_id,
+          reason: reason,
+          first_execution_run_id: first_execution_run_id,
+        )
       end
 
       def query(query, *args)
@@ -31,7 +38,13 @@ module Temporal
       end
 
       def terminate(reason = nil, args = nil)
-        client.terminate_workflow(id, run_id, reason: reason, args: args)
+        client.terminate_workflow(
+          id,
+          run_id: run_id,
+          reason: reason,
+          args: args,
+          first_execution_run_id: first_execution_run_id,
+        )
       end
 
       private

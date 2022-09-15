@@ -8,11 +8,11 @@ module Temporal
       def invoke(method, input)
         chain = interceptors.dup
 
-        traverse_chain = lambda do |input|
+        traverse_chain = lambda do |i|
           if chain.empty?
-            yield(input)
+            yield(i)
           else
-            chain.shift.public_send(method, input, &traverse_chain)
+            chain.shift.public_send(method, i, &traverse_chain)
           end
         end
 
