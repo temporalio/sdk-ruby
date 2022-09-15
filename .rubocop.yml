@@ -10,6 +10,9 @@ AllCops:
 Gemspec/RequireMFA:
   Enabled: false
 
+Layout/LineLength:
+  Max: 120
+
 Style/Documentation:
   Enabled: false
 
@@ -20,9 +23,45 @@ Style/BlockComments:
   Exclude:
     - spec/spec_helper.rb
 
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/GuardClause:
+  Enabled: false
+
+Style/RedundantReturn:
+  Enabled: false
+
+Style/StructInheritance:
+  Enabled: false
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Metrics/AbcSize:
+  Max: 75
+
 Metrics/BlockLength:
   Exclude:
     - spec/**/*_spec.rb
 
 Metrics/ClassLength:
   Max: 400
+
+Metrics/CyclomaticComplexity:
+  Max: 15
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/ParameterLists:
+  Max: 15
+
+Metrics/PerceivedComplexity:
+  Max: 15
