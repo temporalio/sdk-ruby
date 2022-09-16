@@ -2,15 +2,24 @@ require 'temporal/errors'
 
 module Temporal
   # See https://docs.temporal.io/application-development/features/#workflow-retry-policy
-  class RetryPolicy < Struct.new(
-    :initial_interval,
-    :backoff,
-    :max_interval,
-    :max_attempts,
-    :non_retriable_errors,
-    keyword_init: true,
-  )
+  class RetryPolicy
     Invalid = Class.new(Temporal::Error)
+
+    attr_reader :initial_interval, :backoff, :max_interval, :max_attempts, :non_retriable_errors
+
+    def initialize(
+      initial_interval: 1,
+      backoff: 2.0,
+      max_interval: nil,
+      max_attempts: 0,
+      non_retriable_errors: []
+    )
+      @initial_interval = initial_interval
+      @backoff = backoff
+      @max_interval = max_interval
+      @max_attempts = max_attempts
+      @non_retriable_errors = non_retriable_errors
+    end
 
     def validate!
       # Retries disabled

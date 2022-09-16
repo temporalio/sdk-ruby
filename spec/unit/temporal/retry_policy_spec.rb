@@ -2,7 +2,7 @@ require 'temporal/retry_policy'
 
 describe Temporal::RetryPolicy do
   describe '#validate!' do
-    subject { described_class.new(attributes) }
+    subject { described_class.new(**attributes) }
 
     let(:valid_attributes) do
       {
@@ -64,7 +64,7 @@ describe Temporal::RetryPolicy do
 
     context 'with invalid attributes' do
       context 'with missing max_attempts' do
-        let(:attributes) { valid_attributes.tap { |h| h.delete(:max_attempts) } }
+        let(:attributes) { valid_attributes.tap { |h| h[:max_attempts] = nil } }
 
         include_examples 'error', 'Maximum attempts must be specified'
       end
@@ -76,7 +76,7 @@ describe Temporal::RetryPolicy do
       end
 
       context 'with missing :initial_interval' do
-        let(:attributes) { valid_attributes.tap { |h| h.delete(:initial_interval) } }
+        let(:attributes) { valid_attributes.tap { |h| h[:initial_interval] = nil } }
 
         include_examples 'error', 'Initial interval must be specified'
       end
@@ -94,7 +94,7 @@ describe Temporal::RetryPolicy do
       end
 
       context 'with missing :backoff' do
-        let(:attributes) { valid_attributes.tap { |h| h.delete(:backoff) } }
+        let(:attributes) { valid_attributes.tap { |h| h[:backoff] = nil } }
 
         include_examples 'error', 'Backoff coefficient must be specified'
       end
