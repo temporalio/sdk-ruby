@@ -1,10 +1,13 @@
+require 'temporal/interceptor/client'
+require 'temporal/workflow/query_reject_condition'
+
 module Temporal
   class Client
     class WorkflowHandle
       attr_reader :id, :run_id, :result_run_id, :first_execution_run_id
 
-      def initialize(client, id, run_id: nil, result_run_id: nil, first_execution_run_id: nil)
-        @client = client
+      def initialize(client_impl, id, run_id: nil, result_run_id: nil, first_execution_run_id: nil)
+        @client_impl = client_impl
         @id = id
         @run_id = run_id
         @result_run_id = result_run_id
@@ -13,43 +16,64 @@ module Temporal
 
       # TODO: Add timeout and follow_runs
       def result
-        client.await_workflow_result(id, result_run_id)
+        client_impl.await_workflow_result(id, result_run_id)
       end
 
       def describe
-        client.describe_workflow(id, run_id)
+        input = Interceptor::Client::DescribeWorkflowInput.new(id: id, run_id: run_id)
+
+        client_impl.describe_workflow(input)
       end
 
       def cancel(reason = nil)
-        client.cancel_workflow(
-          id,
+        input = Interceptor::Client::CancelWorkflowInput.new(
+          id: id,
           run_id: run_id,
-          reason: reason,
           first_execution_run_id: first_execution_run_id,
+          reason: reason,
         )
+
+        client_impl.cancel_workflow(input)
       end
 
-      def query(query, *args)
-        client.query_workflow(id, run_id, query: query, args: args)
+      def query(query, *args, reject_condition: Workflow::QueryRejectCondition::NONE)
+        input = Interceptor::Client::QueryWorkflowInput.new(
+          id: id,
+          run_id: run_id,
+          query: query,
+          args: args,
+          reject_condition: reject_condition,
+        )
+
+        client_impl.query_workflow(input)
       end
 
       def signal(signal, *args)
-        client.signal_workflow(id, run_id, signal: signal, args: args)
+        input = Interceptor::Client::SignalWorkflowInput.new(
+          id: id,
+          run_id: run_id,
+          signal: signal,
+          args: args,
+        )
+
+        client_impl.signal_workflow(input)
       end
 
       def terminate(reason = nil, args = nil)
-        client.terminate_workflow(
-          id,
+        input = Interceptor::Client::TerminateWorkflowInput.new(
+          id: id,
           run_id: run_id,
+          first_execution_run_id: first_execution_run_id,
           reason: reason,
           args: args,
-          first_execution_run_id: first_execution_run_id,
         )
+
+        client_impl.terminate_workflow(input)
       end
 
       private
 
-      attr_reader :client
+      attr_reader :client_impl
     end
   end
 end
