@@ -1,5 +1,6 @@
 require 'temporal/client/workflow_handle'
 require 'temporal/interceptor/chain'
+require 'temporal/version'
 require 'temporal/workflow/execution_info'
 require 'temporal/workflow/id_reuse_policy'
 require 'temporal/workflow/query_reject_condition'
@@ -12,7 +13,7 @@ module Temporal
         @namespace = namespace
         @converter = converter
         @interceptor_chain = Interceptor::Chain.new(interceptors)
-        @identity = "#{Process.pid}@#{Socket.gethostname}"
+        @identity = "#{Process.pid}@#{Socket.gethostname} (Ruby SDK v#{VERSION})"
       end
 
       def start_workflow(input)
