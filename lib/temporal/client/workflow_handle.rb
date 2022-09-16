@@ -1,6 +1,6 @@
 module Temporal
-  class Workflow
-    class Handle
+  class Client
+    class WorkflowHandle
       attr_reader :id, :run_id, :result_run_id, :first_execution_run_id
 
       def initialize(client, id, run_id: nil, result_run_id: nil, first_execution_run_id: nil)

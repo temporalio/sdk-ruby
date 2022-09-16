@@ -5,7 +5,7 @@ require 'temporal/errors'
 require 'temporal/converter'
 require 'temporal/interceptor/client'
 require 'temporal/interceptor/chain'
-require 'temporal/workflow/handle'
+require 'temporal/client/workflow_handle'
 require 'temporal/workflow/execution_info'
 require 'temporal/workflow/id_reuse_policy'
 require 'temporal/workflow/query_reject_condition'
@@ -139,7 +139,7 @@ module Temporal
     end
 
     def workflow_handle(id, run_id: nil, result_run_id: nil, first_execution_run_id: nil)
-      Workflow::Handle.new(
+      WorkflowHandle.new(
         self,
         id,
         run_id: run_id,
