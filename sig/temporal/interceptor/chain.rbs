@@ -1,12 +1,13 @@
 module Temporal
   module Interceptor
     class Chain
-      def initialize: (?Array[Temporal::Interceptor::Client] interceptors) -> void
-      def invoke: [U, T] (Symbol method, U input) ?{ (U) -> T } -> T
+      def initialize: (?Array[Temporal::Interceptor::Client::_Interface]) -> void
+      # TODO: RBS fails to interpret the inline block defined in #invoke
+      def invoke: (Temporal::Interceptor::Client::interface_method method, untyped input) { (untyped) -> untyped } -> untyped
 
       private
 
-      attr_reader interceptors: Array[Temporal::Interceptor::Client]
+      attr_reader interceptors: Array[Temporal::Interceptor::Client::_Interface]
     end
   end
 end

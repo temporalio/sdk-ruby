@@ -1,6 +1,21 @@
 module Temporal
   module Interceptor
     class Client
+      type interface_method = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
+
+      interface _Interface
+        def public_send: (interface_method, untyped input) { (untyped) -> untyped } -> untyped
+        def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporal::Client::WorkflowHandle } -> Temporal::Client::WorkflowHandle
+        def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporal::Workflow::ExecutionInfo } -> Temporal::Workflow::ExecutionInfo
+        def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped
+        def signal_workflow: (SignalWorkflowInput input) ?{ (SignalWorkflowInput) -> void } -> void
+        def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
+        def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
+      end
+
+      # Client implements its own interface
+      include _Interface
+
       class StartWorkflowInput < Struct[untyped]
         attr_accessor workflow(): String
         attr_accessor args(): Array[untyped]
@@ -107,13 +122,6 @@ module Temporal
           args: Array[untyped]
         ) -> TerminateWorkflowInput
       end
-
-      def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporal::Client::WorkflowHandle } -> Temporal::Client::WorkflowHandle
-      def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporal::Workflow::ExecutionInfo } -> Temporal::Workflow::ExecutionInfo
-      def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped
-      def signal_workflow: (SignalWorkflowInput input) ?{ (SignalWorkflowInput) -> void } -> void
-      def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
-      def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
     end
   end
 end
