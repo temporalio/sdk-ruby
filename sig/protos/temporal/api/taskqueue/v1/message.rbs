@@ -1,6 +1,6 @@
 module Temporal
   module Api
-    module Taskqueue
+    module TaskQueue
       module V1
         # See https://docs.temporal.io/docs/concepts/task-queues/
         #
@@ -107,28 +107,28 @@ module Temporal
 
           def rate_per_second!: () -> ::Float?
 
-          attr_accessor task_id_block(): ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+          attr_accessor task_id_block(): ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
 
-          def task_id_block=: [M < ::Temporal::Api::Taskqueue::V1::TaskIdBlock::_ToProto] (M?) -> M?
+          def task_id_block=: [M < ::Temporal::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (M?) -> M?
                             | ...
 
-          def task_id_block!: () -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+          def task_id_block!: () -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
 
-          def initialize: (?backlog_count_hint: ::Integer, ?read_level: ::Integer, ?ack_level: ::Integer, ?rate_per_second: ::Float, ?task_id_block: ::Temporal::Api::Taskqueue::V1::TaskIdBlock::init?) -> void
+          def initialize: (?backlog_count_hint: ::Integer, ?read_level: ::Integer, ?ack_level: ::Integer, ?rate_per_second: ::Float, ?task_id_block: ::Temporal::Api::TaskQueue::V1::TaskIdBlock::init?) -> void
 
           def []: (:backlog_count_hint) -> ::Integer
                 | (:read_level) -> ::Integer
                 | (:ack_level) -> ::Integer
                 | (:rate_per_second) -> ::Float
-                | (:task_id_block) -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
+                | (:task_id_block) -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
                 | (::Symbol) -> untyped
 
           def []=: (:backlog_count_hint, ::Integer) -> ::Integer
                  | (:read_level, ::Integer) -> ::Integer
                  | (:ack_level, ::Integer) -> ::Integer
                  | (:rate_per_second, ::Float) -> ::Float
-                 | (:task_id_block, ::Temporal::Api::Taskqueue::V1::TaskIdBlock?) -> ::Temporal::Api::Taskqueue::V1::TaskIdBlock?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskIdBlock::_ToProto] (:task_id_block, M?) -> M?
+                 | (:task_id_block, ::Temporal::Api::TaskQueue::V1::TaskIdBlock?) -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (:task_id_block, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -275,12 +275,12 @@ module Temporal
         end
 
         class StickyExecutionAttributes < ::Protobuf::Message
-          attr_accessor worker_task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor worker_task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def worker_task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def worker_task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                                 | ...
 
-          def worker_task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def worker_task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # (-- api-linter: core::0140::prepositions=disabled
           #      aip.dev/not-precedent: "to" is used to indicate interval. --)
@@ -295,14 +295,14 @@ module Temporal
 
           def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
 
-          def initialize: (?worker_task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?) -> void
+          def initialize: (?worker_task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?) -> void
 
-          def []: (:worker_task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def []: (:worker_task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
                 | (::Symbol) -> untyped
 
-          def []=: (:worker_task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:worker_task_queue, M?) -> M?
+          def []=: (:worker_task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:worker_task_queue, M?) -> M?
                  | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
                  | (::Symbol, untyped) -> untyped

@@ -152,12 +152,12 @@ module Temporal
         end
 
         class WorkflowExecutionConfig < ::Protobuf::Message
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           attr_accessor workflow_execution_timeout(): ::Google::Protobuf::Duration?
 
@@ -180,16 +180,16 @@ module Temporal
 
           def default_workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
 
-          def initialize: (?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?default_workflow_task_timeout: ::Google::Protobuf::Duration::init?) -> void
+          def initialize: (?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?default_workflow_task_timeout: ::Google::Protobuf::Duration::init?) -> void
 
-          def []: (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def []: (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
                 | (:default_workflow_task_timeout) -> ::Google::Protobuf::Duration?
                 | (::Symbol) -> untyped
 
-          def []=: (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+          def []=: (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
                  | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?

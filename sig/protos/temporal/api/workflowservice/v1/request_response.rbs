@@ -589,12 +589,12 @@ module Temporal
 
           def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # Serialized arguments to the workflow. These are passed as arguments to the workflow function.
           #
@@ -701,12 +701,12 @@ module Temporal
 
           def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?identity: ::String, ?request_id: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?identity: ::String, ?request_id: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:workflow_id) -> ::String
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
@@ -725,8 +725,8 @@ module Temporal
                  | (:workflow_id, ::String) -> ::String
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
@@ -1058,12 +1058,12 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # The identity of the worker/client who is polling this task queue
           #
@@ -1077,17 +1077,17 @@ module Temporal
 
           def binary_checksum!: () -> ::String?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String) -> void
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String) -> void
 
           def []: (:namespace) -> ::String
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
                 | (:binary_checksum) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:binary_checksum, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
@@ -1200,15 +1200,15 @@ module Temporal
           # The task queue this task originated from, which will always be the original non-sticky name
           #  for the queue, even if this response came from polling a sticky queue.
           #
-          attr_accessor workflow_execution_task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor workflow_execution_task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # The task queue this task originated from, which will always be the original non-sticky name
           #  for the queue, even if this response came from polling a sticky queue.
           #
-          def workflow_execution_task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def workflow_execution_task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                                             | ...
 
-          def workflow_execution_task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def workflow_execution_task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # When this task was scheduled by the server
           #
@@ -1245,7 +1245,7 @@ module Temporal
 
           def queries!: () -> ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]?
 
-          def initialize: (?task_token: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?previous_started_event_id: ::Integer, ?started_event_id: ::Integer, ?attempt: ::Integer, ?backlog_count_hint: ::Integer, ?history: ::Temporal::Api::History::V1::History::init?, ?next_page_token: ::String, ?query: ::Temporal::Api::Query::V1::WorkflowQuery::init?, ?workflow_execution_task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?queries: ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String]) -> void
+          def initialize: (?task_token: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?previous_started_event_id: ::Integer, ?started_event_id: ::Integer, ?attempt: ::Integer, ?backlog_count_hint: ::Integer, ?history: ::Temporal::Api::History::V1::History::init?, ?next_page_token: ::String, ?query: ::Temporal::Api::Query::V1::WorkflowQuery::init?, ?workflow_execution_task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?queries: ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String]) -> void
 
           def []: (:task_token) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
@@ -1257,7 +1257,7 @@ module Temporal
                 | (:history) -> ::Temporal::Api::History::V1::History?
                 | (:next_page_token) -> ::String
                 | (:query) -> ::Temporal::Api::Query::V1::WorkflowQuery?
-                | (:workflow_execution_task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:workflow_execution_task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
                 | (:started_time) -> ::Google::Protobuf::Timestamp?
                 | (:queries) -> ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]
@@ -1277,8 +1277,8 @@ module Temporal
                  | (:next_page_token, ::String) -> ::String
                  | (:query, ::Temporal::Api::Query::V1::WorkflowQuery?) -> ::Temporal::Api::Query::V1::WorkflowQuery?
                  | [M < ::Temporal::Api::Query::V1::WorkflowQuery::_ToProto] (:query, M?) -> M?
-                 | (:workflow_execution_task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:workflow_execution_task_queue, M?) -> M?
+                 | (:workflow_execution_task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:workflow_execution_task_queue, M?) -> M?
                  | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
                  | (:started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
@@ -1332,15 +1332,15 @@ module Temporal
           # May be set by workers to indicate that the worker desires future tasks to be provided with
           #  incremental history on a sticky queue.
           #
-          attr_accessor sticky_attributes(): ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes?
+          attr_accessor sticky_attributes(): ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes?
 
           # May be set by workers to indicate that the worker desires future tasks to be provided with
           #  incremental history on a sticky queue.
           #
-          def sticky_attributes=: [M < ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes::_ToProto] (M?) -> M?
+          def sticky_attributes=: [M < ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes::_ToProto] (M?) -> M?
                                 | ...
 
-          def sticky_attributes!: () -> ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes?
+          def sticky_attributes!: () -> ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes?
 
           # If set, the worker wishes to immediately receive the next workflow task as a response to
           #  this completion. This can save on polling round-trips.
@@ -1379,12 +1379,12 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          def initialize: (?task_token: ::String, ?commands: ::Temporal::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String) -> void
+          def initialize: (?task_token: ::String, ?commands: ::Temporal::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String) -> void
 
           def []: (:task_token) -> ::String
                 | (:commands) -> ::Temporal::Api::Command::V1::Command::field_array
                 | (:identity) -> ::String
-                | (:sticky_attributes) -> ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes?
+                | (:sticky_attributes) -> ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes?
                 | (:return_new_workflow_task) -> bool
                 | (:force_create_new_workflow_task) -> bool
                 | (:binary_checksum) -> ::String
@@ -1396,8 +1396,8 @@ module Temporal
                  | (:commands, ::Temporal::Api::Command::V1::Command::field_array) -> ::Temporal::Api::Command::V1::Command::field_array
                  | (:commands, ::Temporal::Api::Command::V1::Command::array) -> ::Temporal::Api::Command::V1::Command::array
                  | (:identity, ::String) -> ::String
-                 | (:sticky_attributes, ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes?) -> ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes?
-                 | [M < ::Temporal::Api::Taskqueue::V1::StickyExecutionAttributes::_ToProto] (:sticky_attributes, M?) -> M?
+                 | (:sticky_attributes, ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes?) -> ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes?
+                 | [M < ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes::_ToProto] (:sticky_attributes, M?) -> M?
                  | (:return_new_workflow_task, bool) -> bool
                  | (:force_create_new_workflow_task, bool) -> bool
                  | (:binary_checksum, ::String) -> ::String
@@ -1592,12 +1592,12 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # The identity of the worker/client
           #
@@ -1605,27 +1605,27 @@ module Temporal
 
           def identity!: () -> ::String?
 
-          attr_accessor task_queue_metadata(): ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata?
+          attr_accessor task_queue_metadata(): ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
 
-          def task_queue_metadata=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata::_ToProto] (M?) -> M?
+          def task_queue_metadata=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::_ToProto] (M?) -> M?
                                   | ...
 
-          def task_queue_metadata!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata?
+          def task_queue_metadata!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata::init?) -> void
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::init?) -> void
 
           def []: (:namespace) -> ::String
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
-                | (:task_queue_metadata) -> ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata?
+                | (:task_queue_metadata) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:identity, ::String) -> ::String
-                 | (:task_queue_metadata, ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata?) -> ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueueMetadata::_ToProto] (:task_queue_metadata, M?) -> M?
+                 | (:task_queue_metadata, ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::_ToProto] (:task_queue_metadata, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -2967,14 +2967,14 @@ module Temporal
 
           # The task queue to start this workflow on, if it will be started
           #
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # The task queue to start this workflow on, if it will be started
           #
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           # Serialized arguments to the workflow. These are passed as arguments to the workflow function.
           #
@@ -3100,12 +3100,12 @@ module Temporal
 
           def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?identity: ::String, ?request_id: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?signal_name: ::String, ?signal_input: ::Temporal::Api::Common::V1::Payloads::init?, ?control: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?identity: ::String, ?request_id: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?signal_name: ::String, ?signal_input: ::Temporal::Api::Common::V1::Payloads::init?, ?control: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:workflow_id) -> ::String
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
@@ -3127,8 +3127,8 @@ module Temporal
                  | (:workflow_id, ::String) -> ::String
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
@@ -4425,12 +4425,12 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           attr_accessor task_queue_type(): ::Temporal::Api::Enums::V1::TaskQueueType
 
@@ -4443,17 +4443,17 @@ module Temporal
 
           def include_task_queue_status!: () -> bool?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?task_queue_type: ::Temporal::Api::Enums::V1::TaskQueueType::init, ?include_task_queue_status: bool) -> void
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?task_queue_type: ::Temporal::Api::Enums::V1::TaskQueueType::init, ?include_task_queue_status: bool) -> void
 
           def []: (:namespace) -> ::String
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:task_queue_type) -> ::Temporal::Api::Enums::V1::TaskQueueType
                 | (:include_task_queue_status) -> bool
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:task_queue_type, ::Temporal::Api::Enums::V1::TaskQueueType) -> ::Temporal::Api::Enums::V1::TaskQueueType
                  | (:task_queue_type, ::Temporal::Api::Enums::V1::TaskQueueType::values) -> ::Temporal::Api::Enums::V1::TaskQueueType::values
                  | (:include_task_queue_status, bool) -> bool
@@ -4480,30 +4480,30 @@ module Temporal
         end
 
         class DescribeTaskQueueResponse < ::Protobuf::Message
-          attr_accessor pollers(): ::Temporal::Api::Taskqueue::V1::PollerInfo::field_array
+          attr_accessor pollers(): ::Temporal::Api::TaskQueue::V1::PollerInfo::field_array
 
-          def pollers=: (::Temporal::Api::Taskqueue::V1::PollerInfo::array) -> ::Temporal::Api::Taskqueue::V1::PollerInfo::array
+          def pollers=: (::Temporal::Api::TaskQueue::V1::PollerInfo::array) -> ::Temporal::Api::TaskQueue::V1::PollerInfo::array
                       | ...
 
-          def pollers!: () -> ::Temporal::Api::Taskqueue::V1::PollerInfo::field_array?
+          def pollers!: () -> ::Temporal::Api::TaskQueue::V1::PollerInfo::field_array?
 
-          attr_accessor task_queue_status(): ::Temporal::Api::Taskqueue::V1::TaskQueueStatus?
+          attr_accessor task_queue_status(): ::Temporal::Api::TaskQueue::V1::TaskQueueStatus?
 
-          def task_queue_status=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueueStatus::_ToProto] (M?) -> M?
+          def task_queue_status=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueueStatus::_ToProto] (M?) -> M?
                                 | ...
 
-          def task_queue_status!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueueStatus?
+          def task_queue_status!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueueStatus?
 
-          def initialize: (?pollers: ::Temporal::Api::Taskqueue::V1::PollerInfo::array, ?task_queue_status: ::Temporal::Api::Taskqueue::V1::TaskQueueStatus::init?) -> void
+          def initialize: (?pollers: ::Temporal::Api::TaskQueue::V1::PollerInfo::array, ?task_queue_status: ::Temporal::Api::TaskQueue::V1::TaskQueueStatus::init?) -> void
 
-          def []: (:pollers) -> ::Temporal::Api::Taskqueue::V1::PollerInfo::field_array
-                | (:task_queue_status) -> ::Temporal::Api::Taskqueue::V1::TaskQueueStatus?
+          def []: (:pollers) -> ::Temporal::Api::TaskQueue::V1::PollerInfo::field_array
+                | (:task_queue_status) -> ::Temporal::Api::TaskQueue::V1::TaskQueueStatus?
                 | (::Symbol) -> untyped
 
-          def []=: (:pollers, ::Temporal::Api::Taskqueue::V1::PollerInfo::field_array) -> ::Temporal::Api::Taskqueue::V1::PollerInfo::field_array
-                 | (:pollers, ::Temporal::Api::Taskqueue::V1::PollerInfo::array) -> ::Temporal::Api::Taskqueue::V1::PollerInfo::array
-                 | (:task_queue_status, ::Temporal::Api::Taskqueue::V1::TaskQueueStatus?) -> ::Temporal::Api::Taskqueue::V1::TaskQueueStatus?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueueStatus::_ToProto] (:task_queue_status, M?) -> M?
+          def []=: (:pollers, ::Temporal::Api::TaskQueue::V1::PollerInfo::field_array) -> ::Temporal::Api::TaskQueue::V1::PollerInfo::field_array
+                 | (:pollers, ::Temporal::Api::TaskQueue::V1::PollerInfo::array) -> ::Temporal::Api::TaskQueue::V1::PollerInfo::array
+                 | (:task_queue_status, ::Temporal::Api::TaskQueue::V1::TaskQueueStatus?) -> ::Temporal::Api::TaskQueue::V1::TaskQueueStatus?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueueStatus::_ToProto] (:task_queue_status, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -4768,22 +4768,22 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?) -> void
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?) -> void
 
           def []: (:namespace) -> ::String
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -4805,30 +4805,30 @@ module Temporal
         end
 
         class ListTaskQueuePartitionsResponse < ::Protobuf::Message
-          attr_accessor activity_task_queue_partitions(): ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
+          attr_accessor activity_task_queue_partitions(): ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
 
-          def activity_task_queue_partitions=: (::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array
+          def activity_task_queue_partitions=: (::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array
                                              | ...
 
-          def activity_task_queue_partitions!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array?
+          def activity_task_queue_partitions!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array?
 
-          attr_accessor workflow_task_queue_partitions(): ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
+          attr_accessor workflow_task_queue_partitions(): ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
 
-          def workflow_task_queue_partitions=: (::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array
+          def workflow_task_queue_partitions=: (::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array
                                              | ...
 
-          def workflow_task_queue_partitions!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array?
+          def workflow_task_queue_partitions!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array?
 
-          def initialize: (?activity_task_queue_partitions: ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array, ?workflow_task_queue_partitions: ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array) -> void
+          def initialize: (?activity_task_queue_partitions: ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array, ?workflow_task_queue_partitions: ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> void
 
-          def []: (:activity_task_queue_partitions) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
-                | (:workflow_task_queue_partitions) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
+          def []: (:activity_task_queue_partitions) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
+                | (:workflow_task_queue_partitions) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
                 | (::Symbol) -> untyped
 
-          def []=: (:activity_task_queue_partitions, ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
-                 | (:activity_task_queue_partitions, ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array
-                 | (:workflow_task_queue_partitions, ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::field_array
-                 | (:workflow_task_queue_partitions, ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::Taskqueue::V1::TaskQueuePartitionMetadata::array
+          def []=: (:activity_task_queue_partitions, ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
+                 | (:activity_task_queue_partitions, ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array
+                 | (:workflow_task_queue_partitions, ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
+                 | (:workflow_task_queue_partitions, ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporal::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
