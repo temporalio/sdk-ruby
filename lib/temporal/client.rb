@@ -31,7 +31,6 @@ module Temporal
       cron_schedule: '',
       memo: nil,
       search_attributes: nil,
-      headers: {},
       start_signal: nil,
       start_signal_args: []
     )
@@ -48,7 +47,7 @@ module Temporal
         cron_schedule: cron_schedule,
         memo: memo,
         search_attributes: search_attributes,
-        headers: headers,
+        headers: {},
         start_signal: start_signal,
         start_signal_args: start_signal_args,
       )

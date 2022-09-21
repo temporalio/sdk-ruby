@@ -43,6 +43,7 @@ module Temporal
           query: query,
           args: args,
           reject_condition: reject_condition,
+          headers: {},
         )
 
         client_impl.query_workflow(input)
@@ -54,6 +55,7 @@ module Temporal
           run_id: run_id,
           signal: signal,
           args: args,
+          headers: {},
         )
 
         client_impl.signal_workflow(input)
