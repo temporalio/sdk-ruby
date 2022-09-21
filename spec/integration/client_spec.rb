@@ -55,12 +55,20 @@ describe Temporal::Client do
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
 
+  def wait_for_server(url)
+    10.times do
+      Temporal::Connection.new("http://#{url}")
+      break
+    rescue Temporal::Bridge::Error
+      sleep(0.5) # delay before retrying
+    end
+  end
+
   before(:all) do
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
-    sleep(1) # wait for the server to boot up
+    wait_for_server(url)
 
     @worker_pid = fork { exec("#{support_path}/go_worker/main #{url} #{namespace} #{task_queue}") }
-    sleep(1) # wait for the worker to boot up
   end
 
   after(:all) do
