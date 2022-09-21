@@ -20,7 +20,6 @@ module Temporal
       ?cron_schedule: String?,
       ?memo: Hash[Symbol | String, untyped]?,
       ?search_attributes: Hash[Symbol | String, untyped]?,
-      ?headers: Hash[Symbol | String, untyped]?,
       ?start_signal: Symbol | String?,
       ?start_signal_args: Array[untyped]?
     ) -> untyped
