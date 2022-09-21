@@ -22,8 +22,13 @@ jobs:
         with:
           ruby-version: 3.0
           bundler-cache: true
+      # Needed to compile go test server and worker
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.19"
       - run: bundle install
-      - run: bundle exec rake bridge:release
-      - run: bundle exec steep check
       - run: bundle exec rubocop
+      # - run: bundle exec steep check
+      - run: bundle exec rake bridge:release
+      - run: bundle exec rake test_server:build
       - run: bundle exec rspec

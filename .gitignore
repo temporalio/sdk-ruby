@@ -17,3 +17,7 @@ _yardoc/
 
 # Rust builds
 bridge/target
+
+# Go binaries
+spec/support/go_server/main
+spec/support/go_worker/main

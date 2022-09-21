@@ -28,6 +28,14 @@ namespace :bridge do
   end
 end
 
+namespace :test_server do
+  desc 'Build Go server and worker'
+  task :build do
+    sh 'cd spec/support/go_server && go build *.go'
+    sh 'cd spec/support/go_worker && go build *.go'
+  end
+end
+
 namespace :proto do
   desc 'Generate API and Core protobufs'
   task :generate do
