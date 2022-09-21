@@ -18,12 +18,12 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
@@ -143,12 +143,12 @@ module Temporal
 
           def request_eager_execution!: () -> bool?
 
-          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?namespace: ::String, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?request_eager_execution: bool) -> void
+          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?request_eager_execution: bool) -> void
 
           def []: (:activity_id) -> ::String
                 | (:activity_type) -> ::Temporal::Api::Common::V1::ActivityType?
                 | (:namespace) -> ::String
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:header) -> ::Temporal::Api::Common::V1::Header?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
@@ -163,8 +163,8 @@ module Temporal
                  | (:activity_type, ::Temporal::Api::Common::V1::ActivityType?) -> ::Temporal::Api::Common::V1::ActivityType?
                  | [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
                  | (:namespace, ::String) -> ::String
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
                  | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
@@ -701,12 +701,12 @@ module Temporal
 
           def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
@@ -815,10 +815,10 @@ module Temporal
 
           def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?backoff_start_interval: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?backoff_start_interval: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
           def []: (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
@@ -835,8 +835,8 @@ module Temporal
 
           def []=: (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
@@ -896,12 +896,12 @@ module Temporal
 
           def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
@@ -1003,12 +1003,12 @@ module Temporal
 
           def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:workflow_id) -> ::String
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
@@ -1027,8 +1027,8 @@ module Temporal
                  | (:workflow_id, ::String) -> ::String
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?

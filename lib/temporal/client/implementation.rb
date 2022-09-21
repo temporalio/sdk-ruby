@@ -1,4 +1,5 @@
 require 'temporal/client/workflow_handle'
+require 'temporal/errors'
 require 'temporal/interceptor/chain'
 require 'temporal/version'
 require 'temporal/workflow/execution_info'
@@ -55,7 +56,7 @@ module Temporal
       # TODO: Add timeout and follow_runs
       def await_workflow_result(id, run_id)
         request = Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest.new(
-          namespace: namespace,
+          namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: id,
             run_id: run_id || '',
@@ -103,7 +104,7 @@ module Temporal
           namespace: namespace,
           workflow_type: Temporal::Api::Common::V1::WorkflowType.new(name: input.workflow.to_s),
           workflow_id: input.id,
-          task_queue: Temporal::Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue),
+          task_queue: Temporal::Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
           input: converter.to_payloads(input.args),
           workflow_execution_timeout: input.execution_timeout,
           workflow_run_timeout: input.run_timeout,
@@ -146,12 +147,14 @@ module Temporal
         if e.message.include?('AlreadyExists')
           # TODO: Replace with a more specific error
           raise Temporal::Error, 'Workflow already exists'
+        else
+          raise # re-raise
         end
       end
 
       def handle_describe_workflow(input)
         request = Temporal::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest.new(
-          namespace: namespace,
+          namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: input.id,
             run_id: input.run_id || '',
@@ -165,13 +168,13 @@ module Temporal
 
       def handle_query_workflow(input)
         request = Temporal::Api::WorkflowService::V1::QueryWorkflowRequest.new(
-          namespace: namespace,
+          namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: input.id,
             run_id: input.run_id,
           ),
           query: Temporal::Api::Query::V1::WorkflowQuery.new(
-            query_type: input.query,
+            query_type: input.query.to_s,
             query_args: converter.to_payloads(input.args),
           ),
           query_reject_condition: Workflow::QueryRejectCondition.to_raw(input.reject_condition),
@@ -198,12 +201,12 @@ module Temporal
         request = Temporal::Api::WorkflowService::V1::SignalWorkflowExecutionRequest.new(
           identity: identity,
           request_id: SecureRandom.uuid,
-          namespace: namespace,
+          namespace: namespace.to_s,
           workflow_execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: input.id,
             run_id: input.run_id || '',
           ),
-          signal_name: input.signal,
+          signal_name: input.signal.to_s,
           input: converter.to_payloads(input.args),
           header: nil, # TODO: converter.to_payloads headers
         )
@@ -217,7 +220,7 @@ module Temporal
         request = Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest.new(
           identity: identity,
           request_id: SecureRandom.uuid,
-          namespace: namespace,
+          namespace: namespace.to_s,
           workflow_execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: input.id,
             run_id: input.run_id || '',
@@ -234,7 +237,7 @@ module Temporal
       def handle_terminate_workflow(input)
         request = Temporal::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest.new(
           identity: identity,
-          namespace: namespace,
+          namespace: namespace.to_s,
           workflow_execution: Temporal::Api::Common::V1::WorkflowExecution.new(
             workflow_id: input.id,
             run_id: input.run_id || '',
@@ -250,19 +253,23 @@ module Temporal
       end
 
       def process_workflow_result_from(response)
-        if response.history.events.empty?
+        events = response.history&.events
+
+        if !events || events.empty?
           throw(:next) # next loop iteration
-        elsif response.history.events.length != 1
-          raise Temporal::Error, "Expected single close event, got #{response.history.events.length}"
+        elsif events.length != 1
+          raise Temporal::Error, "Expected single close event, got #{events.length}"
         end
 
-        event = response.history.events.first
+        event = events.first
+        # TODO: Use special error type for internal errors
+        raise Temporal::Error, 'Missing final history event' unless event
 
         case event.event_type
         when :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED
           attributes = event.workflow_execution_completed_event_attributes
           # TODO: Handle incorrect payloads object
-          return converter.from_payloads(attributes.result)&.first
+          return converter.from_payloads(attributes&.result)&.first
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED
           # TODO: Use more specific error and decode failure

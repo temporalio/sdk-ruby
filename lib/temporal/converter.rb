@@ -6,18 +6,18 @@ module Temporal
     def to_payloads(data)
       return if data.nil? || Array(data).empty?
 
-      payloads = Array(data).map(&method(:to_payload))
+      payloads = Array(data).map { |value| to_payload(value) }
       Temporal::Api::Common::V1::Payloads.new(payloads: payloads)
     end
 
     def to_payload_map(data)
-      data&.transform_values(&method(:to_payload))
+      data.to_h { |key, value| [key.to_s, to_payload(value)] }
     end
 
     def from_payloads(payloads)
       return unless payloads
 
-      payloads.payloads.map(&method(:from_payload))
+      payloads.payloads.map { |payload| from_payload(payload) }
     end
 
     def from_payload_map(payload_map)
