@@ -1,0 +1,15 @@
+module Temporal
+  class Converter
+    JSON_ENCODING: String
+
+    def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?
+    def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporal::Api::Common::V1::Payload]
+    def from_payloads: (Temporal::Api::Common::V1::Payloads? payloads) -> Array[untyped]?
+    def from_payload_map: (Temporal::Api::Common::V1::Payload::field_hash[::String]? payload_map) -> Hash[String, untyped]?
+
+    private
+
+    def to_payload: (untyped data) -> Temporal::Api::Common::V1::Payload
+    def from_payload: (Temporal::Api::Common::V1::Payload payload) -> untyped
+  end
+end

@@ -1,0 +1,28 @@
+module Temporal
+  class Client
+    class WorkflowHandle
+      attr_reader id: String
+      attr_reader run_id: String?
+      attr_reader result_run_id: String?
+      attr_reader first_execution_run_id: String?
+
+      def initialize: (
+        Temporal::Client::Implementation client_impl,
+        String id,
+        ?run_id: String?,
+        ?result_run_id: String?,
+        ?first_execution_run_id: String?
+      ) -> void
+      def result: -> untyped
+      def describe: -> Temporal::Workflow::ExecutionInfo
+      def cancel: (?String? reason) -> void
+      def query: (String | Symbol query, *untyped args, ?reject_condition: Symbol) -> untyped
+      def signal: (String | Symbol signal, *untyped args) -> void
+      def terminate: (?String? reason, ?untyped args) -> void
+
+      private
+
+      attr_reader client_impl: Temporal::Client::Implementation
+    end
+  end
+end

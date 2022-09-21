@@ -1,0 +1,14 @@
+module Temporal
+  class Workflow
+    class IDReusePolicy
+      ALLOW_DUPLICATE: :ALLOW_DUPLICATE
+      ALLOW_DUPLICATE_FAILED_ONLY: :ALLOW_DUPLICATE_FAILED_ONLY
+      REJECT_DUPLICATE: :REJECT_DUPLICATE
+      POLICIES: Array[Symbol]
+      API_MAP: Hash[Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, Symbol]
+
+      def self.to_raw: (Symbol policy) -> Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init?
+      def self.from_raw: (Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init raw_policy) -> Symbol
+    end
+  end
+end

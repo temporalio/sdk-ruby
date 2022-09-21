@@ -3,7 +3,7 @@ require 'temporal/errors'
 module Temporal
   # See https://docs.temporal.io/application-development/features/#workflow-retry-policy
   class RetryPolicy
-    Invalid = Class.new(Temporal::Error)
+    class Invalid < Temporal::Error; end
 
     attr_reader :initial_interval, :backoff, :max_interval, :max_attempts, :non_retriable_errors
 

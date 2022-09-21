@@ -1,0 +1,24 @@
+module Temporal
+  class Error < StandardError
+  end
+
+  class RetryPolicy
+    Invalid: Temporal::Error
+
+    attr_reader initial_interval: Integer
+    attr_reader backoff: Float
+    attr_reader max_interval: Integer?
+    attr_reader max_attempts: Integer
+    attr_reader non_retriable_errors: Array[StandardError]
+
+    def initialize: (
+      ?initial_interval: Integer,
+      ?backoff: Float,
+      ?max_interval: nil,
+      ?max_attempts: Integer,
+      ?non_retriable_errors: Array[StandardError]
+    ) -> void
+
+    def validate!: -> nil
+  end
+end

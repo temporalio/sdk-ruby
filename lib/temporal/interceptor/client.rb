@@ -1,7 +1,7 @@
 module Temporal
   module Interceptor
     class Client
-      StartWorkflowInput = Struct.new(
+      class StartWorkflowInput < Struct.new(
         :workflow,
         :args,
         :id,
@@ -18,15 +18,15 @@ module Temporal
         :start_signal,
         :start_signal_args,
         keyword_init: true,
-      )
+      ); end
 
-      DescribeWorkflowInput = Struct.new(
+      class DescribeWorkflowInput < Struct.new(
         :id,
         :run_id,
         keyword_init: true,
-      )
+      ); end
 
-      QueryWorkflowInput = Struct.new(
+      class QueryWorkflowInput < Struct.new(
         :id,
         :run_id,
         :query,
@@ -34,33 +34,33 @@ module Temporal
         :reject_condition,
         :headers,
         keyword_init: true,
-      )
+      ); end
 
-      SignalWorkflowInput = Struct.new(
+      class SignalWorkflowInput < Struct.new(
         :id,
         :run_id,
         :signal,
         :args,
         :headers,
         keyword_init: true,
-      )
+      ); end
 
-      CancelWorkflowInput = Struct.new(
+      class CancelWorkflowInput < Struct.new(
         :id,
         :run_id,
         :first_execution_run_id,
         :reason,
         keyword_init: true,
-      )
+      ); end
 
-      TerminateWorkflowInput = Struct.new(
+      class TerminateWorkflowInput < Struct.new(
         :id,
         :run_id,
         :first_execution_run_id,
         :reason,
         :args,
         keyword_init: true,
-      )
+      ); end
 
       def start_workflow(input)
         yield(input)
