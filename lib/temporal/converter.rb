@@ -1,3 +1,5 @@
+require 'json'
+
 # TODO: This is a dummy converter, a proper implementation will follow
 module Temporal
   class Converter
@@ -23,7 +25,10 @@ module Temporal
     def from_payload_map(payload_map)
       return unless payload_map
 
-      payload_map.to_h { |key, value| [key, from_payload(value)] } # rubocop:disable Style/HashTransformValues
+      # Protobuf's Hash isn't compatible with the native Hash, ignore rubocop here
+      # rubocop:disable Style/HashTransformValues, Style/MapToHash
+      payload_map.map { |key, value| [key, from_payload(value)] }.to_h
+      # rubocop:enable Style/HashTransformValues, Style/MapToHash
     end
 
     private

@@ -1,3 +1,5 @@
+require 'socket'
+require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/client/workflow_handle'
 require 'temporal/errors'
 require 'temporal/interceptor/chain'
@@ -79,6 +81,14 @@ module Temporal
 
       attr_reader :connection, :namespace, :converter, :interceptor_chain, :identity
 
+      def convert_headers(headers)
+        return if headers.empty?
+
+        Temporal::Api::Common::V1::Header.new(
+          fields: converter.to_payload_map(headers),
+        )
+      end
+
       def handle_start_workflow(input)
         input.retry_policy&.validate!
 
@@ -89,12 +99,6 @@ module Temporal
         if input.search_attributes
           search_attributes = Temporal::Api::Common::V1::SearchAttributes.new(
             indexed_fields: converter.to_payload_map(input.search_attributes),
-          )
-        end
-
-        unless input.headers.empty?
-          headers = Temporal::Api::Common::V1::Header.new(
-            fields: converter.to_payload_map(input.headers),
           )
         end
 
@@ -114,7 +118,7 @@ module Temporal
           cron_schedule: input.cron_schedule,
           memo: memo,
           search_attributes: search_attributes,
-          header: headers,
+          header: convert_headers(input.headers),
         }
 
         first_execution_run_id = nil
@@ -176,6 +180,7 @@ module Temporal
           query: Temporal::Api::Query::V1::WorkflowQuery.new(
             query_type: input.query.to_s,
             query_args: converter.to_payloads(input.args),
+            header: convert_headers(input.headers),
           ),
           query_reject_condition: Workflow::QueryRejectCondition.to_raw(input.reject_condition),
         )
@@ -208,7 +213,7 @@ module Temporal
           ),
           signal_name: input.signal.to_s,
           input: converter.to_payloads(input.args),
-          header: nil, # TODO: converter.to_payloads headers
+          header: convert_headers(input.headers),
         )
 
         connection.signal_workflow_execution(request)
