@@ -24,6 +24,7 @@ module Temporal
       attr_reader interceptor_chain: Interceptor::Chain
       attr_reader identity: String
 
+      def convert_headers: (Hash[Symbol | String, untyped]) -> Temporal::Api::Common::V1::Header?
       def handle_start_workflow: (Temporal::Interceptor::Client::StartWorkflowInput input) -> Temporal::Client::WorkflowHandle
       def handle_describe_workflow: (Temporal::Interceptor::Client::DescribeWorkflowInput input) -> Temporal::Workflow::ExecutionInfo
       def handle_query_workflow: (Temporal::Interceptor::Client::QueryWorkflowInput input) -> nil

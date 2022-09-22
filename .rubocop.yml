@@ -37,6 +37,8 @@ Style/StructInheritance:
 
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: consistent_comma
+  Exclude:
+    - spec/**/*_spec.rb
 
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: consistent_comma
