@@ -27,7 +27,7 @@ describe Temporal::Client::WorkflowHandle do
       result = subject.result
 
       expect(result).to eq(42)
-      expect(client_impl).to have_received(:await_workflow_result).with(id, result_run_id)
+      expect(client_impl).to have_received(:await_workflow_result).with(id, result_run_id, true)
     end
   end
 

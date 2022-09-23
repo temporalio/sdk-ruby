@@ -13,7 +13,7 @@ module Temporal
         ?result_run_id: String?,
         ?first_execution_run_id: String?
       ) -> void
-      def result: -> untyped
+      def result: (?follow_runs: bool) -> untyped
       def describe: -> Temporal::Workflow::ExecutionInfo
       def cancel: (?String? reason) -> void
       def query: (String | Symbol query, *untyped args, ?reject_condition: Symbol) -> untyped
