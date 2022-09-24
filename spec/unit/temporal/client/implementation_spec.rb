@@ -16,6 +16,12 @@ describe Temporal::Client::Implementation do
   let(:interceptors) { [] }
   let(:id) { SecureRandom.uuid }
   let(:run_id) { SecureRandom.uuid }
+  let(:payload_proto) do
+    Temporal::Api::Common::V1::Payload.new(
+      metadata: { 'encoding' => 'json/plain' },
+      data: '"test"',
+    )
+  end
 
   describe '#start_workflow' do
     let(:input) do
@@ -207,11 +213,6 @@ describe Temporal::Client::Implementation do
     let(:time_now) { Time.now }
 
     before do
-      payload = Temporal::Api::Common::V1::Payload.new(
-        metadata: { 'encoding' => 'json/plain' },
-        data: '"test"',
-      )
-
       allow(connection)
         .to receive(:describe_workflow_execution)
         .and_return(
@@ -226,8 +227,8 @@ describe Temporal::Client::Implementation do
               history_length: 4,
               parent_execution: { workflow_id: 'parent-id', run_id: 'parent-run-id' },
               execution_time: { nanos: time_now.nsec, seconds: time_now.to_i },
-              memo: { fields: { 'memo' => payload } },
-              search_attributes: { indexed_fields: { 'attrs' => payload } },
+              memo: { fields: { 'memo' => payload_proto } },
+              search_attributes: { indexed_fields: { 'attrs' => payload_proto } },
             },
           )
         )
@@ -289,16 +290,11 @@ describe Temporal::Client::Implementation do
     end
 
     before do
-      payload = Temporal::Api::Common::V1::Payload.new(
-        metadata: { 'encoding' => 'json/plain' },
-        data: '"test"',
-      )
-
       allow(connection)
         .to receive(:query_workflow)
         .and_return(
           Temporal::Api::WorkflowService::V1::QueryWorkflowResponse.new(
-            query_result: { payloads: [payload] },
+            query_result: { payloads: [payload_proto] },
           )
         )
     end
@@ -518,6 +514,188 @@ describe Temporal::Client::Implementation do
 
         expect(interceptor.called_methods).to eq([:terminate_workflow])
       end
+    end
+  end
+
+  describe '#await_workflow_result' do
+    # TODO: Provide full proto after implementing Failure handling
+    let(:failure_proto) { Temporal::Api::Failure::V1::Failure.new }
+    let(:new_run_id) { '' }
+
+    before do
+      allow(connection)
+        .to receive(:get_workflow_execution_history)
+        .and_return(
+          Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new(
+            history: { events: [event_proto] }
+          )
+        )
+    end
+
+    shared_examples 'follow runs' do
+      let(:new_run_id) { SecureRandom.uuid }
+      let(:completed_event_proto) do
+        new_payload = payload_proto.dup
+        new_payload.data = '"new test"'
+
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED,
+          workflow_execution_completed_event_attributes: {
+            result: { payloads: [new_payload] },
+          }
+        )
+      end
+
+      before do
+        allow(connection)
+          .to receive(:get_workflow_execution_history)
+          .and_return(
+            Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new(
+              history: { events: [event_proto] }
+            ),
+            Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new(
+              history: { events: [completed_event_proto] }
+            )
+          )
+      end
+
+      it 'calls RPC twice' do
+        result = subject.await_workflow_result(id, run_id, true)
+
+        expect(result).to eq('new test')
+        expect(connection).to have_received(:get_workflow_execution_history).twice
+      end
+    end
+
+    context 'when workflow has completed' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED,
+          workflow_execution_completed_event_attributes: {
+            result: { payloads: [payload_proto] },
+            new_execution_run_id: new_run_id,
+          }
+        )
+      end
+
+      it 'calls the RPC method' do
+        subject.await_workflow_result(id, run_id, false)
+
+        expect(connection).to have_received(:get_workflow_execution_history).once do |request|
+          expect(request)
+            .to be_a(Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest)
+          expect(request.namespace).to eq(namespace)
+          expect(request.execution.workflow_id).to eq(id)
+          expect(request.execution.run_id).to eq(run_id)
+          expect(request.history_event_filter_type).to eq(:HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT)
+          expect(request.wait_new_event).to eq(true)
+          expect(request.skip_archival).to eq(true)
+        end
+      end
+
+      it 'returns the result' do
+        expect(subject.await_workflow_result(id, run_id, false)).to eq('test')
+      end
+
+      include_examples 'follow runs'
+    end
+
+    context 'when workflow has failed' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED,
+          workflow_execution_failed_event_attributes: {
+            failure: failure_proto,
+            new_execution_run_id: new_run_id,
+          },
+        )
+      end
+
+      it 'raises an error' do
+        expect do
+          subject.await_workflow_result(id, run_id, false)
+        end.to raise_error(Temporal::Error, 'Workflow execution failed')
+        expect(connection).to have_received(:get_workflow_execution_history).once
+      end
+
+      include_examples 'follow runs'
+    end
+
+    context 'when workflow was cancelled' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED,
+          workflow_execution_canceled_event_attributes: {
+            details: { payloads: [payload_proto] },
+          },
+        )
+      end
+
+      it 'raises an error' do
+        expect do
+          subject.await_workflow_result(id, run_id, false)
+        end.to raise_error(Temporal::Error, 'Workflow execution cancelled')
+        expect(connection).to have_received(:get_workflow_execution_history).once
+      end
+    end
+
+    context 'when workflow was terminated' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED,
+          workflow_execution_terminated_event_attributes: {
+            reason: 'test reason',
+            details: { payloads: [payload_proto] },
+          },
+        )
+      end
+
+      it 'raises an error' do
+        expect do
+          subject.await_workflow_result(id, run_id, false)
+        end.to raise_error(Temporal::Error, 'Workflow execution terminated')
+        expect(connection).to have_received(:get_workflow_execution_history).once
+      end
+    end
+
+    context 'when workflow has timed out' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT,
+          workflow_execution_timed_out_event_attributes: {
+            new_execution_run_id: new_run_id,
+          },
+        )
+      end
+
+      it 'raises an error' do
+        expect do
+          subject.await_workflow_result(id, run_id, false)
+        end.to raise_error(Temporal::Error, 'Workflow execution timed out')
+        expect(connection).to have_received(:get_workflow_execution_history).once
+      end
+
+      include_examples 'follow runs'
+    end
+
+    context 'when workflow has timed out' do
+      let(:event_proto) do
+        Temporal::Api::History::V1::HistoryEvent.new(
+          event_type: :EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW,
+          workflow_execution_continued_as_new_event_attributes: {
+            new_execution_run_id: new_run_id,
+          },
+        )
+      end
+
+      it 'raises an error' do
+        expect do
+          subject.await_workflow_result(id, run_id, false)
+        end.to raise_error(Temporal::Error, 'Workflow execution continued as new')
+        expect(connection).to have_received(:get_workflow_execution_history).once
+      end
+
+      include_examples 'follow runs'
     end
   end
 end

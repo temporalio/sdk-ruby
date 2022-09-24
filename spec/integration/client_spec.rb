@@ -148,10 +148,27 @@ describe Temporal::Client do
 
   describe 'fetching a workflow result' do
     it 'raises if a workflow fails' do
-      input = { actions: [{ error:  { message: 'test return value' } }] }
+      input = { actions: [{ error: { message: 'test return value' } }] }
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
       expect { handle.result }.to raise_error(Temporal::Error, 'Workflow execution failed')
+    end
+
+    it 'follows runs when workflow was continued as new' do
+      input = { actions: [
+        { continue_as_new: { while_above_zero: 1 } },
+        { result: { run_id: true } },
+      ] }
+      handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
+      final_run_id = handle.result
+
+      expect(final_run_id).not_to be_empty
+      expect(handle.run_id).not_to eq(final_run_id)
+
+      # Calling without following runs raises as expected
+      expect do
+        handle.result(follow_runs: false)
+      end.to raise_error(Temporal::Error, 'Workflow execution continued as new')
     end
   end
 

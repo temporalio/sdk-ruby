@@ -55,8 +55,8 @@ module Temporal
         end
       end
 
-      # TODO: Add timeout and follow_runs
-      def await_workflow_result(id, run_id)
+      # TODO: Add timeout
+      def await_workflow_result(id, run_id, follow_runs)
         request = Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest.new(
           namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
@@ -71,9 +71,11 @@ module Temporal
 
         loop do
           response = connection.get_workflow_execution_history(request)
-          catch(:next) do
-            return process_workflow_result_from(response)
+          next_run_id = catch(:next) do
+            # this will return out of the loop only if :next wasn't thrown
+            return process_workflow_result_from(response, follow_runs)
           end
+          request.execution&.run_id = next_run_id if next_run_id
         end
       end
 
@@ -257,11 +259,11 @@ module Temporal
         return
       end
 
-      def process_workflow_result_from(response)
+      def process_workflow_result_from(response, follow_runs)
         events = response.history&.events
 
         if !events || events.empty?
-          throw(:next) # next loop iteration
+          throw(:next, nil) # next loop, same run_id
         elsif events.length != 1
           raise Temporal::Error, "Expected single close event, got #{events.length}"
         end
@@ -273,10 +275,15 @@ module Temporal
         case event.event_type
         when :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED
           attributes = event.workflow_execution_completed_event_attributes
+          follow(attributes&.new_execution_run_id) if follow_runs
+
           # TODO: Handle incorrect payloads object
           return converter.from_payloads(attributes&.result)&.first
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED
+          attributes = event.workflow_execution_failed_event_attributes
+          follow(attributes&.new_execution_run_id) if follow_runs
+
           # TODO: Use more specific error and decode failure
           raise Temporal::Error, 'Workflow execution failed'
 
@@ -289,13 +296,25 @@ module Temporal
           raise Temporal::Error, 'Workflow execution terminated'
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT
+          attributes = event.workflow_execution_timed_out_event_attributes
+          follow(attributes&.new_execution_run_id) if follow_runs
+
           # TODO: Use more specific error and decode failure
           raise Temporal::Error, 'Workflow execution timed out'
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW
+          attributes = event.workflow_execution_continued_as_new_event_attributes
+          follow(attributes&.new_execution_run_id) if follow_runs
+
           # TODO: Use more specific error and decode failure
           raise Temporal::Error, 'Workflow execution continued as new'
         end
+      end
+
+      def follow(new_run_id)
+        return if !new_run_id || new_run_id.empty?
+
+        throw(:next, new_run_id) # next loop with a new run_id
       end
     end
   end

@@ -14,9 +14,9 @@ module Temporal
         @first_execution_run_id = first_execution_run_id
       end
 
-      # TODO: Add timeout and follow_runs
-      def result
-        client_impl.await_workflow_result(id, result_run_id)
+      # TODO: Add timeout
+      def result(follow_runs: true)
+        client_impl.await_workflow_result(id, result_run_id, follow_runs)
       end
 
       def describe
