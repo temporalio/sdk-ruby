@@ -21,7 +21,9 @@ module Temporal
       ?memo: Hash[Symbol | String, untyped]?,
       ?search_attributes: Hash[Symbol | String, untyped]?,
       ?start_signal: Symbol | String?,
-      ?start_signal_args: Array[untyped]?
+      ?start_signal_args: Array[untyped]?,
+      ?rpc_metadata: Hash[String, String],
+      ?rpc_timeout: Integer?
     ) -> untyped
     def workflow_handle: (String id, ?run_id: String?, ?first_execution_run_id: String?) -> WorkflowHandle
 

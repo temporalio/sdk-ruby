@@ -13,12 +13,12 @@ module Temporal
         ?result_run_id: String?,
         ?first_execution_run_id: String?
       ) -> void
-      def result: (?follow_runs: bool) -> untyped
-      def describe: -> Temporal::Workflow::ExecutionInfo
-      def cancel: (?String? reason) -> void
-      def query: (String | Symbol query, *untyped args, ?reject_condition: Symbol) -> untyped
-      def signal: (String | Symbol signal, *untyped args) -> void
-      def terminate: (?String? reason, ?untyped args) -> void
+      def result: (?follow_runs: bool, ?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> untyped
+      def describe: (?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> Temporal::Workflow::ExecutionInfo
+      def cancel: (?String? reason, ?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> void
+      def query: (String | Symbol query, *untyped args, ?reject_condition: Symbol, ?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> untyped
+      def signal: (String | Symbol signal, *untyped args, ?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> void
+      def terminate: (?String? reason, ?untyped args, ?rpc_metadata: Hash[String, String], ?rpc_timeout: Integer?) -> void
 
       private
 

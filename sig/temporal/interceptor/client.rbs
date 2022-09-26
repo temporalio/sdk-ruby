@@ -32,6 +32,8 @@ module Temporal
         attr_accessor headers(): Hash[Symbol | String, untyped]
         attr_accessor start_signal(): String? | Symbol?
         attr_accessor start_signal_args(): Array[untyped]?
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
         def self.new: (
           workflow: String,
@@ -48,15 +50,24 @@ module Temporal
           search_attributes: Hash[Symbol | String, untyped]?,
           headers: Hash[Symbol | String, untyped]?,
           start_signal: String | Symbol?,
-          start_signal_args: Array[untyped]?
+          start_signal_args: Array[untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
         ) -> StartWorkflowInput
       end
 
       class DescribeWorkflowInput < Struct[untyped]
         attr_accessor id(): String
         attr_accessor run_id(): String
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
-        def self.new: (id: String, run_id: String?) -> DescribeWorkflowInput
+        def self.new: (
+          id: String,
+          run_id: String?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> DescribeWorkflowInput
       end
 
       class QueryWorkflowInput < Struct[untyped]
@@ -66,6 +77,8 @@ module Temporal
         attr_accessor args(): Array[untyped]
         attr_accessor reject_condition(): Symbol
         attr_accessor headers(): Hash[Symbol | String, untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
         def self.new: (
           id: String,
@@ -73,7 +86,9 @@ module Temporal
           query: String | Symbol,
           args: Array[untyped]?,
           reject_condition: Symbol,
-          headers: Hash[Symbol | String, untyped]?
+          headers: Hash[Symbol | String, untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
         ) -> QueryWorkflowInput
       end
 
@@ -83,13 +98,17 @@ module Temporal
         attr_accessor signal(): String | Symbol
         attr_accessor args(): Array[untyped]
         attr_accessor headers(): Hash[Symbol | String, untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
         def self.new: (
           id: String,
           run_id: String?,
           signal: String | Symbol,
           args: Array[untyped]?,
-          headers: Hash[Symbol | String, untyped]?
+          headers: Hash[Symbol | String, untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
         ) -> SignalWorkflowInput
       end
 
@@ -98,12 +117,16 @@ module Temporal
         attr_accessor run_id(): String
         attr_accessor first_execution_run_id(): String
         attr_accessor reason(): String
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
         def self.new: (
           id: String,
           run_id: String?,
           first_execution_run_id: String?,
-          reason: String?
+          reason: String?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
         ) -> CancelWorkflowInput
       end
 
@@ -113,13 +136,17 @@ module Temporal
         attr_accessor first_execution_run_id(): String
         attr_accessor reason(): String
         attr_accessor args(): Array[untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
 
         def self.new: (
           id: String,
           run_id: String?,
           first_execution_run_id: String?,
           reason: String?,
-          args: Array[untyped]
+          args: Array[untyped],
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
         ) -> TerminateWorkflowInput
       end
     end

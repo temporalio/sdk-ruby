@@ -62,6 +62,8 @@ describe Temporal::Client do
         expect(input.headers).to eq({})
         expect(input.start_signal).to eq(nil)
         expect(input.start_signal_args).to eq([])
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
       end
     end
 
@@ -83,6 +85,8 @@ describe Temporal::Client do
         search_attributes: { 'search_attributes' => 'test' },
         start_signal: 'test-signal',
         start_signal_args: [42],
+        rpc_metadata: { 'foo' => 'bar' },
+        rpc_timeout: 5_000,
       )
 
       expect(result).to eq(handle)
@@ -103,6 +107,8 @@ describe Temporal::Client do
         expect(input.headers).to eq({})
         expect(input.start_signal).to eq('test-signal')
         expect(input.start_signal_args).to eq([42])
+        expect(input.rpc_metadata).to eq({ 'foo' => 'bar' })
+        expect(input.rpc_timeout).to eq(5_000)
       end
     end
   end

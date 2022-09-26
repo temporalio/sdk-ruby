@@ -19,6 +19,7 @@ describe Temporal::Client::WorkflowHandle do
   let(:run_id) { SecureRandom.uuid }
   let(:result_run_id) { SecureRandom.uuid }
   let(:first_execution_run_id) { SecureRandom.uuid }
+  let(:rpc_params) { { rpc_metadata: { 'foo' => 'bar' }, rpc_timeout: 5_000 } }
 
   describe '#result' do
     before { allow(client_impl).to receive(:await_workflow_result).and_return(42) }
@@ -27,7 +28,9 @@ describe Temporal::Client::WorkflowHandle do
       result = subject.result
 
       expect(result).to eq(42)
-      expect(client_impl).to have_received(:await_workflow_result).with(id, result_run_id, true)
+      expect(client_impl)
+        .to have_received(:await_workflow_result)
+        .with(id, result_run_id, true, {}, nil)
     end
   end
 
@@ -44,6 +47,19 @@ describe Temporal::Client::WorkflowHandle do
         expect(input).to be_a(Temporal::Interceptor::Client::DescribeWorkflowInput)
         expect(input.id).to eq(id)
         expect(input.run_id).to eq(run_id)
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
+      end
+    end
+
+    context 'with RPC params' do
+      it 'passes RPC params to the client implementation' do
+        subject.describe(**rpc_params)
+
+        expect(client_impl).to have_received(:describe_workflow) do |input|
+          expect(input.rpc_metadata).to eq(rpc_params[:rpc_metadata])
+          expect(input.rpc_timeout).to eq(rpc_params[:rpc_timeout])
+        end
       end
     end
   end
@@ -60,6 +76,8 @@ describe Temporal::Client::WorkflowHandle do
         expect(input.run_id).to eq(run_id)
         expect(input.first_execution_run_id).to eq(first_execution_run_id)
         expect(input.reason).to eq('test reason')
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
       end
     end
 
@@ -69,6 +87,17 @@ describe Temporal::Client::WorkflowHandle do
 
         expect(client_impl).to have_received(:cancel_workflow) do |input|
           expect(input.reason).to eq(nil)
+        end
+      end
+    end
+
+    context 'with RPC params' do
+      it 'passes RPC params to the client implementation' do
+        subject.cancel(**rpc_params)
+
+        expect(client_impl).to have_received(:cancel_workflow) do |input|
+          expect(input.rpc_metadata).to eq(rpc_params[:rpc_metadata])
+          expect(input.rpc_timeout).to eq(rpc_params[:rpc_timeout])
         end
       end
     end
@@ -89,6 +118,8 @@ describe Temporal::Client::WorkflowHandle do
         expect(input.args).to eq([1, 2, 3])
         expect(input.reject_condition).to eq(Temporal::Workflow::QueryRejectCondition::NONE)
         expect(input.headers).to eq({})
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
       end
     end
 
@@ -100,6 +131,8 @@ describe Temporal::Client::WorkflowHandle do
         expect(client_impl).to have_received(:query_workflow) do |input|
           expect(input.query).to eq('test query')
           expect(input.args).to eq([])
+          expect(input.rpc_metadata).to eq({})
+          expect(input.rpc_timeout).to eq(nil)
         end
       end
     end
@@ -116,6 +149,19 @@ describe Temporal::Client::WorkflowHandle do
           expect(input.query).to eq('test query')
           expect(input.args).to eq([])
           expect(input.reject_condition).to eq(Temporal::Workflow::QueryRejectCondition::NOT_OPEN)
+          expect(input.rpc_metadata).to eq({})
+          expect(input.rpc_timeout).to eq(nil)
+        end
+      end
+    end
+
+    context 'with RPC params' do
+      it 'passes RPC params to the client implementation' do
+        subject.query('test query', **rpc_params)
+
+        expect(client_impl).to have_received(:query_workflow) do |input|
+          expect(input.rpc_metadata).to eq(rpc_params[:rpc_metadata])
+          expect(input.rpc_timeout).to eq(rpc_params[:rpc_timeout])
         end
       end
     end
@@ -134,6 +180,8 @@ describe Temporal::Client::WorkflowHandle do
         expect(input.signal).to eq('test signal')
         expect(input.args).to eq([1, 2, 3])
         expect(input.headers).to eq({})
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
       end
     end
 
@@ -144,6 +192,19 @@ describe Temporal::Client::WorkflowHandle do
         expect(client_impl).to have_received(:signal_workflow) do |input|
           expect(input.signal).to eq('test signal')
           expect(input.args).to eq([])
+          expect(input.rpc_metadata).to eq({})
+          expect(input.rpc_timeout).to eq(nil)
+        end
+      end
+    end
+
+    context 'with RPC params' do
+      it 'passes RPC params to the client implementation' do
+        subject.signal('test signal', **rpc_params)
+
+        expect(client_impl).to have_received(:signal_workflow) do |input|
+          expect(input.rpc_metadata).to eq(rpc_params[:rpc_metadata])
+          expect(input.rpc_timeout).to eq(rpc_params[:rpc_timeout])
         end
       end
     end
@@ -162,6 +223,8 @@ describe Temporal::Client::WorkflowHandle do
         expect(input.first_execution_run_id).to eq(first_execution_run_id)
         expect(input.reason).to eq('test reason')
         expect(input.args).to eq([1, 2, 3])
+        expect(input.rpc_metadata).to eq({})
+        expect(input.rpc_timeout).to eq(nil)
       end
     end
 
@@ -172,6 +235,19 @@ describe Temporal::Client::WorkflowHandle do
         expect(client_impl).to have_received(:terminate_workflow) do |input|
           expect(input.reason).to eq(nil)
           expect(input.args).to eq(nil)
+          expect(input.rpc_metadata).to eq({})
+          expect(input.rpc_timeout).to eq(nil)
+        end
+      end
+    end
+
+    context 'with RPC params' do
+      it 'passes RPC params to the client implementation' do
+        subject.terminate(**rpc_params)
+
+        expect(client_impl).to have_received(:terminate_workflow) do |input|
+          expect(input.rpc_metadata).to eq(rpc_params[:rpc_metadata])
+          expect(input.rpc_timeout).to eq(rpc_params[:rpc_timeout])
         end
       end
     end

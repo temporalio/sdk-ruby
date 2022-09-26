@@ -22,6 +22,8 @@ describe Temporal::Client::Implementation do
       data: '"test"',
     )
   end
+  let(:metadata) { { 'foo' => 'bar' } }
+  let(:timeout) { 5_000 }
 
   describe '#start_workflow' do
     let(:input) do
@@ -130,6 +132,21 @@ describe Temporal::Client::Implementation do
         expect(connection).to have_received(:start_workflow_execution) do |request|
           expect(request.header.fields['header'].data).to eq('"test"')
         end
+      end
+    end
+
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.start_workflow(input)
+
+        expect(connection)
+          .to have_received(:start_workflow_execution)
+          .with(anything, metadata: metadata, timeout: timeout)
       end
     end
 
@@ -265,6 +282,21 @@ describe Temporal::Client::Implementation do
       expect(info.search_attributes).to eq({ 'attrs' => 'test' })
     end
 
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.describe_workflow(input)
+
+        expect(connection)
+          .to have_received(:describe_workflow_execution)
+          .with(anything, metadata: metadata, timeout: timeout)
+      end
+    end
+
     context 'with interceptors' do
       let(:interceptors) { [interceptor] }
       let(:interceptor) { Helpers::TestCaptureInterceptor.new }
@@ -332,6 +364,21 @@ describe Temporal::Client::Implementation do
       end
     end
 
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.query_workflow(input)
+
+        expect(connection)
+          .to have_received(:query_workflow)
+          .with(anything, metadata: metadata, timeout: timeout)
+      end
+    end
+
     context 'with interceptors' do
       let(:interceptors) { [interceptor] }
       let(:interceptor) { Helpers::TestCaptureInterceptor.new }
@@ -396,6 +443,21 @@ describe Temporal::Client::Implementation do
       end
     end
 
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.signal_workflow(input)
+
+        expect(connection)
+          .to have_received(:signal_workflow_execution)
+          .with(anything, metadata: metadata, timeout: timeout)
+      end
+    end
+
     context 'with interceptors' do
       let(:interceptors) { [interceptor] }
       let(:interceptor) { Helpers::TestCaptureInterceptor.new }
@@ -441,6 +503,21 @@ describe Temporal::Client::Implementation do
 
     it 'returns nil' do
       expect(subject.cancel_workflow(input)).to eq(nil)
+    end
+
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.cancel_workflow(input)
+
+        expect(connection)
+          .to have_received(:request_cancel_workflow_execution)
+          .with(anything, metadata: metadata, timeout: timeout)
+      end
     end
 
     context 'with interceptors' do
@@ -505,6 +582,21 @@ describe Temporal::Client::Implementation do
       end
     end
 
+    context 'with RPC params' do
+      before do
+        input.rpc_metadata = metadata
+        input.rpc_timeout = timeout
+      end
+
+      it 'passes RPC params to the connection' do
+        subject.terminate_workflow(input)
+
+        expect(connection)
+          .to have_received(:terminate_workflow_execution)
+          .with(anything, metadata: metadata, timeout: timeout)
+      end
+    end
+
     context 'with interceptors' do
       let(:interceptors) { [interceptor] }
       let(:interceptor) { Helpers::TestCaptureInterceptor.new }
@@ -560,7 +652,7 @@ describe Temporal::Client::Implementation do
       end
 
       it 'calls RPC twice' do
-        result = subject.await_workflow_result(id, run_id, true)
+        result = subject.await_workflow_result(id, run_id, true, metadata, timeout)
 
         expect(result).to eq('new test')
         expect(connection).to have_received(:get_workflow_execution_history).twice
@@ -579,9 +671,9 @@ describe Temporal::Client::Implementation do
       end
 
       it 'calls the RPC method' do
-        subject.await_workflow_result(id, run_id, false)
+        subject.await_workflow_result(id, run_id, false, metadata, timeout)
 
-        expect(connection).to have_received(:get_workflow_execution_history).once do |request|
+        expect(connection).to have_received(:get_workflow_execution_history).once do |request, **rpc_params|
           expect(request)
             .to be_a(Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest)
           expect(request.namespace).to eq(namespace)
@@ -590,11 +682,13 @@ describe Temporal::Client::Implementation do
           expect(request.history_event_filter_type).to eq(:HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT)
           expect(request.wait_new_event).to eq(true)
           expect(request.skip_archival).to eq(true)
+          expect(rpc_params[:metadata]).to eq(metadata)
+          expect(rpc_params[:timeout]).to eq(timeout)
         end
       end
 
       it 'returns the result' do
-        expect(subject.await_workflow_result(id, run_id, false)).to eq('test')
+        expect(subject.await_workflow_result(id, run_id, false, metadata, timeout)).to eq('test')
       end
 
       include_examples 'follow runs'
@@ -613,7 +707,7 @@ describe Temporal::Client::Implementation do
 
       it 'raises an error' do
         expect do
-          subject.await_workflow_result(id, run_id, false)
+          subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporal::Error, 'Workflow execution failed')
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
@@ -633,7 +727,7 @@ describe Temporal::Client::Implementation do
 
       it 'raises an error' do
         expect do
-          subject.await_workflow_result(id, run_id, false)
+          subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporal::Error, 'Workflow execution cancelled')
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
@@ -652,7 +746,7 @@ describe Temporal::Client::Implementation do
 
       it 'raises an error' do
         expect do
-          subject.await_workflow_result(id, run_id, false)
+          subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporal::Error, 'Workflow execution terminated')
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
@@ -670,7 +764,7 @@ describe Temporal::Client::Implementation do
 
       it 'raises an error' do
         expect do
-          subject.await_workflow_result(id, run_id, false)
+          subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporal::Error, 'Workflow execution timed out')
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
@@ -690,7 +784,7 @@ describe Temporal::Client::Implementation do
 
       it 'raises an error' do
         expect do
-          subject.await_workflow_result(id, run_id, false)
+          subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporal::Error, 'Workflow execution continued as new')
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
