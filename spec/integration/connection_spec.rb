@@ -25,6 +25,20 @@ describe Temporal::Connection do
       it 'makes an RPC call' do
         expect(subject.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)
       end
+
+      context 'with metadata' do
+        it 'makes an RPC call' do
+          expect(subject.public_send(rpc, desc.input.new, metadata: { 'foo' => 'bar' }))
+            .to be_an_instance_of(desc.output)
+        end
+      end
+
+      context 'with timeout' do
+        it 'makes an RPC call' do
+          expect(subject.public_send(rpc, desc.input.new, timeout: 5_000))
+            .to be_an_instance_of(desc.output)
+        end
+      end
     end
   end
 
