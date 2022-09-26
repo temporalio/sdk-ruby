@@ -6,12 +6,13 @@ mod connection;
 mod runtime;
 mod worker;
 
-use connection::Connection;
+use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
     NilClass
 };
+use std::collections::HashMap;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
 use worker::{Worker, WorkerResult};
 
@@ -59,7 +60,13 @@ methods!(
 
         let result = Thread::call_without_gvl(move || {
             let connection = rtself.get_data_mut(&*CONNECTION_WRAPPER);
-            connection.call(&rpc, request.clone())
+            let params = RpcParams {
+                rpc: rpc.clone(),
+                request: request.clone(),
+                metadata: HashMap::new(),
+                timeout_millis: None
+            };
+            connection.call(params)
         }, Some(|| {}));
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
