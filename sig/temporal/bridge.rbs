@@ -12,7 +12,7 @@ module Temporal
 
     class Connection
       def self.connect: (Runtime, String) -> Temporal::Bridge::Connection
-      def call: (Symbol, String) -> String
+      def call: (Symbol, String, Hash[String, String], Integer?) -> String
     end
 
     class Runtime

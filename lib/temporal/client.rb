@@ -18,7 +18,7 @@ module Temporal
       @implementation = Client::Implementation.new(connection, namespace, converter, interceptors)
     end
 
-    def start_workflow(
+    def start_workflow( # rubocop:disable Metrics/ParameterLists
       workflow,
       *args,
       id:,
@@ -32,7 +32,9 @@ module Temporal
       memo: nil,
       search_attributes: nil,
       start_signal: nil,
-      start_signal_args: []
+      start_signal_args: [],
+      rpc_metadata: {},
+      rpc_timeout: nil
     )
       input = Interceptor::Client::StartWorkflowInput.new(
         workflow: workflow,
@@ -50,6 +52,8 @@ module Temporal
         headers: {},
         start_signal: start_signal,
         start_signal_args: start_signal_args,
+        rpc_metadata: rpc_metadata,
+        rpc_timeout: rpc_timeout,
       )
 
       implementation.start_workflow(input)

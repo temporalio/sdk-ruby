@@ -6,12 +6,13 @@ mod connection;
 mod runtime;
 mod worker;
 
-use connection::Connection;
+use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
-    NilClass
+    NilClass, Hash, Integer,
 };
+use std::collections::HashMap;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
 use worker::{Worker, WorkerResult};
 
@@ -24,6 +25,19 @@ fn raise_bridge_exception(message: &str) {
 fn wrap_bytes(bytes: &Vec<u8>) -> AnyObject {
     let enc = Encoding::find("ASCII-8BIT").unwrap();
     RString::from_bytes(bytes, &enc).to_any_object()
+}
+
+fn to_hash_map(hash: Hash) -> HashMap<String, String> {
+    let mut result = HashMap::new();
+
+    hash.each(|k, v| {
+        result.insert(
+            k.try_convert_to::<RString>().map_err(|e| VM::raise_ex(e)).unwrap().to_string(),
+            v.try_convert_to::<RString>().map_err(|e| VM::raise_ex(e)).unwrap().to_string()
+        );
+    });
+
+    return result
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
@@ -53,13 +67,21 @@ methods!(
             .wrap_data(connection, &*CONNECTION_WRAPPER)
     }
 
-    fn call_rpc(rpc: Symbol, request: RString) -> RString {
+    fn call_rpc(rpc: Symbol, request: RString, metadata: Hash, timeout: Integer) -> RString {
         let rpc = rpc.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
         let request = request.map_err(|e| VM::raise_ex(e)).unwrap().to_string().as_bytes().to_vec();
+        let metadata = to_hash_map(metadata.map_err(|e| VM::raise_ex(e)).unwrap());
+        let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
 
         let result = Thread::call_without_gvl(move || {
             let connection = rtself.get_data_mut(&*CONNECTION_WRAPPER);
-            connection.call(&rpc, request.clone())
+            let params = RpcParams {
+                rpc: rpc.clone(),
+                request: request.clone(),
+                metadata: metadata.clone(),
+                timeout_millis: timeout
+            };
+            connection.call(params)
         }, Some(|| {}));
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();

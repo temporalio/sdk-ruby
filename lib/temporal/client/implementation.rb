@@ -55,8 +55,8 @@ module Temporal
         end
       end
 
-      # TODO: Add timeout
-      def await_workflow_result(id, run_id, follow_runs)
+      def await_workflow_result(id, run_id, follow_runs, rpc_metadata, rpc_timeout)
+        rpc_params = { metadata: rpc_metadata, timeout: rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest.new(
           namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
@@ -70,7 +70,7 @@ module Temporal
         )
 
         loop do
-          response = connection.get_workflow_execution_history(request)
+          response = connection.get_workflow_execution_history(request, **rpc_params)
           next_run_id = catch(:next) do
             # this will return out of the loop only if :next wasn't thrown
             return process_workflow_result_from(response, follow_runs)
@@ -104,6 +104,7 @@ module Temporal
           )
         end
 
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         params = {
           identity: identity,
           request_id: SecureRandom.uuid,
@@ -133,12 +134,12 @@ module Temporal
           klass = Temporal::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest
           request = klass.new(**params)
 
-          response = connection.signal_with_start_workflow_execution(request)
+          response = connection.signal_with_start_workflow_execution(request, **rpc_params)
         else
           klass = Temporal::Api::WorkflowService::V1::StartWorkflowExecutionRequest
           request = klass.new(**params)
 
-          response = connection.start_workflow_execution(request)
+          response = connection.start_workflow_execution(request, **rpc_params)
           first_execution_run_id = response.run_id
         end
 
@@ -159,6 +160,7 @@ module Temporal
       end
 
       def handle_describe_workflow(input)
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest.new(
           namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
@@ -167,12 +169,13 @@ module Temporal
           ),
         )
 
-        response = connection.describe_workflow_execution(request)
+        response = connection.describe_workflow_execution(request, **rpc_params)
 
         Workflow::ExecutionInfo.from_raw(response, converter)
       end
 
       def handle_query_workflow(input)
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::QueryWorkflowRequest.new(
           namespace: namespace.to_s,
           execution: Temporal::Api::Common::V1::WorkflowExecution.new(
@@ -187,7 +190,7 @@ module Temporal
           query_reject_condition: Workflow::QueryRejectCondition.to_raw(input.reject_condition),
         )
 
-        response = connection.query_workflow(request)
+        response = connection.query_workflow(request, **rpc_params)
 
         if response.query_rejected
           status = Workflow::ExecutionStatus.from_raw(response.query_rejected.status)
@@ -205,6 +208,7 @@ module Temporal
       end
 
       def handle_signal_workflow(input)
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::SignalWorkflowExecutionRequest.new(
           identity: identity,
           request_id: SecureRandom.uuid,
@@ -218,12 +222,13 @@ module Temporal
           header: convert_headers(input.headers),
         )
 
-        connection.signal_workflow_execution(request)
+        connection.signal_workflow_execution(request, **rpc_params)
 
         return
       end
 
       def handle_cancel_workflow(input)
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest.new(
           identity: identity,
           request_id: SecureRandom.uuid,
@@ -236,12 +241,13 @@ module Temporal
           reason: input.reason,
         )
 
-        connection.request_cancel_workflow_execution(request)
+        connection.request_cancel_workflow_execution(request, **rpc_params)
 
         return
       end
 
       def handle_terminate_workflow(input)
+        rpc_params = { metadata: input.rpc_metadata, timeout: input.rpc_timeout }
         request = Temporal::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest.new(
           identity: identity,
           namespace: namespace.to_s,
@@ -254,7 +260,7 @@ module Temporal
           details: converter.to_payloads(input.args),
         )
 
-        connection.terminate_workflow_execution(request)
+        connection.terminate_workflow_execution(request, **rpc_params)
 
         return
       end

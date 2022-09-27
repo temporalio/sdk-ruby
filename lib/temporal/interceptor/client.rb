@@ -17,12 +17,16 @@ module Temporal
         :headers,
         :start_signal,
         :start_signal_args,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
       class DescribeWorkflowInput < Struct.new(
         :id,
         :run_id,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
@@ -33,6 +37,8 @@ module Temporal
         :args,
         :reject_condition,
         :headers,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
@@ -42,6 +48,8 @@ module Temporal
         :signal,
         :args,
         :headers,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
@@ -50,6 +58,8 @@ module Temporal
         :run_id,
         :first_execution_run_id,
         :reason,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
@@ -59,6 +69,8 @@ module Temporal
         :first_execution_run_id,
         :reason,
         :args,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true,
       ); end
 
