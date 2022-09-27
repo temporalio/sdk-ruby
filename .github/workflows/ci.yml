@@ -18,6 +18,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - uses: arduino/setup-protoc@v1
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.0
