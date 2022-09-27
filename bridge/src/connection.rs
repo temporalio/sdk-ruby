@@ -5,14 +5,14 @@ use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, WorkflowServiceClientWithMetrics
+    ConfiguredClient, TemporalServiceClientWithMetrics
 };
 use thiserror::Error;
 use tokio::runtime::{Runtime};
 use tonic::metadata::{MetadataKey,MetadataValue};
 use url::Url;
 
-pub type Client = RetryClient<ConfiguredClient<WorkflowServiceClientWithMetrics>>;
+pub type Client = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;
 
 #[derive(Error, Debug)]
 pub enum ConnectionError {
@@ -51,7 +51,7 @@ fn rpc_req<P: prost::Message + Default>(params: RpcParams) -> Result<tonic::Requ
     for (k, v) in params.metadata {
         req.metadata_mut().insert(
             MetadataKey::from_str(k.as_str())?,
-            MetadataValue::from_str(v.as_str())?
+            MetadataValue::try_from(v.as_str())?
         );
     }
 
@@ -89,7 +89,6 @@ async fn create_client(host: String) -> Result<Client, ConnectionError> {
     let url = Url::try_from(&*host)?;
     let options = ClientOptionsBuilder::default()
         .identity("testtest".to_string())
-        .worker_binary_id("fakebinaryid".to_string())
         .target_url(url)
         .client_name("ruby-sdk".to_string())
         .client_version("0.0.1".to_string())
@@ -103,7 +102,7 @@ impl Connection {
     pub fn connect(runtime: Arc<Runtime>, host: String) -> Result<Self, ConnectionError> {
         let client = runtime.block_on(create_client(host))?;
 
-        Ok(Connection { client: client, runtime })
+        Ok(Connection { client, runtime })
     }
 
     pub fn call(&mut self, params: RpcParams) -> Result<Vec<u8>, ConnectionError> {
@@ -148,7 +147,7 @@ impl Connection {
             "get_cluster_info" => rpc_call!(self.client, self.runtime, get_cluster_info, params),
             "get_system_info" => rpc_call!(self.client, self.runtime, get_system_info, params),
             "list_task_queue_partitions" => rpc_call!(self.client, self.runtime, list_task_queue_partitions, params),
-            _ => return Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
+            _ => Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
         }
     }
 }

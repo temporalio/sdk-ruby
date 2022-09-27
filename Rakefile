@@ -9,6 +9,11 @@ RBS_SIG_PATH = 'sig/protos'.freeze
 GRPC_PATH = 'spec/support/grpc'.freeze
 
 namespace :bridge do
+  desc 'Run a linter on SDK Core Bridge'
+  task :lint do
+    sh 'cd bridge && cargo clippy --workspace --all-features --all-targets -- -D warnings'
+  end
+
   desc 'Build SDK Core Bridge'
   task :build do
     sh 'cd bridge && cargo build'

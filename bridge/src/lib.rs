@@ -22,7 +22,7 @@ fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
 }
 
-fn wrap_bytes(bytes: &Vec<u8>) -> AnyObject {
+fn wrap_bytes(bytes: &[u8]) -> AnyObject {
     let enc = Encoding::find("ASCII-8BIT").unwrap();
     RString::from_bytes(bytes, &enc).to_any_object()
 }
@@ -32,12 +32,12 @@ fn to_hash_map(hash: Hash) -> HashMap<String, String> {
 
     hash.each(|k, v| {
         result.insert(
-            k.try_convert_to::<RString>().map_err(|e| VM::raise_ex(e)).unwrap().to_string(),
-            v.try_convert_to::<RString>().map_err(|e| VM::raise_ex(e)).unwrap().to_string()
+            k.try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string(),
+            v.try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string()
         );
     });
 
-    return result
+    result
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
@@ -48,10 +48,10 @@ class!(TemporalBridge);
 
 methods!(
     TemporalBridge,
-    rtself,
+    _rtself, // somehow compiler is sure this is unused and insists on the "_"
 
     fn create_connection(runtime: AnyObject, host: RString) -> AnyObject {
-        let host = host.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
+        let host = host.map_err(VM::raise_ex).unwrap().to_string();
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
 
@@ -68,13 +68,13 @@ methods!(
     }
 
     fn call_rpc(rpc: Symbol, request: RString, metadata: Hash, timeout: Integer) -> RString {
-        let rpc = rpc.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
-        let request = request.map_err(|e| VM::raise_ex(e)).unwrap().to_string().as_bytes().to_vec();
-        let metadata = to_hash_map(metadata.map_err(|e| VM::raise_ex(e)).unwrap());
+        let rpc = rpc.map_err(VM::raise_ex).unwrap().to_string();
+        let request = request.map_err(VM::raise_ex).unwrap().to_string().as_bytes().to_vec();
+        let metadata = to_hash_map(metadata.map_err(VM::raise_ex).unwrap());
         let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
 
         let result = Thread::call_without_gvl(move || {
-            let connection = rtself.get_data_mut(&*CONNECTION_WRAPPER);
+            let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
             let params = RpcParams {
                 rpc: rpc.clone(),
                 request: request.clone(),
@@ -115,15 +115,15 @@ methods!(
     }
 
     fn run_callback_loop() -> NilClass {
-        let runtime = rtself.get_data_mut(&*RUNTIME_WRAPPER);
+        let runtime = _rtself.get_data_mut(&*RUNTIME_WRAPPER);
         runtime.run_callback_loop();
 
         NilClass::new()
     }
 
     fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
-        let namespace = namespace.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
-        let task_queue = task_queue.map_err(|e| VM::raise_ex(e)).unwrap().to_string();
+        let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
+        let task_queue = task_queue.map_err(VM::raise_ex).unwrap().to_string();
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
@@ -148,7 +148,7 @@ methods!(
             ruby_callback.call(&[wrap_bytes(&bytes)]);
         };
 
-        let worker = rtself.get_data_mut(&*WORKER_WRAPPER);
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
         let result = worker.poll_activity_task(callback);
 
         result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
