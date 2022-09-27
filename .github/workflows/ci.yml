@@ -29,6 +29,7 @@ jobs:
       - run: bundle install
       - run: bundle exec rubocop
       - run: bundle exec steep check
+      - run: bundle exec rake bridge:lint
       - run: bundle exec rake bridge:release
       - run: bundle exec rake test_server:build
       - run: bundle exec rspec

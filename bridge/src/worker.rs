@@ -43,7 +43,7 @@ impl Worker {
             temporal_sdk_core::init_worker(config, client.clone())
         });
 
-        return Ok(Worker {
+        Ok(Worker {
             core_worker: Arc::new(core_worker),
             tokio_runtime: runtime.tokio_runtime.clone(),
             callback_tx: runtime.callback_tx.clone(),

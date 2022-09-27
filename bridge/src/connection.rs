@@ -102,7 +102,7 @@ impl Connection {
     pub fn connect(runtime: Arc<Runtime>, host: String) -> Result<Self, ConnectionError> {
         let client = runtime.block_on(create_client(host))?;
 
-        Ok(Connection { client: client, runtime })
+        Ok(Connection { client, runtime })
     }
 
     pub fn call(&mut self, params: RpcParams) -> Result<Vec<u8>, ConnectionError> {
@@ -147,7 +147,7 @@ impl Connection {
             "get_cluster_info" => rpc_call!(self.client, self.runtime, get_cluster_info, params),
             "get_system_info" => rpc_call!(self.client, self.runtime, get_system_info, params),
             "list_task_queue_partitions" => rpc_call!(self.client, self.runtime, list_task_queue_partitions, params),
-            _ => return Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
+            _ => Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
         }
     }
 }
