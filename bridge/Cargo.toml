@@ -6,8 +6,7 @@ edition = "2021"
 
 [dependencies]
 lazy_static = "1.4.0"
-prost = "0.9"
-# prost-types = "0.7"
+prost = "0.11"
 rutie = "0.8.4"
 temporal-client = { version = "0.1.0", path = "./sdk-core/client" }
 temporal-sdk-core = { version = "0.1.0", path = "./sdk-core/core" }
@@ -15,7 +14,7 @@ temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api" }
 temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
 thiserror = "1.0.31"
 tokio = "1.15"
-tonic = "0.6"
+tonic = "0.8"
 url = "2.2"
 
 [lib]

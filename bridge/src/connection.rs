@@ -5,14 +5,14 @@ use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, WorkflowServiceClientWithMetrics
+    ConfiguredClient, TemporalServiceClientWithMetrics
 };
 use thiserror::Error;
 use tokio::runtime::{Runtime};
 use tonic::metadata::{MetadataKey,MetadataValue};
 use url::Url;
 
-pub type Client = RetryClient<ConfiguredClient<WorkflowServiceClientWithMetrics>>;
+pub type Client = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;
 
 #[derive(Error, Debug)]
 pub enum ConnectionError {
@@ -51,7 +51,7 @@ fn rpc_req<P: prost::Message + Default>(params: RpcParams) -> Result<tonic::Requ
     for (k, v) in params.metadata {
         req.metadata_mut().insert(
             MetadataKey::from_str(k.as_str())?,
-            MetadataValue::from_str(v.as_str())?
+            MetadataValue::try_from(v.as_str())?
         );
     }
 
@@ -89,7 +89,6 @@ async fn create_client(host: String) -> Result<Client, ConnectionError> {
     let url = Url::try_from(&*host)?;
     let options = ClientOptionsBuilder::default()
         .identity("testtest".to_string())
-        .worker_binary_id("fakebinaryid".to_string())
         .target_url(url)
         .client_name("ruby-sdk".to_string())
         .client_version("0.0.1".to_string())
