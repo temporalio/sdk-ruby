@@ -1,0 +1,19 @@
+module Temporal
+  module Converter
+    class Composite < Base
+      class ConverterNotFound < Temporal::Error
+      end
+
+      class MetadataNotSet < Temporal::Error
+      end
+
+      include _PayloadConverter
+
+      def initialize: (*_EncodingPayloadConverter converters) -> void
+
+      private
+
+      attr_reader converters: Hash[String, _EncodingPayloadConverter]
+    end
+  end
+end

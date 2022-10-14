@@ -1,0 +1,12 @@
+module Temporal
+  module Converter
+    interface _PayloadConverter
+      def to_payload: (untyped) -> Temporal::Api::Common::V1::Payload
+      def from_payload: (Temporal::Api::Common::V1::Payload) -> untyped
+    end
+
+    class Base
+      include _PayloadConverter
+    end
+  end
+end
