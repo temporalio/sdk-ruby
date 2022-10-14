@@ -1,7 +1,7 @@
-require 'temporal/converter/encoding_base'
+require 'temporal/payload_converter/encoding_base'
 
 module Temporal
-  module Converter
+  module PayloadConverter
     class Nil < EncodingBase
       ENCODING = 'binary/null'.freeze
 

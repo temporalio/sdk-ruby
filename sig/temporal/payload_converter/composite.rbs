@@ -1,5 +1,5 @@
 module Temporal
-  module Converter
+  module PayloadConverter
     class Composite < Base
       class ConverterNotFound < Temporal::Error
       end

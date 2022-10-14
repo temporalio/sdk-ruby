@@ -1,21 +1,21 @@
-require 'temporal/converter/composite'
-require 'temporal/converter/bytes'
-require 'temporal/converter/json'
+require 'temporal/payload_converter/composite'
+require 'temporal/payload_converter/bytes'
+require 'temporal/payload_converter/json'
 
-describe Temporal::Converter::Composite do
+describe Temporal::PayloadConverter::Composite do
   subject { described_class.new(bytes_converter, json_converter) }
 
-  let(:bytes_converter) { Temporal::Converter::Bytes.new }
-  let(:json_converter) { Temporal::Converter::JSON.new }
+  let(:bytes_converter) { Temporal::PayloadConverter::Bytes.new }
+  let(:json_converter) { Temporal::PayloadConverter::JSON.new }
   let(:bytes_payload) do
     Temporal::Api::Common::V1::Payload.new(
-      metadata: { 'encoding' => Temporal::Converter::Bytes::ENCODING },
+      metadata: { 'encoding' => Temporal::PayloadConverter::Bytes::ENCODING },
       data: 'test'.b,
     )
   end
   let(:json_payload) do
     Temporal::Api::Common::V1::Payload.new(
-      metadata: { 'encoding' => Temporal::Converter::JSON::ENCODING },
+      metadata: { 'encoding' => Temporal::PayloadConverter::JSON::ENCODING },
       data: '"test"',
     )
   end
@@ -41,7 +41,7 @@ describe Temporal::Converter::Composite do
       it 'raises if an incoding' do
         expect { subject.to_payload('test') }.to raise_error(
           described_class::ConverterNotFound,
-          'Available converters (Temporal::Converter::Bytes) could not convert data'
+          'Available converters (Temporal::PayloadConverter::Bytes) could not convert data'
         )
       end
     end

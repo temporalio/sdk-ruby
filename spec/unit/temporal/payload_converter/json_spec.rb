@@ -1,4 +1,4 @@
-require 'temporal/converter/json'
+require 'temporal/payload_converter/json'
 
 class TestCustomSerializableClass < Struct.new(:foo)
   def self.json_create(object)
@@ -10,7 +10,7 @@ class TestCustomSerializableClass < Struct.new(:foo)
   end
 end
 
-describe Temporal::Converter::JSON do
+describe Temporal::PayloadConverter::JSON do
   subject { described_class.new }
 
   it 'safely handles non-ASCII encodable UTF characters' do

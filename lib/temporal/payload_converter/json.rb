@@ -1,8 +1,8 @@
 require 'json/ext'
-require 'temporal/converter/encoding_base'
+require 'temporal/payload_converter/encoding_base'
 
 module Temporal
-  module Converter
+  module PayloadConverter
     class JSON < EncodingBase
       ENCODING = 'json/plain'.freeze
 

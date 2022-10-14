@@ -1,5 +1,5 @@
 module Temporal
-  module Converter
+  module PayloadConverter
     interface _EncodingPayloadConverter
       def class: -> Class
       def encoding: -> String

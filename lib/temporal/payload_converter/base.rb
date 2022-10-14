@@ -1,12 +1,6 @@
-require 'temporal/api/common/v1/message_pb'
-
 module Temporal
-  module Converter
-    class EncodingBase
-      def encoding
-        raise NoMethodError, 'must implement #encoding'
-      end
-
+  module PayloadConverter
+    class Base
       def to_payload(_data)
         raise NoMethodError, 'must implement #to_payload'
       end

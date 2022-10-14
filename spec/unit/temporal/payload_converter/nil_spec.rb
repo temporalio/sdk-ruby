@@ -1,6 +1,6 @@
-require 'temporal/converter/nil'
+require 'temporal/payload_converter/nil'
 
-describe Temporal::Converter::Nil do
+describe Temporal::PayloadConverter::Nil do
   subject { described_class.new }
 
   it 'encodes a null payload' do

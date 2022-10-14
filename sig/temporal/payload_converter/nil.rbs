@@ -1,6 +1,6 @@
 module Temporal
-  module Converter
-    class Bytes
+  module PayloadConverter
+    class Nil
       include _EncodingPayloadConverter
 
       ENCODING: String

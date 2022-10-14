@@ -1,8 +1,8 @@
-require 'temporal/converter/base'
+require 'temporal/payload_converter/base'
 require 'temporal/errors'
 
 module Temporal
-  module Converter
+  module PayloadConverter
     class Composite < Base
       class ConverterNotFound < Temporal::Error; end
       class EncodingNotSet < Temporal::Error; end
