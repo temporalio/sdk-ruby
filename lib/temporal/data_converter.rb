@@ -2,7 +2,7 @@ require 'json'
 
 # TODO: This is a dummy converter, a proper implementation will follow
 module Temporal
-  class Converter
+  class DataConverter
     JSON_ENCODING = 'json/plain'.freeze
 
     def to_payloads(data)

@@ -20,7 +20,7 @@ module Temporal
 
       def self.from_raw: (
         Temporal::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse response,
-        Temporal::Converter converter
+        Temporal::DataConverter converter
       ) -> ExecutionInfo
 
       def self.new: (

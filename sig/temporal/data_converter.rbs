@@ -1,5 +1,5 @@
 module Temporal
-  class Converter
+  class DataConverter
     JSON_ENCODING: String
 
     def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?

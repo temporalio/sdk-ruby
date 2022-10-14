@@ -4,7 +4,7 @@ require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/client/implementation'
 require 'temporal/client/workflow_handle'
 require 'temporal/connection'
-require 'temporal/converter'
+require 'temporal/data_converter'
 require 'temporal/errors'
 
 describe Temporal::Client::Implementation do
@@ -12,7 +12,7 @@ describe Temporal::Client::Implementation do
 
   let(:connection) { instance_double(Temporal::Connection) }
   let(:namespace) { 'test-namespace' }
-  let(:converter) { Temporal::Converter.new }
+  let(:converter) { Temporal::DataConverter.new }
   let(:interceptors) { [] }
   let(:id) { SecureRandom.uuid }
   let(:run_id) { SecureRandom.uuid }
