@@ -4,7 +4,7 @@ module Temporal
       class ConverterNotFound < Temporal::Error
       end
 
-      class MetadataNotSet < Temporal::Error
+      class EncodingNotSet < Temporal::Error
       end
 
       include _PayloadConverter

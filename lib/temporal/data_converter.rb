@@ -1,9 +1,10 @@
-require 'json'
+require 'temporal/payload_converter'
 
-# TODO: This is a dummy converter, a proper implementation will follow
 module Temporal
   class DataConverter
-    JSON_ENCODING = 'json/plain'.freeze
+    def initialize(payload_converter: Temporal::PayloadConverter::DEFAULT)
+      @payload_converter = payload_converter
+    end
 
     def to_payloads(data)
       return if data.nil? || Array(data).empty?
@@ -33,17 +34,14 @@ module Temporal
 
     private
 
+    attr_reader :payload_converter
+
     def to_payload(data)
-      Temporal::Api::Common::V1::Payload.new(
-        metadata: { 'encoding' => JSON_ENCODING },
-        data: JSON.generate(data).b,
-      )
+      payload_converter.to_payload(data)
     end
 
     def from_payload(payload)
-      if payload.metadata['encoding'] == JSON_ENCODING
-        JSON.parse(payload.data)
-      end
+      payload_converter.from_payload(payload)
     end
   end
 end
