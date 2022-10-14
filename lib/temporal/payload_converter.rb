@@ -9,6 +9,6 @@ module Temporal
       Temporal::PayloadConverter::Nil.new,
       Temporal::PayloadConverter::Bytes.new,
       Temporal::PayloadConverter::JSON.new,
-    ).freeze
+    )
   end
 end
