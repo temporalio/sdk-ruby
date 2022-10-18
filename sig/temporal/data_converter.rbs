@@ -1,6 +1,12 @@
 module Temporal
   class DataConverter
-    def initialize: (?payload_converter: Temporal::PayloadConverter::_PayloadConverter) -> void
+    class MissingPayload < Temporal::Error
+    end
+
+    def initialize: (
+      ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
+      ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
+    ) -> void
     def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?
     def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporal::Api::Common::V1::Payload]
     def from_payloads: (Temporal::Api::Common::V1::Payloads? payloads) -> Array[untyped]?
@@ -9,7 +15,10 @@ module Temporal
     private
 
     attr_reader payload_converter: Temporal::PayloadConverter::_PayloadConverter
+    attr_reader payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec]
 
+    def encode: (Array[Temporal::Api::Common::V1::Payload]) -> Array[Temporal::Api::Common::V1::Payload]
+    def decode: (Array[Temporal::Api::Common::V1::Payload]) -> Array[Temporal::Api::Common::V1::Payload]
     def to_payload: (untyped data) -> Temporal::Api::Common::V1::Payload
     def from_payload: (Temporal::Api::Common::V1::Payload payload) -> untyped
   end
