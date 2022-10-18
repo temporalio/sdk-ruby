@@ -4,7 +4,7 @@ module Temporal
       def initialize: (
         Temporal::Connection connection,
         Symbol | String namespace,
-        Temporal::Converter converter,
+        Temporal::DataConverter converter,
         Array[Temporal::Interceptor::Client] interceptors
       ) -> void
 
@@ -20,7 +20,7 @@ module Temporal
 
       attr_reader connection: Temporal::Connection
       attr_reader namespace: Symbol | String
-      attr_reader converter: Temporal::Converter
+      attr_reader converter: Temporal::DataConverter
       attr_reader interceptor_chain: Interceptor::Chain
       attr_reader identity: String
 

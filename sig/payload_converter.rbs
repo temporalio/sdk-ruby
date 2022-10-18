@@ -1,0 +1,5 @@
+module Temporal
+  module PayloadConverter
+    DEFAULT: _PayloadConverter
+  end
+end

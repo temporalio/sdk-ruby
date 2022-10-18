@@ -1,13 +1,13 @@
 require 'securerandom'
 require 'temporal/api/workflowservice/v1/request_response_pb'
-require 'temporal/converter'
+require 'temporal/data_converter'
 require 'temporal/workflow/execution_info'
 require 'temporal/workflow/execution_status'
 
 describe Temporal::Workflow::ExecutionInfo do
   subject { described_class.from_raw(proto, converter) }
 
-  let(:converter) { Temporal::Converter.new }
+  let(:converter) { Temporal::DataConverter.new }
   let(:id) { SecureRandom.uuid }
   let(:run_id) { SecureRandom.uuid }
   let(:time_now) { Time.now }

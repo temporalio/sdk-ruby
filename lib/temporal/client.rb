@@ -2,7 +2,7 @@ require 'json'
 require 'securerandom'
 require 'socket'
 require 'temporal/errors'
-require 'temporal/converter'
+require 'temporal/data_converter'
 require 'temporal/client/workflow_handle'
 require 'temporal/client/implementation'
 require 'temporal/workflow/id_reuse_policy'
@@ -14,8 +14,8 @@ module Temporal
     # TODO: More argument to follow for converters, codecs, etc
     def initialize(connection, namespace, interceptors: [])
       @namespace = namespace
-      converter = Converter.new
-      @implementation = Client::Implementation.new(connection, namespace, converter, interceptors)
+      data_converter = DataConverter.new
+      @implementation = Client::Implementation.new(connection, namespace, data_converter, interceptors)
     end
 
     def start_workflow( # rubocop:disable Metrics/ParameterLists

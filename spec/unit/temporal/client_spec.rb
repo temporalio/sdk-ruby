@@ -3,7 +3,7 @@ require 'temporal/client'
 require 'temporal/client/implementation'
 require 'temporal/client/workflow_handle'
 require 'temporal/connection'
-require 'temporal/converter'
+require 'temporal/data_converter'
 require 'temporal/retry_policy'
 
 describe Temporal::Client do
@@ -20,7 +20,7 @@ describe Temporal::Client do
   before do
     allow(Temporal::Client::Implementation)
       .to receive(:new)
-      .with(connection, namespace, an_instance_of(Temporal::Converter), interceptors)
+      .with(connection, namespace, an_instance_of(Temporal::DataConverter), interceptors)
       .and_return(client_impl)
   end
 
