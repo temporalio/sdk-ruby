@@ -28,6 +28,13 @@ module Coresdk
 
       def is_replaying!: () -> bool?
 
+      # / Current history length as determined by the event id of the most recently processed event.
+      # / This ensures that the number is always deterministic
+      #
+      attr_accessor history_length(): ::Integer
+
+      def history_length!: () -> ::Integer?
+
       # / The things to do upon activating the workflow
       #
       attr_accessor jobs(): ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
@@ -39,11 +46,12 @@ module Coresdk
 
       def jobs!: () -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array?
 
-      def initialize: (?run_id: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?is_replaying: bool, ?jobs: ::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> void
+      def initialize: (?run_id: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?is_replaying: bool, ?history_length: ::Integer, ?jobs: ::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> void
 
       def []: (:run_id) -> ::String
             | (:timestamp) -> ::Google::Protobuf::Timestamp?
             | (:is_replaying) -> bool
+            | (:history_length) -> ::Integer
             | (:jobs) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
             | (::Symbol) -> untyped
 
@@ -51,6 +59,7 @@ module Coresdk
              | (:timestamp, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:timestamp, M?) -> M?
              | (:is_replaying, bool) -> bool
+             | (:history_length, ::Integer) -> ::Integer
              | (:jobs, ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
              | (:jobs, ::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::array
              | (::Symbol, untyped) -> untyped
@@ -311,14 +320,14 @@ module Coresdk
 
       # Inputs to the workflow code
       #
-      attr_accessor arguments(): ::Coresdk::Common::Payload::field_array
+      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
 
       # Inputs to the workflow code
       #
-      def arguments=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Coresdk::Common::Payload::field_array?
+      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
 
       # The seed must be used to initialize the random generator used by SDK.
       #  RandomSeedUpdatedAttributes are used to deliver seed updates.
@@ -329,14 +338,14 @@ module Coresdk
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      attr_accessor headers(): ::Coresdk::Common::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      def headers=: (::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Coresdk::Common::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
 
       # Identity of the client who requested this execution
       #
@@ -505,13 +514,13 @@ module Coresdk
 
       def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Coresdk::Common::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Coresdk::Common::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
       def []: (:workflow_type) -> ::String
             | (:workflow_id) -> ::String
-            | (:arguments) -> ::Coresdk::Common::Payload::field_array
+            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
             | (:randomness_seed) -> ::Integer
-            | (:headers) -> ::Coresdk::Common::Payload::field_hash[::String]
+            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
             | (:identity) -> ::String
             | (:parent_workflow_info) -> ::Coresdk::Common::NamespacedWorkflowExecution?
             | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
@@ -533,11 +542,11 @@ module Coresdk
 
       def []=: (:workflow_type, ::String) -> ::String
              | (:workflow_id, ::String) -> ::String
-             | (:arguments, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
-             | (:arguments, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
              | (:randomness_seed, ::Integer) -> ::Integer
-             | (:headers, ::Coresdk::Common::Payload::field_hash[::String]) -> ::Coresdk::Common::Payload::field_hash[::String]
-             | (:headers, ::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
              | (:identity, ::String) -> ::String
              | (:parent_workflow_info, ::Coresdk::Common::NamespacedWorkflowExecution?) -> ::Coresdk::Common::NamespacedWorkflowExecution?
              | [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (:parent_workflow_info, M?) -> M?
@@ -951,38 +960,38 @@ module Coresdk
 
       def query_type!: () -> ::String?
 
-      attr_accessor arguments(): ::Coresdk::Common::Payload::field_array
+      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
 
-      def arguments=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Coresdk::Common::Payload::field_array?
+      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
 
       # / Headers attached to the query
       #
-      attr_accessor headers(): ::Coresdk::Common::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
 
       # / Headers attached to the query
       #
-      def headers=: (::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Coresdk::Common::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Coresdk::Common::Payload::array, ?headers: ::Coresdk::Common::Payload::hash[::String]) -> void
+      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:query_id) -> ::String
             | (:query_type) -> ::String
-            | (:arguments) -> ::Coresdk::Common::Payload::field_array
-            | (:headers) -> ::Coresdk::Common::Payload::field_hash[::String]
+            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:query_id, ::String) -> ::String
              | (:query_type, ::String) -> ::String
-             | (:arguments, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
-             | (:arguments, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
-             | (:headers, ::Coresdk::Common::Payload::field_hash[::String]) -> ::Coresdk::Common::Payload::field_hash[::String]
-             | (:headers, ::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1008,22 +1017,22 @@ module Coresdk
     class CancelWorkflow < ::Protobuf::Message
       # / Information from the cancellation request
       #
-      attr_accessor details(): ::Coresdk::Common::Payload::field_array
+      attr_accessor details(): ::Temporal::Api::Common::V1::Payload::field_array
 
       # / Information from the cancellation request
       #
-      def details=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+      def details=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
                   | ...
 
-      def details!: () -> ::Coresdk::Common::Payload::field_array?
+      def details!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
 
-      def initialize: (?details: ::Coresdk::Common::Payload::array) -> void
+      def initialize: (?details: ::Temporal::Api::Common::V1::Payload::array) -> void
 
-      def []: (:details) -> ::Coresdk::Common::Payload::field_array
+      def []: (:details) -> ::Temporal::Api::Common::V1::Payload::field_array
             | (::Symbol) -> untyped
 
-      def []=: (:details, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
-             | (:details, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+      def []=: (:details, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
+             | (:details, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1051,12 +1060,12 @@ module Coresdk
 
       def signal_name!: () -> ::String?
 
-      attr_accessor input(): ::Coresdk::Common::Payload::field_array
+      attr_accessor input(): ::Temporal::Api::Common::V1::Payload::field_array
 
-      def input=: (::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+      def input=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
                 | ...
 
-      def input!: () -> ::Coresdk::Common::Payload::field_array?
+      def input!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
 
       # Identity of the sender of the signal
       #
@@ -1066,29 +1075,29 @@ module Coresdk
 
       # Headers attached to the signal
       #
-      attr_accessor headers(): ::Coresdk::Common::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
 
       # Headers attached to the signal
       #
-      def headers=: (::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Coresdk::Common::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?signal_name: ::String, ?input: ::Coresdk::Common::Payload::array, ?identity: ::String, ?headers: ::Coresdk::Common::Payload::hash[::String]) -> void
+      def initialize: (?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payload::array, ?identity: ::String, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:signal_name) -> ::String
-            | (:input) -> ::Coresdk::Common::Payload::field_array
+            | (:input) -> ::Temporal::Api::Common::V1::Payload::field_array
             | (:identity) -> ::String
-            | (:headers) -> ::Coresdk::Common::Payload::field_hash[::String]
+            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:signal_name, ::String) -> ::String
-             | (:input, ::Coresdk::Common::Payload::field_array) -> ::Coresdk::Common::Payload::field_array
-             | (:input, ::Coresdk::Common::Payload::array) -> ::Coresdk::Common::Payload::array
+             | (:input, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
+             | (:input, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
              | (:identity, ::String) -> ::String
-             | (:headers, ::Coresdk::Common::Payload::field_hash[::String]) -> ::Coresdk::Common::Payload::field_hash[::String]
-             | (:headers, ::Coresdk::Common::Payload::hash[::String]) -> ::Coresdk::Common::Payload::hash[::String]
+             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

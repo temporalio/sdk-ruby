@@ -48,6 +48,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :message, :string, 1
       optional :source, :string, 2
       optional :stack_trace, :string, 3
+      optional :encoded_attributes, :message, 20, "temporal.api.common.v1.Payload"
       optional :cause, :message, 4, "temporal.api.failure.v1.Failure"
       oneof :failure_info do
         optional :application_failure_info, :message, 5, "temporal.api.failure.v1.ApplicationFailureInfo"

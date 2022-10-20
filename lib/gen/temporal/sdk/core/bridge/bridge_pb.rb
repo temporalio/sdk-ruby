@@ -45,7 +45,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :client_name, :string, 3
       optional :client_version, :string, 4
       optional :identity, :string, 6
-      optional :worker_binary_id, :string, 7
       optional :tls_config, :message, 8, "coresdk.bridge.CreateClientRequest.TlsConfig"
       optional :retry_config, :message, 9, "coresdk.bridge.CreateClientRequest.RetryConfig"
     end

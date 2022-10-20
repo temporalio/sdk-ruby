@@ -147,6 +147,20 @@ impl Connection {
             "get_cluster_info" => rpc_call!(self.client, self.runtime, get_cluster_info, params),
             "get_system_info" => rpc_call!(self.client, self.runtime, get_system_info, params),
             "list_task_queue_partitions" => rpc_call!(self.client, self.runtime, list_task_queue_partitions, params),
+            "create_schedule" => rpc_call!(self.client, self.runtime, create_schedule, params),
+            "describe_schedule" => rpc_call!(self.client, self.runtime, describe_schedule, params),
+            "update_schedule" => rpc_call!(self.client, self.runtime, update_schedule, params),
+            "patch_schedule" => rpc_call!(self.client, self.runtime, patch_schedule, params),
+            "list_schedule_matching_times" => rpc_call!(self.client, self.runtime, list_schedule_matching_times, params),
+            "delete_schedule" => rpc_call!(self.client, self.runtime, delete_schedule, params),
+            "list_schedules" => rpc_call!(self.client, self.runtime, list_schedules, params),
+            "update_worker_build_id_ordering" => rpc_call!(self.client, self.runtime, update_worker_build_id_ordering, params),
+            "get_worker_build_id_ordering" => rpc_call!(self.client, self.runtime, get_worker_build_id_ordering, params),
+            "update_workflow" => rpc_call!(self.client, self.runtime, update_workflow, params),
+            "start_batch_operation" => rpc_call!(self.client, self.runtime, start_batch_operation, params),
+            "stop_batch_operation" => rpc_call!(self.client, self.runtime, stop_batch_operation, params),
+            "describe_batch_operation" => rpc_call!(self.client, self.runtime, describe_batch_operation, params),
+            "list_batch_operations" => rpc_call!(self.client, self.runtime, list_batch_operations, params),
             _ => Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
         }
     }

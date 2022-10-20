@@ -12,20 +12,31 @@ module Temporal
 
           def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          # If this workflow is a child, the namespace our parent lives in
+          # If this workflow is a child, the namespace our parent lives in.
+          #  SDKs and UI tools should use `parent_workflow_namespace` field but server must use `parent_workflow_namespace_id` only.
           #
           attr_accessor parent_workflow_namespace(): ::String
 
           def parent_workflow_namespace!: () -> ::String?
 
+          attr_accessor parent_workflow_namespace_id(): ::String
+
+          def parent_workflow_namespace_id!: () -> ::String?
+
+          # Contains information about parent workflow execution that initiated the child workflow these attributes belong to.
+          #  If the workflow these attributes belong to is not a child workflow of any other execution, this field will not be populated.
+          #
           attr_accessor parent_workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
+          # Contains information about parent workflow execution that initiated the child workflow these attributes belong to.
+          #  If the workflow these attributes belong to is not a child workflow of any other execution, this field will not be populated.
+          #
           def parent_workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                                         | ...
 
           def parent_workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
 
-          # TODO: What is this? ID of the event that requested this workflow execution if we are a child?
+          # EventID of the child execution initiated event in parent workflow
           #
           attr_accessor parent_initiated_event_id(): ::Integer
 
@@ -110,7 +121,8 @@ module Temporal
 
           def last_completion_result!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          # This is the run id when the WorkflowExecutionStarted event was written
+          # This is the run id when the WorkflowExecutionStarted event was written.
+          #  A workflow reset changes the execution run_id, but preserves this field.
           #
           attr_accessor original_execution_run_id(): ::String
 
@@ -122,7 +134,8 @@ module Temporal
 
           def identity!: () -> ::String?
 
-          # This is the very first runId along the chain of ContinueAsNew and Reset.
+          # This is the very first runId along the chain of ContinueAsNew, Retry, Cron and Reset.
+          #  Used to identify a chain.
           #
           attr_accessor first_execution_run_id(): ::String
 
@@ -201,10 +214,19 @@ module Temporal
 
           def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?parent_workflow_namespace: ::String, ?parent_workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?parent_initiated_event_id: ::Integer, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_execution_run_id: ::String, ?initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?original_execution_run_id: ::String, ?identity: ::String, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule: ::String, ?first_workflow_task_backoff: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?prev_auto_reset_points: ::Temporal::Api::Workflow::V1::ResetPoints::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+          # Version of the child execution initiated event in parent workflow
+          #  It should be used together with parent_initiated_event_id to identify
+          #  a child initiated event for global namespace
+          #
+          attr_accessor parent_initiated_event_version(): ::Integer
+
+          def parent_initiated_event_version!: () -> ::Integer?
+
+          def initialize: (?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?parent_workflow_namespace: ::String, ?parent_workflow_namespace_id: ::String, ?parent_workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?parent_initiated_event_id: ::Integer, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_execution_run_id: ::String, ?initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?original_execution_run_id: ::String, ?identity: ::String, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule: ::String, ?first_workflow_task_backoff: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?prev_auto_reset_points: ::Temporal::Api::Workflow::V1::ResetPoints::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?parent_initiated_event_version: ::Integer) -> void
 
           def []: (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:parent_workflow_namespace) -> ::String
+                | (:parent_workflow_namespace_id) -> ::String
                 | (:parent_workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:parent_initiated_event_id) -> ::Integer
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
@@ -228,11 +250,13 @@ module Temporal
                 | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
                 | (:prev_auto_reset_points) -> ::Temporal::Api::Workflow::V1::ResetPoints?
                 | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:parent_initiated_event_version) -> ::Integer
                 | (::Symbol) -> untyped
 
           def []=: (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
                  | (:parent_workflow_namespace, ::String) -> ::String
+                 | (:parent_workflow_namespace_id, ::String) -> ::String
                  | (:parent_workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:parent_workflow_execution, M?) -> M?
                  | (:parent_initiated_event_id, ::Integer) -> ::Integer
@@ -272,6 +296,7 @@ module Temporal
                  | [M < ::Temporal::Api::Workflow::V1::ResetPoints::_ToProto] (:prev_auto_reset_points, M?) -> M?
                  | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
                  | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:parent_initiated_event_version, ::Integer) -> ::Integer
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -728,17 +753,38 @@ module Temporal
 
           def request_id!: () -> ::String?
 
-          def initialize: (?scheduled_event_id: ::Integer, ?identity: ::String, ?request_id: ::String) -> void
+          # True if this workflow should continue-as-new soon because its history size (in
+          #  either event count or bytes) is getting large.
+          #
+          attr_accessor suggest_continue_as_new(): bool
+
+          def suggest_continue_as_new!: () -> bool?
+
+          # Total history size in bytes, which the workflow might use to decide when to
+          #  continue-as-new regardless of the suggestion. Note that history event count is
+          #  just the event id of this event, so we don't include it explicitly here.
+          #
+          attr_accessor history_size_bytes(): ::Integer
+
+          def history_size_bytes!: () -> ::Integer?
+
+          def initialize: (?scheduled_event_id: ::Integer, ?identity: ::String, ?request_id: ::String, ?suggest_continue_as_new: bool, ?history_size_bytes: ::Integer) -> void
 
           def []: (:scheduled_event_id) -> ::Integer
                 | (:identity) -> ::String
                 | (:request_id) -> ::String
+                | (:suggest_continue_as_new) -> bool
+                | (:history_size_bytes) -> ::Integer
                 | (::Symbol) -> untyped
 
           def []=: (:scheduled_event_id, ::Integer) -> ::Integer
                  | (:identity, ::String) -> ::String
                  | (:request_id, ::String) -> ::String
+                 | (:suggest_continue_as_new, bool) -> bool
+                 | (:history_size_bytes, ::Integer) -> ::Integer
                  | (::Symbol, untyped) -> untyped
+
+          def suggest_continue_as_new?: () -> bool
 
           interface _ToProto
             def to_proto: () -> WorkflowTaskStartedEventAttributes
@@ -985,10 +1031,6 @@ module Temporal
 
           def activity_type!: () -> ::Temporal::Api::Common::V1::ActivityType?
 
-          attr_accessor namespace(): ::String
-
-          def namespace!: () -> ::String?
-
           attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
 
           def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
@@ -1105,11 +1147,10 @@ module Temporal
 
           def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
 
-          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_completed_event_id: ::Integer, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?) -> void
+          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_completed_event_id: ::Integer, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?) -> void
 
           def []: (:activity_id) -> ::String
                 | (:activity_type) -> ::Temporal::Api::Common::V1::ActivityType?
-                | (:namespace) -> ::String
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:header) -> ::Temporal::Api::Common::V1::Header?
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
@@ -1124,7 +1165,6 @@ module Temporal
           def []=: (:activity_id, ::String) -> ::String
                  | (:activity_type, ::Temporal::Api::Common::V1::ActivityType?) -> ::Temporal::Api::Common::V1::ActivityType?
                  | [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
-                 | (:namespace, ::String) -> ::String
                  | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                  | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
@@ -2021,11 +2061,16 @@ module Temporal
 
           def workflow_task_completed_event_id!: () -> ::Integer?
 
-          # The namespace the workflow to be cancelled lives in
+          # The namespace the workflow to be cancelled lives in.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2053,10 +2098,11 @@ module Temporal
 
           def reason!: () -> ::String?
 
-          def initialize: (?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?control: ::String, ?child_workflow_only: bool, ?reason: ::String) -> void
+          def initialize: (?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?control: ::String, ?child_workflow_only: bool, ?reason: ::String) -> void
 
           def []: (:workflow_task_completed_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:control) -> ::String
                 | (:child_workflow_only) -> bool
@@ -2065,6 +2111,7 @@ module Temporal
 
           def []=: (:workflow_task_completed_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:control, ::String) -> ::String
@@ -2106,11 +2153,16 @@ module Temporal
 
           def workflow_task_completed_event_id!: () -> ::Integer?
 
-          # namespace of the workflow which failed to cancel
+          # Namespace of the workflow which failed to cancel.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2132,11 +2184,12 @@ module Temporal
 
           def control!: () -> ::String?
 
-          def initialize: (?cause: ::Temporal::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::init, ?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?initiated_event_id: ::Integer, ?control: ::String) -> void
+          def initialize: (?cause: ::Temporal::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::init, ?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?initiated_event_id: ::Integer, ?control: ::String) -> void
 
           def []: (:cause) -> ::Temporal::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause
                 | (:workflow_task_completed_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:initiated_event_id) -> ::Integer
                 | (:control) -> ::String
@@ -2146,6 +2199,7 @@ module Temporal
                  | (:cause, ::Temporal::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values) -> ::Temporal::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values
                  | (:workflow_task_completed_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:initiated_event_id, ::Integer) -> ::Integer
@@ -2178,11 +2232,16 @@ module Temporal
 
           def initiated_event_id!: () -> ::Integer?
 
-          # namespace of the to-be-cancelled workflow
+          # Namespace of the to-be-cancelled workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2191,15 +2250,17 @@ module Temporal
 
           def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
 
-          def initialize: (?initiated_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
+          def initialize: (?initiated_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
 
           def []: (:initiated_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (::Symbol) -> untyped
 
           def []=: (:initiated_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (::Symbol, untyped) -> untyped
@@ -2229,11 +2290,16 @@ module Temporal
 
           def workflow_task_completed_event_id!: () -> ::Integer?
 
-          # namespace of the to-be-signalled workflow
+          # Namespace of the to-be-signalled workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2279,10 +2345,11 @@ module Temporal
 
           def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?control: ::String, ?child_workflow_only: bool, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+          def initialize: (?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?control: ::String, ?child_workflow_only: bool, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:workflow_task_completed_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:signal_name) -> ::String
                 | (:input) -> ::Temporal::Api::Common::V1::Payloads?
@@ -2293,6 +2360,7 @@ module Temporal
 
           def []=: (:workflow_task_completed_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:signal_name, ::String) -> ::String
@@ -2338,9 +2406,16 @@ module Temporal
 
           def workflow_task_completed_event_id!: () -> ::Integer?
 
+          # Namespace of the workflow which failed the signal.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
+          #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2359,11 +2434,12 @@ module Temporal
 
           def control!: () -> ::String?
 
-          def initialize: (?cause: ::Temporal::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::init, ?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?initiated_event_id: ::Integer, ?control: ::String) -> void
+          def initialize: (?cause: ::Temporal::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::init, ?workflow_task_completed_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?initiated_event_id: ::Integer, ?control: ::String) -> void
 
           def []: (:cause) -> ::Temporal::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause
                 | (:workflow_task_completed_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:initiated_event_id) -> ::Integer
                 | (:control) -> ::String
@@ -2373,6 +2449,7 @@ module Temporal
                  | (:cause, ::Temporal::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values) -> ::Temporal::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values
                  | (:workflow_task_completed_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:initiated_event_id, ::Integer) -> ::Integer
@@ -2404,11 +2481,16 @@ module Temporal
 
           def initiated_event_id!: () -> ::Integer?
 
-          # namespace of the workflow which was signaled
+          # Namespace of the workflow which was signaled.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2423,16 +2505,18 @@ module Temporal
 
           def control!: () -> ::String?
 
-          def initialize: (?initiated_event_id: ::Integer, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?control: ::String) -> void
+          def initialize: (?initiated_event_id: ::Integer, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?control: ::String) -> void
 
           def []: (:initiated_event_id) -> ::Integer
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:control) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:initiated_event_id, ::Integer) -> ::Integer
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:control, ::String) -> ::String
@@ -2500,11 +2584,16 @@ module Temporal
         end
 
         class StartChildWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_id(): ::String
 
@@ -2632,9 +2721,10 @@ module Temporal
 
           def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_task_completed_event_id: ::Integer, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?namespace: ::String, ?namespace_id: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_task_completed_event_id: ::Integer, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
           def []: (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_id) -> ::String
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
@@ -2654,6 +2744,7 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_id, ::String) -> ::String
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
@@ -2703,11 +2794,16 @@ module Temporal
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_id(): ::String
 
@@ -2745,9 +2841,10 @@ module Temporal
 
           def workflow_task_completed_event_id!: () -> ::Integer?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?cause: ::Temporal::Api::Enums::V1::StartChildWorkflowExecutionFailedCause::init, ?control: ::String, ?initiated_event_id: ::Integer, ?workflow_task_completed_event_id: ::Integer) -> void
+          def initialize: (?namespace: ::String, ?namespace_id: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?cause: ::Temporal::Api::Enums::V1::StartChildWorkflowExecutionFailedCause::init, ?control: ::String, ?initiated_event_id: ::Integer, ?workflow_task_completed_event_id: ::Integer) -> void
 
           def []: (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_id) -> ::String
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:cause) -> ::Temporal::Api::Enums::V1::StartChildWorkflowExecutionFailedCause
@@ -2757,6 +2854,7 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_id, ::String) -> ::String
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
                  | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
@@ -2786,11 +2884,16 @@ module Temporal
         end
 
         class ChildWorkflowExecutionStartedEventAttributes < ::Protobuf::Message
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           # Id of the `START_CHILD_WORKFLOW_EXECUTION_INITIATED` event which this event corresponds to
           #
@@ -2819,9 +2922,10 @@ module Temporal
 
           def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?namespace: ::String, ?initiated_event_id: ::Integer, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+          def initialize: (?namespace: ::String, ?namespace_id: ::String, ?initiated_event_id: ::Integer, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:initiated_event_id) -> ::Integer
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -2829,6 +2933,7 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:initiated_event_id, ::Integer) -> ::Integer
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
@@ -2864,11 +2969,16 @@ module Temporal
 
           def result!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2896,10 +3006,11 @@ module Temporal
 
           def started_event_id!: () -> ::Integer?
 
-          def initialize: (?result: ::Temporal::Api::Common::V1::Payloads::init?, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
+          def initialize: (?result: ::Temporal::Api::Common::V1::Payloads::init?, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
 
           def []: (:result) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
@@ -2909,6 +3020,7 @@ module Temporal
           def []=: (:result, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:result, M?) -> M?
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -2943,11 +3055,16 @@ module Temporal
 
           def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -2982,10 +3099,11 @@ module Temporal
 
           def retry_state!: () -> ::Temporal::Api::Enums::V1::RetryState?
 
-          def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
+          def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
 
           def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
@@ -2996,6 +3114,7 @@ module Temporal
           def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
                  | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -3032,11 +3151,16 @@ module Temporal
 
           def details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -3064,10 +3188,11 @@ module Temporal
 
           def started_event_id!: () -> ::Integer?
 
-          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
+          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?, ?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
 
           def []: (:details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
@@ -3077,6 +3202,7 @@ module Temporal
           def []=: (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -3104,11 +3230,16 @@ module Temporal
         end
 
         class ChildWorkflowExecutionTimedOutEventAttributes < ::Protobuf::Message
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -3143,9 +3274,10 @@ module Temporal
 
           def retry_state!: () -> ::Temporal::Api::Enums::V1::RetryState?
 
-          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
+          def initialize: (?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
 
           def []: (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
@@ -3154,6 +3286,7 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -3183,11 +3316,16 @@ module Temporal
         end
 
         class ChildWorkflowExecutionTerminatedEventAttributes < ::Protobuf::Message
-          # Namespace of the child workflow
+          # Namespace of the child workflow.
+          #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
+
+          attr_accessor namespace_id(): ::String
+
+          def namespace_id!: () -> ::String?
 
           attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
@@ -3215,9 +3353,10 @@ module Temporal
 
           def started_event_id!: () -> ::Integer?
 
-          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
+          def initialize: (?namespace: ::String, ?namespace_id: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer) -> void
 
           def []: (:namespace) -> ::String
+                | (:namespace_id) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
@@ -3225,6 +3364,7 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
+                 | (:namespace_id, ::String) -> ::String
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -3249,6 +3389,308 @@ module Temporal
           type array = ::Array[ChildWorkflowExecutionTerminatedEventAttributes | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, ChildWorkflowExecutionTerminatedEventAttributes | _ToProto]
+        end
+
+        class WorkflowUpdateRequestedEventAttributes < ::Protobuf::Message
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          attr_accessor update_id(): ::String
+
+          def update_id!: () -> ::String?
+
+          attr_accessor update(): ::Temporal::Api::Update::V1::WorkflowUpdate?
+
+          def update=: [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (M?) -> M?
+                     | ...
+
+          def update!: () -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+
+          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?request_id: ::String, ?update_id: ::String, ?update: ::Temporal::Api::Update::V1::WorkflowUpdate::init?) -> void
+
+          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:request_id) -> ::String
+                | (:update_id) -> ::String
+                | (:update) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+                | (::Symbol) -> untyped
+
+          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:request_id, ::String) -> ::String
+                 | (:update_id, ::String) -> ::String
+                 | (:update, ::Temporal::Api::Update::V1::WorkflowUpdate?) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+                 | [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (:update, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowUpdateRequestedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateRequestedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateRequestedEventAttributes, WorkflowUpdateRequestedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateRequestedEventAttributes, WorkflowUpdateRequestedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowUpdateRequestedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateRequestedEventAttributes | _ToProto]
+        end
+
+        class WorkflowUpdateAcceptedEventAttributes < ::Protobuf::Message
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          attr_accessor update_id(): ::String
+
+          def update_id!: () -> ::String?
+
+          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?update_id: ::String) -> void
+
+          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:update_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:update_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowUpdateAcceptedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateAcceptedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateAcceptedEventAttributes, WorkflowUpdateAcceptedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateAcceptedEventAttributes, WorkflowUpdateAcceptedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowUpdateAcceptedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateAcceptedEventAttributes | _ToProto]
+        end
+
+        class WorkflowUpdateCompletedEventAttributes < ::Protobuf::Message
+          attr_accessor system_header(): ::Temporal::Api::Common::V1::Header?
+
+          def system_header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                            | ...
+
+          def system_header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          attr_accessor update_id(): ::String
+
+          def update_id!: () -> ::String?
+
+          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+
+          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                      | ...
+
+          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+          def initialize: (?system_header: ::Temporal::Api::Common::V1::Header::init?, ?update_id: ::String, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:system_header) -> ::Temporal::Api::Common::V1::Header?
+                | (:update_id) -> ::String
+                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:system_header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:system_header, M?) -> M?
+                 | (:update_id, ::String) -> ::String
+                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowUpdateCompletedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateCompletedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateCompletedEventAttributes, WorkflowUpdateCompletedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateCompletedEventAttributes, WorkflowUpdateCompletedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowUpdateCompletedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateCompletedEventAttributes | _ToProto]
+        end
+
+        class WorkflowPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # If set to a nonempty string, future workflow tasks for this workflow shall be dispatched on
+          #  the provided queue.
+          #
+          attr_accessor new_task_queue(): ::String
+
+          def new_task_queue!: () -> ::String?
+
+          # If set, update the workflow task timeout to this value.
+          #
+          attr_accessor new_workflow_task_timeout(): ::Google::Protobuf::Duration?
+
+          # If set, update the workflow task timeout to this value.
+          #
+          def new_workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def new_workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # If set, update the workflow run timeout to this value. May be set to 0 for no timeout.
+          #
+          attr_accessor new_workflow_run_timeout(): ::Google::Protobuf::Duration?
+
+          # If set, update the workflow run timeout to this value. May be set to 0 for no timeout.
+          #
+          def new_workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                       | ...
+
+          def new_workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # If set, update the workflow execution timeout to this value. May be set to 0 for no timeout.
+          #
+          attr_accessor new_workflow_execution_timeout(): ::Google::Protobuf::Duration?
+
+          # If set, update the workflow execution timeout to this value. May be set to 0 for no timeout.
+          #
+          def new_workflow_execution_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                             | ...
+
+          def new_workflow_execution_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          attr_accessor upserted_memo(): ::Temporal::Api::Common::V1::Memo?
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          def upserted_memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                            | ...
+
+          def upserted_memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          def initialize: (?new_task_queue: ::String, ?new_workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?new_workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?new_workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?upserted_memo: ::Temporal::Api::Common::V1::Memo::init?) -> void
+
+          def []: (:new_task_queue) -> ::String
+                | (:new_workflow_task_timeout) -> ::Google::Protobuf::Duration?
+                | (:new_workflow_run_timeout) -> ::Google::Protobuf::Duration?
+                | (:new_workflow_execution_timeout) -> ::Google::Protobuf::Duration?
+                | (:upserted_memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (::Symbol) -> untyped
+
+          def []=: (:new_task_queue, ::String) -> ::String
+                 | (:new_workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:new_workflow_task_timeout, M?) -> M?
+                 | (:new_workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:new_workflow_run_timeout, M?) -> M?
+                 | (:new_workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:new_workflow_execution_timeout, M?) -> M?
+                 | (:upserted_memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowPropertiesModifiedExternallyEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowPropertiesModifiedExternallyEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowPropertiesModifiedExternallyEventAttributes, WorkflowPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowPropertiesModifiedExternallyEventAttributes, WorkflowPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowPropertiesModifiedExternallyEventAttributes | _ToProto]
+        end
+
+        class ActivityPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # The id of the `ACTIVITY_TASK_SCHEDULED` event this modification corresponds to.
+          #
+          attr_accessor scheduled_event_id(): ::Integer
+
+          def scheduled_event_id!: () -> ::Integer?
+
+          # If set, update the retry policy of the activity, replacing it with the specified one.
+          #  The number of attempts at the activity is preserved.
+          #
+          attr_accessor new_retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+
+          # If set, update the retry policy of the activity, replacing it with the specified one.
+          #  The number of attempts at the activity is preserved.
+          #
+          def new_retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                               | ...
+
+          def new_retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+
+          def initialize: (?scheduled_event_id: ::Integer, ?new_retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?) -> void
+
+          def []: (:scheduled_event_id) -> ::Integer
+                | (:new_retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                | (::Symbol) -> untyped
+
+          def []=: (:scheduled_event_id, ::Integer) -> ::Integer
+                 | (:new_retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:new_retry_policy, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ActivityPropertiesModifiedExternallyEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ActivityPropertiesModifiedExternallyEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ActivityPropertiesModifiedExternallyEventAttributes, ActivityPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityPropertiesModifiedExternallyEventAttributes, ActivityPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          type array = ::Array[ActivityPropertiesModifiedExternallyEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ActivityPropertiesModifiedExternallyEventAttributes | _ToProto]
         end
 
         # History events are the method by which Temporal SDKs advance (or recreate) workflow state.
@@ -3286,6 +3728,15 @@ module Temporal
           attr_accessor task_id(): ::Integer
 
           def task_id!: () -> ::Integer?
+
+          # Set to true when the SDK may ignore the event as it does not impact workflow state or
+          #  information in any way that the SDK need be concerned with. If an SDK encounters an event
+          #  type which it does not understand, it must error unless this is true. If it is true, it's
+          #  acceptable for the event type and/or attributes to be uninterpretable.
+          #
+          attr_accessor worker_may_ignore(): bool
+
+          def worker_may_ignore!: () -> bool?
 
           attr_accessor workflow_execution_started_event_attributes(): ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes?
 
@@ -3567,13 +4018,49 @@ module Temporal
 
           def upsert_workflow_search_attributes_event_attributes!: () -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
 
-          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporal::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporal::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporal::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporal::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporal::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporal::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporal::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?) -> void
+          attr_accessor workflow_update_requested_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+
+          def workflow_update_requested_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::_ToProto] (M?) -> M?
+                                                         | ...
+
+          def workflow_update_requested_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+
+          attr_accessor workflow_update_accepted_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+
+          def workflow_update_accepted_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::_ToProto] (M?) -> M?
+                                                        | ...
+
+          def workflow_update_accepted_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+
+          attr_accessor workflow_update_completed_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+
+          def workflow_update_completed_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes::_ToProto] (M?) -> M?
+                                                         | ...
+
+          def workflow_update_completed_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+
+          attr_accessor workflow_properties_modified_externally_event_attributes(): ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
+
+          def workflow_properties_modified_externally_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::_ToProto] (M?) -> M?
+                                                                       | ...
+
+          def workflow_properties_modified_externally_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
+
+          attr_accessor activity_properties_modified_externally_event_attributes(): ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
+
+          def activity_properties_modified_externally_event_attributes=: [M < ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::_ToProto] (M?) -> M?
+                                                                       | ...
+
+          def activity_properties_modified_externally_event_attributes!: () -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
+
+          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporal::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?worker_may_ignore: bool, ?workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporal::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporal::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporal::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporal::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporal::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporal::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?, ?workflow_update_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::init?, ?workflow_update_accepted_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::init?, ?workflow_update_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes::init?, ?workflow_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::init?, ?activity_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::init?) -> void
 
           def []: (:event_id) -> ::Integer
                 | (:event_time) -> ::Google::Protobuf::Timestamp?
                 | (:event_type) -> ::Temporal::Api::Enums::V1::EventType
                 | (:version) -> ::Integer
                 | (:task_id) -> ::Integer
+                | (:worker_may_ignore) -> bool
                 | (:workflow_execution_started_event_attributes) -> ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes?
                 | (:workflow_execution_completed_event_attributes) -> ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes?
                 | (:workflow_execution_failed_event_attributes) -> ::Temporal::Api::History::V1::WorkflowExecutionFailedEventAttributes?
@@ -3614,6 +4101,11 @@ module Temporal
                 | (:signal_external_workflow_execution_failed_event_attributes) -> ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes?
                 | (:external_workflow_execution_signaled_event_attributes) -> ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes?
                 | (:upsert_workflow_search_attributes_event_attributes) -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
+                | (:workflow_update_requested_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+                | (:workflow_update_accepted_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+                | (:workflow_update_completed_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+                | (:workflow_properties_modified_externally_event_attributes) -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
+                | (:activity_properties_modified_externally_event_attributes) -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
                 | (::Symbol) -> untyped
 
           def []=: (:event_id, ::Integer) -> ::Integer
@@ -3623,6 +4115,7 @@ module Temporal
                  | (:event_type, ::Temporal::Api::Enums::V1::EventType::values) -> ::Temporal::Api::Enums::V1::EventType::values
                  | (:version, ::Integer) -> ::Integer
                  | (:task_id, ::Integer) -> ::Integer
+                 | (:worker_may_ignore, bool) -> bool
                  | (:workflow_execution_started_event_attributes, ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes?
                  | [M < ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes::_ToProto] (:workflow_execution_started_event_attributes, M?) -> M?
                  | (:workflow_execution_completed_event_attributes, ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes?
@@ -3703,7 +4196,19 @@ module Temporal
                  | [M < ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::_ToProto] (:external_workflow_execution_signaled_event_attributes, M?) -> M?
                  | (:upsert_workflow_search_attributes_event_attributes, ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?) -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
                  | [M < ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::_ToProto] (:upsert_workflow_search_attributes_event_attributes, M?) -> M?
+                 | (:workflow_update_requested_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::_ToProto] (:workflow_update_requested_event_attributes, M?) -> M?
+                 | (:workflow_update_accepted_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::_ToProto] (:workflow_update_accepted_event_attributes, M?) -> M?
+                 | (:workflow_update_completed_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes::_ToProto] (:workflow_update_completed_event_attributes, M?) -> M?
+                 | (:workflow_properties_modified_externally_event_attributes, ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::_ToProto] (:workflow_properties_modified_externally_event_attributes, M?) -> M?
+                 | (:activity_properties_modified_externally_event_attributes, ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?) -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::_ToProto] (:activity_properties_modified_externally_event_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
+
+          def worker_may_ignore?: () -> bool
 
           interface _ToProto
             def to_proto: () -> HistoryEvent

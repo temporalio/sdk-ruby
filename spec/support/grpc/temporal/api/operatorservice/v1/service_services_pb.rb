@@ -61,6 +61,25 @@ module Temporal
             # (-- api-linter: core::0135::response-message-name=disabled
             #     aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
             rpc :DeleteNamespace, ::Temporal::Api::OperatorService::V1::DeleteNamespaceRequest, ::Temporal::Api::OperatorService::V1::DeleteNamespaceResponse
+            # DeleteWorkflowExecution asynchronously deletes a specific Workflow Execution (when
+            # WorkflowExecution.run_id is provided) or the latest Workflow Execution (when
+            # WorkflowExecution.run_id is not provided). If the Workflow Execution is Running, it will be
+            # terminated before deletion.
+            # (-- api-linter: core::0135::method-signature=disabled
+            #     aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+            # (-- api-linter: core::0135::response-message-name=disabled
+            #     aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+            rpc :DeleteWorkflowExecution, ::Temporal::Api::OperatorService::V1::DeleteWorkflowExecutionRequest, ::Temporal::Api::OperatorService::V1::DeleteWorkflowExecutionResponse
+            # AddOrUpdateRemoteCluster adds or updates remote cluster.
+            rpc :AddOrUpdateRemoteCluster, ::Temporal::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest, ::Temporal::Api::OperatorService::V1::AddOrUpdateRemoteClusterResponse
+            # RemoveRemoteCluster removes remote cluster.
+            rpc :RemoveRemoteCluster, ::Temporal::Api::OperatorService::V1::RemoveRemoteClusterRequest, ::Temporal::Api::OperatorService::V1::RemoveRemoteClusterResponse
+            # DescribeCluster returns information about Temporal cluster.
+            rpc :DescribeCluster, ::Temporal::Api::OperatorService::V1::DescribeClusterRequest, ::Temporal::Api::OperatorService::V1::DescribeClusterResponse
+            # ListClusters returns information about Temporal clusters.
+            rpc :ListClusters, ::Temporal::Api::OperatorService::V1::ListClustersRequest, ::Temporal::Api::OperatorService::V1::ListClustersResponse
+            # ListClusterMembers returns information about Temporal cluster members.
+            rpc :ListClusterMembers, ::Temporal::Api::OperatorService::V1::ListClusterMembersRequest, ::Temporal::Api::OperatorService::V1::ListClusterMembersResponse
           end
 
           Stub = Service.rpc_stub_class

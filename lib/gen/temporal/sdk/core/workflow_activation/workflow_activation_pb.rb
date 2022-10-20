@@ -18,7 +18,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :run_id, :string, 1
       optional :timestamp, :message, 2, "google.protobuf.Timestamp"
       optional :is_replaying, :bool, 3
-      repeated :jobs, :message, 4, "coresdk.workflow_activation.WorkflowActivationJob"
+      optional :history_length, :uint32, 4
+      repeated :jobs, :message, 5, "coresdk.workflow_activation.WorkflowActivationJob"
     end
     add_message "coresdk.workflow_activation.WorkflowActivationJob" do
       oneof :variant do
@@ -40,9 +41,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "coresdk.workflow_activation.StartWorkflow" do
       optional :workflow_type, :string, 1
       optional :workflow_id, :string, 2
-      repeated :arguments, :message, 3, "coresdk.common.Payload"
+      repeated :arguments, :message, 3, "temporal.api.common.v1.Payload"
       optional :randomness_seed, :uint64, 4
-      map :headers, :string, :message, 5, "coresdk.common.Payload"
+      map :headers, :string, :message, 5, "temporal.api.common.v1.Payload"
       optional :identity, :string, 6
       optional :parent_workflow_info, :message, 7, "coresdk.common.NamespacedWorkflowExecution"
       optional :workflow_execution_timeout, :message, 8, "google.protobuf.Duration"
@@ -97,17 +98,17 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "coresdk.workflow_activation.QueryWorkflow" do
       optional :query_id, :string, 1
       optional :query_type, :string, 2
-      repeated :arguments, :message, 3, "coresdk.common.Payload"
-      map :headers, :string, :message, 5, "coresdk.common.Payload"
+      repeated :arguments, :message, 3, "temporal.api.common.v1.Payload"
+      map :headers, :string, :message, 5, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.workflow_activation.CancelWorkflow" do
-      repeated :details, :message, 1, "coresdk.common.Payload"
+      repeated :details, :message, 1, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.workflow_activation.SignalWorkflow" do
       optional :signal_name, :string, 1
-      repeated :input, :message, 2, "coresdk.common.Payload"
+      repeated :input, :message, 2, "temporal.api.common.v1.Payload"
       optional :identity, :string, 3
-      map :headers, :string, :message, 5, "coresdk.common.Payload"
+      map :headers, :string, :message, 5, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.workflow_activation.NotifyHasPatch" do
       optional :patch_id, :string, 1

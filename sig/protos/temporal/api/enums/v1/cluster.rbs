@@ -1,0 +1,44 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        class ClusterMemberRole < ::Protobuf::Enum
+          type names = :CLUSTER_MEMBER_ROLE_UNSPECIFIED | :CLUSTER_MEMBER_ROLE_FRONTEND | :CLUSTER_MEMBER_ROLE_HISTORY | :CLUSTER_MEMBER_ROLE_MATCHING | :CLUSTER_MEMBER_ROLE_WORKER
+
+          type strings = "CLUSTER_MEMBER_ROLE_UNSPECIFIED" | "CLUSTER_MEMBER_ROLE_FRONTEND" | "CLUSTER_MEMBER_ROLE_HISTORY" | "CLUSTER_MEMBER_ROLE_MATCHING" | "CLUSTER_MEMBER_ROLE_WORKER"
+
+          type tags = 0 | 1 | 2 | 3 | 4
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          CLUSTER_MEMBER_ROLE_UNSPECIFIED: ClusterMemberRole
+
+          CLUSTER_MEMBER_ROLE_FRONTEND: ClusterMemberRole
+
+          CLUSTER_MEMBER_ROLE_HISTORY: ClusterMemberRole
+
+          CLUSTER_MEMBER_ROLE_MATCHING: ClusterMemberRole
+
+          CLUSTER_MEMBER_ROLE_WORKER: ClusterMemberRole
+
+          # The type of `#initialize` parameter.
+          type init = ClusterMemberRole | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ClusterMemberRole, ClusterMemberRole | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ClusterMemberRole, ClusterMemberRole | values]
+
+          type array = ::Array[ClusterMemberRole | values]
+
+          type hash[KEY] = ::Hash[KEY, ClusterMemberRole | values]
+        end
+      end
+    end
+  end
+end

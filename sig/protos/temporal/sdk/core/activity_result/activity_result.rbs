@@ -139,20 +139,20 @@ module Coresdk
     # * Used to report successful completion either when executing or resolving
     #
     class Success < ::Protobuf::Message
-      attr_accessor result(): ::Coresdk::Common::Payload?
+      attr_accessor result(): ::Temporal::Api::Common::V1::Payload?
 
-      def result=: [M < ::Coresdk::Common::Payload::_ToProto] (M?) -> M?
+      def result=: [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (M?) -> M?
                  | ...
 
-      def result!: () -> ::Coresdk::Common::Payload?
+      def result!: () -> ::Temporal::Api::Common::V1::Payload?
 
-      def initialize: (?result: ::Coresdk::Common::Payload::init?) -> void
+      def initialize: (?result: ::Temporal::Api::Common::V1::Payload::init?) -> void
 
-      def []: (:result) -> ::Coresdk::Common::Payload?
+      def []: (:result) -> ::Temporal::Api::Common::V1::Payload?
             | (::Symbol) -> untyped
 
-      def []=: (:result, ::Coresdk::Common::Payload?) -> ::Coresdk::Common::Payload?
-             | [M < ::Coresdk::Common::Payload::_ToProto] (:result, M?) -> M?
+      def []=: (:result, ::Temporal::Api::Common::V1::Payload?) -> ::Temporal::Api::Common::V1::Payload?
+             | [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

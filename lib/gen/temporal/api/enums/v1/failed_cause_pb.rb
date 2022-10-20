@@ -35,14 +35,17 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_enum "temporal.api.enums.v1.StartChildWorkflowExecutionFailedCause" do
       value :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED, 0
       value :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS, 1
+      value :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND, 2
     end
     add_enum "temporal.api.enums.v1.CancelExternalWorkflowExecutionFailedCause" do
       value :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED, 0
       value :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_EXTERNAL_WORKFLOW_EXECUTION_NOT_FOUND, 1
+      value :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND, 2
     end
     add_enum "temporal.api.enums.v1.SignalExternalWorkflowExecutionFailedCause" do
       value :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED, 0
       value :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_EXTERNAL_WORKFLOW_EXECUTION_NOT_FOUND, 1
+      value :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND, 2
     end
     add_enum "temporal.api.enums.v1.ResourceExhaustedCause" do
       value :RESOURCE_EXHAUSTED_CAUSE_UNSPECIFIED, 0

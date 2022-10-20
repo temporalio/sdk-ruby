@@ -243,17 +243,26 @@ module Temporal
 
           def rate_per_second!: () -> ::Float?
 
-          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float) -> void
+          # If a worker has specified an ID for use with the worker versioning feature while polling,
+          #  that id must appear here.
+          #
+          attr_accessor worker_versioning_build_id(): ::String
+
+          def worker_versioning_build_id!: () -> ::String?
+
+          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float, ?worker_versioning_build_id: ::String) -> void
 
           def []: (:last_access_time) -> ::Google::Protobuf::Timestamp?
                 | (:identity) -> ::String
                 | (:rate_per_second) -> ::Float
+                | (:worker_versioning_build_id) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:last_access_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_access_time, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:rate_per_second, ::Float) -> ::Float
+                 | (:worker_versioning_build_id, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -323,6 +332,110 @@ module Temporal
           type array = ::Array[StickyExecutionAttributes | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, StickyExecutionAttributes | _ToProto]
+        end
+
+        # Used by the worker versioning APIs, represents a node in the version graph for a particular
+        #  task queue
+        #
+        class VersionIdNode < ::Protobuf::Message
+          attr_accessor version(): ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def version=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                      | ...
+
+          def version!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # A pointer to the previous version this version is considered to be compatible with
+          #
+          attr_accessor previous_compatible(): ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          # A pointer to the previous version this version is considered to be compatible with
+          #
+          def previous_compatible=: [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
+                                  | ...
+
+          def previous_compatible!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          # A pointer to the last incompatible version (previous major version)
+          #
+          attr_accessor previous_incompatible(): ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          # A pointer to the last incompatible version (previous major version)
+          #
+          def previous_incompatible=: [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
+                                    | ...
+
+          def previous_incompatible!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          def initialize: (?version: ::Temporal::Api::TaskQueue::V1::VersionId::init?, ?previous_compatible: ::Temporal::Api::TaskQueue::V1::VersionIdNode::init?, ?previous_incompatible: ::Temporal::Api::TaskQueue::V1::VersionIdNode::init?) -> void
+
+          def []: (:version) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                | (:previous_compatible) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                | (:previous_incompatible) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                | (::Symbol) -> untyped
+
+          def []=: (:version, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:version, M?) -> M?
+                 | (:previous_compatible, ::Temporal::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_compatible, M?) -> M?
+                 | (:previous_incompatible, ::Temporal::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_incompatible, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> VersionIdNode
+          end
+
+          # The type of `#initialize` parameter.
+          type init = VersionIdNode | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[VersionIdNode, VersionIdNode | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, VersionIdNode, VersionIdNode | _ToProto]
+
+          type array = ::Array[VersionIdNode | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, VersionIdNode | _ToProto]
+        end
+
+        # Used by the worker versioning APIs, represents a specific version of something
+        #  Currently, that's just a whole-worker id. In the future, if we support
+        #  WASM workflow bundle based versioning, for example, then the inside of this
+        #  message may become a oneof of different version types.
+        #
+        class VersionId < ::Protobuf::Message
+          # An opaque whole-worker identifier
+          #
+          attr_accessor worker_build_id(): ::String
+
+          def worker_build_id!: () -> ::String?
+
+          def initialize: (?worker_build_id: ::String) -> void
+
+          def []: (:worker_build_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:worker_build_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> VersionId
+          end
+
+          # The type of `#initialize` parameter.
+          type init = VersionId | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[VersionId, VersionId | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, VersionId, VersionId | _ToProto]
+
+          type array = ::Array[VersionId | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, VersionId | _ToProto]
         end
       end
     end

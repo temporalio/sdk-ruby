@@ -290,5 +290,103 @@ module Temporal
 
       Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse.decode(response)
     end
+
+    def create_schedule(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::CreateScheduleRequest.encode(request)
+      response = core_connection.call(:create_schedule, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::CreateScheduleResponse.decode(response)
+    end
+
+    def describe_schedule(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::DescribeScheduleRequest.encode(request)
+      response = core_connection.call(:describe_schedule, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::DescribeScheduleResponse.decode(response)
+    end
+
+    def update_schedule(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::UpdateScheduleRequest.encode(request)
+      response = core_connection.call(:update_schedule, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::UpdateScheduleResponse.decode(response)
+    end
+
+    def patch_schedule(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::PatchScheduleRequest.encode(request)
+      response = core_connection.call(:patch_schedule, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::PatchScheduleResponse.decode(response)
+    end
+
+    def list_schedule_matching_times(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::ListScheduleMatchingTimesRequest.encode(request)
+      response = core_connection.call(:list_schedule_matching_times, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::ListScheduleMatchingTimesResponse.decode(response)
+    end
+
+    def delete_schedule(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::DeleteScheduleRequest.encode(request)
+      response = core_connection.call(:delete_schedule, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::DeleteScheduleResponse.decode(response)
+    end
+
+    def list_schedules(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::ListSchedulesRequest.encode(request)
+      response = core_connection.call(:list_schedules, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::ListSchedulesResponse.decode(response)
+    end
+
+    def update_worker_build_id_ordering(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::UpdateWorkerBuildIdOrderingRequest.encode(request)
+      response = core_connection.call(:update_worker_build_id_ordering, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::UpdateWorkerBuildIdOrderingResponse.decode(response)
+    end
+
+    def get_worker_build_id_ordering(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::GetWorkerBuildIdOrderingRequest.encode(request)
+      response = core_connection.call(:get_worker_build_id_ordering, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::GetWorkerBuildIdOrderingResponse.decode(response)
+    end
+
+    def update_workflow(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::UpdateWorkflowRequest.encode(request)
+      response = core_connection.call(:update_workflow, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::UpdateWorkflowResponse.decode(response)
+    end
+
+    def start_batch_operation(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::StartBatchOperationRequest.encode(request)
+      response = core_connection.call(:start_batch_operation, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::StartBatchOperationResponse.decode(response)
+    end
+
+    def stop_batch_operation(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::StopBatchOperationRequest.encode(request)
+      response = core_connection.call(:stop_batch_operation, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::StopBatchOperationResponse.decode(response)
+    end
+
+    def describe_batch_operation(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::DescribeBatchOperationRequest.encode(request)
+      response = core_connection.call(:describe_batch_operation, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::DescribeBatchOperationResponse.decode(response)
+    end
+
+    def list_batch_operations(request, metadata: {}, timeout: nil)
+      encoded = Temporal::Api::WorkflowService::V1::ListBatchOperationsRequest.encode(request)
+      response = core_connection.call(:list_batch_operations, encoded, metadata, timeout)
+
+      Temporal::Api::WorkflowService::V1::ListBatchOperationsResponse.decode(response)
+    end
   end
 end

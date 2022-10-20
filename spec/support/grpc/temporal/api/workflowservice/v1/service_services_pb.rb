@@ -179,9 +179,9 @@ module Temporal
             # RequestCancelWorkflowExecution is called by workers when they want to request cancellation of
             # a workflow execution.
             #
-            # This result in a new `WORKFLOW_EXECUTION_CANCEL_REQUESTED` event being written to the
-            # workflow history and a new workflow task created for the workflow. Fails with `NotFound` if
-            # the workflow is already completed or doesn't exist.
+            # This results in a new `WORKFLOW_EXECUTION_CANCEL_REQUESTED` event being written to the
+            # workflow history and a new workflow task created for the workflow. It returns success if the requested
+            # workflow is already closed. It fails with 'NotFound' if the requested workflow doesn't exist.
             rpc :RequestCancelWorkflowExecution, ::Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest, ::Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionResponse
             # SignalWorkflowExecution is used to send a signal to a running workflow execution.
             #
@@ -249,6 +249,55 @@ module Temporal
             # GetSystemInfo returns information about the system.
             rpc :GetSystemInfo, ::Temporal::Api::WorkflowService::V1::GetSystemInfoRequest, ::Temporal::Api::WorkflowService::V1::GetSystemInfoResponse
             rpc :ListTaskQueuePartitions, ::Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest, ::Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse
+            # Creates a new schedule.
+            # (-- api-linter: core::0133::method-signature=disabled
+            #     aip.dev/not-precedent: CreateSchedule doesn't follow Google API format --)
+            # (-- api-linter: core::0133::response-message-name=disabled
+            #     aip.dev/not-precedent: CreateSchedule doesn't follow Google API format --)
+            # (-- api-linter: core::0133::http-uri-parent=disabled
+            #     aip.dev/not-precedent: CreateSchedule doesn't follow Google API format --)
+            rpc :CreateSchedule, ::Temporal::Api::WorkflowService::V1::CreateScheduleRequest, ::Temporal::Api::WorkflowService::V1::CreateScheduleResponse
+            # Returns the schedule description and current state of an existing schedule.
+            rpc :DescribeSchedule, ::Temporal::Api::WorkflowService::V1::DescribeScheduleRequest, ::Temporal::Api::WorkflowService::V1::DescribeScheduleResponse
+            # Changes the configuration or state of an existing schedule.
+            # (-- api-linter: core::0134::response-message-name=disabled
+            #     aip.dev/not-precedent: UpdateSchedule RPC doesn't follow Google API format. --)
+            # (-- api-linter: core::0134::method-signature=disabled
+            #     aip.dev/not-precedent: UpdateSchedule RPC doesn't follow Google API format. --)
+            rpc :UpdateSchedule, ::Temporal::Api::WorkflowService::V1::UpdateScheduleRequest, ::Temporal::Api::WorkflowService::V1::UpdateScheduleResponse
+            # Makes a specific change to a schedule or triggers an immediate action.
+            # (-- api-linter: core::0134::synonyms=disabled
+            #     aip.dev/not-precedent: we have both patch and update. --)
+            rpc :PatchSchedule, ::Temporal::Api::WorkflowService::V1::PatchScheduleRequest, ::Temporal::Api::WorkflowService::V1::PatchScheduleResponse
+            # Lists matching times within a range.
+            rpc :ListScheduleMatchingTimes, ::Temporal::Api::WorkflowService::V1::ListScheduleMatchingTimesRequest, ::Temporal::Api::WorkflowService::V1::ListScheduleMatchingTimesResponse
+            # Deletes a schedule, removing it from the system.
+            # (-- api-linter: core::0135::method-signature=disabled
+            #     aip.dev/not-precedent: DeleteSchedule doesn't follow Google API format --)
+            # (-- api-linter: core::0135::response-message-name=disabled
+            #     aip.dev/not-precedent: DeleteSchedule doesn't follow Google API format --)
+            rpc :DeleteSchedule, ::Temporal::Api::WorkflowService::V1::DeleteScheduleRequest, ::Temporal::Api::WorkflowService::V1::DeleteScheduleResponse
+            # List all schedules in a namespace.
+            rpc :ListSchedules, ::Temporal::Api::WorkflowService::V1::ListSchedulesRequest, ::Temporal::Api::WorkflowService::V1::ListSchedulesResponse
+            # (-- api-linter: core::0134::response-message-name=disabled
+            #     aip.dev/not-precedent: UpdateWorkerBuildIdOrdering RPC doesn't follow Google API format. --)
+            # (-- api-linter: core::0134::method-signature=disabled
+            #     aip.dev/not-precedent: UpdateWorkerBuildIdOrdering RPC doesn't follow Google API format. --)
+            rpc :UpdateWorkerBuildIdOrdering, ::Temporal::Api::WorkflowService::V1::UpdateWorkerBuildIdOrderingRequest, ::Temporal::Api::WorkflowService::V1::UpdateWorkerBuildIdOrderingResponse
+            # This could / maybe should just be part of `DescribeTaskQueue`, but is broken out here to show easily.
+            rpc :GetWorkerBuildIdOrdering, ::Temporal::Api::WorkflowService::V1::GetWorkerBuildIdOrderingRequest, ::Temporal::Api::WorkflowService::V1::GetWorkerBuildIdOrderingResponse
+            # Invokes the specified update function on user workflow code.
+            # (-- api-linter: core::0134=disabled
+            #     aip.dev/not-precedent: UpdateWorkflow doesn't follow Google API format --)
+            rpc :UpdateWorkflow, ::Temporal::Api::WorkflowService::V1::UpdateWorkflowRequest, ::Temporal::Api::WorkflowService::V1::UpdateWorkflowResponse
+            # StartBatchOperation starts a new batch operation
+            rpc :StartBatchOperation, ::Temporal::Api::WorkflowService::V1::StartBatchOperationRequest, ::Temporal::Api::WorkflowService::V1::StartBatchOperationResponse
+            # StopBatchOperation stops a batch operation
+            rpc :StopBatchOperation, ::Temporal::Api::WorkflowService::V1::StopBatchOperationRequest, ::Temporal::Api::WorkflowService::V1::StopBatchOperationResponse
+            # DescribeBatchOperation returns the information about a batch operation
+            rpc :DescribeBatchOperation, ::Temporal::Api::WorkflowService::V1::DescribeBatchOperationRequest, ::Temporal::Api::WorkflowService::V1::DescribeBatchOperationResponse
+            # ListBatchOperations returns a list of batch operations
+            rpc :ListBatchOperations, ::Temporal::Api::WorkflowService::V1::ListBatchOperationsRequest, ::Temporal::Api::WorkflowService::V1::ListBatchOperationsResponse
           end
 
           Stub = Service.rpc_stub_class

@@ -604,6 +604,182 @@ module Temporal
 
           type hash[KEY] = ::Hash[KEY, ResetPointInfo | _ToProto]
         end
+
+        # NewWorkflowExecutionInfo is a shared message that encapsulates all the
+        #  required arguments to starting a workflow in different contexts.
+        #
+        class NewWorkflowExecutionInfo < ::Protobuf::Message
+          attr_accessor workflow_id(): ::String
+
+          def workflow_id!: () -> ::String?
+
+          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
+
+          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+                            | ...
+
+          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
+
+          attr_accessor task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
+
+          def task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
+                         | ...
+
+          def task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+
+          # Serialized arguments to the workflow.
+          #
+          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
+
+          # Serialized arguments to the workflow.
+          #
+          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                    | ...
+
+          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          # Total workflow execution timeout including retries and continue as new.
+          #
+          attr_accessor workflow_execution_timeout(): ::Google::Protobuf::Duration?
+
+          # Total workflow execution timeout including retries and continue as new.
+          #
+          def workflow_execution_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                         | ...
+
+          def workflow_execution_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow run.
+          #
+          attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow run.
+          #
+          def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                   | ...
+
+          def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow task.
+          #
+          attr_accessor workflow_task_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow task.
+          #
+          def workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                    | ...
+
+          def workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
+          #
+          attr_accessor workflow_id_reuse_policy(): ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
+
+          # Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
+          #
+          def workflow_id_reuse_policy=: (::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values
+                                       | ...
+
+          def workflow_id_reuse_policy!: () -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy?
+
+          # The retry policy for the workflow. Will never exceed `workflow_execution_timeout`.
+          #
+          attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+
+          # The retry policy for the workflow. Will never exceed `workflow_execution_timeout`.
+          #
+          def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+
+          # See https://docs.temporal.io/docs/content/what-is-a-temporal-cron-job/
+          #
+          attr_accessor cron_schedule(): ::String
+
+          def cron_schedule!: () -> ::String?
+
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                   | ...
+
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          def initialize: (?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
+
+          def []: (:workflow_id) -> ::String
+                | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
+                | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_id_reuse_policy) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
+                | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                | (:cron_schedule) -> ::String
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_id, ::String) -> ::String
+                 | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+                 | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
+                 | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
+                 | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
+                 | (:workflow_id_reuse_policy, ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
+                 | (:workflow_id_reuse_policy, ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values
+                 | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:cron_schedule, ::String) -> ::String
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NewWorkflowExecutionInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NewWorkflowExecutionInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NewWorkflowExecutionInfo, NewWorkflowExecutionInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NewWorkflowExecutionInfo, NewWorkflowExecutionInfo | _ToProto]
+
+          type array = ::Array[NewWorkflowExecutionInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NewWorkflowExecutionInfo | _ToProto]
+        end
       end
     end
   end

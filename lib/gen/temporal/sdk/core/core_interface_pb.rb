@@ -6,6 +6,7 @@ require 'google/protobuf'
 require 'google/protobuf/duration_pb'
 require 'google/protobuf/empty_pb'
 require 'google/protobuf/timestamp_pb'
+require 'temporal/api/common/v1/message_pb'
 require 'temporal/sdk/core/activity_result/activity_result_pb'
 require 'temporal/sdk/core/activity_task/activity_task_pb'
 require 'temporal/sdk/core/common/common_pb'
@@ -18,7 +19,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/sdk/core/core_interface.proto", :syntax => :proto3) do
     add_message "coresdk.ActivityHeartbeat" do
       optional :task_token, :bytes, 1
-      repeated :details, :message, 2, "coresdk.common.Payload"
+      repeated :details, :message, 2, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.ActivityTaskCompletion" do
       optional :task_token, :bytes, 1
