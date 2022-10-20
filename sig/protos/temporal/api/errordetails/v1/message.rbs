@@ -1,6 +1,6 @@
 module Temporal
   module Api
-    module Errordetails
+    module ErrorDetails
       module V1
         class NotFoundFailure < ::Protobuf::Message
           attr_accessor current_cluster(): ::String
@@ -119,6 +119,119 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, NamespaceNotActiveFailure | _ToProto]
         end
 
+        class NamespaceInvalidStateFailure < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Current state of the requested namespace.
+          #
+          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
+
+          # Current state of the requested namespace.
+          #
+          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
+
+          # Allowed namespace states for requested operation.
+          #  For example NAMESPACE_STATE_DELETED is forbidden for most operations but allowed for DescribeNamespace.
+          #
+          attr_accessor allowed_states(): ::Temporal::Api::Enums::V1::NamespaceState::field_array
+
+          # Allowed namespace states for requested operation.
+          #  For example NAMESPACE_STATE_DELETED is forbidden for most operations but allowed for DescribeNamespace.
+          #
+          def allowed_states=: (::Temporal::Api::Enums::V1::NamespaceState::array) -> ::Temporal::Api::Enums::V1::NamespaceState::array
+                             | ...
+
+          def allowed_states!: () -> ::Temporal::Api::Enums::V1::NamespaceState::field_array?
+
+          def initialize: (?namespace: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?allowed_states: ::Temporal::Api::Enums::V1::NamespaceState::array) -> void
+
+          def []: (:namespace) -> ::String
+                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (:allowed_states) -> ::Temporal::Api::Enums::V1::NamespaceState::field_array
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (:allowed_states, ::Temporal::Api::Enums::V1::NamespaceState::field_array) -> ::Temporal::Api::Enums::V1::NamespaceState::field_array
+                 | (:allowed_states, ::Temporal::Api::Enums::V1::NamespaceState::array) -> ::Temporal::Api::Enums::V1::NamespaceState::array
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceInvalidStateFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceInvalidStateFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceInvalidStateFailure, NamespaceInvalidStateFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceInvalidStateFailure, NamespaceInvalidStateFailure | _ToProto]
+
+          type array = ::Array[NamespaceInvalidStateFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceInvalidStateFailure | _ToProto]
+        end
+
+        class NamespaceNotFoundFailure < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?namespace: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> NamespaceNotFoundFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceNotFoundFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceNotFoundFailure, NamespaceNotFoundFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceNotFoundFailure, NamespaceNotFoundFailure | _ToProto]
+
+          type array = ::Array[NamespaceNotFoundFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceNotFoundFailure | _ToProto]
+        end
+
+        class NamespaceAlreadyExistsFailure < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> NamespaceAlreadyExistsFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = NamespaceAlreadyExistsFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
+
+          type array = ::Array[NamespaceAlreadyExistsFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, NamespaceAlreadyExistsFailure | _ToProto]
+        end
+
         class ClientVersionNotSupportedFailure < ::Protobuf::Message
           attr_accessor client_version(): ::String
 
@@ -197,27 +310,6 @@ module Temporal
           type array = ::Array[ServerVersionNotSupportedFailure | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, ServerVersionNotSupportedFailure | _ToProto]
-        end
-
-        class NamespaceAlreadyExistsFailure < ::Protobuf::Message
-          def initialize: () -> void
-
-          interface _ToProto
-            def to_proto: () -> NamespaceAlreadyExistsFailure
-          end
-
-          # The type of `#initialize` parameter.
-          type init = NamespaceAlreadyExistsFailure | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, NamespaceAlreadyExistsFailure, NamespaceAlreadyExistsFailure | _ToProto]
-
-          type array = ::Array[NamespaceAlreadyExistsFailure | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, NamespaceAlreadyExistsFailure | _ToProto]
         end
 
         class CancellationAlreadyRequestedFailure < ::Protobuf::Message
@@ -375,6 +467,27 @@ module Temporal
           type array = ::Array[SystemWorkflowFailure | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, SystemWorkflowFailure | _ToProto]
+        end
+
+        class WorkflowNotReadyFailure < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> WorkflowNotReadyFailure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowNotReadyFailure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowNotReadyFailure, WorkflowNotReadyFailure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowNotReadyFailure, WorkflowNotReadyFailure | _ToProto]
+
+          type array = ::Array[WorkflowNotReadyFailure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowNotReadyFailure | _ToProto]
         end
       end
     end

@@ -1,0 +1,70 @@
+module Temporal
+  module Api
+    module Update
+      module V1
+        class WorkflowUpdate < ::Protobuf::Message
+          # Headers that are passed with the update to the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          # Headers that are passed with the update to the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          # The name of the update function to invoke on the target workflow.
+          #
+          attr_accessor name(): ::String
+
+          def name!: () -> ::String?
+
+          # The arguments to pass to the named update function.
+          #
+          attr_accessor args(): ::Temporal::Api::Common::V1::Payloads?
+
+          # The arguments to pass to the named update function.
+          #
+          def args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                   | ...
+
+          def args!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporal::Api::Common::V1::Payloads::init?) -> void
+
+          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:name) -> ::String
+                | (:args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (::Symbol) -> untyped
+
+          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:name, ::String) -> ::String
+                 | (:args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowUpdate
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdate | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdate, WorkflowUpdate | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdate, WorkflowUpdate | _ToProto]
+
+          type array = ::Array[WorkflowUpdate | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdate | _ToProto]
+        end
+      end
+    end
+  end
+end

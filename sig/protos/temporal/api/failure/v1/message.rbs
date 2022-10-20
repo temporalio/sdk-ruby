@@ -367,6 +367,9 @@ module Temporal
 
           def message!: () -> ::String?
 
+          # The source this Failure originated in, e.g. TypeScriptSDK / JavaSDK
+          #  In some SDKs this is used to rehydrate the stack trace into an exception object.
+          #
           attr_accessor source(): ::String
 
           def source!: () -> ::String?
@@ -374,6 +377,45 @@ module Temporal
           attr_accessor stack_trace(): ::String
 
           def stack_trace!: () -> ::String?
+
+          # Alternative way to supply `message` and `stack_trace` and possibly other attributes, used for encryption of
+          #  errors originating in user code which might contain sensitive information.
+          #  The `encoded_attributes` Payload could represent any serializable object, e.g. JSON object or a `Failure` proto
+          #  message.
+          #
+          #  SDK authors: 
+          #  - The SDK should provide a default `encodeFailureAttributes` and `decodeFailureAttributes` implementation that:
+          #    - Uses a JSON object to represent `{ message, stack_trace }`.
+          #    - Overwrites the original message with "Encoded failure" to indicate that more information could be extracted.
+          #    - Overwrites the original stack_trace with an empty string.
+          #    - The resulting JSON object is converted to Payload using the default PayloadConverter and should be processed
+          #      by the user-provided PayloadCodec
+          #
+          #  - If there's demand, we could allow overriding the default SDK implementation to encode other opaque Failure attributes.
+          #  (-- api-linter: core::0203::optional=disabled --)
+          #
+          attr_accessor encoded_attributes(): ::Temporal::Api::Common::V1::Payload?
+
+          # Alternative way to supply `message` and `stack_trace` and possibly other attributes, used for encryption of
+          #  errors originating in user code which might contain sensitive information.
+          #  The `encoded_attributes` Payload could represent any serializable object, e.g. JSON object or a `Failure` proto
+          #  message.
+          #
+          #  SDK authors: 
+          #  - The SDK should provide a default `encodeFailureAttributes` and `decodeFailureAttributes` implementation that:
+          #    - Uses a JSON object to represent `{ message, stack_trace }`.
+          #    - Overwrites the original message with "Encoded failure" to indicate that more information could be extracted.
+          #    - Overwrites the original stack_trace with an empty string.
+          #    - The resulting JSON object is converted to Payload using the default PayloadConverter and should be processed
+          #      by the user-provided PayloadCodec
+          #
+          #  - If there's demand, we could allow overriding the default SDK implementation to encode other opaque Failure attributes.
+          #  (-- api-linter: core::0203::optional=disabled --)
+          #
+          def encoded_attributes=: [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+                                 | ...
+
+          def encoded_attributes!: () -> ::Temporal::Api::Common::V1::Payload?
 
           attr_accessor cause(): ::Temporal::Api::Failure::V1::Failure?
 
@@ -438,11 +480,12 @@ module Temporal
 
           def child_workflow_execution_failure_info!: () -> ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
 
-          def initialize: (?message: ::String, ?source: ::String, ?stack_trace: ::String, ?cause: ::Temporal::Api::Failure::V1::Failure::init?, ?application_failure_info: ::Temporal::Api::Failure::V1::ApplicationFailureInfo::init?, ?timeout_failure_info: ::Temporal::Api::Failure::V1::TimeoutFailureInfo::init?, ?canceled_failure_info: ::Temporal::Api::Failure::V1::CanceledFailureInfo::init?, ?terminated_failure_info: ::Temporal::Api::Failure::V1::TerminatedFailureInfo::init?, ?server_failure_info: ::Temporal::Api::Failure::V1::ServerFailureInfo::init?, ?reset_workflow_failure_info: ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo::init?, ?activity_failure_info: ::Temporal::Api::Failure::V1::ActivityFailureInfo::init?, ?child_workflow_execution_failure_info: ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::init?) -> void
+          def initialize: (?message: ::String, ?source: ::String, ?stack_trace: ::String, ?encoded_attributes: ::Temporal::Api::Common::V1::Payload::init?, ?cause: ::Temporal::Api::Failure::V1::Failure::init?, ?application_failure_info: ::Temporal::Api::Failure::V1::ApplicationFailureInfo::init?, ?timeout_failure_info: ::Temporal::Api::Failure::V1::TimeoutFailureInfo::init?, ?canceled_failure_info: ::Temporal::Api::Failure::V1::CanceledFailureInfo::init?, ?terminated_failure_info: ::Temporal::Api::Failure::V1::TerminatedFailureInfo::init?, ?server_failure_info: ::Temporal::Api::Failure::V1::ServerFailureInfo::init?, ?reset_workflow_failure_info: ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo::init?, ?activity_failure_info: ::Temporal::Api::Failure::V1::ActivityFailureInfo::init?, ?child_workflow_execution_failure_info: ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::init?) -> void
 
           def []: (:message) -> ::String
                 | (:source) -> ::String
                 | (:stack_trace) -> ::String
+                | (:encoded_attributes) -> ::Temporal::Api::Common::V1::Payload?
                 | (:cause) -> ::Temporal::Api::Failure::V1::Failure?
                 | (:application_failure_info) -> ::Temporal::Api::Failure::V1::ApplicationFailureInfo?
                 | (:timeout_failure_info) -> ::Temporal::Api::Failure::V1::TimeoutFailureInfo?
@@ -457,6 +500,8 @@ module Temporal
           def []=: (:message, ::String) -> ::String
                  | (:source, ::String) -> ::String
                  | (:stack_trace, ::String) -> ::String
+                 | (:encoded_attributes, ::Temporal::Api::Common::V1::Payload?) -> ::Temporal::Api::Common::V1::Payload?
+                 | [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (:encoded_attributes, M?) -> M?
                  | (:cause, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
                  | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:cause, M?) -> M?
                  | (:application_failure_info, ::Temporal::Api::Failure::V1::ApplicationFailureInfo?) -> ::Temporal::Api::Failure::V1::ApplicationFailureInfo?

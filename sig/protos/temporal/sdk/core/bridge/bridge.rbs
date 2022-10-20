@@ -405,10 +405,6 @@ module Coresdk
 
       def identity!: () -> ::String?
 
-      attr_accessor worker_binary_id(): ::String
-
-      def worker_binary_id!: () -> ::String?
-
       attr_accessor tls_config(): ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
 
       def tls_config=: [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (M?) -> M?
@@ -423,14 +419,13 @@ module Coresdk
 
       def retry_config!: () -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
 
-      def initialize: (?target_url: ::String, ?namespace: ::String, ?client_name: ::String, ?client_version: ::String, ?identity: ::String, ?worker_binary_id: ::String, ?tls_config: ::Coresdk::Bridge::CreateClientRequest::TlsConfig::init?, ?retry_config: ::Coresdk::Bridge::CreateClientRequest::RetryConfig::init?) -> void
+      def initialize: (?target_url: ::String, ?namespace: ::String, ?client_name: ::String, ?client_version: ::String, ?identity: ::String, ?tls_config: ::Coresdk::Bridge::CreateClientRequest::TlsConfig::init?, ?retry_config: ::Coresdk::Bridge::CreateClientRequest::RetryConfig::init?) -> void
 
       def []: (:target_url) -> ::String
             | (:namespace) -> ::String
             | (:client_name) -> ::String
             | (:client_version) -> ::String
             | (:identity) -> ::String
-            | (:worker_binary_id) -> ::String
             | (:tls_config) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
             | (:retry_config) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
             | (::Symbol) -> untyped
@@ -440,7 +435,6 @@ module Coresdk
              | (:client_name, ::String) -> ::String
              | (:client_version, ::String) -> ::String
              | (:identity, ::String) -> ::String
-             | (:worker_binary_id, ::String) -> ::String
              | (:tls_config, ::Coresdk::Bridge::CreateClientRequest::TlsConfig?) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
              | [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (:tls_config, M?) -> M?
              | (:retry_config, ::Coresdk::Bridge::CreateClientRequest::RetryConfig?) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?

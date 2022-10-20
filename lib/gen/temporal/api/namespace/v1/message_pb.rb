@@ -17,6 +17,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :owner_email, :string, 4
       map :data, :string, :string, 5
       optional :id, :string, 6
+      optional :supports_schedules, :bool, 100
     end
     add_message "temporal.api.namespace.v1.NamespaceConfig" do
       optional :workflow_execution_retention_ttl, :message, 1, "google.protobuf.Duration"

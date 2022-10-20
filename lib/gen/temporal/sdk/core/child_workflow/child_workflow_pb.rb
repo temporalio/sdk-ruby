@@ -3,6 +3,7 @@
 
 require 'google/protobuf'
 
+require 'temporal/api/common/v1/message_pb'
 require 'temporal/api/failure/v1/message_pb'
 require 'temporal/sdk/core/common/common_pb'
 
@@ -16,7 +17,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       end
     end
     add_message "coresdk.child_workflow.Success" do
-      optional :result, :message, 1, "coresdk.common.Payload"
+      optional :result, :message, 1, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.child_workflow.Failure" do
       optional :failure, :message, 1, "temporal.api.failure.v1.Failure"

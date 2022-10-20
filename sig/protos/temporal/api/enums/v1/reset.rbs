@@ -2,7 +2,9 @@ module Temporal
   module Api
     module Enums
       module V1
-        # TODO: What is this?
+        # Reset reapplay(replay) options
+        #  * RESET_REAPPLY_TYPE_SIGNAL (default) - Signals are reapplied when workflow is reset
+        #  * RESET_REAPPLY_TYPE_NONE - nothing is reapplied
         #
         class ResetReapplyType < ::Protobuf::Enum
           type names = :RESET_REAPPLY_TYPE_UNSPECIFIED | :RESET_REAPPLY_TYPE_SIGNAL | :RESET_REAPPLY_TYPE_NONE

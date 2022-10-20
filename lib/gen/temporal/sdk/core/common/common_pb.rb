@@ -7,51 +7,16 @@ require 'google/protobuf/duration_pb'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/sdk/core/common/common.proto", :syntax => :proto3) do
-    add_message "coresdk.common.Payload" do
-      map :metadata, :string, :bytes, 1
-      optional :data, :bytes, 2
-    end
-    add_message "coresdk.common.WorkflowExecution" do
-      optional :workflow_id, :string, 1
-      optional :run_id, :string, 2
-    end
     add_message "coresdk.common.NamespacedWorkflowExecution" do
       optional :namespace, :string, 1
       optional :workflow_id, :string, 2
       optional :run_id, :string, 3
-    end
-    add_message "coresdk.common.RetryPolicy" do
-      optional :initial_interval, :message, 1, "google.protobuf.Duration"
-      optional :backoff_coefficient, :double, 2
-      optional :maximum_interval, :message, 3, "google.protobuf.Duration"
-      optional :maximum_attempts, :int32, 4
-      repeated :non_retryable_error_types, :string, 5
-    end
-    add_enum "coresdk.common.WorkflowIdReusePolicy" do
-      value :WORKFLOW_ID_REUSE_POLICY_UNSPECIFIED, 0
-      value :WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE, 1
-      value :WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY, 2
-      value :WORKFLOW_ID_REUSE_POLICY_REJECT_DUPLICATE, 3
-    end
-    add_enum "coresdk.common.CancelExternalWorkflowExecutionFailedCause" do
-      value :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED, 0
-      value :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_EXTERNAL_WORKFLOW_EXECUTION_NOT_FOUND, 1
-    end
-    add_enum "coresdk.common.SignalExternalWorkflowExecutionFailedCause" do
-      value :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED, 0
-      value :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_EXTERNAL_WORKFLOW_EXECUTION_NOT_FOUND, 1
     end
   end
 end
 
 module Coresdk
   module Common
-    Payload = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.Payload").msgclass
-    WorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.WorkflowExecution").msgclass
     NamespacedWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.NamespacedWorkflowExecution").msgclass
-    RetryPolicy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.RetryPolicy").msgclass
-    WorkflowIdReusePolicy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.WorkflowIdReusePolicy").enummodule
-    CancelExternalWorkflowExecutionFailedCause = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.CancelExternalWorkflowExecutionFailedCause").enummodule
-    SignalExternalWorkflowExecutionFailedCause = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.SignalExternalWorkflowExecutionFailedCause").enummodule
   end
 end

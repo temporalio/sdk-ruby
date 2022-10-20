@@ -11,14 +11,16 @@ require 'temporal/api/enums/v1/failed_cause_pb'
 require 'temporal/api/enums/v1/workflow_pb'
 require 'temporal/api/common/v1/message_pb'
 require 'temporal/api/failure/v1/message_pb'
-require 'temporal/api/workflow/v1/message_pb'
 require 'temporal/api/taskqueue/v1/message_pb'
+require 'temporal/api/update/v1/message_pb'
+require 'temporal/api/workflow/v1/message_pb'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/api/history/v1/message.proto", :syntax => :proto3) do
     add_message "temporal.api.history.v1.WorkflowExecutionStartedEventAttributes" do
       optional :workflow_type, :message, 1, "temporal.api.common.v1.WorkflowType"
       optional :parent_workflow_namespace, :string, 2
+      optional :parent_workflow_namespace_id, :string, 27
       optional :parent_workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :parent_initiated_event_id, :int64, 4
       optional :task_queue, :message, 5, "temporal.api.taskqueue.v1.TaskQueue"
@@ -42,6 +44,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :search_attributes, :message, 23, "temporal.api.common.v1.SearchAttributes"
       optional :prev_auto_reset_points, :message, 24, "temporal.api.workflow.v1.ResetPoints"
       optional :header, :message, 25, "temporal.api.common.v1.Header"
+      optional :parent_initiated_event_version, :int64, 26
     end
     add_message "temporal.api.history.v1.WorkflowExecutionCompletedEventAttributes" do
       optional :result, :message, 1, "temporal.api.common.v1.Payloads"
@@ -83,6 +86,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :scheduled_event_id, :int64, 1
       optional :identity, :string, 2
       optional :request_id, :string, 3
+      optional :suggest_continue_as_new, :bool, 4
+      optional :history_size_bytes, :int64, 5
     end
     add_message "temporal.api.history.v1.WorkflowTaskCompletedEventAttributes" do
       optional :scheduled_event_id, :int64, 1
@@ -109,7 +114,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ActivityTaskScheduledEventAttributes" do
       optional :activity_id, :string, 1
       optional :activity_type, :message, 2, "temporal.api.common.v1.ActivityType"
-      optional :namespace, :string, 3
       optional :task_queue, :message, 4, "temporal.api.taskqueue.v1.TaskQueue"
       optional :header, :message, 5, "temporal.api.common.v1.Header"
       optional :input, :message, 6, "temporal.api.common.v1.Payloads"
@@ -203,6 +207,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.RequestCancelExternalWorkflowExecutionInitiatedEventAttributes" do
       optional :workflow_task_completed_event_id, :int64, 1
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :control, :string, 4
       optional :child_workflow_only, :bool, 5
@@ -212,6 +217,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :cause, :enum, 1, "temporal.api.enums.v1.CancelExternalWorkflowExecutionFailedCause"
       optional :workflow_task_completed_event_id, :int64, 2
       optional :namespace, :string, 3
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 4, "temporal.api.common.v1.WorkflowExecution"
       optional :initiated_event_id, :int64, 5
       optional :control, :string, 6
@@ -219,11 +225,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ExternalWorkflowExecutionCancelRequestedEventAttributes" do
       optional :initiated_event_id, :int64, 1
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 4
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
     end
     add_message "temporal.api.history.v1.SignalExternalWorkflowExecutionInitiatedEventAttributes" do
       optional :workflow_task_completed_event_id, :int64, 1
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 9
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :signal_name, :string, 4
       optional :input, :message, 5, "temporal.api.common.v1.Payloads"
@@ -235,6 +243,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :cause, :enum, 1, "temporal.api.enums.v1.SignalExternalWorkflowExecutionFailedCause"
       optional :workflow_task_completed_event_id, :int64, 2
       optional :namespace, :string, 3
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 4, "temporal.api.common.v1.WorkflowExecution"
       optional :initiated_event_id, :int64, 5
       optional :control, :string, 6
@@ -242,6 +251,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ExternalWorkflowExecutionSignaledEventAttributes" do
       optional :initiated_event_id, :int64, 1
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 5
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :control, :string, 4
     end
@@ -251,6 +261,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "temporal.api.history.v1.StartChildWorkflowExecutionInitiatedEventAttributes" do
       optional :namespace, :string, 1
+      optional :namespace_id, :string, 18
       optional :workflow_id, :string, 2
       optional :workflow_type, :message, 3, "temporal.api.common.v1.WorkflowType"
       optional :task_queue, :message, 4, "temporal.api.taskqueue.v1.TaskQueue"
@@ -270,6 +281,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "temporal.api.history.v1.StartChildWorkflowExecutionFailedEventAttributes" do
       optional :namespace, :string, 1
+      optional :namespace_id, :string, 8
       optional :workflow_id, :string, 2
       optional :workflow_type, :message, 3, "temporal.api.common.v1.WorkflowType"
       optional :cause, :enum, 4, "temporal.api.enums.v1.StartChildWorkflowExecutionFailedCause"
@@ -279,6 +291,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "temporal.api.history.v1.ChildWorkflowExecutionStartedEventAttributes" do
       optional :namespace, :string, 1
+      optional :namespace_id, :string, 6
       optional :initiated_event_id, :int64, 2
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 4, "temporal.api.common.v1.WorkflowType"
@@ -287,6 +300,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ChildWorkflowExecutionCompletedEventAttributes" do
       optional :result, :message, 1, "temporal.api.common.v1.Payloads"
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 4, "temporal.api.common.v1.WorkflowType"
       optional :initiated_event_id, :int64, 5
@@ -295,6 +309,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ChildWorkflowExecutionFailedEventAttributes" do
       optional :failure, :message, 1, "temporal.api.failure.v1.Failure"
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 8
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 4, "temporal.api.common.v1.WorkflowType"
       optional :initiated_event_id, :int64, 5
@@ -304,6 +319,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.history.v1.ChildWorkflowExecutionCanceledEventAttributes" do
       optional :details, :message, 1, "temporal.api.common.v1.Payloads"
       optional :namespace, :string, 2
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 3, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 4, "temporal.api.common.v1.WorkflowType"
       optional :initiated_event_id, :int64, 5
@@ -311,6 +327,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "temporal.api.history.v1.ChildWorkflowExecutionTimedOutEventAttributes" do
       optional :namespace, :string, 1
+      optional :namespace_id, :string, 7
       optional :workflow_execution, :message, 2, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 3, "temporal.api.common.v1.WorkflowType"
       optional :initiated_event_id, :int64, 4
@@ -319,10 +336,40 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "temporal.api.history.v1.ChildWorkflowExecutionTerminatedEventAttributes" do
       optional :namespace, :string, 1
+      optional :namespace_id, :string, 6
       optional :workflow_execution, :message, 2, "temporal.api.common.v1.WorkflowExecution"
       optional :workflow_type, :message, 3, "temporal.api.common.v1.WorkflowType"
       optional :initiated_event_id, :int64, 4
       optional :started_event_id, :int64, 5
+    end
+    add_message "temporal.api.history.v1.WorkflowUpdateRequestedEventAttributes" do
+      optional :header, :message, 1, "temporal.api.common.v1.Header"
+      optional :request_id, :string, 2
+      optional :update_id, :string, 3
+      optional :update, :message, 4, "temporal.api.update.v1.WorkflowUpdate"
+    end
+    add_message "temporal.api.history.v1.WorkflowUpdateAcceptedEventAttributes" do
+      optional :header, :message, 1, "temporal.api.common.v1.Header"
+      optional :update_id, :string, 2
+    end
+    add_message "temporal.api.history.v1.WorkflowUpdateCompletedEventAttributes" do
+      optional :system_header, :message, 1, "temporal.api.common.v1.Header"
+      optional :update_id, :string, 3
+      oneof :result do
+        optional :success, :message, 4, "temporal.api.common.v1.Payloads"
+        optional :failure, :message, 5, "temporal.api.failure.v1.Failure"
+      end
+    end
+    add_message "temporal.api.history.v1.WorkflowPropertiesModifiedExternallyEventAttributes" do
+      optional :new_task_queue, :string, 1
+      optional :new_workflow_task_timeout, :message, 2, "google.protobuf.Duration"
+      optional :new_workflow_run_timeout, :message, 3, "google.protobuf.Duration"
+      optional :new_workflow_execution_timeout, :message, 4, "google.protobuf.Duration"
+      optional :upserted_memo, :message, 5, "temporal.api.common.v1.Memo"
+    end
+    add_message "temporal.api.history.v1.ActivityPropertiesModifiedExternallyEventAttributes" do
+      optional :scheduled_event_id, :int64, 1
+      optional :new_retry_policy, :message, 2, "temporal.api.common.v1.RetryPolicy"
     end
     add_message "temporal.api.history.v1.HistoryEvent" do
       optional :event_id, :int64, 1
@@ -330,6 +377,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :event_type, :enum, 3, "temporal.api.enums.v1.EventType"
       optional :version, :int64, 4
       optional :task_id, :int64, 5
+      optional :worker_may_ignore, :bool, 300
       oneof :attributes do
         optional :workflow_execution_started_event_attributes, :message, 6, "temporal.api.history.v1.WorkflowExecutionStartedEventAttributes"
         optional :workflow_execution_completed_event_attributes, :message, 7, "temporal.api.history.v1.WorkflowExecutionCompletedEventAttributes"
@@ -371,6 +419,11 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
         optional :signal_external_workflow_execution_failed_event_attributes, :message, 43, "temporal.api.history.v1.SignalExternalWorkflowExecutionFailedEventAttributes"
         optional :external_workflow_execution_signaled_event_attributes, :message, 44, "temporal.api.history.v1.ExternalWorkflowExecutionSignaledEventAttributes"
         optional :upsert_workflow_search_attributes_event_attributes, :message, 45, "temporal.api.history.v1.UpsertWorkflowSearchAttributesEventAttributes"
+        optional :workflow_update_requested_event_attributes, :message, 46, "temporal.api.history.v1.WorkflowUpdateRequestedEventAttributes"
+        optional :workflow_update_accepted_event_attributes, :message, 47, "temporal.api.history.v1.WorkflowUpdateAcceptedEventAttributes"
+        optional :workflow_update_completed_event_attributes, :message, 48, "temporal.api.history.v1.WorkflowUpdateCompletedEventAttributes"
+        optional :workflow_properties_modified_externally_event_attributes, :message, 49, "temporal.api.history.v1.WorkflowPropertiesModifiedExternallyEventAttributes"
+        optional :activity_properties_modified_externally_event_attributes, :message, 50, "temporal.api.history.v1.ActivityPropertiesModifiedExternallyEventAttributes"
       end
     end
     add_message "temporal.api.history.v1.History" do
@@ -423,6 +476,11 @@ module Temporal
         ChildWorkflowExecutionCanceledEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.ChildWorkflowExecutionCanceledEventAttributes").msgclass
         ChildWorkflowExecutionTimedOutEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.ChildWorkflowExecutionTimedOutEventAttributes").msgclass
         ChildWorkflowExecutionTerminatedEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.ChildWorkflowExecutionTerminatedEventAttributes").msgclass
+        WorkflowUpdateRequestedEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.WorkflowUpdateRequestedEventAttributes").msgclass
+        WorkflowUpdateAcceptedEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.WorkflowUpdateAcceptedEventAttributes").msgclass
+        WorkflowUpdateCompletedEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.WorkflowUpdateCompletedEventAttributes").msgclass
+        WorkflowPropertiesModifiedExternallyEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.WorkflowPropertiesModifiedExternallyEventAttributes").msgclass
+        ActivityPropertiesModifiedExternallyEventAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.ActivityPropertiesModifiedExternallyEventAttributes").msgclass
         HistoryEvent = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.HistoryEvent").msgclass
         History = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.history.v1.History").msgclass
       end

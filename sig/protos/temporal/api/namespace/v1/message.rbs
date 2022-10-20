@@ -37,7 +37,14 @@ module Temporal
 
           def id!: () -> ::String?
 
-          def initialize: (?name: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?id: ::String) -> void
+          # Whether scheduled workflows are supported on this namespace. This is only needed
+          #  temporarily while the feature is experimental, so we can give it a high tag.
+          #
+          attr_accessor supports_schedules(): bool
+
+          def supports_schedules!: () -> bool?
+
+          def initialize: (?name: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?id: ::String, ?supports_schedules: bool) -> void
 
           def []: (:name) -> ::String
                 | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
@@ -45,6 +52,7 @@ module Temporal
                 | (:owner_email) -> ::String
                 | (:data) -> ::Protobuf::field_hash[::String, ::String]
                 | (:id) -> ::String
+                | (:supports_schedules) -> bool
                 | (::Symbol) -> untyped
 
           def []=: (:name, ::String) -> ::String
@@ -55,7 +63,10 @@ module Temporal
                  | (:data, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
                  | (:data, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
                  | (:id, ::String) -> ::String
+                 | (:supports_schedules, bool) -> bool
                  | (::Symbol, untyped) -> untyped
+
+          def supports_schedules?: () -> bool
 
           interface _ToProto
             def to_proto: () -> NamespaceInfo
@@ -252,10 +263,14 @@ module Temporal
           def owner_email!: () -> ::String?
 
           # A key-value map for any customized purpose.
+          #  If data already exists on the namespace, 
+          #  this will merge with the existing key values.
           #
           attr_accessor data(): ::Protobuf::field_hash[::String, ::String]
 
           # A key-value map for any customized purpose.
+          #  If data already exists on the namespace, 
+          #  this will merge with the existing key values.
           #
           def data=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
                    | ...

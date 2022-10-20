@@ -1,0 +1,79 @@
+module Temporal
+  module Api
+    module Enums
+      module V1
+        class WorkflowUpdateResultAccessStyle < ::Protobuf::Enum
+          type names = :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED | :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE
+
+          type strings = "WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED" | "WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE"
+
+          type tags = 0 | 1
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED: WorkflowUpdateResultAccessStyle
+
+          # Indicates that the update response _must_ be included as part of the gRPC
+          #  response body
+          #
+          WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE: WorkflowUpdateResultAccessStyle
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateResultAccessStyle | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateResultAccessStyle, WorkflowUpdateResultAccessStyle | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateResultAccessStyle, WorkflowUpdateResultAccessStyle | values]
+
+          type array = ::Array[WorkflowUpdateResultAccessStyle | values]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateResultAccessStyle | values]
+        end
+
+        class WorkflowUpdateDurabilityPreference < ::Protobuf::Enum
+          type names = :WORKFLOW_UPDATE_DURABILITY_PREFERENCE_UNSPECIFIED | :WORKFLOW_UPDATE_DURABILITY_PREFERENCE_BYPASS
+
+          type strings = "WORKFLOW_UPDATE_DURABILITY_PREFERENCE_UNSPECIFIED" | "WORKFLOW_UPDATE_DURABILITY_PREFERENCE_BYPASS"
+
+          type tags = 0 | 1
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          # The workflow expresses no preference as to the durability of the
+          #  the associated update.
+          #
+          WORKFLOW_UPDATE_DURABILITY_PREFERENCE_UNSPECIFIED: WorkflowUpdateDurabilityPreference
+
+          # Used by a workflow to indicate that no workflow state mutation occurred
+          #  while processing the update and that it wishes that the update not be
+          #  made durable (and thus not take up space in workflow history).
+          #
+          WORKFLOW_UPDATE_DURABILITY_PREFERENCE_BYPASS: WorkflowUpdateDurabilityPreference
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateDurabilityPreference | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateDurabilityPreference, WorkflowUpdateDurabilityPreference | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateDurabilityPreference, WorkflowUpdateDurabilityPreference | values]
+
+          type array = ::Array[WorkflowUpdateDurabilityPreference | values]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateDurabilityPreference | values]
+        end
+      end
+    end
+  end
+end

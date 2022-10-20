@@ -83,6 +83,53 @@ module Temporal
 
           type hash[KEY] = ::Hash[KEY, NamespaceReplicationConfig | _ToProto]
         end
+
+        # Represents a historical replication status of a Namespace
+        #
+        class FailoverStatus < ::Protobuf::Message
+          # Timestamp when the Cluster switched to the following failover_version
+          #
+          attr_accessor failover_time(): ::Google::Protobuf::Timestamp?
+
+          # Timestamp when the Cluster switched to the following failover_version
+          #
+          def failover_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                            | ...
+
+          def failover_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor failover_version(): ::Integer
+
+          def failover_version!: () -> ::Integer?
+
+          def initialize: (?failover_time: ::Google::Protobuf::Timestamp::init?, ?failover_version: ::Integer) -> void
+
+          def []: (:failover_time) -> ::Google::Protobuf::Timestamp?
+                | (:failover_version) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:failover_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:failover_time, M?) -> M?
+                 | (:failover_version, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> FailoverStatus
+          end
+
+          # The type of `#initialize` parameter.
+          type init = FailoverStatus | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[FailoverStatus, FailoverStatus | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FailoverStatus, FailoverStatus | _ToProto]
+
+          type array = ::Array[FailoverStatus | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, FailoverStatus | _ToProto]
+        end
       end
     end
   end

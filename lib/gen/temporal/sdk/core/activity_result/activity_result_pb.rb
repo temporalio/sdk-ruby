@@ -5,8 +5,8 @@ require 'google/protobuf'
 
 require 'google/protobuf/duration_pb'
 require 'google/protobuf/timestamp_pb'
+require 'temporal/api/common/v1/message_pb'
 require 'temporal/api/failure/v1/message_pb'
-require 'temporal/sdk/core/common/common_pb'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/sdk/core/activity_result/activity_result.proto", :syntax => :proto3) do
@@ -27,7 +27,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       end
     end
     add_message "coresdk.activity_result.Success" do
-      optional :result, :message, 1, "coresdk.common.Payload"
+      optional :result, :message, 1, "temporal.api.common.v1.Payload"
     end
     add_message "coresdk.activity_result.Failure" do
       optional :failure, :message, 1, "temporal.api.failure.v1.Failure"

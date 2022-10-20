@@ -74,6 +74,21 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :expire_time, :message, 5, "google.protobuf.Timestamp"
       optional :resettable, :bool, 6
     end
+    add_message "temporal.api.workflow.v1.NewWorkflowExecutionInfo" do
+      optional :workflow_id, :string, 1
+      optional :workflow_type, :message, 2, "temporal.api.common.v1.WorkflowType"
+      optional :task_queue, :message, 3, "temporal.api.taskqueue.v1.TaskQueue"
+      optional :input, :message, 4, "temporal.api.common.v1.Payloads"
+      optional :workflow_execution_timeout, :message, 5, "google.protobuf.Duration"
+      optional :workflow_run_timeout, :message, 6, "google.protobuf.Duration"
+      optional :workflow_task_timeout, :message, 7, "google.protobuf.Duration"
+      optional :workflow_id_reuse_policy, :enum, 8, "temporal.api.enums.v1.WorkflowIdReusePolicy"
+      optional :retry_policy, :message, 9, "temporal.api.common.v1.RetryPolicy"
+      optional :cron_schedule, :string, 10
+      optional :memo, :message, 11, "temporal.api.common.v1.Memo"
+      optional :search_attributes, :message, 12, "temporal.api.common.v1.SearchAttributes"
+      optional :header, :message, 13, "temporal.api.common.v1.Header"
+    end
   end
 end
 
@@ -88,6 +103,7 @@ module Temporal
         PendingWorkflowTaskInfo = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.workflow.v1.PendingWorkflowTaskInfo").msgclass
         ResetPoints = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.workflow.v1.ResetPoints").msgclass
         ResetPointInfo = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.workflow.v1.ResetPointInfo").msgclass
+        NewWorkflowExecutionInfo = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.workflow.v1.NewWorkflowExecutionInfo").msgclass
       end
     end
   end

@@ -3,7 +3,14 @@
 
 require 'google/protobuf'
 
+require 'dependencies/gogoproto/gogo_pb'
+require 'google/protobuf/timestamp_pb'
+require 'google/protobuf/duration_pb'
+require 'temporal/api/cluster/v1/message_pb'
+require 'temporal/api/common/v1/message_pb'
+require 'temporal/api/enums/v1/cluster_pb'
 require 'temporal/api/enums/v1/common_pb'
+require 'temporal/api/version/v1/message_pb'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/api/operatorservice/v1/request_response.proto", :syntax => :proto3) do
@@ -30,6 +37,61 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "temporal.api.operatorservice.v1.DeleteNamespaceResponse" do
       optional :deleted_namespace, :string, 1
     end
+    add_message "temporal.api.operatorservice.v1.DeleteWorkflowExecutionRequest" do
+      optional :namespace, :string, 1
+      optional :workflow_execution, :message, 2, "temporal.api.common.v1.WorkflowExecution"
+    end
+    add_message "temporal.api.operatorservice.v1.DeleteWorkflowExecutionResponse" do
+    end
+    add_message "temporal.api.operatorservice.v1.AddOrUpdateRemoteClusterRequest" do
+      optional :frontend_address, :string, 1
+      optional :enable_remote_cluster_connection, :bool, 2
+    end
+    add_message "temporal.api.operatorservice.v1.AddOrUpdateRemoteClusterResponse" do
+    end
+    add_message "temporal.api.operatorservice.v1.RemoveRemoteClusterRequest" do
+      optional :cluster_name, :string, 1
+    end
+    add_message "temporal.api.operatorservice.v1.RemoveRemoteClusterResponse" do
+    end
+    add_message "temporal.api.operatorservice.v1.DescribeClusterRequest" do
+      optional :cluster_name, :string, 1
+    end
+    add_message "temporal.api.operatorservice.v1.DescribeClusterResponse" do
+      map :supported_clients, :string, :string, 1
+      optional :server_version, :string, 2
+      optional :membership_info, :message, 3, "temporal.api.cluster.v1.MembershipInfo"
+      optional :cluster_id, :string, 4
+      optional :cluster_name, :string, 5
+      optional :history_shard_count, :int32, 6
+      optional :persistence_store, :string, 7
+      optional :visibility_store, :string, 8
+      optional :version_info, :message, 9, "temporal.api.version.v1.VersionInfo"
+      optional :failover_version_increment, :int64, 10
+      optional :initial_failover_version, :int64, 11
+      optional :is_global_namespace_enabled, :bool, 12
+    end
+    add_message "temporal.api.operatorservice.v1.ListClustersRequest" do
+      optional :page_size, :int32, 1
+      optional :next_page_token, :bytes, 2
+    end
+    add_message "temporal.api.operatorservice.v1.ListClustersResponse" do
+      repeated :clusters, :message, 1, "temporal.api.cluster.v1.ClusterMetadata"
+      optional :next_page_token, :bytes, 2
+    end
+    add_message "temporal.api.operatorservice.v1.ListClusterMembersRequest" do
+      optional :last_heartbeat_within, :message, 1, "google.protobuf.Duration"
+      optional :rpc_address, :string, 2
+      optional :host_id, :string, 3
+      optional :role, :enum, 4, "temporal.api.enums.v1.ClusterMemberRole"
+      optional :session_started_after_time, :message, 5, "google.protobuf.Timestamp"
+      optional :page_size, :int32, 6
+      optional :next_page_token, :bytes, 7
+    end
+    add_message "temporal.api.operatorservice.v1.ListClusterMembersResponse" do
+      repeated :active_members, :message, 1, "temporal.api.cluster.v1.ClusterMember"
+      optional :next_page_token, :bytes, 2
+    end
   end
 end
 
@@ -45,6 +107,18 @@ module Temporal
         ListSearchAttributesResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.ListSearchAttributesResponse").msgclass
         DeleteNamespaceRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DeleteNamespaceRequest").msgclass
         DeleteNamespaceResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DeleteNamespaceResponse").msgclass
+        DeleteWorkflowExecutionRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DeleteWorkflowExecutionRequest").msgclass
+        DeleteWorkflowExecutionResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DeleteWorkflowExecutionResponse").msgclass
+        AddOrUpdateRemoteClusterRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.AddOrUpdateRemoteClusterRequest").msgclass
+        AddOrUpdateRemoteClusterResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.AddOrUpdateRemoteClusterResponse").msgclass
+        RemoveRemoteClusterRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.RemoveRemoteClusterRequest").msgclass
+        RemoveRemoteClusterResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.RemoveRemoteClusterResponse").msgclass
+        DescribeClusterRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DescribeClusterRequest").msgclass
+        DescribeClusterResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.DescribeClusterResponse").msgclass
+        ListClustersRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.ListClustersRequest").msgclass
+        ListClustersResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.ListClustersResponse").msgclass
+        ListClusterMembersRequest = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.ListClusterMembersRequest").msgclass
+        ListClusterMembersResponse = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.operatorservice.v1.ListClusterMembersResponse").msgclass
       end
     end
   end

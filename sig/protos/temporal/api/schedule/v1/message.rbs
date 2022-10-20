@@ -1,0 +1,1125 @@
+module Temporal
+  module Api
+    module Schedule
+      module V1
+        # CalendarSpec describes an event specification relative to the calendar,
+        #  similar to a traditional cron specification. Each field can be one of:
+        #    *: matches always
+        #    x: matches when the field equals x
+        #    x/y : matches when the field equals x+n*y where n is an integer
+        #    x-z: matches when the field is between x and z inclusive
+        #    w,x,y,...: matches when the field is one of the listed values
+        #  Each x, y, z, ... is either a decimal integer, or a month or day of week name
+        #  or abbreviation (in the appropriate fields).
+        #  A second in time matches if all fields match.
+        #  Note that the special case that some cron implementations have for treating
+        #  day_of_month and day_of_week as "or" instead of "and" when both are set is
+        #  not implemented.
+        #  day_of_week can accept 0 or 7 as Sunday
+        #  TODO: add relative-to-end-of-month
+        #  TODO: add nth day-of-week in month
+        #
+        class CalendarSpec < ::Protobuf::Message
+          # Expression to match seconds. Default: 0
+          #
+          attr_accessor second(): ::String
+
+          def second!: () -> ::String?
+
+          # Expression to match minutes. Default: 0
+          #
+          attr_accessor minute(): ::String
+
+          def minute!: () -> ::String?
+
+          # Expression to match hours. Default: 0
+          #
+          attr_accessor hour(): ::String
+
+          def hour!: () -> ::String?
+
+          # Expression to match days of the month. Default: *
+          #  (-- api-linter: core::0140::prepositions=disabled
+          #      aip.dev/not-precedent: standard name of field --)
+          #
+          attr_accessor day_of_month(): ::String
+
+          def day_of_month!: () -> ::String?
+
+          # Expression to match months. Default: *
+          #
+          attr_accessor month(): ::String
+
+          def month!: () -> ::String?
+
+          # Expression to match years. Default: *
+          #
+          attr_accessor year(): ::String
+
+          def year!: () -> ::String?
+
+          # Expression to match days of the week. Default: *
+          #
+          attr_accessor day_of_week(): ::String
+
+          def day_of_week!: () -> ::String?
+
+          def initialize: (?second: ::String, ?minute: ::String, ?hour: ::String, ?day_of_month: ::String, ?month: ::String, ?year: ::String, ?day_of_week: ::String) -> void
+
+          def []: (:second) -> ::String
+                | (:minute) -> ::String
+                | (:hour) -> ::String
+                | (:day_of_month) -> ::String
+                | (:month) -> ::String
+                | (:year) -> ::String
+                | (:day_of_week) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:second, ::String) -> ::String
+                 | (:minute, ::String) -> ::String
+                 | (:hour, ::String) -> ::String
+                 | (:day_of_month, ::String) -> ::String
+                 | (:month, ::String) -> ::String
+                 | (:year, ::String) -> ::String
+                 | (:day_of_week, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CalendarSpec
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CalendarSpec | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CalendarSpec, CalendarSpec | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CalendarSpec, CalendarSpec | _ToProto]
+
+          type array = ::Array[CalendarSpec | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CalendarSpec | _ToProto]
+        end
+
+        # IntervalSpec matches times that can be expressed as:
+        #  epoch + n * interval + phase
+        #  where n is an integer.
+        #  phase defaults to zero if missing. interval is required.
+        #  Both interval and phase must be non-negative and are truncated to the nearest
+        #  second before any calculations.
+        #  For example, an interval of 1 hour with phase of zero would match every hour,
+        #  on the hour. The same interval but a phase of 19 minutes would match every
+        #  xx:19:00. An interval of 28 days with phase zero would match
+        #  2022-02-17T00:00:00Z (among other times). The same interval with a phase of 3
+        #  days, 5 hours, and 23 minutes would match 2022-02-20T05:23:00Z instead.
+        #
+        class IntervalSpec < ::Protobuf::Message
+          attr_accessor interval(): ::Google::Protobuf::Duration?
+
+          def interval=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                       | ...
+
+          def interval!: () -> ::Google::Protobuf::Duration?
+
+          attr_accessor phase(): ::Google::Protobuf::Duration?
+
+          def phase=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                    | ...
+
+          def phase!: () -> ::Google::Protobuf::Duration?
+
+          def initialize: (?interval: ::Google::Protobuf::Duration::init?, ?phase: ::Google::Protobuf::Duration::init?) -> void
+
+          def []: (:interval) -> ::Google::Protobuf::Duration?
+                | (:phase) -> ::Google::Protobuf::Duration?
+                | (::Symbol) -> untyped
+
+          def []=: (:interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:interval, M?) -> M?
+                 | (:phase, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:phase, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> IntervalSpec
+          end
+
+          # The type of `#initialize` parameter.
+          type init = IntervalSpec | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[IntervalSpec, IntervalSpec | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, IntervalSpec, IntervalSpec | _ToProto]
+
+          type array = ::Array[IntervalSpec | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, IntervalSpec | _ToProto]
+        end
+
+        # ScheduleSpec is a complete description of a set of absolute timestamps
+        #  (possibly infinite) that an action should occur at. The meaning of a
+        #  ScheduleSpec depends only on its contents and never changes, except that the
+        #  definition of a time zone can change over time (most commonly, when daylight
+        #  saving time policy changes for an area). To create a totally self-contained
+        #  ScheduleSpec, use UTC or include timezone_data.
+        #
+        class ScheduleSpec < ::Protobuf::Message
+          # Calendar-based specifications of times.
+          #
+          attr_accessor calendar(): ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+
+          # Calendar-based specifications of times.
+          #
+          def calendar=: (::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+                       | ...
+
+          def calendar!: () -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array?
+
+          # Interval-based specifications of times.
+          #
+          attr_accessor interval(): ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
+
+          # Interval-based specifications of times.
+          #
+          def interval=: (::Temporal::Api::Schedule::V1::IntervalSpec::array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::array
+                       | ...
+
+          def interval!: () -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array?
+
+          # Any timestamps matching any of the exclude_calendar specs will be
+          #  skipped.
+          #
+          attr_accessor exclude_calendar(): ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+
+          # Any timestamps matching any of the exclude_calendar specs will be
+          #  skipped.
+          #
+          def exclude_calendar=: (::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+                               | ...
+
+          def exclude_calendar!: () -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array?
+
+          # Any timestamps before start_time will be skipped. Together, start_time
+          #  and end_time make an inclusive interval.
+          #
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+          # Any timestamps before start_time will be skipped. Together, start_time
+          #  and end_time make an inclusive interval.
+          #
+          def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Any timestamps after end_time will be skipped.
+          #
+          attr_accessor end_time(): ::Google::Protobuf::Timestamp?
+
+          # Any timestamps after end_time will be skipped.
+          #
+          def end_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                       | ...
+
+          def end_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # All timestamps will be incremented by a random value from 0 to this
+          #  amount of jitter. Default: 1 second
+          #
+          attr_accessor jitter(): ::Google::Protobuf::Duration?
+
+          # All timestamps will be incremented by a random value from 0 to this
+          #  amount of jitter. Default: 1 second
+          #
+          def jitter=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                     | ...
+
+          def jitter!: () -> ::Google::Protobuf::Duration?
+
+          # Time zone to interpret all CalendarSpecs in.
+          #
+          #  If unset, defaults to UTC. We recommend using UTC for your application if
+          #  at all possible, to avoid various surprising properties of time zones.
+          #
+          #  Time zones may be provided by name, corresponding to names in the IANA
+          #  time zone database (see https://www.iana.org/time-zones). The definition
+          #  will be loaded by the Temporal server from the environment it runs in.
+          #
+          #  If your application requires more control over the time zone definition
+          #  used, it may pass in a complete definition in the form of a TZif file
+          #  from the time zone database. If present, this will be used instead of
+          #  loading anything from the environment. You are then responsible for
+          #  updating timezone_data when the definition changes.
+          #
+          #  Calendar spec matching is based on literal matching of the clock time
+          #  with no special handling of DST: if you write a calendar spec that fires
+          #  at 2:30am and specify a time zone that follows DST, that action will not
+          #  be triggered on the day that has no 2:30am. Similarly, an action that
+          #  fires at 1:30am will be triggered twice on the day that has two 1:30s.
+          #
+          attr_accessor timezone_name(): ::String
+
+          def timezone_name!: () -> ::String?
+
+          attr_accessor timezone_data(): ::String
+
+          def timezone_data!: () -> ::String?
+
+          def initialize: (?calendar: ::Temporal::Api::Schedule::V1::CalendarSpec::array, ?interval: ::Temporal::Api::Schedule::V1::IntervalSpec::array, ?exclude_calendar: ::Temporal::Api::Schedule::V1::CalendarSpec::array, ?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?jitter: ::Google::Protobuf::Duration::init?, ?timezone_name: ::String, ?timezone_data: ::String) -> void
+
+          def []: (:calendar) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+                | (:interval) -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
+                | (:exclude_calendar) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+                | (:start_time) -> ::Google::Protobuf::Timestamp?
+                | (:end_time) -> ::Google::Protobuf::Timestamp?
+                | (:jitter) -> ::Google::Protobuf::Duration?
+                | (:timezone_name) -> ::String
+                | (:timezone_data) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+                 | (:calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+                 | (:interval, ::Temporal::Api::Schedule::V1::IntervalSpec::field_array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
+                 | (:interval, ::Temporal::Api::Schedule::V1::IntervalSpec::array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::array
+                 | (:exclude_calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+                 | (:exclude_calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+                 | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
+                 | (:end_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:end_time, M?) -> M?
+                 | (:jitter, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:jitter, M?) -> M?
+                 | (:timezone_name, ::String) -> ::String
+                 | (:timezone_data, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleSpec
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleSpec | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleSpec, ScheduleSpec | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleSpec, ScheduleSpec | _ToProto]
+
+          type array = ::Array[ScheduleSpec | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleSpec | _ToProto]
+        end
+
+        class SchedulePolicies < ::Protobuf::Message
+          # Policy for overlaps.
+          #  Note that this can be changed after a schedule has taken some actions, and we can't
+          #  provide 100% sensible semantics for all changes. The most confusing case would be
+          #  changes to/from ALLOW_ALL: with that policy multiple scheduled workflows can run
+          #  concurrently, but for all other policies only one can run at a time. Changing
+          #  between these two classes will leave all workflows with the other class alone.
+          #  E.g., if changing from ALLOW_ALL to CANCEL_OTHER, and there are workflows running,
+          #  those workflows will not be cancelled. If changing from ALLOW_ALL to SKIP with
+          #  workflows running, the running workflows will not cause the next action to be
+          #  skipped.
+          #
+          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+
+          # Policy for overlaps.
+          #  Note that this can be changed after a schedule has taken some actions, and we can't
+          #  provide 100% sensible semantics for all changes. The most confusing case would be
+          #  changes to/from ALLOW_ALL: with that policy multiple scheduled workflows can run
+          #  concurrently, but for all other policies only one can run at a time. Changing
+          #  between these two classes will leave all workflows with the other class alone.
+          #  E.g., if changing from ALLOW_ALL to CANCEL_OTHER, and there are workflows running,
+          #  those workflows will not be cancelled. If changing from ALLOW_ALL to SKIP with
+          #  workflows running, the running workflows will not cause the next action to be
+          #  skipped.
+          #
+          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                             | ...
+
+          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+
+          # Policy for catchups:
+          #  If the Temporal server misses an action due to one or more components
+          #  being down, and comes back up, the action will be run if the scheduled
+          #  time is within this window from the current time.
+          #  This value defaults to 60 seconds, and can't be less than 10 seconds.
+          #
+          attr_accessor catchup_window(): ::Google::Protobuf::Duration?
+
+          # Policy for catchups:
+          #  If the Temporal server misses an action due to one or more components
+          #  being down, and comes back up, the action will be run if the scheduled
+          #  time is within this window from the current time.
+          #  This value defaults to 60 seconds, and can't be less than 10 seconds.
+          #
+          def catchup_window=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                             | ...
+
+          def catchup_window!: () -> ::Google::Protobuf::Duration?
+
+          # If true, and a workflow run fails or times out, turn on "paused".
+          #  This applies after retry policies: the full chain of retries must fail to
+          #  trigger a pause here.
+          #
+          attr_accessor pause_on_failure(): bool
+
+          def pause_on_failure!: () -> bool?
+
+          def initialize: (?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init, ?catchup_window: ::Google::Protobuf::Duration::init?, ?pause_on_failure: bool) -> void
+
+          def []: (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                | (:catchup_window) -> ::Google::Protobuf::Duration?
+                | (:pause_on_failure) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                 | (:catchup_window, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:catchup_window, M?) -> M?
+                 | (:pause_on_failure, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def pause_on_failure?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> SchedulePolicies
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SchedulePolicies | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SchedulePolicies, SchedulePolicies | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SchedulePolicies, SchedulePolicies | _ToProto]
+
+          type array = ::Array[SchedulePolicies | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SchedulePolicies | _ToProto]
+        end
+
+        class ScheduleAction < ::Protobuf::Message
+          # All fields of NewWorkflowExecutionInfo are valid except for:
+          #  - workflow_id_reuse_policy
+          #  - cron_schedule
+          #  The workflow id of the started workflow may not match this exactly,
+          #  it may have a timestamp appended for uniqueness.
+          #
+          attr_accessor start_workflow(): ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+
+          # All fields of NewWorkflowExecutionInfo are valid except for:
+          #  - workflow_id_reuse_policy
+          #  - cron_schedule
+          #  The workflow id of the started workflow may not match this exactly,
+          #  it may have a timestamp appended for uniqueness.
+          #
+          def start_workflow=: [M < ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (M?) -> M?
+                             | ...
+
+          def start_workflow!: () -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+
+          def initialize: (?start_workflow: ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::init?) -> void
+
+          def []: (:start_workflow) -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+                | (::Symbol) -> untyped
+
+          def []=: (:start_workflow, ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?) -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+                 | [M < ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (:start_workflow, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleAction
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleAction | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleAction, ScheduleAction | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleAction, ScheduleAction | _ToProto]
+
+          type array = ::Array[ScheduleAction | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleAction | _ToProto]
+        end
+
+        class ScheduleActionResult < ::Protobuf::Message
+          # Time that the action was taken (according to the schedule, including jitter).
+          #
+          attr_accessor schedule_time(): ::Google::Protobuf::Timestamp?
+
+          # Time that the action was taken (according to the schedule, including jitter).
+          #
+          def schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                            | ...
+
+          def schedule_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Time that the action was taken (real time).
+          #
+          attr_accessor actual_time(): ::Google::Protobuf::Timestamp?
+
+          # Time that the action was taken (real time).
+          #
+          def actual_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def actual_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # If action was start_workflow:
+          #
+          attr_accessor start_workflow_result(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # If action was start_workflow:
+          #
+          def start_workflow_result=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                                    | ...
+
+          def start_workflow_result!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          def initialize: (?schedule_time: ::Google::Protobuf::Timestamp::init?, ?actual_time: ::Google::Protobuf::Timestamp::init?, ?start_workflow_result: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
+
+          def []: (:schedule_time) -> ::Google::Protobuf::Timestamp?
+                | (:actual_time) -> ::Google::Protobuf::Timestamp?
+                | (:start_workflow_result) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (::Symbol) -> untyped
+
+          def []=: (:schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:schedule_time, M?) -> M?
+                 | (:actual_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:actual_time, M?) -> M?
+                 | (:start_workflow_result, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:start_workflow_result, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleActionResult
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleActionResult | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleActionResult, ScheduleActionResult | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleActionResult, ScheduleActionResult | _ToProto]
+
+          type array = ::Array[ScheduleActionResult | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleActionResult | _ToProto]
+        end
+
+        class ScheduleState < ::Protobuf::Message
+          # Informative human-readable message with contextual notes, e.g. the reason
+          #  a schedule is paused. The system may overwrite this message on certain
+          #  conditions, e.g. when pause-on-failure happens.
+          #
+          attr_accessor notes(): ::String
+
+          def notes!: () -> ::String?
+
+          # If true, do not take any actions based on the schedule spec.
+          #
+          attr_accessor paused(): bool
+
+          def paused!: () -> bool?
+
+          # If limited_actions is true, decrement remaining_actions after each action, and do
+          #  not take any more scheduled actions if remaining_actions is zero. Actions may still
+          #  be taken by explicit request. Skipped actions (due to overlap policy) do not count
+          #  against remaining actions.
+          #
+          attr_accessor limited_actions(): bool
+
+          def limited_actions!: () -> bool?
+
+          attr_accessor remaining_actions(): ::Integer
+
+          def remaining_actions!: () -> ::Integer?
+
+          def initialize: (?notes: ::String, ?paused: bool, ?limited_actions: bool, ?remaining_actions: ::Integer) -> void
+
+          def []: (:notes) -> ::String
+                | (:paused) -> bool
+                | (:limited_actions) -> bool
+                | (:remaining_actions) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:notes, ::String) -> ::String
+                 | (:paused, bool) -> bool
+                 | (:limited_actions, bool) -> bool
+                 | (:remaining_actions, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          def paused?: () -> bool
+
+          def limited_actions?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> ScheduleState
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleState | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleState, ScheduleState | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleState, ScheduleState | _ToProto]
+
+          type array = ::Array[ScheduleState | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleState | _ToProto]
+        end
+
+        class TriggerImmediatelyRequest < ::Protobuf::Message
+          # Override overlap policy for this one request.
+          #
+          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+
+          # Override overlap policy for this one request.
+          #
+          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                             | ...
+
+          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+
+          def initialize: (?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
+
+          def []: (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                | (::Symbol) -> untyped
+
+          def []=: (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> TriggerImmediatelyRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = TriggerImmediatelyRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[TriggerImmediatelyRequest, TriggerImmediatelyRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, TriggerImmediatelyRequest, TriggerImmediatelyRequest | _ToProto]
+
+          type array = ::Array[TriggerImmediatelyRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, TriggerImmediatelyRequest | _ToProto]
+        end
+
+        class BackfillRequest < ::Protobuf::Message
+          # Time range to evaluate schedule in.
+          #
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+          # Time range to evaluate schedule in.
+          #
+          def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor end_time(): ::Google::Protobuf::Timestamp?
+
+          def end_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                       | ...
+
+          def end_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Override overlap policy for this request.
+          #
+          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+
+          # Override overlap policy for this request.
+          #
+          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                             | ...
+
+          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+
+          def initialize: (?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
+
+          def []: (:start_time) -> ::Google::Protobuf::Timestamp?
+                | (:end_time) -> ::Google::Protobuf::Timestamp?
+                | (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                | (::Symbol) -> untyped
+
+          def []=: (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
+                 | (:end_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:end_time, M?) -> M?
+                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> BackfillRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = BackfillRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[BackfillRequest, BackfillRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, BackfillRequest, BackfillRequest | _ToProto]
+
+          type array = ::Array[BackfillRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, BackfillRequest | _ToProto]
+        end
+
+        class SchedulePatch < ::Protobuf::Message
+          # If set, trigger one action immediately.
+          #
+          attr_accessor trigger_immediately(): ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+
+          # If set, trigger one action immediately.
+          #
+          def trigger_immediately=: [M < ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (M?) -> M?
+                                  | ...
+
+          def trigger_immediately!: () -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+
+          # If set, runs though the specified time period(s) and takes actions as if that time
+          #  passed by right now, all at once. The overlap policy can be overridden for the
+          #  scope of the backfill.
+          #
+          attr_accessor backfill_request(): ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
+
+          # If set, runs though the specified time period(s) and takes actions as if that time
+          #  passed by right now, all at once. The overlap policy can be overridden for the
+          #  scope of the backfill.
+          #
+          def backfill_request=: (::Temporal::Api::Schedule::V1::BackfillRequest::array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::array
+                               | ...
+
+          def backfill_request!: () -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array?
+
+          # If set, change the state to paused or unpaused (respectively) and set the
+          #  notes field to the value of the string.
+          #
+          attr_accessor pause(): ::String
+
+          def pause!: () -> ::String?
+
+          attr_accessor unpause(): ::String
+
+          def unpause!: () -> ::String?
+
+          def initialize: (?trigger_immediately: ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::init?, ?backfill_request: ::Temporal::Api::Schedule::V1::BackfillRequest::array, ?pause: ::String, ?unpause: ::String) -> void
+
+          def []: (:trigger_immediately) -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+                | (:backfill_request) -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
+                | (:pause) -> ::String
+                | (:unpause) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:trigger_immediately, ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?) -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+                 | [M < ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (:trigger_immediately, M?) -> M?
+                 | (:backfill_request, ::Temporal::Api::Schedule::V1::BackfillRequest::field_array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
+                 | (:backfill_request, ::Temporal::Api::Schedule::V1::BackfillRequest::array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::array
+                 | (:pause, ::String) -> ::String
+                 | (:unpause, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> SchedulePatch
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SchedulePatch | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SchedulePatch, SchedulePatch | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SchedulePatch, SchedulePatch | _ToProto]
+
+          type array = ::Array[SchedulePatch | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SchedulePatch | _ToProto]
+        end
+
+        class ScheduleInfo < ::Protobuf::Message
+          # Number of actions taken so far.
+          #
+          attr_accessor action_count(): ::Integer
+
+          def action_count!: () -> ::Integer?
+
+          # Number of times a scheduled action was skipped due to missing the catchup window.
+          #
+          attr_accessor missed_catchup_window(): ::Integer
+
+          def missed_catchup_window!: () -> ::Integer?
+
+          # Number of skipped actions due to overlap.
+          #
+          attr_accessor overlap_skipped(): ::Integer
+
+          def overlap_skipped!: () -> ::Integer?
+
+          # Currently-running workflows started by this schedule. (There might be
+          #  more than one if the overlap policy allows overlaps.)
+          #  Note that the run_ids in here are the original execution run ids as
+          #  started by the schedule. If the workflows retried, did continue-as-new,
+          #  or were reset, they might still be running but with a different run_id.
+          #
+          attr_accessor running_workflows(): ::Temporal::Api::Common::V1::WorkflowExecution::field_array
+
+          # Currently-running workflows started by this schedule. (There might be
+          #  more than one if the overlap policy allows overlaps.)
+          #  Note that the run_ids in here are the original execution run ids as
+          #  started by the schedule. If the workflows retried, did continue-as-new,
+          #  or were reset, they might still be running but with a different run_id.
+          #
+          def running_workflows=: (::Temporal::Api::Common::V1::WorkflowExecution::array) -> ::Temporal::Api::Common::V1::WorkflowExecution::array
+                                | ...
+
+          def running_workflows!: () -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array?
+
+          # Most recent ten actual action times (including manual triggers).
+          #
+          attr_accessor recent_actions(): ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+
+          # Most recent ten actual action times (including manual triggers).
+          #
+          def recent_actions=: (::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                             | ...
+
+          def recent_actions!: () -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array?
+
+          # Next ten scheduled action times.
+          #
+          attr_accessor future_action_times(): ::Google::Protobuf::Timestamp::field_array
+
+          # Next ten scheduled action times.
+          #
+          def future_action_times=: (::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                                  | ...
+
+          def future_action_times!: () -> ::Google::Protobuf::Timestamp::field_array?
+
+          # Timestamps of schedule creation and last update.
+          #
+          attr_accessor create_time(): ::Google::Protobuf::Timestamp?
+
+          # Timestamps of schedule creation and last update.
+          #
+          def create_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def create_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor update_time(): ::Google::Protobuf::Timestamp?
+
+          def update_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                          | ...
+
+          def update_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Error for invalid schedule. If this is set, no actions will be taken.
+          #
+          attr_accessor invalid_schedule_error(): ::String
+
+          def invalid_schedule_error!: () -> ::String?
+
+          def initialize: (?action_count: ::Integer, ?missed_catchup_window: ::Integer, ?overlap_skipped: ::Integer, ?running_workflows: ::Temporal::Api::Common::V1::WorkflowExecution::array, ?recent_actions: ::Temporal::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array, ?create_time: ::Google::Protobuf::Timestamp::init?, ?update_time: ::Google::Protobuf::Timestamp::init?, ?invalid_schedule_error: ::String) -> void
+
+          def []: (:action_count) -> ::Integer
+                | (:missed_catchup_window) -> ::Integer
+                | (:overlap_skipped) -> ::Integer
+                | (:running_workflows) -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array
+                | (:recent_actions) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                | (:future_action_times) -> ::Google::Protobuf::Timestamp::field_array
+                | (:create_time) -> ::Google::Protobuf::Timestamp?
+                | (:update_time) -> ::Google::Protobuf::Timestamp?
+                | (:invalid_schedule_error) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:action_count, ::Integer) -> ::Integer
+                 | (:missed_catchup_window, ::Integer) -> ::Integer
+                 | (:overlap_skipped, ::Integer) -> ::Integer
+                 | (:running_workflows, ::Temporal::Api::Common::V1::WorkflowExecution::field_array) -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array
+                 | (:running_workflows, ::Temporal::Api::Common::V1::WorkflowExecution::array) -> ::Temporal::Api::Common::V1::WorkflowExecution::array
+                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                 | (:future_action_times, ::Google::Protobuf::Timestamp::field_array) -> ::Google::Protobuf::Timestamp::field_array
+                 | (:future_action_times, ::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                 | (:create_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:create_time, M?) -> M?
+                 | (:update_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:update_time, M?) -> M?
+                 | (:invalid_schedule_error, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleInfo, ScheduleInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleInfo, ScheduleInfo | _ToProto]
+
+          type array = ::Array[ScheduleInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleInfo | _ToProto]
+        end
+
+        class Schedule < ::Protobuf::Message
+          attr_accessor spec(): ::Temporal::Api::Schedule::V1::ScheduleSpec?
+
+          def spec=: [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
+                   | ...
+
+          def spec!: () -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+
+          attr_accessor action(): ::Temporal::Api::Schedule::V1::ScheduleAction?
+
+          def action=: [M < ::Temporal::Api::Schedule::V1::ScheduleAction::_ToProto] (M?) -> M?
+                     | ...
+
+          def action!: () -> ::Temporal::Api::Schedule::V1::ScheduleAction?
+
+          attr_accessor policies(): ::Temporal::Api::Schedule::V1::SchedulePolicies?
+
+          def policies=: [M < ::Temporal::Api::Schedule::V1::SchedulePolicies::_ToProto] (M?) -> M?
+                       | ...
+
+          def policies!: () -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
+
+          attr_accessor state(): ::Temporal::Api::Schedule::V1::ScheduleState?
+
+          def state=: [M < ::Temporal::Api::Schedule::V1::ScheduleState::_ToProto] (M?) -> M?
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Schedule::V1::ScheduleState?
+
+          def initialize: (?spec: ::Temporal::Api::Schedule::V1::ScheduleSpec::init?, ?action: ::Temporal::Api::Schedule::V1::ScheduleAction::init?, ?policies: ::Temporal::Api::Schedule::V1::SchedulePolicies::init?, ?state: ::Temporal::Api::Schedule::V1::ScheduleState::init?) -> void
+
+          def []: (:spec) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+                | (:action) -> ::Temporal::Api::Schedule::V1::ScheduleAction?
+                | (:policies) -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
+                | (:state) -> ::Temporal::Api::Schedule::V1::ScheduleState?
+                | (::Symbol) -> untyped
+
+          def []=: (:spec, ::Temporal::Api::Schedule::V1::ScheduleSpec?) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
+                 | (:action, ::Temporal::Api::Schedule::V1::ScheduleAction?) -> ::Temporal::Api::Schedule::V1::ScheduleAction?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleAction::_ToProto] (:action, M?) -> M?
+                 | (:policies, ::Temporal::Api::Schedule::V1::SchedulePolicies?) -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
+                 | [M < ::Temporal::Api::Schedule::V1::SchedulePolicies::_ToProto] (:policies, M?) -> M?
+                 | (:state, ::Temporal::Api::Schedule::V1::ScheduleState?) -> ::Temporal::Api::Schedule::V1::ScheduleState?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleState::_ToProto] (:state, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Schedule
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Schedule | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Schedule, Schedule | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Schedule, Schedule | _ToProto]
+
+          type array = ::Array[Schedule | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Schedule | _ToProto]
+        end
+
+        # ScheduleListInfo is an abbreviated set of values from Schedule and ScheduleInfo
+        #  that's returned in ListSchedules.
+        #
+        class ScheduleListInfo < ::Protobuf::Message
+          # From spec:
+          #  Some fields are too large/unimportant for the purpose of listing, so we'll clear them
+          #  from this copy of spec: exclude_calendar, jitter, timezone_data.
+          #
+          attr_accessor spec(): ::Temporal::Api::Schedule::V1::ScheduleSpec?
+
+          # From spec:
+          #  Some fields are too large/unimportant for the purpose of listing, so we'll clear them
+          #  from this copy of spec: exclude_calendar, jitter, timezone_data.
+          #
+          def spec=: [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
+                   | ...
+
+          def spec!: () -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+
+          # From action:
+          #  Action is a oneof field, but we need to encode this in JSON and oneof fields don't work
+          #  well with JSON. If action is start_workflow, this is set:
+          #
+          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
+
+          # From action:
+          #  Action is a oneof field, but we need to encode this in JSON and oneof fields don't work
+          #  well with JSON. If action is start_workflow, this is set:
+          #
+          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+                            | ...
+
+          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
+
+          # From state:
+          #
+          attr_accessor notes(): ::String
+
+          def notes!: () -> ::String?
+
+          attr_accessor paused(): bool
+
+          def paused!: () -> bool?
+
+          # From info (maybe fewer entries):
+          #
+          attr_accessor recent_actions(): ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+
+          # From info (maybe fewer entries):
+          #
+          def recent_actions=: (::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                             | ...
+
+          def recent_actions!: () -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array?
+
+          attr_accessor future_action_times(): ::Google::Protobuf::Timestamp::field_array
+
+          def future_action_times=: (::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                                  | ...
+
+          def future_action_times!: () -> ::Google::Protobuf::Timestamp::field_array?
+
+          def initialize: (?spec: ::Temporal::Api::Schedule::V1::ScheduleSpec::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?notes: ::String, ?paused: bool, ?recent_actions: ::Temporal::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array) -> void
+
+          def []: (:spec) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+                | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
+                | (:notes) -> ::String
+                | (:paused) -> bool
+                | (:recent_actions) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                | (:future_action_times) -> ::Google::Protobuf::Timestamp::field_array
+                | (::Symbol) -> untyped
+
+          def []=: (:spec, ::Temporal::Api::Schedule::V1::ScheduleSpec?) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
+                 | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+                 | (:notes, ::String) -> ::String
+                 | (:paused, bool) -> bool
+                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                 | (:future_action_times, ::Google::Protobuf::Timestamp::field_array) -> ::Google::Protobuf::Timestamp::field_array
+                 | (:future_action_times, ::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                 | (::Symbol, untyped) -> untyped
+
+          def paused?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> ScheduleListInfo
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleListInfo | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleListInfo, ScheduleListInfo | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleListInfo, ScheduleListInfo | _ToProto]
+
+          type array = ::Array[ScheduleListInfo | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleListInfo | _ToProto]
+        end
+
+        # ScheduleListEntry is returned by ListSchedules.
+        #
+        class ScheduleListEntry < ::Protobuf::Message
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                   | ...
+
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+
+          attr_accessor info(): ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+
+          def info=: [M < ::Temporal::Api::Schedule::V1::ScheduleListInfo::_ToProto] (M?) -> M?
+                   | ...
+
+          def info!: () -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+
+          def initialize: (?schedule_id: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?info: ::Temporal::Api::Schedule::V1::ScheduleListInfo::init?) -> void
+
+          def []: (:schedule_id) -> ::String
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                | (:info) -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+                | (::Symbol) -> untyped
+
+          def []=: (:schedule_id, ::String) -> ::String
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:info, ::Temporal::Api::Schedule::V1::ScheduleListInfo?) -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleListInfo::_ToProto] (:info, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleListEntry
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleListEntry | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleListEntry, ScheduleListEntry | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleListEntry, ScheduleListEntry | _ToProto]
+
+          type array = ::Array[ScheduleListEntry | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleListEntry | _ToProto]
+        end
+      end
+    end
+  end
+end

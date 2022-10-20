@@ -315,13 +315,27 @@ module Temporal
 
           def is_global_namespace!: () -> bool?
 
-          def initialize: (?namespace_info: ::Temporal::Api::Namespace::V1::NamespaceInfo::init?, ?config: ::Temporal::Api::Namespace::V1::NamespaceConfig::init?, ?replication_config: ::Temporal::Api::Replication::V1::NamespaceReplicationConfig::init?, ?failover_version: ::Integer, ?is_global_namespace: bool) -> void
+          # Contains the historical state of failover_versions for the cluster, truncated to contain only the last N
+          #  states to ensure that the list does not grow unbounded.
+          #
+          attr_accessor failover_history(): ::Temporal::Api::Replication::V1::FailoverStatus::field_array
+
+          # Contains the historical state of failover_versions for the cluster, truncated to contain only the last N
+          #  states to ensure that the list does not grow unbounded.
+          #
+          def failover_history=: (::Temporal::Api::Replication::V1::FailoverStatus::array) -> ::Temporal::Api::Replication::V1::FailoverStatus::array
+                               | ...
+
+          def failover_history!: () -> ::Temporal::Api::Replication::V1::FailoverStatus::field_array?
+
+          def initialize: (?namespace_info: ::Temporal::Api::Namespace::V1::NamespaceInfo::init?, ?config: ::Temporal::Api::Namespace::V1::NamespaceConfig::init?, ?replication_config: ::Temporal::Api::Replication::V1::NamespaceReplicationConfig::init?, ?failover_version: ::Integer, ?is_global_namespace: bool, ?failover_history: ::Temporal::Api::Replication::V1::FailoverStatus::array) -> void
 
           def []: (:namespace_info) -> ::Temporal::Api::Namespace::V1::NamespaceInfo?
                 | (:config) -> ::Temporal::Api::Namespace::V1::NamespaceConfig?
                 | (:replication_config) -> ::Temporal::Api::Replication::V1::NamespaceReplicationConfig?
                 | (:failover_version) -> ::Integer
                 | (:is_global_namespace) -> bool
+                | (:failover_history) -> ::Temporal::Api::Replication::V1::FailoverStatus::field_array
                 | (::Symbol) -> untyped
 
           def []=: (:namespace_info, ::Temporal::Api::Namespace::V1::NamespaceInfo?) -> ::Temporal::Api::Namespace::V1::NamespaceInfo?
@@ -332,6 +346,8 @@ module Temporal
                  | [M < ::Temporal::Api::Replication::V1::NamespaceReplicationConfig::_ToProto] (:replication_config, M?) -> M?
                  | (:failover_version, ::Integer) -> ::Integer
                  | (:is_global_namespace, bool) -> bool
+                 | (:failover_history, ::Temporal::Api::Replication::V1::FailoverStatus::field_array) -> ::Temporal::Api::Replication::V1::FailoverStatus::field_array
+                 | (:failover_history, ::Temporal::Api::Replication::V1::FailoverStatus::array) -> ::Temporal::Api::Replication::V1::FailoverStatus::array
                  | (::Symbol, untyped) -> untyped
 
           def is_global_namespace?: () -> bool
@@ -1072,17 +1088,29 @@ module Temporal
           def identity!: () -> ::String?
 
           # Each worker process should provide an ID unique to the specific set of code it is running
+          #  "checksum" in this field name isn't very accurate, it should be though of as an id.
           #
           attr_accessor binary_checksum(): ::String
 
           def binary_checksum!: () -> ::String?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String) -> void
+          # If set, the worker is opting in to build-id based versioning and wishes to only
+          #  receive tasks that are considered compatible with the version provided in the string.
+          #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
+          #  When set, and `binary_checksum` is not, this value should also be considered as the
+          #  `binary_checksum`.
+          #
+          attr_accessor worker_versioning_build_id(): ::String
+
+          def worker_versioning_build_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_build_id: ::String) -> void
 
           def []: (:namespace) -> ::String
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
                 | (:binary_checksum) -> ::String
+                | (:worker_versioning_build_id) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
@@ -1090,6 +1118,7 @@ module Temporal
                  | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:binary_checksum, ::String) -> ::String
+                 | (:worker_versioning_build_id, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1612,12 +1641,21 @@ module Temporal
 
           def task_queue_metadata!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::init?) -> void
+          # If set, the worker is opting in to build-id based versioning and wishes to only
+          #  receive tasks that are considered compatible with the version provided in the string.
+          #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
+          #
+          attr_accessor worker_versioning_build_id(): ::String
+
+          def worker_versioning_build_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::init?, ?worker_versioning_build_id: ::String) -> void
 
           def []: (:namespace) -> ::String
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
                 | (:task_queue_metadata) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
+                | (:worker_versioning_build_id) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
@@ -1626,6 +1664,7 @@ module Temporal
                  | (:identity, ::String) -> ::String
                  | (:task_queue_metadata, ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
                  | [M < ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::_ToProto] (:task_queue_metadata, M?) -> M?
+                 | (:worker_versioning_build_id, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -3234,11 +3273,11 @@ module Temporal
 
           def request_id!: () -> ::String?
 
-          # Should be removed. Appears unused.
+          # Reset reapplay(replay) options.
           #
           attr_accessor reset_reapply_type(): ::Temporal::Api::Enums::V1::ResetReapplyType
 
-          # Should be removed. Appears unused.
+          # Reset reapplay(replay) options.
           #
           def reset_reapply_type=: (::Temporal::Api::Enums::V1::ResetReapplyType::values) -> ::Temporal::Api::Enums::V1::ResetReapplyType::values
                                  | ...
@@ -4681,16 +4720,32 @@ module Temporal
 
             def activity_failure_include_heartbeat!: () -> bool?
 
-            def initialize: (?signal_and_query_header: bool, ?internal_error_differentiation: bool, ?activity_failure_include_heartbeat: bool) -> void
+            # Supports scheduled workflow features.
+            #
+            attr_accessor supports_schedules(): bool
+
+            def supports_schedules!: () -> bool?
+
+            # True if server uses protos that include temporal.api.failure.v1.Failure.encoded_attributes
+            #
+            attr_accessor encoded_failure_attributes(): bool
+
+            def encoded_failure_attributes!: () -> bool?
+
+            def initialize: (?signal_and_query_header: bool, ?internal_error_differentiation: bool, ?activity_failure_include_heartbeat: bool, ?supports_schedules: bool, ?encoded_failure_attributes: bool) -> void
 
             def []: (:signal_and_query_header) -> bool
                   | (:internal_error_differentiation) -> bool
                   | (:activity_failure_include_heartbeat) -> bool
+                  | (:supports_schedules) -> bool
+                  | (:encoded_failure_attributes) -> bool
                   | (::Symbol) -> untyped
 
             def []=: (:signal_and_query_header, bool) -> bool
                    | (:internal_error_differentiation, bool) -> bool
                    | (:activity_failure_include_heartbeat, bool) -> bool
+                   | (:supports_schedules, bool) -> bool
+                   | (:encoded_failure_attributes, bool) -> bool
                    | (::Symbol, untyped) -> untyped
 
             def signal_and_query_header?: () -> bool
@@ -4698,6 +4753,10 @@ module Temporal
             def internal_error_differentiation?: () -> bool
 
             def activity_failure_include_heartbeat?: () -> bool
+
+            def supports_schedules?: () -> bool
+
+            def encoded_failure_attributes?: () -> bool
 
             interface _ToProto
               def to_proto: () -> Capabilities
@@ -4847,6 +4906,1546 @@ module Temporal
           type array = ::Array[ListTaskQueuePartitionsResponse | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, ListTaskQueuePartitionsResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0133::request-parent-required=disabled
+        #      aip.dev/not-precedent: CreateSchedule doesn't follow Google API format --)
+        #  (-- api-linter: core::0133::request-unknown-fields=disabled
+        #      aip.dev/not-precedent: CreateSchedule doesn't follow Google API format --)
+        #  (-- api-linter: core::0133::request-resource-behavior=disabled
+        #      aip.dev/not-precedent: field_behavior annotation not available in our gogo fork --)
+        #  (-- api-linter: core::0203::optional=disabled
+        #      aip.dev/not-precedent: field_behavior annotation not available in our gogo fork --)
+        #
+        class CreateScheduleRequest < ::Protobuf::Message
+          # The namespace the schedule should be created in.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the new schedule.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          # The schedule spec, policies, action, and initial state.
+          #
+          attr_accessor schedule(): ::Temporal::Api::Schedule::V1::Schedule?
+
+          # The schedule spec, policies, action, and initial state.
+          #
+          def schedule=: [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (M?) -> M?
+                       | ...
+
+          def schedule!: () -> ::Temporal::Api::Schedule::V1::Schedule?
+
+          # Optional initial patch (e.g. to run the action once immediately).
+          #
+          attr_accessor initial_patch(): ::Temporal::Api::Schedule::V1::SchedulePatch?
+
+          # Optional initial patch (e.g. to run the action once immediately).
+          #
+          def initial_patch=: [M < ::Temporal::Api::Schedule::V1::SchedulePatch::_ToProto] (M?) -> M?
+                            | ...
+
+          def initial_patch!: () -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+
+          # The identity of the client who initiated this request.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          # A unique identifier for this create request for idempotence. Typically UUIDv4.
+          #
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          # Memo and search attributes to attach to the schedule itself.
+          #
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+
+          # Memo and search attributes to attach to the schedule itself.
+          #
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                   | ...
+
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String, ?schedule: ::Temporal::Api::Schedule::V1::Schedule::init?, ?initial_patch: ::Temporal::Api::Schedule::V1::SchedulePatch::init?, ?identity: ::String, ?request_id: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (:schedule) -> ::Temporal::Api::Schedule::V1::Schedule?
+                | (:initial_patch) -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+                | (:identity) -> ::String
+                | (:request_id) -> ::String
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (:schedule, ::Temporal::Api::Schedule::V1::Schedule?) -> ::Temporal::Api::Schedule::V1::Schedule?
+                 | [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (:schedule, M?) -> M?
+                 | (:initial_patch, ::Temporal::Api::Schedule::V1::SchedulePatch?) -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+                 | [M < ::Temporal::Api::Schedule::V1::SchedulePatch::_ToProto] (:initial_patch, M?) -> M?
+                 | (:identity, ::String) -> ::String
+                 | (:request_id, ::String) -> ::String
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CreateScheduleRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CreateScheduleRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CreateScheduleRequest, CreateScheduleRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CreateScheduleRequest, CreateScheduleRequest | _ToProto]
+
+          type array = ::Array[CreateScheduleRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CreateScheduleRequest | _ToProto]
+        end
+
+        class CreateScheduleResponse < ::Protobuf::Message
+          attr_accessor conflict_token(): ::String
+
+          def conflict_token!: () -> ::String?
+
+          def initialize: (?conflict_token: ::String) -> void
+
+          def []: (:conflict_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:conflict_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CreateScheduleResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CreateScheduleResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CreateScheduleResponse, CreateScheduleResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CreateScheduleResponse, CreateScheduleResponse | _ToProto]
+
+          type array = ::Array[CreateScheduleResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CreateScheduleResponse | _ToProto]
+        end
+
+        class DescribeScheduleRequest < ::Protobuf::Message
+          # The namespace of the schedule to describe.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the schedule to describe.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DescribeScheduleRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DescribeScheduleRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DescribeScheduleRequest, DescribeScheduleRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeScheduleRequest, DescribeScheduleRequest | _ToProto]
+
+          type array = ::Array[DescribeScheduleRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DescribeScheduleRequest | _ToProto]
+        end
+
+        class DescribeScheduleResponse < ::Protobuf::Message
+          # The complete current schedule details. This may not match the schedule as
+          #  created because:
+          #  - some fields in the state are modified automatically
+          #  - the schedule may have been modified by UpdateSchedule or PatchSchedule
+          #
+          attr_accessor schedule(): ::Temporal::Api::Schedule::V1::Schedule?
+
+          # The complete current schedule details. This may not match the schedule as
+          #  created because:
+          #  - some fields in the state are modified automatically
+          #  - the schedule may have been modified by UpdateSchedule or PatchSchedule
+          #
+          def schedule=: [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (M?) -> M?
+                       | ...
+
+          def schedule!: () -> ::Temporal::Api::Schedule::V1::Schedule?
+
+          # Extra schedule state info.
+          #
+          attr_accessor info(): ::Temporal::Api::Schedule::V1::ScheduleInfo?
+
+          # Extra schedule state info.
+          #
+          def info=: [M < ::Temporal::Api::Schedule::V1::ScheduleInfo::_ToProto] (M?) -> M?
+                   | ...
+
+          def info!: () -> ::Temporal::Api::Schedule::V1::ScheduleInfo?
+
+          # The memo and search attributes that the schedule was created with.
+          #
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+
+          # The memo and search attributes that the schedule was created with.
+          #
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                   | ...
+
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+                                | ...
+
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+
+          # This value can be passed back to UpdateSchedule to ensure that the
+          #  schedule was not modified between a Describe and an Update, which could
+          #  lead to lost updates and other confusion.
+          #
+          attr_accessor conflict_token(): ::String
+
+          def conflict_token!: () -> ::String?
+
+          def initialize: (?schedule: ::Temporal::Api::Schedule::V1::Schedule::init?, ?info: ::Temporal::Api::Schedule::V1::ScheduleInfo::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?conflict_token: ::String) -> void
+
+          def []: (:schedule) -> ::Temporal::Api::Schedule::V1::Schedule?
+                | (:info) -> ::Temporal::Api::Schedule::V1::ScheduleInfo?
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                | (:conflict_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:schedule, ::Temporal::Api::Schedule::V1::Schedule?) -> ::Temporal::Api::Schedule::V1::Schedule?
+                 | [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (:schedule, M?) -> M?
+                 | (:info, ::Temporal::Api::Schedule::V1::ScheduleInfo?) -> ::Temporal::Api::Schedule::V1::ScheduleInfo?
+                 | [M < ::Temporal::Api::Schedule::V1::ScheduleInfo::_ToProto] (:info, M?) -> M?
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:conflict_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DescribeScheduleResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DescribeScheduleResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DescribeScheduleResponse, DescribeScheduleResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeScheduleResponse, DescribeScheduleResponse | _ToProto]
+
+          type array = ::Array[DescribeScheduleResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DescribeScheduleResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0134::request-mask-required=disabled
+        #      aip.dev/not-precedent: UpdateSchedule doesn't follow Google API format --)
+        #
+        class UpdateScheduleRequest < ::Protobuf::Message
+          # The namespace of the schedule to update.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the schedule to update.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          # The new schedule. The four main fields of the schedule (spec, action,
+          #  policies, state) are replaced completely by the values in this message.
+          #
+          attr_accessor schedule(): ::Temporal::Api::Schedule::V1::Schedule?
+
+          # The new schedule. The four main fields of the schedule (spec, action,
+          #  policies, state) are replaced completely by the values in this message.
+          #
+          def schedule=: [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (M?) -> M?
+                       | ...
+
+          def schedule!: () -> ::Temporal::Api::Schedule::V1::Schedule?
+
+          # This can be the value of conflict_token from a DescribeScheduleResponse,
+          #  which will cause this request to fail if the schedule has been modified
+          #  between the Describe and this Update.
+          #  If missing, the schedule will be updated unconditionally.
+          #
+          attr_accessor conflict_token(): ::String
+
+          def conflict_token!: () -> ::String?
+
+          # The identity of the client who initiated this request.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          # A unique identifier for this update request for idempotence. Typically UUIDv4.
+          #
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String, ?schedule: ::Temporal::Api::Schedule::V1::Schedule::init?, ?conflict_token: ::String, ?identity: ::String, ?request_id: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (:schedule) -> ::Temporal::Api::Schedule::V1::Schedule?
+                | (:conflict_token) -> ::String
+                | (:identity) -> ::String
+                | (:request_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (:schedule, ::Temporal::Api::Schedule::V1::Schedule?) -> ::Temporal::Api::Schedule::V1::Schedule?
+                 | [M < ::Temporal::Api::Schedule::V1::Schedule::_ToProto] (:schedule, M?) -> M?
+                 | (:conflict_token, ::String) -> ::String
+                 | (:identity, ::String) -> ::String
+                 | (:request_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> UpdateScheduleRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateScheduleRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateScheduleRequest, UpdateScheduleRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateScheduleRequest, UpdateScheduleRequest | _ToProto]
+
+          type array = ::Array[UpdateScheduleRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateScheduleRequest | _ToProto]
+        end
+
+        class UpdateScheduleResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> UpdateScheduleResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateScheduleResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateScheduleResponse, UpdateScheduleResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateScheduleResponse, UpdateScheduleResponse | _ToProto]
+
+          type array = ::Array[UpdateScheduleResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateScheduleResponse | _ToProto]
+        end
+
+        class PatchScheduleRequest < ::Protobuf::Message
+          # The namespace of the schedule to patch.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the schedule to patch.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          attr_accessor patch(): ::Temporal::Api::Schedule::V1::SchedulePatch?
+
+          def patch=: [M < ::Temporal::Api::Schedule::V1::SchedulePatch::_ToProto] (M?) -> M?
+                    | ...
+
+          def patch!: () -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+
+          # The identity of the client who initiated this request.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          # A unique identifier for this update request for idempotence. Typically UUIDv4.
+          #
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String, ?patch: ::Temporal::Api::Schedule::V1::SchedulePatch::init?, ?identity: ::String, ?request_id: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (:patch) -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+                | (:identity) -> ::String
+                | (:request_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (:patch, ::Temporal::Api::Schedule::V1::SchedulePatch?) -> ::Temporal::Api::Schedule::V1::SchedulePatch?
+                 | [M < ::Temporal::Api::Schedule::V1::SchedulePatch::_ToProto] (:patch, M?) -> M?
+                 | (:identity, ::String) -> ::String
+                 | (:request_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> PatchScheduleRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PatchScheduleRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PatchScheduleRequest, PatchScheduleRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PatchScheduleRequest, PatchScheduleRequest | _ToProto]
+
+          type array = ::Array[PatchScheduleRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PatchScheduleRequest | _ToProto]
+        end
+
+        class PatchScheduleResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> PatchScheduleResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = PatchScheduleResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[PatchScheduleResponse, PatchScheduleResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, PatchScheduleResponse, PatchScheduleResponse | _ToProto]
+
+          type array = ::Array[PatchScheduleResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, PatchScheduleResponse | _ToProto]
+        end
+
+        class ListScheduleMatchingTimesRequest < ::Protobuf::Message
+          # The namespace of the schedule to query.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the schedule to query.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          # Time range to query.
+          #
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+          # Time range to query.
+          #
+          def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor end_time(): ::Google::Protobuf::Timestamp?
+
+          def end_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                       | ...
+
+          def end_time!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String, ?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (:start_time) -> ::Google::Protobuf::Timestamp?
+                | (:end_time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
+                 | (:end_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:end_time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListScheduleMatchingTimesRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListScheduleMatchingTimesRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListScheduleMatchingTimesRequest, ListScheduleMatchingTimesRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListScheduleMatchingTimesRequest, ListScheduleMatchingTimesRequest | _ToProto]
+
+          type array = ::Array[ListScheduleMatchingTimesRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListScheduleMatchingTimesRequest | _ToProto]
+        end
+
+        class ListScheduleMatchingTimesResponse < ::Protobuf::Message
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp::field_array
+
+          def start_time=: (::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp::field_array?
+
+          def initialize: (?start_time: ::Google::Protobuf::Timestamp::array) -> void
+
+          def []: (:start_time) -> ::Google::Protobuf::Timestamp::field_array
+                | (::Symbol) -> untyped
+
+          def []=: (:start_time, ::Google::Protobuf::Timestamp::field_array) -> ::Google::Protobuf::Timestamp::field_array
+                 | (:start_time, ::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListScheduleMatchingTimesResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListScheduleMatchingTimesResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListScheduleMatchingTimesResponse, ListScheduleMatchingTimesResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListScheduleMatchingTimesResponse, ListScheduleMatchingTimesResponse | _ToProto]
+
+          type array = ::Array[ListScheduleMatchingTimesResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListScheduleMatchingTimesResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0135::request-name-required=disabled
+        #      aip.dev/not-precedent: DeleteSchedule doesn't follow Google API format --)
+        #  (-- api-linter: core::0135::request-unknown-fields=disabled
+        #      aip.dev/not-precedent: DeleteSchedule doesn't follow Google API format --)
+        #
+        class DeleteScheduleRequest < ::Protobuf::Message
+          # The namespace of the schedule to delete.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The id of the schedule to delete.
+          #
+          attr_accessor schedule_id(): ::String
+
+          def schedule_id!: () -> ::String?
+
+          # The identity of the client who initiated this request.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?schedule_id: ::String, ?identity: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:schedule_id) -> ::String
+                | (:identity) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:schedule_id, ::String) -> ::String
+                 | (:identity, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DeleteScheduleRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteScheduleRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteScheduleRequest, DeleteScheduleRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteScheduleRequest, DeleteScheduleRequest | _ToProto]
+
+          type array = ::Array[DeleteScheduleRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteScheduleRequest | _ToProto]
+        end
+
+        class DeleteScheduleResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> DeleteScheduleResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteScheduleResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteScheduleResponse, DeleteScheduleResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteScheduleResponse, DeleteScheduleResponse | _ToProto]
+
+          type array = ::Array[DeleteScheduleResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteScheduleResponse | _ToProto]
+        end
+
+        class ListSchedulesRequest < ::Protobuf::Message
+          # The namespace to list schedules in.
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # How many to return at once.
+          #
+          attr_accessor maximum_page_size(): ::Integer
+
+          def maximum_page_size!: () -> ::Integer?
+
+          # Token to get the next page of results.
+          #
+          attr_accessor next_page_token(): ::String
+
+          def next_page_token!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?maximum_page_size: ::Integer, ?next_page_token: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:maximum_page_size) -> ::Integer
+                | (:next_page_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:maximum_page_size, ::Integer) -> ::Integer
+                 | (:next_page_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListSchedulesRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListSchedulesRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListSchedulesRequest, ListSchedulesRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListSchedulesRequest, ListSchedulesRequest | _ToProto]
+
+          type array = ::Array[ListSchedulesRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListSchedulesRequest | _ToProto]
+        end
+
+        class ListSchedulesResponse < ::Protobuf::Message
+          attr_accessor schedules(): ::Temporal::Api::Schedule::V1::ScheduleListEntry::field_array
+
+          def schedules=: (::Temporal::Api::Schedule::V1::ScheduleListEntry::array) -> ::Temporal::Api::Schedule::V1::ScheduleListEntry::array
+                        | ...
+
+          def schedules!: () -> ::Temporal::Api::Schedule::V1::ScheduleListEntry::field_array?
+
+          attr_accessor next_page_token(): ::String
+
+          def next_page_token!: () -> ::String?
+
+          def initialize: (?schedules: ::Temporal::Api::Schedule::V1::ScheduleListEntry::array, ?next_page_token: ::String) -> void
+
+          def []: (:schedules) -> ::Temporal::Api::Schedule::V1::ScheduleListEntry::field_array
+                | (:next_page_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:schedules, ::Temporal::Api::Schedule::V1::ScheduleListEntry::field_array) -> ::Temporal::Api::Schedule::V1::ScheduleListEntry::field_array
+                 | (:schedules, ::Temporal::Api::Schedule::V1::ScheduleListEntry::array) -> ::Temporal::Api::Schedule::V1::ScheduleListEntry::array
+                 | (:next_page_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListSchedulesResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListSchedulesResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListSchedulesResponse, ListSchedulesResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListSchedulesResponse, ListSchedulesResponse | _ToProto]
+
+          type array = ::Array[ListSchedulesResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListSchedulesResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0134::request-mask-required=disabled
+        #      aip.dev/not-precedent: UpdateWorkerBuildIdOrderingRequest doesn't follow Google API format --)
+        #  (-- api-linter: core::0134::request-resource-required=disabled
+        #      aip.dev/not-precedent: UpdateWorkerBuildIdOrderingRequest RPC doesn't follow Google API format. --)
+        #
+        class UpdateWorkerBuildIdOrderingRequest < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Must be set, the task queue to apply changes to. Because all workers on
+          #  a given task queue must have the same set of workflow & activity
+          #  implementations, there is no reason to specify a task queue type here.
+          #
+          attr_accessor task_queue(): ::String
+
+          def task_queue!: () -> ::String?
+
+          # The version id we are targeting.
+          #
+          attr_accessor version_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # The version id we are targeting.
+          #
+          def version_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                         | ...
+
+          def version_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # When set, indicates that the `version_id` in this message is compatible
+          #  with the one specified in this field. Because compatability should form
+          #  a DAG, any build id can only be the "next compatible" version for one
+          #  other ID of a certain type at a time, and any setting which would create a cycle is invalid.
+          #
+          attr_accessor previous_compatible(): ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # When set, indicates that the `version_id` in this message is compatible
+          #  with the one specified in this field. Because compatability should form
+          #  a DAG, any build id can only be the "next compatible" version for one
+          #  other ID of a certain type at a time, and any setting which would create a cycle is invalid.
+          #
+          def previous_compatible=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                  | ...
+
+          def previous_compatible!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # When set, establishes the specified `version_id` as the default of it's type
+          #  for the queue. Workers matching it will begin processing new workflow executions.
+          #  The existing default will be marked as a previous incompatible version
+          #  to this one, assuming it is not also in `is_compatible_with`.
+          #
+          attr_accessor become_default(): bool
+
+          def become_default!: () -> bool?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::String, ?version_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?, ?previous_compatible: ::Temporal::Api::TaskQueue::V1::VersionId::init?, ?become_default: bool) -> void
+
+          def []: (:namespace) -> ::String
+                | (:task_queue) -> ::String
+                | (:version_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                | (:previous_compatible) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                | (:become_default) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:task_queue, ::String) -> ::String
+                 | (:version_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:version_id, M?) -> M?
+                 | (:previous_compatible, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:previous_compatible, M?) -> M?
+                 | (:become_default, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def become_default?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> UpdateWorkerBuildIdOrderingRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateWorkerBuildIdOrderingRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateWorkerBuildIdOrderingRequest, UpdateWorkerBuildIdOrderingRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateWorkerBuildIdOrderingRequest, UpdateWorkerBuildIdOrderingRequest | _ToProto]
+
+          type array = ::Array[UpdateWorkerBuildIdOrderingRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateWorkerBuildIdOrderingRequest | _ToProto]
+        end
+
+        class UpdateWorkerBuildIdOrderingResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> UpdateWorkerBuildIdOrderingResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateWorkerBuildIdOrderingResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateWorkerBuildIdOrderingResponse, UpdateWorkerBuildIdOrderingResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateWorkerBuildIdOrderingResponse, UpdateWorkerBuildIdOrderingResponse | _ToProto]
+
+          type array = ::Array[UpdateWorkerBuildIdOrderingResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateWorkerBuildIdOrderingResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0134::request-resource-required=disabled
+        #      aip.dev/not-precedent: GetWorkerBuildIdOrderingRequest RPC doesn't follow Google API format. --)
+        #
+        class GetWorkerBuildIdOrderingRequest < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Must be set, the task queue to interrogate about worker id ordering
+          #
+          attr_accessor task_queue(): ::String
+
+          def task_queue!: () -> ::String?
+
+          # Limits how deep the returned DAG will go. 1 will return only the
+          #  default build id. A default/0 value will return the entire graph.
+          #
+          attr_accessor max_depth(): ::Integer
+
+          def max_depth!: () -> ::Integer?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::String, ?max_depth: ::Integer) -> void
+
+          def []: (:namespace) -> ::String
+                | (:task_queue) -> ::String
+                | (:max_depth) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:task_queue, ::String) -> ::String
+                 | (:max_depth, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> GetWorkerBuildIdOrderingRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = GetWorkerBuildIdOrderingRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[GetWorkerBuildIdOrderingRequest, GetWorkerBuildIdOrderingRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, GetWorkerBuildIdOrderingRequest, GetWorkerBuildIdOrderingRequest | _ToProto]
+
+          type array = ::Array[GetWorkerBuildIdOrderingRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, GetWorkerBuildIdOrderingRequest | _ToProto]
+        end
+
+        class GetWorkerBuildIdOrderingResponse < ::Protobuf::Message
+          # The currently established default version
+          #
+          attr_accessor current_default(): ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          # The currently established default version
+          #
+          def current_default=: [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
+                              | ...
+
+          def current_default!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+
+          # Other current latest-compatible versions who are not the overall default. These are the
+          #  versions that will be used when generating new tasks by following the graph from the
+          #  version of the last task out to a leaf.
+          #
+          attr_accessor compatible_leaves(): ::Temporal::Api::TaskQueue::V1::VersionIdNode::field_array
+
+          # Other current latest-compatible versions who are not the overall default. These are the
+          #  versions that will be used when generating new tasks by following the graph from the
+          #  version of the last task out to a leaf.
+          #
+          def compatible_leaves=: (::Temporal::Api::TaskQueue::V1::VersionIdNode::array) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode::array
+                                | ...
+
+          def compatible_leaves!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode::field_array?
+
+          def initialize: (?current_default: ::Temporal::Api::TaskQueue::V1::VersionIdNode::init?, ?compatible_leaves: ::Temporal::Api::TaskQueue::V1::VersionIdNode::array) -> void
+
+          def []: (:current_default) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                | (:compatible_leaves) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode::field_array
+                | (::Symbol) -> untyped
+
+          def []=: (:current_default, ::Temporal::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:current_default, M?) -> M?
+                 | (:compatible_leaves, ::Temporal::Api::TaskQueue::V1::VersionIdNode::field_array) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode::field_array
+                 | (:compatible_leaves, ::Temporal::Api::TaskQueue::V1::VersionIdNode::array) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode::array
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> GetWorkerBuildIdOrderingResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = GetWorkerBuildIdOrderingResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[GetWorkerBuildIdOrderingResponse, GetWorkerBuildIdOrderingResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, GetWorkerBuildIdOrderingResponse, GetWorkerBuildIdOrderingResponse | _ToProto]
+
+          type array = ::Array[GetWorkerBuildIdOrderingResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, GetWorkerBuildIdOrderingResponse | _ToProto]
+        end
+
+        # (-- api-linter: core::0134=disabled
+        #      aip.dev/not-precedent: Update RPCs don't follow Google API format. --)
+        #
+        class UpdateWorkflowRequest < ::Protobuf::Message
+          # A unique ID for this logical request
+          #
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          # The manner in which the update result will be accessed.
+          #  This field requires a non-default value; the default value of the enum
+          #  will result in an error.
+          #
+          attr_accessor result_access_style(): ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle
+
+          # The manner in which the update result will be accessed.
+          #  This field requires a non-default value; the default value of the enum
+          #  will result in an error.
+          #
+          def result_access_style=: (::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::values) -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::values
+                                  | ...
+
+          def result_access_style!: () -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle?
+
+          # The namespace name of the target workflow
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # The target workflow id and (optionally) a specific run thereof
+          #  (-- api-linter: core::0203::optional=disabled
+          #      aip.dev/not-precedent: false positive triggered by the word "optional" --)
+          #
+          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # The target workflow id and (optionally) a specific run thereof
+          #  (-- api-linter: core::0203::optional=disabled
+          #      aip.dev/not-precedent: false positive triggered by the word "optional" --)
+          #
+          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                                 | ...
+
+          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # If set, this call will error if the most recent (if no run id is set on
+          #  `workflow_execution`), or specified (if it is) workflow execution is not
+          #  part of the same execution chain as this id.
+          #
+          attr_accessor first_execution_run_id(): ::String
+
+          def first_execution_run_id!: () -> ::String?
+
+          # The name under which the workflow update function is registered and the
+          #  arguments to pass to said function.
+          #
+          attr_accessor update(): ::Temporal::Api::Update::V1::WorkflowUpdate?
+
+          # The name under which the workflow update function is registered and the
+          #  arguments to pass to said function.
+          #
+          def update=: [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (M?) -> M?
+                     | ...
+
+          def update!: () -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+
+          def initialize: (?request_id: ::String, ?result_access_style: ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::init, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?first_execution_run_id: ::String, ?update: ::Temporal::Api::Update::V1::WorkflowUpdate::init?) -> void
+
+          def []: (:request_id) -> ::String
+                | (:result_access_style) -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle
+                | (:namespace) -> ::String
+                | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:first_execution_run_id) -> ::String
+                | (:update) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+                | (::Symbol) -> untyped
+
+          def []=: (:request_id, ::String) -> ::String
+                 | (:result_access_style, ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle) -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle
+                 | (:result_access_style, ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::values) -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::values
+                 | (:namespace, ::String) -> ::String
+                 | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:first_execution_run_id, ::String) -> ::String
+                 | (:update, ::Temporal::Api::Update::V1::WorkflowUpdate?) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+                 | [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (:update, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> UpdateWorkflowRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateWorkflowRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateWorkflowRequest, UpdateWorkflowRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateWorkflowRequest, UpdateWorkflowRequest | _ToProto]
+
+          type array = ::Array[UpdateWorkflowRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateWorkflowRequest | _ToProto]
+        end
+
+        class UpdateWorkflowResponse < ::Protobuf::Message
+          # An opaque token that can be used to retrieve the update result via
+          #  polling if it is not returned as part of the gRPC response
+          #
+          attr_accessor update_token(): ::String
+
+          def update_token!: () -> ::String?
+
+          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+
+          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                      | ...
+
+          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+          def initialize: (?update_token: ::String, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:update_token) -> ::String
+                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:update_token, ::String) -> ::String
+                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> UpdateWorkflowResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpdateWorkflowResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpdateWorkflowResponse, UpdateWorkflowResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateWorkflowResponse, UpdateWorkflowResponse | _ToProto]
+
+          type array = ::Array[UpdateWorkflowResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpdateWorkflowResponse | _ToProto]
+        end
+
+        class StartBatchOperationRequest < ::Protobuf::Message
+          # Namespace that contains the batch operation
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Visibility query defines the the group of workflow to do batch operation
+          #
+          attr_accessor visibility_query(): ::String
+
+          def visibility_query!: () -> ::String?
+
+          attr_accessor termination_operation(): ::Temporal::Api::Batch::V1::BatchOperationTermination?
+
+          def termination_operation=: [M < ::Temporal::Api::Batch::V1::BatchOperationTermination::_ToProto] (M?) -> M?
+                                    | ...
+
+          def termination_operation!: () -> ::Temporal::Api::Batch::V1::BatchOperationTermination?
+
+          attr_accessor signal_operation(): ::Temporal::Api::Batch::V1::BatchOperationSignal?
+
+          def signal_operation=: [M < ::Temporal::Api::Batch::V1::BatchOperationSignal::_ToProto] (M?) -> M?
+                               | ...
+
+          def signal_operation!: () -> ::Temporal::Api::Batch::V1::BatchOperationSignal?
+
+          attr_accessor cancellation_operation(): ::Temporal::Api::Batch::V1::BatchOperationCancellation?
+
+          def cancellation_operation=: [M < ::Temporal::Api::Batch::V1::BatchOperationCancellation::_ToProto] (M?) -> M?
+                                     | ...
+
+          def cancellation_operation!: () -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
+
+          def initialize: (?namespace: ::String, ?visibility_query: ::String, ?termination_operation: ::Temporal::Api::Batch::V1::BatchOperationTermination::init?, ?signal_operation: ::Temporal::Api::Batch::V1::BatchOperationSignal::init?, ?cancellation_operation: ::Temporal::Api::Batch::V1::BatchOperationCancellation::init?) -> void
+
+          def []: (:namespace) -> ::String
+                | (:visibility_query) -> ::String
+                | (:termination_operation) -> ::Temporal::Api::Batch::V1::BatchOperationTermination?
+                | (:signal_operation) -> ::Temporal::Api::Batch::V1::BatchOperationSignal?
+                | (:cancellation_operation) -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:visibility_query, ::String) -> ::String
+                 | (:termination_operation, ::Temporal::Api::Batch::V1::BatchOperationTermination?) -> ::Temporal::Api::Batch::V1::BatchOperationTermination?
+                 | [M < ::Temporal::Api::Batch::V1::BatchOperationTermination::_ToProto] (:termination_operation, M?) -> M?
+                 | (:signal_operation, ::Temporal::Api::Batch::V1::BatchOperationSignal?) -> ::Temporal::Api::Batch::V1::BatchOperationSignal?
+                 | [M < ::Temporal::Api::Batch::V1::BatchOperationSignal::_ToProto] (:signal_operation, M?) -> M?
+                 | (:cancellation_operation, ::Temporal::Api::Batch::V1::BatchOperationCancellation?) -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
+                 | [M < ::Temporal::Api::Batch::V1::BatchOperationCancellation::_ToProto] (:cancellation_operation, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StartBatchOperationRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StartBatchOperationRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartBatchOperationRequest, StartBatchOperationRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartBatchOperationRequest, StartBatchOperationRequest | _ToProto]
+
+          type array = ::Array[StartBatchOperationRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StartBatchOperationRequest | _ToProto]
+        end
+
+        class StartBatchOperationResponse < ::Protobuf::Message
+          # Batch job id
+          #
+          attr_accessor job_id(): ::String
+
+          def job_id!: () -> ::String?
+
+          def initialize: (?job_id: ::String) -> void
+
+          def []: (:job_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:job_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StartBatchOperationResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StartBatchOperationResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartBatchOperationResponse, StartBatchOperationResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartBatchOperationResponse, StartBatchOperationResponse | _ToProto]
+
+          type array = ::Array[StartBatchOperationResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StartBatchOperationResponse | _ToProto]
+        end
+
+        class StopBatchOperationRequest < ::Protobuf::Message
+          # Namespace that contains the batch operation
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Batch job id
+          #
+          attr_accessor job_id(): ::String
+
+          def job_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?job_id: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:job_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:job_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StopBatchOperationRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StopBatchOperationRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StopBatchOperationRequest, StopBatchOperationRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StopBatchOperationRequest, StopBatchOperationRequest | _ToProto]
+
+          type array = ::Array[StopBatchOperationRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StopBatchOperationRequest | _ToProto]
+        end
+
+        class StopBatchOperationResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> StopBatchOperationResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StopBatchOperationResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StopBatchOperationResponse, StopBatchOperationResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StopBatchOperationResponse, StopBatchOperationResponse | _ToProto]
+
+          type array = ::Array[StopBatchOperationResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StopBatchOperationResponse | _ToProto]
+        end
+
+        class DescribeBatchOperationRequest < ::Protobuf::Message
+          # Namespace that contains the batch operation
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Batch job id
+          #
+          attr_accessor job_id(): ::String
+
+          def job_id!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?job_id: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:job_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:job_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DescribeBatchOperationRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DescribeBatchOperationRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DescribeBatchOperationRequest, DescribeBatchOperationRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeBatchOperationRequest, DescribeBatchOperationRequest | _ToProto]
+
+          type array = ::Array[DescribeBatchOperationRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DescribeBatchOperationRequest | _ToProto]
+        end
+
+        class DescribeBatchOperationResponse < ::Protobuf::Message
+          # Batch operation type
+          #
+          attr_accessor operation_type(): ::Temporal::Api::Enums::V1::BatchOperationType
+
+          # Batch operation type
+          #
+          def operation_type=: (::Temporal::Api::Enums::V1::BatchOperationType::values) -> ::Temporal::Api::Enums::V1::BatchOperationType::values
+                             | ...
+
+          def operation_type!: () -> ::Temporal::Api::Enums::V1::BatchOperationType?
+
+          # Batch job ID
+          #
+          attr_accessor job_id(): ::String
+
+          def job_id!: () -> ::String?
+
+          # Batch operation state
+          #
+          attr_accessor state(): ::Temporal::Api::Enums::V1::BatchOperationState
+
+          # Batch operation state
+          #
+          def state=: (::Temporal::Api::Enums::V1::BatchOperationState::values) -> ::Temporal::Api::Enums::V1::BatchOperationState::values
+                    | ...
+
+          def state!: () -> ::Temporal::Api::Enums::V1::BatchOperationState?
+
+          # Batch operation start time
+          #
+          attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+          # Batch operation start time
+          #
+          def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Batch operation close time
+          #
+          attr_accessor close_time(): ::Google::Protobuf::Timestamp?
+
+          # Batch operation close time
+          #
+          def close_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                         | ...
+
+          def close_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # Total operation count
+          #
+          attr_accessor total_operation_count(): ::Integer
+
+          def total_operation_count!: () -> ::Integer?
+
+          # Complete operation count
+          #
+          attr_accessor complete_operation_count(): ::Integer
+
+          def complete_operation_count!: () -> ::Integer?
+
+          # Failure operation count
+          #
+          attr_accessor failure_operation_count(): ::Integer
+
+          def failure_operation_count!: () -> ::Integer?
+
+          def initialize: (?operation_type: ::Temporal::Api::Enums::V1::BatchOperationType::init, ?job_id: ::String, ?state: ::Temporal::Api::Enums::V1::BatchOperationState::init, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?total_operation_count: ::Integer, ?complete_operation_count: ::Integer, ?failure_operation_count: ::Integer) -> void
+
+          def []: (:operation_type) -> ::Temporal::Api::Enums::V1::BatchOperationType
+                | (:job_id) -> ::String
+                | (:state) -> ::Temporal::Api::Enums::V1::BatchOperationState
+                | (:start_time) -> ::Google::Protobuf::Timestamp?
+                | (:close_time) -> ::Google::Protobuf::Timestamp?
+                | (:total_operation_count) -> ::Integer
+                | (:complete_operation_count) -> ::Integer
+                | (:failure_operation_count) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:operation_type, ::Temporal::Api::Enums::V1::BatchOperationType) -> ::Temporal::Api::Enums::V1::BatchOperationType
+                 | (:operation_type, ::Temporal::Api::Enums::V1::BatchOperationType::values) -> ::Temporal::Api::Enums::V1::BatchOperationType::values
+                 | (:job_id, ::String) -> ::String
+                 | (:state, ::Temporal::Api::Enums::V1::BatchOperationState) -> ::Temporal::Api::Enums::V1::BatchOperationState
+                 | (:state, ::Temporal::Api::Enums::V1::BatchOperationState::values) -> ::Temporal::Api::Enums::V1::BatchOperationState::values
+                 | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
+                 | (:close_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:close_time, M?) -> M?
+                 | (:total_operation_count, ::Integer) -> ::Integer
+                 | (:complete_operation_count, ::Integer) -> ::Integer
+                 | (:failure_operation_count, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DescribeBatchOperationResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DescribeBatchOperationResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DescribeBatchOperationResponse, DescribeBatchOperationResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeBatchOperationResponse, DescribeBatchOperationResponse | _ToProto]
+
+          type array = ::Array[DescribeBatchOperationResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DescribeBatchOperationResponse | _ToProto]
+        end
+
+        class ListBatchOperationsRequest < ::Protobuf::Message
+          # Namespace that contains the batch operation
+          #
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # List page size
+          #
+          attr_accessor page_size(): ::Integer
+
+          def page_size!: () -> ::Integer?
+
+          # Next page token
+          #
+          attr_accessor next_page_token(): ::String
+
+          def next_page_token!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?page_size: ::Integer, ?next_page_token: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (:page_size) -> ::Integer
+                | (:next_page_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:page_size, ::Integer) -> ::Integer
+                 | (:next_page_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListBatchOperationsRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListBatchOperationsRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListBatchOperationsRequest, ListBatchOperationsRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListBatchOperationsRequest, ListBatchOperationsRequest | _ToProto]
+
+          type array = ::Array[ListBatchOperationsRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListBatchOperationsRequest | _ToProto]
+        end
+
+        class ListBatchOperationsResponse < ::Protobuf::Message
+          # BatchOperationInfo contains the basic info about batch operation
+          #
+          attr_accessor operation_info(): ::Temporal::Api::Batch::V1::BatchOperationInfo::field_array
+
+          # BatchOperationInfo contains the basic info about batch operation
+          #
+          def operation_info=: (::Temporal::Api::Batch::V1::BatchOperationInfo::array) -> ::Temporal::Api::Batch::V1::BatchOperationInfo::array
+                             | ...
+
+          def operation_info!: () -> ::Temporal::Api::Batch::V1::BatchOperationInfo::field_array?
+
+          attr_accessor next_page_token(): ::String
+
+          def next_page_token!: () -> ::String?
+
+          def initialize: (?operation_info: ::Temporal::Api::Batch::V1::BatchOperationInfo::array, ?next_page_token: ::String) -> void
+
+          def []: (:operation_info) -> ::Temporal::Api::Batch::V1::BatchOperationInfo::field_array
+                | (:next_page_token) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:operation_info, ::Temporal::Api::Batch::V1::BatchOperationInfo::field_array) -> ::Temporal::Api::Batch::V1::BatchOperationInfo::field_array
+                 | (:operation_info, ::Temporal::Api::Batch::V1::BatchOperationInfo::array) -> ::Temporal::Api::Batch::V1::BatchOperationInfo::array
+                 | (:next_page_token, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ListBatchOperationsResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ListBatchOperationsResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ListBatchOperationsResponse, ListBatchOperationsResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListBatchOperationsResponse, ListBatchOperationsResponse | _ToProto]
+
+          type array = ::Array[ListBatchOperationsResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ListBatchOperationsResponse | _ToProto]
         end
       end
     end
