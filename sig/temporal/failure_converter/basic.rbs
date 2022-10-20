@@ -1,0 +1,13 @@
+module Temporal
+  module FailureConverter
+    class Basic
+      include _FailureConverter
+
+      def initialize: (Temporal::PayloadConverter::_PayloadConverter) -> void
+
+      private
+
+      attr_reader payload_converter: Temporal::PayloadConverter::_PayloadConverter
+    end
+  end
+end

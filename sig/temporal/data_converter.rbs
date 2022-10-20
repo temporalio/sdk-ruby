@@ -6,20 +6,26 @@ module Temporal
     def initialize: (
       ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
       ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
+      ?failure_converter: Temporal::FailureConverter::_FailureConverter,
     ) -> void
     def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?
     def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporal::Api::Common::V1::Payload]
+    def to_failure: (StandardError error) -> Temporal::Api::Failure::V1::Failure
     def from_payloads: (Temporal::Api::Common::V1::Payloads? payloads) -> Array[untyped]?
     def from_payload_map: (Temporal::Api::Common::V1::Payload::field_hash[::String]? payload_map) -> Hash[String, untyped]?
+    def from_failure: (Temporal::Api::Failure::V1::Failure failure) -> StandardError
 
     private
 
     attr_reader payload_converter: Temporal::PayloadConverter::_PayloadConverter
     attr_reader payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec]
+    attr_reader failure_converter: Temporal::FailureConverter::_FailureConverter
 
-    def encode: (Array[Temporal::Api::Common::V1::Payload]) -> Array[Temporal::Api::Common::V1::Payload]
-    def decode: (Array[Temporal::Api::Common::V1::Payload]) -> Array[Temporal::Api::Common::V1::Payload]
+    def encode: (Array[Temporal::Api::Common::V1::Payload]?) -> Array[Temporal::Api::Common::V1::Payload]
+    def decode: (Array[Temporal::Api::Common::V1::Payload]?) -> Array[Temporal::Api::Common::V1::Payload]
     def to_payload: (untyped data) -> Temporal::Api::Common::V1::Payload
     def from_payload: (Temporal::Api::Common::V1::Payload payload) -> untyped
+    def encode_failure: (Temporal::Api::Failure::V1::Failure failure) -> Temporal::Api::Failure::V1::Failure
+    def decode_failure: (Temporal::Api::Failure::V1::Failure failure) -> Temporal::Api::Failure::V1::Failure
   end
 end
