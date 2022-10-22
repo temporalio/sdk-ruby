@@ -1,3 +1,4 @@
+require 'temporal/api/common/v1/message_pb'
 require 'temporal/api/failure/v1/message_pb'
 require 'temporal/error/failure'
 require 'temporal/failure_converter/base'
@@ -11,11 +12,35 @@ module Temporal
       end
 
       def to_failure(error)
-        Temporal::Api::Failure::V1::Failure.new(message: error.message)
+        # TODO: Handle error.raw
 
-        # case error
-        # when Temporal::Error::TimeoutError
-        #   to_timeout_failure(error)
+        failure =
+          case error
+          when Temporal::Error::ApplicationError
+            to_application_failure(error)
+          when Temporal::Error::TimeoutError
+            to_timeout_failure(error)
+          when Temporal::Error::CancelledError
+            to_cancelled_failure(error)
+          when Temporal::Error::TerminatedError
+            to_terminated_failure(error)
+          when Temporal::Error::ServerError
+            to_server_failure(error)
+          when Temporal::Error::ResetWorkflowError
+            to_reset_workflow_failure(error)
+          when Temporal::Error::ActivityError
+            to_activity_failure(error)
+          when Temporal::Error::ChildWorkflowError
+            to_child_workflow_execution_failure(error)
+          else
+            to_generic_failure(error)
+          end
+
+        failure.message = error.message
+        failure.stack_trace = error.backtrace&.join("\n") unless error.backtrace&.empty?
+        failure.cause = to_failure(error.cause) if error.cause
+
+        failure
 
         # if (this.options.encodeCommonAttributes) {
         #   const { message, stackTrace } = failure;
@@ -62,11 +87,102 @@ module Temporal
 
       attr_reader :payload_converter
 
+      def to_payloads(data)
+        return if data.nil? || Array(data).empty?
+
+        # TODO: depend on the DataConverter instead?
+        payloads = Array(data).map { |value| payload_converter.to_payload(value) }
+        Temporal::Api::Common::V1::Payloads.new(payloads: payloads)
+      end
+
       def from_payloads(payloads)
         return unless payloads
 
         # TODO: depend on the DataConverter instead?
         payloads.payloads.map { |payload| payload_converter.from_payload(payload) }
+      end
+
+      def to_application_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          application_failure_info: {
+            type: error.type,
+            non_retryable: error.non_retryable,
+            details: to_payloads(error.details),
+          },
+        )
+      end
+
+      def to_timeout_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          timeout_failure_info: {
+            timeout_type: error.type,
+            last_heartbeat_details: to_payloads(error.last_heartbeat_details),
+          },
+        )
+      end
+
+      def to_cancelled_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          canceled_failure_info: {
+            details: to_payloads(error.details),
+          },
+        )
+      end
+
+      def to_terminated_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          terminated_failure_info: { },
+        )
+      end
+
+      def to_server_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          server_failure_info: {
+            non_retryable: error.non_retryable,
+          },
+        )
+      end
+
+      def to_reset_workflow_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          reset_workflow_failure_info: {
+            last_heartbeat_details: to_payloads(error.last_heartbeat_details),
+          },
+        )
+      end
+
+      def to_activity_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          activity_failure_info: {
+            scheduled_event_id: error.scheduled_event_id,
+            started_event_id: error.started_event_id,
+            identity: error.identity,
+            activity_type: { name: error.activity_name },
+            activity_id: error.activity_id,
+            retry_state: error.retry_state,
+          },
+        )
+      end
+
+      def to_child_workflow_execution_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          child_workflow_execution_failure_info: {
+            namespace: error.namespace,
+            workflow_execution: { workflow_id: error.workflow_id, run_id: error.run_id },
+            workflow_type: { name: error.workflow_name },
+            initiated_event_id: error.initiated_event_id,
+            started_event_id: error.started_event_id,
+            retry_state: error.retry_state,
+          },
+        )
+      end
+
+      def to_generic_failure(error)
+        Temporal::Api::Failure::V1::Failure.new(
+          application_failure_info: {
+            type: error.class.name,
+          },
+        )
       end
 
       def from_application_failure(failure, cause)
