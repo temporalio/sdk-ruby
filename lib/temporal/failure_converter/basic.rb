@@ -3,16 +3,22 @@ require 'temporal/api/failure/v1/message_pb'
 require 'temporal/error/failure'
 require 'temporal/failure_converter/base'
 require 'temporal/payload_converter'
+require 'temporal/retry_state'
+require 'temporal/timeout_type'
 
 module Temporal
   module FailureConverter
     class Basic
-      def initialize(payload_converter: Temporal::PayloadConverter::DEFAULT)
+      def initialize(
+        payload_converter: Temporal::PayloadConverter::DEFAULT,
+        encode_common_attributes: false
+      )
         @payload_converter = payload_converter
+        @encode_common_attributes = encode_common_attributes
       end
 
       def to_failure(error)
-        # TODO: Handle error.raw
+        return error.raw if error.is_a?(Temporal::Error::Failure) && error.raw
 
         failure =
           case error
@@ -40,19 +46,20 @@ module Temporal
         failure.stack_trace = error.backtrace&.join("\n") unless error.backtrace&.empty?
         failure.cause = to_failure(error.cause) if error.cause
 
-        failure
+        if encode_common_attributes?
+          failure.encoded_attributes = payload_converter.to_payload(
+            'message' => failure.message,
+            'stack_trace' => failure.stack_trace,
+          )
+          failure.message = 'Encoded failure'
+          failure.stack_trace = ''
+        end
 
-        # if (this.options.encodeCommonAttributes) {
-        #   const { message, stackTrace } = failure;
-        #   failure.message = 'Encoded failure';
-        #   failure.stackTrace = '';
-        #   failure.encodedAttributes = this.options.payloadConverter.toPayload({ message, stack_trace: stackTrace });
-        # }
+        failure
       end
 
       def from_failure(failure)
-        # TODO: decode encoded attributes
-
+        failure = apply_from_encoded_attributes(failure)
         cause = failure.cause ? from_failure(failure.cause) : nil
 
         error =
@@ -87,10 +94,13 @@ module Temporal
 
       attr_reader :payload_converter
 
+      def encode_common_attributes?
+        @encode_common_attributes
+      end
+
       def to_payloads(data)
         return if data.nil? || Array(data).empty?
 
-        # TODO: depend on the DataConverter instead?
         payloads = Array(data).map { |value| payload_converter.to_payload(value) }
         Temporal::Api::Common::V1::Payloads.new(payloads: payloads)
       end
@@ -98,8 +108,25 @@ module Temporal
       def from_payloads(payloads)
         return unless payloads
 
-        # TODO: depend on the DataConverter instead?
         payloads.payloads.map { |payload| payload_converter.from_payload(payload) }
+      end
+
+      def apply_from_encoded_attributes(failure)
+        return failure unless failure.encoded_attributes
+
+        attributes = payload_converter.from_payload(failure.encoded_attributes)
+        return failure unless attributes.is_a?(Hash)
+
+        failure = failure.dup
+        if attributes['message'].is_a?(String)
+          failure.message = attributes['message']
+        end
+
+        if attributes['stack_trace'].is_a?(String)
+          failure.stack_trace = attributes['stack_trace']
+        end
+
+        failure
       end
 
       def to_application_failure(error)
@@ -115,7 +142,7 @@ module Temporal
       def to_timeout_failure(error)
         Temporal::Api::Failure::V1::Failure.new(
           timeout_failure_info: {
-            timeout_type: error.type,
+            timeout_type: Temporal::TimeoutType.to_raw(error.type),
             last_heartbeat_details: to_payloads(error.last_heartbeat_details),
           },
         )
@@ -159,7 +186,7 @@ module Temporal
             identity: error.identity,
             activity_type: { name: error.activity_name },
             activity_id: error.activity_id,
-            retry_state: error.retry_state,
+            retry_state: Temporal::RetryState.to_raw(error.retry_state),
           },
         )
       end
@@ -172,7 +199,7 @@ module Temporal
             workflow_type: { name: error.workflow_name },
             initiated_event_id: error.initiated_event_id,
             started_event_id: error.started_event_id,
-            retry_state: error.retry_state,
+            retry_state: Temporal::RetryState.to_raw(error.retry_state),
           },
         )
       end
@@ -199,8 +226,7 @@ module Temporal
       def from_timeout_failure(failure, cause)
         Temporal::Error::TimeoutError.new(
           failure.message || 'Timeout',
-          # TODO: Convert to an enum class
-          failure.timeout_failure_info.timeout_type,
+          Temporal::TimeoutType.from_raw(failure.timeout_failure_info.timeout_type),
           from_payloads(failure.timeout_failure_info.last_heartbeat_details),
           failure,
           cause,
@@ -250,8 +276,7 @@ module Temporal
           failure.activity_failure_info.identity,
           failure.activity_failure_info.activity_type.name,
           failure.activity_failure_info.activity_id,
-          # TODO: Convert to an enum class
-          failure.activity_failure_info.retry_state,
+          Temporal::RetryState.from_raw(failure.activity_failure_info.retry_state),
           failure,
           cause,
         )
@@ -266,8 +291,7 @@ module Temporal
           failure.child_workflow_execution_failure_info.workflow_type.name,
           failure.child_workflow_execution_failure_info.initiated_event_id,
           failure.child_workflow_execution_failure_info.started_event_id,
-          # TODO: Convert to an enum class
-          failure.child_workflow_execution_failure_info.retry_state,
+          Temporal::RetryState.from_raw(failure.child_workflow_execution_failure_info.retry_state),
           failure,
           cause,
         )

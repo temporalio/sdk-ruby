@@ -1,3 +1,5 @@
+require 'temporal/api/enums/v1/workflow_pb'
+
 module Temporal
   class Workflow
     module ExecutionStatus
@@ -22,7 +24,7 @@ module Temporal
       }.freeze
 
       def self.to_raw(status)
-        Temporal::Api::Enums::V1::WorkflowExecutionStatus.fetch(API_MAP.invert[status])
+        Temporal::Api::Enums::V1::WorkflowExecutionStatus.resolve(API_MAP.invert[status])
       end
 
       def self.from_raw(raw_status)

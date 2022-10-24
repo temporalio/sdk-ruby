@@ -40,7 +40,7 @@ describe Temporal::FailureConverter::Basic do
     context 'with TimeoutError' do
       let(:error) do
         Temporal::Error::TimeoutError.new(
-          'Test error', Temporal::Api::Enums::V1::TimeoutType::TIMEOUT_TYPE_SCHEDULE_TO_START, [details], nil, nil
+          'Test error', Temporal::TimeoutType::SCHEDULE_TO_START, [details], nil, nil
         )
       end
 
@@ -135,7 +135,7 @@ describe Temporal::FailureConverter::Basic do
           'test-identity',
           'test-activity',
           'test-activity-id',
-          Temporal::Api::Enums::V1::RetryState::RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED,
+          Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
           nil,
           nil
         )
@@ -153,7 +153,8 @@ describe Temporal::FailureConverter::Basic do
         expect(failure.activity_failure_info.identity).to eq('test-identity')
         expect(failure.activity_failure_info.activity_type.name).to eq('test-activity')
         expect(failure.activity_failure_info.activity_id).to eq('test-activity-id')
-        expect(failure.activity_failure_info.retry_state).to eq(:RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED)
+        expect(failure.activity_failure_info.retry_state)
+          .to eq(:RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED)
       end
     end
 
@@ -167,7 +168,7 @@ describe Temporal::FailureConverter::Basic do
           'test-workflow',
           1,
           2,
-          Temporal::Api::Enums::V1::RetryState::RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED,
+          Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
           nil,
           nil
         )
@@ -204,6 +205,23 @@ describe Temporal::FailureConverter::Basic do
         expect(failure.application_failure_info.type).to eq('StandardError')
         expect(failure.application_failure_info.non_retryable).to eq(false)
         expect(failure.application_failure_info.details).to eq(nil)
+      end
+    end
+
+    context 'when encode_common_attributes is set to true' do
+      subject { described_class.new(payload_converter: converter, encode_common_attributes: true) }
+      let(:error) { StandardError.new('Test error') }
+
+      it 'encodes attributes' do
+        failure = subject.to_failure(error)
+
+        expect(failure.message).to eq('Encoded failure')
+        expect(failure.stack_trace).to be_empty
+        expect(failure.encoded_attributes).to be_a(Temporal::Api::Common::V1::Payload)
+        expect(converter.from_payload(failure.encoded_attributes)).to eq(
+          'message' => 'Test error',
+          'stack_trace' => stack_trace,
+        )
       end
     end
   end
@@ -271,7 +289,7 @@ describe Temporal::FailureConverter::Basic do
 
         expect(error).to be_a(Temporal::Error::TimeoutError)
         expect(error.message).to eq('Test failure')
-        expect(error.type).to eq(:TIMEOUT_TYPE_SCHEDULE_TO_START)
+        expect(error.type).to eq(Temporal::TimeoutType::SCHEDULE_TO_START)
         expect(error.last_heartbeat_details).to eq([details])
         expect(error.raw).to eq(failure)
         expect(error.backtrace).to eq(backtrace)
@@ -385,7 +403,7 @@ describe Temporal::FailureConverter::Basic do
         expect(error.identity).to eq('test-identity')
         expect(error.activity_name).to eq('test-activity')
         expect(error.activity_id).to eq('test-activity-id')
-        expect(error.retry_state).to eq(:RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED)
+        expect(error.retry_state).to eq(Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED)
         expect(error.raw).to eq(failure)
         expect(error.backtrace).to eq(backtrace)
         expect(error.cause).to eq(nil)
@@ -417,10 +435,33 @@ describe Temporal::FailureConverter::Basic do
         expect(error.workflow_name).to eq('test-workflow')
         expect(error.initiated_event_id).to eq(1)
         expect(error.started_event_id).to eq(2)
-        expect(error.retry_state).to eq(:RETRY_STATE_MAXIMUM_ATTEMPTS_REACHED)
+        expect(error.retry_state).to eq(Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED)
         expect(error.raw).to eq(failure)
         expect(error.backtrace).to eq(backtrace)
         expect(error.cause).to eq(nil)
+      end
+    end
+
+    context 'with encoded attributes' do
+      it 'applies encoded attributes' do
+        failure.encoded_attributes = converter.to_payload({
+          'message' => 'Encoded message',
+          'stack_trace' => "a.rb:1\nb.rb:2"
+        })
+
+        error = subject.from_failure(failure)
+
+        expect(error.message).to eq('Encoded message')
+        expect(error.backtrace).to eq(['a.rb:1', 'b.rb:2'])
+      end
+
+      it 'ignores unsupported attributes' do
+        failure.encoded_attributes = converter.to_payload({ 'foo' => 'bar' })
+
+        error = subject.from_failure(failure)
+
+        expect(error.message).to eq('Test failure')
+        expect(error.backtrace).to eq(backtrace)
       end
     end
   end
