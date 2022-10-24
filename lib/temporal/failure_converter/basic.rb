@@ -43,7 +43,7 @@ module Temporal
           end
 
         failure.message = error.message
-        failure.stack_trace = error.backtrace&.join("\n") unless error.backtrace&.empty?
+        failure.stack_trace = error.backtrace.join("\n") if error.backtrace && !error.backtrace.empty?
         failure.cause = to_failure(error.cause) if error.cause
 
         if encode_common_attributes?
@@ -156,9 +156,9 @@ module Temporal
         )
       end
 
-      def to_terminated_failure(error)
+      def to_terminated_failure(_error)
         Temporal::Api::Failure::V1::Failure.new(
-          terminated_failure_info: { },
+          terminated_failure_info: {},
         )
       end
 

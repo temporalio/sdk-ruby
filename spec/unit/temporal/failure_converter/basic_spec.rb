@@ -444,10 +444,10 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with encoded attributes' do
       it 'applies encoded attributes' do
-        failure.encoded_attributes = converter.to_payload({
+        failure.encoded_attributes = converter.to_payload(
           'message' => 'Encoded message',
-          'stack_trace' => "a.rb:1\nb.rb:2"
-        })
+          'stack_trace' => "a.rb:1\nb.rb:2",
+        )
 
         error = subject.from_failure(failure)
 
