@@ -8,11 +8,13 @@ require 'temporal/timeout_type'
 
 module Temporal
   module FailureConverter
-    class Basic
+    class Basic < Base
       def initialize(
         payload_converter: Temporal::PayloadConverter::DEFAULT,
         encode_common_attributes: false
       )
+        super()
+
         @payload_converter = payload_converter
         @encode_common_attributes = encode_common_attributes
       end

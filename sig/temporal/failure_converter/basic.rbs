@@ -1,6 +1,6 @@
 module Temporal
   module FailureConverter
-    class Basic
+    class Basic < Base
       def initialize: (
         ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
         ?encode_common_attributes: bool
