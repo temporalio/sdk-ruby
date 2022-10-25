@@ -6,7 +6,7 @@ module Temporal
     class Failure < Error
       attr_reader :raw
 
-      def initialize(message, raw, cause)
+      def initialize(message, raw: nil, cause: nil)
         super(message)
 
         @raw = raw
@@ -14,15 +14,15 @@ module Temporal
       end
 
       def cause
-        @cause || super
+        @cause
       end
     end
 
     class ApplicationError < Failure
       attr_reader :type, :details, :non_retryable
 
-      def initialize(message, type, details, non_retryable, raw, cause)
-        super(message, raw, cause)
+      def initialize(message, type:, details: [], non_retryable: false, raw: nil, cause: nil)
+        super(message, raw: raw, cause: cause)
 
         @type = type
         @details = details
@@ -37,8 +37,8 @@ module Temporal
     class TimeoutError < Failure
       attr_reader :type, :last_heartbeat_details
 
-      def initialize(message, type, last_heartbeat_details, raw, cause)
-        super(message, raw, cause)
+      def initialize(message, type:, last_heartbeat_details:, raw: nil, cause: nil)
+        super(message, raw: raw, cause: cause)
 
         @type = type
         @last_heartbeat_details = last_heartbeat_details
@@ -48,8 +48,8 @@ module Temporal
     class CancelledError < Failure
       attr_reader :details
 
-      def initialize(message, details, raw, cause)
-        super(message, raw, cause)
+      def initialize(message, details:, raw: nil, cause: nil)
+        super(message, raw: raw, cause: cause)
 
         @details = details
       end
@@ -60,8 +60,8 @@ module Temporal
     class ServerError < Failure
       attr_reader :non_retryable
 
-      def initialize(message, non_retryable, raw, cause)
-        super(message, raw, cause)
+      def initialize(message, non_retryable:, raw: nil, cause: nil)
+        super(message, raw: raw, cause: cause)
 
         @non_retryable = non_retryable
       end
@@ -74,8 +74,8 @@ module Temporal
     class ResetWorkflowError < Failure
       attr_reader :last_heartbeat_details
 
-      def initialize(message, last_heartbeat_details, raw, cause)
-        super(message, raw, cause)
+      def initialize(message, last_heartbeat_details:, raw: nil, cause: nil)
+        super(message, raw: raw, cause: cause)
 
         @last_heartbeat_details = last_heartbeat_details
       end
@@ -91,16 +91,16 @@ module Temporal
 
       def initialize(
         message,
-        scheduled_event_id,
-        started_event_id,
-        identity,
-        activity_name,
-        activity_id,
-        retry_state,
-        raw,
-        cause
+        scheduled_event_id:,
+        started_event_id:,
+        identity:,
+        activity_name:,
+        activity_id:,
+        retry_state:,
+        raw: nil,
+        cause: nil
       )
-        super(message, raw, cause)
+        super(message, raw: raw, cause: cause)
 
         @scheduled_event_id = scheduled_event_id
         @started_event_id = started_event_id
@@ -122,17 +122,17 @@ module Temporal
 
       def initialize(
         message,
-        namespace,
-        workflow_id,
-        run_id,
-        workflow_name,
-        initiated_event_id,
-        started_event_id,
-        retry_state,
-        raw,
-        cause
+        namespace:,
+        workflow_id:,
+        run_id:,
+        workflow_name:,
+        initiated_event_id:,
+        started_event_id:,
+        retry_state:,
+        raw: nil,
+        cause: nil
       )
-        super(message, raw, cause)
+        super(message, raw: raw, cause: cause)
 
         @namespace = namespace
         @workflow_id = workflow_id

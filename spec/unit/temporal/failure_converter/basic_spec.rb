@@ -19,7 +19,12 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with ApplicationError' do
       let(:error) do
-        Temporal::Error::ApplicationError.new('Test error', 'Test type', [details], true, nil, nil)
+        Temporal::Error::ApplicationError.new(
+          'Test error',
+          type: 'Test type',
+          details: [details],
+          non_retryable: true,
+        )
       end
 
       it 'returns a failure' do
@@ -40,7 +45,9 @@ describe Temporal::FailureConverter::Basic do
     context 'with TimeoutError' do
       let(:error) do
         Temporal::Error::TimeoutError.new(
-          'Test error', Temporal::TimeoutType::SCHEDULE_TO_START, [details], nil, nil
+          'Test error',
+          type: Temporal::TimeoutType::SCHEDULE_TO_START,
+          last_heartbeat_details: [details],
         )
       end
 
@@ -60,7 +67,7 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with CancelledError' do
       let(:error) do
-        Temporal::Error::CancelledError.new('Test error', [details], nil, nil)
+        Temporal::Error::CancelledError.new('Test error', details: [details])
       end
 
       it 'returns a failure' do
@@ -78,7 +85,7 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with TerminatedError' do
       let(:error) do
-        Temporal::Error::TerminatedError.new('Test error', nil, nil)
+        Temporal::Error::TerminatedError.new('Test error')
       end
 
       it 'returns a failure' do
@@ -94,7 +101,7 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with ServerError' do
       let(:error) do
-        Temporal::Error::ServerError.new('Test error', true, nil, nil)
+        Temporal::Error::ServerError.new('Test error', non_retryable: true)
       end
 
       it 'returns a failure' do
@@ -110,7 +117,7 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with ResetWorkflowError' do
       let(:error) do
-        Temporal::Error::ResetWorkflowError.new('Test error', [details], nil, nil)
+        Temporal::Error::ResetWorkflowError.new('Test error', last_heartbeat_details: [details])
       end
 
       it 'returns a failure' do
@@ -130,14 +137,12 @@ describe Temporal::FailureConverter::Basic do
       let(:error) do
         Temporal::Error::ActivityError.new(
           'Test error',
-          1,
-          2,
-          'test-identity',
-          'test-activity',
-          'test-activity-id',
-          Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
-          nil,
-          nil
+          scheduled_event_id: 1,
+          started_event_id: 2,
+          identity: 'test-identity',
+          activity_name: 'test-activity',
+          activity_id: 'test-activity-id',
+          retry_state: Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
         )
       end
 
@@ -162,15 +167,13 @@ describe Temporal::FailureConverter::Basic do
       let(:error) do
         Temporal::Error::ChildWorkflowError.new(
           'Test error',
-          'test-namespace',
-          'test-workflow-id',
-          'test-run-id',
-          'test-workflow',
-          1,
-          2,
-          Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
-          nil,
-          nil
+          namespace: 'test-namespace',
+          workflow_id: 'test-workflow-id',
+          run_id: 'test-run-id',
+          workflow_name: 'test-workflow',
+          initiated_event_id: 1,
+          started_event_id: 2,
+          retry_state: Temporal::RetryState::MAXIMUM_ATTEMPTS_REACHED,
         )
       end
 

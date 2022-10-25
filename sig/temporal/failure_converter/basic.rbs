@@ -1,13 +1,77 @@
 module Temporal
   module FailureConverter
     class Basic
-      include _FailureConverter
-
-      def initialize: (Temporal::PayloadConverter::_PayloadConverter) -> void
+      def initialize: (
+        ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
+        ?encode_common_attributes: bool
+      ) -> void
+      def to_failure: (Exception) -> Temporal::Api::Failure::V1::Failure
+      def from_failure: (Temporal::Api::Failure::V1::Failure) -> Temporal::Error::Failure
 
       private
 
+      @encode_common_attributes: bool
       attr_reader payload_converter: Temporal::PayloadConverter::_PayloadConverter
+
+      def encode_common_attributes?: -> bool
+      def to_payloads: (Array[untyped]?) -> Temporal::Api::Common::V1::Payloads?
+      def from_payloads: (Temporal::Api::Common::V1::Payloads?) -> Array[untyped]
+      def apply_from_encoded_attributes: (Temporal::Api::Failure::V1::Failure) -> Temporal::Api::Failure::V1::Failure
+
+      def to_application_failure: (Temporal::Error::ApplicationError) -> Temporal::Api::Failure::V1::Failure
+      def to_timeout_failure: (Temporal::Error::TimeoutError) -> Temporal::Api::Failure::V1::Failure
+      def to_cancelled_failure: (Temporal::Error::CancelledError) -> Temporal::Api::Failure::V1::Failure
+      def to_terminated_failure: (Temporal::Error::TerminatedError) -> Temporal::Api::Failure::V1::Failure
+      def to_server_failure: (Temporal::Error::ServerError) -> Temporal::Api::Failure::V1::Failure
+      def to_reset_workflow_failure: (Temporal::Error::ResetWorkflowError) -> Temporal::Api::Failure::V1::Failure
+      def to_activity_failure: (Temporal::Error::ActivityError) -> Temporal::Api::Failure::V1::Failure
+      def to_child_workflow_execution_failure: (Temporal::Error::ChildWorkflowError) -> Temporal::Api::Failure::V1::Failure
+      def to_generic_failure: (Exception) -> Temporal::Api::Failure::V1::Failure
+
+      def from_application_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::ApplicationFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::ApplicationError
+      def from_timeout_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::TimeoutFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::TimeoutError
+      def from_cancelled_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::CanceledFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::CancelledError
+      def from_terminated_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::TerminatedFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::TerminatedError
+      def from_server_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::ServerFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::ServerError
+      def from_reset_workflow_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::ResetWorkflowFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::ResetWorkflowError
+      def from_activity_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::ActivityFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::ActivityError
+      def from_child_workflow_execution_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::ChildWorkflowError
+      def from_generic_failure: (
+        Temporal::Api::Failure::V1::Failure,
+        Temporal::Error::Failure?
+      ) -> Temporal::Error::Failure
     end
   end
 end

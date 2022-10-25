@@ -1,6 +1,9 @@
 module Temporal
   class Workflow
     module ExecutionStatus
+      type values =
+        :RUNNING | :COMPLETED | :FAILED | :CANCELED | :TERMINATED | :CONTINUED_AS_NEW | :TIMED_OUT
+
       RUNNING: :RUNNING
       COMPLETED: :COMPLETED
       FAILED: :FAILED
@@ -8,11 +11,11 @@ module Temporal
       TERMINATED: :TERMINATED
       CONTINUED_AS_NEW: :CONTINUED_AS_NEW
       TIMED_OUT: :TIMED_OUT
-      STATUSES: Array[Symbol]
-      API_MAP: Hash[String, Symbol]
+      STATUSES: Array[values]
+      API_MAP: Hash[Temporal::Api::Enums::V1::WorkflowExecutionStatus::init, values]
 
-      def self.to_raw: (Symbol status) -> Temporal::Api::Enums::V1::WorkflowExecutionStatus::init?
-      def self.from_raw: (Temporal::Api::Enums::V1::WorkflowExecutionStatus? raw_status) -> Symbol
+      def self.to_raw: (values) -> Temporal::Api::Enums::V1::WorkflowExecutionStatus::init
+      def self.from_raw: (Temporal::Api::Enums::V1::WorkflowExecutionStatus::init) -> values
     end
   end
 end
