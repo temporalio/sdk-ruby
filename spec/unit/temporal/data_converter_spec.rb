@@ -1,5 +1,6 @@
 require 'temporal/api/common/v1/message_pb'
 require 'temporal/data_converter'
+require 'temporal/error/failure'
 require 'temporal/payload_converter'
 require 'temporal/payload_codec/base'
 
@@ -71,9 +72,16 @@ class TestEncodingSwappingPayloadCodec < Temporal::PayloadCodec::Base
 end
 
 describe Temporal::DataConverter do
-  subject { described_class.new(payload_converter: converter, payload_codecs: codecs) }
+  subject do
+    described_class.new(
+      payload_converter: converter,
+      payload_codecs: codecs,
+      failure_converter: failure_converter,
+    )
+  end
   let(:converter) { Temporal::PayloadConverter::DEFAULT }
   let(:codecs) { [] }
+  let(:failure_converter) { Temporal::FailureConverter::DEFAULT }
   let(:nil_payload) do
     Temporal::Api::Common::V1::Payload.new(
       metadata: { 'encoding' => Temporal::PayloadConverter::Nil::ENCODING },
@@ -94,6 +102,8 @@ describe Temporal::DataConverter do
     allow(converter).to receive(:from_payload).and_call_original
     allow(test_codec).to receive(:encode).and_call_original
     allow(test_codec).to receive(:decode).and_call_original
+    allow(failure_converter).to receive(:to_failure).and_call_original
+    allow(failure_converter).to receive(:from_failure).and_call_original
   end
 
   describe '#to_payloads' do
@@ -180,6 +190,37 @@ describe Temporal::DataConverter do
     end
   end
 
+  describe '#to_failure' do
+    let(:error) do
+      Temporal::Error::ApplicationError.new('test error', type: 'test type', details: 'test')
+    end
+
+    it 'converts an error to a failure' do
+      result = subject.to_failure(error)
+
+      expect(result).to be_a(Temporal::Api::Failure::V1::Failure)
+      expect(result.message).to eq('test error')
+      expect(result.application_failure_info.type).to eq('test type')
+      expect(result.application_failure_info.details.payloads.first.data).to eq('"test"')
+
+      expect(failure_converter).to have_received(:to_failure).with(error).once
+    end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+
+      it 'encodes payloads' do
+        result = subject.to_failure(error)
+        payloads = result.application_failure_info.details.payloads
+
+        expect(payloads.length).to eq(1)
+        expect(payloads.first.metadata['encoding']).to eq(TestConcatenatingPayloadCodec::ENCODING)
+
+        expect(test_codec).to have_received(:encode).once
+      end
+    end
+  end
+
   describe '#from_payloads' do
     it 'returns nil when nothing is given' do
       expect(subject.from_payloads(nil)).to eq(nil)
@@ -247,6 +288,48 @@ describe Temporal::DataConverter do
     end
   end
 
+  describe '#from_failure' do
+    let(:failure) do
+      Temporal::Api::Failure::V1::Failure.new(
+        message: 'Test failure',
+        stack_trace: "a.rb:1\nb.rb:2",
+        application_failure_info: Temporal::Api::Failure::V1::ApplicationFailureInfo.new(
+          type: 'Test application error',
+          non_retryable: true,
+          details: { payloads: [payload] },
+        ),
+      )
+    end
+    let(:payload) { json_payload }
+
+    it 'converts a failure to an error' do
+      result = subject.from_failure(failure)
+
+      expect(result).to be_a(Temporal::Error::ApplicationError)
+      expect(result.message).to eq('Test failure')
+      expect(result.type).to eq('Test application error')
+      expect(result).not_to be_retryable
+      expect(result.details).to eq(['test'])
+      expect(result.backtrace).to eq(['a.rb:1', 'b.rb:2'])
+
+      expect(failure_converter).to have_received(:from_failure).with(failure).once
+    end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+      let(:payload) { test_codec.encode([json_payload]).first }
+
+      it 'decodecs each payload' do
+        result = subject.from_failure(failure)
+
+        expect(result).to be_a(Temporal::Error::ApplicationError)
+        expect(result.details).to eq(['test'])
+
+        expect(test_codec).to have_received(:decode).once
+      end
+    end
+  end
+
   describe 'full circle' do
     it 'converts values to payloads and back' do
       input = ['test', nil]
@@ -266,6 +349,16 @@ describe Temporal::DataConverter do
       expect(subject.from_payload_map(subject.to_payload_map(input))).to eq(input)
     end
 
+    it 'converts an error to a failure and back' do
+      error = Temporal::Error::ApplicationError.new(
+        'test error',
+        type: 'test type',
+        details: 'test'
+      )
+
+      expect(subject.from_failure(subject.to_failure(error))).to eq(error)
+    end
+
     context 'with payload codecs' do
       let(:codecs) { [test_codec, swap_codec] }
 
@@ -279,6 +372,16 @@ describe Temporal::DataConverter do
         input = { 'one' => 'test', 'two' => nil }
 
         expect(subject.from_payload_map(subject.to_payload_map(input))).to eq(input)
+      end
+
+      it 'converts an error to a failure and back' do
+        error = Temporal::Error::ApplicationError.new(
+          'test error',
+          type: 'test type',
+          details: 'test'
+        )
+
+        expect(subject.from_failure(subject.to_failure(error))).to eq(error)
       end
     end
   end

@@ -106,17 +106,21 @@ module Temporal
       failure.cause = failure.cause ? encode_failure(failure.cause) : nil
 
       if failure.application_failure_info
-        failure.application_failure_info.details&.payloads =
-          encode(failure.application_failure_info.details&.payloads)
+        failure.application_failure_info.details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: encode(failure.application_failure_info.details&.payloads).to_a,
+        )
       elsif failure.timeout_failure_info
-        failure.timeout_failure_info.last_heartbeat_details&.payloads =
-          encode(failure.timeout_failure_info.last_heartbeat_details&.payloads)
+        failure.timeout_failure_info.last_heartbeat_details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: encode(failure.timeout_failure_info.last_heartbeat_details&.payloads).to_a,
+        )
       elsif failure.canceled_failure_info
-        failure.canceled_failure_info.details&.payloads =
-          encode(failure.canceled_failure_info.details&.payloads)
+        failure.canceled_failure_info.details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: encode(failure.canceled_failure_info.details&.payloads).to_a,
+        )
       elsif failure.reset_workflow_failure_info
-        failure.reset_workflow_failure_info.last_heartbeat_details&.payloads =
-          encode(failure.reset_workflow_failure_info.last_heartbeat_details&.payloads)
+        failure.reset_workflow_failure_info.last_heartbeat_details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: encode(failure.reset_workflow_failure_info.last_heartbeat_details&.payloads).to_a,
+        )
       end
 
       failure
@@ -129,17 +133,21 @@ module Temporal
       failure.cause = failure.cause ? decode_failure(failure.cause) : nil
 
       if failure.application_failure_info
-        failure.application_failure_info.details&.payloads =
-          decode(failure.application_failure_info.details&.payloads)
+        failure.application_failure_info.details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: decode(failure.application_failure_info.details&.payloads).to_a,
+        )
       elsif failure.timeout_failure_info
-        failure.timeout_failure_info.last_heartbeat_details&.payloads =
-          decode(failure.timeout_failure_info.last_heartbeat_details&.payloads)
+        failure.timeout_failure_info.last_heartbeat_details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: decode(failure.timeout_failure_info.last_heartbeat_details&.payloads).to_a,
+        )
       elsif failure.canceled_failure_info
-        failure.canceled_failure_info.details&.payloads =
-          decode(failure.canceled_failure_info.details&.payloads)
+        failure.canceled_failure_info.details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: decode(failure.canceled_failure_info.details&.payloads).to_a,
+        )
       elsif failure.reset_workflow_failure_info
-        failure.reset_workflow_failure_info.last_heartbeat_details&.payloads =
-          decode(failure.reset_workflow_failure_info.last_heartbeat_details&.payloads)
+        failure.reset_workflow_failure_info.last_heartbeat_details = Temporal::Api::Common::V1::Payloads.new(
+          payloads: decode(failure.reset_workflow_failure_info.last_heartbeat_details&.payloads).to_a,
+        )
       end
 
       failure
