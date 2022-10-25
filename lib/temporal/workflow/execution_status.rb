@@ -11,6 +11,8 @@ module Temporal
         TIMED_OUT = :TIMED_OUT,
       ].freeze
 
+      # RBS screws up style definitions when using .freeze
+      # rubocop:disable Style/MutableConstant
       API_MAP = {
         WORKFLOW_EXECUTION_STATUS_RUNNING: RUNNING,
         WORKFLOW_EXECUTION_STATUS_COMPLETED: COMPLETED,
@@ -20,6 +22,7 @@ module Temporal
         WORKFLOW_EXECUTION_STATUS_CONTINUED_AS_NEW: CONTINUED_AS_NEW,
         WORKFLOW_EXECUTION_STATUS_TIMED_OUT: TIMED_OUT,
       }
+      # rubocop:enable Style/MutableConstant
 
       def self.to_raw(status)
         API_MAP.invert[status]

@@ -184,7 +184,7 @@ module Temporal
             scheduled_event_id: error.scheduled_event_id,
             started_event_id: error.started_event_id,
             identity: error.identity,
-            activity_type: Temporal::Api::Common::V1::ActivityType::new(name: error.activity_name || ''),
+            activity_type: Temporal::Api::Common::V1::ActivityType.new(name: error.activity_name || ''),
             activity_id: error.activity_id,
             retry_state: Temporal::RetryState.to_raw(error.retry_state),
           ),
@@ -196,11 +196,11 @@ module Temporal
           child_workflow_execution_failure_info:
             Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo.new(
               namespace: error.namespace,
-              workflow_execution: Temporal::Api::Common::V1::WorkflowExecution::new(
+              workflow_execution: Temporal::Api::Common::V1::WorkflowExecution.new(
                 workflow_id: error.workflow_id || '',
-                run_id: error.run_id || ''
+                run_id: error.run_id || '',
               ),
-              workflow_type: Temporal::Api::Common::V1::WorkflowType::new(name: error.workflow_name || ''),
+              workflow_type: Temporal::Api::Common::V1::WorkflowType.new(name: error.workflow_name || ''),
               initiated_event_id: error.initiated_event_id,
               started_event_id: error.started_event_id,
               retry_state: Temporal::RetryState.to_raw(error.retry_state),

@@ -14,7 +14,7 @@ module Temporal
       end
 
       def cause
-        @cause
+        @cause || super
       end
     end
 

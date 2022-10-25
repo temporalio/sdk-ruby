@@ -5,7 +5,7 @@ module Temporal
       attr_reader raw: Temporal::Api::Failure::V1::Failure?
 
       def initialize: (String message, ?raw: Temporal::Api::Failure::V1::Failure?, ?cause: Failure?) -> void
-      def cause: -> Failure?
+      def cause: -> (Failure | Exception)?
     end
 
     class ApplicationError < Failure
