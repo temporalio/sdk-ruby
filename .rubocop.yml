@@ -29,6 +29,10 @@ Style/IfUnlessModifier:
 Style/GuardClause:
   Enabled: false
 
+Style/MultilineBlockChain:
+  Exclude:
+    - spec/**/*_spec.rb
+
 Style/RedundantReturn:
   Enabled: false
 

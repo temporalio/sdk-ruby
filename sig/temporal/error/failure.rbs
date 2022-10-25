@@ -31,18 +31,18 @@ module Temporal
       def initialize: (
         String message,
         type: Temporal::TimeoutType::values,
-        last_heartbeat_details: Array[untyped],
+        ?last_heartbeat_details: Array[untyped],
         ?raw: Temporal::Api::Failure::V1::Failure?,
         ?cause: Failure?
       ) -> void
     end
 
     class CancelledError < Failure
-      attr_reader details: Array[untyped]
+      attr_reader details: Array[untyped]?
 
       def initialize: (
         String message,
-        details: Array[untyped],
+        ?details: Array[untyped]?,
         ?raw: Temporal::Api::Failure::V1::Failure?,
         ?cause: Failure?
       ) -> void
@@ -68,7 +68,7 @@ module Temporal
 
       def initialize: (
         String message,
-        last_heartbeat_details: Array[untyped],
+        ?last_heartbeat_details: Array[untyped],
         ?raw: Temporal::Api::Failure::V1::Failure?,
         ?cause: Failure?
       ) -> void

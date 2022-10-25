@@ -61,6 +61,8 @@ module Temporal
     end
 
     def from_failure(failure)
+      raise ArgumentError, 'missing a failure to convert from' unless failure
+
       failure = decode_failure(failure)
       failure_converter.from_failure(failure)
     end

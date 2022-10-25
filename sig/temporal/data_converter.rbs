@@ -13,7 +13,7 @@ module Temporal
     def to_failure: (Exception error) -> Temporal::Api::Failure::V1::Failure
     def from_payloads: (Temporal::Api::Common::V1::Payloads? payloads) -> Array[untyped]?
     def from_payload_map: (Temporal::Api::Common::V1::Payload::field_hash[::String]? payload_map) -> Hash[String, untyped]?
-    def from_failure: (Temporal::Api::Failure::V1::Failure failure) -> Exception
+    def from_failure: (Temporal::Api::Failure::V1::Failure? failure) -> Exception
 
     private
 

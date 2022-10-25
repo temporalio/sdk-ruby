@@ -610,8 +610,16 @@ describe Temporal::Client::Implementation do
   end
 
   describe '#await_workflow_result' do
-    # TODO: Provide full proto after implementing Failure handling
-    let(:failure_proto) { Temporal::Api::Failure::V1::Failure.new }
+    let(:failure_proto) do
+      Temporal::Api::Failure::V1::Failure.new(
+        message: 'Test error',
+        application_failure_info: {
+          type: 'ApplicationError',
+          non_retryable: true,
+          details: { payloads: [payload_proto] },
+        }
+      )
+    end
     let(:new_run_id) { '' }
 
     before do
@@ -708,7 +716,12 @@ describe Temporal::Client::Implementation do
       it 'raises an error' do
         expect do
           subject.await_workflow_result(id, run_id, false, metadata, timeout)
-        end.to raise_error(Temporal::Error, 'Workflow execution failed')
+        end.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporal::Error::ApplicationError)
+          expect(error.cause.message).to eq('Test error')
+        end
+
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
 
@@ -728,7 +741,13 @@ describe Temporal::Client::Implementation do
       it 'raises an error' do
         expect do
           subject.await_workflow_result(id, run_id, false, metadata, timeout)
-        end.to raise_error(Temporal::Error, 'Workflow execution cancelled')
+        end.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporal::Error::CancelledError)
+          expect(error.cause.message).to eq('Workflow execution cancelled')
+          expect(error.cause.details).to eq(['test'])
+        end
+
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
     end
@@ -747,7 +766,12 @@ describe Temporal::Client::Implementation do
       it 'raises an error' do
         expect do
           subject.await_workflow_result(id, run_id, false, metadata, timeout)
-        end.to raise_error(Temporal::Error, 'Workflow execution terminated')
+        end.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporal::Error::TerminatedError)
+          expect(error.cause.message).to eq('test reason')
+        end
+
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
     end
@@ -765,7 +789,13 @@ describe Temporal::Client::Implementation do
       it 'raises an error' do
         expect do
           subject.await_workflow_result(id, run_id, false, metadata, timeout)
-        end.to raise_error(Temporal::Error, 'Workflow execution timed out')
+        end.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporal::Error::TimeoutError)
+          expect(error.cause.message).to eq('Workflow execution timed out')
+          expect(error.cause.type).to eq(Temporal::TimeoutType::START_TO_CLOSE)
+        end
+
         expect(connection).to have_received(:get_workflow_execution_history).once
       end
 

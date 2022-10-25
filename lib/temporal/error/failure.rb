@@ -37,7 +37,7 @@ module Temporal
     class TimeoutError < Failure
       attr_reader :type, :last_heartbeat_details
 
-      def initialize(message, type:, last_heartbeat_details:, raw: nil, cause: nil)
+      def initialize(message, type:, last_heartbeat_details: [], raw: nil, cause: nil)
         super(message, raw: raw, cause: cause)
 
         @type = type
@@ -48,7 +48,7 @@ module Temporal
     class CancelledError < Failure
       attr_reader :details
 
-      def initialize(message, details:, raw: nil, cause: nil)
+      def initialize(message, details: [], raw: nil, cause: nil)
         super(message, raw: raw, cause: cause)
 
         @details = details
@@ -74,7 +74,7 @@ module Temporal
     class ResetWorkflowError < Failure
       attr_reader :last_heartbeat_details
 
-      def initialize(message, last_heartbeat_details:, raw: nil, cause: nil)
+      def initialize(message, last_heartbeat_details: [], raw: nil, cause: nil)
         super(message, raw: raw, cause: cause)
 
         @last_heartbeat_details = last_heartbeat_details
