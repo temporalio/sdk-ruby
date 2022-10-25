@@ -277,8 +277,7 @@ module Temporal
         end
 
         event = events.first
-        # TODO: Use special error type for internal errors
-        raise Temporal::Error, 'Missing final history event' unless event
+        raise Temporal::Error::UnexpectedResponse, 'Missing final history event' unless event
 
         case event.event_type
         when :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED

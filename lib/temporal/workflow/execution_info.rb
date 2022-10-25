@@ -1,3 +1,4 @@
+require 'temporal/errors'
 require 'temporal/workflow/execution_status'
 require 'google/protobuf/well_known_types'
 
@@ -22,7 +23,7 @@ module Temporal
     )
       def self.from_raw(response, converter)
         raw_info = response.workflow_execution_info
-        raise 'unexpected' unless raw_info
+        raise Temporal::Error::UnexpectedResponse, 'missing workflow_execution_info' unless raw_info
 
         new(
           raw: response,
