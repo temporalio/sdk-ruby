@@ -2,7 +2,7 @@ require 'temporal/failure_converter/basic'
 require 'temporal/payload_converter'
 
 describe Temporal::FailureConverter::Basic do
-  subject { described_class.new(payload_converter: converter) }
+  subject { described_class.new }
   let(:converter) { Temporal::PayloadConverter::DEFAULT }
   let(:details) { { 'foo' => 'bar' } }
   let(:payload) { converter.to_payload(details) }
@@ -28,7 +28,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(converter).to have_received(:to_payload).with(details).once
 
@@ -52,7 +52,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(converter).to have_received(:to_payload).with(details).once
 
@@ -71,7 +71,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(converter).to have_received(:to_payload).with(details).once
 
@@ -89,7 +89,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(failure).to be_a(Temporal::Api::Failure::V1::Failure)
         expect(failure.message).to eq('Test error')
@@ -105,7 +105,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(failure).to be_a(Temporal::Api::Failure::V1::Failure)
         expect(failure.message).to eq('Test error')
@@ -121,7 +121,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(converter).to have_received(:to_payload).with(details).once
 
@@ -147,7 +147,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(failure).to be_a(Temporal::Api::Failure::V1::Failure)
         expect(failure.message).to eq('Test error')
@@ -178,7 +178,7 @@ describe Temporal::FailureConverter::Basic do
       end
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
         failure_info = failure.child_workflow_execution_failure_info
 
         expect(failure).to be_a(Temporal::Api::Failure::V1::Failure)
@@ -199,7 +199,7 @@ describe Temporal::FailureConverter::Basic do
       let(:error) { StandardError.new('Test error') }
 
       it 'returns a failure' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(failure).to be_a(Temporal::Api::Failure::V1::Failure)
         expect(failure.message).to eq('Test error')
@@ -212,11 +212,11 @@ describe Temporal::FailureConverter::Basic do
     end
 
     context 'when encode_common_attributes is set to true' do
-      subject { described_class.new(payload_converter: converter, encode_common_attributes: true) }
+      subject { described_class.new(encode_common_attributes: true) }
       let(:error) { StandardError.new('Test error') }
 
       it 'encodes attributes' do
-        failure = subject.to_failure(error)
+        failure = subject.to_failure(error, converter)
 
         expect(failure.message).to eq('Encoded failure')
         expect(failure.stack_trace).to be_empty
@@ -239,7 +239,7 @@ describe Temporal::FailureConverter::Basic do
 
     context 'with missing failure info' do
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::Failure)
         expect(error.message).to eq('Test failure')
@@ -261,7 +261,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.application_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::ApplicationError)
         expect(error.message).to eq('Test failure')
@@ -288,7 +288,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.timeout_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::TimeoutError)
         expect(error.message).to eq('Test failure')
@@ -312,7 +312,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.canceled_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::CancelledError)
         expect(error.message).to eq('Test failure')
@@ -331,7 +331,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.terminated_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::TerminatedError)
         expect(error.message).to eq('Test failure')
@@ -347,7 +347,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.server_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::ServerError)
         expect(error.message).to eq('Test failure')
@@ -369,7 +369,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.reset_workflow_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::ResetWorkflowError)
         expect(error.message).to eq('Test failure')
@@ -397,7 +397,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.activity_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::ActivityError)
         expect(error.message).to eq('Test failure')
@@ -428,7 +428,7 @@ describe Temporal::FailureConverter::Basic do
       before { failure.child_workflow_execution_failure_info = failure_info }
 
       it 'returns an error' do
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error).to be_a(Temporal::Error::ChildWorkflowError)
         expect(error.message).to eq('Test failure')
@@ -452,7 +452,7 @@ describe Temporal::FailureConverter::Basic do
           'stack_trace' => "a.rb:1\nb.rb:2",
         )
 
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error.message).to eq('Encoded message')
         expect(error.backtrace).to eq(['a.rb:1', 'b.rb:2'])
@@ -461,7 +461,7 @@ describe Temporal::FailureConverter::Basic do
       it 'ignores unsupported attributes' do
         failure.encoded_attributes = converter.to_payload({ 'foo' => 'bar' })
 
-        error = subject.from_failure(failure)
+        error = subject.from_failure(failure, converter)
 
         expect(error.message).to eq('Test failure')
         expect(error.backtrace).to eq(backtrace)

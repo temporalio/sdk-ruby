@@ -203,7 +203,7 @@ describe Temporal::DataConverter do
       expect(result.application_failure_info.type).to eq('test type')
       expect(result.application_failure_info.details.payloads.first.data).to eq('"test"')
 
-      expect(failure_converter).to have_received(:to_failure).with(error).once
+      expect(failure_converter).to have_received(:to_failure).with(error, converter).once
     end
 
     context 'with payload codecs' do
@@ -312,7 +312,7 @@ describe Temporal::DataConverter do
       expect(result.details).to eq(['test'])
       expect(result.backtrace).to eq(['a.rb:1', 'b.rb:2'])
 
-      expect(failure_converter).to have_received(:from_failure).with(failure).once
+      expect(failure_converter).to have_received(:from_failure).with(failure, converter).once
     end
 
     context 'with payload codecs' do

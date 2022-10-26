@@ -35,7 +35,7 @@ module Temporal
     end
 
     def to_failure(error)
-      failure = failure_converter.to_failure(error)
+      failure = failure_converter.to_failure(error, payload_converter)
       encode_failure(failure)
     end
 
@@ -64,7 +64,7 @@ module Temporal
       raise ArgumentError, 'missing a failure to convert from' unless failure
 
       failure = decode_failure(failure)
-      failure_converter.from_failure(failure)
+      failure_converter.from_failure(failure, payload_converter)
     end
 
     private
