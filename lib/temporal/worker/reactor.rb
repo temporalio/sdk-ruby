@@ -82,7 +82,7 @@ module Temporal
           mutex.synchronize do
             if queue.empty? && fibers.empty?
               @running = false
-              break
+              return
             end
           end
         end

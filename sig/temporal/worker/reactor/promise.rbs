@@ -9,7 +9,8 @@ module Temporal
         def fulfilled?: () -> bool
         def result: () -> Object?
         def wait: () -> void
-        def set: (Object | Exception) -> void
+        def resolve: (Object) -> void
+        def reject: (Exception) -> void
 
         private
 

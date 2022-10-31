@@ -2,17 +2,17 @@ module Temporal
   class Worker
     class Reactor
       module Command
-        class Start
-          attr_reader block: ^() -> void
+        class Start < Struct[untyped]
+          attr_accessor block: ^(*untyped) -> void
 
-          def initialize: (^() -> void) -> void
+          def self.new: (^(*untyped) -> void) -> instance
         end
 
-        class Resume
-          attr_reader fiber: Fiber
-          attr_reader value: untyped
+        class Resume < Struct[untyped]
+          attr_accessor fiber: Fiber
+          attr_accessor value: untyped
 
-          def initialize: (Fiber, untyped) -> void
+          def self.new: (Fiber, untyped) -> instance
         end
       end
     end

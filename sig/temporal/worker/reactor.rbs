@@ -32,8 +32,8 @@ module Temporal
       def running?: () -> bool
       def run_loop: () -> void
       def handle: (command) -> void
-      def run_in_fiber: (^() -> void) -> void
-      def enqueue: () { () -> void } -> void
+      def run_in_fiber: (^(*untyped) -> void) -> void
+      def enqueue: () { (*untyped) -> void } -> void
       def resume: (Fiber, untyped) -> void
     end
   end
