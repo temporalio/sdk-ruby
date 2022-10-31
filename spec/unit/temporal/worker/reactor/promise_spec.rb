@@ -39,7 +39,7 @@ describe Temporal::Worker::Reactor::Promise do
 
       Fiber.new do
         subject.result
-      rescue => e
+      rescue StandardError => e
         caught_error = e
       end.resume
       subject.reject(test_error)

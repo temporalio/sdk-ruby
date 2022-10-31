@@ -16,7 +16,7 @@ module Temporal
         runtime.core_runtime,
         connection.core_connection,
         namespace,
-        task_queue
+        task_queue,
       )
     end
 

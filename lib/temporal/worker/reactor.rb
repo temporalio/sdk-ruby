@@ -47,8 +47,8 @@ module Temporal
 
           value = Fiber.yield
           promise.resolve(value)
-        rescue StandardError => error
-          promise.reject(error)
+        rescue StandardError => e
+          promise.reject(e)
         end
 
         promise
