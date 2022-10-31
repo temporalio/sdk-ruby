@@ -1,6 +1,8 @@
 require 'securerandom'
 require 'temporal/client'
 require 'temporal/connection'
+require 'temporal/error/failure'
+require 'temporal/error/workflow_failure'
 require 'temporal/interceptor/client'
 
 class TestInterceptor < Temporal::Interceptor::Client
@@ -151,7 +153,11 @@ describe Temporal::Client do
       input = { actions: [{ error: { message: 'test return value' } }] }
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-      expect { handle.result }.to raise_error(Temporal::Error, 'Workflow execution failed')
+      expect { handle.result }.to raise_error do |error|
+        expect(error).to be_a(Temporal::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporal::Error::ApplicationError)
+        expect(error.cause.message).to eq('test return value')
+      end
     end
 
     it 'follows runs when workflow was continued as new' do
@@ -210,7 +216,11 @@ describe Temporal::Client do
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
       handle.cancel
 
-      expect { handle.result }.to raise_error(Temporal::Error, 'Workflow execution cancelled')
+      expect { handle.result }.to raise_error do |error|
+        expect(error).to be_a(Temporal::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporal::Error::CancelledError)
+        expect(error.cause.message).to eq('Workflow execution cancelled')
+      end
     end
   end
 
@@ -218,9 +228,13 @@ describe Temporal::Client do
     it 'successfully cancels a workflow' do
       input = { actions: [{ sleep: { millis: 15_000 } }] }
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
-      handle.terminate
+      handle.terminate('test reason')
 
-      expect { handle.result }.to raise_error(Temporal::Error, 'Workflow execution terminated')
+      expect { handle.result }.to raise_error do |error|
+        expect(error).to be_a(Temporal::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporal::Error::TerminatedError)
+        expect(error.cause.message).to eq('test reason')
+      end
     end
   end
 

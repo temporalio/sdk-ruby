@@ -1,8 +1,10 @@
 require 'socket'
 require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/client/workflow_handle'
-require 'temporal/errors'
+require 'temporal/error/failure'
+require 'temporal/error/workflow_failure'
 require 'temporal/interceptor/chain'
+require 'temporal/timeout_type'
 require 'temporal/version'
 require 'temporal/workflow/execution_info'
 require 'temporal/workflow/id_reuse_policy'
@@ -275,8 +277,7 @@ module Temporal
         end
 
         event = events.first
-        # TODO: Use special error type for internal errors
-        raise Temporal::Error, 'Missing final history event' unless event
+        raise Temporal::Error::UnexpectedResponse, 'Missing final history event' unless event
 
         case event.event_type
         when :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED
@@ -290,23 +291,39 @@ module Temporal
           attributes = event.workflow_execution_failed_event_attributes
           follow(attributes&.new_execution_run_id) if follow_runs
 
-          # TODO: Use more specific error and decode failure
-          raise Temporal::Error, 'Workflow execution failed'
+          raise Temporal::Error::WorkflowFailure.new(
+            cause: converter.from_failure(attributes&.failure),
+          )
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED
-          # TODO: Use more specific error and decode failure
-          raise Temporal::Error, 'Workflow execution cancelled'
+          attributes = event.workflow_execution_canceled_event_attributes
+
+          raise Temporal::Error::WorkflowFailure.new(
+            cause: Temporal::Error::CancelledError.new(
+              'Workflow execution cancelled',
+              details: converter.from_payloads(attributes&.details),
+            ),
+          )
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED
-          # TODO: Use more specific error and decode failure
-          raise Temporal::Error, 'Workflow execution terminated'
+          attributes = event.workflow_execution_terminated_event_attributes
+
+          raise Temporal::Error::WorkflowFailure.new(
+            cause: Temporal::Error::TerminatedError.new(
+              attributes&.reason || 'Workflow execution terminated',
+            ),
+          )
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT
           attributes = event.workflow_execution_timed_out_event_attributes
           follow(attributes&.new_execution_run_id) if follow_runs
 
-          # TODO: Use more specific error and decode failure
-          raise Temporal::Error, 'Workflow execution timed out'
+          raise Temporal::Error::WorkflowFailure.new(
+            cause: Temporal::Error::TimeoutError.new(
+              'Workflow execution timed out',
+              type: Temporal::TimeoutType::START_TO_CLOSE,
+            ),
+          )
 
         when :EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW
           attributes = event.workflow_execution_continued_as_new_event_attributes

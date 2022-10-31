@@ -1,0 +1,9 @@
+module Temporal
+  class Error < StandardError
+    class RPCError < Error
+    end
+
+    class UnexpectedResponse < RPCError
+    end
+  end
+end

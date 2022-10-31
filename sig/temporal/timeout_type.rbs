@@ -1,0 +1,15 @@
+module Temporal
+  module TimeoutType
+    type values = :START_TO_CLOSE | :SCHEDULE_TO_START | :SCHEDULE_TO_CLOSE | :HEARTBEAT
+
+    START_TO_CLOSE: :START_TO_CLOSE
+    SCHEDULE_TO_START: :SCHEDULE_TO_START
+    SCHEDULE_TO_CLOSE: :SCHEDULE_TO_CLOSE
+    HEARTBEAT: :HEARTBEAT
+    TYPES: Array[values]
+    API_MAP: Hash[Temporal::Api::Enums::V1::TimeoutType::init, values]
+
+    def self.to_raw: (values) -> Temporal::Api::Enums::V1::TimeoutType::init
+    def self.from_raw: (Temporal::Api::Enums::V1::TimeoutType::init) -> values
+  end
+end
