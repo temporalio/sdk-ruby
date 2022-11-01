@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-rspec' # spec linter
   spec.add_development_dependency 'steep' # type checker
   spec.add_development_dependency 'typeprof' # type generator
+  spec.add_development_dependency 'yard' # docs
 end

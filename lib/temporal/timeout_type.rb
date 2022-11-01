@@ -1,4 +1,5 @@
 module Temporal
+  # Type of timeout for {Temporal::TimeoutError}.
   module TimeoutType
     TYPES = [
       START_TO_CLOSE = :START_TO_CLOSE,

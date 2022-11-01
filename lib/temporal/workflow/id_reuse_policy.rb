@@ -2,6 +2,9 @@ require 'temporal/api/enums/v1/workflow_pb'
 
 module Temporal
   class Workflow
+    # How already-in-use workflow IDs are handled on start.
+    #
+    # @see Temporal::Api::Enums::V1::WorkflowIdReusePolicy
     class IDReusePolicy
       POLICIES = [
         ALLOW_DUPLICATE = :ALLOW_DUPLICATE,

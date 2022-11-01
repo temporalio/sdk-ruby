@@ -9,15 +9,50 @@ require 'temporal/workflow/id_reuse_policy'
 
 module Temporal
   class Client
+    # @return [String] Namespace used for client calls.
     attr_reader :namespace
 
-    # TODO: More argument to follow for converters, codecs, etc
+    # Create a Temporal client from a service client.
+    #
+    # @param connection [Temporal::Connection] A previously established connection with the
+    #   Temporal server.
+    # @param namespace [String] Namespace to use for client calls.
+    # @param interceptors [Array<Temporal::Interceptor::Client>] List of interceptors for
+    #   intercepting client calls. Executed in their original order.
     def initialize(connection, namespace, interceptors: [])
       @namespace = namespace
       data_converter = DataConverter.new
       @implementation = Client::Implementation.new(connection, namespace, data_converter, interceptors)
     end
 
+    # Start a workflow and return its handle.
+    #
+    # @param workflow [String] Name of the workflow.
+    # @param args [any] Arguments to the workflow.
+    # @param id [String] Unique identifier for the workflow execution.
+    # @param task_queue [String, Symbol] Task queue to run the workflow on.
+    # @param execution_timeout [Integer] Total workflow execution timeout including
+    #   retries and continue as new.
+    # @param run_timeout [Integer] Timeout of a single workflow run.
+    # @param task_timeout [Integer] Timeout of a single workflow task.
+    # @param id_reuse_policy [Symbol] How already-existing IDs are treated. Refer to
+    #   {Temporal::Workflow::IDReusePolicy} for the list of allowed values.
+    # @param retry_policy [Temporal::RetryPolicy] Retry policy for the workflow.
+    #   See {Temporal::RetryPolicy}.
+    # @param cron_schedule [String] See https://docs.temporal.io/docs/content/what-is-a-temporal-cron-job.
+    # @param memo [Hash<String, any>] Memo for the workflow.
+    # @param search_attributes [Hash<String, any>] Search attributes for the workflow.
+    # @param start_signal [String, Symbol] If present, this signal is sent as signal-with-start
+    #   instead of traditional workflow start.
+    # @param start_signal_args [Array<any>] Arguments for start_signal if `:start_signal`
+    #   present.
+    # @param rpc_metadata [Hash<String, String>] Headers used on the RPC call. Keys here override
+    #   client-level RPC metadata keys.
+    # @param rpc_timeout [Integer] Optional RPC deadline to set for the RPC call.
+    #
+    # @return [Temporal::Client::WorkflowHandle] A workflow handle to the started/existing workflow.
+    #
+    # @raise [Temporal::Error::RPCError] Workflow could not be started.
     def start_workflow( # rubocop:disable Metrics/ParameterLists
       workflow,
       *args,
@@ -59,6 +94,14 @@ module Temporal
       implementation.start_workflow(input)
     end
 
+    # Get a workflow handle to an existing workflow by its ID.
+    #
+    # @param id [String] Workflow ID to get a handle to.
+    # @param run_id [String, nil] Run ID that will be used for all calls.
+    # @param first_execution_run_id [String, nil] First execution run ID used for cancellation and
+    #   termination.
+    #
+    # @return [Temporal::Client::WorkflowHandle] The workflow handle.
     def workflow_handle(id, run_id: nil, first_execution_run_id: nil)
       WorkflowHandle.new(
         implementation,
