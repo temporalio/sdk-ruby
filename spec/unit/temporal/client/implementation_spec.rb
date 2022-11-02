@@ -6,13 +6,21 @@ require 'temporal/client/workflow_handle'
 require 'temporal/connection'
 require 'temporal/data_converter'
 require 'temporal/errors'
+require 'temporal/failure_converter'
+require 'temporal/payload_converter'
 
 describe Temporal::Client::Implementation do
   subject { described_class.new(connection, namespace, converter, interceptors) }
 
   let(:connection) { instance_double(Temporal::Connection) }
   let(:namespace) { 'test-namespace' }
-  let(:converter) { Temporal::DataConverter.new }
+  let(:converter) do
+    Temporal::DataConverter.new(
+      payload_converter: Temporal::PayloadConverter::DEFAULT,
+      payload_codecs: [],
+      failure_converter: Temporal::FailureConverter::DEFAULT,
+    )
+  end
   let(:interceptors) { [] }
   let(:id) { SecureRandom.uuid }
   let(:run_id) { SecureRandom.uuid }

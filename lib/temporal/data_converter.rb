@@ -1,17 +1,11 @@
 require 'temporal/api/common/v1/message_pb'
 require 'temporal/errors'
-require 'temporal/payload_converter'
-require 'temporal/failure_converter'
 
 module Temporal
   class DataConverter
     class MissingPayload < Temporal::Error; end
 
-    def initialize(
-      payload_converter: Temporal::PayloadConverter::DEFAULT,
-      payload_codecs: [],
-      failure_converter: Temporal::FailureConverter::DEFAULT
-    )
+    def initialize(payload_converter:, payload_codecs:, failure_converter:)
       @payload_converter = payload_converter
       @payload_codecs = payload_codecs
       @failure_converter = failure_converter

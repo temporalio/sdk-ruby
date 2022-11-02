@@ -1,10 +1,12 @@
 require 'json'
 require 'securerandom'
 require 'socket'
-require 'temporal/errors'
-require 'temporal/data_converter'
-require 'temporal/client/workflow_handle'
 require 'temporal/client/implementation'
+require 'temporal/client/workflow_handle'
+require 'temporal/data_converter'
+require 'temporal/errors'
+require 'temporal/failure_converter'
+require 'temporal/payload_converter'
 require 'temporal/workflow/id_reuse_policy'
 
 module Temporal
@@ -18,9 +20,31 @@ module Temporal
     # @param namespace [String] Namespace to use for client calls.
     # @param interceptors [Array<Temporal::Interceptor::Client>] List of interceptors for
     #   intercepting client calls. Executed in their original order.
-    def initialize(connection, namespace, interceptors: [])
+    # @param payload_converter [Temporal::PayloadConverter::Base] A custom payload converter for
+    #   converting Ruby values to/from protos. See {Temporal::PayloadConverter::Base} for the
+    #   interface definition.
+    # @param payload_codecs [Array<Temporal::PayloadCodec::Base>] A list of payload codecs to
+    #   transform payload protos. See {Temporal::PayloadCodec::Base} for the interface definition.
+    # @param failure_converter [Temporal::FailureConverter::Base] A custom failure converter for
+    #   converting Exceptions to/from protos. See {Temporal::FailureConverter::Base} for the
+    #   interface definition.
+    #
+    # @see https://docs.temporal.io/concepts/what-is-a-data-converter for more information on
+    #   payload converters and codecs.
+    def initialize(
+      connection,
+      namespace,
+      interceptors: [],
+      payload_converter: Temporal::PayloadConverter::DEFAULT,
+      payload_codecs: [],
+      failure_converter: Temporal::FailureConverter::DEFAULT
+    )
       @namespace = namespace
-      data_converter = DataConverter.new
+      data_converter = DataConverter.new(
+        payload_converter: payload_converter,
+        payload_codecs: payload_codecs,
+        failure_converter: failure_converter,
+      )
       @implementation = Client::Implementation.new(connection, namespace, data_converter, interceptors)
     end
 
