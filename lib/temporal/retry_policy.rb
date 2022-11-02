@@ -1,12 +1,35 @@
 require 'temporal/errors'
 
 module Temporal
-  # See https://docs.temporal.io/application-development/features/#workflow-retry-policy
+  # Options for retrying workflows and activities.
+  #
+  # @see https://docs.temporal.io/application-development/features/#workflow-retry-policy
   class RetryPolicy
     class Invalid < Temporal::Error; end
 
-    attr_reader :initial_interval, :backoff, :max_interval, :max_attempts, :non_retriable_errors
+    # @return [Integer] Backoff interval for the first retry.
+    attr_reader :initial_interval
 
+    # @return [Float] Coefficient to multiply previous backoff interval by to get new interval.
+    attr_reader :backoff
+
+    # @return [Integer, nil] Maximum backoff interval between retries. Default 100x
+    #   {#initial_interval}.
+    attr_reader :max_interval
+
+    # @return [Integer] Maximum number of attempts. If 0, the default, there is no maximum.
+    attr_reader :max_attempts
+
+    # @return [Array<String>] List of error types that are not retryable.
+    attr_reader :non_retriable_errors
+
+    # @param initial_interval [Integer] Backoff interval (in seconds) for the first retry.
+    # @param backoff [Float] Coefficient to multiply previous backoff interval by to get new
+    #   interval.
+    # @param max_interval [Integer] Maximum backoff interval between retries. Default 100x
+    #   {#initial_interval}.
+    # @param max_attempts [Integer] Maximum number of attempts. If 0, there is no maximum.
+    # @param non_retriable_errors [Array<String>] List of error types that are not retryable.
     def initialize(
       initial_interval: 1,
       backoff: 2.0,

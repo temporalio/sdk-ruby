@@ -2,6 +2,9 @@ require 'temporal/api/enums/v1/query_pb'
 
 module Temporal
   class Workflow
+    # Whether a query should be rejected in certain conditions.
+    #
+    # @see Temporal::Api::Enums::V1::QueryRejectCondition
     module QueryRejectCondition
       CONDITIONS = [
         NONE = :NONE,

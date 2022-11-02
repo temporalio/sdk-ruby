@@ -1,4 +1,5 @@
 module Temporal
+  # Current retry state of the workflow/activity during error.
   module RetryState
     STATES = [
       IN_PROGRESS = :IN_PROGRESS,
