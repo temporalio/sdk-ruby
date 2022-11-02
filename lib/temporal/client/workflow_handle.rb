@@ -14,8 +14,8 @@ module Temporal
       # Run ID used for {#signal} and {#query} calls if present to ensure the query or signal happen
       # on this exact run.
       #
-      # This is only created via {Temporal::Client#workflow_handle}.
-      # {Temporal::Client#start_workflow} will not set this value.
+      # This is only set on handles created via {Temporal::Client#workflow_handle} with a `run_id`
+      # parameter. {Temporal::Client#start_workflow} does not set this value.
       #
       # This cannot be mutated. If a different run ID is needed, {Temporal::Client#workflow_handle}
       # must be used instead.

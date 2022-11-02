@@ -12,10 +12,9 @@ module Temporal
     # @return [String] Namespace used for client calls.
     attr_reader :namespace
 
-    # Create a Temporal client from a service client.
+    # Create a Temporal client from a connection.
     #
-    # @param connection [Temporal::Connection] A previously established connection with the
-    #   Temporal server.
+    # @param connection [Temporal::Connection] A connection to the Temporal server.
     # @param namespace [String] Namespace to use for client calls.
     # @param interceptors [Array<Temporal::Interceptor::Client>] List of interceptors for
     #   intercepting client calls. Executed in their original order.
@@ -97,9 +96,11 @@ module Temporal
     # Get a workflow handle to an existing workflow by its ID.
     #
     # @param id [String] Workflow ID to get a handle to.
-    # @param run_id [String, nil] Run ID that will be used for all calls.
-    # @param first_execution_run_id [String, nil] First execution run ID used for cancellation and
-    #   termination.
+    # @param run_id [String, nil] Run ID that will be used for all calls. If omitted, the latest run
+    #   for a given workflow ID will be referenced.
+    # @param first_execution_run_id [String, nil] A run ID referencing the first workflow execution
+    #   in a chain. Workflows are chained when using continue-as-new, retries (as permitted by the
+    #   retry policy) or cron executions.
     #
     # @return [Temporal::Client::WorkflowHandle] The workflow handle.
     def workflow_handle(id, run_id: nil, first_execution_run_id: nil)
