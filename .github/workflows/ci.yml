@@ -11,7 +11,7 @@ jobs:
   # Lint and test the project
   build-lint-test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         ruby:
           - 2.7.6
