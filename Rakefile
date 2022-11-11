@@ -10,7 +10,7 @@ RBS_SIG_PATH = 'sig/protos'.freeze
 GRPC_PATH = 'spec/support/grpc'.freeze
 
 Thermite::Tasks.new(
-  cargo_project_path: File.expand_path('bridge', File.dirname(__FILE__)),
+  cargo_project_path: File.expand_path('bridge', __dir__),
   ruby_project_path: __dir__,
 )
 
