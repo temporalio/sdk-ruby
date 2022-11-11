@@ -27,6 +27,18 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: "1.19"
+      - uses: Swatinem/rust-cache@v1
+        with:
+          working-directory: bridge
+      - name: Setup Golang test server caches
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-golang-${{ hashFiles('spec/support/**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golang-
       - run: bundle install
       - run: bundle exec rubocop
       # Turned off for now because of an incompatibility in steep
