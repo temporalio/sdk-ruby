@@ -41,9 +41,9 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: "1.19"
-      - uses: Swatinem/rust-cache@v1
-        with:
-          working-directory: bridge
+      # - uses: Swatinem/rust-cache@v1
+      #   with:
+      #     working-directory: bridge
       - name: Setup Golang test server caches
         uses: actions/cache@v3
         with:
