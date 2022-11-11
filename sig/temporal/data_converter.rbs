@@ -4,9 +4,9 @@ module Temporal
     end
 
     def initialize: (
-      ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
-      ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
-      ?failure_converter: Temporal::FailureConverter::_FailureConverter,
+      payload_converter: Temporal::PayloadConverter::_PayloadConverter,
+      payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
+      failure_converter: Temporal::FailureConverter::_FailureConverter,
     ) -> void
     def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?
     def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporal::Api::Common::V1::Payload]

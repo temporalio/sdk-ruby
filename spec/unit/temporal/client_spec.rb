@@ -4,6 +4,9 @@ require 'temporal/client/implementation'
 require 'temporal/client/workflow_handle'
 require 'temporal/connection'
 require 'temporal/data_converter'
+require 'temporal/failure_converter'
+require 'temporal/payload_codec/base'
+require 'temporal/payload_converter'
 require 'temporal/retry_policy'
 
 describe Temporal::Client do
@@ -22,6 +25,57 @@ describe Temporal::Client do
       .to receive(:new)
       .with(connection, namespace, an_instance_of(Temporal::DataConverter), interceptors)
       .and_return(client_impl)
+  end
+
+  describe '#initialize' do
+    before { allow(Temporal::DataConverter).to receive(:new).and_call_original }
+
+    context 'with a custom payload converter' do
+      let(:payload_converter) { instance_double(Temporal::PayloadConverter::Base) }
+
+      it 'passes it to a data converter' do
+        described_class.new(connection, namespace, payload_converter: payload_converter)
+
+        expect(Temporal::DataConverter).to have_received(:new).with(
+          payload_converter: payload_converter,
+          payload_codecs: [],
+          failure_converter: Temporal::FailureConverter::DEFAULT,
+        )
+      end
+    end
+
+    context 'with custom payload codecs' do
+      let(:payload_codecs) do
+        [
+          instance_double(Temporal::PayloadCodec::Base),
+          instance_double(Temporal::PayloadCodec::Base),
+        ]
+      end
+
+      it 'passes it to a data converter' do
+        described_class.new(connection, namespace, payload_codecs: payload_codecs)
+
+        expect(Temporal::DataConverter).to have_received(:new).with(
+          payload_converter: Temporal::PayloadConverter::DEFAULT,
+          payload_codecs: payload_codecs,
+          failure_converter: Temporal::FailureConverter::DEFAULT,
+        )
+      end
+    end
+
+    context 'with a custom failure converter' do
+      let(:failure_converter) { instance_double(Temporal::FailureConverter::Base) }
+
+      it 'passes it to a data converter' do
+        described_class.new(connection, namespace, failure_converter: failure_converter)
+
+        expect(Temporal::DataConverter).to have_received(:new).with(
+          payload_converter: Temporal::PayloadConverter::DEFAULT,
+          payload_codecs: [],
+          failure_converter: failure_converter,
+        )
+      end
+    end
   end
 
   describe '#start_workflow' do
