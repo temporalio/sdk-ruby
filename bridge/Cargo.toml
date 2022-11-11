@@ -20,3 +20,6 @@ url = "2.2"
 [lib]
 name = "bridge"
 crate-type = ["dylib"]
+
+[package.metadata.thermite]
+github_releases = true
