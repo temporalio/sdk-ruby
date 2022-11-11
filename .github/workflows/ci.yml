@@ -44,6 +44,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: bridge
+          key: ${{ matrix.os }}-${{ matrix.ruby }}
       - name: Setup Golang test server caches
         uses: actions/cache@v3
         with:
