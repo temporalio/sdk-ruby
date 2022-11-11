@@ -204,7 +204,7 @@ describe Temporal::Client do
       input = { action_signal: 'test-signal' }
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-      handle.signal('test-signal', { result: { value: 'test signal arg' } })
+      handle.signal('test-signal', { result: { value: 'test signal arg' } }, {})
 
       expect(handle.result).to eq('test signal arg')
     end
