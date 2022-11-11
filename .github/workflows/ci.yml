@@ -10,8 +10,21 @@ on: # rebuild any PRs and main branch changes
 jobs:
   # Lint and test the project
   build-lint-test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby:
+          - 2.7.6
+          - 3.0.4
+          - 3.1.2
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
+      - name: Print build information
+        run: 'echo head_ref: ${{ github.head_ref }}, ref: ${{ github.ref }}, os: ${{ matrix.os }}, ruby: ${{ matrix.ruby }}'
       - uses: actions/checkout@v2
         with:
           submodules: recursive
@@ -21,7 +34,7 @@ jobs:
       - uses: arduino/setup-protoc@v1
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       # Needed to compile go test server and worker
       - uses: actions/setup-go@v2
