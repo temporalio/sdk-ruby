@@ -12,9 +12,9 @@ Gem::Specification.new do |spec|
   spec.email         = ['anthony@temporal.io']
 
   spec.require_paths = ['lib']
-  spec.files         = Dir['{lib}/**/*.*'] + %w[temporal.gemspec Gemfile LICENSE README.md]
+  spec.files         = Dir['{lib}/**/*.*'] + %w[Rakefile temporal.gemspec Gemfile LICENSE README.md]
 
-  spec.extensions    = ['ext/Rakefile']
+  spec.extensions    = ['Rakefile']
 
   spec.required_ruby_version = '>= 2.7.0'
 

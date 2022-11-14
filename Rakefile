@@ -64,3 +64,5 @@ namespace :proto do
        "--rbs_out=#{RBS_SIG_PATH} #{protos}"
   end
 end
+
+task default: 'thermite:build'
