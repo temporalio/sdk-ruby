@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.files         =
     Dir['{lib}/**/*.*'] +
-    Dir['{bridge}/src/*.*'] +
+    Dir['{bridge}/**/*.*'] +
     %w[Rakefile bridge/Cargo.toml temporal.gemspec Gemfile LICENSE README.md]
 
   spec.extensions    = ['Rakefile']
