@@ -63,3 +63,7 @@ jobs:
       - run: bundle exec rake bridge:release
       - run: bundle exec rake test_server:build
       - run: bundle exec rspec
+      - name: Package and install the gem
+        run: |
+          gem build temporal.gemspec
+          gem install $(echo temporal-ruby-*.gem)

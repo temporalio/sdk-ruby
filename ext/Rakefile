@@ -1,0 +1,8 @@
+require 'thermite/tasks'
+
+Thermite::Tasks.new(
+  cargo_project_path: File.expand_path('../bridge', __dir__),
+  ruby_project_path: File.expand_path('..', __dir__),
+)
+
+task default: 'thermite:build'

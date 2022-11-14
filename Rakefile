@@ -1,12 +1,18 @@
 require 'bundler/gem_tasks'
 require 'rbs_protobuf'
 require 'fileutils'
+require 'thermite/tasks'
 
 API_PROTO_ROOT = 'bridge/sdk-core/protos/api_upstream'.freeze
 CORE_PROTO_ROOT = 'bridge/sdk-core/protos/local'.freeze
 PROTOBUF_PATH = 'lib/gen'.freeze
 RBS_SIG_PATH = 'sig/protos'.freeze
 GRPC_PATH = 'spec/support/grpc'.freeze
+
+Thermite::Tasks.new(
+  cargo_project_path: File.expand_path('bridge', __dir__),
+  ruby_project_path: __dir__,
+)
 
 namespace :bridge do
   desc 'Run a linter on SDK Core Bridge'
@@ -16,21 +22,18 @@ namespace :bridge do
 
   desc 'Build SDK Core Bridge'
   task :build do
-    sh 'cd bridge && cargo build'
+    ENV['CARGO_PROFILE'] = 'debug'
+    Rake::Task['thermite:build'].invoke
   end
 
   desc 'Release SDK Core Bridge'
-  task :release do
-    sh 'cd bridge && cargo build --release'
-  end
+  task release: ['thermite:build']
 
   # Mac OS with rbenv users keep leaving behind build artifacts from
   #   when they tried to build against a statically linked Ruby and then
   #   try against a dynamically linked one causing errors in the build result
   desc 'Clean up previous build artefacts'
-  task :clean do
-    sh 'cd bridge && cargo clean'
-  end
+  task clean: ['thermite:clean']
 end
 
 namespace :test_server do

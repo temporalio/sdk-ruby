@@ -12,12 +12,18 @@ Gem::Specification.new do |spec|
   spec.email         = ['anthony@temporal.io']
 
   spec.require_paths = ['lib']
-  spec.files         = Dir['{lib}/**/*.*'] + %w[temporal.gemspec Gemfile LICENSE README.md]
+  spec.extensions    = ['ext/Rakefile']
+
+  spec.files =
+    Dir['lib/**/*.*'] +
+    Dir['bridge/**/*.*'].reject { |x| x.include?('/target/') } +
+    %w[ext/Rakefile temporal.gemspec Gemfile LICENSE README.md]
 
   spec.required_ruby_version = '>= 2.7.0'
 
   spec.add_dependency 'google-protobuf', '~> 3.21.1' # Protobuf
   spec.add_dependency 'rutie', '~> 0.0.4' # Rust bindings
+  spec.add_dependency 'thermite', '~> 0.13.0' # For compiling Rust ext
 
   spec.add_development_dependency 'grpc' # Ruby GRPC for the mock server
   spec.add_development_dependency 'grpc-tools' # GRPC generator for the mock server
