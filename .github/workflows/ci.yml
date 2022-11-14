@@ -65,5 +65,5 @@ jobs:
       - run: bundle exec rspec
       - name: Package and install the gem
         run: |
-          bundle exec rake thermite:tarball
-          bundle exec rake install
+          gem build temporal.gemspec
+          gem install $(echo temporal-ruby-*.gem)

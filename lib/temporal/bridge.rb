@@ -1,12 +1,14 @@
 require 'rutie'
 
-BRIDGE_DIR = File.expand_path('../../bridge/src', File.dirname(__FILE__))
+BRIDGE_DIR = File.expand_path('..', __dir__)
 
 module Temporal
   module Bridge
     # TODO: Expand this into more specific error types
     class Error < StandardError; end
 
-    Rutie.new(:bridge, release: ENV['DEBUG'] ? :debug : :release).init('init_bridge', BRIDGE_DIR)
+    Rutie
+      .new(:bridge, lib_path: '', lib_suffix: 'so', lib_prefix: '')
+      .init('init_bridge', BRIDGE_DIR)
   end
 end
