@@ -11,7 +11,7 @@ describe Temporal::Connection do
   # TODO: For some reason the Bridge doesn't play well with the server in the same
   #       process throwing SegFaults in cases. Needs further investigation
   before(:all) do
-    @pid = fork { exec("bundle exec ruby spec/support/mock_server.rb") }
+    @pid = fork { exec('bundle exec ruby spec/support/mock_server.rb') }
     Helpers::TestRPC.wait("http://#{mock_address}", 10)
   end
   after(:all) { Process.kill('QUIT', @pid) }

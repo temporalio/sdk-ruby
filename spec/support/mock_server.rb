@@ -1,4 +1,4 @@
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   $LOAD_PATH << File.expand_path('..', File.dirname(__FILE__))
   $LOAD_PATH << File.expand_path('../../lib/gen', File.dirname(__FILE__))
 end
@@ -22,6 +22,6 @@ class MockServer < Temporal::Api::WorkflowService::V1::WorkflowService::Service
   end
 end
 
-if __FILE__ == $0
+if __FILE__ == $PROGRAM_NAME
   MockServer.run('0.0.0.0:4444')
 end
