@@ -1,3 +1,8 @@
+if __FILE__ == $PROGRAM_NAME
+  $LOAD_PATH << File.expand_path('..', File.dirname(__FILE__))
+  $LOAD_PATH << File.expand_path('../../lib/gen', File.dirname(__FILE__))
+end
+
 require 'grpc'
 require 'support/grpc/temporal/api/workflowservice/v1/service_services_pb'
 
@@ -15,4 +20,8 @@ class MockServer < Temporal::Api::WorkflowService::V1::WorkflowService::Service
       desc.output.new # return an empty response
     end
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  MockServer.run('0.0.0.0:4444')
 end

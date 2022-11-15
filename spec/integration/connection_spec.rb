@@ -1,31 +1,18 @@
 require 'grpc'
 require 'temporal/connection'
+require 'support/helpers/test_rpc'
 require 'support/mock_server'
 
 describe Temporal::Connection do
   mock_address = '0.0.0.0:4444'.freeze
-
-  def wait_for_mock_server(address, attempts, interval = 1)
-    request = Temporal::Api::WorkflowService::V1::GetSystemInfoRequest.new
-    attempts.times do |i|
-      connection = described_class.new("http://#{address}")
-      connection.get_system_info(request)
-      break
-    rescue StandardError => e
-      puts "Error connecting to a mock server: #{e}. Attempt #{i + 1} / #{attempts}"
-      raise if i + 1 == attempts # re-raise upon exhausting attempts
-
-      sleep interval
-    end
-  end
 
   subject { described_class.new("http://#{mock_address}") }
 
   # TODO: For some reason the Bridge doesn't play well with the server in the same
   #       process throwing SegFaults in cases. Needs further investigation
   before(:all) do
-    @pid = fork { MockServer.run(mock_address) }
-    wait_for_mock_server(mock_address, 10)
+    @pid = fork { exec('bundle exec ruby spec/support/mock_server.rb') }
+    Helpers::TestRPC.wait("http://#{mock_address}", 10)
   end
   after(:all) { Process.kill('QUIT', @pid) }
 
