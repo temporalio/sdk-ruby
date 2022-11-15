@@ -1,7 +1,6 @@
 name: Build Native Extensions
 
 on: # build when publishing a release
-  pull_request: # testing before merging
   release:
     types: [published]
 
@@ -11,8 +10,8 @@ jobs:
       fail-fast: true
       matrix:
         ruby:
-          # - 2.7.6
-          # - 3.0.4
+          - 2.7.6
+          - 3.0.4
           - 3.1.2
         os_arch:
           - ubuntu-x86
@@ -79,8 +78,11 @@ jobs:
           echo "tarball=$(echo bridge-*.tar.gz)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: ${{ steps.package.outputs.tarball }}
-          path: /tmp/registry/storage
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.package.outputs.tarball }}
+          asset_name: ${{ steps.package.outputs.tarball }}
           asset_content_type: application/x-gzip
