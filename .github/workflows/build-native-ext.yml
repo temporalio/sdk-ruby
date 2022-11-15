@@ -79,7 +79,7 @@ jobs:
         id: package
         env:
           TARGET_ARCH: ${{ matrix.arch }}
-          RUSTFLAGS: --target ${{ matrix.target }}
+          CARGO_BUILD_TARGET: ${{ matrix.target }}
         run: |
           bundle exec rake thermite:tarball
           echo bridge-*.tar.gz
