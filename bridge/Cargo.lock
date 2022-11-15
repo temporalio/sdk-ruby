@@ -188,6 +188,7 @@ dependencies = [
 name = "bridge"
 version = "0.0.1"
 dependencies = [
+ "indexmap",
  "lazy_static",
  "prost",
  "rutie",
