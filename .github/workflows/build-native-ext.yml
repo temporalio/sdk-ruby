@@ -1,0 +1,88 @@
+name: Build Native Extensions
+
+on: # build when publishing a release
+  release:
+    types: [published]
+
+jobs:
+  build-binaries:
+    strategy:
+      fail-fast: true
+      matrix:
+        ruby:
+          - 2.7.6
+          - 3.0.4
+          - 3.1.2
+        os_arch:
+          - ubuntu-x86
+          - ubuntu-arm
+          - macos-x86
+          - macos-arm
+        include:
+          - os_arch: ubuntu-x86
+            os: ubuntu-18.04
+            target: x86_64-unknown-linux-gnu
+          - os_arch: ubuntu-arm
+            os: ubuntu-18.04
+            target: aarch64-unknown-linux-gnu
+            rustflags: '-C linker=aarch64-linux-gnu-gcc'
+          - os_arch: macos-x86
+            os: macos-latest
+            target: x86_64-apple-darwin
+          - os_arch: macos-arm
+            os: macos-latest
+            target: aarch64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Add ${{ matrix.target }} rust target
+        run: rustup target add ${{ matrix.target }}
+
+      - if: ${{ matrix.os == 'ubuntu-18.04' }}
+        name: Print libc version
+        run: ldd --version
+
+      - if: ${{ matrix.target == 'aarch64-unknown-linux-gnu' }}
+        name: Install gcc-aarch64-linux-gnu
+        run: sudo apt update && sudo apt install -y gcc-aarch64-linux-gnu
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: bridge
+          key: ${{ matrix.os }}-${{ matrix.ruby }}-${{ matrix.target }}
+
+      - name: Install ruby gems
+        run: bundle install --jobs 4
+
+      - name: Compile native extension
+        id: package
+        run: |
+          bundle exec rake thermite:tarball
+          echo "tarball=$(echo bridge-*.tar.gz)" >> $GITHUB_OUTPUT
+
+      - name: Upload artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.package.outputs.tarball }}
+          asset_name: ${{ steps.package.outputs.tarball }}
+          asset_content_type: application/x-gzip
