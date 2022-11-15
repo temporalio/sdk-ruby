@@ -1,11 +1,11 @@
 name: Build Native Extensions
 
 on: # build when publishing a release
+  pull_request: # testing before merging
   release:
     types: [published]
 
 jobs:
-  # Lint and test the project
   build-binaries:
     strategy:
       fail-fast: true
