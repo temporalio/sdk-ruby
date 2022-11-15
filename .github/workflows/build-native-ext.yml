@@ -1,6 +1,7 @@
 name: Build Native Extensions
 
 on: # build when publishing a release
+  pull_request: # for testing
   release:
     types: [published]
 
@@ -10,8 +11,8 @@ jobs:
       fail-fast: true
       matrix:
         ruby:
-          - 2.7.6
-          - 3.0.4
+          # - 2.7.6
+          # - 3.0.4
           - 3.1.2
         os_arch:
           - ubuntu-x86
@@ -22,16 +23,19 @@ jobs:
           - os_arch: ubuntu-x86
             os: ubuntu-18.04
             target: x86_64-unknown-linux-gnu
+            arch: x86_64
           - os_arch: ubuntu-arm
             os: ubuntu-18.04
             target: aarch64-unknown-linux-gnu
-            rustflags: '-C linker=aarch64-linux-gnu-gcc'
+            arch: arm64
           - os_arch: macos-x86
             os: macos-latest
             target: x86_64-apple-darwin
+            arch: x86_64
           - os_arch: macos-arm
             os: macos-latest
             target: aarch64-apple-darwin
+            arch: arm64
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -73,16 +77,20 @@ jobs:
 
       - name: Compile native extension
         id: package
+        env:
+          TARGET_ARCH: ${{ matrix.arch }}
+          RUSTFLAGS: --target ${{ matrix.target }}
         run: |
           bundle exec rake thermite:tarball
+          echo bridge-*.tar.gz
           echo "tarball=$(echo bridge-*.tar.gz)" >> $GITHUB_OUTPUT
 
-      - name: Upload artifacts
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ steps.package.outputs.tarball }}
-          asset_name: ${{ steps.package.outputs.tarball }}
-          asset_content_type: application/x-gzip
+      # - name: Upload artifacts
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ github.event.release.upload_url }}
+      #     asset_path: ${{ steps.package.outputs.tarball }}
+      #     asset_name: ${{ steps.package.outputs.tarball }}
+      #     asset_content_type: application/x-gzip
