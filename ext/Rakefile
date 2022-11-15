@@ -1,5 +1,5 @@
 require 'thermite/tasks'
-require 'thermite_patch'
+require_relative '../lib/thermite_patch'
 
 Thermite::Tasks.new(
   cargo_project_path: File.expand_path('../bridge', __dir__),

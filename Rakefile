@@ -2,7 +2,7 @@ require 'bundler/gem_tasks'
 require 'rbs_protobuf'
 require 'fileutils'
 require 'thermite/tasks'
-require 'thermite_patch'
+require_relative 'lib/thermite_patch'
 
 API_PROTO_ROOT = 'bridge/sdk-core/protos/api_upstream'.freeze
 CORE_PROTO_ROOT = 'bridge/sdk-core/protos/local'.freeze
