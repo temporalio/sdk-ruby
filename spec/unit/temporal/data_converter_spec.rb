@@ -1,6 +1,7 @@
 require 'temporal/api/common/v1/message_pb'
 require 'temporal/data_converter'
 require 'temporal/error/failure'
+require 'temporal/failure_converter'
 require 'temporal/payload_converter'
 require 'temporal/payload_codec/base'
 
