@@ -56,6 +56,9 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
+      - name: Print ruby LD
+        run: ruby -e "puts RbConfig::CONFIG['libdir']"
+
       - name: Add ${{ matrix.target }} rust target
         run: rustup target add ${{ matrix.target }}
 
