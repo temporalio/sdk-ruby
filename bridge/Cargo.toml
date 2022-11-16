@@ -22,8 +22,5 @@ url = "2.2"
 name = "bridge"
 crate-type = ["dylib"]
 
-[target.aarch64-unknown-linux-gnu]
-rustflags = ["-C", "linker=aarch64-linux-gnu-gcc"]
-
 [package.metadata.thermite]
 github_releases = true
