@@ -6,9 +6,6 @@ edition = "2021"
 repository = "https://github.com/temporalio/sdk-ruby"
 
 [dependencies]
-# TODO: Without this entry our cross-compilation fails in GH - https://github.com/temporalio/sdk-ruby/actions/runs/3473477077/jobs/5805530924.
-#       The fix was suggested here - https://github.com/bluss/indexmap/issues/151#issuecomment-716691744
-indexmap = { version = "1.9.1", features = ["std"] }
 lazy_static = "1.4.0"
 prost = "0.11"
 rutie = "0.8.4"
@@ -24,6 +21,9 @@ url = "2.2"
 [lib]
 name = "bridge"
 crate-type = ["dylib"]
+
+[target.aarch64-unknown-linux-gnu]
+rustflags = ["-C", "linker=aarch64-linux-gnu-gcc"]
 
 [package.metadata.thermite]
 github_releases = true

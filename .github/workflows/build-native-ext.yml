@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          # - 2.7.6
-          # - 3.0.4
+          - 2.7.6
+          - 3.0.4
           - 3.1.2
         os_arch:
           - ubuntu-x86
@@ -59,12 +59,12 @@ jobs:
       - name: Add ${{ matrix.target }} rust target
         run: rustup target add ${{ matrix.target }}
 
-      - if: ${{ matrix.os == 'ubuntu-18.04' }}
+      - if: ${{ matrix.os == 'ubuntu-latest' }}
         name: Print libc version
         run: ldd --version
 
-      - if: ${{ matrix.target == 'aarch64-unknown-linux-gnu' }}
-        name: Install gcc-aarch64-linux-gnu
+      - if: ${{ matrix.os_arch == 'ubuntu-arm' }}
+        name: Install gcc-aarch64-linux-gnu linker
         run: sudo apt update && sudo apt install -y gcc-aarch64-linux-gnu
 
       - uses: Swatinem/rust-cache@v2
