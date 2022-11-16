@@ -1,7 +1,6 @@
 name: Build Native Extensions
 
 on: # build when publishing a release
-  pull_request: # for testing
   release:
     types: [published]
 
@@ -86,12 +85,12 @@ jobs:
           echo bridge-*.tar.gz
           echo "tarball=$(echo bridge-*.tar.gz)" >> $GITHUB_OUTPUT
 
-      # - name: Upload artifacts
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: ${{ github.event.release.upload_url }}
-      #     asset_path: ${{ steps.package.outputs.tarball }}
-      #     asset_name: ${{ steps.package.outputs.tarball }}
-      #     asset_content_type: application/x-gzip
+      - name: Upload artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ steps.package.outputs.tarball }}
+          asset_name: ${{ steps.package.outputs.tarball }}
+          asset_content_type: application/x-gzip
