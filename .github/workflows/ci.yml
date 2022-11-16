@@ -1,7 +1,7 @@
 name: Continuous Integration
 
 on: # rebuild any PRs and main branch changes
-  pull_request:
+  # pull_request: temporarily disable
   push:
     branches:
       - main
