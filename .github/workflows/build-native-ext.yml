@@ -57,7 +57,8 @@ jobs:
           bundler-cache: true
 
       - name: Print ruby LD
-        run: ruby -e "puts RbConfig::CONFIG['libdir']"
+        id: ruby_ld
+        run: echo "path=$(ruby -e "puts RbConfig::CONFIG['libdir']")" >> $GITHUB_OUTPUT
 
       - name: Add ${{ matrix.target }} rust target
         run: rustup target add ${{ matrix.target }}
@@ -84,6 +85,7 @@ jobs:
           TARGET_ARCH: ${{ matrix.arch }}
           CARGO_BUILD_TARGET: ${{ matrix.target }}
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
+          LD_LIBRARY_PATH: ${{ steps.ruby_ld.outputs.path }}
         run: |
           bundle exec rake thermite:tarball
           echo bridge-*.tar.gz
