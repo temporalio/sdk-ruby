@@ -8,7 +8,7 @@ on: # build when publishing a release
 jobs:
   build-binaries:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         ruby:
           # - 2.7.6

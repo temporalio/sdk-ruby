@@ -12,5 +12,12 @@ module Thermite
     def target_os
       @target_os ||= RbConfig::CONFIG['target_os'].sub(/darwin\d+/, 'darwin')
     end
+
+    # Due to the lack of cross-compilation support, thermite assumes the resulting binary
+    # is placed in target/<profile>, however it's actually in target/<target_arch>/<profile>
+    def cargo_target_path(profile, *path_components)
+      target_base = ENV.fetch('CARGO_TARGET_DIR', File.join(rust_toplevel_dir, 'target'))
+      File.join(target_base, ENV.fetch('CARGO_BUILD_TARGET', ''), profile, *path_components)
+    end
   end
 end
