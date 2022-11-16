@@ -11,9 +11,9 @@ jobs:
       fail-fast: false
       matrix:
         ruby:
-          - 2.7.6
-          - 3.0.4
-          - 3.1.2
+          - 2.7.0-dev
+          - 3.0.0-dev
+          - 3.1.0-dev
         os_arch:
           - ubuntu-x86
           - ubuntu-arm
