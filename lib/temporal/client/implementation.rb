@@ -119,7 +119,7 @@ module Temporal
           workflow_run_timeout: input.run_timeout,
           workflow_task_timeout: input.task_timeout,
           workflow_id_reuse_policy: Workflow::IDReusePolicy.to_raw(input.id_reuse_policy),
-          retry_policy: nil, # TODO: serialize retry policy
+          retry_policy: input.retry_policy&.to_proto,
           cron_schedule: input.cron_schedule,
           memo: memo,
           search_attributes: search_attributes,

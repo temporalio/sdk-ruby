@@ -1,18 +1,20 @@
 require 'temporal/retry_policy'
 
 describe Temporal::RetryPolicy do
+  subject { described_class.new(**valid_attributes) }
+
+  let(:valid_attributes) do
+    {
+      initial_interval: 1,
+      backoff: 1.5,
+      max_interval: 5,
+      max_attempts: 3,
+      non_retriable_errors: [StandardError],
+    }
+  end
+
   describe '#validate!' do
     subject { described_class.new(**attributes) }
-
-    let(:valid_attributes) do
-      {
-        initial_interval: 1,
-        backoff: 1.5,
-        max_interval: 5,
-        max_attempts: 3,
-        non_retriable_errors: [StandardError],
-      }
-    end
 
     let(:unlimited_attempts) do
       {
@@ -116,6 +118,19 @@ describe Temporal::RetryPolicy do
 
         include_examples 'error', 'Maximum interval cannot be less than initial interval'
       end
+    end
+  end
+
+  describe '#to_proto' do
+    it 'serializes itself into proto' do
+      proto = subject.to_proto
+
+      expect(proto).to be_a(Temporal::Api::Common::V1::RetryPolicy)
+      expect(proto.initial_interval.seconds).to eq(subject.initial_interval)
+      expect(proto.backoff_coefficient).to eq(subject.backoff)
+      expect(proto.maximum_interval.seconds).to eq(subject.max_interval)
+      expect(proto.maximum_attempts).to eq(subject.max_attempts)
+      expect(proto.non_retryable_error_types.to_a).to eq(['StandardError'])
     end
   end
 end
