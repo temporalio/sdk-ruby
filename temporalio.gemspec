@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.files =
     Dir['lib/**/*.*'] +
     Dir['bridge/**/*.*'].reject { |x| x.include?('/target/') } +
-    %w[ext/Rakefile temporal.gemspec Gemfile LICENSE README.md]
+    %w[ext/Rakefile temporalio.gemspec Gemfile LICENSE README.md]
 
   spec.required_ruby_version = '>= 2.7.0'
 

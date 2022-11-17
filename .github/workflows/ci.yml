@@ -66,4 +66,4 @@ jobs:
       - name: Package and install the gem
         run: |
           gem build temporal.gemspec
-          gem install $(echo temporal-ruby-*.gem)
+          gem install $(echo temporalio-*.gem)
