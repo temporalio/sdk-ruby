@@ -65,5 +65,5 @@ jobs:
       - run: bundle exec rspec
       - name: Package and install the gem
         run: |
-          gem build temporal.gemspec
+          gem build temporalio.gemspec
           gem install $(echo temporalio-*.gem)

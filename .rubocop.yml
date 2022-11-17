@@ -55,7 +55,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Exclude:
-    - temporal.gemspec
+    - temporalio.gemspec
     - spec/**/*_spec.rb
 
 Metrics/ClassLength:
