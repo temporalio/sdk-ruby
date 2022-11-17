@@ -154,8 +154,7 @@ module Temporal
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
         if e.message.include?('AlreadyExists')
-          # TODO: Replace with a more specific error
-          raise Temporal::Error, 'Workflow already exists'
+          raise Temporal::Error::RPCError, 'Workflow already exists'
         else
           raise # re-raise
         end
@@ -196,16 +195,14 @@ module Temporal
 
         if response.query_rejected
           status = Workflow::ExecutionStatus.from_raw(response.query_rejected.status)
-          # TODO: Replace with a specific error when implemented
-          raise Temporal::Error, "Query rejected, workflow status: #{status}"
+          raise Temporal::Error::QueryRejected, status
         end
 
         converter.from_payloads(response.query_result)&.first
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
         if e.message.include?('unknown queryType')
-          # TODO: Replace with a more specific error
-          raise Temporal::Error, 'Unsupported query'
+          raise Temporal::Error::UnsupportedQuery, "Unsupported query: #{input.query}"
         end
       end
 

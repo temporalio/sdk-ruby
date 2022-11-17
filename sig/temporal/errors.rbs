@@ -5,5 +5,14 @@ module Temporal
 
     class UnexpectedResponse < RPCError
     end
+
+    class UnsupportedQuery < RPCError
+    end
+
+    class QueryRejected < RPCError
+      attr_reader status: Temporal::Workflow::ExecutionStatus::values
+
+      def initialize: (Temporal::Workflow::ExecutionStatus::values) -> void
+    end
   end
 end

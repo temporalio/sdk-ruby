@@ -360,6 +360,26 @@ describe Temporal::Client::Implementation do
       expect(subject.query_workflow(input)).to eq('test')
     end
 
+    context 'when query is rejected' do
+      before do
+        allow(connection)
+          .to receive(:query_workflow)
+          .and_return(
+            Temporal::Api::WorkflowService::V1::QueryWorkflowResponse.new(
+              query_rejected: { status: :WORKFLOW_EXECUTION_STATUS_COMPLETED },
+            )
+          )
+      end
+
+      it 'raises an error' do
+        expect { subject.query_workflow(input) }.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::QueryRejected)
+          expect(error.message).to eq('Query rejected, workflow status: COMPLETED')
+          expect(error.status).to eq(Temporal::Workflow::ExecutionStatus::COMPLETED)
+        end
+      end
+    end
+
     context 'with header' do
       before { input.headers = { 'header' => 'test' } }
 

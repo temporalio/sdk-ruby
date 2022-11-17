@@ -184,10 +184,9 @@ describe Temporal::Client do
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
       handle.result
 
-      # TODO: Change this to a wrapped error later
       expect do
         handle.query('other test query', 'test query arg')
-      end.to raise_error(Temporal::Error, 'Unsupported query')
+      end.to raise_error(Temporal::Error::UnsupportedQuery, 'Unsupported query: other test query')
     end
   end
 
