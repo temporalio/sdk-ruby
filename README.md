@@ -46,7 +46,7 @@ A client can be created and used to start a workflow like so:
 
 ```ruby
 # Establish a gRPC connection to the server
-connection = Temporal::Connection.new('http://localhost:7233')
+connection = Temporal::Connection.new('localhost:7233')
 
 # Initialize a Client with a namespace
 client = Temporal::Client.new(connection, 'my-namespace')
