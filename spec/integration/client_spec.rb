@@ -54,13 +54,13 @@ describe Temporal::Client do
 
   subject { described_class.new(connection, namespace) }
 
-  let(:connection) { Temporal::Connection.new("http://#{url}") }
+  let(:connection) { Temporal::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
 
   before(:all) do
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
-    Helpers::TestRPC.wait("http://#{url}", 10, 0.5)
+    Helpers::TestRPC.wait(url, 10, 0.5)
 
     @worker_pid = fork { exec("#{support_path}/go_worker/main #{url} #{namespace} #{task_queue}") }
   end
@@ -96,7 +96,10 @@ describe Temporal::Client do
           task_queue: task_queue,
           id_reuse_policy: Temporal::Workflow::IDReusePolicy::REJECT_DUPLICATE,
         )
-      end.to raise_error(Temporal::Error, 'Workflow already exists')
+      end.to raise_error(
+        Temporal::Error::WorkflowExecutionAlreadyStarted,
+        'Workflow execution already started'
+      )
 
       # Run with a default policy again expecting it to succeed
       input = { actions: [{ result: { value: 'test return value 3' } }] }
@@ -184,10 +187,10 @@ describe Temporal::Client do
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
       handle.result
 
-      # TODO: Change this to a wrapped error later
-      expect do
-        handle.query('other test query', 'test query arg')
-      end.to raise_error(Temporal::Error, 'Unsupported query')
+      expect { handle.query('other test query', 'test query arg') }.to raise_error do |error|
+        expect(error).to be_a(Temporal::Error::QueryFailed)
+        expect(error.message).to include('unknown queryType other test query')
+      end
     end
   end
 

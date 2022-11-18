@@ -1,6 +1,7 @@
 require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/bridge'
 require 'temporal/runtime'
+require 'uri'
 
 module Temporal
   # A connection to the Temporal server.
@@ -13,8 +14,9 @@ module Temporal
     # @param host [String] `host:port` for the Temporal server. For local development, this is
     #   often `"localhost:7233"`.
     def initialize(host)
+      url = parse_url(host)
       runtime = Temporal::Runtime.instance
-      @core_connection = Temporal::Bridge::Connection.connect(runtime.core_runtime, host)
+      @core_connection = Temporal::Bridge::Connection.connect(runtime.core_runtime, url)
     end
 
     # @param request [Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest]
@@ -717,6 +719,18 @@ module Temporal
       response = core_connection.call(:list_batch_operations, encoded, metadata, timeout)
 
       Temporal::Api::WorkflowService::V1::ListBatchOperationsResponse.decode(response)
+    end
+
+    private
+
+    def parse_url(url)
+      # Turn this into a valid URI before parsing
+      uri = URI.parse(url.include?('://') ? url : "//#{url}")
+      raise Temporal::Error, 'Target host as URL with scheme are not supported' if uri.scheme
+
+      # TODO: Add support for mTLS
+      uri.scheme = 'http'
+      uri.to_s
     end
   end
 end

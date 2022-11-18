@@ -119,7 +119,7 @@ module Temporal
           workflow_run_timeout: input.run_timeout,
           workflow_task_timeout: input.task_timeout,
           workflow_id_reuse_policy: Workflow::IDReusePolicy.to_raw(input.id_reuse_policy),
-          retry_policy: nil, # TODO: serialize retry policy
+          retry_policy: input.retry_policy&.to_proto,
           cron_schedule: input.cron_schedule,
           memo: memo,
           search_attributes: search_attributes,
@@ -154,8 +154,7 @@ module Temporal
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
         if e.message.include?('AlreadyExists')
-          # TODO: Replace with a more specific error
-          raise Temporal::Error, 'Workflow already exists'
+          raise Temporal::Error::WorkflowExecutionAlreadyStarted, 'Workflow execution already started'
         else
           raise # re-raise
         end
@@ -196,17 +195,13 @@ module Temporal
 
         if response.query_rejected
           status = Workflow::ExecutionStatus.from_raw(response.query_rejected.status)
-          # TODO: Replace with a specific error when implemented
-          raise Temporal::Error, "Query rejected, workflow status: #{status}"
+          raise Temporal::Error::QueryRejected, status
         end
 
         converter.from_payloads(response.query_result)&.first
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
-        if e.message.include?('unknown queryType')
-          # TODO: Replace with a more specific error
-          raise Temporal::Error, 'Unsupported query'
-        end
+        raise Temporal::Error::QueryFailed, e.message
       end
 
       def handle_signal_workflow(input)

@@ -1,3 +1,4 @@
+require 'temporal/api/common/v1/message_pb'
 require 'temporal/errors'
 
 module Temporal
@@ -66,6 +67,16 @@ module Temporal
         raise Invalid, 'Maximum interval cannot be negative' if max_interval.negative?
         raise Invalid, 'Maximum interval cannot be less than initial interval' if max_interval < initial_interval
       end
+    end
+
+    def to_proto
+      Temporal::Api::Common::V1::RetryPolicy.new(
+        initial_interval: Google::Protobuf::Duration.new(seconds: initial_interval),
+        backoff_coefficient: backoff,
+        maximum_interval: max_interval ? Google::Protobuf::Duration.new(seconds: max_interval) : nil,
+        maximum_attempts: max_attempts,
+        non_retryable_error_types: non_retriable_errors.map(&:name).compact,
+      )
     end
   end
 end

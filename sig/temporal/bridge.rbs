@@ -1,7 +1,12 @@
 BRIDGE_DIR: String
 
 class Rutie
-  def initialize: (Symbol, release: String | Symbol) -> void
+  def initialize: (
+    Symbol bridge,
+    ?lib_path: String | Symbol,
+    ?lib_suffix: String | Symbol,
+    ?lib_prefix: String | Symbol
+  ) -> void
   def init: (String, String) -> void
 end
 

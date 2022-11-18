@@ -6,13 +6,13 @@ require 'support/mock_server'
 describe Temporal::Connection do
   mock_address = '0.0.0.0:4444'.freeze
 
-  subject { described_class.new("http://#{mock_address}") }
+  subject { described_class.new(mock_address) }
 
   # TODO: For some reason the Bridge doesn't play well with the server in the same
   #       process throwing SegFaults in cases. Needs further investigation
   before(:all) do
     @pid = fork { exec('bundle exec ruby spec/support/mock_server.rb') }
-    Helpers::TestRPC.wait("http://#{mock_address}", 10)
+    Helpers::TestRPC.wait(mock_address, 10)
   end
   after(:all) { Process.kill('QUIT', @pid) }
 
@@ -49,7 +49,13 @@ describe Temporal::Connection do
     end
 
     it 'raises when unable to connect' do
-      expect { described_class.new('http://0.0.0.0:3333') }.to raise_error(Temporal::Bridge::Error)
+      expect { described_class.new('0.0.0.0:3333') }.to raise_error(Temporal::Bridge::Error)
+    end
+
+    it 'raises when given a URL with schema' do
+      expect do
+        described_class.new('http://localhost:3333')
+      end.to raise_error(Temporal::Error, 'Target host as URL with scheme are not supported')
     end
 
     it 'raises when incorrect request was provided' do
