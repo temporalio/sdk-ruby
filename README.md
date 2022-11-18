@@ -21,6 +21,7 @@ At this point the SDK only supports the **Temporal Client** capabilities:
 - Interacting with a workflow (cancelling, querying, signalling, etc)
 - Interceptor and Data Conversion support
 - gRPC access to Temporal Server
+- Temporal Cloud is not yet supported due to the lack of TLS support, but it's coming soon
 
 
 ## Quick Start
