@@ -209,7 +209,7 @@ describe Temporal::Client::Implementation do
       it 'raises Temporal::Error' do
         expect do
           subject.start_workflow(input)
-        end.to raise_error(Temporal::Error, 'Workflow already exists')
+        end.to raise_error(Temporal::Error::WorkflowExecutionAlreadyStarted, 'Workflow execution already started')
       end
     end
 

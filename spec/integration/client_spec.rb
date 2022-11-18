@@ -96,7 +96,10 @@ describe Temporal::Client do
           task_queue: task_queue,
           id_reuse_policy: Temporal::Workflow::IDReusePolicy::REJECT_DUPLICATE,
         )
-      end.to raise_error(Temporal::Error, 'Workflow already exists')
+      end.to raise_error(
+        Temporal::Error::WorkflowExecutionAlreadyStarted,
+        'Workflow execution already started'
+      )
 
       # Run with a default policy again expecting it to succeed
       input = { actions: [{ result: { value: 'test return value 3' } }] }

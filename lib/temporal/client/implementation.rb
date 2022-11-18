@@ -154,7 +154,7 @@ module Temporal
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
         if e.message.include?('AlreadyExists')
-          raise Temporal::Error::RPCError, 'Workflow already exists'
+          raise Temporal::Error::WorkflowExecutionAlreadyStarted, 'Workflow execution already started'
         else
           raise # re-raise
         end

@@ -6,6 +6,8 @@ module Temporal
 
     class UnexpectedResponse < RPCError; end
 
+    class WorkflowExecutionAlreadyStarted < RPCError; end
+
     class UnsupportedQuery < RPCError; end
 
     class QueryRejected < RPCError
