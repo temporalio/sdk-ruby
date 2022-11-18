@@ -43,5 +43,9 @@ module Temporal
     def get_cluster_info: (Temporal::Api::WorkflowService::V1::GetClusterInfoRequest request, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporal::Api::WorkflowService::V1::GetClusterInfoResponse
     def get_system_info: (Temporal::Api::WorkflowService::V1::GetSystemInfoRequest request, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporal::Api::WorkflowService::V1::GetSystemInfoResponse
     def list_task_queue_partitions: (Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest request, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse
+
+    private
+
+    def parse_url: (String) -> String
   end
 end

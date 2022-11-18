@@ -54,13 +54,13 @@ describe Temporal::Client do
 
   subject { described_class.new(connection, namespace) }
 
-  let(:connection) { Temporal::Connection.new("http://#{url}") }
+  let(:connection) { Temporal::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
 
   before(:all) do
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
-    Helpers::TestRPC.wait("http://#{url}", 10, 0.5)
+    Helpers::TestRPC.wait(url, 10, 0.5)
 
     @worker_pid = fork { exec("#{support_path}/go_worker/main #{url} #{namespace} #{task_queue}") }
   end
