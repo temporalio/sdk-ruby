@@ -201,9 +201,7 @@ module Temporal
         converter.from_payloads(response.query_result)&.first
       rescue Temporal::Bridge::Error => e
         # TODO: Raise a better error from the bridge
-        if e.message.include?('unknown queryType')
-          raise Temporal::Error::UnsupportedQuery, "Unsupported query: #{input.query}"
-        end
+        raise Temporal::Error::QueryFailed, e.message
       end
 
       def handle_signal_workflow(input)

@@ -8,7 +8,7 @@ module Temporal
 
     class WorkflowExecutionAlreadyStarted < RPCError; end
 
-    class UnsupportedQuery < RPCError; end
+    class QueryFailed < RPCError; end
 
     class QueryRejected < RPCError
       attr_reader :status

@@ -9,7 +9,7 @@ module Temporal
     class WorkflowExecutionAlreadyStarted < RPCError
     end
 
-    class UnsupportedQuery < RPCError
+    class QueryFailed < RPCError
     end
 
     class QueryRejected < RPCError
