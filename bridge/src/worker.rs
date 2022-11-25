@@ -44,6 +44,7 @@ impl Worker {
         let config = WorkerConfigBuilder::default()
             .namespace(namespace)
             .task_queue(task_queue)
+            .worker_build_id("test-worker-build") // TODO: replace this with an actual build id
             .build()?;
 
         let core_worker = runtime.tokio_runtime.block_on(async move {
