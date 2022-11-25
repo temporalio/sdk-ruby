@@ -159,6 +159,26 @@ methods!(
 
         NilClass::new()
     }
+
+    fn worker_complete_activity_task(proto: RString) -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #worker_complete_activity_task without a block");
+        }
+
+        let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+            ruby_callback.call(&[]);
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.complete_activity_task(bytes, callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
 );
 
 #[no_mangle]
@@ -179,6 +199,7 @@ pub extern "C" fn init_bridge() {
         module.define_nested_class("Worker", None).define(|klass| {
             klass.def_self("create", create_worker);
             klass.def("poll_activity_task", worker_poll_activity_task);
+            klass.def("complete_activity_task", worker_complete_activity_task);
         });
     });
 }
