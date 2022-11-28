@@ -640,22 +640,22 @@ module Coresdk
 
       def seq!: () -> ::Integer?
 
-      attr_accessor result(): ::Coresdk::Activity_result::ActivityResolution?
+      attr_accessor result(): ::Coresdk::ActivityResult::ActivityResolution?
 
-      def result=: [M < ::Coresdk::Activity_result::ActivityResolution::_ToProto] (M?) -> M?
+      def result=: [M < ::Coresdk::ActivityResult::ActivityResolution::_ToProto] (M?) -> M?
                  | ...
 
-      def result!: () -> ::Coresdk::Activity_result::ActivityResolution?
+      def result!: () -> ::Coresdk::ActivityResult::ActivityResolution?
 
-      def initialize: (?seq: ::Integer, ?result: ::Coresdk::Activity_result::ActivityResolution::init?) -> void
+      def initialize: (?seq: ::Integer, ?result: ::Coresdk::ActivityResult::ActivityResolution::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:result) -> ::Coresdk::Activity_result::ActivityResolution?
+            | (:result) -> ::Coresdk::ActivityResult::ActivityResolution?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:result, ::Coresdk::Activity_result::ActivityResolution?) -> ::Coresdk::Activity_result::ActivityResolution?
-             | [M < ::Coresdk::Activity_result::ActivityResolution::_ToProto] (:result, M?) -> M?
+             | (:result, ::Coresdk::ActivityResult::ActivityResolution?) -> ::Coresdk::ActivityResult::ActivityResolution?
+             | [M < ::Coresdk::ActivityResult::ActivityResolution::_ToProto] (:result, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
