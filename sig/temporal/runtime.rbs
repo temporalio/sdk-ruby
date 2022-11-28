@@ -1,6 +1,3 @@
-module Singleton
-end
-
 module Temporal
   class Runtime
     attr_reader core_runtime: Temporal::Bridge::Runtime

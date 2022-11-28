@@ -1,0 +1,15 @@
+module Async
+  class Reactor
+    def initialize: -> void
+
+    def run: { (Async::Task) -> void } -> void
+  end
+
+  class Task
+    def async: { (Async::Task) -> void } -> void
+  end
+end
+
+module Kernel
+  def Async: { -> void } -> void
+end
