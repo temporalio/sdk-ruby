@@ -1,0 +1,28 @@
+module Temporal
+  class Worker
+    class Activity
+      @running: bool
+
+      def initialize: (
+        Temporal::Bridge::Worker core_worker,
+        Temporal::DataConverter converter,
+        Temporal::Worker::_ActivityExecutor executor
+      ) -> void
+      def run: (Temporal::Worker::_Reactor reactor) -> void
+      def shutdown: -> void
+
+      private
+
+      attr_reader worker: SyncWorker
+      attr_reader converter: Temporal::DataConverter
+      attr_reader executor: Temporal::Worker::_ActivityExecutor
+
+      def running?: -> bool
+      def process_activity_task: (Coresdk::ActivityTask::Start task) -> untyped
+      def send_completion_response: (String task_token, untyped result) -> void
+      def send_failure_response: (String task_token, ::Exception exception) -> void
+      def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
+      def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
+    end
+  end
+end
