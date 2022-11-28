@@ -11,6 +11,10 @@ module Temporal
       @failure_converter = failure_converter
     end
 
+    def to_payload(data)
+      payload_converter.to_payload(data)
+    end
+
     def to_payloads(data)
       return if data.nil? || Array(data).empty?
 
@@ -31,6 +35,10 @@ module Temporal
     def to_failure(error)
       failure = failure_converter.to_failure(error, payload_converter)
       encode_failure(failure)
+    end
+
+    def from_payload(payload)
+      payload_converter.from_payload(payload)
     end
 
     def from_payloads(payloads)
@@ -83,14 +91,6 @@ module Temporal
       end
 
       payloads
-    end
-
-    def to_payload(data)
-      payload_converter.to_payload(data)
-    end
-
-    def from_payload(payload)
-      payload_converter.from_payload(payload)
     end
 
     def encode_failure(failure)
