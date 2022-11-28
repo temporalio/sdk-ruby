@@ -19,7 +19,10 @@ Gem::Specification.new do |spec|
     Dir['bridge/**/*.*'].reject { |x| x.include?('/target/') } +
     %w[ext/Rakefile temporalio.gemspec Gemfile LICENSE README.md]
 
-  spec.required_ruby_version = '>= 2.7.0'
+  # Limited by async. While we support both v1 and v2, we only allow Ruby >= 3
+  # since async v1 with Ruby 2 has a blocking behaviour (despite identical interface):
+  # https://github.com/socketry/async/discussions/108#discussioncomment-541788
+  spec.required_ruby_version = '>= 3.0.2'
 
   spec.add_dependency 'async' # Fiber-based reactor. Open-ended to allow Ruby 3.1+ to use v2
   spec.add_dependency 'google-protobuf', '~> 3.21.1' # Protobuf
