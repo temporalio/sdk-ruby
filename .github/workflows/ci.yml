@@ -56,9 +56,7 @@ jobs:
             ${{ runner.os }}-golang-
       - run: bundle install
       - run: bundle exec rubocop
-      # Turned off for now because of an incompatibility in steep
-      # More info — https://github.com/soutaro/steep/issues/477
-      # - run: bundle exec steep check
+      - run: bundle exec steep check
       - run: bundle exec rake bridge:lint
       - run: bundle exec rake bridge:release
       - run: bundle exec rake test_server:build

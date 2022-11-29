@@ -41,7 +41,8 @@ module Temporal
 
         failure.message = error.message
         failure.stack_trace = error.backtrace&.join("\n") || ''
-        failure.cause = to_failure(error.cause, payload_converter) if error.cause
+        # RBS: StandardError fallback is only needed to satisfy steep - https://github.com/soutaro/steep/issues/477
+        failure.cause = to_failure(error.cause || StandardError.new, payload_converter) if error.cause
 
         if encode_common_attributes?
           failure.encoded_attributes = payload_converter.to_payload(
