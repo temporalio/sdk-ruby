@@ -8,7 +8,6 @@ module Temporal
     # so all the blocks end up being executed within it.
     class Reactor
       def initialize
-        @reactor = Async::Reactor.new
         @queue = Queue.new
         @thread = nil
         @mutex = Mutex.new
@@ -21,7 +20,7 @@ module Temporal
 
       private
 
-      attr_reader :reactor, :queue, :mutex
+      attr_reader :queue, :mutex
 
       def ensure_reactor_thread
         mutex.synchronize do
@@ -30,6 +29,7 @@ module Temporal
       end
 
       def run_loop
+        reactor = Async::Reactor.new
         reactor.run do |task|
           loop do
             block = queue.pop
