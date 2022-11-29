@@ -46,6 +46,8 @@ module Temporal
         executor.schedule do
           result = ActivityTaskProcessor.new(task).process
           queue << result
+        rescue StandardError => e
+          queue << e
         end
 
         queue.pop
@@ -63,9 +65,11 @@ module Temporal
 
       def handle_start_activity(task_token, task)
         result = process_activity_task(task)
-        send_completion_response(task_token, result)
-      rescue StandardError => e
-        send_failure_response(task_token, e)
+        if result.is_a?(Exception)
+          send_failure_response(task_token, result)
+        else
+          send_completion_response(task_token, result)
+        end
       end
 
       def handle_cancel_activity(task_token, task)

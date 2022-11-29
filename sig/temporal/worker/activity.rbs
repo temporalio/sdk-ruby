@@ -18,7 +18,7 @@ module Temporal
       attr_reader executor: Temporal::Worker::_ActivityExecutor
 
       def running?: -> bool
-      def process_activity_task: (Coresdk::ActivityTask::Start task) -> untyped
+      def process_activity_task: (Coresdk::ActivityTask::Start task) -> (untyped | Exception)
       def send_completion_response: (String task_token, untyped result) -> void
       def send_failure_response: (String task_token, ::Exception exception) -> void
       def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
