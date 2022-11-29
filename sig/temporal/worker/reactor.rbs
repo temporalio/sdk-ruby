@@ -11,7 +11,6 @@ module Temporal
 
       private
 
-      attr_reader reactor: Async::Reactor
       attr_reader queue: Thread::Queue
       attr_reader thread: Thread?
       attr_reader mutex: Thread::Mutex
