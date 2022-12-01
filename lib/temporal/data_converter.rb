@@ -11,20 +11,20 @@ module Temporal
       @failure_converter = failure_converter
     end
 
-    def to_payload(data)
-      payload_converter.to_payload(data)
+    def to_payload(value)
+      value_to_payload(value)
     end
 
     def to_payloads(data)
       return if data.nil? || Array(data).empty?
 
-      payloads = Array(data).map { |value| to_payload(value) }
+      payloads = Array(data).map { |value| value_to_payload(value) }
       Temporal::Api::Common::V1::Payloads.new(payloads: encode(payloads))
     end
 
     def to_payload_map(data)
       data.to_h do |key, value|
-        payload = to_payload(value)
+        payload = value_to_payload(value)
         encoded_payload = encode([payload]).first
         raise MissingPayload, 'Payload Codecs returned no payloads' unless encoded_payload
 
@@ -38,14 +38,14 @@ module Temporal
     end
 
     def from_payload(payload)
-      payload_converter.from_payload(payload)
+      payload_to_value(payload)
     end
 
     def from_payloads(payloads)
       return unless payloads
 
       decode(payloads.payloads)
-        .map { |payload| from_payload(payload) }
+        .map { |payload| payload_to_value(payload) }
     end
 
     def from_payload_map(payload_map)
@@ -57,7 +57,7 @@ module Temporal
         decoded_payload = decode([payload]).first
         raise MissingPayload, 'Payload Codecs returned no payloads' unless decoded_payload
 
-        [key, from_payload(decoded_payload)]
+        [key, payload_to_value(decoded_payload)]
       end.to_h
       # rubocop:enable Style/MapToHash
     end
@@ -72,6 +72,14 @@ module Temporal
     private
 
     attr_reader :payload_converter, :payload_codecs, :failure_converter
+
+    def value_to_payload(value)
+      payload_converter.to_payload(value)
+    end
+
+    def payload_to_value(payload)
+      payload_converter.from_payload(payload)
+    end
 
     def encode(payloads)
       return [] unless payloads
