@@ -12,7 +12,11 @@ module Temporal
     end
 
     def to_payload(value)
-      value_to_payload(value)
+      payload = value_to_payload(value)
+      encoded_payload = encode([payload]).first
+      raise MissingPayload, 'Payload Codecs returned no payloads' unless encoded_payload
+
+      encoded_payload
     end
 
     def to_payloads(data)
@@ -38,7 +42,10 @@ module Temporal
     end
 
     def from_payload(payload)
-      payload_to_value(payload)
+      decoded_payload = decode([payload]).first
+      raise MissingPayload, 'Payload Codecs returned no payloads' unless decoded_payload
+
+      payload_to_value(decoded_payload)
     end
 
     def from_payloads(payloads)

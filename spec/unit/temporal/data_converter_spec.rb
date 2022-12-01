@@ -114,6 +114,17 @@ describe Temporal::DataConverter do
       expect(result).to be_a(Temporal::Api::Common::V1::Payload)
       expect(converter).to have_received(:to_payload).with('test')
     end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+
+      it 'encodes the payloads' do
+        result = subject.to_payload('test')
+
+        expect(result.metadata['encoding']).to eq(TestConcatenatingPayloadCodec::ENCODING)
+        expect(test_codec).to have_received(:encode).once
+      end
+    end
   end
 
   describe '#to_payloads' do
@@ -238,6 +249,19 @@ describe Temporal::DataConverter do
       expect(result).to eq('test')
       expect(converter).to have_received(:from_payload).with(json_payload)
     end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+
+      it 'decodes the payloads' do
+        payload = test_codec.encode([json_payload]).first
+
+        result = subject.from_payload(payload)
+
+        expect(result).to eq('test')
+        expect(test_codec).to have_received(:decode).once
+      end
+    end
   end
 
   describe '#from_payloads' do
@@ -257,7 +281,7 @@ describe Temporal::DataConverter do
     context 'with payload codecs' do
       let(:codecs) { [test_codec] }
 
-      it 'decodecs the payloads' do
+      it 'decodes the payloads' do
         mixed_payloads = test_codec.encode([json_payload, nil_payload])
         payloads = Temporal::Api::Common::V1::Payloads.new(payloads: mixed_payloads)
 
@@ -350,6 +374,11 @@ describe Temporal::DataConverter do
   end
 
   describe 'full circle' do
+    it 'converts a single value to payload and back' do
+      expect(subject.from_payload(subject.to_payload('test'))).to eq('test')
+      expect(subject.from_payload(subject.to_payload(nil))).to eq(nil)
+    end
+
     it 'converts values to payloads and back' do
       input = ['test', nil]
 
@@ -380,6 +409,11 @@ describe Temporal::DataConverter do
 
     context 'with payload codecs' do
       let(:codecs) { [test_codec, swap_codec] }
+
+      it 'converts a single value to payload and back' do
+        expect(subject.from_payload(subject.to_payload('test'))).to eq('test')
+        expect(subject.from_payload(subject.to_payload(nil))).to eq(nil)
+      end
 
       it 'converts values to payloads and back' do
         input = ['test', nil]
