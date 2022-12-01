@@ -1,0 +1,22 @@
+module Temporal
+  class Worker
+    interface _Reactor
+      def async: { (Async::Task) -> void } -> void
+    end
+
+    class Reactor
+      include _Reactor
+
+      def initialize: -> void
+
+      private
+
+      attr_reader queue: Thread::Queue
+      attr_reader thread: Thread?
+      attr_reader mutex: Thread::Mutex
+
+      def ensure_reactor_thread: -> void
+      def run_loop: -> void
+    end
+  end
+end

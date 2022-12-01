@@ -1,5 +1,6 @@
 require 'temporal/api/workflowservice/v1/request_response_pb'
 require 'temporal/bridge'
+require 'temporal/errors'
 require 'temporal/runtime'
 require 'uri'
 

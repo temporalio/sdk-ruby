@@ -1,0 +1,28 @@
+module Temporal
+  class Worker
+    @running: bool
+
+    def initialize: (
+      Temporal::Connection connection,
+      String namespace,
+      String task_queue,
+      ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
+      ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
+      ?failure_converter: Temporal::FailureConverter::_FailureConverter,
+      ?activity_executor: Temporal::Worker::_ActivityExecutor?,
+      ?max_concurrent_activities: Integer
+    ) -> void
+    def run: -> void
+    def start: (?Temporal::Worker::_Reactor? reactor) -> void
+    def shutdown: -> void
+
+    private
+
+    attr_reader mutex: Thread::Mutex
+    attr_reader runtime: Temporal::Runtime
+    attr_reader activity_worker: Temporal::Worker::Activity
+    attr_reader workflow_worker: untyped
+
+    def running?: -> bool
+  end
+end

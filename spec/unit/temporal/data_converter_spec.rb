@@ -107,6 +107,15 @@ describe Temporal::DataConverter do
     allow(failure_converter).to receive(:from_failure).and_call_original
   end
 
+  describe '#to_payload' do
+    it 'calls the provided payload converter' do
+      result = subject.to_payload('test')
+
+      expect(result).to be_a(Temporal::Api::Common::V1::Payload)
+      expect(converter).to have_received(:to_payload).with('test')
+    end
+  end
+
   describe '#to_payloads' do
     it 'returns nil when nil given' do
       expect(subject.to_payloads(nil)).to eq(nil)
@@ -219,6 +228,15 @@ describe Temporal::DataConverter do
 
         expect(test_codec).to have_received(:encode).once
       end
+    end
+  end
+
+  describe '#from_payload' do
+    it 'calls the provided payload converter' do
+      result = subject.from_payload(json_payload)
+
+      expect(result).to eq('test')
+      expect(converter).to have_received(:from_payload).with(json_payload)
     end
   end
 

@@ -1,9 +1,7 @@
-module Singleton
-end
-
 module Temporal
   class Runtime
     attr_reader core_runtime: Temporal::Bridge::Runtime
+    attr_reader reactor: Temporal::Worker::Reactor
 
     @thread: Thread
 

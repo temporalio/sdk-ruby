@@ -22,9 +22,15 @@ fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
 }
 
-fn wrap_bytes(bytes: &[u8]) -> AnyObject {
+fn wrap_bytes(bytes: Vec<u8>) -> RString {
     let enc = Encoding::find("ASCII-8BIT").unwrap();
-    RString::from_bytes(bytes, &enc).to_any_object()
+    RString::from_bytes(&bytes, &enc)
+}
+
+fn unwrap_bytes(string: RString) -> Vec<u8> {
+    // It is important to use the _unchecked conversion, otherwise Rutie
+    // will assume incorrect encoding and screw up the encoded proto
+    string.to_vec_u8_unchecked()
 }
 
 fn to_hash_map(hash: Hash) -> HashMap<String, String> {
@@ -69,7 +75,7 @@ methods!(
 
     fn call_rpc(rpc: Symbol, request: RString, metadata: Hash, timeout: Integer) -> RString {
         let rpc = rpc.map_err(VM::raise_ex).unwrap().to_string();
-        let request = request.map_err(VM::raise_ex).unwrap().to_string().as_bytes().to_vec();
+        let request = unwrap_bytes(request.map_err(VM::raise_ex).unwrap());
         let metadata = to_hash_map(metadata.map_err(VM::raise_ex).unwrap());
         let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
 
@@ -86,8 +92,7 @@ methods!(
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
-        let enc = Encoding::find("ASCII-8BIT").unwrap();
-        RString::from_bytes(&response, &enc)
+        wrap_bytes(response)
     }
 
     // TODO: Add telemetry configuration to this interface
@@ -142,14 +147,33 @@ methods!(
         }
 
         let ruby_callback = VM::block_proc();
-
         let callback = move |result: WorkerResult| {
             let bytes = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
-            ruby_callback.call(&[wrap_bytes(&bytes)]);
+            ruby_callback.call(&[wrap_bytes(bytes).to_any_object()]);
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
         let result = worker.poll_activity_task(callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
+    fn worker_complete_activity_task(proto: RString) -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #worker_complete_activity_task without a block");
+        }
+
+        let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+            ruby_callback.call(&[]);
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.complete_activity_task(bytes, callback);
 
         result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
@@ -175,6 +199,7 @@ pub extern "C" fn init_bridge() {
         module.define_nested_class("Worker", None).define(|klass| {
             klass.def_self("create", create_worker);
             klass.def("poll_activity_task", worker_poll_activity_task);
+            klass.def("complete_activity_task", worker_complete_activity_task);
         });
     });
 }

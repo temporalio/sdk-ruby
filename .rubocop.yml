@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.0
   SuggestExtensions: false
   Exclude:
     - lib/gen/**/*
@@ -72,3 +72,6 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Max: 25
+
+Naming/MemoizedInstanceVariableName:
+  Enabled: false

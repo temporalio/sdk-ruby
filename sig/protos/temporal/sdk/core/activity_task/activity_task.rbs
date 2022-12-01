@@ -1,5 +1,5 @@
 module Coresdk
-  module Activity_task
+  module ActivityTask
     class ActivityCancelReason < ::Protobuf::Enum
       type names = :NOT_FOUND | :CANCELLED | :TIMED_OUT
 
@@ -48,38 +48,38 @@ module Coresdk
 
       # / Start activity execution.
       #
-      attr_accessor start(): ::Coresdk::Activity_task::Start?
+      attr_accessor start(): ::Coresdk::ActivityTask::Start?
 
       # / Start activity execution.
       #
-      def start=: [M < ::Coresdk::Activity_task::Start::_ToProto] (M?) -> M?
+      def start=: [M < ::Coresdk::ActivityTask::Start::_ToProto] (M?) -> M?
                 | ...
 
-      def start!: () -> ::Coresdk::Activity_task::Start?
+      def start!: () -> ::Coresdk::ActivityTask::Start?
 
       # / Attempt to cancel activity execution.
       #
-      attr_accessor cancel(): ::Coresdk::Activity_task::Cancel?
+      attr_accessor cancel(): ::Coresdk::ActivityTask::Cancel?
 
       # / Attempt to cancel activity execution.
       #
-      def cancel=: [M < ::Coresdk::Activity_task::Cancel::_ToProto] (M?) -> M?
+      def cancel=: [M < ::Coresdk::ActivityTask::Cancel::_ToProto] (M?) -> M?
                  | ...
 
-      def cancel!: () -> ::Coresdk::Activity_task::Cancel?
+      def cancel!: () -> ::Coresdk::ActivityTask::Cancel?
 
-      def initialize: (?task_token: ::String, ?start: ::Coresdk::Activity_task::Start::init?, ?cancel: ::Coresdk::Activity_task::Cancel::init?) -> void
+      def initialize: (?task_token: ::String, ?start: ::Coresdk::ActivityTask::Start::init?, ?cancel: ::Coresdk::ActivityTask::Cancel::init?) -> void
 
       def []: (:task_token) -> ::String
-            | (:start) -> ::Coresdk::Activity_task::Start?
-            | (:cancel) -> ::Coresdk::Activity_task::Cancel?
+            | (:start) -> ::Coresdk::ActivityTask::Start?
+            | (:cancel) -> ::Coresdk::ActivityTask::Cancel?
             | (::Symbol) -> untyped
 
       def []=: (:task_token, ::String) -> ::String
-             | (:start, ::Coresdk::Activity_task::Start?) -> ::Coresdk::Activity_task::Start?
-             | [M < ::Coresdk::Activity_task::Start::_ToProto] (:start, M?) -> M?
-             | (:cancel, ::Coresdk::Activity_task::Cancel?) -> ::Coresdk::Activity_task::Cancel?
-             | [M < ::Coresdk::Activity_task::Cancel::_ToProto] (:cancel, M?) -> M?
+             | (:start, ::Coresdk::ActivityTask::Start?) -> ::Coresdk::ActivityTask::Start?
+             | [M < ::Coresdk::ActivityTask::Start::_ToProto] (:start, M?) -> M?
+             | (:cancel, ::Coresdk::ActivityTask::Cancel?) -> ::Coresdk::ActivityTask::Cancel?
+             | [M < ::Coresdk::ActivityTask::Cancel::_ToProto] (:cancel, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -333,20 +333,20 @@ module Coresdk
     # / Attempt to cancel a running activity
     #
     class Cancel < ::Protobuf::Message
-      attr_accessor reason(): ::Coresdk::Activity_task::ActivityCancelReason
+      attr_accessor reason(): ::Coresdk::ActivityTask::ActivityCancelReason
 
-      def reason=: (::Coresdk::Activity_task::ActivityCancelReason::values) -> ::Coresdk::Activity_task::ActivityCancelReason::values
+      def reason=: (::Coresdk::ActivityTask::ActivityCancelReason::values) -> ::Coresdk::ActivityTask::ActivityCancelReason::values
                  | ...
 
-      def reason!: () -> ::Coresdk::Activity_task::ActivityCancelReason?
+      def reason!: () -> ::Coresdk::ActivityTask::ActivityCancelReason?
 
-      def initialize: (?reason: ::Coresdk::Activity_task::ActivityCancelReason::init) -> void
+      def initialize: (?reason: ::Coresdk::ActivityTask::ActivityCancelReason::init) -> void
 
-      def []: (:reason) -> ::Coresdk::Activity_task::ActivityCancelReason
+      def []: (:reason) -> ::Coresdk::ActivityTask::ActivityCancelReason
             | (::Symbol) -> untyped
 
-      def []=: (:reason, ::Coresdk::Activity_task::ActivityCancelReason) -> ::Coresdk::Activity_task::ActivityCancelReason
-             | (:reason, ::Coresdk::Activity_task::ActivityCancelReason::values) -> ::Coresdk::Activity_task::ActivityCancelReason::values
+      def []=: (:reason, ::Coresdk::ActivityTask::ActivityCancelReason) -> ::Coresdk::ActivityTask::ActivityCancelReason
+             | (:reason, ::Coresdk::ActivityTask::ActivityCancelReason::values) -> ::Coresdk::ActivityTask::ActivityCancelReason::values
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

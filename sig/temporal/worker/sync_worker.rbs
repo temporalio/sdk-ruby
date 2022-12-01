@@ -1,0 +1,16 @@
+module Temporal
+  class Worker
+    class SyncWorker
+      def initialize: (Temporal::Bridge::Worker core_worker) -> void
+      def poll_activity_task: -> Coresdk::ActivityTask::ActivityTask
+      def complete_activity_task_with_success: (String task_token, Temporal::Api::Common::V1::Payload payload) -> void
+      def complete_activity_task_with_failure: (String task_token, Temporal::Api::Failure::V1::Failure failure) -> void
+
+      private
+
+      attr_reader core_worker: Temporal::Bridge::Worker
+
+      def with_queue: { (Thread::Queue) -> void } -> untyped
+    end
+  end
+end

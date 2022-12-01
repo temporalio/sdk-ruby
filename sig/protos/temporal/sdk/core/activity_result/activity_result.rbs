@@ -1,53 +1,53 @@
 module Coresdk
-  module Activity_result
+  module ActivityResult
     # *
     #  Used to report activity completions to core
     #
     class ActivityExecutionResult < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::Activity_result::Success?
+      attr_accessor completed(): ::Coresdk::ActivityResult::Success?
 
-      def completed=: [M < ::Coresdk::Activity_result::Success::_ToProto] (M?) -> M?
+      def completed=: [M < ::Coresdk::ActivityResult::Success::_ToProto] (M?) -> M?
                     | ...
 
-      def completed!: () -> ::Coresdk::Activity_result::Success?
+      def completed!: () -> ::Coresdk::ActivityResult::Success?
 
-      attr_accessor failed(): ::Coresdk::Activity_result::Failure?
+      attr_accessor failed(): ::Coresdk::ActivityResult::Failure?
 
-      def failed=: [M < ::Coresdk::Activity_result::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Coresdk::ActivityResult::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::Activity_result::Failure?
+      def failed!: () -> ::Coresdk::ActivityResult::Failure?
 
-      attr_accessor cancelled(): ::Coresdk::Activity_result::Cancellation?
+      attr_accessor cancelled(): ::Coresdk::ActivityResult::Cancellation?
 
-      def cancelled=: [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::Activity_result::Cancellation?
+      def cancelled!: () -> ::Coresdk::ActivityResult::Cancellation?
 
-      attr_accessor will_complete_async(): ::Coresdk::Activity_result::WillCompleteAsync?
+      attr_accessor will_complete_async(): ::Coresdk::ActivityResult::WillCompleteAsync?
 
-      def will_complete_async=: [M < ::Coresdk::Activity_result::WillCompleteAsync::_ToProto] (M?) -> M?
+      def will_complete_async=: [M < ::Coresdk::ActivityResult::WillCompleteAsync::_ToProto] (M?) -> M?
                               | ...
 
-      def will_complete_async!: () -> ::Coresdk::Activity_result::WillCompleteAsync?
+      def will_complete_async!: () -> ::Coresdk::ActivityResult::WillCompleteAsync?
 
-      def initialize: (?completed: ::Coresdk::Activity_result::Success::init?, ?failed: ::Coresdk::Activity_result::Failure::init?, ?cancelled: ::Coresdk::Activity_result::Cancellation::init?, ?will_complete_async: ::Coresdk::Activity_result::WillCompleteAsync::init?) -> void
+      def initialize: (?completed: ::Coresdk::ActivityResult::Success::init?, ?failed: ::Coresdk::ActivityResult::Failure::init?, ?cancelled: ::Coresdk::ActivityResult::Cancellation::init?, ?will_complete_async: ::Coresdk::ActivityResult::WillCompleteAsync::init?) -> void
 
-      def []: (:completed) -> ::Coresdk::Activity_result::Success?
-            | (:failed) -> ::Coresdk::Activity_result::Failure?
-            | (:cancelled) -> ::Coresdk::Activity_result::Cancellation?
-            | (:will_complete_async) -> ::Coresdk::Activity_result::WillCompleteAsync?
+      def []: (:completed) -> ::Coresdk::ActivityResult::Success?
+            | (:failed) -> ::Coresdk::ActivityResult::Failure?
+            | (:cancelled) -> ::Coresdk::ActivityResult::Cancellation?
+            | (:will_complete_async) -> ::Coresdk::ActivityResult::WillCompleteAsync?
             | (::Symbol) -> untyped
 
-      def []=: (:completed, ::Coresdk::Activity_result::Success?) -> ::Coresdk::Activity_result::Success?
-             | [M < ::Coresdk::Activity_result::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::Activity_result::Failure?) -> ::Coresdk::Activity_result::Failure?
-             | [M < ::Coresdk::Activity_result::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::Activity_result::Cancellation?) -> ::Coresdk::Activity_result::Cancellation?
-             | [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (:cancelled, M?) -> M?
-             | (:will_complete_async, ::Coresdk::Activity_result::WillCompleteAsync?) -> ::Coresdk::Activity_result::WillCompleteAsync?
-             | [M < ::Coresdk::Activity_result::WillCompleteAsync::_ToProto] (:will_complete_async, M?) -> M?
+      def []=: (:completed, ::Coresdk::ActivityResult::Success?) -> ::Coresdk::ActivityResult::Success?
+             | [M < ::Coresdk::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Coresdk::ActivityResult::Failure?) -> ::Coresdk::ActivityResult::Failure?
+             | [M < ::Coresdk::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Coresdk::ActivityResult::Cancellation?) -> ::Coresdk::ActivityResult::Cancellation?
+             | [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:will_complete_async, ::Coresdk::ActivityResult::WillCompleteAsync?) -> ::Coresdk::ActivityResult::WillCompleteAsync?
+             | [M < ::Coresdk::ActivityResult::WillCompleteAsync::_ToProto] (:will_complete_async, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -72,50 +72,50 @@ module Coresdk
     #  in the workflow.
     #
     class ActivityResolution < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::Activity_result::Success?
+      attr_accessor completed(): ::Coresdk::ActivityResult::Success?
 
-      def completed=: [M < ::Coresdk::Activity_result::Success::_ToProto] (M?) -> M?
+      def completed=: [M < ::Coresdk::ActivityResult::Success::_ToProto] (M?) -> M?
                     | ...
 
-      def completed!: () -> ::Coresdk::Activity_result::Success?
+      def completed!: () -> ::Coresdk::ActivityResult::Success?
 
-      attr_accessor failed(): ::Coresdk::Activity_result::Failure?
+      attr_accessor failed(): ::Coresdk::ActivityResult::Failure?
 
-      def failed=: [M < ::Coresdk::Activity_result::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Coresdk::ActivityResult::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::Activity_result::Failure?
+      def failed!: () -> ::Coresdk::ActivityResult::Failure?
 
-      attr_accessor cancelled(): ::Coresdk::Activity_result::Cancellation?
+      attr_accessor cancelled(): ::Coresdk::ActivityResult::Cancellation?
 
-      def cancelled=: [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::Activity_result::Cancellation?
+      def cancelled!: () -> ::Coresdk::ActivityResult::Cancellation?
 
-      attr_accessor backoff(): ::Coresdk::Activity_result::DoBackoff?
+      attr_accessor backoff(): ::Coresdk::ActivityResult::DoBackoff?
 
-      def backoff=: [M < ::Coresdk::Activity_result::DoBackoff::_ToProto] (M?) -> M?
+      def backoff=: [M < ::Coresdk::ActivityResult::DoBackoff::_ToProto] (M?) -> M?
                   | ...
 
-      def backoff!: () -> ::Coresdk::Activity_result::DoBackoff?
+      def backoff!: () -> ::Coresdk::ActivityResult::DoBackoff?
 
-      def initialize: (?completed: ::Coresdk::Activity_result::Success::init?, ?failed: ::Coresdk::Activity_result::Failure::init?, ?cancelled: ::Coresdk::Activity_result::Cancellation::init?, ?backoff: ::Coresdk::Activity_result::DoBackoff::init?) -> void
+      def initialize: (?completed: ::Coresdk::ActivityResult::Success::init?, ?failed: ::Coresdk::ActivityResult::Failure::init?, ?cancelled: ::Coresdk::ActivityResult::Cancellation::init?, ?backoff: ::Coresdk::ActivityResult::DoBackoff::init?) -> void
 
-      def []: (:completed) -> ::Coresdk::Activity_result::Success?
-            | (:failed) -> ::Coresdk::Activity_result::Failure?
-            | (:cancelled) -> ::Coresdk::Activity_result::Cancellation?
-            | (:backoff) -> ::Coresdk::Activity_result::DoBackoff?
+      def []: (:completed) -> ::Coresdk::ActivityResult::Success?
+            | (:failed) -> ::Coresdk::ActivityResult::Failure?
+            | (:cancelled) -> ::Coresdk::ActivityResult::Cancellation?
+            | (:backoff) -> ::Coresdk::ActivityResult::DoBackoff?
             | (::Symbol) -> untyped
 
-      def []=: (:completed, ::Coresdk::Activity_result::Success?) -> ::Coresdk::Activity_result::Success?
-             | [M < ::Coresdk::Activity_result::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::Activity_result::Failure?) -> ::Coresdk::Activity_result::Failure?
-             | [M < ::Coresdk::Activity_result::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::Activity_result::Cancellation?) -> ::Coresdk::Activity_result::Cancellation?
-             | [M < ::Coresdk::Activity_result::Cancellation::_ToProto] (:cancelled, M?) -> M?
-             | (:backoff, ::Coresdk::Activity_result::DoBackoff?) -> ::Coresdk::Activity_result::DoBackoff?
-             | [M < ::Coresdk::Activity_result::DoBackoff::_ToProto] (:backoff, M?) -> M?
+      def []=: (:completed, ::Coresdk::ActivityResult::Success?) -> ::Coresdk::ActivityResult::Success?
+             | [M < ::Coresdk::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Coresdk::ActivityResult::Failure?) -> ::Coresdk::ActivityResult::Failure?
+             | [M < ::Coresdk::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Coresdk::ActivityResult::Cancellation?) -> ::Coresdk::ActivityResult::Cancellation?
+             | [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:backoff, ::Coresdk::ActivityResult::DoBackoff?) -> ::Coresdk::ActivityResult::DoBackoff?
+             | [M < ::Coresdk::ActivityResult::DoBackoff::_ToProto] (:backoff, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

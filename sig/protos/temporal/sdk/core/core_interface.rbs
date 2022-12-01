@@ -49,22 +49,22 @@ module Coresdk
 
     def task_token!: () -> ::String?
 
-    attr_accessor result(): ::Coresdk::Activity_result::ActivityExecutionResult?
+    attr_accessor result(): ::Coresdk::ActivityResult::ActivityExecutionResult?
 
-    def result=: [M < ::Coresdk::Activity_result::ActivityExecutionResult::_ToProto] (M?) -> M?
+    def result=: [M < ::Coresdk::ActivityResult::ActivityExecutionResult::_ToProto] (M?) -> M?
                | ...
 
-    def result!: () -> ::Coresdk::Activity_result::ActivityExecutionResult?
+    def result!: () -> ::Coresdk::ActivityResult::ActivityExecutionResult?
 
-    def initialize: (?task_token: ::String, ?result: ::Coresdk::Activity_result::ActivityExecutionResult::init?) -> void
+    def initialize: (?task_token: ::String, ?result: ::Coresdk::ActivityResult::ActivityExecutionResult::init?) -> void
 
     def []: (:task_token) -> ::String
-          | (:result) -> ::Coresdk::Activity_result::ActivityExecutionResult?
+          | (:result) -> ::Coresdk::ActivityResult::ActivityExecutionResult?
           | (::Symbol) -> untyped
 
     def []=: (:task_token, ::String) -> ::String
-           | (:result, ::Coresdk::Activity_result::ActivityExecutionResult?) -> ::Coresdk::Activity_result::ActivityExecutionResult?
-           | [M < ::Coresdk::Activity_result::ActivityExecutionResult::_ToProto] (:result, M?) -> M?
+           | (:result, ::Coresdk::ActivityResult::ActivityExecutionResult?) -> ::Coresdk::ActivityResult::ActivityExecutionResult?
+           | [M < ::Coresdk::ActivityResult::ActivityExecutionResult::_ToProto] (:result, M?) -> M?
            | (::Symbol, untyped) -> untyped
 
     interface _ToProto

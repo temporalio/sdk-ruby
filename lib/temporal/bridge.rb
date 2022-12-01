@@ -1,6 +1,7 @@
 require 'rutie'
 
-BRIDGE_DIR = File.expand_path('..', __dir__)
+# RBS: for some reason __dir__ has a type of (String | nil)
+BRIDGE_DIR = File.expand_path('..', __dir__ || '.')
 
 module Temporal
   module Bridge
