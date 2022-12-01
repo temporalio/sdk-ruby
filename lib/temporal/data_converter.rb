@@ -28,11 +28,7 @@ module Temporal
 
     def to_payload_map(data)
       data.to_h do |key, value|
-        payload = value_to_payload(value)
-        encoded_payload = encode([payload]).first
-        raise MissingPayload, 'Payload Codecs returned no payloads' unless encoded_payload
-
-        [key.to_s, encoded_payload]
+        [key.to_s, to_payload(value)]
       end
     end
 
@@ -59,14 +55,11 @@ module Temporal
       return unless payload_map
 
       # Protobuf's Hash isn't compatible with the native Hash, ignore rubocop here
-      # rubocop:disable Style/MapToHash
+      # rubocop:disable Style/MapToHash, Style/HashTransformValues
       payload_map.map do |key, payload|
-        decoded_payload = decode([payload]).first
-        raise MissingPayload, 'Payload Codecs returned no payloads' unless decoded_payload
-
-        [key, payload_to_value(decoded_payload)]
+        [key, from_payload(payload)]
       end.to_h
-      # rubocop:enable Style/MapToHash
+      # rubocop:enable Style/MapToHash, Style/HashTransformValues
     end
 
     def from_failure(failure)

@@ -124,6 +124,16 @@ describe Temporal::DataConverter do
         expect(result.metadata['encoding']).to eq(TestConcatenatingPayloadCodec::ENCODING)
         expect(test_codec).to have_received(:encode).once
       end
+
+      context 'with faulty codec' do
+        let(:codecs) { [faulty_codec] }
+
+        it 'raises' do
+          expect do
+            subject.to_payload('test')
+          end.to raise_error(described_class::MissingPayload, 'Payload Codecs returned no payloads')
+        end
+      end
     end
   end
 
@@ -251,15 +261,24 @@ describe Temporal::DataConverter do
     end
 
     context 'with payload codecs' do
+      let(:payload) { test_codec.encode([json_payload]).first }
       let(:codecs) { [test_codec] }
 
       it 'decodes the payloads' do
-        payload = test_codec.encode([json_payload]).first
-
         result = subject.from_payload(payload)
 
         expect(result).to eq('test')
         expect(test_codec).to have_received(:decode).once
+      end
+
+      context 'with faulty codec' do
+        let(:codecs) { [faulty_codec] }
+
+        it 'raises' do
+          expect do
+            subject.from_payload(payload)
+          end.to raise_error(described_class::MissingPayload, 'Payload Codecs returned no payloads')
+        end
       end
     end
   end
