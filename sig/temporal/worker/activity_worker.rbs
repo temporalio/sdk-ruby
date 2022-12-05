@@ -1,10 +1,12 @@
 module Temporal
   class Worker
-    class Activity
+    class ActivityWorker
       @running: bool
 
       def initialize: (
+        String task_queue,
         Temporal::Bridge::Worker core_worker,
+        Array[singleton(Temporal::Activity)] activities,
         Temporal::DataConverter converter,
         Temporal::Worker::_ActivityExecutor executor
       ) -> void
@@ -13,14 +15,19 @@ module Temporal
 
       private
 
+      attr_reader task_queue: String
       attr_reader worker: SyncWorker
+      attr_reader activities: Hash[String, singleton(Temporal::Activity)]
       attr_reader converter: Temporal::DataConverter
       attr_reader executor: Temporal::Worker::_ActivityExecutor
+      attr_reader running_activities: Hash[String, Temporal::Worker::ActivityRunner]
 
       def running?: -> bool
-      def process_activity_task: (Coresdk::ActivityTask::Start task) -> (untyped | Exception)
-      def send_completion_response: (String task_token, untyped result) -> void
-      def send_failure_response: (String task_token, ::Exception exception) -> void
+      def prepare_activities: (Array[singleton(Temporal::Activity)] activities)
+        -> Hash[String, singleton(Temporal::Activity)]
+      def lookup_activity: (String activity_type) -> singleton(Temporal::Activity)
+      def run_activity: (String token, Coresdk::ActivityTask::Start task)
+        -> (Temporal::Api::Common::V1::Payload | Temporal::Api::Failure::V1::Failure)
       def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
       def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
     end

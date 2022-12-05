@@ -7,6 +7,10 @@ class Google::Protobuf::Timestamp
   def to_time: () -> Time
 end
 
+class Google::Protobuf::Duration
+  def to_f: () -> Float
+end
+
 # Source: google/protobuf
 class Coresdk::ActivityTaskCompletion
   def self.encode: (Coresdk::ActivityTaskCompletion) -> String

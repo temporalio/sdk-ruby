@@ -7,8 +7,11 @@ describe Temporal::Runtime do
     let(:mock_runtime) { instance_double(Temporal::Bridge::Runtime, run_callback_loop: nil) }
 
     before do
+      described_class.instance_variable_set(:@singleton__instance__, nil)
       allow(subject).to receive(:core_runtime).and_return(mock_runtime)
     end
+
+    after { described_class.instance_variable_set(:@singleton__instance__, nil) }
 
     it 'runs the callback loop once' do
       subject.ensure_callback_loop

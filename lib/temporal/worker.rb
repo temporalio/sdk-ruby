@@ -2,7 +2,7 @@ require 'async'
 require 'temporal/bridge'
 require 'temporal/data_converter'
 require 'temporal/runtime'
-require 'temporal/worker/activity'
+require 'temporal/worker/activity_worker'
 require 'temporal/worker/thread_pool_executor'
 
 module Temporal
@@ -12,6 +12,7 @@ module Temporal
       connection,
       namespace,
       task_queue,
+      activities: [],
       data_converter: Temporal::DataConverter.new,
       activity_executor: nil,
       max_concurrent_activities: 100
@@ -26,7 +27,13 @@ module Temporal
         namespace,
         task_queue,
       )
-      @activity_worker = Worker::Activity.new(core_worker, data_converter, activity_executor)
+      @activity_worker = init_activity_worker(
+        task_queue,
+        core_worker,
+        activities,
+        data_converter,
+        activity_executor,
+      )
       @workflow_worker = nil
     end
 
@@ -58,6 +65,12 @@ module Temporal
 
     def running?
       @running
+    end
+
+    def init_activity_worker(task_queue, core_worker, activities, data_converter, executor)
+      return if activities.empty?
+
+      Worker::ActivityWorker.new(task_queue, core_worker, activities, data_converter, executor)
     end
   end
 end
