@@ -19,9 +19,7 @@ module Temporal
         @running = true
 
         while running?
-          puts 'polling...'
           activity_task = worker.poll_activity_task
-          puts "Got activity task: #{activity_task}"
           reactor.async do
             if activity_task.start
               handle_start_activity(activity_task.task_token, activity_task.start)
