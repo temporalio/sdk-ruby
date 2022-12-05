@@ -283,6 +283,33 @@ describe Temporal::DataConverter do
     end
   end
 
+  describe '#from_payload_array' do
+    it 'returns empty array when given empty array' do
+      expect(subject.from_payload_array([])).to eq([])
+    end
+
+    it 'calls the provided payload converter' do
+      result = subject.from_payload_array([json_payload, nil_payload])
+
+      expect(result).to eq(['test', nil])
+      expect(converter).to have_received(:from_payload).with(json_payload)
+      expect(converter).to have_received(:from_payload).with(nil_payload)
+    end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+
+      it 'decodecs the payloads' do
+        mixed_payloads = test_codec.encode([json_payload, nil_payload])
+
+        result = subject.from_payload_array(mixed_payloads)
+
+        expect(result).to eq(['test', nil])
+        expect(test_codec).to have_received(:decode).once
+      end
+    end
+  end
+
   describe '#from_payloads' do
     it 'returns nil when nothing is given' do
       expect(subject.from_payloads(nil)).to eq(nil)
