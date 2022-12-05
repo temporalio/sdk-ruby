@@ -6,9 +6,7 @@ module Temporal
       Temporal::Connection connection,
       String | Symbol namespace,
       ?interceptors: Array[Temporal::Interceptor::Client],
-      ?payload_converter: Temporal::PayloadConverter::_PayloadConverter,
-      ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
-      ?failure_converter: Temporal::FailureConverter::_FailureConverter
+      ?data_converter: Temporal::DataConverter
     ) -> void
     def start_workflow: (
       String workflow,

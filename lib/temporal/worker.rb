@@ -1,8 +1,6 @@
 require 'async'
 require 'temporal/bridge'
 require 'temporal/data_converter'
-require 'temporal/failure_converter'
-require 'temporal/payload_converter'
 require 'temporal/runtime'
 require 'temporal/worker/activity'
 require 'temporal/worker/thread_pool_executor'
@@ -14,9 +12,7 @@ module Temporal
       connection,
       namespace,
       task_queue,
-      payload_converter: Temporal::PayloadConverter::DEFAULT,
-      payload_codecs: [],
-      failure_converter: Temporal::FailureConverter::DEFAULT,
+      data_converter: Temporal::DataConverter.new,
       activity_executor: nil,
       max_concurrent_activities: 100
     )
@@ -24,11 +20,6 @@ module Temporal
       @mutex = Mutex.new
       @runtime = Temporal::Runtime.instance
       activity_executor ||= ThreadPoolExecutor.new(max_concurrent_activities)
-      data_converter = DataConverter.new(
-        payload_converter: payload_converter,
-        payload_codecs: payload_codecs,
-        failure_converter: failure_converter,
-      )
       core_worker = Temporal::Bridge::Worker.create(
         @runtime.core_runtime,
         connection.core_connection,

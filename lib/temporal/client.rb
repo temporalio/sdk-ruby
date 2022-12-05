@@ -20,14 +20,8 @@ module Temporal
     # @param namespace [String] Namespace to use for client calls.
     # @param interceptors [Array<Temporal::Interceptor::Client>] List of interceptors for
     #   intercepting client calls. Executed in their original order.
-    # @param payload_converter [Temporal::PayloadConverter::Base] A custom payload converter for
-    #   converting Ruby values to/from protos. See {Temporal::PayloadConverter::Base} for the
-    #   interface definition.
-    # @param payload_codecs [Array<Temporal::PayloadCodec::Base>] A list of payload codecs to
-    #   transform payload protos. See {Temporal::PayloadCodec::Base} for the interface definition.
-    # @param failure_converter [Temporal::FailureConverter::Base] A custom failure converter for
-    #   converting Exceptions to/from protos. See {Temporal::FailureConverter::Base} for the
-    #   interface definition.
+    # @param data_converter [Temporal::DataConverter] Data converter to use for all data conversions
+    #   to/from payloads.
     #
     # @see https://docs.temporal.io/concepts/what-is-a-data-converter for more information on
     #   payload converters and codecs.
@@ -35,16 +29,9 @@ module Temporal
       connection,
       namespace,
       interceptors: [],
-      payload_converter: Temporal::PayloadConverter::DEFAULT,
-      payload_codecs: [],
-      failure_converter: Temporal::FailureConverter::DEFAULT
+      data_converter: Temporal::DataConverter.new
     )
       @namespace = namespace
-      data_converter = DataConverter.new(
-        payload_converter: payload_converter,
-        payload_codecs: payload_codecs,
-        failure_converter: failure_converter,
-      )
       @implementation = Client::Implementation.new(connection, namespace, data_converter, interceptors)
     end
 
