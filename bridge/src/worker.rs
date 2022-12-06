@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::sync::mpsc::Sender;
 use temporal_sdk_core::api::{Worker as WorkerTrait};
 use temporal_sdk_core_api::worker::{WorkerConfigBuilder, WorkerConfigBuilderError};
-use temporal_sdk_core_protos::coresdk::ActivityTaskCompletion;
+use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use thiserror::Error;
 use tokio::runtime::{Runtime as TokioRuntime};
 
@@ -94,6 +94,13 @@ impl Worker {
 
             callback_tx.send(Command::RunCallback(callback)).expect("Unable to send a callback");
         });
+
+        Ok(())
+    }
+
+    pub fn record_activity_heartbeat(&self, bytes: Vec<u8>) -> Result<(), WorkerError> {
+        let proto = ActivityHeartbeat::decode(&*bytes)?;
+        self.core_worker.record_activity_heartbeat(proto);
 
         Ok(())
     }

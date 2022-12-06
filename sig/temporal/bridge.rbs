@@ -31,6 +31,7 @@ module Temporal
       def self.create: (Runtime, Connection, String, String) -> Temporal::Bridge::Worker
       def poll_activity_task: { (String) -> void } -> void
       def complete_activity_task: (String) { (nil) -> void } -> void
+      def record_activity_heartbeat: (String) -> void
     end
   end
 end
