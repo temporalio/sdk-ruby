@@ -38,6 +38,13 @@ module Temporal
       encoded_payload
     end
 
+    def to_payload_array(data)
+      return [] if data.nil? || Array(data).empty?
+
+      payloads = Array(data).map { |value| value_to_payload(value) }
+      encode(payloads)
+    end
+
     def to_payloads(data)
       return if data.nil? || Array(data).empty?
 

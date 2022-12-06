@@ -137,6 +137,46 @@ describe Temporal::DataConverter do
     end
   end
 
+  describe '#to_payload_array' do
+    it 'returns empty array when given nil' do
+      expect(subject.to_payload_array(nil)).to eq([])
+    end
+
+    it 'returns empty array when given empty array' do
+      expect(subject.to_payload_array([])).to eq([])
+    end
+
+    it 'converts a single value to payload array' do
+      result = subject.to_payload_array('test')
+
+      expect(result.length).to eq(1)
+      expect(result.first).to eq(json_payload)
+      expect(converter).to have_received(:to_payload).with('test').once
+    end
+
+    it 'converts an array to payloads' do
+      result = subject.to_payload_array(['test', nil])
+
+      expect(result.length).to eq(2)
+      expect(result.first).to eq(json_payload)
+      expect(result.last).to eq(nil_payload)
+      expect(converter).to have_received(:to_payload).with('test').once
+      expect(converter).to have_received(:to_payload).with(nil).once
+    end
+
+    context 'with payload codecs' do
+      let(:codecs) { [test_codec] }
+
+      it 'encodes the payloads' do
+        result = subject.to_payload_array(['test', nil])
+
+        expect(result.length).to eq(1)
+        expect(result.first.metadata['encoding']).to eq(TestConcatenatingPayloadCodec::ENCODING)
+        expect(test_codec).to have_received(:encode).once
+      end
+    end
+  end
+
   describe '#to_payloads' do
     it 'returns nil when nil given' do
       expect(subject.to_payloads(nil)).to eq(nil)
