@@ -6,6 +6,7 @@ module Temporal
         Coresdk::ActivityTask::Start start,
         String task_queue,
         String task_token,
+        Temporal::Worker::SyncWorker worker,
         Temporal::DataConverter converter
       ) -> void
       def run: -> (Temporal::Api::Common::V1::Payload | Temporal::Api::Failure::V1::Failure)
@@ -17,9 +18,11 @@ module Temporal
       attr_reader start: Coresdk::ActivityTask::Start
       attr_reader task_queue: String
       attr_reader task_token: String
+      attr_reader worker: Temporal::Worker::SyncWorker
       attr_reader converter: Temporal::DataConverter
 
       def generate_activity_info: -> Temporal::Activity::Info
+      def heartbeat: (*untyped) -> void
     end
   end
 end

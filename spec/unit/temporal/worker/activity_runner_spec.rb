@@ -4,6 +4,7 @@ require 'temporal/activity'
 require 'temporal/data_converter'
 require 'temporal/sdk/core/activity_task/activity_task_pb'
 require 'temporal/worker/activity_runner'
+require 'temporal/worker/sync_worker'
 
 class TestRunnableActivity < Temporal::Activity
   def execute(command)
@@ -12,12 +13,14 @@ class TestRunnableActivity < Temporal::Activity
       'bar'
     when 'fail'
       raise StandardError, 'Test failure'
+    when 'heartbeat'
+      activity.heartbeat('test')
     end
   end
 end
 
 describe Temporal::Worker::ActivityRunner do
-  subject { described_class.new(TestRunnableActivity, task, task_queue, token, converter) }
+  subject { described_class.new(TestRunnableActivity, task, task_queue, token, worker, converter) }
 
   let(:task) do
     Coresdk::ActivityTask::Start.new(
@@ -42,6 +45,7 @@ describe Temporal::Worker::ActivityRunner do
   let(:time) { Time.now }
   let(:task_queue) { 'test-task-queue' }
   let(:token) { 'test_token' }
+  let(:worker) { instance_double(Temporal::Worker::SyncWorker) }
   let(:converter) { Temporal::DataConverter.new }
 
   describe '#run' do
@@ -78,6 +82,24 @@ describe Temporal::Worker::ActivityRunner do
         expect(info.workflow_namespace).to eq('test-namespace')
         expect(info.workflow_run_id).to eq('test-run-id')
         expect(info.workflow_type).to eq('test-workflow')
+      end
+    end
+
+    context 'heartbeat' do
+      let(:command) { 'heartbeat' }
+
+      before do
+        allow(worker).to receive(:record_activity_heartbeat).and_return(nil)
+      end
+
+      it 'supplies a heartbeat proc for the context' do
+        subject.run
+
+        expect(worker).to have_received(:record_activity_heartbeat) do |task_token, payloads|
+          expect(task_token).to eq(token)
+          expect(payloads.length).to eq(1)
+          expect(payloads.first.data).to eq('"test"')
+        end
       end
     end
 

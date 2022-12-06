@@ -54,6 +54,16 @@ module Temporal
         end
       end
 
+      def record_activity_heartbeat(task_token, payloads)
+        proto = Coresdk::ActivityHeartbeat.new(
+          task_token: task_token,
+          details: payloads,
+        )
+        encoded_proto = Coresdk::ActivityHeartbeat.encode(proto)
+
+        core_worker.record_activity_heartbeat(encoded_proto)
+      end
+
       private
 
       attr_reader :core_worker

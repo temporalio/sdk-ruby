@@ -24,6 +24,17 @@ class TestBasicFailingActivity < Temporal::Activity
   end
 end
 
+class TestHeartbeatActivity < Temporal::Activity
+  def execute
+    if activity.info.heartbeat_details.empty?
+      activity.heartbeat('foo', 'bar')
+      raise 'retry'
+    end
+
+    activity.info.heartbeat_details.join(' ')
+  end
+end
+
 describe Temporal::Worker::ActivityWorker do
   support_path = 'spec/support'.freeze
   port = 5555
@@ -36,10 +47,16 @@ describe Temporal::Worker::ActivityWorker do
       connection,
       namespace,
       activity_task_queue,
-      activities: [TestBasicActivity, TestCustomNameActivity, TestBasicFailingActivity],
+      activities: [
+        TestBasicActivity,
+        TestCustomNameActivity,
+        TestBasicFailingActivity,
+        TestHeartbeatActivity,
+      ],
     )
   end
 
+  let(:activity_task_queue) { 'test-activity-worker' }
   let(:client) { Temporal::Client.new(connection, namespace) }
   let(:connection) { Temporal::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
@@ -125,6 +142,31 @@ describe Temporal::Worker::ActivityWorker do
           expect(error.cause.cause.message).to eq('test error')
         end
       end
+    end
+  end
+
+  describe 'running a heartbeating activity' do
+    # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
+    let(:activity_task_queue) { 'test-activity-worker-4' }
+
+    it 'runs an activity and returns heartbeat details' do
+      input = {
+        actions: [{
+          execute_activity: {
+            name: 'TestHeartbeatActivity',
+            task_queue: activity_task_queue,
+            retry_max_attempts: 2,
+          },
+        }],
+      }
+      handle = client.start_workflow(
+        workflow,
+        input,
+        id: id,
+        task_queue: task_queue,
+      )
+
+      expect(handle.result).to eq('foo bar')
     end
   end
 end

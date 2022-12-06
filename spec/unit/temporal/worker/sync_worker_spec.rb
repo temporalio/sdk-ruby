@@ -56,4 +56,21 @@ describe Temporal::Worker::SyncWorker do
       end
     end
   end
+
+  describe '#record_activity_heartbeat' do
+    let(:payload) { Temporal::Api::Common::V1::Payload.new(data: 'test') }
+
+    before { allow(core_worker).to receive(:record_activity_heartbeat) }
+
+    it 'sends an encoded response' do
+      subject.record_activity_heartbeat(token, [payload])
+
+      expect(core_worker).to have_received(:record_activity_heartbeat) do |bytes|
+        proto = Coresdk::ActivityHeartbeat.decode(bytes)
+        expect(proto.task_token).to eq(token)
+        expect(proto.details.size).to eq(1)
+        expect(proto.details.first).to eq(payload)
+      end
+    end
+  end
 end
