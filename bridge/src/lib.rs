@@ -169,7 +169,7 @@ methods!(
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
             result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
-            ruby_callback.call(&[]);
+            ruby_callback.call(&[NilClass::new().to_any_object()]);
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);

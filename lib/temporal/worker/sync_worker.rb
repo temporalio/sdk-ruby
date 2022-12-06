@@ -15,9 +15,9 @@ module Temporal
       end
 
       def poll_activity_task
-        with_queue do |q|
+        with_queue do |done|
           core_worker.poll_activity_task do |task|
-            q << Coresdk::ActivityTask::ActivityTask.decode(task)
+            done.call(Coresdk::ActivityTask::ActivityTask.decode(task))
           end
         end
       end
@@ -33,10 +33,8 @@ module Temporal
         )
         encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
 
-        with_queue do |q|
-          core_worker.complete_activity_task(encoded_proto) do
-            q << nil
-          end
+        with_queue do |done|
+          core_worker.complete_activity_task(encoded_proto, &done)
         end
       end
 
@@ -51,10 +49,8 @@ module Temporal
         )
         encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
 
-        with_queue do |q|
-          core_worker.complete_activity_task(encoded_proto) do
-            q << nil
-          end
+        with_queue do |done|
+          core_worker.complete_activity_task(encoded_proto, &done)
         end
       end
 
@@ -64,7 +60,8 @@ module Temporal
 
       def with_queue(&block)
         queue = Queue.new
-        block.call(queue)
+        done = ->(result = nil) { queue << result }
+        block.call(done)
         queue.pop
       end
     end

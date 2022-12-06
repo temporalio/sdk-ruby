@@ -10,7 +10,7 @@ module Temporal
 
       attr_reader core_worker: Temporal::Bridge::Worker
 
-      def with_queue: { (Thread::Queue) -> void } -> untyped
+      def with_queue: { (^(?untyped) -> void) -> void } -> untyped
     end
   end
 end

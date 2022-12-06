@@ -28,7 +28,7 @@ describe Temporal::Worker::SyncWorker do
   describe '#complete_activity_task_with_success' do
     let(:payload) { Temporal::Api::Common::V1::Payload.new(data: 'test') }
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield }
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
 
     it 'sends an encoded response' do
       subject.complete_activity_task_with_success(token, payload)
@@ -44,7 +44,7 @@ describe Temporal::Worker::SyncWorker do
   describe '#complete_activity_task_with_failure' do
     let(:failure) { Temporal::Api::Failure::V1::Failure.new(message: 'Test failure') }
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield }
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
 
     it 'sends an encoded response' do
       subject.complete_activity_task_with_failure(token, failure)
