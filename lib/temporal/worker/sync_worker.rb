@@ -23,35 +23,26 @@ module Temporal
       end
 
       def complete_activity_task_with_success(task_token, payload)
-        proto = Coresdk::ActivityTaskCompletion.new(
-          task_token: task_token,
-          result: Coresdk::ActivityResult::ActivityExecutionResult.new(
-            completed: Coresdk::ActivityResult::Success.new(
-              result: payload,
-            ),
-          ),
+        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
+          completed: Coresdk::ActivityResult::Success.new(result: payload),
         )
-        encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
 
-        with_queue do |done|
-          core_worker.complete_activity_task(encoded_proto, &done)
-        end
+        complete_activity_task(task_token, result)
       end
 
       def complete_activity_task_with_failure(task_token, failure)
-        proto = Coresdk::ActivityTaskCompletion.new(
-          task_token: task_token,
-          result: Coresdk::ActivityResult::ActivityExecutionResult.new(
-            failed: Coresdk::ActivityResult::Failure.new(
-              failure: failure,
-            ),
-          ),
-        )
-        encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
+        result =
+          if failure.canceled_failure_info
+            Coresdk::ActivityResult::ActivityExecutionResult.new(
+              cancelled: Coresdk::ActivityResult::Cancellation.new(failure: failure),
+            )
+          else
+            Coresdk::ActivityResult::ActivityExecutionResult.new(
+              failed: Coresdk::ActivityResult::Failure.new(failure: failure),
+            )
+          end
 
-        with_queue do |done|
-          core_worker.complete_activity_task(encoded_proto, &done)
-        end
+        complete_activity_task(task_token, result)
       end
 
       def record_activity_heartbeat(task_token, payloads)
@@ -73,6 +64,18 @@ module Temporal
         done = ->(result = nil) { queue << result }
         block.call(done)
         queue.pop
+      end
+
+      def complete_activity_task(task_token, result)
+        proto = Coresdk::ActivityTaskCompletion.new(
+          task_token: task_token,
+          result: result,
+        )
+        encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
+
+        with_queue do |done|
+          core_worker.complete_activity_task(encoded_proto, &done)
+        end
       end
     end
   end
