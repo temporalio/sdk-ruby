@@ -4,8 +4,16 @@ module Temporal
       @activity_name = new_name
     end
 
+    def self.shielded
+      @shielded = true
+    end
+
     def self._name
       @activity_name || name || ''
+    end
+
+    def self._shielded
+      @shielded || false
     end
 
     def initialize(context)

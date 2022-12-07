@@ -1,9 +1,12 @@
 module Temporal
   class Activity
     self.@activity_name: String
+    self.@shielded: bool
 
     def self.activity_name: (String new_name) -> void
+    def self.shielded: -> void
     def self._name: -> String
+    def self._shielded: -> bool
     def initialize: (untyped context) -> void
     def execute: (*untyped _args) -> untyped
 

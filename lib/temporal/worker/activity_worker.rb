@@ -94,8 +94,10 @@ module Temporal
         running_activities.delete(task_token)
       end
 
-      def handle_cancel_activity(task_token, cancel)
-        # TODO: pending implementation
+      def handle_cancel_activity(task_token, _cancel)
+        runner = running_activities[task_token]
+        # TODO: Warn of a missing activity if runner is absent
+        runner.cancel
       end
     end
   end

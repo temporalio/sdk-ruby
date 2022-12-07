@@ -3,13 +3,20 @@ module Temporal
     class Context
       attr_reader info: Temporal::Activity::Info
 
-      def initialize: (Temporal::Activity::Info info, ^(*untyped) -> void) -> void
+      def initialize: (Temporal::Activity::Info info, ^(*untyped) -> void, ?shielded: bool) -> void
       def heartbeat: (*untyped details) -> void
+      def shield: { -> untyped } -> untyped
+      def cancelled?: -> bool
+      def cancel: -> void
 
       private
 
+      @shielded: bool
+      @cancelled: bool
+
       attr_reader thread: Thread
       attr_reader heartbeat_proc: ^(*untyped) -> void
+      attr_reader mutex: Thread::Mutex
     end
   end
 end

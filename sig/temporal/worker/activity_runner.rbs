@@ -14,6 +14,8 @@ module Temporal
 
       private
 
+      @context: Temporal::Activity::Context
+
       attr_reader activity_class: singleton(Temporal::Activity)
       attr_reader start: Coresdk::ActivityTask::Start
       attr_reader task_queue: String
@@ -21,6 +23,7 @@ module Temporal
       attr_reader worker: Temporal::Worker::SyncWorker
       attr_reader converter: Temporal::DataConverter
 
+      def context: -> Temporal::Activity::Context
       def generate_activity_info: -> Temporal::Activity::Info
       def heartbeat: (*untyped) -> void
     end
