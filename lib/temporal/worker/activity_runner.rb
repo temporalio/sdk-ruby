@@ -8,16 +8,18 @@ module Temporal
     # some threaded or async executor's context since methods called here might be blocking
     # and this should not affect the main worker reactor.
     class ActivityRunner
-      def initialize(activity_class, start, task_queue, task_token, converter)
+      def initialize(activity_class, start, task_queue, task_token, worker, converter)
         @activity_class = activity_class
         @start = start
         @task_queue = task_queue
         @task_token = task_token
+        @worker = worker
         @converter = converter
       end
 
       def run
-        context = Temporal::Activity::Context.new(generate_activity_info)
+        heartbeat_proc = ->(*details) { heartbeat(*details) }
+        context = Temporal::Activity::Context.new(generate_activity_info, heartbeat_proc)
         activity = activity_class.new(context)
         input = converter.from_payload_array(start.input.to_a)
 
@@ -34,7 +36,7 @@ module Temporal
 
       private
 
-      attr_reader :activity_class, :start, :task_queue, :task_token, :converter
+      attr_reader :activity_class, :start, :task_queue, :task_token, :worker, :converter
 
       def generate_activity_info
         Temporal::Activity::Info.new(
@@ -56,6 +58,11 @@ module Temporal
           workflow_run_id: start.workflow_execution&.run_id,
           workflow_type: start.workflow_type,
         ).freeze
+      end
+
+      def heartbeat(*details)
+        payloads = converter.to_payload_array(details)
+        worker.record_activity_heartbeat(task_token, payloads)
       end
     end
   end

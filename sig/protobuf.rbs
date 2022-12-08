@@ -16,6 +16,10 @@ class Coresdk::ActivityTaskCompletion
   def self.encode: (Coresdk::ActivityTaskCompletion) -> String
 end
 
+class Coresdk::ActivityHeartbeat
+  def self.encode: (Coresdk::ActivityHeartbeat) -> String
+end
+
 class Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest
   def self.encode: (Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest) -> String
 end

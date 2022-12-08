@@ -28,7 +28,7 @@ describe Temporal::Worker::SyncWorker do
   describe '#complete_activity_task_with_success' do
     let(:payload) { Temporal::Api::Common::V1::Payload.new(data: 'test') }
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield }
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
 
     it 'sends an encoded response' do
       subject.complete_activity_task_with_success(token, payload)
@@ -44,7 +44,7 @@ describe Temporal::Worker::SyncWorker do
   describe '#complete_activity_task_with_failure' do
     let(:failure) { Temporal::Api::Failure::V1::Failure.new(message: 'Test failure') }
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield }
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
 
     it 'sends an encoded response' do
       subject.complete_activity_task_with_failure(token, failure)
@@ -53,6 +53,23 @@ describe Temporal::Worker::SyncWorker do
         proto = Coresdk::ActivityTaskCompletion.decode(bytes)
         expect(proto.task_token).to eq(token)
         expect(proto.result.failed.failure).to eq(failure)
+      end
+    end
+  end
+
+  describe '#record_activity_heartbeat' do
+    let(:payload) { Temporal::Api::Common::V1::Payload.new(data: 'test') }
+
+    before { allow(core_worker).to receive(:record_activity_heartbeat) }
+
+    it 'sends an encoded response' do
+      subject.record_activity_heartbeat(token, [payload])
+
+      expect(core_worker).to have_received(:record_activity_heartbeat) do |bytes|
+        proto = Coresdk::ActivityHeartbeat.decode(bytes)
+        expect(proto.task_token).to eq(token)
+        expect(proto.details.size).to eq(1)
+        expect(proto.details.first).to eq(payload)
       end
     end
   end

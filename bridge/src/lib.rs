@@ -169,11 +169,22 @@ methods!(
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
             result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
-            ruby_callback.call(&[]);
+            ruby_callback.call(&[NilClass::new().to_any_object()]);
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
         let result = worker.complete_activity_task(bytes, callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
+    fn worker_record_activity_heartbeat(proto: RString) -> NilClass {
+        let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+
+        let result = worker.record_activity_heartbeat(bytes);
 
         result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
@@ -200,6 +211,7 @@ pub extern "C" fn init_bridge() {
             klass.def_self("create", create_worker);
             klass.def("poll_activity_task", worker_poll_activity_task);
             klass.def("complete_activity_task", worker_complete_activity_task);
+            klass.def("record_activity_heartbeat", worker_record_activity_heartbeat);
         });
     });
 }

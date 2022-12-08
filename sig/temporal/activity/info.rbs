@@ -5,7 +5,7 @@ module Temporal
       attr_accessor activity_type: String
       attr_accessor attempt: Integer
       attr_accessor current_attempt_scheduled_time: Time?
-      attr_accessor heartbeat_details: untyped
+      attr_accessor heartbeat_details: Array[untyped]
       attr_accessor heartbeat_timeout: Float
       attr_accessor local: bool
       attr_accessor schedule_to_close_timeout: Float
@@ -24,7 +24,7 @@ module Temporal
         activity_type: String?,
         attempt: Integer?,
         current_attempt_scheduled_time: Time?,
-        heartbeat_details: untyped,
+        heartbeat_details: Array[untyped],
         heartbeat_timeout: Float?,
         local: bool,
         schedule_to_close_timeout: Float?,

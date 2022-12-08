@@ -59,7 +59,7 @@ describe Temporal::Worker::ActivityWorker do
 
     before do
       allow(subject).to receive(:running?).and_return(true, false)
-      allow(core_worker).to receive(:complete_activity_task).and_yield
+      allow(core_worker).to receive(:complete_activity_task).and_yield(nil)
       allow(core_worker).to receive(:poll_activity_task) do |&block|
         proto = Coresdk::ActivityTask::ActivityTask.new(
           task_token: token,

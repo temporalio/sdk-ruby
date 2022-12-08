@@ -8,7 +8,8 @@ module Temporal
       ?payload_codecs: Array[Temporal::PayloadCodec::_PayloadCodec],
       ?failure_converter: Temporal::FailureConverter::_FailureConverter,
     ) -> void
-    def to_payload: (untyped data) -> Temporal::Api::Common::V1::Payload
+    def to_payload: (untyped value) -> Temporal::Api::Common::V1::Payload
+    def to_payload_array: (Array[untyped]? data) -> Array[Temporal::Api::Common::V1::Payload]
     def to_payloads: (Array[untyped]? data) -> Temporal::Api::Common::V1::Payloads?
     def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporal::Api::Common::V1::Payload]
     def to_failure: (Exception error) -> Temporal::Api::Failure::V1::Failure

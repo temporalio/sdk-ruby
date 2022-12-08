@@ -71,7 +71,7 @@ module Temporal
 
       def run_activity(token, start)
         activity_class = lookup_activity(start.activity_type)
-        runner = ActivityRunner.new(activity_class, start, task_queue, token, converter)
+        runner = ActivityRunner.new(activity_class, start, task_queue, token, worker, converter)
         running_activities[token] = runner
         queue = Queue.new
 
