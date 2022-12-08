@@ -63,8 +63,7 @@ module Temporal
         activities.fetch(activity_type) do
           activity_names = activities.keys.sort.join(', ')
           raise Temporal::Error::ApplicationError.new(
-            "Activity function #{activity_type} is not registered on this worker, " \
-            "available activities: #{activity_names}",
+            "Activity #{activity_type} is not registered on this worker, available activities: #{activity_names}",
             type: 'NotFoundError',
           )
         end

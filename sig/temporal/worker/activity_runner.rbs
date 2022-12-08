@@ -3,7 +3,7 @@ module Temporal
     class ActivityRunner
       def initialize: (
         singleton(Temporal::Activity) activity_class,
-        Coresdk::ActivityTask::Start task,
+        Coresdk::ActivityTask::Start start,
         String task_queue,
         String task_token,
         Temporal::DataConverter converter
@@ -14,7 +14,7 @@ module Temporal
       private
 
       attr_reader activity_class: singleton(Temporal::Activity)
-      attr_reader task: Coresdk::ActivityTask::Start
+      attr_reader start: Coresdk::ActivityTask::Start
       attr_reader task_queue: String
       attr_reader task_token: String
       attr_reader converter: Temporal::DataConverter

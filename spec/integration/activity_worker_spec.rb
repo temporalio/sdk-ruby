@@ -4,11 +4,23 @@ require 'temporal/bridge'
 require 'temporal/client'
 require 'temporal/worker'
 
-class HelloWorldActivity < Temporal::Activity
-  activity_name 'echo-activity'
-
+class TestBasicActivity < Temporal::Activity
   def execute(name)
     "Hello, #{name}!"
+  end
+end
+
+class TestCustomNameActivity < Temporal::Activity
+  activity_name 'test-activity'
+
+  def execute(one, two)
+    [one, two].join(', ')
+  end
+end
+
+class TestBasicFailingActivity < Temporal::Activity
+  def execute
+    raise 'test error'
   end
 end
 
@@ -16,7 +28,6 @@ describe Temporal::Worker::ActivityWorker do
   support_path = 'spec/support'.freeze
   port = 5555
   task_queue = 'test-worker'.freeze
-  activity_task_queue = 'test-activity-worker'.freeze
   namespace = 'ruby-samples'.freeze
   url = "localhost:#{port}".freeze
 
@@ -25,7 +36,7 @@ describe Temporal::Worker::ActivityWorker do
       connection,
       namespace,
       activity_task_queue,
-      activities: [HelloWorldActivity],
+      activities: [TestBasicActivity, TestCustomNameActivity, TestBasicFailingActivity],
     )
   end
 
@@ -50,15 +61,18 @@ describe Temporal::Worker::ActivityWorker do
     Process.wait(@server_pid)
   end
 
+  before { subject.start }
+  after { subject.shutdown }
+
   describe 'running an activity' do
-    before { subject.start }
-    after { subject.shutdown }
+    # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
+    let(:activity_task_queue) { 'test-activity-worker-1' }
 
     it 'runs an activity and returns a result' do
       input = {
         actions: [{
           execute_activity: {
-            name: 'echo-activity',
+            name: 'TestBasicActivity',
             task_queue: activity_task_queue,
             args: ['test'],
           },
@@ -67,6 +81,50 @@ describe Temporal::Worker::ActivityWorker do
       handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
       expect(handle.result).to eq('Hello, test!')
+    end
+
+    context 'when activity has a custom name' do
+      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
+      let(:activity_task_queue) { 'test-activity-worker-2' }
+
+      it 'runs an activity and returns a result' do
+        input = {
+          actions: [{
+            execute_activity: {
+              name: 'test-activity',
+              task_queue: activity_task_queue,
+              args: %w[foo bar],
+            },
+          }],
+        }
+        handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
+
+        expect(handle.result).to eq('foo, bar')
+      end
+    end
+
+    context 'when activity fails' do
+      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
+      let(:activity_task_queue) { 'test-activity-worker-3' }
+
+      it 'raises an application error' do
+        input = {
+          actions: [{
+            execute_activity: {
+              name: 'TestBasicFailingActivity',
+              task_queue: activity_task_queue,
+            },
+          }],
+        }
+        handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
+
+        expect { handle.result }.to raise_error do |error|
+          expect(error).to be_a(Temporal::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporal::Error::ActivityError)
+          expect(error.cause.cause).to be_a(Temporal::Error::ApplicationError)
+          expect(error.cause.cause.message).to eq('test error')
+        end
+      end
     end
   end
 end

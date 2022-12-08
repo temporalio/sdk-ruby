@@ -35,6 +35,10 @@ module Temporal
         activity_executor,
       )
       @workflow_worker = nil
+
+      if !@activity_worker && !@workflow_worker
+        raise ArgumentError, 'At least one activity or workflow must be specified'
+      end
     end
 
     def run

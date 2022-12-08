@@ -24,7 +24,7 @@ describe Temporal::Worker do
     end
 
     it 'initializes the core worker' do
-      described_class.new(connection, namespace, task_queue)
+      described_class.new(connection, namespace, task_queue, activities: activities)
 
       expect(Temporal::Bridge::Worker)
         .to have_received(:create)
@@ -32,14 +32,28 @@ describe Temporal::Worker do
     end
 
     it 'uses a default executor with a default size' do
-      described_class.new(connection, namespace, task_queue)
+      described_class.new(connection, namespace, task_queue, activities: activities)
 
       expect(Temporal::Worker::ThreadPoolExecutor).to have_received(:new).with(100)
     end
 
+    context 'without activities' do
+      it 'raises an error' do
+        expect do
+          described_class.new(connection, namespace, task_queue)
+        end.to raise_error(ArgumentError, 'At least one activity or workflow must be specified')
+      end
+    end
+
     context 'with max_concurrent_activities' do
       it 'uses a default executor with a specified size' do
-        described_class.new(connection, namespace, task_queue, max_concurrent_activities: 42)
+        described_class.new(
+          connection,
+          namespace,
+          task_queue,
+          activities: activities,
+          max_concurrent_activities: 42
+        )
 
         expect(Temporal::Worker::ThreadPoolExecutor).to have_received(:new).with(42)
       end

@@ -17,7 +17,7 @@ describe Temporal::Connection do
   after(:all) { Process.kill('QUIT', @pid) }
 
   MockServer.rpc_descs.each do |rpc, desc|
-    rpc = ::GRPC::GenericService.underscore(rpc.to_s)
+    rpc = GRPC::GenericService.underscore(rpc.to_s)
 
     # TODO: Remove once https://github.com/temporalio/sdk-core/issues/335 fixed
     next if rpc == 'get_workflow_execution_history_reverse'

@@ -83,8 +83,7 @@ describe Temporal::Worker::ActivityWorker do
           proto = Coresdk::ActivityTaskCompletion.decode(bytes)
           expect(proto.task_token).to eq(token)
           expect(proto.result.failed.failure.message).to eq(
-            'Activity function unknown-activity is not registered on this worker, ' \
-            'available activities: TestActivity'
+            'Activity unknown-activity is not registered on this worker, available activities: TestActivity'
           )
           expect(proto.result.failed.failure.application_failure_info.type).to eq('NotFoundError')
         end
