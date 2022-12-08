@@ -70,6 +70,14 @@ describe Temporal::Activity::Context do
         end
       end
     end
+
+    context 'when called on an already cancelled context' do
+      it 'has no effect' do
+        subject.cancel rescue nil # rubocop:disable Style/RescueModifier
+
+        expect(subject.shield { 42 }).to eq(42)
+      end
+    end
   end
 
   describe '#cancelled?' do

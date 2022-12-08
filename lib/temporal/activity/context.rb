@@ -19,8 +19,9 @@ module Temporal
       end
 
       def shield(&block)
-        # The whole activity is shielded or called from a nested shield
-        return block.call if @shielded
+        # The whole activity is shielded, called from a nested shield
+        #   or while handling a CancelledError (in a rescue or ensure blocks)
+        return block.call if @shielded || @cancelled
 
         mutex.synchronize do
           @shielded = true
@@ -40,13 +41,13 @@ module Temporal
       def cancel
         @cancelled = true
 
-        if mutex.try_lock
-          # @shielded inside the lock means the whole activity is shielded
-          unless @shielded
-            thread.raise(Temporal::Error::CancelledError.new('Unhandled cancellation'))
-          end
-          mutex.unlock
+        # @shielded inside the lock means the whole activity is shielded
+        if mutex.try_lock && !@shielded
+          thread.raise(Temporal::Error::CancelledError.new('Unhandled cancellation'))
         end
+      ensure
+        # only release the lock if owned by the current thread
+        mutex.unlock if mutex.owned?
       end
 
       private
