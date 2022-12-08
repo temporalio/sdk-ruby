@@ -1,0 +1,16 @@
+module Temporal
+  class Activity
+    self.@activity_name: String
+
+    def self.activity_name: (String new_name) -> void
+    def self._name: -> String
+    def initialize: (untyped context) -> void
+    def execute: (*untyped _args) -> untyped
+
+    private
+
+    attr_reader context: untyped
+
+    def activity: -> untyped
+  end
+end

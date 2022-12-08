@@ -6,6 +6,7 @@ module Temporal
       Temporal::Connection connection,
       String namespace,
       String task_queue,
+      ?activities: Array[singleton(Temporal::Activity)],
       ?data_converter: Temporal::DataConverter,
       ?activity_executor: Temporal::Worker::_ActivityExecutor?,
       ?max_concurrent_activities: Integer
@@ -18,9 +19,16 @@ module Temporal
 
     attr_reader mutex: Thread::Mutex
     attr_reader runtime: Temporal::Runtime
-    attr_reader activity_worker: Temporal::Worker::Activity
+    attr_reader activity_worker: Temporal::Worker::ActivityWorker?
     attr_reader workflow_worker: untyped
 
     def running?: -> bool
+    def init_activity_worker: (
+      String task_queue,
+      Temporal::Bridge::Worker core_worker,
+      Array[singleton(Temporal::Activity)] activities,
+      Temporal::DataConverter data_converter,
+      Temporal::Worker::_ActivityExecutor executor
+    ) -> Temporal::Worker::ActivityWorker?
   end
 end

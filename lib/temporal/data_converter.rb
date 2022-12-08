@@ -63,6 +63,13 @@ module Temporal
       payload_to_value(decoded_payload)
     end
 
+    def from_payload_array(payloads)
+      return [] if payloads.empty?
+
+      decode(payloads)
+        .map { |payload| payload_to_value(payload) }
+    end
+
     def from_payloads(payloads)
       return unless payloads
 

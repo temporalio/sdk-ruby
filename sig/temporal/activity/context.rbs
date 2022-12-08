@@ -1,0 +1,13 @@
+module Temporal
+  class Activity
+    class Context
+      attr_reader info: Temporal::Activity::Info
+
+      def initialize: (Temporal::Activity::Info info) -> void
+
+      private
+
+      attr_reader thread: Thread
+    end
+  end
+end
