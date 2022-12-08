@@ -24,8 +24,10 @@ module Temporal
 
         mutex.synchronize do
           @shielded = true
-          block.call
+          result = block.call
           raise Temporal::Error::CancelledError, 'Unhandled cancellation' if @cancelled
+
+          result
         ensure # runs while still holding the lock
           @shielded = false
         end

@@ -61,63 +61,98 @@ describe Temporal::Worker::ActivityWorker do
       allow(subject).to receive(:running?).and_return(true, false)
       allow(core_worker).to receive(:complete_activity_task).and_yield(nil)
       allow(core_worker).to receive(:poll_activity_task) do |&block|
-        proto = Coresdk::ActivityTask::ActivityTask.new(
+        block.call(task.to_proto)
+      end
+      allow(Temporal::Worker::ActivityRunner).to receive(:new).and_return(runner)
+    end
+
+    context 'when processing a start task' do
+      let(:task) do
+        Coresdk::ActivityTask::ActivityTask.new(
           task_token: token,
           start: Coresdk::ActivityTask::Start.new(
             activity_type: activity_name,
             input: [converter.to_payload('test')],
           )
         )
-        block.call(proto.to_proto)
       end
-      allow(Temporal::Worker::ActivityRunner).to receive(:new).and_return(runner)
+
+      context 'when activity is not registered' do
+        let(:activity_name) { 'unknown-activity' }
+
+        it 'responds with a failure' do
+          Async { |task| subject.run(task) }
+
+          expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            expect(proto.task_token).to eq(token)
+            expect(proto.result.failed.failure.message).to eq(
+              'Activity unknown-activity is not registered on this worker, available activities: TestActivity'
+            )
+            expect(proto.result.failed.failure.application_failure_info.type).to eq('NotFoundError')
+          end
+        end
+      end
+
+      context 'when it succeeds' do
+        before { allow(runner).to receive(:run).and_return(converter.to_payload('test result')) }
+
+        it 'processes an activity task and sends back the result' do
+          Async { |task| subject.run(task) }
+
+          expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            expect(proto.task_token).to eq(token)
+            expect(proto.result.completed.result.data).to eq('"test result"')
+          end
+        end
+      end
+
+      context 'when it raises an error' do
+        before do
+          allow(runner)
+            .to receive(:run)
+            .and_return(converter.to_failure(StandardError.new('test error')))
+        end
+
+        it 'processes an activity task and sends back the failure' do
+          Async { |task| subject.run(task) }
+
+          expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            expect(proto.task_token).to eq(token)
+            expect(proto.result.failed.failure.message).to eq('test error')
+          end
+        end
+      end
     end
 
-    context 'when activity is not registered' do
-      let(:activity_name) { 'unknown-activity' }
-
-      it 'responds with a failure' do
-        Async { |task| subject.run(task) }
-
-        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-          expect(proto.task_token).to eq(token)
-          expect(proto.result.failed.failure.message).to eq(
-            'Activity unknown-activity is not registered on this worker, available activities: TestActivity'
+    context 'when processing a cancel task' do
+      let(:task) do
+        Coresdk::ActivityTask::ActivityTask.new(
+          task_token: token,
+          cancel: Coresdk::ActivityTask::Cancel.new(
+            reason: Coresdk::ActivityTask::ActivityCancelReason::CANCELLED,
           )
-          expect(proto.result.failed.failure.application_failure_info.type).to eq('NotFoundError')
+        )
+      end
+
+      context 'when task is running' do
+        before do
+          allow(subject).to receive(:running_activities).and_return(token => runner)
+          allow(runner).to receive(:cancel)
+        end
+
+        it 'cancels the runner' do
+          Async { |task| subject.run(task) }
+
+          expect(runner).to have_received(:cancel)
         end
       end
-    end
 
-    context 'when it succeeds' do
-      before { allow(runner).to receive(:run).and_return(converter.to_payload('test result')) }
-
-      it 'processes an activity task and sends back the result' do
-        Async { |task| subject.run(task) }
-
-        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-          expect(proto.task_token).to eq(token)
-          expect(proto.result.completed.result.data).to eq('"test result"')
-        end
-      end
-    end
-
-    context 'when it raises an error' do
-      before do
-        allow(runner)
-          .to receive(:run)
-          .and_return(converter.to_failure(StandardError.new('test error')))
-      end
-
-      it 'processes an activity task and sends back the failure' do
-        Async { |task| subject.run(task) }
-
-        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-          expect(proto.task_token).to eq(token)
-          expect(proto.result.failed.failure.message).to eq('test error')
+      context 'when task is not running' do
+        xit 'warns' do
+          # pending implementation
         end
       end
     end
