@@ -1,0 +1,8 @@
+# Missing signatures for Ruby's stdlib
+
+# https://rubyapi.org/3.1/o/thread#method-i-raise
+class Thread
+  def raise: () -> bot
+           | (::String arg0) -> bot
+           | (::_Exception arg0, ?untyped arg1, ?::Array[::String] arg2) -> bot
+end
