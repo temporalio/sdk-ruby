@@ -7,7 +7,7 @@ class TestActivityWithCustomName < Temporal::Activity
 end
 
 class TestShieldedActivity < Temporal::Activity
-  shielded
+  shielded!
 end
 
 describe Temporal::Activity do

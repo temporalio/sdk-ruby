@@ -77,7 +77,7 @@ end
 
 # A shielded activity will not get cancelled
 class TestCancellingShieldedActivity < Temporal::Activity
-  shielded
+  shielded!
 
   def execute(cycles)
     cycles.times do

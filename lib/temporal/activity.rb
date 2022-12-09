@@ -4,7 +4,7 @@ module Temporal
       @activity_name = new_name
     end
 
-    def self.shielded
+    def self.shielded!
       @shielded = true
     end
 
