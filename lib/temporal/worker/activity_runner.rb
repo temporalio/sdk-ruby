@@ -18,8 +18,6 @@ module Temporal
       end
 
       def run
-        heartbeat_proc = ->(*details) { heartbeat(*details) }
-        context = Temporal::Activity::Context.new(generate_activity_info, heartbeat_proc)
         activity = activity_class.new(context)
         input = converter.from_payload_array(start.input.to_a)
 
@@ -31,12 +29,23 @@ module Temporal
       end
 
       def cancel
-        # TODO: pending implementation
+        context.cancel
       end
 
       private
 
       attr_reader :activity_class, :start, :task_queue, :task_token, :worker, :converter
+
+      def context
+        return @context if @context
+
+        heartbeat_proc = ->(*details) { heartbeat(*details) }
+        @context = Temporal::Activity::Context.new(
+          generate_activity_info,
+          heartbeat_proc,
+          shielded: activity_class._shielded,
+        )
+      end
 
       def generate_activity_info
         Temporal::Activity::Info.new(

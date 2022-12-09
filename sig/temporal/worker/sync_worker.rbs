@@ -5,6 +5,7 @@ module Temporal
       def poll_activity_task: -> Coresdk::ActivityTask::ActivityTask
       def complete_activity_task_with_success: (String task_token, Temporal::Api::Common::V1::Payload payload) -> void
       def complete_activity_task_with_failure: (String task_token, Temporal::Api::Failure::V1::Failure failure) -> void
+      def complete_activity_task_with_cancellation: (String task_token, Temporal::Api::Failure::V1::Failure failure) -> void
       def record_activity_heartbeat: (String task_token, Array[Temporal::Api::Common::V1::Payload] payloads) -> void
 
       private
@@ -12,6 +13,7 @@ module Temporal
       attr_reader core_worker: Temporal::Bridge::Worker
 
       def with_queue: { (^(?untyped) -> void) -> void } -> untyped
+      def complete_activity_task: (String task_token, Coresdk::ActivityResult::ActivityExecutionResult result) -> void
     end
   end
 end
