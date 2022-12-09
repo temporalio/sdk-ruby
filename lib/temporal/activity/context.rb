@@ -23,6 +23,12 @@ module Temporal
         #   or while handling a CancelledError (in a rescue or ensure blocks)
         return block.call if @shielded || @cancelled
 
+        if Thread.current != thread
+          # TODO: Use logger instead when implemented
+          warn "Activity shielding is not intended to be used outside of activity's thread."
+          return block.call
+        end
+
         mutex.synchronize do
           @shielded = true
           result = block.call
@@ -41,13 +47,14 @@ module Temporal
       def cancel
         @cancelled = true
 
+        locked = mutex.try_lock
         # @shielded inside the lock means the whole activity is shielded
-        if mutex.try_lock && !@shielded
+        if locked && !@shielded
           thread.raise(Temporal::Error::CancelledError.new('Unhandled cancellation'))
         end
       ensure
-        # only release the lock if owned by the current thread
-        mutex.unlock if mutex.owned?
+        # only release the lock if we locked it
+        mutex.unlock if locked
       end
 
       private

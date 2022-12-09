@@ -37,7 +37,7 @@ describe Temporal::Activity::Context do
       it 'raises after finishing the block' do
         expect do
           subject.shield do
-            subject.instance_variable_set(:@cancelled, true)
+            subject.cancel
           end
         end.to raise_error(Temporal::Error::CancelledError, 'Unhandled cancellation')
       end
@@ -49,7 +49,7 @@ describe Temporal::Activity::Context do
       it 'ignores cancellation' do
         expect(
           subject.shield do
-            subject.instance_variable_set(:@cancelled, true)
+            subject.cancel
             42
           end
         ).to eq(42)
@@ -61,7 +61,7 @@ describe Temporal::Activity::Context do
         expect do
           subject.shield do
             result = subject.shield do
-              subject.instance_variable_set(:@cancelled, true)
+              subject.cancel
               42
             end
 
@@ -76,6 +76,19 @@ describe Temporal::Activity::Context do
         subject.cancel rescue nil # rubocop:disable Style/RescueModifier
 
         expect(subject.shield { 42 }).to eq(42)
+      end
+    end
+
+    context 'when called from a different thread' do
+      it 'warns' do
+        # create contex from another thread
+        context = Thread.new { subject }.value
+        allow(context).to receive(:warn)
+
+        expect(context.shield { 42 }).to eq(42)
+        expect(context)
+          .to have_received(:warn)
+          .with("Activity shielding is not intended to be used outside of activity's thread.")
       end
     end
   end
