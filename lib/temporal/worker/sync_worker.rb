@@ -31,16 +31,17 @@ module Temporal
       end
 
       def complete_activity_task_with_failure(task_token, failure)
-        result =
-          if failure.canceled_failure_info
-            Coresdk::ActivityResult::ActivityExecutionResult.new(
-              cancelled: Coresdk::ActivityResult::Cancellation.new(failure: failure),
-            )
-          else
-            Coresdk::ActivityResult::ActivityExecutionResult.new(
-              failed: Coresdk::ActivityResult::Failure.new(failure: failure),
-            )
-          end
+        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
+          failed: Coresdk::ActivityResult::Failure.new(failure: failure),
+        )
+
+        complete_activity_task(task_token, result)
+      end
+
+      def complete_activity_task_with_cancellation(task_token, failure)
+        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
+          cancelled: Coresdk::ActivityResult::Cancellation.new(failure: failure),
+        )
 
         complete_activity_task(task_token, result)
       end

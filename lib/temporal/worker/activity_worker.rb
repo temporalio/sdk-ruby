@@ -13,6 +13,7 @@ module Temporal
         @converter = converter
         @executor = executor
         @running_activities = {}
+        @cancellations = []
       end
 
       def run(reactor)
@@ -38,7 +39,7 @@ module Temporal
 
       private
 
-      attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities
+      attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities, :cancellations
 
       def running?
         @running
@@ -86,17 +87,31 @@ module Temporal
 
       def handle_start_activity(task_token, start)
         result = run_activity(task_token, start)
-        if result.is_a?(Temporal::Api::Common::V1::Payload)
+
+        case result
+        when Temporal::Api::Common::V1::Payload
           worker.complete_activity_task_with_success(task_token, result)
-        else
-          worker.complete_activity_task_with_failure(task_token, result)
+        when Temporal::Api::Failure::V1::Failure
+          # only respond with a cancellation when it was requested, otherwise it's a regular failure
+          if result.canceled_failure_info && cancellations.include?(task_token)
+            worker.complete_activity_task_with_cancellation(task_token, result)
+          else
+            worker.complete_activity_task_with_failure(task_token, result)
+          end
         end
+
         running_activities.delete(task_token)
+        cancellations.delete(task_token)
       end
 
       def handle_cancel_activity(task_token, _cancel)
-        runner = running_activities[task_token]
-        # TODO: Warn of a missing activity if runner is absent
+        runner = running_activities.fetch(task_token) do
+          # TODO: Use logger instead when implemented
+          warn "Cannot find activity to cancel for token #{task_token}"
+          return # early escape
+        end
+
+        cancellations << task_token
         runner&.cancel
       end
     end

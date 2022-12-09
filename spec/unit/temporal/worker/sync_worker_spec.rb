@@ -42,43 +42,43 @@ describe Temporal::Worker::SyncWorker do
   end
 
   describe '#complete_activity_task_with_failure' do
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
-
-    context 'with a cancellation' do
-      let(:failure) do
-        Temporal::Api::Failure::V1::Failure.new(
-          message: 'Test cancellation',
-          canceled_failure_info: Temporal::Api::Failure::V1::CanceledFailureInfo.new,
-        )
-      end
-
-      it 'sends an encoded response' do
-        subject.complete_activity_task_with_failure(token, failure)
-
-        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-          expect(proto.task_token).to eq(token)
-          expect(proto.result.cancelled.failure).to eq(failure)
-        end
-      end
+    let(:failure) do
+      Temporal::Api::Failure::V1::Failure.new(
+        message: 'Test failure',
+        terminated_failure_info: Temporal::Api::Failure::V1::TerminatedFailureInfo.new,
+      )
     end
 
-    context 'with any other failure' do
-      let(:failure) do
-        Temporal::Api::Failure::V1::Failure.new(
-          message: 'Test failure',
-          terminated_failure_info: Temporal::Api::Failure::V1::TerminatedFailureInfo.new,
-        )
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
+
+    it 'sends an encoded response' do
+      subject.complete_activity_task_with_failure(token, failure)
+
+      expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+        proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+        expect(proto.task_token).to eq(token)
+        expect(proto.result.failed.failure).to eq(failure)
       end
+    end
+  end
 
-      it 'sends an encoded response' do
-        subject.complete_activity_task_with_failure(token, failure)
+  describe '#complete_activity_task_with_cancellation' do
+    let(:failure) do
+      Temporal::Api::Failure::V1::Failure.new(
+        message: 'Test cancellation',
+        canceled_failure_info: Temporal::Api::Failure::V1::CanceledFailureInfo.new,
+      )
+    end
 
-        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-          expect(proto.task_token).to eq(token)
-          expect(proto.result.failed.failure).to eq(failure)
-        end
+    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
+
+    it 'sends an encoded response' do
+      subject.complete_activity_task_with_cancellation(token, failure)
+
+      expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+        proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+        expect(proto.task_token).to eq(token)
+        expect(proto.result.cancelled.failure).to eq(failure)
       end
     end
   end

@@ -21,6 +21,7 @@ module Temporal
       attr_reader converter: Temporal::DataConverter
       attr_reader executor: Temporal::Worker::_ActivityExecutor
       attr_reader running_activities: Hash[String, Temporal::Worker::ActivityRunner]
+      attr_reader cancellations: Array[String]
 
       def running?: -> bool
       def prepare_activities: (Array[singleton(Temporal::Activity)] activities)

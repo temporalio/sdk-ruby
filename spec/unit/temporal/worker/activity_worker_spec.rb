@@ -125,6 +125,41 @@ describe Temporal::Worker::ActivityWorker do
           end
         end
       end
+
+      context 'when it gets cancelled' do
+        before do
+          allow(runner)
+            .to receive(:run)
+            .and_return(converter.to_failure(Temporal::Error::CancelledError.new('test cancellation')))
+        end
+
+        context 'when cancellation was not requested' do
+          it 'processes an activity task and sends back a regular failure' do
+            Async { |task| subject.run(task) }
+
+            expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+              proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+              expect(proto.task_token).to eq(token)
+              expect(proto.result.failed.failure.message).to eq('test cancellation')
+            end
+          end
+        end
+
+        context 'when cancellation was requested' do
+          # Simulate cancellation
+          before { subject.instance_variable_get(:@cancellations) << token }
+
+          it 'processes an activity task and sends back a cancellation' do
+            Async { |task| subject.run(task) }
+
+            expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+              proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+              expect(proto.task_token).to eq(token)
+              expect(proto.result.cancelled.failure.message).to eq('test cancellation')
+            end
+          end
+        end
+      end
     end
 
     context 'when processing a cancel task' do
@@ -151,8 +186,14 @@ describe Temporal::Worker::ActivityWorker do
       end
 
       context 'when task is not running' do
-        xit 'warns' do
-          # pending implementation
+        before { allow(subject).to receive(:warn) }
+
+        it 'warns' do
+          Async { |task| subject.run(task) }
+
+          expect(subject)
+            .to have_received(:warn)
+            .with("Cannot find activity to cancel for token #{token}")
         end
       end
     end
