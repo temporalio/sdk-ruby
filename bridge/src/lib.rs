@@ -14,12 +14,21 @@ use rutie::{
 };
 use std::collections::HashMap;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
-use worker::{Worker, WorkerResult};
+use worker::{Worker, WorkerError, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
+}
+
+fn wrap_worker_error(e: &WorkerError) -> AnyException {
+    let name = match e {
+        WorkerError::Shutdown() => "Temporal::Bridge::Error::WorkerShutdown",
+        _ => "Temporal::Bridge::Error"
+    };
+
+    AnyException::new(name, Some(&format!("[{:?}] {}", e, e.to_string())))
 }
 
 fn wrap_bytes(bytes: Vec<u8>) -> RString {
@@ -44,6 +53,10 @@ fn to_hash_map(hash: Hash) -> HashMap<String, String> {
     });
 
     result
+}
+
+fn ruby_nil() -> AnyObject {
+    NilClass::new().to_any_object()
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
@@ -148,8 +161,10 @@ methods!(
 
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
-            let bytes = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
-            ruby_callback.call(&[wrap_bytes(bytes).to_any_object()]);
+            match result {
+                Ok(bytes) => ruby_callback.call(&[wrap_bytes(bytes).to_any_object()]),
+                Err(e) => ruby_callback.call(&[ruby_nil(), wrap_worker_error(&e).to_any_object()])
+            };
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
@@ -168,8 +183,10 @@ methods!(
         let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
-            result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
-            ruby_callback.call(&[NilClass::new().to_any_object()]);
+            match result {
+                Ok(_) => ruby_callback.call(&[ruby_nil()]),
+                Err(e) => ruby_callback.call(&[ruby_nil(), wrap_worker_error(&e).to_any_object()])
+            };
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);

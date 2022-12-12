@@ -4,6 +4,7 @@ use prost::Message;
 use std::sync::Arc;
 use std::sync::mpsc::Sender;
 use temporal_sdk_core::api::{Worker as WorkerTrait};
+use temporal_sdk_core_api::errors::{PollActivityError};
 use temporal_sdk_core_api::worker::{WorkerConfigBuilder, WorkerConfigBuilderError};
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use thiserror::Error;

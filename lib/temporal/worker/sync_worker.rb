@@ -16,8 +16,8 @@ module Temporal
 
       def poll_activity_task
         with_queue do |done|
-          core_worker.poll_activity_task do |task|
-            done.call(Coresdk::ActivityTask::ActivityTask.decode(task))
+          core_worker.poll_activity_task do |task, error|
+            done.call(task && Coresdk::ActivityTask::ActivityTask.decode(task), error)
           end
         end
       end
@@ -62,9 +62,12 @@ module Temporal
 
       def with_queue(&block)
         queue = Queue.new
-        done = ->(result = nil) { queue << result }
+        done = ->(result, error = nil) { queue << [result, error] }
         block.call(done)
-        queue.pop
+        (result, exception) = queue.pop
+        raise exception if exception
+
+        result
       end
 
       def complete_activity_task(task_token, result)

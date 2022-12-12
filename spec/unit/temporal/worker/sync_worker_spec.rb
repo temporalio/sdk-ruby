@@ -9,34 +9,58 @@ describe Temporal::Worker::SyncWorker do
   let(:token) { 'test_token' }
 
   describe '#poll_activity_task' do
-    before do
-      allow(core_worker).to receive(:poll_activity_task) do |&block|
-        proto = Coresdk::ActivityTask::ActivityTask.new(task_token: token)
-        block.call(proto.to_proto)
+    context 'when call succeeds' do
+      before do
+        allow(core_worker).to receive(:poll_activity_task) do |&block|
+          proto = Coresdk::ActivityTask::ActivityTask.new(task_token: token)
+          block.call(proto.to_proto)
+        end
+      end
+
+      it 'calls core worker and decodes the response' do
+        task = subject.poll_activity_task
+
+        expect(task).to be_a(Coresdk::ActivityTask::ActivityTask)
+        expect(task.task_token).to eq(token)
+        expect(core_worker).to have_received(:poll_activity_task)
       end
     end
 
-    it 'calls core worker and decodes the response' do
-      task = subject.poll_activity_task
+    context 'when call fails' do
+      let(:error) { Temporal::Bridge::Error.new('test error') }
 
-      expect(task).to be_a(Coresdk::ActivityTask::ActivityTask)
-      expect(task.task_token).to eq(token)
-      expect(core_worker).to have_received(:poll_activity_task)
+      before { allow(core_worker).to receive(:poll_activity_task).and_yield(nil, error) }
+
+      it 'raises the error' do
+        expect { subject.poll_activity_task }.to raise_error(error)
+      end
     end
   end
 
   describe '#complete_activity_task_with_success' do
     let(:payload) { Temporal::Api::Common::V1::Payload.new(data: 'test') }
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
+    context 'when call succeeds' do
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, nil) }
 
-    it 'sends an encoded response' do
-      subject.complete_activity_task_with_success(token, payload)
+      it 'sends an encoded response' do
+        subject.complete_activity_task_with_success(token, payload)
 
-      expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-        proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-        expect(proto.task_token).to eq(token)
-        expect(proto.result.completed.result).to eq(payload)
+        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          expect(proto.task_token).to eq(token)
+          expect(proto.result.completed.result).to eq(payload)
+        end
+      end
+    end
+
+    context 'when call fails' do
+      let(:error) { Temporal::Bridge::Error.new('test error') }
+
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, error) }
+
+      it 'raises the error' do
+        expect { subject.complete_activity_task_with_success(token, payload) }.to raise_error(error)
       end
     end
   end
@@ -49,15 +73,27 @@ describe Temporal::Worker::SyncWorker do
       )
     end
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
+    context 'when call succeeds' do
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, nil) }
 
-    it 'sends an encoded response' do
-      subject.complete_activity_task_with_failure(token, failure)
+      it 'sends an encoded response' do
+        subject.complete_activity_task_with_failure(token, failure)
 
-      expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-        proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-        expect(proto.task_token).to eq(token)
-        expect(proto.result.failed.failure).to eq(failure)
+        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          expect(proto.task_token).to eq(token)
+          expect(proto.result.failed.failure).to eq(failure)
+        end
+      end
+    end
+
+    context 'when call fails' do
+      let(:error) { Temporal::Bridge::Error.new('test error') }
+
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, error) }
+
+      it 'raises the error' do
+        expect { subject.complete_activity_task_with_failure(token, failure) }.to raise_error(error)
       end
     end
   end
@@ -70,15 +106,27 @@ describe Temporal::Worker::SyncWorker do
       )
     end
 
-    before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil) }
+    context 'when call succeeds' do
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, nil) }
 
-    it 'sends an encoded response' do
-      subject.complete_activity_task_with_cancellation(token, failure)
+      it 'sends an encoded response' do
+        subject.complete_activity_task_with_cancellation(token, failure)
 
-      expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-        proto = Coresdk::ActivityTaskCompletion.decode(bytes)
-        expect(proto.task_token).to eq(token)
-        expect(proto.result.cancelled.failure).to eq(failure)
+        expect(core_worker).to have_received(:complete_activity_task) do |bytes|
+          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          expect(proto.task_token).to eq(token)
+          expect(proto.result.cancelled.failure).to eq(failure)
+        end
+      end
+    end
+
+    context 'when call fails' do
+      let(:error) { Temporal::Bridge::Error.new('test error') }
+
+      before { allow(core_worker).to receive(:complete_activity_task).and_yield(nil, error) }
+
+      it 'raises the error' do
+        expect { subject.complete_activity_task_with_cancellation(token, failure) }.to raise_error(error)
       end
     end
   end
