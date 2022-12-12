@@ -19,6 +19,7 @@ module Temporal
 
     attr_reader mutex: Thread::Mutex
     attr_reader runtime: Temporal::Runtime
+    attr_reader core_worker: Temporal::Bridge::Worker
     attr_reader activity_worker: Temporal::Worker::ActivityWorker?
     attr_reader workflow_worker: untyped
 

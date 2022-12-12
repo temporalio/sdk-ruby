@@ -1,4 +1,5 @@
 require 'support/helpers/test_rpc'
+require 'temporal/activity'
 require 'temporal/bridge'
 require 'temporal/connection'
 require 'temporal/worker'
@@ -98,12 +99,18 @@ describe Temporal::Worker do
   describe '#shutdown' do
     let(:activity_worker) { instance_double(Temporal::Worker::ActivityWorker, shutdown: nil) }
 
-    before { allow(Temporal::Worker::ActivityWorker).to receive(:new).and_return(activity_worker) }
+    before do
+      allow(core_worker).to receive(:initiate_shutdown)
+      allow(core_worker).to receive(:shutdown)
+      allow(Temporal::Worker::ActivityWorker).to receive(:new).and_return(activity_worker)
+    end
 
     it 'calls shutdown on all workers' do
       subject.shutdown
 
-      expect(activity_worker).to have_received(:shutdown)
+      expect(core_worker).to have_received(:initiate_shutdown).ordered
+      expect(activity_worker).to have_received(:shutdown).ordered
+      expect(core_worker).to have_received(:shutdown).ordered
     end
   end
 end

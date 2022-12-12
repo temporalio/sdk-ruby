@@ -32,6 +32,8 @@ module Temporal
       def poll_activity_task: { (String?, Exception?) -> void } -> void
       def complete_activity_task: (String) { (nil, Exception?) -> void } -> void
       def record_activity_heartbeat: (String) -> void
+      def initiate_shutdown: -> void
+      def shutdown: -> void
     end
   end
 end

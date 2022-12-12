@@ -58,11 +58,11 @@ describe Temporal::Worker::ActivityWorker do
     let(:activity_name) { 'TestActivity' }
 
     before do
-      allow(subject).to receive(:running?).and_return(true, false)
       allow(core_worker).to receive(:complete_activity_task).and_yield(nil, nil)
-      allow(core_worker).to receive(:poll_activity_task) do |&block|
-        block.call(task.to_proto)
-      end
+      allow(core_worker).to receive(:poll_activity_task).and_invoke(
+        ->(&block) { block.call(task.to_proto) },
+        -> { raise(Temporal::Bridge::Error::WorkerShutdown) },
+      )
       allow(Temporal::Worker::ActivityRunner).to receive(:new).and_return(runner)
     end
 

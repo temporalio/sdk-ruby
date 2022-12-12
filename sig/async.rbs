@@ -6,7 +6,8 @@ module Async
   end
 
   class Task
-    def async: { (Async::Task) -> void } -> void
+    def async: { (Async::Task) -> void } -> Async::Task
+    def wait: -> void
   end
 end
 

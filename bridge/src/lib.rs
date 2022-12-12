@@ -207,6 +207,20 @@ methods!(
 
         NilClass::new()
     }
+
+    fn worker_initiate_shutdown() -> NilClass {
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        worker.initiate_shutdown();
+
+        NilClass::new()
+    }
+
+    fn worker_shutdown() -> NilClass {
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        worker.shutdown();
+
+        NilClass::new()
+    }
 );
 
 #[no_mangle]
@@ -229,6 +243,8 @@ pub extern "C" fn init_bridge() {
             klass.def("poll_activity_task", worker_poll_activity_task);
             klass.def("complete_activity_task", worker_complete_activity_task);
             klass.def("record_activity_heartbeat", worker_record_activity_heartbeat);
+            klass.def("initiate_shutdown", worker_initiate_shutdown);
+            klass.def("shutdown", worker_shutdown);
         });
     });
 }

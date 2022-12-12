@@ -12,7 +12,7 @@ module Temporal
 
       attr_reader core_worker: Temporal::Bridge::Worker
 
-      def with_queue: { (^(?untyped) -> void) -> void } -> untyped
+      def with_queue: { (^(untyped?, Exception?) -> void) -> void } -> untyped
       def complete_activity_task: (String task_token, Coresdk::ActivityResult::ActivityExecutionResult result) -> void
     end
   end

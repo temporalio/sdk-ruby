@@ -29,6 +29,9 @@ pub enum WorkerError {
 
     #[error("Unable to send a request. Channel is closed")]
     ChannelClosed(),
+
+    #[error("Core worker is shutting down")]
+    Shutdown(),
 }
 
 pub type WorkerResult = Result<Vec<u8>, WorkerError>;
@@ -71,6 +74,7 @@ impl Worker {
                     let bytes = task.encode_to_vec();
                     Box::new(move || callback(Ok(bytes)))
                 },
+                Err(PollActivityError::ShutDown) => Box::new(move || callback(Err(WorkerError::Shutdown()))),
                 Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollActivityTask(e))))
             };
 
@@ -104,5 +108,17 @@ impl Worker {
         self.core_worker.record_activity_heartbeat(proto);
 
         Ok(())
+    }
+
+    pub fn initiate_shutdown(&self) {
+        self.core_worker.initiate_shutdown();
+    }
+
+    pub fn shutdown(&self) {
+        let core_worker = self.core_worker.clone();
+
+        self.tokio_runtime.block_on(async move {
+            core_worker.shutdown().await;
+        });
     }
 }
