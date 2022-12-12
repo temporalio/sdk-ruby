@@ -17,6 +17,7 @@ module Temporal
       end
 
       def run(reactor)
+        # @type var async_tasks: Array[Async::Task]
         async_tasks = []
 
         loop do
