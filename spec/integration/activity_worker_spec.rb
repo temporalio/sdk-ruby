@@ -155,9 +155,6 @@ describe Temporal::Worker::ActivityWorker do
   after { subject.shutdown }
 
   describe 'running an activity' do
-    # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-    let(:activity_task_queue) { 'test-activity-worker-1' }
-
     it 'runs an activity and returns a result' do
       input = {
         actions: [{
@@ -174,9 +171,6 @@ describe Temporal::Worker::ActivityWorker do
     end
 
     context 'when activity has a custom name' do
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-2' }
-
       it 'runs an activity and returns a result' do
         input = {
           actions: [{
@@ -194,9 +188,6 @@ describe Temporal::Worker::ActivityWorker do
     end
 
     context 'when activity fails' do
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-3' }
-
       it 'raises an application error' do
         input = {
           actions: [{
@@ -219,9 +210,6 @@ describe Temporal::Worker::ActivityWorker do
   end
 
   describe 'running a heartbeating activity' do
-    # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-    let(:activity_task_queue) { 'test-activity-worker-4' }
-
     it 'runs an activity and returns heartbeat details' do
       input = {
         actions: [{
@@ -257,8 +245,6 @@ describe Temporal::Worker::ActivityWorker do
 
     context 'when unhandled' do
       let(:activity_name) { 'TestCancellingActivity' }
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-5' }
 
       it 'raises from within an activity' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
@@ -272,8 +258,6 @@ describe Temporal::Worker::ActivityWorker do
 
     context 'when protected by a shield' do
       let(:activity_name) { 'TestCancellingActivityWithShield' }
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-6' }
 
       it 'performs all cycles' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
@@ -284,8 +268,6 @@ describe Temporal::Worker::ActivityWorker do
 
     context 'when handled manually in a shield' do
       let(:activity_name) { 'TestManuallyCancellingActivityWithShield' }
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-7' }
 
       it 'raises' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
@@ -301,8 +283,6 @@ describe Temporal::Worker::ActivityWorker do
 
     context 'when unhandled by a shielded activity' do
       let(:activity_name) { 'TestCancellingShieldedActivity' }
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-8' }
 
       it 'does not affect activity' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
@@ -313,8 +293,6 @@ describe Temporal::Worker::ActivityWorker do
 
     context 'when intentionally ignored' do
       let(:activity_name) { 'TestCancellationIgnoringActivity' }
-      # TODO: Use a different task queue due to an incomplete Worker#shutdown implementation
-      let(:activity_task_queue) { 'test-activity-worker-9' }
 
       it 'return a number of performed cycles' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)

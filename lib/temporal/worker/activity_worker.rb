@@ -6,7 +6,6 @@ module Temporal
   class Worker
     class ActivityWorker
       def initialize(task_queue, core_worker, activities, converter, executor)
-        @running = false
         @task_queue = task_queue
         @worker = SyncWorker.new(core_worker)
         @activities = prepare_activities(activities)
@@ -14,36 +13,39 @@ module Temporal
         @executor = executor
         @running_activities = {}
         @cancellations = []
+        @shutdown_queue = Queue.new
       end
 
       def run(reactor)
-        @running = true
+        # @type var async_tasks: Array[Async::Task]
+        async_tasks = []
 
-        while running?
+        loop do
           activity_task = worker.poll_activity_task
-          reactor.async do
+          async_tasks << reactor.async do |async_task|
             if activity_task.start
               handle_start_activity(activity_task.task_token, activity_task.start)
             elsif activity_task.cancel
               handle_cancel_activity(activity_task.task_token, activity_task.cancel)
             end
+
+            async_tasks.delete(async_task)
           end
         end
+      rescue Temporal::Bridge::Error::WorkerShutdown
+        async_tasks.each(&:wait) # wait for all outstanding tasks to finish
+        shutdown_queue << nil
       end
 
       def shutdown
-        @running = false
+        shutdown_queue.pop
         executor.shutdown
-        # TODO: core worker shutdown implementation pending
       end
 
       private
 
-      attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities, :cancellations
-
-      def running?
-        @running
-      end
+      attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities,
+                  :cancellations, :shutdown_queue
 
       def prepare_activities(activities)
         activities.each_with_object({}) do |activity, result|

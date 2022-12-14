@@ -21,7 +21,7 @@ module Temporal
       @mutex = Mutex.new
       @runtime = Temporal::Runtime.instance
       activity_executor ||= ThreadPoolExecutor.new(max_concurrent_activities)
-      core_worker = Temporal::Bridge::Worker.create(
+      @core_worker = Temporal::Bridge::Worker.create(
         @runtime.core_runtime,
         connection.core_connection,
         namespace,
@@ -29,7 +29,7 @@ module Temporal
       )
       @activity_worker = init_activity_worker(
         task_queue,
-        core_worker,
+        @core_worker,
         activities,
         data_converter,
         activity_executor,
@@ -59,13 +59,15 @@ module Temporal
     end
 
     def shutdown
+      core_worker.initiate_shutdown
       activity_worker&.shutdown
       workflow_worker&.shutdown
+      core_worker.shutdown
     end
 
     private
 
-    attr_reader :mutex, :runtime, :activity_worker, :workflow_worker
+    attr_reader :mutex, :runtime, :core_worker, :activity_worker, :workflow_worker
 
     def running?
       @running

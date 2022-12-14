@@ -10,7 +10,7 @@ module Temporal
         Temporal::DataConverter converter,
         Temporal::Worker::_ActivityExecutor executor
       ) -> void
-      def run: (Temporal::Worker::_Reactor reactor) -> void
+      def run: (Async::Task reactor) -> void
       def shutdown: -> void
 
       private
@@ -22,6 +22,7 @@ module Temporal
       attr_reader executor: Temporal::Worker::_ActivityExecutor
       attr_reader running_activities: Hash[String, Temporal::Worker::ActivityRunner]
       attr_reader cancellations: Array[String]
+      attr_reader shutdown_queue: Thread::Queue
 
       def running?: -> bool
       def prepare_activities: (Array[singleton(Temporal::Activity)] activities)
