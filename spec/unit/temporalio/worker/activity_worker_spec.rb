@@ -197,5 +197,31 @@ describe Temporalio::Worker::ActivityWorker do
         end
       end
     end
+
+    context 'when handling a fatal error' do
+      let(:task) do
+        Coresdk::ActivityTask::ActivityTask.new(
+          task_token: token,
+          start: Coresdk::ActivityTask::Start.new(
+            activity_type: activity_name,
+            input: [converter.to_payload('test')],
+          )
+        )
+      end
+
+      before do
+        allow(runner).to receive(:run).and_return(converter.to_payload('test result'))
+        allow(core_worker).to receive(:poll_activity_task).and_invoke(
+          ->(&block) { block.call(task.to_proto) },
+          -> { raise(Temporalio::Bridge::Error) },
+        )
+      end
+
+      it 're-raises the error' do
+        Async do |task|
+          expect { subject.run(task) }.to raise_error(Temporalio::Bridge::Error)
+        end
+      end
+    end
   end
 end

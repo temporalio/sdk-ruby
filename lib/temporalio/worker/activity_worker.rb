@@ -1,6 +1,7 @@
 require 'temporalio/error/failure'
-require 'temporalio/worker/sync_worker'
+require 'temporalio/errors'
 require 'temporalio/worker/activity_runner'
+require 'temporalio/worker/sync_worker'
 
 module Temporalio
   class Worker
@@ -13,39 +14,42 @@ module Temporalio
         @executor = executor
         @running_activities = {}
         @cancellations = []
-        @shutdown_queue = Queue.new
+        @drain_queue = Queue.new
       end
 
       def run(reactor)
-        # @type var async_tasks: Array[Async::Task]
-        async_tasks = []
+        # @type var outstanding_tasks: Array[Async::Task]
+        outstanding_tasks = []
 
         loop do
           activity_task = worker.poll_activity_task
-          async_tasks << reactor.async do |async_task|
+          outstanding_tasks << reactor.async do |async_task|
             if activity_task.start
               handle_start_activity(activity_task.task_token, activity_task.start)
             elsif activity_task.cancel
               handle_cancel_activity(activity_task.task_token, activity_task.cancel)
             end
-
-            async_tasks.delete(async_task)
+          ensure
+            outstanding_tasks.delete(async_task)
           end
         end
       rescue Temporalio::Bridge::Error::WorkerShutdown
-        async_tasks.each(&:wait) # wait for all outstanding tasks to finish
-        shutdown_queue << nil
+        # No need to re-raise this error, it's a part of a normal shutdown
+      ensure
+        reactor.async do
+          outstanding_tasks.each(&:wait)
+          drain_queue.close
+        end
       end
 
-      def shutdown
-        shutdown_queue.pop
-        executor.shutdown
+      def drain
+        drain_queue.pop
       end
 
       private
 
       attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities,
-                  :cancellations, :shutdown_queue
+                  :cancellations, :drain_queue
 
       def prepare_activities(activities)
         activities.each_with_object({}) do |activity, result|

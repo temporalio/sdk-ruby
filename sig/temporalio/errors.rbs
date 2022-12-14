@@ -17,5 +17,11 @@ module Temporalio
 
       def initialize: (Temporalio::Workflow::ExecutionStatus::values) -> void
     end
+
+    class Internal < Error
+    end
+
+    class WorkerShutdown < Internal
+    end
   end
 end
