@@ -6,15 +6,15 @@ mod connection;
 mod runtime;
 mod worker;
 
-use connection::{Connection, ConnectionError, RpcParams, RpcResult};
+use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
     NilClass, Hash, Integer,
 };
 use std::collections::HashMap;
-use std::sync::mpsc;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
+use tokio_util::sync::CancellationToken;
 use worker::{Worker, WorkerError, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
@@ -92,7 +92,7 @@ methods!(
         let request = unwrap_bytes(request.map_err(VM::raise_ex).unwrap());
         let metadata = to_hash_map(metadata.map_err(VM::raise_ex).unwrap());
         let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
-        let (tx, rx) = mpsc::channel::<RpcResult>();
+        let token = CancellationToken::new();
 
         let result = Thread::call_without_gvl(|| {
             let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
@@ -102,11 +102,8 @@ methods!(
                 metadata: metadata.clone(),
                 timeout_millis: timeout
             };
-            connection.call(params, tx.clone());
-            rx.recv().expect("RPC result channel closed")
-        }, Some(|| {
-            tx.send(Err(ConnectionError::RequestCancelled)).expect("Unable to close connection");
-        }));
+            connection.call(params, token.clone())
+        }, Some(|| { token.cancel() }));
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 

@@ -197,6 +197,7 @@ dependencies = [
  "temporal-sdk-core-protos",
  "thiserror",
  "tokio",
+ "tokio-util",
  "tonic",
  "url",
 ]

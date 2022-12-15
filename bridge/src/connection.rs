@@ -2,14 +2,15 @@ use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::str::FromStr;
 use std::sync::Arc;
-use std::sync::mpsc;
 use std::time::Duration;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
     ConfiguredClient, TemporalServiceClientWithMetrics
 };
 use thiserror::Error;
+use tokio::{select};
 use tokio::runtime::{Runtime};
+use tokio_util::sync::CancellationToken;
 use tonic::metadata::{MetadataKey,MetadataValue};
 use url::Url;
 
@@ -171,12 +172,14 @@ impl Connection {
         Ok(Connection { client, runtime })
     }
 
-    pub fn call(&self, params: RpcParams, tx: mpsc::Sender<RpcResult>) {
+    pub fn call(&self, params: RpcParams, cancel_token: CancellationToken) -> RpcResult {
         let core_client = self.client.clone();
 
-        self.runtime.spawn(async move {
-            let result = make_rpc_call(core_client, params).await;
-            tx.send(result).expect("Unable to send an RPC result");
-        });
+        self.runtime.block_on(async move {
+            select! {
+                _ = cancel_token.cancelled() => Err(ConnectionError::RequestCancelled),
+                result = make_rpc_call(core_client, params) => result
+            }
+        })
     }
 }
