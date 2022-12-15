@@ -14,6 +14,7 @@ use rutie::{
 };
 use std::collections::HashMap;
 use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
+use tokio_util::sync::CancellationToken;
 use worker::{Worker, WorkerError, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
@@ -55,8 +56,12 @@ fn to_hash_map(hash: Hash) -> HashMap<String, String> {
     result
 }
 
-fn ruby_nil() -> AnyObject {
-    NilClass::new().to_any_object()
+fn worker_result_to_proc_args(result: WorkerResult) -> [AnyObject; 2] {
+    let ruby_nil = NilClass::new().to_any_object();
+    match result {
+        Ok(bytes) => [wrap_bytes(bytes).to_any_object(), ruby_nil],
+        Err(e) => [ruby_nil, wrap_worker_error(&e).to_any_object()]
+    }
 }
 
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
@@ -91,8 +96,9 @@ methods!(
         let request = unwrap_bytes(request.map_err(VM::raise_ex).unwrap());
         let metadata = to_hash_map(metadata.map_err(VM::raise_ex).unwrap());
         let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
+        let token = CancellationToken::new();
 
-        let result = Thread::call_without_gvl(move || {
+        let result = Thread::call_without_gvl(|| {
             let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
             let params = RpcParams {
                 rpc: rpc.clone(),
@@ -100,8 +106,8 @@ methods!(
                 metadata: metadata.clone(),
                 timeout_millis: timeout
             };
-            connection.call(params)
-        }, Some(|| {}));
+            connection.call(params, token.clone())
+        }, Some(|| { token.cancel() }));
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
@@ -161,10 +167,7 @@ methods!(
 
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
-            match result {
-                Ok(bytes) => ruby_callback.call(&[wrap_bytes(bytes).to_any_object()]),
-                Err(e) => ruby_callback.call(&[ruby_nil(), wrap_worker_error(&e).to_any_object()])
-            };
+            ruby_callback.call(&worker_result_to_proc_args(result));
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
@@ -183,10 +186,7 @@ methods!(
         let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
         let ruby_callback = VM::block_proc();
         let callback = move |result: WorkerResult| {
-            match result {
-                Ok(_) => ruby_callback.call(&[ruby_nil()]),
-                Err(e) => ruby_callback.call(&[ruby_nil(), wrap_worker_error(&e).to_any_object()])
-            };
+            ruby_callback.call(&worker_result_to_proc_args(result));
         };
 
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);

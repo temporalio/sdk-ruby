@@ -263,4 +263,29 @@ describe Temporal::Client do
       expect(interceptor.results[5]).to eq([:terminate_workflow, handle.id])
     end
   end
+
+  # This case ensures we handle thread interruption (such as Thread#raise) properly
+  describe 'plays nice with GVL' do
+    it 'allows to be interrupted' do
+      input = {
+        actions: [{
+          execute_activity: {
+            # We want this to stay unprocessed on the server
+            name: 'non-existing-activity',
+            task_queue: 'non-existing-task-queue',
+          },
+        }],
+      }
+      handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
+
+      main_thread = Thread.current
+      t = Thread.new do
+        sleep 0.1 # wait for the handle to block
+        main_thread.raise(StandardError, 'test interrupt')
+      end
+
+      expect { handle.result }.to raise_error(StandardError, 'test interrupt')
+      t.join # make sure the test thread does not raise
+    end
+  end
 end
