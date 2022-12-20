@@ -7,6 +7,8 @@ module Temporalio
     # The main class for handling activity processing. It is expected to be executed from
     # some threaded or async executor's context since methods called here might be blocking
     # and this should not affect the main worker reactor.
+    #
+    # @api private
     class ActivityRunner
       def initialize(activity_class, start, task_queue, task_token, worker, converter)
         @activity_class = activity_class

@@ -7,6 +7,11 @@ require 'temporalio/timeout_type'
 
 module Temporalio
   module FailureConverter
+    # A default implementation of a FailureConverter.
+    #
+    # Use {Temporalio::DataConverter} for the set of helper method for interaction with converters.
+    #
+    # @api private
     class Basic < Base
       def initialize(encode_common_attributes: false)
         super()

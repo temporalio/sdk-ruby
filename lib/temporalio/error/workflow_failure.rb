@@ -4,6 +4,8 @@ module Temporalio
   class Error
     # Used as a wrapper to perserve failure hierarchy in nested calls
     # i.e. WorkflowFailure(ActivityError(WorkflowFailure(CancelledError)))
+    #
+    # @api private
     class WorkflowFailure < Error
       attr_reader :cause
 

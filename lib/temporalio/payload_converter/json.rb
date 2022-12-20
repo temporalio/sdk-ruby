@@ -3,6 +3,7 @@ require 'temporalio/payload_converter/encoding_base'
 
 module Temporalio
   module PayloadConverter
+    # A payload converter for encoding/decoding JSON data.
     class JSON < EncodingBase
       ENCODING = 'json/plain'.freeze
 

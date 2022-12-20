@@ -5,6 +5,7 @@ require 'temporalio/worker/sync_worker'
 
 module Temporalio
   class Worker
+    # @api private
     class ActivityWorker
       def initialize(task_queue, core_worker, activities, converter, executor)
         @task_queue = task_queue

@@ -28,7 +28,7 @@ At this point the SDK only supports the **Temporal Client** capabilities:
 
 ### Installation
 
-Add the [`temporalio` gem](https://rubygems.org/gems/temporalio) to your Gemfile:
+Add the [temporalio gem](https://rubygems.org/gems/temporalio) to your Gemfile:
 
 ```ruby
 gem 'temporalio'
@@ -82,7 +82,7 @@ The default data converter supports converting multiple types including:
 
 - `nil`
 - bytes (`String` with `Encoding::ASCII_8BIT`)
-- Anything that [`JSON.generate`](https://ruby-doc.org/stdlib-3.0.0/libdoc/json/rdoc/JSON.html#method-i-generate)
+- Anything that [JSON.generate](https://ruby-doc.org/stdlib-3.0.0/libdoc/json/rdoc/JSON.html#method-i-generate)
   supports
 
 This notably doesn't include any `Date`, `Time`, or `DateTime` objects as they may not work across

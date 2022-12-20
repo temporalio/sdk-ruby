@@ -3,10 +3,12 @@ require 'temporalio/errors'
 
 module Temporalio
   module PayloadConverter
+    # A payload converter for combining multiple payload converters together.
     class Composite < Base
       class ConverterNotFound < Temporalio::Error; end
       class EncodingNotSet < Temporalio::Error; end
 
+      # @param converters [Array<Temporalio::PayloadConverter::Base>] List of converters
       def initialize(*converters)
         super()
 
