@@ -10,6 +10,7 @@ module Temporalio
   # This is used to instantiate a {Temporalio::Client}. But it also can be used for a direct
   # interaction with the API.
   class Connection
+    # @api private
     attr_reader :core_connection
 
     # @param host [String] `host:port` for the Temporal server. For local development, this is

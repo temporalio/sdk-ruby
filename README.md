@@ -23,6 +23,11 @@ At this point the SDK only supports the **Temporal Client** capabilities:
 - gRPC access to Temporal Server
 - Temporal Cloud is not yet supported due to the lack of TLS support, but it's coming soon
 
+As well as **Activity Worker** capabilities:
+
+- Definiting activities
+- Activity heartbeats/cancellations
+- Running activity workers
 
 ## Quick Start
 
@@ -87,6 +92,152 @@ The default data converter supports converting multiple types including:
 
 This notably doesn't include any `Date`, `Time`, or `DateTime` objects as they may not work across
 different SDKs. A custom payload converter can be implemented to support these.
+
+### Workers
+
+Workers host workflows (coming soon) and/or activities. Here's how to run a worker:
+
+```ruby
+require 'temporal'
+
+# Establish a gRPC connection to the server
+connection = Temporal::Connection.new('localhost:7233')
+
+# Initialize a new worker with your activities
+worker = Temporal::Worker.new(connection, 'my-namespace', 'my-task-queue', activities: [MyActivity])
+
+# Occupy the thread by running the worker
+worker.run
+```
+
+Some things to note about the above code:
+
+- This creates/uses the same connection that is used for initializing a client
+- Workers can have many more options not shown here (e.g. data converters and interceptors)
+
+In order to have more control over running of a worker you can provide a block of code by the end of
+which the worker will shut itself down:
+
+```ruby
+# initialize worker as in the example above
+
+# Run the worker for 5 seconds, then shut down
+worker.run { sleep 5 }
+
+client = Temporal::Client.new(connection, 'my-namespace')
+handle = client.start_workflow('MyWorkflow', 'some input', id: 'my-id', task_queue: 'my-task-queue')
+
+# Run the worker until MyWorkflow completes
+worker.run { handle.result }
+```
+
+You can also shut down a running worker by calling `Temporal::Worker#shutdown` from a separate
+thread at any time.
+
+#### Running multiple workers
+
+In order to run multiple workers in the same thread you can use the `Temporal::Worker.run` method:
+
+```ruby
+# Initialize workers
+worker_1 = Temporal::Worker.new(connection, 'my-namespace-1', 'my-task-queue-1', activities: [MyActivity1, MyActivity2])
+worker_2 = Temporal::Worker.new(connection, 'my-namespace-2', 'my-task-queue-1', activities: [MyActivity3])
+worker_3 = Temporal::Worker.new(connection, 'my-namespace-1', 'my-task-queue-2', activities: [MyActivity4])
+
+Temporal::Worker.run(worker_1, worker_2, worker_3)
+```
+
+Please note that similar to `Temporal::Worker#run`, `Temporal::Worker.run` accepts a block that
+behaves the same way — the workers will be shut down when the block finishes.
+
+#### Worker Shutdown
+
+The `Temporal::Worker#run` (as well as `Temporal::Worker#shutdown`) invocation will wait on all
+activities to complete, so if a long-running activity does not at least respect cancellation, the
+shutdown may never complete.
+
+### Activities
+
+#### Definition
+
+Activities are defined by subclassing `Temporal::Activity` class:
+
+```ruby
+class SayHelloActivity < Temporal::Activity
+  def execute(name)
+    return "Hello, #{name}!"
+  end
+end
+```
+
+Some things to note about activity definitions:
+
+- A custom name for the activity can be set with a class method `activity_name` from within the
+  class definition
+- Long running activities should regularly heartbeat and handle cancellation
+- Activities can only have positional arguments. Best practice is to only take a single argument
+  that is an object/dataclass of fields that can be added to as needed.
+
+#### Activity Context
+
+Activity classes have access to `Temporal::Activity::Context` via the `activity` method. Which
+itself provides access to useful methods, specifically:
+
+- `info` - Returns the immutable info of the currently running activity
+- `heartbeat(*details)` - Record a heartbeat
+- `cancelled?` - Whether a cancellation has been requested on this activity
+- `shield` - Prevent cancel exception from being thrown during the provided block of code
+
+##### Heartbeating and Cancellation
+
+In order for a non-local activity to be notified of cancellation requests, it must call
+`activity.heartbeat`. It is strongly recommended that all but the fastest executing activities call
+this method regularly.
+
+In addition to obtaining cancellation information, heartbeats also support detail data that is
+persisted on the server for retrieval during activity retry. If an activity calls
+`activity.heartbeat(123, 456)` and then fails and is retried, `activity.info.heartbeat_details` will
+return an array containing `123` and `456` on the next run.
+
+A cancellation is implemented using the `Thread#raise` method, which will raise a
+`Temporal::Error::CancelledError` during the execution of an activity. This means that your code
+might get interrupted at any point and never complete. In order to protect critical parts of your
+activities wrap them in `activity.shield`:
+
+```ruby
+class ActivityWithCriticalLogic < Temporal::Activity
+  def execute
+    activity.shield do
+      run_business_critical_logic_1
+    end
+
+    run_non_critical_logic
+
+    activity.shield do
+      run_business_critical_logic_2
+    end
+  end
+end
+```
+
+This will ensure that a cancellation request received while inside the `activity.shield` block will
+not raise an exception until that block finishes.
+
+In case the entire activity is considered critical, you can mark it as `shielded!` and ignore
+cancellation requests altogether:
+
+```ruby
+class CriticalActivity < Temporal::Activity
+  shielded!
+
+  def execute
+    ...
+  end
+end
+```
+
+For any long-running activity using this approach it is recommended to periodically check
+`activity.cancelled?` flag and respond accordingly.
 
 
 ## Dev Setup
