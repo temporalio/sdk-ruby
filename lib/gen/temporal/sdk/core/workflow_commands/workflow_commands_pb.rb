@@ -33,6 +33,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
         optional :schedule_local_activity, :message, 16, "coresdk.workflow_commands.ScheduleLocalActivity"
         optional :request_cancel_local_activity, :message, 17, "coresdk.workflow_commands.RequestCancelLocalActivity"
         optional :upsert_workflow_search_attributes, :message, 18, "coresdk.workflow_commands.UpsertWorkflowSearchAttributes"
+        optional :modify_workflow_properties, :message, 19, "coresdk.workflow_commands.ModifyWorkflowProperties"
       end
     end
     add_message "coresdk.workflow_commands.StartTimer" do
@@ -46,7 +47,6 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :seq, :uint32, 1
       optional :activity_id, :string, 2
       optional :activity_type, :string, 3
-      optional :namespace, :string, 4
       optional :task_queue, :string, 5
       map :headers, :string, :message, 6, "temporal.api.common.v1.Payload"
       repeated :arguments, :message, 7, "temporal.api.common.v1.Payload"
@@ -157,6 +157,9 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     add_message "coresdk.workflow_commands.UpsertWorkflowSearchAttributes" do
       map :search_attributes, :string, :message, 1, "temporal.api.common.v1.Payload"
     end
+    add_message "coresdk.workflow_commands.ModifyWorkflowProperties" do
+      optional :upserted_memo, :message, 1, "temporal.api.common.v1.Memo"
+    end
     add_enum "coresdk.workflow_commands.ActivityCancellationType" do
       value :TRY_CANCEL, 0
       value :WAIT_CANCELLATION_COMPLETED, 1
@@ -187,6 +190,7 @@ module Coresdk
     SignalExternalWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.SignalExternalWorkflowExecution").msgclass
     CancelSignalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelSignalWorkflow").msgclass
     UpsertWorkflowSearchAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.UpsertWorkflowSearchAttributes").msgclass
+    ModifyWorkflowProperties = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ModifyWorkflowProperties").msgclass
     ActivityCancellationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ActivityCancellationType").enummodule
   end
 end

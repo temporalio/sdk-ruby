@@ -1,9 +1,9 @@
 require 'grpc'
-require 'temporal/connection'
+require 'temporalio/connection'
 require 'support/helpers/test_rpc'
 require 'support/mock_server'
 
-describe Temporal::Connection do
+describe Temporalio::Connection do
   mock_address = '0.0.0.0:4444'.freeze
 
   subject { described_class.new(mock_address) }
@@ -45,21 +45,21 @@ describe Temporal::Connection do
 
   describe 'error handling' do
     it 'raises when given invalid url' do
-      expect { described_class.new('not_a_real_url') }.to raise_error(Temporal::Bridge::Error)
+      expect { described_class.new('not_a_real_url') }.to raise_error(Temporalio::Bridge::Error)
     end
 
     it 'raises when unable to connect' do
-      expect { described_class.new('0.0.0.0:3333') }.to raise_error(Temporal::Bridge::Error)
+      expect { described_class.new('0.0.0.0:3333') }.to raise_error(Temporalio::Bridge::Error)
     end
 
     it 'raises when given a URL with schema' do
       expect do
         described_class.new('http://localhost:3333')
-      end.to raise_error(Temporal::Error, 'Target host as URL with scheme are not supported')
+      end.to raise_error(Temporalio::Error, 'Target host as URL with scheme are not supported')
     end
 
     it 'raises when incorrect request was provided' do
-      request = Temporal::Api::WorkflowService::V1::GetClusterInfoRequest.new
+      request = Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest.new
 
       expect { subject.describe_namespace(request) }.to raise_error(ArgumentError)
     end

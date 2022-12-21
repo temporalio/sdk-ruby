@@ -117,14 +117,14 @@ module Coresdk
 
       # The workflow execution which requested this activity
       #
-      attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+      attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
 
       # The workflow execution which requested this activity
       #
-      def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+      def workflow_execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                              | ...
 
-      def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+      def workflow_execution!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
 
       # The activity's ID
       #
@@ -138,34 +138,34 @@ module Coresdk
 
       def activity_type!: () -> ::String?
 
-      attr_accessor header_fields(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor header_fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
-      def header_fields=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def header_fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                         | ...
 
-      def header_fields!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def header_fields!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
       # Arguments to the activity
       #
-      attr_accessor input(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # Arguments to the activity
       #
-      def input=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                 | ...
 
-      def input!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # The last details that were recorded by a heartbeat when this task was generated
       #
-      attr_accessor heartbeat_details(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor heartbeat_details(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # The last details that were recorded by a heartbeat when this task was generated
       #
-      def heartbeat_details=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def heartbeat_details=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                             | ...
 
-      def heartbeat_details!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def heartbeat_details!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # When the task was *first* scheduled
       #
@@ -241,16 +241,16 @@ module Coresdk
       #  (or not) during activity scheduling as the service can override the provided one in case its
       #  values are not specified or exceed configured system limits.
       #
-      attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # This is an actual retry policy the service uses. It can be different from the one provided
       #  (or not) during activity scheduling as the service can override the provided one in case its
       #  values are not specified or exceed configured system limits.
       #
-      def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                        | ...
 
-      def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # Set to true if this is a local activity. Note that heartbeating does not apply to local
       #  activities.
@@ -259,16 +259,16 @@ module Coresdk
 
       def is_local!: () -> bool?
 
-      def initialize: (?workflow_namespace: ::String, ?workflow_type: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?activity_id: ::String, ?activity_type: ::String, ?header_fields: ::Temporal::Api::Common::V1::Payload::hash[::String], ?input: ::Temporal::Api::Common::V1::Payload::array, ?heartbeat_details: ::Temporal::Api::Common::V1::Payload::array, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?current_attempt_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?is_local: bool) -> void
+      def initialize: (?workflow_namespace: ::String, ?workflow_type: ::String, ?workflow_execution: ::Temporalio::Api::Common::V1::WorkflowExecution::init?, ?activity_id: ::String, ?activity_type: ::String, ?header_fields: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?input: ::Temporalio::Api::Common::V1::Payload::array, ?heartbeat_details: ::Temporalio::Api::Common::V1::Payload::array, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?current_attempt_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?is_local: bool) -> void
 
       def []: (:workflow_namespace) -> ::String
             | (:workflow_type) -> ::String
-            | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+            | (:workflow_execution) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
             | (:activity_id) -> ::String
             | (:activity_type) -> ::String
-            | (:header_fields) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-            | (:input) -> ::Temporal::Api::Common::V1::Payload::field_array
-            | (:heartbeat_details) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:header_fields) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+            | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
+            | (:heartbeat_details) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
             | (:current_attempt_scheduled_time) -> ::Google::Protobuf::Timestamp?
             | (:started_time) -> ::Google::Protobuf::Timestamp?
@@ -276,22 +276,22 @@ module Coresdk
             | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
             | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
             | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
-            | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
             | (:is_local) -> bool
             | (::Symbol) -> untyped
 
       def []=: (:workflow_namespace, ::String) -> ::String
              | (:workflow_type, ::String) -> ::String
-             | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-             | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+             | (:workflow_execution, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+             | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
              | (:activity_id, ::String) -> ::String
              | (:activity_type, ::String) -> ::String
-             | (:header_fields, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:header_fields, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
-             | (:input, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:input, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-             | (:heartbeat_details, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:heartbeat_details, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:header_fields, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:header_fields, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+             | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+             | (:heartbeat_details, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:heartbeat_details, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
              | (:current_attempt_scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
@@ -305,8 +305,8 @@ module Coresdk
              | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
              | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
-             | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
              | (:is_local, bool) -> bool
              | (::Symbol, untyped) -> untyped
 

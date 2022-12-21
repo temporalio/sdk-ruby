@@ -13,7 +13,7 @@
 # it.
 #
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-require 'temporal'
+require 'temporalio'
 require 'pry'
 
 $LOAD_PATH << File.expand_path('./', File.dirname(__FILE__))

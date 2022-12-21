@@ -22,11 +22,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :COMMAND_TYPE_UPSERT_WORKFLOW_SEARCH_ATTRIBUTES, 13
       value :COMMAND_TYPE_ACCEPT_WORKFLOW_UPDATE, 14
       value :COMMAND_TYPE_COMPLETE_WORKFLOW_UPDATE, 15
+      value :COMMAND_TYPE_MODIFY_WORKFLOW_PROPERTIES, 16
+      value :COMMAND_TYPE_REJECT_WORKFLOW_UPDATE, 17
     end
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Enums
       module V1

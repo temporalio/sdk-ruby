@@ -1,0 +1,12 @@
+module Temporalio
+  module PayloadCodec
+    interface _PayloadCodec
+      def encode: (Array[Temporalio::Api::Common::V1::Payload]) -> Array[Temporalio::Api::Common::V1::Payload]
+      def decode: (Array[Temporalio::Api::Common::V1::Payload]) -> Array[Temporalio::Api::Common::V1::Payload]
+    end
+
+    class Base
+      include _PayloadCodec
+    end
+  end
+end

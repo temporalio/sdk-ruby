@@ -61,6 +61,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :cron_schedule_to_schedule_interval, :message, 20, "google.protobuf.Duration"
       optional :memo, :message, 21, "temporal.api.common.v1.Memo"
       optional :search_attributes, :message, 22, "temporal.api.common.v1.SearchAttributes"
+      optional :start_time, :message, 23, "google.protobuf.Timestamp"
     end
     add_message "coresdk.workflow_activation.FireTimer" do
       optional :seq, :uint32, 1

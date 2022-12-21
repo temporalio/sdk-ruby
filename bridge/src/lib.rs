@@ -13,20 +13,20 @@ use rutie::{
     NilClass, Hash, Integer,
 };
 use std::collections::HashMap;
-use temporal_sdk_core::{Logger, TelemetryOptionsBuilder};
+use temporal_sdk_core_api::telemetry::{Logger, TelemetryOptionsBuilder};
 use tokio_util::sync::CancellationToken;
 use worker::{Worker, WorkerError, WorkerResult};
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn raise_bridge_exception(message: &str) {
-    VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
+    VM::raise_ex(AnyException::new("Temporalio::Bridge::Error", Some(message)));
 }
 
 fn wrap_worker_error(e: &WorkerError) -> AnyException {
     let name = match e {
-        WorkerError::Shutdown() => "Temporal::Bridge::Error::WorkerShutdown",
-        _ => "Temporal::Bridge::Error"
+        WorkerError::Shutdown() => "Temporalio::Bridge::Error::WorkerShutdown",
+        _ => "Temporalio::Bridge::Error"
     };
 
     AnyException::new(name, Some(&format!("[{:?}] {}", e, e)))
@@ -85,7 +85,7 @@ methods!(
 
         let connection = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
-        Module::from_existing("Temporal")
+        Module::from_existing("Temporalio")
             .get_nested_module("Bridge")
             .get_nested_class("Connection")
             .wrap_data(connection, &*CONNECTION_WRAPPER)
@@ -114,25 +114,16 @@ methods!(
         wrap_bytes(response)
     }
 
-    // TODO: Add telemetry configuration to this interface
-    fn init_telemetry() -> NilClass {
-        let telemetry_config = TelemetryOptionsBuilder::default()
-            .tracing_filter("temporal_sdk_core=DEBUG".to_string())
-            .logging(Logger::Console)
+    fn init_runtime() -> AnyObject {
+        let telemetry_options = TelemetryOptionsBuilder::default()
+            .logging(Logger::Console { filter: "temporal_sdk_core=DEBUG".to_string() })
             .build()
             .map_err(|e| raise_bridge_exception(&e.to_string()))
             .unwrap();
 
-        temporal_sdk_core::telemetry_init(&telemetry_config)
-            .expect("Unable to initialize telemetry");
+        let runtime = Runtime::new(RUNTIME_THREAD_COUNT, telemetry_options);
 
-        NilClass::new()
-    }
-
-    fn init_runtime() -> AnyObject {
-        let runtime = Runtime::new(RUNTIME_THREAD_COUNT);
-
-        Module::from_existing("Temporal")
+        Module::from_existing("Temporalio")
             .get_nested_module("Bridge")
             .get_nested_class("Runtime")
             .wrap_data(runtime, &*RUNTIME_WRAPPER)
@@ -154,7 +145,7 @@ methods!(
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
         let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue);
 
-        Module::from_existing("Temporal")
+        Module::from_existing("Temporalio")
             .get_nested_module("Bridge")
             .get_nested_class("Worker")
             .wrap_data(worker.unwrap(), &*WORKER_WRAPPER)
@@ -225,9 +216,7 @@ methods!(
 
 #[no_mangle]
 pub extern "C" fn init_bridge() {
-    Module::from_existing("Temporal").get_nested_module("Bridge").define(|module| {
-        module.def_self("init_telemetry", init_telemetry);
-
+    Module::from_existing("Temporalio").get_nested_module("Bridge").define(|module| {
         module.define_nested_class("Runtime", None).define(|klass| {
             klass.def_self("init", init_runtime);
             klass.def("run_callback_loop", run_callback_loop);

@@ -1,0 +1,154 @@
+module Temporalio
+  module Interceptor
+    class Client
+      type interface_method = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
+
+      interface _Interface
+        def public_send: (interface_method, untyped input) { (untyped) -> untyped } -> untyped
+        def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporalio::Client::WorkflowHandle } -> Temporalio::Client::WorkflowHandle
+        def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporalio::Workflow::ExecutionInfo } -> Temporalio::Workflow::ExecutionInfo
+        def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped
+        def signal_workflow: (SignalWorkflowInput input) ?{ (SignalWorkflowInput) -> void } -> void
+        def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
+        def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
+      end
+
+      # Client implements its own interface
+      include _Interface
+
+      class StartWorkflowInput < Struct[untyped]
+        attr_accessor workflow(): String
+        attr_accessor args(): Array[untyped]
+        attr_accessor id(): String
+        attr_accessor task_queue(): String | Symbol
+        attr_accessor execution_timeout(): Integer?
+        attr_accessor run_timeout(): Integer?
+        attr_accessor task_timeout(): Integer?
+        attr_accessor id_reuse_policy(): Symbol
+        attr_accessor retry_policy(): Temporalio::RetryPolicy
+        attr_accessor cron_schedule(): String?
+        attr_accessor memo(): Hash[Symbol | String, untyped]
+        attr_accessor search_attributes(): Hash[Symbol | String, untyped]
+        attr_accessor headers(): Hash[Symbol | String, untyped]
+        attr_accessor start_signal(): String? | Symbol?
+        attr_accessor start_signal_args(): Array[untyped]?
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          workflow: String,
+          args: Array[untyped],
+          id: String,
+          task_queue: String | Symbol,
+          execution_timeout: Integer?,
+          run_timeout: Integer?,
+          task_timeout: Integer?,
+          id_reuse_policy: Symbol?,
+          retry_policy: Temporalio::RetryPolicy?,
+          cron_schedule: String?,
+          memo: Hash[Symbol | String, untyped]?,
+          search_attributes: Hash[Symbol | String, untyped]?,
+          headers: Hash[Symbol | String, untyped]?,
+          start_signal: String | Symbol?,
+          start_signal_args: Array[untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> StartWorkflowInput
+      end
+
+      class DescribeWorkflowInput < Struct[untyped]
+        attr_accessor id(): String
+        attr_accessor run_id(): String
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          id: String,
+          run_id: String?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> DescribeWorkflowInput
+      end
+
+      class QueryWorkflowInput < Struct[untyped]
+        attr_accessor id(): String
+        attr_accessor run_id(): String
+        attr_accessor query(): String | Symbol
+        attr_accessor args(): Array[untyped]
+        attr_accessor reject_condition(): Symbol
+        attr_accessor headers(): Hash[Symbol | String, untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          id: String,
+          run_id: String?,
+          query: String | Symbol,
+          args: Array[untyped]?,
+          reject_condition: Symbol,
+          headers: Hash[Symbol | String, untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> QueryWorkflowInput
+      end
+
+      class SignalWorkflowInput < Struct[untyped]
+        attr_accessor id(): String
+        attr_accessor run_id(): String
+        attr_accessor signal(): String | Symbol
+        attr_accessor args(): Array[untyped]
+        attr_accessor headers(): Hash[Symbol | String, untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          id: String,
+          run_id: String?,
+          signal: String | Symbol,
+          args: Array[untyped]?,
+          headers: Hash[Symbol | String, untyped]?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> SignalWorkflowInput
+      end
+
+      class CancelWorkflowInput < Struct[untyped]
+        attr_accessor id(): String
+        attr_accessor run_id(): String
+        attr_accessor first_execution_run_id(): String
+        attr_accessor reason(): String
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          id: String,
+          run_id: String?,
+          first_execution_run_id: String?,
+          reason: String?,
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> CancelWorkflowInput
+      end
+
+      class TerminateWorkflowInput < Struct[untyped]
+        attr_accessor id(): String
+        attr_accessor run_id(): String
+        attr_accessor first_execution_run_id(): String
+        attr_accessor reason(): String
+        attr_accessor args(): Array[untyped]
+        attr_accessor rpc_metadata(): Hash[String, String]
+        attr_accessor rpc_timeout(): Integer?
+
+        def self.new: (
+          id: String,
+          run_id: String?,
+          first_execution_run_id: String?,
+          reason: String?,
+          args: Array[untyped],
+          rpc_metadata: Hash[String, String],
+          rpc_timeout: Integer?
+        ) -> TerminateWorkflowInput
+      end
+    end
+  end
+end

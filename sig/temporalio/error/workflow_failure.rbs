@@ -1,0 +1,9 @@
+module Temporalio
+  class Error < StandardError
+    class WorkflowFailure < Error
+      attr_reader cause: Exception
+
+      def initialize: (cause: Exception) -> void
+    end
+  end
+end

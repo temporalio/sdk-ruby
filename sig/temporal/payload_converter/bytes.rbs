@@ -1,9 +1,0 @@
-module Temporal
-  module PayloadConverter
-    class Bytes
-      include _EncodingPayloadConverter
-
-      ENCODING: String
-    end
-  end
-end

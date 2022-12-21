@@ -1,0 +1,14 @@
+module Temporalio
+  class Workflow
+    module QueryRejectCondition
+      NONE: :NONE
+      NOT_OPEN: :NOT_OPEN
+      NOT_COMPLETED_CLEANLY: :NOT_COMPLETED_CLEANLY
+      CONDITIONS: Array[Symbol]
+      API_MAP: Hash[Temporalio::Api::Enums::V1::QueryRejectCondition::init, Symbol]
+
+      def self.to_raw: (Symbol condition) -> Temporalio::Api::Enums::V1::QueryRejectCondition::init
+      def self.from_raw: (Temporalio::Api::Enums::V1::QueryRejectCondition::init raw_condition) -> Symbol
+    end
+  end
+end

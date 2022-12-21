@@ -24,7 +24,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Replication
       module V1

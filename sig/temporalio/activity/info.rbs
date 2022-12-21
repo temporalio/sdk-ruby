@@ -1,0 +1,43 @@
+module Temporalio
+  class Activity
+    class Info < Struct[untyped]
+      attr_accessor activity_id: String
+      attr_accessor activity_type: String
+      attr_accessor attempt: Integer
+      attr_accessor current_attempt_scheduled_time: Time?
+      attr_accessor heartbeat_details: Array[untyped]
+      attr_accessor heartbeat_timeout: Float
+      attr_accessor local: bool
+      attr_accessor schedule_to_close_timeout: Float
+      attr_accessor scheduled_time: Time?
+      attr_accessor start_to_close_timeout: Float
+      attr_accessor started_time: Time?
+      attr_accessor task_queue: String
+      attr_accessor task_token: String
+      attr_accessor workflow_id: String
+      attr_accessor workflow_namespace: String
+      attr_accessor workflow_run_id: String
+      attr_accessor workflow_type: String
+
+      def self.new: (
+        activity_id: String?,
+        activity_type: String?,
+        attempt: Integer?,
+        current_attempt_scheduled_time: Time?,
+        heartbeat_details: Array[untyped],
+        heartbeat_timeout: Float?,
+        local: bool,
+        schedule_to_close_timeout: Float?,
+        scheduled_time: Time?,
+        start_to_close_timeout: Float?,
+        started_time: Time?,
+        task_queue: String?,
+        task_token: String?,
+        workflow_id: String?,
+        workflow_namespace: String?,
+        workflow_run_id: String?,
+        workflow_type: String?
+      ) -> Info
+    end
+  end
+end

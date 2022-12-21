@@ -1,13 +1,13 @@
-module Temporal
+module Temporalio
   module Api
     module Enums
       module V1
         class BatchOperationType < ::Protobuf::Enum
-          type names = :BATCH_OPERATION_TYPE_UNSPECIFIED | :BATCH_OPERATION_TYPE_TERMINATE | :BATCH_OPERATION_TYPE_CANCEL | :BATCH_OPERATION_TYPE_SIGNAL
+          type names = :BATCH_OPERATION_TYPE_UNSPECIFIED | :BATCH_OPERATION_TYPE_TERMINATE | :BATCH_OPERATION_TYPE_CANCEL | :BATCH_OPERATION_TYPE_SIGNAL | :BATCH_OPERATION_TYPE_DELETE
 
-          type strings = "BATCH_OPERATION_TYPE_UNSPECIFIED" | "BATCH_OPERATION_TYPE_TERMINATE" | "BATCH_OPERATION_TYPE_CANCEL" | "BATCH_OPERATION_TYPE_SIGNAL"
+          type strings = "BATCH_OPERATION_TYPE_UNSPECIFIED" | "BATCH_OPERATION_TYPE_TERMINATE" | "BATCH_OPERATION_TYPE_CANCEL" | "BATCH_OPERATION_TYPE_SIGNAL" | "BATCH_OPERATION_TYPE_DELETE"
 
-          type tags = 0 | 1 | 2 | 3
+          type tags = 0 | 1 | 2 | 3 | 4
 
           type values = names | strings | tags
 
@@ -22,6 +22,8 @@ module Temporal
           BATCH_OPERATION_TYPE_CANCEL: BatchOperationType
 
           BATCH_OPERATION_TYPE_SIGNAL: BatchOperationType
+
+          BATCH_OPERATION_TYPE_DELETE: BatchOperationType
 
           # The type of `#initialize` parameter.
           type init = BatchOperationType | values

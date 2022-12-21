@@ -1,8 +1,8 @@
-require_relative './lib/temporal/version'
+require_relative './lib/temporalio/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'temporalio'
-  spec.version       = Temporal::VERSION
+  spec.version       = Temporalio::VERSION
   spec.summary       = 'Temporal.io Ruby SDK'
   spec.description   = 'An SDK for implementing Temporal.io workflows and activities in Ruby'
   spec.homepage      = 'https://github.com/temporalio/sdk-ruby'

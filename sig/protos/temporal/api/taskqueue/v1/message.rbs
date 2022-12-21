@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module TaskQueue
       module V1
@@ -11,24 +11,24 @@ module Temporal
 
           # Default: TASK_QUEUE_KIND_NORMAL.
           #
-          attr_accessor kind(): ::Temporal::Api::Enums::V1::TaskQueueKind
+          attr_accessor kind(): ::Temporalio::Api::Enums::V1::TaskQueueKind
 
           # Default: TASK_QUEUE_KIND_NORMAL.
           #
-          def kind=: (::Temporal::Api::Enums::V1::TaskQueueKind::values) -> ::Temporal::Api::Enums::V1::TaskQueueKind::values
+          def kind=: (::Temporalio::Api::Enums::V1::TaskQueueKind::values) -> ::Temporalio::Api::Enums::V1::TaskQueueKind::values
                    | ...
 
-          def kind!: () -> ::Temporal::Api::Enums::V1::TaskQueueKind?
+          def kind!: () -> ::Temporalio::Api::Enums::V1::TaskQueueKind?
 
-          def initialize: (?name: ::String, ?kind: ::Temporal::Api::Enums::V1::TaskQueueKind::init) -> void
+          def initialize: (?name: ::String, ?kind: ::Temporalio::Api::Enums::V1::TaskQueueKind::init) -> void
 
           def []: (:name) -> ::String
-                | (:kind) -> ::Temporal::Api::Enums::V1::TaskQueueKind
+                | (:kind) -> ::Temporalio::Api::Enums::V1::TaskQueueKind
                 | (::Symbol) -> untyped
 
           def []=: (:name, ::String) -> ::String
-                 | (:kind, ::Temporal::Api::Enums::V1::TaskQueueKind) -> ::Temporal::Api::Enums::V1::TaskQueueKind
-                 | (:kind, ::Temporal::Api::Enums::V1::TaskQueueKind::values) -> ::Temporal::Api::Enums::V1::TaskQueueKind::values
+                 | (:kind, ::Temporalio::Api::Enums::V1::TaskQueueKind) -> ::Temporalio::Api::Enums::V1::TaskQueueKind
+                 | (:kind, ::Temporalio::Api::Enums::V1::TaskQueueKind::values) -> ::Temporalio::Api::Enums::V1::TaskQueueKind::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -107,28 +107,28 @@ module Temporal
 
           def rate_per_second!: () -> ::Float?
 
-          attr_accessor task_id_block(): ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
+          attr_accessor task_id_block(): ::Temporalio::Api::TaskQueue::V1::TaskIdBlock?
 
-          def task_id_block=: [M < ::Temporal::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (M?) -> M?
+          def task_id_block=: [M < ::Temporalio::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (M?) -> M?
                             | ...
 
-          def task_id_block!: () -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
+          def task_id_block!: () -> ::Temporalio::Api::TaskQueue::V1::TaskIdBlock?
 
-          def initialize: (?backlog_count_hint: ::Integer, ?read_level: ::Integer, ?ack_level: ::Integer, ?rate_per_second: ::Float, ?task_id_block: ::Temporal::Api::TaskQueue::V1::TaskIdBlock::init?) -> void
+          def initialize: (?backlog_count_hint: ::Integer, ?read_level: ::Integer, ?ack_level: ::Integer, ?rate_per_second: ::Float, ?task_id_block: ::Temporalio::Api::TaskQueue::V1::TaskIdBlock::init?) -> void
 
           def []: (:backlog_count_hint) -> ::Integer
                 | (:read_level) -> ::Integer
                 | (:ack_level) -> ::Integer
                 | (:rate_per_second) -> ::Float
-                | (:task_id_block) -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
+                | (:task_id_block) -> ::Temporalio::Api::TaskQueue::V1::TaskIdBlock?
                 | (::Symbol) -> untyped
 
           def []=: (:backlog_count_hint, ::Integer) -> ::Integer
                  | (:read_level, ::Integer) -> ::Integer
                  | (:ack_level, ::Integer) -> ::Integer
                  | (:rate_per_second, ::Float) -> ::Float
-                 | (:task_id_block, ::Temporal::Api::TaskQueue::V1::TaskIdBlock?) -> ::Temporal::Api::TaskQueue::V1::TaskIdBlock?
-                 | [M < ::Temporal::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (:task_id_block, M?) -> M?
+                 | (:task_id_block, ::Temporalio::Api::TaskQueue::V1::TaskIdBlock?) -> ::Temporalio::Api::TaskQueue::V1::TaskIdBlock?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::TaskIdBlock::_ToProto] (:task_id_block, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -246,23 +246,30 @@ module Temporal
           # If a worker has specified an ID for use with the worker versioning feature while polling,
           #  that id must appear here.
           #
-          attr_accessor worker_versioning_build_id(): ::String
+          attr_accessor worker_versioning_id(): ::Temporalio::Api::TaskQueue::V1::VersionId?
 
-          def worker_versioning_build_id!: () -> ::String?
+          # If a worker has specified an ID for use with the worker versioning feature while polling,
+          #  that id must appear here.
+          #
+          def worker_versioning_id=: [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
 
-          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float, ?worker_versioning_build_id: ::String) -> void
+          def worker_versioning_id!: () -> ::Temporalio::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float, ?worker_versioning_id: ::Temporalio::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:last_access_time) -> ::Google::Protobuf::Timestamp?
                 | (:identity) -> ::String
                 | (:rate_per_second) -> ::Float
-                | (:worker_versioning_build_id) -> ::String
+                | (:worker_versioning_id) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:last_access_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_access_time, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:rate_per_second, ::Float) -> ::Float
-                 | (:worker_versioning_build_id, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporalio::Api::TaskQueue::V1::VersionId?) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -284,12 +291,12 @@ module Temporal
         end
 
         class StickyExecutionAttributes < ::Protobuf::Message
-          attr_accessor worker_task_queue(): ::Temporal::Api::TaskQueue::V1::TaskQueue?
+          attr_accessor worker_task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
 
-          def worker_task_queue=: [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def worker_task_queue=: [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
                                 | ...
 
-          def worker_task_queue!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+          def worker_task_queue!: () -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
 
           # (-- api-linter: core::0140::prepositions=disabled
           #      aip.dev/not-precedent: "to" is used to indicate interval. --)
@@ -304,14 +311,14 @@ module Temporal
 
           def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
 
-          def initialize: (?worker_task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?) -> void
+          def initialize: (?worker_task_queue: ::Temporalio::Api::TaskQueue::V1::TaskQueue::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?) -> void
 
-          def []: (:worker_task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
+          def []: (:worker_task_queue) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
                 | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
                 | (::Symbol) -> untyped
 
-          def []=: (:worker_task_queue, ::Temporal::Api::TaskQueue::V1::TaskQueue?) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
-                 | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:worker_task_queue, M?) -> M?
+          def []=: (:worker_task_queue, ::Temporalio::Api::TaskQueue::V1::TaskQueue?) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (:worker_task_queue, M?) -> M?
                  | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
                  | (::Symbol, untyped) -> untyped
@@ -338,48 +345,48 @@ module Temporal
         #  task queue
         #
         class VersionIdNode < ::Protobuf::Message
-          attr_accessor version(): ::Temporal::Api::TaskQueue::V1::VersionId?
+          attr_accessor version(): ::Temporalio::Api::TaskQueue::V1::VersionId?
 
-          def version=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+          def version=: [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
                       | ...
 
-          def version!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+          def version!: () -> ::Temporalio::Api::TaskQueue::V1::VersionId?
 
           # A pointer to the previous version this version is considered to be compatible with
           #
-          attr_accessor previous_compatible(): ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+          attr_accessor previous_compatible(): ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
 
           # A pointer to the previous version this version is considered to be compatible with
           #
-          def previous_compatible=: [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
+          def previous_compatible=: [M < ::Temporalio::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
                                   | ...
 
-          def previous_compatible!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+          def previous_compatible!: () -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
 
           # A pointer to the last incompatible version (previous major version)
           #
-          attr_accessor previous_incompatible(): ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+          attr_accessor previous_incompatible(): ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
 
           # A pointer to the last incompatible version (previous major version)
           #
-          def previous_incompatible=: [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
+          def previous_incompatible=: [M < ::Temporalio::Api::TaskQueue::V1::VersionIdNode::_ToProto] (M?) -> M?
                                     | ...
 
-          def previous_incompatible!: () -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+          def previous_incompatible!: () -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
 
-          def initialize: (?version: ::Temporal::Api::TaskQueue::V1::VersionId::init?, ?previous_compatible: ::Temporal::Api::TaskQueue::V1::VersionIdNode::init?, ?previous_incompatible: ::Temporal::Api::TaskQueue::V1::VersionIdNode::init?) -> void
+          def initialize: (?version: ::Temporalio::Api::TaskQueue::V1::VersionId::init?, ?previous_compatible: ::Temporalio::Api::TaskQueue::V1::VersionIdNode::init?, ?previous_incompatible: ::Temporalio::Api::TaskQueue::V1::VersionIdNode::init?) -> void
 
-          def []: (:version) -> ::Temporal::Api::TaskQueue::V1::VersionId?
-                | (:previous_compatible) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
-                | (:previous_incompatible) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
+          def []: (:version) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
+                | (:previous_compatible) -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
+                | (:previous_incompatible) -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
                 | (::Symbol) -> untyped
 
-          def []=: (:version, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
-                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:version, M?) -> M?
-                 | (:previous_compatible, ::Temporal::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
-                 | [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_compatible, M?) -> M?
-                 | (:previous_incompatible, ::Temporal::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporal::Api::TaskQueue::V1::VersionIdNode?
-                 | [M < ::Temporal::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_incompatible, M?) -> M?
+          def []=: (:version, ::Temporalio::Api::TaskQueue::V1::VersionId?) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (:version, M?) -> M?
+                 | (:previous_compatible, ::Temporalio::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_compatible, M?) -> M?
+                 | (:previous_incompatible, ::Temporalio::Api::TaskQueue::V1::VersionIdNode?) -> ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
+                 | [M < ::Temporalio::Api::TaskQueue::V1::VersionIdNode::_ToProto] (:previous_incompatible, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

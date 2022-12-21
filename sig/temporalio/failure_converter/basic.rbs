@@ -1,0 +1,86 @@
+module Temporalio
+  module FailureConverter
+    class Basic < Base
+      type payload_converter = Temporalio::PayloadConverter::_PayloadConverter
+      type failure_proto = Temporalio::Api::Failure::V1::Failure
+      type payloads_proto = Temporalio::Api::Common::V1::Payloads
+
+      def initialize: (?encode_common_attributes: bool) -> void
+      def to_failure: (Exception, payload_converter) -> failure_proto
+      def from_failure: (failure_proto, payload_converter) -> Temporalio::Error::Failure
+
+      private
+
+      @encode_common_attributes: bool
+
+      def encode_common_attributes?: -> bool
+      def to_payloads: (Array[untyped]?, payload_converter) -> payloads_proto?
+      def from_payloads: (payloads_proto?, payload_converter) -> Array[untyped]
+      def apply_from_encoded_attributes: (failure_proto, payload_converter) -> failure_proto
+
+      def to_application_failure: (Temporalio::Error::ApplicationError, payload_converter) -> failure_proto
+      def to_timeout_failure: (Temporalio::Error::TimeoutError, payload_converter) -> failure_proto
+      def to_cancelled_failure: (Temporalio::Error::CancelledError, payload_converter) -> failure_proto
+      def to_terminated_failure: (Temporalio::Error::TerminatedError, payload_converter) -> failure_proto
+      def to_server_failure: (Temporalio::Error::ServerError, payload_converter) -> failure_proto
+      def to_reset_workflow_failure: (Temporalio::Error::ResetWorkflowError, payload_converter) -> failure_proto
+      def to_activity_failure: (Temporalio::Error::ActivityError, payload_converter) -> failure_proto
+      def to_child_workflow_execution_failure: (Temporalio::Error::ChildWorkflowError, payload_converter) -> failure_proto
+      def to_generic_failure: (Exception, payload_converter) -> failure_proto
+
+      def from_application_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::ApplicationFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::ApplicationError
+      def from_timeout_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::TimeoutFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::TimeoutError
+      def from_cancelled_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::CanceledFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::CancelledError
+      def from_terminated_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::TerminatedFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::TerminatedError
+      def from_server_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::ServerFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::ServerError
+      def from_reset_workflow_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::ResetWorkflowError
+      def from_activity_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::ActivityFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::ActivityError
+      def from_child_workflow_execution_failure: (
+        failure_proto,
+        Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::ChildWorkflowError
+      def from_generic_failure: (
+        failure_proto,
+        Temporalio::Error::Failure?,
+        payload_converter
+      ) -> Temporalio::Error::Failure
+    end
+  end
+end

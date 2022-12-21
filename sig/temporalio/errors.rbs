@@ -1,0 +1,21 @@
+module Temporalio
+  class Error < StandardError
+    class RPCError < Error
+    end
+
+    class UnexpectedResponse < RPCError
+    end
+
+    class WorkflowExecutionAlreadyStarted < RPCError
+    end
+
+    class QueryFailed < RPCError
+    end
+
+    class QueryRejected < RPCError
+      attr_reader status: Temporalio::Workflow::ExecutionStatus::values
+
+      def initialize: (Temporalio::Workflow::ExecutionStatus::values) -> void
+    end
+  end
+end

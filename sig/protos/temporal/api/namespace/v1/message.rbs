@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Namespace
       module V1
@@ -7,12 +7,12 @@ module Temporal
 
           def name!: () -> ::String?
 
-          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
+          attr_accessor state(): ::Temporalio::Api::Enums::V1::NamespaceState
 
-          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+          def state=: (::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
                     | ...
 
-          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
+          def state!: () -> ::Temporalio::Api::Enums::V1::NamespaceState?
 
           attr_accessor description(): ::String
 
@@ -44,10 +44,10 @@ module Temporal
 
           def supports_schedules!: () -> bool?
 
-          def initialize: (?name: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?id: ::String, ?supports_schedules: bool) -> void
+          def initialize: (?name: ::String, ?state: ::Temporalio::Api::Enums::V1::NamespaceState::init, ?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?id: ::String, ?supports_schedules: bool) -> void
 
           def []: (:name) -> ::String
-                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (:state) -> ::Temporalio::Api::Enums::V1::NamespaceState
                 | (:description) -> ::String
                 | (:owner_email) -> ::String
                 | (:data) -> ::Protobuf::field_hash[::String, ::String]
@@ -56,8 +56,8 @@ module Temporal
                 | (::Symbol) -> untyped
 
           def []=: (:name, ::String) -> ::String
-                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
-                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState) -> ::Temporalio::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
                  | (:description, ::String) -> ::String
                  | (:owner_email, ::String) -> ::String
                  | (:data, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
@@ -94,23 +94,23 @@ module Temporal
 
           def workflow_execution_retention_ttl!: () -> ::Google::Protobuf::Duration?
 
-          attr_accessor bad_binaries(): ::Temporal::Api::Namespace::V1::BadBinaries?
+          attr_accessor bad_binaries(): ::Temporalio::Api::Namespace::V1::BadBinaries?
 
-          def bad_binaries=: [M < ::Temporal::Api::Namespace::V1::BadBinaries::_ToProto] (M?) -> M?
+          def bad_binaries=: [M < ::Temporalio::Api::Namespace::V1::BadBinaries::_ToProto] (M?) -> M?
                            | ...
 
-          def bad_binaries!: () -> ::Temporal::Api::Namespace::V1::BadBinaries?
+          def bad_binaries!: () -> ::Temporalio::Api::Namespace::V1::BadBinaries?
 
           # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
           #
-          attr_accessor history_archival_state(): ::Temporal::Api::Enums::V1::ArchivalState
+          attr_accessor history_archival_state(): ::Temporalio::Api::Enums::V1::ArchivalState
 
           # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
           #
-          def history_archival_state=: (::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+          def history_archival_state=: (::Temporalio::Api::Enums::V1::ArchivalState::values) -> ::Temporalio::Api::Enums::V1::ArchivalState::values
                                      | ...
 
-          def history_archival_state!: () -> ::Temporal::Api::Enums::V1::ArchivalState?
+          def history_archival_state!: () -> ::Temporalio::Api::Enums::V1::ArchivalState?
 
           attr_accessor history_archival_uri(): ::String
 
@@ -118,38 +118,38 @@ module Temporal
 
           # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
           #
-          attr_accessor visibility_archival_state(): ::Temporal::Api::Enums::V1::ArchivalState
+          attr_accessor visibility_archival_state(): ::Temporalio::Api::Enums::V1::ArchivalState
 
           # If unspecified (ARCHIVAL_STATE_UNSPECIFIED) then default server configuration is used.
           #
-          def visibility_archival_state=: (::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+          def visibility_archival_state=: (::Temporalio::Api::Enums::V1::ArchivalState::values) -> ::Temporalio::Api::Enums::V1::ArchivalState::values
                                         | ...
 
-          def visibility_archival_state!: () -> ::Temporal::Api::Enums::V1::ArchivalState?
+          def visibility_archival_state!: () -> ::Temporalio::Api::Enums::V1::ArchivalState?
 
           attr_accessor visibility_archival_uri(): ::String
 
           def visibility_archival_uri!: () -> ::String?
 
-          def initialize: (?workflow_execution_retention_ttl: ::Google::Protobuf::Duration::init?, ?bad_binaries: ::Temporal::Api::Namespace::V1::BadBinaries::init?, ?history_archival_state: ::Temporal::Api::Enums::V1::ArchivalState::init, ?history_archival_uri: ::String, ?visibility_archival_state: ::Temporal::Api::Enums::V1::ArchivalState::init, ?visibility_archival_uri: ::String) -> void
+          def initialize: (?workflow_execution_retention_ttl: ::Google::Protobuf::Duration::init?, ?bad_binaries: ::Temporalio::Api::Namespace::V1::BadBinaries::init?, ?history_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?history_archival_uri: ::String, ?visibility_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?visibility_archival_uri: ::String) -> void
 
           def []: (:workflow_execution_retention_ttl) -> ::Google::Protobuf::Duration?
-                | (:bad_binaries) -> ::Temporal::Api::Namespace::V1::BadBinaries?
-                | (:history_archival_state) -> ::Temporal::Api::Enums::V1::ArchivalState
+                | (:bad_binaries) -> ::Temporalio::Api::Namespace::V1::BadBinaries?
+                | (:history_archival_state) -> ::Temporalio::Api::Enums::V1::ArchivalState
                 | (:history_archival_uri) -> ::String
-                | (:visibility_archival_state) -> ::Temporal::Api::Enums::V1::ArchivalState
+                | (:visibility_archival_state) -> ::Temporalio::Api::Enums::V1::ArchivalState
                 | (:visibility_archival_uri) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:workflow_execution_retention_ttl, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_retention_ttl, M?) -> M?
-                 | (:bad_binaries, ::Temporal::Api::Namespace::V1::BadBinaries?) -> ::Temporal::Api::Namespace::V1::BadBinaries?
-                 | [M < ::Temporal::Api::Namespace::V1::BadBinaries::_ToProto] (:bad_binaries, M?) -> M?
-                 | (:history_archival_state, ::Temporal::Api::Enums::V1::ArchivalState) -> ::Temporal::Api::Enums::V1::ArchivalState
-                 | (:history_archival_state, ::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                 | (:bad_binaries, ::Temporalio::Api::Namespace::V1::BadBinaries?) -> ::Temporalio::Api::Namespace::V1::BadBinaries?
+                 | [M < ::Temporalio::Api::Namespace::V1::BadBinaries::_ToProto] (:bad_binaries, M?) -> M?
+                 | (:history_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState) -> ::Temporalio::Api::Enums::V1::ArchivalState
+                 | (:history_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState::values) -> ::Temporalio::Api::Enums::V1::ArchivalState::values
                  | (:history_archival_uri, ::String) -> ::String
-                 | (:visibility_archival_state, ::Temporal::Api::Enums::V1::ArchivalState) -> ::Temporal::Api::Enums::V1::ArchivalState
-                 | (:visibility_archival_state, ::Temporal::Api::Enums::V1::ArchivalState::values) -> ::Temporal::Api::Enums::V1::ArchivalState::values
+                 | (:visibility_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState) -> ::Temporalio::Api::Enums::V1::ArchivalState
+                 | (:visibility_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState::values) -> ::Temporalio::Api::Enums::V1::ArchivalState::values
                  | (:visibility_archival_uri, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -172,20 +172,20 @@ module Temporal
         end
 
         class BadBinaries < ::Protobuf::Message
-          attr_accessor binaries(): ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+          attr_accessor binaries(): ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
 
-          def binaries=: (::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]
+          def binaries=: (::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]
                        | ...
 
-          def binaries!: () -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]?
+          def binaries!: () -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]?
 
-          def initialize: (?binaries: ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> void
+          def initialize: (?binaries: ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> void
 
-          def []: (:binaries) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+          def []: (:binaries) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
                 | (::Symbol) -> untyped
 
-          def []=: (:binaries, ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
-                 | (:binaries, ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporal::Api::Namespace::V1::BadBinaryInfo::hash[::String]
+          def []=: (:binaries, ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
+                 | (:binaries, ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -283,7 +283,7 @@ module Temporal
           #   Handover -> [ Registered ]
           #  Default is NAMESPACE_STATE_UNSPECIFIED which is do not change state.
           #
-          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
+          attr_accessor state(): ::Temporalio::Api::Enums::V1::NamespaceState
 
           # New namespace state, server will reject if transition is not allowed.
           #  Allowed transitions are:
@@ -291,25 +291,25 @@ module Temporal
           #   Handover -> [ Registered ]
           #  Default is NAMESPACE_STATE_UNSPECIFIED which is do not change state.
           #
-          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+          def state=: (::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
                     | ...
 
-          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
+          def state!: () -> ::Temporalio::Api::Enums::V1::NamespaceState?
 
-          def initialize: (?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?state: ::Temporal::Api::Enums::V1::NamespaceState::init) -> void
+          def initialize: (?description: ::String, ?owner_email: ::String, ?data: ::Hash[::String, ::String], ?state: ::Temporalio::Api::Enums::V1::NamespaceState::init) -> void
 
           def []: (:description) -> ::String
                 | (:owner_email) -> ::String
                 | (:data) -> ::Protobuf::field_hash[::String, ::String]
-                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (:state) -> ::Temporalio::Api::Enums::V1::NamespaceState
                 | (::Symbol) -> untyped
 
           def []=: (:description, ::String) -> ::String
                  | (:owner_email, ::String) -> ::String
                  | (:data, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
                  | (:data, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
-                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
-                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState) -> ::Temporalio::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

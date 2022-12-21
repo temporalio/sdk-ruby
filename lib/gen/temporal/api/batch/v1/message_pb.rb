@@ -17,9 +17,8 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :close_time, :message, 4, "google.protobuf.Timestamp"
     end
     add_message "temporal.api.batch.v1.BatchOperationTermination" do
-      optional :reason, :string, 1
-      optional :details, :message, 2, "temporal.api.common.v1.Payloads"
-      optional :identity, :string, 3
+      optional :details, :message, 1, "temporal.api.common.v1.Payloads"
+      optional :identity, :string, 2
     end
     add_message "temporal.api.batch.v1.BatchOperationSignal" do
       optional :signal, :string, 1
@@ -28,13 +27,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :identity, :string, 4
     end
     add_message "temporal.api.batch.v1.BatchOperationCancellation" do
-      optional :reason, :string, 1
-      optional :identity, :string, 2
+      optional :identity, :string, 1
+    end
+    add_message "temporal.api.batch.v1.BatchOperationDeletion" do
+      optional :identity, :string, 1
     end
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Batch
       module V1
@@ -42,6 +43,7 @@ module Temporal
         BatchOperationTermination = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.batch.v1.BatchOperationTermination").msgclass
         BatchOperationSignal = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.batch.v1.BatchOperationSignal").msgclass
         BatchOperationCancellation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.batch.v1.BatchOperationCancellation").msgclass
+        BatchOperationDeletion = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.batch.v1.BatchOperationDeletion").msgclass
       end
     end
   end

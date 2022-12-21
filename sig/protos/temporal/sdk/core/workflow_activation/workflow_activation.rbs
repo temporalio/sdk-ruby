@@ -1,5 +1,5 @@
 module Coresdk
-  module Workflow_activation
+  module WorkflowActivation
     # / An instruction to the lang sdk to run some workflow code, whether for the first time or from
     # / a cached state.
     #
@@ -37,22 +37,22 @@ module Coresdk
 
       # / The things to do upon activating the workflow
       #
-      attr_accessor jobs(): ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
+      attr_accessor jobs(): ::Coresdk::WorkflowActivation::WorkflowActivationJob::field_array
 
       # / The things to do upon activating the workflow
       #
-      def jobs=: (::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::array
+      def jobs=: (::Coresdk::WorkflowActivation::WorkflowActivationJob::array) -> ::Coresdk::WorkflowActivation::WorkflowActivationJob::array
                | ...
 
-      def jobs!: () -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array?
+      def jobs!: () -> ::Coresdk::WorkflowActivation::WorkflowActivationJob::field_array?
 
-      def initialize: (?run_id: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?is_replaying: bool, ?history_length: ::Integer, ?jobs: ::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> void
+      def initialize: (?run_id: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?is_replaying: bool, ?history_length: ::Integer, ?jobs: ::Coresdk::WorkflowActivation::WorkflowActivationJob::array) -> void
 
       def []: (:run_id) -> ::String
             | (:timestamp) -> ::Google::Protobuf::Timestamp?
             | (:is_replaying) -> bool
             | (:history_length) -> ::Integer
-            | (:jobs) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
+            | (:jobs) -> ::Coresdk::WorkflowActivation::WorkflowActivationJob::field_array
             | (::Symbol) -> untyped
 
       def []=: (:run_id, ::String) -> ::String
@@ -60,8 +60,8 @@ module Coresdk
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:timestamp, M?) -> M?
              | (:is_replaying, bool) -> bool
              | (:history_length, ::Integer) -> ::Integer
-             | (:jobs, ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::field_array
-             | (:jobs, ::Coresdk::Workflow_activation::WorkflowActivationJob::array) -> ::Coresdk::Workflow_activation::WorkflowActivationJob::array
+             | (:jobs, ::Coresdk::WorkflowActivation::WorkflowActivationJob::field_array) -> ::Coresdk::WorkflowActivation::WorkflowActivationJob::field_array
+             | (:jobs, ::Coresdk::WorkflowActivation::WorkflowActivationJob::array) -> ::Coresdk::WorkflowActivation::WorkflowActivationJob::array
              | (::Symbol, untyped) -> untyped
 
       def is_replaying?: () -> bool
@@ -87,139 +87,139 @@ module Coresdk
     class WorkflowActivationJob < ::Protobuf::Message
       # / Begin a workflow for the first time
       #
-      attr_accessor start_workflow(): ::Coresdk::Workflow_activation::StartWorkflow?
+      attr_accessor start_workflow(): ::Coresdk::WorkflowActivation::StartWorkflow?
 
       # / Begin a workflow for the first time
       #
-      def start_workflow=: [M < ::Coresdk::Workflow_activation::StartWorkflow::_ToProto] (M?) -> M?
+      def start_workflow=: [M < ::Coresdk::WorkflowActivation::StartWorkflow::_ToProto] (M?) -> M?
                          | ...
 
-      def start_workflow!: () -> ::Coresdk::Workflow_activation::StartWorkflow?
+      def start_workflow!: () -> ::Coresdk::WorkflowActivation::StartWorkflow?
 
       # / A timer has fired, allowing whatever was waiting on it (if anything) to proceed
       #
-      attr_accessor fire_timer(): ::Coresdk::Workflow_activation::FireTimer?
+      attr_accessor fire_timer(): ::Coresdk::WorkflowActivation::FireTimer?
 
       # / A timer has fired, allowing whatever was waiting on it (if anything) to proceed
       #
-      def fire_timer=: [M < ::Coresdk::Workflow_activation::FireTimer::_ToProto] (M?) -> M?
+      def fire_timer=: [M < ::Coresdk::WorkflowActivation::FireTimer::_ToProto] (M?) -> M?
                      | ...
 
-      def fire_timer!: () -> ::Coresdk::Workflow_activation::FireTimer?
+      def fire_timer!: () -> ::Coresdk::WorkflowActivation::FireTimer?
 
       # / Workflow was reset. The randomness seed must be updated.
       #
-      attr_accessor update_random_seed(): ::Coresdk::Workflow_activation::UpdateRandomSeed?
+      attr_accessor update_random_seed(): ::Coresdk::WorkflowActivation::UpdateRandomSeed?
 
       # / Workflow was reset. The randomness seed must be updated.
       #
-      def update_random_seed=: [M < ::Coresdk::Workflow_activation::UpdateRandomSeed::_ToProto] (M?) -> M?
+      def update_random_seed=: [M < ::Coresdk::WorkflowActivation::UpdateRandomSeed::_ToProto] (M?) -> M?
                              | ...
 
-      def update_random_seed!: () -> ::Coresdk::Workflow_activation::UpdateRandomSeed?
+      def update_random_seed!: () -> ::Coresdk::WorkflowActivation::UpdateRandomSeed?
 
       # / A request to query the workflow was received.
       #
-      attr_accessor query_workflow(): ::Coresdk::Workflow_activation::QueryWorkflow?
+      attr_accessor query_workflow(): ::Coresdk::WorkflowActivation::QueryWorkflow?
 
       # / A request to query the workflow was received.
       #
-      def query_workflow=: [M < ::Coresdk::Workflow_activation::QueryWorkflow::_ToProto] (M?) -> M?
+      def query_workflow=: [M < ::Coresdk::WorkflowActivation::QueryWorkflow::_ToProto] (M?) -> M?
                          | ...
 
-      def query_workflow!: () -> ::Coresdk::Workflow_activation::QueryWorkflow?
+      def query_workflow!: () -> ::Coresdk::WorkflowActivation::QueryWorkflow?
 
       # / A request to cancel the workflow was received.
       #
-      attr_accessor cancel_workflow(): ::Coresdk::Workflow_activation::CancelWorkflow?
+      attr_accessor cancel_workflow(): ::Coresdk::WorkflowActivation::CancelWorkflow?
 
       # / A request to cancel the workflow was received.
       #
-      def cancel_workflow=: [M < ::Coresdk::Workflow_activation::CancelWorkflow::_ToProto] (M?) -> M?
+      def cancel_workflow=: [M < ::Coresdk::WorkflowActivation::CancelWorkflow::_ToProto] (M?) -> M?
                           | ...
 
-      def cancel_workflow!: () -> ::Coresdk::Workflow_activation::CancelWorkflow?
+      def cancel_workflow!: () -> ::Coresdk::WorkflowActivation::CancelWorkflow?
 
       # / A request to signal the workflow was received.
       #
-      attr_accessor signal_workflow(): ::Coresdk::Workflow_activation::SignalWorkflow?
+      attr_accessor signal_workflow(): ::Coresdk::WorkflowActivation::SignalWorkflow?
 
       # / A request to signal the workflow was received.
       #
-      def signal_workflow=: [M < ::Coresdk::Workflow_activation::SignalWorkflow::_ToProto] (M?) -> M?
+      def signal_workflow=: [M < ::Coresdk::WorkflowActivation::SignalWorkflow::_ToProto] (M?) -> M?
                           | ...
 
-      def signal_workflow!: () -> ::Coresdk::Workflow_activation::SignalWorkflow?
+      def signal_workflow!: () -> ::Coresdk::WorkflowActivation::SignalWorkflow?
 
       # / An activity was resolved, result could be completed, failed or cancelled
       #
-      attr_accessor resolve_activity(): ::Coresdk::Workflow_activation::ResolveActivity?
+      attr_accessor resolve_activity(): ::Coresdk::WorkflowActivation::ResolveActivity?
 
       # / An activity was resolved, result could be completed, failed or cancelled
       #
-      def resolve_activity=: [M < ::Coresdk::Workflow_activation::ResolveActivity::_ToProto] (M?) -> M?
+      def resolve_activity=: [M < ::Coresdk::WorkflowActivation::ResolveActivity::_ToProto] (M?) -> M?
                            | ...
 
-      def resolve_activity!: () -> ::Coresdk::Workflow_activation::ResolveActivity?
+      def resolve_activity!: () -> ::Coresdk::WorkflowActivation::ResolveActivity?
 
       # / A patch marker has been detected and lang is being told that change exists. This
       # / job is strange in that it is sent pre-emptively to lang without any corresponding
       # / command being sent first.
       #
-      attr_accessor notify_has_patch(): ::Coresdk::Workflow_activation::NotifyHasPatch?
+      attr_accessor notify_has_patch(): ::Coresdk::WorkflowActivation::NotifyHasPatch?
 
       # / A patch marker has been detected and lang is being told that change exists. This
       # / job is strange in that it is sent pre-emptively to lang without any corresponding
       # / command being sent first.
       #
-      def notify_has_patch=: [M < ::Coresdk::Workflow_activation::NotifyHasPatch::_ToProto] (M?) -> M?
+      def notify_has_patch=: [M < ::Coresdk::WorkflowActivation::NotifyHasPatch::_ToProto] (M?) -> M?
                            | ...
 
-      def notify_has_patch!: () -> ::Coresdk::Workflow_activation::NotifyHasPatch?
+      def notify_has_patch!: () -> ::Coresdk::WorkflowActivation::NotifyHasPatch?
 
       # / A child workflow execution has started or failed to start
       #
-      attr_accessor resolve_child_workflow_execution_start(): ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart?
+      attr_accessor resolve_child_workflow_execution_start(): ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart?
 
       # / A child workflow execution has started or failed to start
       #
-      def resolve_child_workflow_execution_start=: [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart::_ToProto] (M?) -> M?
+      def resolve_child_workflow_execution_start=: [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart::_ToProto] (M?) -> M?
                                                  | ...
 
-      def resolve_child_workflow_execution_start!: () -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart?
+      def resolve_child_workflow_execution_start!: () -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart?
 
       # / A child workflow was resolved, result could be completed or failed
       #
-      attr_accessor resolve_child_workflow_execution(): ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution?
+      attr_accessor resolve_child_workflow_execution(): ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution?
 
       # / A child workflow was resolved, result could be completed or failed
       #
-      def resolve_child_workflow_execution=: [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution::_ToProto] (M?) -> M?
+      def resolve_child_workflow_execution=: [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution::_ToProto] (M?) -> M?
                                            | ...
 
-      def resolve_child_workflow_execution!: () -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution?
+      def resolve_child_workflow_execution!: () -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution?
 
       # / An attempt to signal an external workflow resolved
       #
-      attr_accessor resolve_signal_external_workflow(): ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow?
+      attr_accessor resolve_signal_external_workflow(): ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow?
 
       # / An attempt to signal an external workflow resolved
       #
-      def resolve_signal_external_workflow=: [M < ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow::_ToProto] (M?) -> M?
+      def resolve_signal_external_workflow=: [M < ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow::_ToProto] (M?) -> M?
                                            | ...
 
-      def resolve_signal_external_workflow!: () -> ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow?
+      def resolve_signal_external_workflow!: () -> ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow?
 
       # / An attempt to cancel an external workflow resolved
       #
-      attr_accessor resolve_request_cancel_external_workflow(): ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow?
+      attr_accessor resolve_request_cancel_external_workflow(): ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow?
 
       # / An attempt to cancel an external workflow resolved
       #
-      def resolve_request_cancel_external_workflow=: [M < ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow::_ToProto] (M?) -> M?
+      def resolve_request_cancel_external_workflow=: [M < ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow::_ToProto] (M?) -> M?
                                                    | ...
 
-      def resolve_request_cancel_external_workflow!: () -> ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow?
+      def resolve_request_cancel_external_workflow!: () -> ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow?
 
       # / Remove the workflow identified by the [WorkflowActivation] containing this job from the cache
       # / after performing the activation.
@@ -227,7 +227,7 @@ module Coresdk
       # / If other job variant are present in the list, this variant will be the last job in the
       # / job list. The string value is a reason for eviction.
       #
-      attr_accessor remove_from_cache(): ::Coresdk::Workflow_activation::RemoveFromCache?
+      attr_accessor remove_from_cache(): ::Coresdk::WorkflowActivation::RemoveFromCache?
 
       # / Remove the workflow identified by the [WorkflowActivation] containing this job from the cache
       # / after performing the activation.
@@ -235,54 +235,54 @@ module Coresdk
       # / If other job variant are present in the list, this variant will be the last job in the
       # / job list. The string value is a reason for eviction.
       #
-      def remove_from_cache=: [M < ::Coresdk::Workflow_activation::RemoveFromCache::_ToProto] (M?) -> M?
+      def remove_from_cache=: [M < ::Coresdk::WorkflowActivation::RemoveFromCache::_ToProto] (M?) -> M?
                             | ...
 
-      def remove_from_cache!: () -> ::Coresdk::Workflow_activation::RemoveFromCache?
+      def remove_from_cache!: () -> ::Coresdk::WorkflowActivation::RemoveFromCache?
 
-      def initialize: (?start_workflow: ::Coresdk::Workflow_activation::StartWorkflow::init?, ?fire_timer: ::Coresdk::Workflow_activation::FireTimer::init?, ?update_random_seed: ::Coresdk::Workflow_activation::UpdateRandomSeed::init?, ?query_workflow: ::Coresdk::Workflow_activation::QueryWorkflow::init?, ?cancel_workflow: ::Coresdk::Workflow_activation::CancelWorkflow::init?, ?signal_workflow: ::Coresdk::Workflow_activation::SignalWorkflow::init?, ?resolve_activity: ::Coresdk::Workflow_activation::ResolveActivity::init?, ?notify_has_patch: ::Coresdk::Workflow_activation::NotifyHasPatch::init?, ?resolve_child_workflow_execution_start: ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart::init?, ?resolve_child_workflow_execution: ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution::init?, ?resolve_signal_external_workflow: ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow::init?, ?resolve_request_cancel_external_workflow: ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow::init?, ?remove_from_cache: ::Coresdk::Workflow_activation::RemoveFromCache::init?) -> void
+      def initialize: (?start_workflow: ::Coresdk::WorkflowActivation::StartWorkflow::init?, ?fire_timer: ::Coresdk::WorkflowActivation::FireTimer::init?, ?update_random_seed: ::Coresdk::WorkflowActivation::UpdateRandomSeed::init?, ?query_workflow: ::Coresdk::WorkflowActivation::QueryWorkflow::init?, ?cancel_workflow: ::Coresdk::WorkflowActivation::CancelWorkflow::init?, ?signal_workflow: ::Coresdk::WorkflowActivation::SignalWorkflow::init?, ?resolve_activity: ::Coresdk::WorkflowActivation::ResolveActivity::init?, ?notify_has_patch: ::Coresdk::WorkflowActivation::NotifyHasPatch::init?, ?resolve_child_workflow_execution_start: ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart::init?, ?resolve_child_workflow_execution: ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution::init?, ?resolve_signal_external_workflow: ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow::init?, ?resolve_request_cancel_external_workflow: ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow::init?, ?remove_from_cache: ::Coresdk::WorkflowActivation::RemoveFromCache::init?) -> void
 
-      def []: (:start_workflow) -> ::Coresdk::Workflow_activation::StartWorkflow?
-            | (:fire_timer) -> ::Coresdk::Workflow_activation::FireTimer?
-            | (:update_random_seed) -> ::Coresdk::Workflow_activation::UpdateRandomSeed?
-            | (:query_workflow) -> ::Coresdk::Workflow_activation::QueryWorkflow?
-            | (:cancel_workflow) -> ::Coresdk::Workflow_activation::CancelWorkflow?
-            | (:signal_workflow) -> ::Coresdk::Workflow_activation::SignalWorkflow?
-            | (:resolve_activity) -> ::Coresdk::Workflow_activation::ResolveActivity?
-            | (:notify_has_patch) -> ::Coresdk::Workflow_activation::NotifyHasPatch?
-            | (:resolve_child_workflow_execution_start) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart?
-            | (:resolve_child_workflow_execution) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution?
-            | (:resolve_signal_external_workflow) -> ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow?
-            | (:resolve_request_cancel_external_workflow) -> ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow?
-            | (:remove_from_cache) -> ::Coresdk::Workflow_activation::RemoveFromCache?
+      def []: (:start_workflow) -> ::Coresdk::WorkflowActivation::StartWorkflow?
+            | (:fire_timer) -> ::Coresdk::WorkflowActivation::FireTimer?
+            | (:update_random_seed) -> ::Coresdk::WorkflowActivation::UpdateRandomSeed?
+            | (:query_workflow) -> ::Coresdk::WorkflowActivation::QueryWorkflow?
+            | (:cancel_workflow) -> ::Coresdk::WorkflowActivation::CancelWorkflow?
+            | (:signal_workflow) -> ::Coresdk::WorkflowActivation::SignalWorkflow?
+            | (:resolve_activity) -> ::Coresdk::WorkflowActivation::ResolveActivity?
+            | (:notify_has_patch) -> ::Coresdk::WorkflowActivation::NotifyHasPatch?
+            | (:resolve_child_workflow_execution_start) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart?
+            | (:resolve_child_workflow_execution) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution?
+            | (:resolve_signal_external_workflow) -> ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow?
+            | (:resolve_request_cancel_external_workflow) -> ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow?
+            | (:remove_from_cache) -> ::Coresdk::WorkflowActivation::RemoveFromCache?
             | (::Symbol) -> untyped
 
-      def []=: (:start_workflow, ::Coresdk::Workflow_activation::StartWorkflow?) -> ::Coresdk::Workflow_activation::StartWorkflow?
-             | [M < ::Coresdk::Workflow_activation::StartWorkflow::_ToProto] (:start_workflow, M?) -> M?
-             | (:fire_timer, ::Coresdk::Workflow_activation::FireTimer?) -> ::Coresdk::Workflow_activation::FireTimer?
-             | [M < ::Coresdk::Workflow_activation::FireTimer::_ToProto] (:fire_timer, M?) -> M?
-             | (:update_random_seed, ::Coresdk::Workflow_activation::UpdateRandomSeed?) -> ::Coresdk::Workflow_activation::UpdateRandomSeed?
-             | [M < ::Coresdk::Workflow_activation::UpdateRandomSeed::_ToProto] (:update_random_seed, M?) -> M?
-             | (:query_workflow, ::Coresdk::Workflow_activation::QueryWorkflow?) -> ::Coresdk::Workflow_activation::QueryWorkflow?
-             | [M < ::Coresdk::Workflow_activation::QueryWorkflow::_ToProto] (:query_workflow, M?) -> M?
-             | (:cancel_workflow, ::Coresdk::Workflow_activation::CancelWorkflow?) -> ::Coresdk::Workflow_activation::CancelWorkflow?
-             | [M < ::Coresdk::Workflow_activation::CancelWorkflow::_ToProto] (:cancel_workflow, M?) -> M?
-             | (:signal_workflow, ::Coresdk::Workflow_activation::SignalWorkflow?) -> ::Coresdk::Workflow_activation::SignalWorkflow?
-             | [M < ::Coresdk::Workflow_activation::SignalWorkflow::_ToProto] (:signal_workflow, M?) -> M?
-             | (:resolve_activity, ::Coresdk::Workflow_activation::ResolveActivity?) -> ::Coresdk::Workflow_activation::ResolveActivity?
-             | [M < ::Coresdk::Workflow_activation::ResolveActivity::_ToProto] (:resolve_activity, M?) -> M?
-             | (:notify_has_patch, ::Coresdk::Workflow_activation::NotifyHasPatch?) -> ::Coresdk::Workflow_activation::NotifyHasPatch?
-             | [M < ::Coresdk::Workflow_activation::NotifyHasPatch::_ToProto] (:notify_has_patch, M?) -> M?
-             | (:resolve_child_workflow_execution_start, ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart?) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart?
-             | [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStart::_ToProto] (:resolve_child_workflow_execution_start, M?) -> M?
-             | (:resolve_child_workflow_execution, ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution?) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution?
-             | [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecution::_ToProto] (:resolve_child_workflow_execution, M?) -> M?
-             | (:resolve_signal_external_workflow, ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow?) -> ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow?
-             | [M < ::Coresdk::Workflow_activation::ResolveSignalExternalWorkflow::_ToProto] (:resolve_signal_external_workflow, M?) -> M?
-             | (:resolve_request_cancel_external_workflow, ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow?) -> ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow?
-             | [M < ::Coresdk::Workflow_activation::ResolveRequestCancelExternalWorkflow::_ToProto] (:resolve_request_cancel_external_workflow, M?) -> M?
-             | (:remove_from_cache, ::Coresdk::Workflow_activation::RemoveFromCache?) -> ::Coresdk::Workflow_activation::RemoveFromCache?
-             | [M < ::Coresdk::Workflow_activation::RemoveFromCache::_ToProto] (:remove_from_cache, M?) -> M?
+      def []=: (:start_workflow, ::Coresdk::WorkflowActivation::StartWorkflow?) -> ::Coresdk::WorkflowActivation::StartWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::StartWorkflow::_ToProto] (:start_workflow, M?) -> M?
+             | (:fire_timer, ::Coresdk::WorkflowActivation::FireTimer?) -> ::Coresdk::WorkflowActivation::FireTimer?
+             | [M < ::Coresdk::WorkflowActivation::FireTimer::_ToProto] (:fire_timer, M?) -> M?
+             | (:update_random_seed, ::Coresdk::WorkflowActivation::UpdateRandomSeed?) -> ::Coresdk::WorkflowActivation::UpdateRandomSeed?
+             | [M < ::Coresdk::WorkflowActivation::UpdateRandomSeed::_ToProto] (:update_random_seed, M?) -> M?
+             | (:query_workflow, ::Coresdk::WorkflowActivation::QueryWorkflow?) -> ::Coresdk::WorkflowActivation::QueryWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::QueryWorkflow::_ToProto] (:query_workflow, M?) -> M?
+             | (:cancel_workflow, ::Coresdk::WorkflowActivation::CancelWorkflow?) -> ::Coresdk::WorkflowActivation::CancelWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::CancelWorkflow::_ToProto] (:cancel_workflow, M?) -> M?
+             | (:signal_workflow, ::Coresdk::WorkflowActivation::SignalWorkflow?) -> ::Coresdk::WorkflowActivation::SignalWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::SignalWorkflow::_ToProto] (:signal_workflow, M?) -> M?
+             | (:resolve_activity, ::Coresdk::WorkflowActivation::ResolveActivity?) -> ::Coresdk::WorkflowActivation::ResolveActivity?
+             | [M < ::Coresdk::WorkflowActivation::ResolveActivity::_ToProto] (:resolve_activity, M?) -> M?
+             | (:notify_has_patch, ::Coresdk::WorkflowActivation::NotifyHasPatch?) -> ::Coresdk::WorkflowActivation::NotifyHasPatch?
+             | [M < ::Coresdk::WorkflowActivation::NotifyHasPatch::_ToProto] (:notify_has_patch, M?) -> M?
+             | (:resolve_child_workflow_execution_start, ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart?) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart?
+             | [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStart::_ToProto] (:resolve_child_workflow_execution_start, M?) -> M?
+             | (:resolve_child_workflow_execution, ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution?) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution?
+             | [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecution::_ToProto] (:resolve_child_workflow_execution, M?) -> M?
+             | (:resolve_signal_external_workflow, ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow?) -> ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::ResolveSignalExternalWorkflow::_ToProto] (:resolve_signal_external_workflow, M?) -> M?
+             | (:resolve_request_cancel_external_workflow, ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow?) -> ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow?
+             | [M < ::Coresdk::WorkflowActivation::ResolveRequestCancelExternalWorkflow::_ToProto] (:resolve_request_cancel_external_workflow, M?) -> M?
+             | (:remove_from_cache, ::Coresdk::WorkflowActivation::RemoveFromCache?) -> ::Coresdk::WorkflowActivation::RemoveFromCache?
+             | [M < ::Coresdk::WorkflowActivation::RemoveFromCache::_ToProto] (:remove_from_cache, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -320,14 +320,14 @@ module Coresdk
 
       # Inputs to the workflow code
       #
-      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # Inputs to the workflow code
       #
-      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # The seed must be used to initialize the random generator used by SDK.
       #  RandomSeedUpdatedAttributes are used to deliver seed updates.
@@ -338,14 +338,14 @@ module Coresdk
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
       # Identity of the client who requested this execution
       #
@@ -406,36 +406,36 @@ module Coresdk
 
       # If this workflow was a continuation, indicates the type of continuation.
       #
-      attr_accessor continued_initiator(): ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
+      attr_accessor continued_initiator(): ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
 
       # If this workflow was a continuation, indicates the type of continuation.
       #
-      def continued_initiator=: (::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
+      def continued_initiator=: (::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
                               | ...
 
-      def continued_initiator!: () -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator?
+      def continued_initiator!: () -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator?
 
       # If this workflow was a continuation and that continuation failed, the details of that.
       #
-      attr_accessor continued_failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor continued_failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # If this workflow was a continuation and that continuation failed, the details of that.
       #
-      def continued_failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def continued_failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                             | ...
 
-      def continued_failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def continued_failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
       # If this workflow was a continuation and that continuation completed, the details of that.
       #
-      attr_accessor last_completion_result(): ::Temporal::Api::Common::V1::Payloads?
+      attr_accessor last_completion_result(): ::Temporalio::Api::Common::V1::Payloads?
 
       # If this workflow was a continuation and that continuation completed, the details of that.
       #
-      def last_completion_result=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+      def last_completion_result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                                  | ...
 
-      def last_completion_result!: () -> ::Temporal::Api::Common::V1::Payloads?
+      def last_completion_result!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
       # This is the very first run id the workflow ever had, following continuation chains.
       #
@@ -445,14 +445,14 @@ module Coresdk
 
       # This workflow's retry policy
       #
-      attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # This workflow's retry policy
       #
-      def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                        | ...
 
-      def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # Starting at 1, the number of times we have tried to execute this workflow
       #
@@ -494,59 +494,71 @@ module Coresdk
 
       # User-defined memo
       #
-      attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+      attr_accessor memo(): ::Temporalio::Api::Common::V1::Memo?
 
       # User-defined memo
       #
-      def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+      def memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                | ...
 
-      def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+      def memo!: () -> ::Temporalio::Api::Common::V1::Memo?
 
       # Search attributes created/updated when this workflow was started
       #
-      attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+      attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
 
       # Search attributes created/updated when this workflow was started
       #
-      def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+      def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                             | ...
 
-      def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+      def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
 
-      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
+      # When the workflow execution started event was first written
+      #
+      attr_accessor start_time(): ::Google::Protobuf::Timestamp?
+
+      # When the workflow execution started event was first written
+      #
+      def start_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                     | ...
+
+      def start_time!: () -> ::Google::Protobuf::Timestamp?
+
+      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporalio::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporalio::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporalio::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?, ?start_time: ::Google::Protobuf::Timestamp::init?) -> void
 
       def []: (:workflow_type) -> ::String
             | (:workflow_id) -> ::String
-            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (:randomness_seed) -> ::Integer
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (:identity) -> ::String
             | (:parent_workflow_info) -> ::Coresdk::Common::NamespacedWorkflowExecution?
             | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
             | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
             | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
             | (:continued_from_execution_run_id) -> ::String
-            | (:continued_initiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
-            | (:continued_failure) -> ::Temporal::Api::Failure::V1::Failure?
-            | (:last_completion_result) -> ::Temporal::Api::Common::V1::Payloads?
+            | (:continued_initiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
+            | (:continued_failure) -> ::Temporalio::Api::Failure::V1::Failure?
+            | (:last_completion_result) -> ::Temporalio::Api::Common::V1::Payloads?
             | (:first_execution_run_id) -> ::String
-            | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
             | (:attempt) -> ::Integer
             | (:cron_schedule) -> ::String
             | (:workflow_execution_expiration_time) -> ::Google::Protobuf::Timestamp?
             | (:cron_schedule_to_schedule_interval) -> ::Google::Protobuf::Duration?
-            | (:memo) -> ::Temporal::Api::Common::V1::Memo?
-            | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+            | (:memo) -> ::Temporalio::Api::Common::V1::Memo?
+            | (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+            | (:start_time) -> ::Google::Protobuf::Timestamp?
             | (::Symbol) -> untyped
 
       def []=: (:workflow_type, ::String) -> ::String
              | (:workflow_id, ::String) -> ::String
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (:randomness_seed, ::Integer) -> ::Integer
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (:identity, ::String) -> ::String
              | (:parent_workflow_info, ::Coresdk::Common::NamespacedWorkflowExecution?) -> ::Coresdk::Common::NamespacedWorkflowExecution?
              | [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (:parent_workflow_info, M?) -> M?
@@ -557,25 +569,27 @@ module Coresdk
              | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
              | (:continued_from_execution_run_id, ::String) -> ::String
-             | (:continued_initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
-             | (:continued_initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
-             | (:continued_failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:continued_failure, M?) -> M?
-             | (:last_completion_result, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-             | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
+             | (:continued_initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
+             | (:continued_initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
+             | (:continued_failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:continued_failure, M?) -> M?
+             | (:last_completion_result, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+             | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
              | (:first_execution_run_id, ::String) -> ::String
-             | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
              | (:attempt, ::Integer) -> ::Integer
              | (:cron_schedule, ::String) -> ::String
              | (:workflow_execution_expiration_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:workflow_execution_expiration_time, M?) -> M?
              | (:cron_schedule_to_schedule_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:cron_schedule_to_schedule_interval, M?) -> M?
-             | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
-             | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
-             | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
-             | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+             | (:memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
+             | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+             | (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+             | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+             | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -686,42 +700,42 @@ module Coresdk
 
       def seq!: () -> ::Integer?
 
-      attr_accessor succeeded(): ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess?
+      attr_accessor succeeded(): ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess?
 
-      def succeeded=: [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess::_ToProto] (M?) -> M?
+      def succeeded=: [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess::_ToProto] (M?) -> M?
                     | ...
 
-      def succeeded!: () -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess?
+      def succeeded!: () -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess?
 
-      attr_accessor failed(): ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure?
+      attr_accessor failed(): ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure?
 
-      def failed=: [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure?
+      def failed!: () -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure?
 
-      attr_accessor cancelled(): ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled?
+      attr_accessor cancelled(): ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled?
 
-      def cancelled=: [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled?
+      def cancelled!: () -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled?
 
-      def initialize: (?seq: ::Integer, ?succeeded: ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess::init?, ?failed: ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure::init?, ?cancelled: ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled::init?) -> void
+      def initialize: (?seq: ::Integer, ?succeeded: ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess::init?, ?failed: ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure::init?, ?cancelled: ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:succeeded) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess?
-            | (:failed) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure?
-            | (:cancelled) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled?
+            | (:succeeded) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess?
+            | (:failed) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure?
+            | (:cancelled) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:succeeded, ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess?) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess?
-             | [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartSuccess::_ToProto] (:succeeded, M?) -> M?
-             | (:failed, ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure?) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure?
-             | [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartFailure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled?) -> ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled?
-             | [M < ::Coresdk::Workflow_activation::ResolveChildWorkflowExecutionStartCancelled::_ToProto] (:cancelled, M?) -> M?
+             | (:succeeded, ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess?) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess?
+             | [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartSuccess::_ToProto] (:succeeded, M?) -> M?
+             | (:failed, ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure?) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure?
+             | [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartFailure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled?) -> ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled?
+             | [M < ::Coresdk::WorkflowActivation::ResolveChildWorkflowExecutionStartCancelled::_ToProto] (:cancelled, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -831,20 +845,20 @@ module Coresdk
     # / The failure is constructed in core for lang's convenience.
     #
     class ResolveChildWorkflowExecutionStartCancelled < ::Protobuf::Message
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -960,38 +974,38 @@ module Coresdk
 
       def query_type!: () -> ::String?
 
-      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # / Headers attached to the query
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # / Headers attached to the query
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:query_id) -> ::String
             | (:query_type) -> ::String
-            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:query_id, ::String) -> ::String
              | (:query_type, ::String) -> ::String
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1017,22 +1031,22 @@ module Coresdk
     class CancelWorkflow < ::Protobuf::Message
       # / Information from the cancellation request
       #
-      attr_accessor details(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor details(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # / Information from the cancellation request
       #
-      def details=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def details=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                   | ...
 
-      def details!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def details!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-      def initialize: (?details: ::Temporal::Api::Common::V1::Payload::array) -> void
+      def initialize: (?details: ::Temporalio::Api::Common::V1::Payload::array) -> void
 
-      def []: (:details) -> ::Temporal::Api::Common::V1::Payload::field_array
+      def []: (:details) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (::Symbol) -> untyped
 
-      def []=: (:details, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:details, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def []=: (:details, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:details, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1060,12 +1074,12 @@ module Coresdk
 
       def signal_name!: () -> ::String?
 
-      attr_accessor input(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      def input=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                 | ...
 
-      def input!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # Identity of the sender of the signal
       #
@@ -1075,29 +1089,29 @@ module Coresdk
 
       # Headers attached to the signal
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # Headers attached to the signal
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payload::array, ?identity: ::String, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+      def initialize: (?signal_name: ::String, ?input: ::Temporalio::Api::Common::V1::Payload::array, ?identity: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:signal_name) -> ::String
-            | (:input) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (:identity) -> ::String
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:signal_name, ::String) -> ::String
-             | (:input, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:input, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (:identity, ::String) -> ::String
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1163,25 +1177,25 @@ module Coresdk
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?seq: ::Integer, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?seq: ::Integer, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1213,25 +1227,25 @@ module Coresdk
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?seq: ::Integer, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?seq: ::Integer, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1322,22 +1336,22 @@ module Coresdk
 
       def message!: () -> ::String?
 
-      attr_accessor reason(): ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason
+      attr_accessor reason(): ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason
 
-      def reason=: (::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason::values) -> ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason::values
+      def reason=: (::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason::values) -> ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason::values
                  | ...
 
-      def reason!: () -> ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason?
+      def reason!: () -> ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason?
 
-      def initialize: (?message: ::String, ?reason: ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason::init) -> void
+      def initialize: (?message: ::String, ?reason: ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason::init) -> void
 
       def []: (:message) -> ::String
-            | (:reason) -> ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason
+            | (:reason) -> ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason
             | (::Symbol) -> untyped
 
       def []=: (:message, ::String) -> ::String
-             | (:reason, ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason) -> ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason
-             | (:reason, ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason::values) -> ::Coresdk::Workflow_activation::RemoveFromCache::EvictionReason::values
+             | (:reason, ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason) -> ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason
+             | (:reason, ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason::values) -> ::Coresdk::WorkflowActivation::RemoveFromCache::EvictionReason::values
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

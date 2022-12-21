@@ -1,0 +1,42 @@
+module Temporalio
+  module Api
+    module Enums
+      module V1
+        class InteractionType < ::Protobuf::Enum
+          type names = :INTERACTION_TYPE_UNSPECIFIED | :INTERACTION_TYPE_WORKFLOW_QUERY | :INTERACTION_TYPE_WORKFLOW_UPDATE | :INTERACTION_TYPE_WORKFLOW_SIGNAL
+
+          type strings = "INTERACTION_TYPE_UNSPECIFIED" | "INTERACTION_TYPE_WORKFLOW_QUERY" | "INTERACTION_TYPE_WORKFLOW_UPDATE" | "INTERACTION_TYPE_WORKFLOW_SIGNAL"
+
+          type tags = 0 | 1 | 2 | 3
+
+          type values = names | strings | tags
+
+          attr_reader name(): names
+
+          attr_reader tag(): tags
+
+          INTERACTION_TYPE_UNSPECIFIED: InteractionType
+
+          INTERACTION_TYPE_WORKFLOW_QUERY: InteractionType
+
+          INTERACTION_TYPE_WORKFLOW_UPDATE: InteractionType
+
+          INTERACTION_TYPE_WORKFLOW_SIGNAL: InteractionType
+
+          # The type of `#initialize` parameter.
+          type init = InteractionType | values
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[InteractionType, InteractionType | values]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, InteractionType, InteractionType | values]
+
+          type array = ::Array[InteractionType | values]
+
+          type hash[KEY] = ::Hash[KEY, InteractionType | values]
+        end
+      end
+    end
+  end
+end

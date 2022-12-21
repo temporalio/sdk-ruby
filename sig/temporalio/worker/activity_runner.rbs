@@ -1,0 +1,31 @@
+module Temporalio
+  class Worker
+    class ActivityRunner
+      def initialize: (
+        singleton(Temporalio::Activity) activity_class,
+        Coresdk::ActivityTask::Start start,
+        String task_queue,
+        String task_token,
+        Temporalio::Worker::SyncWorker worker,
+        Temporalio::DataConverter converter
+      ) -> void
+      def run: -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
+      def cancel: -> void
+
+      private
+
+      @context: Temporalio::Activity::Context
+
+      attr_reader activity_class: singleton(Temporalio::Activity)
+      attr_reader start: Coresdk::ActivityTask::Start
+      attr_reader task_queue: String
+      attr_reader task_token: String
+      attr_reader worker: Temporalio::Worker::SyncWorker
+      attr_reader converter: Temporalio::DataConverter
+
+      def context: -> Temporalio::Activity::Context
+      def generate_activity_info: -> Temporalio::Activity::Info
+      def heartbeat: (*untyped) -> void
+    end
+  end
+end

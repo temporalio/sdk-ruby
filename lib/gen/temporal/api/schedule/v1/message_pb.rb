@@ -20,15 +20,34 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :month, :string, 5
       optional :year, :string, 6
       optional :day_of_week, :string, 7
+      optional :comment, :string, 8
+    end
+    add_message "temporal.api.schedule.v1.Range" do
+      optional :start, :int32, 1
+      optional :end, :int32, 2
+      optional :step, :int32, 3
+    end
+    add_message "temporal.api.schedule.v1.StructuredCalendarSpec" do
+      repeated :second, :message, 1, "temporal.api.schedule.v1.Range"
+      repeated :minute, :message, 2, "temporal.api.schedule.v1.Range"
+      repeated :hour, :message, 3, "temporal.api.schedule.v1.Range"
+      repeated :day_of_month, :message, 4, "temporal.api.schedule.v1.Range"
+      repeated :month, :message, 5, "temporal.api.schedule.v1.Range"
+      repeated :year, :message, 6, "temporal.api.schedule.v1.Range"
+      repeated :day_of_week, :message, 7, "temporal.api.schedule.v1.Range"
+      optional :comment, :string, 8
     end
     add_message "temporal.api.schedule.v1.IntervalSpec" do
       optional :interval, :message, 1, "google.protobuf.Duration"
       optional :phase, :message, 2, "google.protobuf.Duration"
     end
     add_message "temporal.api.schedule.v1.ScheduleSpec" do
+      repeated :structured_calendar, :message, 7, "temporal.api.schedule.v1.StructuredCalendarSpec"
+      repeated :cron_string, :string, 8
       repeated :calendar, :message, 1, "temporal.api.schedule.v1.CalendarSpec"
       repeated :interval, :message, 2, "temporal.api.schedule.v1.IntervalSpec"
       repeated :exclude_calendar, :message, 3, "temporal.api.schedule.v1.CalendarSpec"
+      repeated :exclude_structured_calendar, :message, 9, "temporal.api.schedule.v1.StructuredCalendarSpec"
       optional :start_time, :message, 4, "google.protobuf.Timestamp"
       optional :end_time, :message, 5, "google.protobuf.Timestamp"
       optional :jitter, :message, 6, "google.protobuf.Duration"
@@ -104,11 +123,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Schedule
       module V1
         CalendarSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.CalendarSpec").msgclass
+        Range = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.Range").msgclass
+        StructuredCalendarSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.StructuredCalendarSpec").msgclass
         IntervalSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.IntervalSpec").msgclass
         ScheduleSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.ScheduleSpec").msgclass
         SchedulePolicies = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.schedule.v1.SchedulePolicies").msgclass

@@ -1,0 +1,35 @@
+module Temporalio
+  class DataConverter
+    class MissingPayload < Temporalio::Error
+    end
+
+    def initialize: (
+      ?payload_converter: Temporalio::PayloadConverter::_PayloadConverter,
+      ?payload_codecs: Array[Temporalio::PayloadCodec::_PayloadCodec],
+      ?failure_converter: Temporalio::FailureConverter::_FailureConverter,
+    ) -> void
+    def to_payload: (untyped value) -> Temporalio::Api::Common::V1::Payload
+    def to_payload_array: (Array[untyped]? data) -> Array[Temporalio::Api::Common::V1::Payload]
+    def to_payloads: (Array[untyped]? data) -> Temporalio::Api::Common::V1::Payloads?
+    def to_payload_map: (Hash[String | Symbol, untyped] data) -> Hash[String, Temporalio::Api::Common::V1::Payload]
+    def to_failure: (Exception error) -> Temporalio::Api::Failure::V1::Failure
+    def from_payload: (Temporalio::Api::Common::V1::Payload payload) -> untyped
+    def from_payload_array: (Array[Temporalio::Api::Common::V1::Payload] payloads) -> Array[untyped]
+    def from_payloads: (Temporalio::Api::Common::V1::Payloads? payloads) -> Array[untyped]?
+    def from_payload_map: (Temporalio::Api::Common::V1::Payload::field_hash[::String]? payload_map) -> Hash[String, untyped]?
+    def from_failure: (Temporalio::Api::Failure::V1::Failure? failure) -> Exception
+
+    private
+
+    attr_reader payload_converter: Temporalio::PayloadConverter::_PayloadConverter
+    attr_reader payload_codecs: Array[Temporalio::PayloadCodec::_PayloadCodec]
+    attr_reader failure_converter: Temporalio::FailureConverter::_FailureConverter
+
+    def value_to_payload: (untyped value) -> Temporalio::Api::Common::V1::Payload
+    def payload_to_value: (Temporalio::Api::Common::V1::Payload payload) -> untyped
+    def encode: (Array[Temporalio::Api::Common::V1::Payload]?) -> Array[Temporalio::Api::Common::V1::Payload]
+    def decode: (Array[Temporalio::Api::Common::V1::Payload]?) -> Array[Temporalio::Api::Common::V1::Payload]
+    def encode_failure: (Temporalio::Api::Failure::V1::Failure failure) -> Temporalio::Api::Failure::V1::Failure
+    def decode_failure: (Temporalio::Api::Failure::V1::Failure failure) -> Temporalio::Api::Failure::V1::Failure
+  end
+end
