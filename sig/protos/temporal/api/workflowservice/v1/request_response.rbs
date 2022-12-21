@@ -1095,22 +1095,31 @@ module Temporal
           def binary_checksum!: () -> ::String?
 
           # If set, the worker is opting in to build-id based versioning and wishes to only
-          #  receive tasks that are considered compatible with the version provided in the string.
+          #  receive tasks that are considered compatible with the version provided.
           #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
-          #  When set, and `binary_checksum` is not, this value should also be considered as the
-          #  `binary_checksum`.
+          #  When `worker_versioning_id` has a `worker_build_id`, and `binary_checksum` is not
+          #  set, that value should also be considered as the `binary_checksum`.
           #
-          attr_accessor worker_versioning_build_id(): ::String
+          attr_accessor worker_versioning_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
 
-          def worker_versioning_build_id!: () -> ::String?
+          # If set, the worker is opting in to build-id based versioning and wishes to only
+          #  receive tasks that are considered compatible with the version provided.
+          #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
+          #  When `worker_versioning_id` has a `worker_build_id`, and `binary_checksum` is not
+          #  set, that value should also be considered as the `binary_checksum`.
+          #
+          def worker_versioning_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_build_id: ::String) -> void
+          def worker_versioning_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
                 | (:binary_checksum) -> ::String
-                | (:worker_versioning_build_id) -> ::String
+                | (:worker_versioning_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
@@ -1118,7 +1127,8 @@ module Temporal
                  | [M < ::Temporal::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:binary_checksum, ::String) -> ::String
-                 | (:worker_versioning_build_id, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1274,7 +1284,14 @@ module Temporal
 
           def queries!: () -> ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]?
 
-          def initialize: (?task_token: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?previous_started_event_id: ::Integer, ?started_event_id: ::Integer, ?attempt: ::Integer, ?backlog_count_hint: ::Integer, ?history: ::Temporal::Api::History::V1::History::init?, ?next_page_token: ::String, ?query: ::Temporal::Api::Query::V1::WorkflowQuery::init?, ?workflow_execution_task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?queries: ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String]) -> void
+          attr_accessor interactions(): ::Temporal::Api::Interaction::V1::Invocation::field_array
+
+          def interactions=: (::Temporal::Api::Interaction::V1::Invocation::array) -> ::Temporal::Api::Interaction::V1::Invocation::array
+                           | ...
+
+          def interactions!: () -> ::Temporal::Api::Interaction::V1::Invocation::field_array?
+
+          def initialize: (?task_token: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?previous_started_event_id: ::Integer, ?started_event_id: ::Integer, ?attempt: ::Integer, ?backlog_count_hint: ::Integer, ?history: ::Temporal::Api::History::V1::History::init?, ?next_page_token: ::String, ?query: ::Temporal::Api::Query::V1::WorkflowQuery::init?, ?workflow_execution_task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?queries: ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String], ?interactions: ::Temporal::Api::Interaction::V1::Invocation::array) -> void
 
           def []: (:task_token) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
@@ -1290,6 +1307,7 @@ module Temporal
                 | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
                 | (:started_time) -> ::Google::Protobuf::Timestamp?
                 | (:queries) -> ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]
+                | (:interactions) -> ::Temporal::Api::Interaction::V1::Invocation::field_array
                 | (::Symbol) -> untyped
 
           def []=: (:task_token, ::String) -> ::String
@@ -1314,6 +1332,8 @@ module Temporal
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:started_time, M?) -> M?
                  | (:queries, ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]) -> ::Temporal::Api::Query::V1::WorkflowQuery::field_hash[::String]
                  | (:queries, ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String]) -> ::Temporal::Api::Query::V1::WorkflowQuery::hash[::String]
+                 | (:interactions, ::Temporal::Api::Interaction::V1::Invocation::field_array) -> ::Temporal::Api::Interaction::V1::Invocation::field_array
+                 | (:interactions, ::Temporal::Api::Interaction::V1::Invocation::array) -> ::Temporal::Api::Interaction::V1::Invocation::array
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1408,7 +1428,24 @@ module Temporal
 
           def namespace!: () -> ::String?
 
-          def initialize: (?task_token: ::String, ?commands: ::Temporal::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String) -> void
+          # If using versioning, worker should send the same id here that it used to
+          #  poll for the workflow task.
+          #  When `worker_versioning_id` has a `worker_build_id`, and `binary_checksum` is not
+          #  set, that value should also be considered as the `binary_checksum`.
+          #
+          attr_accessor worker_versioning_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # If using versioning, worker should send the same id here that it used to
+          #  poll for the workflow task.
+          #  When `worker_versioning_id` has a `worker_build_id`, and `binary_checksum` is not
+          #  set, that value should also be considered as the `binary_checksum`.
+          #
+          def worker_versioning_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
+
+          def worker_versioning_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?task_token: ::String, ?commands: ::Temporal::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporal::Api::TaskQueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String, ?worker_versioning_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:task_token) -> ::String
                 | (:commands) -> ::Temporal::Api::Command::V1::Command::field_array
@@ -1419,6 +1456,7 @@ module Temporal
                 | (:binary_checksum) -> ::String
                 | (:query_results) -> ::Temporal::Api::Query::V1::WorkflowQueryResult::field_hash[::String]
                 | (:namespace) -> ::String
+                | (:worker_versioning_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:task_token, ::String) -> ::String
@@ -1433,6 +1471,8 @@ module Temporal
                  | (:query_results, ::Temporal::Api::Query::V1::WorkflowQueryResult::field_hash[::String]) -> ::Temporal::Api::Query::V1::WorkflowQueryResult::field_hash[::String]
                  | (:query_results, ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String]) -> ::Temporal::Api::Query::V1::WorkflowQueryResult::hash[::String]
                  | (:namespace, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           def return_new_workflow_task?: () -> bool
@@ -1480,16 +1520,22 @@ module Temporal
 
           def activity_tasks!: () -> ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::field_array?
 
-          def initialize: (?workflow_task: ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse::init?, ?activity_tasks: ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::array) -> void
+          attr_accessor reset_history_event_id(): ::Integer
+
+          def reset_history_event_id!: () -> ::Integer?
+
+          def initialize: (?workflow_task: ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse::init?, ?activity_tasks: ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::array, ?reset_history_event_id: ::Integer) -> void
 
           def []: (:workflow_task) -> ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse?
                 | (:activity_tasks) -> ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::field_array
+                | (:reset_history_event_id) -> ::Integer
                 | (::Symbol) -> untyped
 
           def []=: (:workflow_task, ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse?) -> ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse?
                  | [M < ::Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse::_ToProto] (:workflow_task, M?) -> M?
                  | (:activity_tasks, ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::field_array) -> ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::field_array
                  | (:activity_tasks, ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::array) -> ::Temporal::Api::WorkflowService::V1::PollActivityTaskQueueResponse::array
+                 | (:reset_history_event_id, ::Integer) -> ::Integer
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1642,20 +1688,27 @@ module Temporal
           def task_queue_metadata!: () -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
 
           # If set, the worker is opting in to build-id based versioning and wishes to only
-          #  receive tasks that are considered compatible with the version provided in the string.
+          #  receive tasks that are considered compatible with the version provided.
           #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
           #
-          attr_accessor worker_versioning_build_id(): ::String
+          attr_accessor worker_versioning_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
 
-          def worker_versioning_build_id!: () -> ::String?
+          # If set, the worker is opting in to build-id based versioning and wishes to only
+          #  receive tasks that are considered compatible with the version provided.
+          #  Doing so only makes sense in conjunction with the `UpdateWorkerBuildIdOrdering` API.
+          #
+          def worker_versioning_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
 
-          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::init?, ?worker_versioning_build_id: ::String) -> void
+          def worker_versioning_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?namespace: ::String, ?task_queue: ::Temporal::Api::TaskQueue::V1::TaskQueue::init?, ?identity: ::String, ?task_queue_metadata: ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::init?, ?worker_versioning_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:task_queue) -> ::Temporal::Api::TaskQueue::V1::TaskQueue?
                 | (:identity) -> ::String
                 | (:task_queue_metadata) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
-                | (:worker_versioning_build_id) -> ::String
+                | (:worker_versioning_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
@@ -1664,7 +1717,8 @@ module Temporal
                  | (:identity, ::String) -> ::String
                  | (:task_queue_metadata, ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?) -> ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata?
                  | [M < ::Temporal::Api::TaskQueue::V1::TaskQueueMetadata::_ToProto] (:task_queue_metadata, M?) -> M?
-                 | (:worker_versioning_build_id, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -3453,6 +3507,77 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, TerminateWorkflowExecutionResponse | _ToProto]
         end
 
+        # (-- api-linter: core::0135::request-unknown-fields=disabled
+        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+        #  (-- api-linter: core::0135::request-name-required=disabled
+        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
+        #
+        class DeleteWorkflowExecutionRequest < ::Protobuf::Message
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          # Workflow Execution to delete. If run_id is not specified, the latest one is used.
+          #
+          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          # Workflow Execution to delete. If run_id is not specified, the latest one is used.
+          #
+          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+                                 | ...
+
+          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+
+          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
+
+          def []: (:namespace) -> ::String
+                | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> DeleteWorkflowExecutionRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteWorkflowExecutionRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteWorkflowExecutionRequest, DeleteWorkflowExecutionRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteWorkflowExecutionRequest, DeleteWorkflowExecutionRequest | _ToProto]
+
+          type array = ::Array[DeleteWorkflowExecutionRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteWorkflowExecutionRequest | _ToProto]
+        end
+
+        class DeleteWorkflowExecutionResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> DeleteWorkflowExecutionResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = DeleteWorkflowExecutionResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[DeleteWorkflowExecutionResponse, DeleteWorkflowExecutionResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteWorkflowExecutionResponse, DeleteWorkflowExecutionResponse | _ToProto]
+
+          type array = ::Array[DeleteWorkflowExecutionResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, DeleteWorkflowExecutionResponse | _ToProto]
+        end
+
         class ListOpenWorkflowExecutionsRequest < ::Protobuf::Message
           attr_accessor namespace(): ::String
 
@@ -4732,13 +4857,29 @@ module Temporal
 
             def encoded_failure_attributes!: () -> bool?
 
-            def initialize: (?signal_and_query_header: bool, ?internal_error_differentiation: bool, ?activity_failure_include_heartbeat: bool, ?supports_schedules: bool, ?encoded_failure_attributes: bool) -> void
+            # True if server supports dispatching Workflow and Activity tasks based on a worker's build_id
+            #  (see:
+            #  https://github.com/temporalio/proposals/blob/a123af3b559f43db16ea6dd31870bfb754c4dc5e/versioning/worker-versions.md)
+            #
+            attr_accessor build_id_based_versioning(): bool
+
+            def build_id_based_versioning!: () -> bool?
+
+            # True if server supports upserting workflow memo
+            #
+            attr_accessor upsert_memo(): bool
+
+            def upsert_memo!: () -> bool?
+
+            def initialize: (?signal_and_query_header: bool, ?internal_error_differentiation: bool, ?activity_failure_include_heartbeat: bool, ?supports_schedules: bool, ?encoded_failure_attributes: bool, ?build_id_based_versioning: bool, ?upsert_memo: bool) -> void
 
             def []: (:signal_and_query_header) -> bool
                   | (:internal_error_differentiation) -> bool
                   | (:activity_failure_include_heartbeat) -> bool
                   | (:supports_schedules) -> bool
                   | (:encoded_failure_attributes) -> bool
+                  | (:build_id_based_versioning) -> bool
+                  | (:upsert_memo) -> bool
                   | (::Symbol) -> untyped
 
             def []=: (:signal_and_query_header, bool) -> bool
@@ -4746,6 +4887,8 @@ module Temporal
                    | (:activity_failure_include_heartbeat, bool) -> bool
                    | (:supports_schedules, bool) -> bool
                    | (:encoded_failure_attributes, bool) -> bool
+                   | (:build_id_based_versioning, bool) -> bool
+                   | (:upsert_memo, bool) -> bool
                    | (::Symbol, untyped) -> untyped
 
             def signal_and_query_header?: () -> bool
@@ -4757,6 +4900,10 @@ module Temporal
             def supports_schedules?: () -> bool
 
             def encoded_failure_attributes?: () -> bool
+
+            def build_id_based_versioning?: () -> bool
+
+            def upsert_memo?: () -> bool
 
             interface _ToProto
               def to_proto: () -> Capabilities
@@ -5101,6 +5248,9 @@ module Temporal
         class DescribeScheduleResponse < ::Protobuf::Message
           # The complete current schedule details. This may not match the schedule as
           #  created because:
+          #  - some types of schedule specs may get compiled into others (e.g.
+          #    CronString into StructuredCalendarSpec)
+          #  - some unspecified fields may be replaced by defaults
           #  - some fields in the state are modified automatically
           #  - the schedule may have been modified by UpdateSchedule or PatchSchedule
           #
@@ -5108,6 +5258,9 @@ module Temporal
 
           # The complete current schedule details. This may not match the schedule as
           #  created because:
+          #  - some types of schedule specs may get compiled into others (e.g.
+          #    CronString into StructuredCalendarSpec)
+          #  - some unspecified fields may be replaced by defaults
           #  - some fields in the state are modified automatically
           #  - the schedule may have been modified by UpdateSchedule or PatchSchedule
           #
@@ -5928,27 +6081,34 @@ module Temporal
 
           def first_execution_run_id!: () -> ::String?
 
+          # A string identifying the agent that requested this interaction.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
           # The name under which the workflow update function is registered and the
           #  arguments to pass to said function.
           #
-          attr_accessor update(): ::Temporal::Api::Update::V1::WorkflowUpdate?
+          attr_accessor input(): ::Temporal::Api::Interaction::V1::Input?
 
           # The name under which the workflow update function is registered and the
           #  arguments to pass to said function.
           #
-          def update=: [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (M?) -> M?
-                     | ...
+          def input=: [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
+                    | ...
 
-          def update!: () -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+          def input!: () -> ::Temporal::Api::Interaction::V1::Input?
 
-          def initialize: (?request_id: ::String, ?result_access_style: ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::init, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?first_execution_run_id: ::String, ?update: ::Temporal::Api::Update::V1::WorkflowUpdate::init?) -> void
+          def initialize: (?request_id: ::String, ?result_access_style: ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle::init, ?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?first_execution_run_id: ::String, ?identity: ::String, ?input: ::Temporal::Api::Interaction::V1::Input::init?) -> void
 
           def []: (:request_id) -> ::String
                 | (:result_access_style) -> ::Temporal::Api::Enums::V1::WorkflowUpdateResultAccessStyle
                 | (:namespace) -> ::String
                 | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:first_execution_run_id) -> ::String
-                | (:update) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
+                | (:identity) -> ::String
+                | (:input) -> ::Temporal::Api::Interaction::V1::Input?
                 | (::Symbol) -> untyped
 
           def []=: (:request_id, ::String) -> ::String
@@ -5958,8 +6118,9 @@ module Temporal
                  | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                  | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:first_execution_run_id, ::String) -> ::String
-                 | (:update, ::Temporal::Api::Update::V1::WorkflowUpdate?) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
-                 | [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (:update, M?) -> M?
+                 | (:identity, ::String) -> ::String
+                 | (:input, ::Temporal::Api::Interaction::V1::Input?) -> ::Temporal::Api::Interaction::V1::Input?
+                 | [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -5988,32 +6149,26 @@ module Temporal
 
           def update_token!: () -> ::String?
 
-          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+          # The success or failure status of the update
+          #
+          attr_accessor output(): ::Temporal::Api::Interaction::V1::Output?
 
-          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
-                      | ...
+          # The success or failure status of the update
+          #
+          def output=: [M < ::Temporal::Api::Interaction::V1::Output::_ToProto] (M?) -> M?
+                     | ...
 
-          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def output!: () -> ::Temporal::Api::Interaction::V1::Output?
 
-          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
-
-          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                      | ...
-
-          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
-
-          def initialize: (?update_token: ::String, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+          def initialize: (?update_token: ::String, ?output: ::Temporal::Api::Interaction::V1::Output::init?) -> void
 
           def []: (:update_token) -> ::String
-                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
-                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (:output) -> ::Temporal::Api::Interaction::V1::Output?
                 | (::Symbol) -> untyped
 
           def []=: (:update_token, ::String) -> ::String
-                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
-                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (:output, ::Temporal::Api::Interaction::V1::Output?) -> ::Temporal::Api::Interaction::V1::Output?
+                 | [M < ::Temporal::Api::Interaction::V1::Output::_ToProto] (:output, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -6047,6 +6202,18 @@ module Temporal
 
           def visibility_query!: () -> ::String?
 
+          # Job ID defines the unique ID for the batch job
+          #
+          attr_accessor job_id(): ::String
+
+          def job_id!: () -> ::String?
+
+          # Reason to perform the batch operation
+          #
+          attr_accessor reason(): ::String
+
+          def reason!: () -> ::String?
+
           attr_accessor termination_operation(): ::Temporal::Api::Batch::V1::BatchOperationTermination?
 
           def termination_operation=: [M < ::Temporal::Api::Batch::V1::BatchOperationTermination::_ToProto] (M?) -> M?
@@ -6068,23 +6235,37 @@ module Temporal
 
           def cancellation_operation!: () -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
 
-          def initialize: (?namespace: ::String, ?visibility_query: ::String, ?termination_operation: ::Temporal::Api::Batch::V1::BatchOperationTermination::init?, ?signal_operation: ::Temporal::Api::Batch::V1::BatchOperationSignal::init?, ?cancellation_operation: ::Temporal::Api::Batch::V1::BatchOperationCancellation::init?) -> void
+          attr_accessor deletion_operation(): ::Temporal::Api::Batch::V1::BatchOperationDeletion?
+
+          def deletion_operation=: [M < ::Temporal::Api::Batch::V1::BatchOperationDeletion::_ToProto] (M?) -> M?
+                                 | ...
+
+          def deletion_operation!: () -> ::Temporal::Api::Batch::V1::BatchOperationDeletion?
+
+          def initialize: (?namespace: ::String, ?visibility_query: ::String, ?job_id: ::String, ?reason: ::String, ?termination_operation: ::Temporal::Api::Batch::V1::BatchOperationTermination::init?, ?signal_operation: ::Temporal::Api::Batch::V1::BatchOperationSignal::init?, ?cancellation_operation: ::Temporal::Api::Batch::V1::BatchOperationCancellation::init?, ?deletion_operation: ::Temporal::Api::Batch::V1::BatchOperationDeletion::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:visibility_query) -> ::String
+                | (:job_id) -> ::String
+                | (:reason) -> ::String
                 | (:termination_operation) -> ::Temporal::Api::Batch::V1::BatchOperationTermination?
                 | (:signal_operation) -> ::Temporal::Api::Batch::V1::BatchOperationSignal?
                 | (:cancellation_operation) -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
+                | (:deletion_operation) -> ::Temporal::Api::Batch::V1::BatchOperationDeletion?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
                  | (:visibility_query, ::String) -> ::String
+                 | (:job_id, ::String) -> ::String
+                 | (:reason, ::String) -> ::String
                  | (:termination_operation, ::Temporal::Api::Batch::V1::BatchOperationTermination?) -> ::Temporal::Api::Batch::V1::BatchOperationTermination?
                  | [M < ::Temporal::Api::Batch::V1::BatchOperationTermination::_ToProto] (:termination_operation, M?) -> M?
                  | (:signal_operation, ::Temporal::Api::Batch::V1::BatchOperationSignal?) -> ::Temporal::Api::Batch::V1::BatchOperationSignal?
                  | [M < ::Temporal::Api::Batch::V1::BatchOperationSignal::_ToProto] (:signal_operation, M?) -> M?
                  | (:cancellation_operation, ::Temporal::Api::Batch::V1::BatchOperationCancellation?) -> ::Temporal::Api::Batch::V1::BatchOperationCancellation?
                  | [M < ::Temporal::Api::Batch::V1::BatchOperationCancellation::_ToProto] (:cancellation_operation, M?) -> M?
+                 | (:deletion_operation, ::Temporal::Api::Batch::V1::BatchOperationDeletion?) -> ::Temporal::Api::Batch::V1::BatchOperationDeletion?
+                 | [M < ::Temporal::Api::Batch::V1::BatchOperationDeletion::_ToProto] (:deletion_operation, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -6106,19 +6287,7 @@ module Temporal
         end
 
         class StartBatchOperationResponse < ::Protobuf::Message
-          # Batch job id
-          #
-          attr_accessor job_id(): ::String
-
-          def job_id!: () -> ::String?
-
-          def initialize: (?job_id: ::String) -> void
-
-          def []: (:job_id) -> ::String
-                | (::Symbol) -> untyped
-
-          def []=: (:job_id, ::String) -> ::String
-                 | (::Symbol, untyped) -> untyped
+          def initialize: () -> void
 
           interface _ToProto
             def to_proto: () -> StartBatchOperationResponse
@@ -6151,14 +6320,30 @@ module Temporal
 
           def job_id!: () -> ::String?
 
-          def initialize: (?namespace: ::String, ?job_id: ::String) -> void
+          # Reason to stop a batch operation
+          #
+          attr_accessor reason(): ::String
+
+          def reason!: () -> ::String?
+
+          # Identity of the operator
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          def initialize: (?namespace: ::String, ?job_id: ::String, ?reason: ::String, ?identity: ::String) -> void
 
           def []: (:namespace) -> ::String
                 | (:job_id) -> ::String
+                | (:reason) -> ::String
+                | (:identity) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
                  | (:job_id, ::String) -> ::String
+                 | (:reason, ::String) -> ::String
+                 | (:identity, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -6310,7 +6495,19 @@ module Temporal
 
           def failure_operation_count!: () -> ::Integer?
 
-          def initialize: (?operation_type: ::Temporal::Api::Enums::V1::BatchOperationType::init, ?job_id: ::String, ?state: ::Temporal::Api::Enums::V1::BatchOperationState::init, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?total_operation_count: ::Integer, ?complete_operation_count: ::Integer, ?failure_operation_count: ::Integer) -> void
+          # Identity indicates the operator identity
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          # Reason indicates the reason to stop a operation
+          #
+          attr_accessor reason(): ::String
+
+          def reason!: () -> ::String?
+
+          def initialize: (?operation_type: ::Temporal::Api::Enums::V1::BatchOperationType::init, ?job_id: ::String, ?state: ::Temporal::Api::Enums::V1::BatchOperationState::init, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?total_operation_count: ::Integer, ?complete_operation_count: ::Integer, ?failure_operation_count: ::Integer, ?identity: ::String, ?reason: ::String) -> void
 
           def []: (:operation_type) -> ::Temporal::Api::Enums::V1::BatchOperationType
                 | (:job_id) -> ::String
@@ -6320,6 +6517,8 @@ module Temporal
                 | (:total_operation_count) -> ::Integer
                 | (:complete_operation_count) -> ::Integer
                 | (:failure_operation_count) -> ::Integer
+                | (:identity) -> ::String
+                | (:reason) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:operation_type, ::Temporal::Api::Enums::V1::BatchOperationType) -> ::Temporal::Api::Enums::V1::BatchOperationType
@@ -6334,6 +6533,8 @@ module Temporal
                  | (:total_operation_count, ::Integer) -> ::Integer
                  | (:complete_operation_count, ::Integer) -> ::Integer
                  | (:failure_operation_count, ::Integer) -> ::Integer
+                 | (:identity, ::String) -> ::String
+                 | (:reason, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

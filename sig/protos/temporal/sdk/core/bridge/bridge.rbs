@@ -791,12 +791,12 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor activation(): ::Coresdk::Workflow_activation::WorkflowActivation?
+      attr_accessor activation(): ::Coresdk::WorkflowActivation::WorkflowActivation?
 
-      def activation=: [M < ::Coresdk::Workflow_activation::WorkflowActivation::_ToProto] (M?) -> M?
+      def activation=: [M < ::Coresdk::WorkflowActivation::WorkflowActivation::_ToProto] (M?) -> M?
                      | ...
 
-      def activation!: () -> ::Coresdk::Workflow_activation::WorkflowActivation?
+      def activation!: () -> ::Coresdk::WorkflowActivation::WorkflowActivation?
 
       attr_accessor error(): ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
 
@@ -805,14 +805,14 @@ module Coresdk
 
       def error!: () -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
 
-      def initialize: (?activation: ::Coresdk::Workflow_activation::WorkflowActivation::init?, ?error: ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::init?) -> void
+      def initialize: (?activation: ::Coresdk::WorkflowActivation::WorkflowActivation::init?, ?error: ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::init?) -> void
 
-      def []: (:activation) -> ::Coresdk::Workflow_activation::WorkflowActivation?
+      def []: (:activation) -> ::Coresdk::WorkflowActivation::WorkflowActivation?
             | (:error) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:activation, ::Coresdk::Workflow_activation::WorkflowActivation?) -> ::Coresdk::Workflow_activation::WorkflowActivation?
-             | [M < ::Coresdk::Workflow_activation::WorkflowActivation::_ToProto] (:activation, M?) -> M?
+      def []=: (:activation, ::Coresdk::WorkflowActivation::WorkflowActivation?) -> ::Coresdk::WorkflowActivation::WorkflowActivation?
+             | [M < ::Coresdk::WorkflowActivation::WorkflowActivation::_ToProto] (:activation, M?) -> M?
              | (:error, ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
              | [M < ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped

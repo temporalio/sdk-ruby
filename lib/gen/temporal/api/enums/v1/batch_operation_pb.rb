@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :BATCH_OPERATION_TYPE_TERMINATE, 1
       value :BATCH_OPERATION_TYPE_CANCEL, 2
       value :BATCH_OPERATION_TYPE_SIGNAL, 3
+      value :BATCH_OPERATION_TYPE_DELETE, 4
     end
     add_enum "temporal.api.enums.v1.BatchOperationState" do
       value :BATCH_OPERATION_STATE_UNSPECIFIED, 0
@@ -20,7 +21,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Enums
       module V1

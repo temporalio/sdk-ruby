@@ -28,6 +28,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :auto_reset_points, :message, 12, "temporal.api.workflow.v1.ResetPoints"
       optional :task_queue, :string, 13
       optional :state_transition_count, :int64, 14
+      optional :history_size_bytes, :int64, 15
     end
     add_message "temporal.api.workflow.v1.WorkflowExecutionConfig" do
       optional :task_queue, :message, 1, "temporal.api.taskqueue.v1.TaskQueue"
@@ -92,7 +93,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Workflow
       module V1

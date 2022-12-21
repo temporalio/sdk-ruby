@@ -1,5 +1,5 @@
 module Coresdk
-  module Workflow_commands
+  module WorkflowCommands
     class ActivityCancellationType < ::Protobuf::Enum
       type names = :TRY_CANCEL | :WAIT_CANCELLATION_COMPLETED | :ABANDON
 
@@ -43,190 +43,200 @@ module Coresdk
     end
 
     class WorkflowCommand < ::Protobuf::Message
-      attr_accessor start_timer(): ::Coresdk::Workflow_commands::StartTimer?
+      attr_accessor start_timer(): ::Coresdk::WorkflowCommands::StartTimer?
 
-      def start_timer=: [M < ::Coresdk::Workflow_commands::StartTimer::_ToProto] (M?) -> M?
+      def start_timer=: [M < ::Coresdk::WorkflowCommands::StartTimer::_ToProto] (M?) -> M?
                       | ...
 
-      def start_timer!: () -> ::Coresdk::Workflow_commands::StartTimer?
+      def start_timer!: () -> ::Coresdk::WorkflowCommands::StartTimer?
 
-      attr_accessor schedule_activity(): ::Coresdk::Workflow_commands::ScheduleActivity?
+      attr_accessor schedule_activity(): ::Coresdk::WorkflowCommands::ScheduleActivity?
 
-      def schedule_activity=: [M < ::Coresdk::Workflow_commands::ScheduleActivity::_ToProto] (M?) -> M?
+      def schedule_activity=: [M < ::Coresdk::WorkflowCommands::ScheduleActivity::_ToProto] (M?) -> M?
                             | ...
 
-      def schedule_activity!: () -> ::Coresdk::Workflow_commands::ScheduleActivity?
+      def schedule_activity!: () -> ::Coresdk::WorkflowCommands::ScheduleActivity?
 
-      attr_accessor respond_to_query(): ::Coresdk::Workflow_commands::QueryResult?
+      attr_accessor respond_to_query(): ::Coresdk::WorkflowCommands::QueryResult?
 
-      def respond_to_query=: [M < ::Coresdk::Workflow_commands::QueryResult::_ToProto] (M?) -> M?
+      def respond_to_query=: [M < ::Coresdk::WorkflowCommands::QueryResult::_ToProto] (M?) -> M?
                            | ...
 
-      def respond_to_query!: () -> ::Coresdk::Workflow_commands::QueryResult?
+      def respond_to_query!: () -> ::Coresdk::WorkflowCommands::QueryResult?
 
-      attr_accessor request_cancel_activity(): ::Coresdk::Workflow_commands::RequestCancelActivity?
+      attr_accessor request_cancel_activity(): ::Coresdk::WorkflowCommands::RequestCancelActivity?
 
-      def request_cancel_activity=: [M < ::Coresdk::Workflow_commands::RequestCancelActivity::_ToProto] (M?) -> M?
+      def request_cancel_activity=: [M < ::Coresdk::WorkflowCommands::RequestCancelActivity::_ToProto] (M?) -> M?
                                   | ...
 
-      def request_cancel_activity!: () -> ::Coresdk::Workflow_commands::RequestCancelActivity?
+      def request_cancel_activity!: () -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
 
-      attr_accessor cancel_timer(): ::Coresdk::Workflow_commands::CancelTimer?
+      attr_accessor cancel_timer(): ::Coresdk::WorkflowCommands::CancelTimer?
 
-      def cancel_timer=: [M < ::Coresdk::Workflow_commands::CancelTimer::_ToProto] (M?) -> M?
+      def cancel_timer=: [M < ::Coresdk::WorkflowCommands::CancelTimer::_ToProto] (M?) -> M?
                        | ...
 
-      def cancel_timer!: () -> ::Coresdk::Workflow_commands::CancelTimer?
+      def cancel_timer!: () -> ::Coresdk::WorkflowCommands::CancelTimer?
 
-      attr_accessor complete_workflow_execution(): ::Coresdk::Workflow_commands::CompleteWorkflowExecution?
+      attr_accessor complete_workflow_execution(): ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
 
-      def complete_workflow_execution=: [M < ::Coresdk::Workflow_commands::CompleteWorkflowExecution::_ToProto] (M?) -> M?
+      def complete_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (M?) -> M?
                                       | ...
 
-      def complete_workflow_execution!: () -> ::Coresdk::Workflow_commands::CompleteWorkflowExecution?
+      def complete_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
 
-      attr_accessor fail_workflow_execution(): ::Coresdk::Workflow_commands::FailWorkflowExecution?
+      attr_accessor fail_workflow_execution(): ::Coresdk::WorkflowCommands::FailWorkflowExecution?
 
-      def fail_workflow_execution=: [M < ::Coresdk::Workflow_commands::FailWorkflowExecution::_ToProto] (M?) -> M?
+      def fail_workflow_execution=: [M < ::Coresdk::WorkflowCommands::FailWorkflowExecution::_ToProto] (M?) -> M?
                                   | ...
 
-      def fail_workflow_execution!: () -> ::Coresdk::Workflow_commands::FailWorkflowExecution?
+      def fail_workflow_execution!: () -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
 
-      attr_accessor continue_as_new_workflow_execution(): ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution?
+      attr_accessor continue_as_new_workflow_execution(): ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
 
-      def continue_as_new_workflow_execution=: [M < ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution::_ToProto] (M?) -> M?
+      def continue_as_new_workflow_execution=: [M < ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (M?) -> M?
                                              | ...
 
-      def continue_as_new_workflow_execution!: () -> ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution?
+      def continue_as_new_workflow_execution!: () -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
 
-      attr_accessor cancel_workflow_execution(): ::Coresdk::Workflow_commands::CancelWorkflowExecution?
+      attr_accessor cancel_workflow_execution(): ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
 
-      def cancel_workflow_execution=: [M < ::Coresdk::Workflow_commands::CancelWorkflowExecution::_ToProto] (M?) -> M?
+      def cancel_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CancelWorkflowExecution::_ToProto] (M?) -> M?
                                     | ...
 
-      def cancel_workflow_execution!: () -> ::Coresdk::Workflow_commands::CancelWorkflowExecution?
+      def cancel_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
 
-      attr_accessor set_patch_marker(): ::Coresdk::Workflow_commands::SetPatchMarker?
+      attr_accessor set_patch_marker(): ::Coresdk::WorkflowCommands::SetPatchMarker?
 
-      def set_patch_marker=: [M < ::Coresdk::Workflow_commands::SetPatchMarker::_ToProto] (M?) -> M?
+      def set_patch_marker=: [M < ::Coresdk::WorkflowCommands::SetPatchMarker::_ToProto] (M?) -> M?
                            | ...
 
-      def set_patch_marker!: () -> ::Coresdk::Workflow_commands::SetPatchMarker?
+      def set_patch_marker!: () -> ::Coresdk::WorkflowCommands::SetPatchMarker?
 
-      attr_accessor start_child_workflow_execution(): ::Coresdk::Workflow_commands::StartChildWorkflowExecution?
+      attr_accessor start_child_workflow_execution(): ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
 
-      def start_child_workflow_execution=: [M < ::Coresdk::Workflow_commands::StartChildWorkflowExecution::_ToProto] (M?) -> M?
+      def start_child_workflow_execution=: [M < ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (M?) -> M?
                                          | ...
 
-      def start_child_workflow_execution!: () -> ::Coresdk::Workflow_commands::StartChildWorkflowExecution?
+      def start_child_workflow_execution!: () -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
 
-      attr_accessor cancel_child_workflow_execution(): ::Coresdk::Workflow_commands::CancelChildWorkflowExecution?
+      attr_accessor cancel_child_workflow_execution(): ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
 
-      def cancel_child_workflow_execution=: [M < ::Coresdk::Workflow_commands::CancelChildWorkflowExecution::_ToProto] (M?) -> M?
+      def cancel_child_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (M?) -> M?
                                           | ...
 
-      def cancel_child_workflow_execution!: () -> ::Coresdk::Workflow_commands::CancelChildWorkflowExecution?
+      def cancel_child_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
 
-      attr_accessor request_cancel_external_workflow_execution(): ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution?
+      attr_accessor request_cancel_external_workflow_execution(): ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
 
-      def request_cancel_external_workflow_execution=: [M < ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution::_ToProto] (M?) -> M?
+      def request_cancel_external_workflow_execution=: [M < ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (M?) -> M?
                                                      | ...
 
-      def request_cancel_external_workflow_execution!: () -> ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution?
+      def request_cancel_external_workflow_execution!: () -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
 
-      attr_accessor signal_external_workflow_execution(): ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution?
+      attr_accessor signal_external_workflow_execution(): ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
 
-      def signal_external_workflow_execution=: [M < ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution::_ToProto] (M?) -> M?
+      def signal_external_workflow_execution=: [M < ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (M?) -> M?
                                              | ...
 
-      def signal_external_workflow_execution!: () -> ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution?
+      def signal_external_workflow_execution!: () -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
 
-      attr_accessor cancel_signal_workflow(): ::Coresdk::Workflow_commands::CancelSignalWorkflow?
+      attr_accessor cancel_signal_workflow(): ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
 
-      def cancel_signal_workflow=: [M < ::Coresdk::Workflow_commands::CancelSignalWorkflow::_ToProto] (M?) -> M?
+      def cancel_signal_workflow=: [M < ::Coresdk::WorkflowCommands::CancelSignalWorkflow::_ToProto] (M?) -> M?
                                  | ...
 
-      def cancel_signal_workflow!: () -> ::Coresdk::Workflow_commands::CancelSignalWorkflow?
+      def cancel_signal_workflow!: () -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
 
-      attr_accessor schedule_local_activity(): ::Coresdk::Workflow_commands::ScheduleLocalActivity?
+      attr_accessor schedule_local_activity(): ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
 
-      def schedule_local_activity=: [M < ::Coresdk::Workflow_commands::ScheduleLocalActivity::_ToProto] (M?) -> M?
+      def schedule_local_activity=: [M < ::Coresdk::WorkflowCommands::ScheduleLocalActivity::_ToProto] (M?) -> M?
                                   | ...
 
-      def schedule_local_activity!: () -> ::Coresdk::Workflow_commands::ScheduleLocalActivity?
+      def schedule_local_activity!: () -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
 
-      attr_accessor request_cancel_local_activity(): ::Coresdk::Workflow_commands::RequestCancelLocalActivity?
+      attr_accessor request_cancel_local_activity(): ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
 
-      def request_cancel_local_activity=: [M < ::Coresdk::Workflow_commands::RequestCancelLocalActivity::_ToProto] (M?) -> M?
+      def request_cancel_local_activity=: [M < ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (M?) -> M?
                                         | ...
 
-      def request_cancel_local_activity!: () -> ::Coresdk::Workflow_commands::RequestCancelLocalActivity?
+      def request_cancel_local_activity!: () -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
 
-      attr_accessor upsert_workflow_search_attributes(): ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes?
+      attr_accessor upsert_workflow_search_attributes(): ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
 
-      def upsert_workflow_search_attributes=: [M < ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes::_ToProto] (M?) -> M?
+      def upsert_workflow_search_attributes=: [M < ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (M?) -> M?
                                             | ...
 
-      def upsert_workflow_search_attributes!: () -> ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes?
+      def upsert_workflow_search_attributes!: () -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
 
-      def initialize: (?start_timer: ::Coresdk::Workflow_commands::StartTimer::init?, ?schedule_activity: ::Coresdk::Workflow_commands::ScheduleActivity::init?, ?respond_to_query: ::Coresdk::Workflow_commands::QueryResult::init?, ?request_cancel_activity: ::Coresdk::Workflow_commands::RequestCancelActivity::init?, ?cancel_timer: ::Coresdk::Workflow_commands::CancelTimer::init?, ?complete_workflow_execution: ::Coresdk::Workflow_commands::CompleteWorkflowExecution::init?, ?fail_workflow_execution: ::Coresdk::Workflow_commands::FailWorkflowExecution::init?, ?continue_as_new_workflow_execution: ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution::init?, ?cancel_workflow_execution: ::Coresdk::Workflow_commands::CancelWorkflowExecution::init?, ?set_patch_marker: ::Coresdk::Workflow_commands::SetPatchMarker::init?, ?start_child_workflow_execution: ::Coresdk::Workflow_commands::StartChildWorkflowExecution::init?, ?cancel_child_workflow_execution: ::Coresdk::Workflow_commands::CancelChildWorkflowExecution::init?, ?request_cancel_external_workflow_execution: ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution::init?, ?signal_external_workflow_execution: ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution::init?, ?cancel_signal_workflow: ::Coresdk::Workflow_commands::CancelSignalWorkflow::init?, ?schedule_local_activity: ::Coresdk::Workflow_commands::ScheduleLocalActivity::init?, ?request_cancel_local_activity: ::Coresdk::Workflow_commands::RequestCancelLocalActivity::init?, ?upsert_workflow_search_attributes: ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes::init?) -> void
+      attr_accessor modify_workflow_properties(): ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
 
-      def []: (:start_timer) -> ::Coresdk::Workflow_commands::StartTimer?
-            | (:schedule_activity) -> ::Coresdk::Workflow_commands::ScheduleActivity?
-            | (:respond_to_query) -> ::Coresdk::Workflow_commands::QueryResult?
-            | (:request_cancel_activity) -> ::Coresdk::Workflow_commands::RequestCancelActivity?
-            | (:cancel_timer) -> ::Coresdk::Workflow_commands::CancelTimer?
-            | (:complete_workflow_execution) -> ::Coresdk::Workflow_commands::CompleteWorkflowExecution?
-            | (:fail_workflow_execution) -> ::Coresdk::Workflow_commands::FailWorkflowExecution?
-            | (:continue_as_new_workflow_execution) -> ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution?
-            | (:cancel_workflow_execution) -> ::Coresdk::Workflow_commands::CancelWorkflowExecution?
-            | (:set_patch_marker) -> ::Coresdk::Workflow_commands::SetPatchMarker?
-            | (:start_child_workflow_execution) -> ::Coresdk::Workflow_commands::StartChildWorkflowExecution?
-            | (:cancel_child_workflow_execution) -> ::Coresdk::Workflow_commands::CancelChildWorkflowExecution?
-            | (:request_cancel_external_workflow_execution) -> ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution?
-            | (:signal_external_workflow_execution) -> ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution?
-            | (:cancel_signal_workflow) -> ::Coresdk::Workflow_commands::CancelSignalWorkflow?
-            | (:schedule_local_activity) -> ::Coresdk::Workflow_commands::ScheduleLocalActivity?
-            | (:request_cancel_local_activity) -> ::Coresdk::Workflow_commands::RequestCancelLocalActivity?
-            | (:upsert_workflow_search_attributes) -> ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes?
+      def modify_workflow_properties=: [M < ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (M?) -> M?
+                                     | ...
+
+      def modify_workflow_properties!: () -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
+
+      def initialize: (?start_timer: ::Coresdk::WorkflowCommands::StartTimer::init?, ?schedule_activity: ::Coresdk::WorkflowCommands::ScheduleActivity::init?, ?respond_to_query: ::Coresdk::WorkflowCommands::QueryResult::init?, ?request_cancel_activity: ::Coresdk::WorkflowCommands::RequestCancelActivity::init?, ?cancel_timer: ::Coresdk::WorkflowCommands::CancelTimer::init?, ?complete_workflow_execution: ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::init?, ?fail_workflow_execution: ::Coresdk::WorkflowCommands::FailWorkflowExecution::init?, ?continue_as_new_workflow_execution: ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::init?, ?cancel_workflow_execution: ::Coresdk::WorkflowCommands::CancelWorkflowExecution::init?, ?set_patch_marker: ::Coresdk::WorkflowCommands::SetPatchMarker::init?, ?start_child_workflow_execution: ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::init?, ?cancel_child_workflow_execution: ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::init?, ?request_cancel_external_workflow_execution: ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::init?, ?signal_external_workflow_execution: ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::init?, ?cancel_signal_workflow: ::Coresdk::WorkflowCommands::CancelSignalWorkflow::init?, ?schedule_local_activity: ::Coresdk::WorkflowCommands::ScheduleLocalActivity::init?, ?request_cancel_local_activity: ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::init?, ?upsert_workflow_search_attributes: ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::init?, ?modify_workflow_properties: ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::init?) -> void
+
+      def []: (:start_timer) -> ::Coresdk::WorkflowCommands::StartTimer?
+            | (:schedule_activity) -> ::Coresdk::WorkflowCommands::ScheduleActivity?
+            | (:respond_to_query) -> ::Coresdk::WorkflowCommands::QueryResult?
+            | (:request_cancel_activity) -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
+            | (:cancel_timer) -> ::Coresdk::WorkflowCommands::CancelTimer?
+            | (:complete_workflow_execution) -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
+            | (:fail_workflow_execution) -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
+            | (:continue_as_new_workflow_execution) -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
+            | (:cancel_workflow_execution) -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
+            | (:set_patch_marker) -> ::Coresdk::WorkflowCommands::SetPatchMarker?
+            | (:start_child_workflow_execution) -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
+            | (:cancel_child_workflow_execution) -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
+            | (:request_cancel_external_workflow_execution) -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+            | (:signal_external_workflow_execution) -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
+            | (:cancel_signal_workflow) -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
+            | (:schedule_local_activity) -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
+            | (:request_cancel_local_activity) -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
+            | (:upsert_workflow_search_attributes) -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
+            | (:modify_workflow_properties) -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
             | (::Symbol) -> untyped
 
-      def []=: (:start_timer, ::Coresdk::Workflow_commands::StartTimer?) -> ::Coresdk::Workflow_commands::StartTimer?
-             | [M < ::Coresdk::Workflow_commands::StartTimer::_ToProto] (:start_timer, M?) -> M?
-             | (:schedule_activity, ::Coresdk::Workflow_commands::ScheduleActivity?) -> ::Coresdk::Workflow_commands::ScheduleActivity?
-             | [M < ::Coresdk::Workflow_commands::ScheduleActivity::_ToProto] (:schedule_activity, M?) -> M?
-             | (:respond_to_query, ::Coresdk::Workflow_commands::QueryResult?) -> ::Coresdk::Workflow_commands::QueryResult?
-             | [M < ::Coresdk::Workflow_commands::QueryResult::_ToProto] (:respond_to_query, M?) -> M?
-             | (:request_cancel_activity, ::Coresdk::Workflow_commands::RequestCancelActivity?) -> ::Coresdk::Workflow_commands::RequestCancelActivity?
-             | [M < ::Coresdk::Workflow_commands::RequestCancelActivity::_ToProto] (:request_cancel_activity, M?) -> M?
-             | (:cancel_timer, ::Coresdk::Workflow_commands::CancelTimer?) -> ::Coresdk::Workflow_commands::CancelTimer?
-             | [M < ::Coresdk::Workflow_commands::CancelTimer::_ToProto] (:cancel_timer, M?) -> M?
-             | (:complete_workflow_execution, ::Coresdk::Workflow_commands::CompleteWorkflowExecution?) -> ::Coresdk::Workflow_commands::CompleteWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::CompleteWorkflowExecution::_ToProto] (:complete_workflow_execution, M?) -> M?
-             | (:fail_workflow_execution, ::Coresdk::Workflow_commands::FailWorkflowExecution?) -> ::Coresdk::Workflow_commands::FailWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::FailWorkflowExecution::_ToProto] (:fail_workflow_execution, M?) -> M?
-             | (:continue_as_new_workflow_execution, ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution?) -> ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::ContinueAsNewWorkflowExecution::_ToProto] (:continue_as_new_workflow_execution, M?) -> M?
-             | (:cancel_workflow_execution, ::Coresdk::Workflow_commands::CancelWorkflowExecution?) -> ::Coresdk::Workflow_commands::CancelWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::CancelWorkflowExecution::_ToProto] (:cancel_workflow_execution, M?) -> M?
-             | (:set_patch_marker, ::Coresdk::Workflow_commands::SetPatchMarker?) -> ::Coresdk::Workflow_commands::SetPatchMarker?
-             | [M < ::Coresdk::Workflow_commands::SetPatchMarker::_ToProto] (:set_patch_marker, M?) -> M?
-             | (:start_child_workflow_execution, ::Coresdk::Workflow_commands::StartChildWorkflowExecution?) -> ::Coresdk::Workflow_commands::StartChildWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::StartChildWorkflowExecution::_ToProto] (:start_child_workflow_execution, M?) -> M?
-             | (:cancel_child_workflow_execution, ::Coresdk::Workflow_commands::CancelChildWorkflowExecution?) -> ::Coresdk::Workflow_commands::CancelChildWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::CancelChildWorkflowExecution::_ToProto] (:cancel_child_workflow_execution, M?) -> M?
-             | (:request_cancel_external_workflow_execution, ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution?) -> ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::RequestCancelExternalWorkflowExecution::_ToProto] (:request_cancel_external_workflow_execution, M?) -> M?
-             | (:signal_external_workflow_execution, ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution?) -> ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution?
-             | [M < ::Coresdk::Workflow_commands::SignalExternalWorkflowExecution::_ToProto] (:signal_external_workflow_execution, M?) -> M?
-             | (:cancel_signal_workflow, ::Coresdk::Workflow_commands::CancelSignalWorkflow?) -> ::Coresdk::Workflow_commands::CancelSignalWorkflow?
-             | [M < ::Coresdk::Workflow_commands::CancelSignalWorkflow::_ToProto] (:cancel_signal_workflow, M?) -> M?
-             | (:schedule_local_activity, ::Coresdk::Workflow_commands::ScheduleLocalActivity?) -> ::Coresdk::Workflow_commands::ScheduleLocalActivity?
-             | [M < ::Coresdk::Workflow_commands::ScheduleLocalActivity::_ToProto] (:schedule_local_activity, M?) -> M?
-             | (:request_cancel_local_activity, ::Coresdk::Workflow_commands::RequestCancelLocalActivity?) -> ::Coresdk::Workflow_commands::RequestCancelLocalActivity?
-             | [M < ::Coresdk::Workflow_commands::RequestCancelLocalActivity::_ToProto] (:request_cancel_local_activity, M?) -> M?
-             | (:upsert_workflow_search_attributes, ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes?) -> ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes?
-             | [M < ::Coresdk::Workflow_commands::UpsertWorkflowSearchAttributes::_ToProto] (:upsert_workflow_search_attributes, M?) -> M?
+      def []=: (:start_timer, ::Coresdk::WorkflowCommands::StartTimer?) -> ::Coresdk::WorkflowCommands::StartTimer?
+             | [M < ::Coresdk::WorkflowCommands::StartTimer::_ToProto] (:start_timer, M?) -> M?
+             | (:schedule_activity, ::Coresdk::WorkflowCommands::ScheduleActivity?) -> ::Coresdk::WorkflowCommands::ScheduleActivity?
+             | [M < ::Coresdk::WorkflowCommands::ScheduleActivity::_ToProto] (:schedule_activity, M?) -> M?
+             | (:respond_to_query, ::Coresdk::WorkflowCommands::QueryResult?) -> ::Coresdk::WorkflowCommands::QueryResult?
+             | [M < ::Coresdk::WorkflowCommands::QueryResult::_ToProto] (:respond_to_query, M?) -> M?
+             | (:request_cancel_activity, ::Coresdk::WorkflowCommands::RequestCancelActivity?) -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
+             | [M < ::Coresdk::WorkflowCommands::RequestCancelActivity::_ToProto] (:request_cancel_activity, M?) -> M?
+             | (:cancel_timer, ::Coresdk::WorkflowCommands::CancelTimer?) -> ::Coresdk::WorkflowCommands::CancelTimer?
+             | [M < ::Coresdk::WorkflowCommands::CancelTimer::_ToProto] (:cancel_timer, M?) -> M?
+             | (:complete_workflow_execution, ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (:complete_workflow_execution, M?) -> M?
+             | (:fail_workflow_execution, ::Coresdk::WorkflowCommands::FailWorkflowExecution?) -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::FailWorkflowExecution::_ToProto] (:fail_workflow_execution, M?) -> M?
+             | (:continue_as_new_workflow_execution, ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?) -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (:continue_as_new_workflow_execution, M?) -> M?
+             | (:cancel_workflow_execution, ::Coresdk::WorkflowCommands::CancelWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::CancelWorkflowExecution::_ToProto] (:cancel_workflow_execution, M?) -> M?
+             | (:set_patch_marker, ::Coresdk::WorkflowCommands::SetPatchMarker?) -> ::Coresdk::WorkflowCommands::SetPatchMarker?
+             | [M < ::Coresdk::WorkflowCommands::SetPatchMarker::_ToProto] (:set_patch_marker, M?) -> M?
+             | (:start_child_workflow_execution, ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?) -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (:start_child_workflow_execution, M?) -> M?
+             | (:cancel_child_workflow_execution, ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (:cancel_child_workflow_execution, M?) -> M?
+             | (:request_cancel_external_workflow_execution, ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?) -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (:request_cancel_external_workflow_execution, M?) -> M?
+             | (:signal_external_workflow_execution, ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?) -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
+             | [M < ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (:signal_external_workflow_execution, M?) -> M?
+             | (:cancel_signal_workflow, ::Coresdk::WorkflowCommands::CancelSignalWorkflow?) -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
+             | [M < ::Coresdk::WorkflowCommands::CancelSignalWorkflow::_ToProto] (:cancel_signal_workflow, M?) -> M?
+             | (:schedule_local_activity, ::Coresdk::WorkflowCommands::ScheduleLocalActivity?) -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
+             | [M < ::Coresdk::WorkflowCommands::ScheduleLocalActivity::_ToProto] (:schedule_local_activity, M?) -> M?
+             | (:request_cancel_local_activity, ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?) -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
+             | [M < ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (:request_cancel_local_activity, M?) -> M?
+             | (:upsert_workflow_search_attributes, ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?) -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
+             | [M < ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (:upsert_workflow_search_attributes, M?) -> M?
+             | (:modify_workflow_properties, ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?) -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
+             | [M < ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (:modify_workflow_properties, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -338,10 +348,6 @@ module Coresdk
 
       def activity_type!: () -> ::String?
 
-      attr_accessor namespace(): ::String
-
-      def namespace!: () -> ::String?
-
       # The name of the task queue to place this activity request in
       #
       attr_accessor task_queue(): ::String
@@ -437,14 +443,14 @@ module Coresdk
 
       # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
       #
-      attr_accessor cancellation_type(): ::Coresdk::Workflow_commands::ActivityCancellationType
+      attr_accessor cancellation_type(): ::Coresdk::WorkflowCommands::ActivityCancellationType
 
       # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
       #
-      def cancellation_type=: (::Coresdk::Workflow_commands::ActivityCancellationType::values) -> ::Coresdk::Workflow_commands::ActivityCancellationType::values
+      def cancellation_type=: (::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
                             | ...
 
-      def cancellation_type!: () -> ::Coresdk::Workflow_commands::ActivityCancellationType?
+      def cancellation_type!: () -> ::Coresdk::WorkflowCommands::ActivityCancellationType?
 
       # / If set, the worker will not tell the service that it can immediately start executing this
       # / activity. When unset/default, workers will always attempt to do so if activity execution
@@ -454,12 +460,11 @@ module Coresdk
 
       def do_not_eagerly_execute!: () -> bool?
 
-      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?namespace: ::String, ?task_queue: ::String, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cancellation_type: ::Coresdk::Workflow_commands::ActivityCancellationType::init, ?do_not_eagerly_execute: bool) -> void
+      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?task_queue: ::String, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cancellation_type: ::Coresdk::WorkflowCommands::ActivityCancellationType::init, ?do_not_eagerly_execute: bool) -> void
 
       def []: (:seq) -> ::Integer
             | (:activity_id) -> ::String
             | (:activity_type) -> ::String
-            | (:namespace) -> ::String
             | (:task_queue) -> ::String
             | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
             | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
@@ -468,14 +473,13 @@ module Coresdk
             | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
             | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
             | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
-            | (:cancellation_type) -> ::Coresdk::Workflow_commands::ActivityCancellationType
+            | (:cancellation_type) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
             | (:do_not_eagerly_execute) -> bool
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
              | (:activity_id, ::String) -> ::String
              | (:activity_type, ::String) -> ::String
-             | (:namespace, ::String) -> ::String
              | (:task_queue, ::String) -> ::String
              | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
              | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
@@ -491,8 +495,8 @@ module Coresdk
              | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
              | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
              | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (:cancellation_type, ::Coresdk::Workflow_commands::ActivityCancellationType) -> ::Coresdk::Workflow_commands::ActivityCancellationType
-             | (:cancellation_type, ::Coresdk::Workflow_commands::ActivityCancellationType::values) -> ::Coresdk::Workflow_commands::ActivityCancellationType::values
+             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
+             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
              | (:do_not_eagerly_execute, bool) -> bool
              | (::Symbol, untyped) -> untyped
 
@@ -653,18 +657,18 @@ module Coresdk
       # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
       # / will default to `TRY_CANCEL` automatically.
       #
-      attr_accessor cancellation_type(): ::Coresdk::Workflow_commands::ActivityCancellationType
+      attr_accessor cancellation_type(): ::Coresdk::WorkflowCommands::ActivityCancellationType
 
       # / Defines how the workflow will wait (or not) for cancellation of the activity to be
       # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
       # / will default to `TRY_CANCEL` automatically.
       #
-      def cancellation_type=: (::Coresdk::Workflow_commands::ActivityCancellationType::values) -> ::Coresdk::Workflow_commands::ActivityCancellationType::values
+      def cancellation_type=: (::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
                             | ...
 
-      def cancellation_type!: () -> ::Coresdk::Workflow_commands::ActivityCancellationType?
+      def cancellation_type!: () -> ::Coresdk::WorkflowCommands::ActivityCancellationType?
 
-      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?attempt: ::Integer, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?local_retry_threshold: ::Google::Protobuf::Duration::init?, ?cancellation_type: ::Coresdk::Workflow_commands::ActivityCancellationType::init) -> void
+      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?attempt: ::Integer, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?local_retry_threshold: ::Google::Protobuf::Duration::init?, ?cancellation_type: ::Coresdk::WorkflowCommands::ActivityCancellationType::init) -> void
 
       def []: (:seq) -> ::Integer
             | (:activity_id) -> ::String
@@ -678,7 +682,7 @@ module Coresdk
             | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
             | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
             | (:local_retry_threshold) -> ::Google::Protobuf::Duration?
-            | (:cancellation_type) -> ::Coresdk::Workflow_commands::ActivityCancellationType
+            | (:cancellation_type) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
@@ -701,8 +705,8 @@ module Coresdk
              | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
              | (:local_retry_threshold, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:local_retry_threshold, M?) -> M?
-             | (:cancellation_type, ::Coresdk::Workflow_commands::ActivityCancellationType) -> ::Coresdk::Workflow_commands::ActivityCancellationType
-             | (:cancellation_type, ::Coresdk::Workflow_commands::ActivityCancellationType::values) -> ::Coresdk::Workflow_commands::ActivityCancellationType::values
+             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
+             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -796,12 +800,12 @@ module Coresdk
 
       def query_id!: () -> ::String?
 
-      attr_accessor succeeded(): ::Coresdk::Workflow_commands::QuerySuccess?
+      attr_accessor succeeded(): ::Coresdk::WorkflowCommands::QuerySuccess?
 
-      def succeeded=: [M < ::Coresdk::Workflow_commands::QuerySuccess::_ToProto] (M?) -> M?
+      def succeeded=: [M < ::Coresdk::WorkflowCommands::QuerySuccess::_ToProto] (M?) -> M?
                     | ...
 
-      def succeeded!: () -> ::Coresdk::Workflow_commands::QuerySuccess?
+      def succeeded!: () -> ::Coresdk::WorkflowCommands::QuerySuccess?
 
       attr_accessor failed(): ::Temporal::Api::Failure::V1::Failure?
 
@@ -810,16 +814,16 @@ module Coresdk
 
       def failed!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?query_id: ::String, ?succeeded: ::Coresdk::Workflow_commands::QuerySuccess::init?, ?failed: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?query_id: ::String, ?succeeded: ::Coresdk::WorkflowCommands::QuerySuccess::init?, ?failed: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
       def []: (:query_id) -> ::String
-            | (:succeeded) -> ::Coresdk::Workflow_commands::QuerySuccess?
+            | (:succeeded) -> ::Coresdk::WorkflowCommands::QuerySuccess?
             | (:failed) -> ::Temporal::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:query_id, ::String) -> ::String
-             | (:succeeded, ::Coresdk::Workflow_commands::QuerySuccess?) -> ::Coresdk::Workflow_commands::QuerySuccess?
-             | [M < ::Coresdk::Workflow_commands::QuerySuccess::_ToProto] (:succeeded, M?) -> M?
+             | (:succeeded, ::Coresdk::WorkflowCommands::QuerySuccess?) -> ::Coresdk::WorkflowCommands::QuerySuccess?
+             | [M < ::Coresdk::WorkflowCommands::QuerySuccess::_ToProto] (:succeeded, M?) -> M?
              | (:failed, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
              | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failed, M?) -> M?
              | (::Symbol, untyped) -> untyped
@@ -1644,6 +1648,49 @@ module Coresdk
       type array = ::Array[UpsertWorkflowSearchAttributes | _ToProto]
 
       type hash[KEY] = ::Hash[KEY, UpsertWorkflowSearchAttributes | _ToProto]
+    end
+
+    class ModifyWorkflowProperties < ::Protobuf::Message
+      # If set, update the workflow memo with the provided values. The values will be merged with
+      #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+      #  used as the value for the key being deleted.
+      #
+      attr_accessor upserted_memo(): ::Temporal::Api::Common::V1::Memo?
+
+      # If set, update the workflow memo with the provided values. The values will be merged with
+      #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+      #  used as the value for the key being deleted.
+      #
+      def upserted_memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                        | ...
+
+      def upserted_memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+      def initialize: (?upserted_memo: ::Temporal::Api::Common::V1::Memo::init?) -> void
+
+      def []: (:upserted_memo) -> ::Temporal::Api::Common::V1::Memo?
+            | (::Symbol) -> untyped
+
+      def []=: (:upserted_memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+             | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
+             | (::Symbol, untyped) -> untyped
+
+      interface _ToProto
+        def to_proto: () -> ModifyWorkflowProperties
+      end
+
+      # The type of `#initialize` parameter.
+      type init = ModifyWorkflowProperties | _ToProto
+
+      # The type of `repeated` field.
+      type field_array = ::Protobuf::Field::FieldArray[ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
+
+      # The type of `map` field.
+      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
+
+      type array = ::Array[ModifyWorkflowProperties | _ToProto]
+
+      type hash[KEY] = ::Hash[KEY, ModifyWorkflowProperties | _ToProto]
     end
   end
 end

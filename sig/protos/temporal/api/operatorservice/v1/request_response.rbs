@@ -1,6 +1,6 @@
 module Temporal
   module Api
-    module Operatorservice
+    module OperatorService
       module V1
         # (-- Search Attribute --)
         #
@@ -281,82 +281,15 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, DeleteNamespaceResponse | _ToProto]
         end
 
-        # (-- api-linter: core::0135::request-unknown-fields=disabled
-        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
-        #  (-- api-linter: core::0135::request-name-required=disabled
-        #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
-        #
-        class DeleteWorkflowExecutionRequest < ::Protobuf::Message
-          attr_accessor namespace(): ::String
-
-          def namespace!: () -> ::String?
-
-          # Workflow Execution to delete. If run_id is not specified, the latest one is used.
-          #
-          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
-
-          # Workflow Execution to delete. If run_id is not specified, the latest one is used.
-          #
-          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
-                                 | ...
-
-          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
-
-          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
-
-          def []: (:namespace) -> ::String
-                | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-                | (::Symbol) -> untyped
-
-          def []=: (:namespace, ::String) -> ::String
-                 | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> DeleteWorkflowExecutionRequest
-          end
-
-          # The type of `#initialize` parameter.
-          type init = DeleteWorkflowExecutionRequest | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[DeleteWorkflowExecutionRequest, DeleteWorkflowExecutionRequest | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteWorkflowExecutionRequest, DeleteWorkflowExecutionRequest | _ToProto]
-
-          type array = ::Array[DeleteWorkflowExecutionRequest | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, DeleteWorkflowExecutionRequest | _ToProto]
-        end
-
-        class DeleteWorkflowExecutionResponse < ::Protobuf::Message
-          def initialize: () -> void
-
-          interface _ToProto
-            def to_proto: () -> DeleteWorkflowExecutionResponse
-          end
-
-          # The type of `#initialize` parameter.
-          type init = DeleteWorkflowExecutionResponse | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[DeleteWorkflowExecutionResponse, DeleteWorkflowExecutionResponse | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DeleteWorkflowExecutionResponse, DeleteWorkflowExecutionResponse | _ToProto]
-
-          type array = ::Array[DeleteWorkflowExecutionResponse | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, DeleteWorkflowExecutionResponse | _ToProto]
-        end
-
         class AddOrUpdateRemoteClusterRequest < ::Protobuf::Message
+          # Frontend Address is a cross cluster accessible address.
+          #
           attr_accessor frontend_address(): ::String
 
           def frontend_address!: () -> ::String?
 
+          # Flag to enable / disable the cross cluster connection.
+          #
           attr_accessor enable_remote_cluster_connection(): bool
 
           def enable_remote_cluster_connection!: () -> bool?
@@ -413,6 +346,8 @@ module Temporal
         end
 
         class RemoveRemoteClusterRequest < ::Protobuf::Message
+          # Remote cluster name to be removed.
+          #
           attr_accessor cluster_name(): ::String
 
           def cluster_name!: () -> ::String?
@@ -464,148 +399,6 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, RemoveRemoteClusterResponse | _ToProto]
         end
 
-        class DescribeClusterRequest < ::Protobuf::Message
-          attr_accessor cluster_name(): ::String
-
-          def cluster_name!: () -> ::String?
-
-          def initialize: (?cluster_name: ::String) -> void
-
-          def []: (:cluster_name) -> ::String
-                | (::Symbol) -> untyped
-
-          def []=: (:cluster_name, ::String) -> ::String
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> DescribeClusterRequest
-          end
-
-          # The type of `#initialize` parameter.
-          type init = DescribeClusterRequest | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[DescribeClusterRequest, DescribeClusterRequest | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeClusterRequest, DescribeClusterRequest | _ToProto]
-
-          type array = ::Array[DescribeClusterRequest | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, DescribeClusterRequest | _ToProto]
-        end
-
-        class DescribeClusterResponse < ::Protobuf::Message
-          attr_accessor supported_clients(): ::Protobuf::field_hash[::String, ::String]
-
-          def supported_clients=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
-                                | ...
-
-          def supported_clients!: () -> ::Protobuf::field_hash[::String, ::String]?
-
-          attr_accessor server_version(): ::String
-
-          def server_version!: () -> ::String?
-
-          attr_accessor membership_info(): ::Temporal::Api::Cluster::V1::MembershipInfo?
-
-          def membership_info=: [M < ::Temporal::Api::Cluster::V1::MembershipInfo::_ToProto] (M?) -> M?
-                              | ...
-
-          def membership_info!: () -> ::Temporal::Api::Cluster::V1::MembershipInfo?
-
-          attr_accessor cluster_id(): ::String
-
-          def cluster_id!: () -> ::String?
-
-          attr_accessor cluster_name(): ::String
-
-          def cluster_name!: () -> ::String?
-
-          attr_accessor history_shard_count(): ::Integer
-
-          def history_shard_count!: () -> ::Integer?
-
-          attr_accessor persistence_store(): ::String
-
-          def persistence_store!: () -> ::String?
-
-          attr_accessor visibility_store(): ::String
-
-          def visibility_store!: () -> ::String?
-
-          attr_accessor version_info(): ::Temporal::Api::Version::V1::VersionInfo?
-
-          def version_info=: [M < ::Temporal::Api::Version::V1::VersionInfo::_ToProto] (M?) -> M?
-                           | ...
-
-          def version_info!: () -> ::Temporal::Api::Version::V1::VersionInfo?
-
-          attr_accessor failover_version_increment(): ::Integer
-
-          def failover_version_increment!: () -> ::Integer?
-
-          attr_accessor initial_failover_version(): ::Integer
-
-          def initial_failover_version!: () -> ::Integer?
-
-          attr_accessor is_global_namespace_enabled(): bool
-
-          def is_global_namespace_enabled!: () -> bool?
-
-          def initialize: (?supported_clients: ::Hash[::String, ::String], ?server_version: ::String, ?membership_info: ::Temporal::Api::Cluster::V1::MembershipInfo::init?, ?cluster_id: ::String, ?cluster_name: ::String, ?history_shard_count: ::Integer, ?persistence_store: ::String, ?visibility_store: ::String, ?version_info: ::Temporal::Api::Version::V1::VersionInfo::init?, ?failover_version_increment: ::Integer, ?initial_failover_version: ::Integer, ?is_global_namespace_enabled: bool) -> void
-
-          def []: (:supported_clients) -> ::Protobuf::field_hash[::String, ::String]
-                | (:server_version) -> ::String
-                | (:membership_info) -> ::Temporal::Api::Cluster::V1::MembershipInfo?
-                | (:cluster_id) -> ::String
-                | (:cluster_name) -> ::String
-                | (:history_shard_count) -> ::Integer
-                | (:persistence_store) -> ::String
-                | (:visibility_store) -> ::String
-                | (:version_info) -> ::Temporal::Api::Version::V1::VersionInfo?
-                | (:failover_version_increment) -> ::Integer
-                | (:initial_failover_version) -> ::Integer
-                | (:is_global_namespace_enabled) -> bool
-                | (::Symbol) -> untyped
-
-          def []=: (:supported_clients, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
-                 | (:supported_clients, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
-                 | (:server_version, ::String) -> ::String
-                 | (:membership_info, ::Temporal::Api::Cluster::V1::MembershipInfo?) -> ::Temporal::Api::Cluster::V1::MembershipInfo?
-                 | [M < ::Temporal::Api::Cluster::V1::MembershipInfo::_ToProto] (:membership_info, M?) -> M?
-                 | (:cluster_id, ::String) -> ::String
-                 | (:cluster_name, ::String) -> ::String
-                 | (:history_shard_count, ::Integer) -> ::Integer
-                 | (:persistence_store, ::String) -> ::String
-                 | (:visibility_store, ::String) -> ::String
-                 | (:version_info, ::Temporal::Api::Version::V1::VersionInfo?) -> ::Temporal::Api::Version::V1::VersionInfo?
-                 | [M < ::Temporal::Api::Version::V1::VersionInfo::_ToProto] (:version_info, M?) -> M?
-                 | (:failover_version_increment, ::Integer) -> ::Integer
-                 | (:initial_failover_version, ::Integer) -> ::Integer
-                 | (:is_global_namespace_enabled, bool) -> bool
-                 | (::Symbol, untyped) -> untyped
-
-          def is_global_namespace_enabled?: () -> bool
-
-          interface _ToProto
-            def to_proto: () -> DescribeClusterResponse
-          end
-
-          # The type of `#initialize` parameter.
-          type init = DescribeClusterResponse | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[DescribeClusterResponse, DescribeClusterResponse | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, DescribeClusterResponse, DescribeClusterResponse | _ToProto]
-
-          type array = ::Array[DescribeClusterResponse | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, DescribeClusterResponse | _ToProto]
-        end
-
         class ListClustersRequest < ::Protobuf::Message
           attr_accessor page_size(): ::Integer
 
@@ -644,25 +437,29 @@ module Temporal
         end
 
         class ListClustersResponse < ::Protobuf::Message
-          attr_accessor clusters(): ::Temporal::Api::Cluster::V1::ClusterMetadata::field_array
+          # List of all cluster information
+          #
+          attr_accessor clusters(): ::Temporal::Api::OperatorService::V1::ClusterMetadata::field_array
 
-          def clusters=: (::Temporal::Api::Cluster::V1::ClusterMetadata::array) -> ::Temporal::Api::Cluster::V1::ClusterMetadata::array
+          # List of all cluster information
+          #
+          def clusters=: (::Temporal::Api::OperatorService::V1::ClusterMetadata::array) -> ::Temporal::Api::OperatorService::V1::ClusterMetadata::array
                        | ...
 
-          def clusters!: () -> ::Temporal::Api::Cluster::V1::ClusterMetadata::field_array?
+          def clusters!: () -> ::Temporal::Api::OperatorService::V1::ClusterMetadata::field_array?
 
           attr_accessor next_page_token(): ::String
 
           def next_page_token!: () -> ::String?
 
-          def initialize: (?clusters: ::Temporal::Api::Cluster::V1::ClusterMetadata::array, ?next_page_token: ::String) -> void
+          def initialize: (?clusters: ::Temporal::Api::OperatorService::V1::ClusterMetadata::array, ?next_page_token: ::String) -> void
 
-          def []: (:clusters) -> ::Temporal::Api::Cluster::V1::ClusterMetadata::field_array
+          def []: (:clusters) -> ::Temporal::Api::OperatorService::V1::ClusterMetadata::field_array
                 | (:next_page_token) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:clusters, ::Temporal::Api::Cluster::V1::ClusterMetadata::field_array) -> ::Temporal::Api::Cluster::V1::ClusterMetadata::field_array
-                 | (:clusters, ::Temporal::Api::Cluster::V1::ClusterMetadata::array) -> ::Temporal::Api::Cluster::V1::ClusterMetadata::array
+          def []=: (:clusters, ::Temporal::Api::OperatorService::V1::ClusterMetadata::field_array) -> ::Temporal::Api::OperatorService::V1::ClusterMetadata::field_array
+                 | (:clusters, ::Temporal::Api::OperatorService::V1::ClusterMetadata::array) -> ::Temporal::Api::OperatorService::V1::ClusterMetadata::array
                  | (:next_page_token, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -684,136 +481,79 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, ListClustersResponse | _ToProto]
         end
 
-        class ListClusterMembersRequest < ::Protobuf::Message
-          # (-- api-linter: core::0140::prepositions=disabled
-          #      aip.dev/not-precedent: "within" is used to indicate a time range. --)
+        class ClusterMetadata < ::Protobuf::Message
+          # Name of the cluster name.
           #
-          attr_accessor last_heartbeat_within(): ::Google::Protobuf::Duration?
+          attr_accessor cluster_name(): ::String
 
-          # (-- api-linter: core::0140::prepositions=disabled
-          #      aip.dev/not-precedent: "within" is used to indicate a time range. --)
+          def cluster_name!: () -> ::String?
+
+          # Id of the cluster.
           #
-          def last_heartbeat_within=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                    | ...
+          attr_accessor cluster_id(): ::String
 
-          def last_heartbeat_within!: () -> ::Google::Protobuf::Duration?
+          def cluster_id!: () -> ::String?
 
-          attr_accessor rpc_address(): ::String
-
-          def rpc_address!: () -> ::String?
-
-          attr_accessor host_id(): ::String
-
-          def host_id!: () -> ::String?
-
-          attr_accessor role(): ::Temporal::Api::Enums::V1::ClusterMemberRole
-
-          def role=: (::Temporal::Api::Enums::V1::ClusterMemberRole::values) -> ::Temporal::Api::Enums::V1::ClusterMemberRole::values
-                   | ...
-
-          def role!: () -> ::Temporal::Api::Enums::V1::ClusterMemberRole?
-
-          # (-- api-linter: core::0140::prepositions=disabled
-          #      aip.dev/not-precedent: "after" is used to indicate a time range. --)
+          # Cluster accessible address.
           #
-          attr_accessor session_started_after_time(): ::Google::Protobuf::Timestamp?
+          attr_accessor address(): ::String
 
-          # (-- api-linter: core::0140::prepositions=disabled
-          #      aip.dev/not-precedent: "after" is used to indicate a time range. --)
+          def address!: () -> ::String?
+
+          # A unique failover version across all connected clusters.
           #
-          def session_started_after_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                                         | ...
+          attr_accessor initial_failover_version(): ::Integer
 
-          def session_started_after_time!: () -> ::Google::Protobuf::Timestamp?
+          def initial_failover_version!: () -> ::Integer?
 
-          attr_accessor page_size(): ::Integer
+          # History service shard number.
+          #
+          attr_accessor history_shard_count(): ::Integer
 
-          def page_size!: () -> ::Integer?
+          def history_shard_count!: () -> ::Integer?
 
-          attr_accessor next_page_token(): ::String
+          # A flag to indicate if a connection is active.
+          #
+          attr_accessor is_connection_enabled(): bool
 
-          def next_page_token!: () -> ::String?
+          def is_connection_enabled!: () -> bool?
 
-          def initialize: (?last_heartbeat_within: ::Google::Protobuf::Duration::init?, ?rpc_address: ::String, ?host_id: ::String, ?role: ::Temporal::Api::Enums::V1::ClusterMemberRole::init, ?session_started_after_time: ::Google::Protobuf::Timestamp::init?, ?page_size: ::Integer, ?next_page_token: ::String) -> void
+          def initialize: (?cluster_name: ::String, ?cluster_id: ::String, ?address: ::String, ?initial_failover_version: ::Integer, ?history_shard_count: ::Integer, ?is_connection_enabled: bool) -> void
 
-          def []: (:last_heartbeat_within) -> ::Google::Protobuf::Duration?
-                | (:rpc_address) -> ::String
-                | (:host_id) -> ::String
-                | (:role) -> ::Temporal::Api::Enums::V1::ClusterMemberRole
-                | (:session_started_after_time) -> ::Google::Protobuf::Timestamp?
-                | (:page_size) -> ::Integer
-                | (:next_page_token) -> ::String
+          def []: (:cluster_name) -> ::String
+                | (:cluster_id) -> ::String
+                | (:address) -> ::String
+                | (:initial_failover_version) -> ::Integer
+                | (:history_shard_count) -> ::Integer
+                | (:is_connection_enabled) -> bool
                 | (::Symbol) -> untyped
 
-          def []=: (:last_heartbeat_within, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-                 | [M < ::Google::Protobuf::Duration::_ToProto] (:last_heartbeat_within, M?) -> M?
-                 | (:rpc_address, ::String) -> ::String
-                 | (:host_id, ::String) -> ::String
-                 | (:role, ::Temporal::Api::Enums::V1::ClusterMemberRole) -> ::Temporal::Api::Enums::V1::ClusterMemberRole
-                 | (:role, ::Temporal::Api::Enums::V1::ClusterMemberRole::values) -> ::Temporal::Api::Enums::V1::ClusterMemberRole::values
-                 | (:session_started_after_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:session_started_after_time, M?) -> M?
-                 | (:page_size, ::Integer) -> ::Integer
-                 | (:next_page_token, ::String) -> ::String
+          def []=: (:cluster_name, ::String) -> ::String
+                 | (:cluster_id, ::String) -> ::String
+                 | (:address, ::String) -> ::String
+                 | (:initial_failover_version, ::Integer) -> ::Integer
+                 | (:history_shard_count, ::Integer) -> ::Integer
+                 | (:is_connection_enabled, bool) -> bool
                  | (::Symbol, untyped) -> untyped
 
+          def is_connection_enabled?: () -> bool
+
           interface _ToProto
-            def to_proto: () -> ListClusterMembersRequest
+            def to_proto: () -> ClusterMetadata
           end
 
           # The type of `#initialize` parameter.
-          type init = ListClusterMembersRequest | _ToProto
+          type init = ClusterMetadata | _ToProto
 
           # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[ListClusterMembersRequest, ListClusterMembersRequest | _ToProto]
+          type field_array = ::Protobuf::Field::FieldArray[ClusterMetadata, ClusterMetadata | _ToProto]
 
           # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListClusterMembersRequest, ListClusterMembersRequest | _ToProto]
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ClusterMetadata, ClusterMetadata | _ToProto]
 
-          type array = ::Array[ListClusterMembersRequest | _ToProto]
+          type array = ::Array[ClusterMetadata | _ToProto]
 
-          type hash[KEY] = ::Hash[KEY, ListClusterMembersRequest | _ToProto]
-        end
-
-        class ListClusterMembersResponse < ::Protobuf::Message
-          attr_accessor active_members(): ::Temporal::Api::Cluster::V1::ClusterMember::field_array
-
-          def active_members=: (::Temporal::Api::Cluster::V1::ClusterMember::array) -> ::Temporal::Api::Cluster::V1::ClusterMember::array
-                             | ...
-
-          def active_members!: () -> ::Temporal::Api::Cluster::V1::ClusterMember::field_array?
-
-          attr_accessor next_page_token(): ::String
-
-          def next_page_token!: () -> ::String?
-
-          def initialize: (?active_members: ::Temporal::Api::Cluster::V1::ClusterMember::array, ?next_page_token: ::String) -> void
-
-          def []: (:active_members) -> ::Temporal::Api::Cluster::V1::ClusterMember::field_array
-                | (:next_page_token) -> ::String
-                | (::Symbol) -> untyped
-
-          def []=: (:active_members, ::Temporal::Api::Cluster::V1::ClusterMember::field_array) -> ::Temporal::Api::Cluster::V1::ClusterMember::field_array
-                 | (:active_members, ::Temporal::Api::Cluster::V1::ClusterMember::array) -> ::Temporal::Api::Cluster::V1::ClusterMember::array
-                 | (:next_page_token, ::String) -> ::String
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> ListClusterMembersResponse
-          end
-
-          # The type of `#initialize` parameter.
-          type init = ListClusterMembersResponse | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[ListClusterMembersResponse, ListClusterMembersResponse | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ListClusterMembersResponse, ListClusterMembersResponse | _ToProto]
-
-          type array = ::Array[ListClusterMembersResponse | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, ListClusterMembersResponse | _ToProto]
+          type hash[KEY] = ::Hash[KEY, ClusterMetadata | _ToProto]
         end
       end
     end

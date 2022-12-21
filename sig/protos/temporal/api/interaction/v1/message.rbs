@@ -1,0 +1,254 @@
+module Temporal
+  module Api
+    module Interaction
+      module V1
+        # Meta carries metadata about an interaction for use by the system (i.e. not
+        #  generall user-visible)
+        #
+        class Meta < ::Protobuf::Message
+          # An ID with workflow-scoped uniqueness for this interaction
+          #
+          attr_accessor id(): ::String
+
+          def id!: () -> ::String?
+
+          # The event ID after which this interaction can execute. The effects of
+          #  history up to and including this event ID should be visible to the
+          #  interaction when it executes.
+          #
+          attr_accessor event_id(): ::Integer
+
+          def event_id!: () -> ::Integer?
+
+          # The type of this interaction.
+          #
+          attr_accessor interaction_type(): ::Temporal::Api::Enums::V1::InteractionType
+
+          # The type of this interaction.
+          #
+          def interaction_type=: (::Temporal::Api::Enums::V1::InteractionType::values) -> ::Temporal::Api::Enums::V1::InteractionType::values
+                               | ...
+
+          def interaction_type!: () -> ::Temporal::Api::Enums::V1::InteractionType?
+
+          # A string identifying the agent that requested this interaction.
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          attr_accessor request_id(): ::String
+
+          def request_id!: () -> ::String?
+
+          def initialize: (?id: ::String, ?event_id: ::Integer, ?interaction_type: ::Temporal::Api::Enums::V1::InteractionType::init, ?identity: ::String, ?request_id: ::String) -> void
+
+          def []: (:id) -> ::String
+                | (:event_id) -> ::Integer
+                | (:interaction_type) -> ::Temporal::Api::Enums::V1::InteractionType
+                | (:identity) -> ::String
+                | (:request_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:id, ::String) -> ::String
+                 | (:event_id, ::Integer) -> ::Integer
+                 | (:interaction_type, ::Temporal::Api::Enums::V1::InteractionType) -> ::Temporal::Api::Enums::V1::InteractionType
+                 | (:interaction_type, ::Temporal::Api::Enums::V1::InteractionType::values) -> ::Temporal::Api::Enums::V1::InteractionType::values
+                 | (:identity, ::String) -> ::String
+                 | (:request_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Meta
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Meta | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Meta, Meta | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Meta, Meta | _ToProto]
+
+          type array = ::Array[Meta | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Meta | _ToProto]
+        end
+
+        # Input carries interaction input that comes from the caller.
+        #
+        class Input < ::Protobuf::Message
+          # Headers that are passed with the interaction to and from the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          # Headers that are passed with the interaction to and from the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          # The name of the input handler to invoke on the target workflow
+          #
+          attr_accessor name(): ::String
+
+          def name!: () -> ::String?
+
+          # The arguments to pass to the named handler.
+          #
+          attr_accessor args(): ::Temporal::Api::Common::V1::Payloads?
+
+          # The arguments to pass to the named handler.
+          #
+          def args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                   | ...
+
+          def args!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporal::Api::Common::V1::Payloads::init?) -> void
+
+          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:name) -> ::String
+                | (:args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (::Symbol) -> untyped
+
+          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:name, ::String) -> ::String
+                 | (:args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Input
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Input | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Input, Input | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Input, Input | _ToProto]
+
+          type array = ::Array[Input | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Input | _ToProto]
+        end
+
+        # Output carries the output data from an interaction.
+        #
+        class Output < ::Protobuf::Message
+          # Headers that are passed with the interaction to and from the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+
+          # Headers that are passed with the interaction to and from the processing workflow.
+          #  These can include things like auth or tracing tokens.
+          #
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+                     | ...
+
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
+
+          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+
+          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+                      | ...
+
+          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
+
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Output
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Output | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Output, Output | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Output, Output | _ToProto]
+
+          type array = ::Array[Output | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Output | _ToProto]
+        end
+
+        class Invocation < ::Protobuf::Message
+          attr_accessor meta(): ::Temporal::Api::Interaction::V1::Meta?
+
+          def meta=: [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
+                   | ...
+
+          def meta!: () -> ::Temporal::Api::Interaction::V1::Meta?
+
+          attr_accessor input(): ::Temporal::Api::Interaction::V1::Input?
+
+          def input=: [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
+                    | ...
+
+          def input!: () -> ::Temporal::Api::Interaction::V1::Input?
+
+          def initialize: (?meta: ::Temporal::Api::Interaction::V1::Meta::init?, ?input: ::Temporal::Api::Interaction::V1::Input::init?) -> void
+
+          def []: (:meta) -> ::Temporal::Api::Interaction::V1::Meta?
+                | (:input) -> ::Temporal::Api::Interaction::V1::Input?
+                | (::Symbol) -> untyped
+
+          def []=: (:meta, ::Temporal::Api::Interaction::V1::Meta?) -> ::Temporal::Api::Interaction::V1::Meta?
+                 | [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:input, ::Temporal::Api::Interaction::V1::Input?) -> ::Temporal::Api::Interaction::V1::Input?
+                 | [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Invocation
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Invocation | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Invocation, Invocation | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Invocation, Invocation | _ToProto]
+
+          type array = ::Array[Invocation | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Invocation | _ToProto]
+        end
+      end
+    end
+  end
+end

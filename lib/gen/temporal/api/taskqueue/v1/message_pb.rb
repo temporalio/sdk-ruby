@@ -37,7 +37,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :last_access_time, :message, 1, "google.protobuf.Timestamp"
       optional :identity, :string, 2
       optional :rate_per_second, :double, 3
-      optional :worker_versioning_build_id, :string, 4
+      optional :worker_versioning_id, :message, 4, "temporal.api.taskqueue.v1.VersionId"
     end
     add_message "temporal.api.taskqueue.v1.StickyExecutionAttributes" do
       optional :worker_task_queue, :message, 1, "temporal.api.taskqueue.v1.TaskQueue"
@@ -54,7 +54,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module TaskQueue
       module V1

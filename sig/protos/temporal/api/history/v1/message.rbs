@@ -829,18 +829,34 @@ module Temporal
 
           def binary_checksum!: () -> ::String?
 
-          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?binary_checksum: ::String) -> void
+          # ID of the worker who picked up this workflow task, or missing if worker
+          #  is not using versioning.
+          #
+          attr_accessor worker_versioning_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          # ID of the worker who picked up this workflow task, or missing if worker
+          #  is not using versioning.
+          #
+          def worker_versioning_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
+
+          def worker_versioning_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:scheduled_event_id) -> ::Integer
                 | (:started_event_id) -> ::Integer
                 | (:identity) -> ::String
                 | (:binary_checksum) -> ::String
+                | (:worker_versioning_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:scheduled_event_id, ::Integer) -> ::Integer
                  | (:started_event_id, ::Integer) -> ::Integer
                  | (:identity, ::String) -> ::String
                  | (:binary_checksum, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -2583,6 +2599,57 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, UpsertWorkflowSearchAttributesEventAttributes | _ToProto]
         end
 
+        class WorkflowPropertiesModifiedEventAttributes < ::Protobuf::Message
+          # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
+          #
+          attr_accessor workflow_task_completed_event_id(): ::Integer
+
+          def workflow_task_completed_event_id!: () -> ::Integer?
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          attr_accessor upserted_memo(): ::Temporal::Api::Common::V1::Memo?
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          def upserted_memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                            | ...
+
+          def upserted_memo!: () -> ::Temporal::Api::Common::V1::Memo?
+
+          def initialize: (?workflow_task_completed_event_id: ::Integer, ?upserted_memo: ::Temporal::Api::Common::V1::Memo::init?) -> void
+
+          def []: (:workflow_task_completed_event_id) -> ::Integer
+                | (:upserted_memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_task_completed_event_id, ::Integer) -> ::Integer
+                 | (:upserted_memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowPropertiesModifiedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowPropertiesModifiedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowPropertiesModifiedEventAttributes, WorkflowPropertiesModifiedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowPropertiesModifiedEventAttributes, WorkflowPropertiesModifiedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowPropertiesModifiedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowPropertiesModifiedEventAttributes | _ToProto]
+        end
+
         class StartChildWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
@@ -3391,84 +3458,31 @@ module Temporal
           type hash[KEY] = ::Hash[KEY, ChildWorkflowExecutionTerminatedEventAttributes | _ToProto]
         end
 
-        class WorkflowUpdateRequestedEventAttributes < ::Protobuf::Message
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
-
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
-                     | ...
-
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
-
-          attr_accessor request_id(): ::String
-
-          def request_id!: () -> ::String?
-
-          attr_accessor update_id(): ::String
-
-          def update_id!: () -> ::String?
-
-          attr_accessor update(): ::Temporal::Api::Update::V1::WorkflowUpdate?
-
-          def update=: [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (M?) -> M?
-                     | ...
-
-          def update!: () -> ::Temporal::Api::Update::V1::WorkflowUpdate?
-
-          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?request_id: ::String, ?update_id: ::String, ?update: ::Temporal::Api::Update::V1::WorkflowUpdate::init?) -> void
-
-          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
-                | (:request_id) -> ::String
-                | (:update_id) -> ::String
-                | (:update) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
-                | (::Symbol) -> untyped
-
-          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:request_id, ::String) -> ::String
-                 | (:update_id, ::String) -> ::String
-                 | (:update, ::Temporal::Api::Update::V1::WorkflowUpdate?) -> ::Temporal::Api::Update::V1::WorkflowUpdate?
-                 | [M < ::Temporal::Api::Update::V1::WorkflowUpdate::_ToProto] (:update, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> WorkflowUpdateRequestedEventAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = WorkflowUpdateRequestedEventAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateRequestedEventAttributes, WorkflowUpdateRequestedEventAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateRequestedEventAttributes, WorkflowUpdateRequestedEventAttributes | _ToProto]
-
-          type array = ::Array[WorkflowUpdateRequestedEventAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, WorkflowUpdateRequestedEventAttributes | _ToProto]
-        end
-
         class WorkflowUpdateAcceptedEventAttributes < ::Protobuf::Message
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor meta(): ::Temporal::Api::Interaction::V1::Meta?
 
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
-                     | ...
+          def meta=: [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
+                   | ...
 
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
+          def meta!: () -> ::Temporal::Api::Interaction::V1::Meta?
 
-          attr_accessor update_id(): ::String
+          attr_accessor input(): ::Temporal::Api::Interaction::V1::Input?
 
-          def update_id!: () -> ::String?
+          def input=: [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
+                    | ...
 
-          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?update_id: ::String) -> void
+          def input!: () -> ::Temporal::Api::Interaction::V1::Input?
 
-          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
-                | (:update_id) -> ::String
+          def initialize: (?meta: ::Temporal::Api::Interaction::V1::Meta::init?, ?input: ::Temporal::Api::Interaction::V1::Input::init?) -> void
+
+          def []: (:meta) -> ::Temporal::Api::Interaction::V1::Meta?
+                | (:input) -> ::Temporal::Api::Interaction::V1::Input?
                 | (::Symbol) -> untyped
 
-          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:update_id, ::String) -> ::String
+          def []=: (:meta, ::Temporal::Api::Interaction::V1::Meta?) -> ::Temporal::Api::Interaction::V1::Meta?
+                 | [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:input, ::Temporal::Api::Interaction::V1::Input?) -> ::Temporal::Api::Interaction::V1::Input?
+                 | [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -3490,46 +3504,30 @@ module Temporal
         end
 
         class WorkflowUpdateCompletedEventAttributes < ::Protobuf::Message
-          attr_accessor system_header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor meta(): ::Temporal::Api::Interaction::V1::Meta?
 
-          def system_header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
-                            | ...
+          def meta=: [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
+                   | ...
 
-          def system_header!: () -> ::Temporal::Api::Common::V1::Header?
+          def meta!: () -> ::Temporal::Api::Interaction::V1::Meta?
 
-          attr_accessor update_id(): ::String
+          attr_accessor output(): ::Temporal::Api::Interaction::V1::Output?
 
-          def update_id!: () -> ::String?
+          def output=: [M < ::Temporal::Api::Interaction::V1::Output::_ToProto] (M?) -> M?
+                     | ...
 
-          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+          def output!: () -> ::Temporal::Api::Interaction::V1::Output?
 
-          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
-                      | ...
+          def initialize: (?meta: ::Temporal::Api::Interaction::V1::Meta::init?, ?output: ::Temporal::Api::Interaction::V1::Output::init?) -> void
 
-          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
-
-          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
-
-          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                      | ...
-
-          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
-
-          def initialize: (?system_header: ::Temporal::Api::Common::V1::Header::init?, ?update_id: ::String, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
-
-          def []: (:system_header) -> ::Temporal::Api::Common::V1::Header?
-                | (:update_id) -> ::String
-                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
-                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+          def []: (:meta) -> ::Temporal::Api::Interaction::V1::Meta?
+                | (:output) -> ::Temporal::Api::Interaction::V1::Output?
                 | (::Symbol) -> untyped
 
-          def []=: (:system_header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:system_header, M?) -> M?
-                 | (:update_id, ::String) -> ::String
-                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
-                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+          def []=: (:meta, ::Temporal::Api::Interaction::V1::Meta?) -> ::Temporal::Api::Interaction::V1::Meta?
+                 | [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:output, ::Temporal::Api::Interaction::V1::Output?) -> ::Temporal::Api::Interaction::V1::Output?
+                 | [M < ::Temporal::Api::Interaction::V1::Output::_ToProto] (:output, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -3548,6 +3546,51 @@ module Temporal
           type array = ::Array[WorkflowUpdateCompletedEventAttributes | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, WorkflowUpdateCompletedEventAttributes | _ToProto]
+        end
+
+        class WorkflowUpdateRejectedEventAttributes < ::Protobuf::Message
+          attr_accessor meta(): ::Temporal::Api::Interaction::V1::Meta?
+
+          def meta=: [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
+                   | ...
+
+          def meta!: () -> ::Temporal::Api::Interaction::V1::Meta?
+
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+
+          def initialize: (?meta: ::Temporal::Api::Interaction::V1::Meta::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:meta) -> ::Temporal::Api::Interaction::V1::Meta?
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:meta, ::Temporal::Api::Interaction::V1::Meta?) -> ::Temporal::Api::Interaction::V1::Meta?
+                 | [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowUpdateRejectedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowUpdateRejectedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateRejectedEventAttributes, WorkflowUpdateRejectedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateRejectedEventAttributes, WorkflowUpdateRejectedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowUpdateRejectedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowUpdateRejectedEventAttributes | _ToProto]
         end
 
         class WorkflowPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
@@ -4018,12 +4061,12 @@ module Temporal
 
           def upsert_workflow_search_attributes_event_attributes!: () -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
 
-          attr_accessor workflow_update_requested_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+          attr_accessor workflow_update_rejected_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
 
-          def workflow_update_requested_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::_ToProto] (M?) -> M?
-                                                         | ...
+          def workflow_update_rejected_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes::_ToProto] (M?) -> M?
+                                                        | ...
 
-          def workflow_update_requested_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+          def workflow_update_rejected_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
 
           attr_accessor workflow_update_accepted_event_attributes(): ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
 
@@ -4053,7 +4096,14 @@ module Temporal
 
           def activity_properties_modified_externally_event_attributes!: () -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
 
-          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporal::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?worker_may_ignore: bool, ?workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporal::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporal::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporal::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporal::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporal::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporal::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?, ?workflow_update_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::init?, ?workflow_update_accepted_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::init?, ?workflow_update_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes::init?, ?workflow_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::init?, ?activity_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::init?) -> void
+          attr_accessor workflow_properties_modified_event_attributes(): ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
+
+          def workflow_properties_modified_event_attributes=: [M < ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes::_ToProto] (M?) -> M?
+                                                            | ...
+
+          def workflow_properties_modified_event_attributes!: () -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
+
+          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporal::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?worker_may_ignore: bool, ?workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporal::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporal::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporal::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporal::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporal::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporal::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporal::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporal::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporal::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporal::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporal::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?, ?workflow_update_rejected_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes::init?, ?workflow_update_accepted_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::init?, ?workflow_update_completed_event_attributes: ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes::init?, ?workflow_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::init?, ?activity_properties_modified_externally_event_attributes: ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::init?, ?workflow_properties_modified_event_attributes: ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes::init?) -> void
 
           def []: (:event_id) -> ::Integer
                 | (:event_time) -> ::Google::Protobuf::Timestamp?
@@ -4101,11 +4151,12 @@ module Temporal
                 | (:signal_external_workflow_execution_failed_event_attributes) -> ::Temporal::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes?
                 | (:external_workflow_execution_signaled_event_attributes) -> ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes?
                 | (:upsert_workflow_search_attributes_event_attributes) -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
-                | (:workflow_update_requested_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
+                | (:workflow_update_rejected_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
                 | (:workflow_update_accepted_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
                 | (:workflow_update_completed_event_attributes) -> ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
                 | (:workflow_properties_modified_externally_event_attributes) -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
                 | (:activity_properties_modified_externally_event_attributes) -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
+                | (:workflow_properties_modified_event_attributes) -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
                 | (::Symbol) -> untyped
 
           def []=: (:event_id, ::Integer) -> ::Integer
@@ -4196,8 +4247,8 @@ module Temporal
                  | [M < ::Temporal::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::_ToProto] (:external_workflow_execution_signaled_event_attributes, M?) -> M?
                  | (:upsert_workflow_search_attributes_event_attributes, ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?) -> ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
                  | [M < ::Temporal::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::_ToProto] (:upsert_workflow_search_attributes_event_attributes, M?) -> M?
-                 | (:workflow_update_requested_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes?
-                 | [M < ::Temporal::Api::History::V1::WorkflowUpdateRequestedEventAttributes::_ToProto] (:workflow_update_requested_event_attributes, M?) -> M?
+                 | (:workflow_update_rejected_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowUpdateRejectedEventAttributes::_ToProto] (:workflow_update_rejected_event_attributes, M?) -> M?
                  | (:workflow_update_accepted_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
                  | [M < ::Temporal::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::_ToProto] (:workflow_update_accepted_event_attributes, M?) -> M?
                  | (:workflow_update_completed_event_attributes, ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
@@ -4206,6 +4257,8 @@ module Temporal
                  | [M < ::Temporal::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::_ToProto] (:workflow_properties_modified_externally_event_attributes, M?) -> M?
                  | (:activity_properties_modified_externally_event_attributes, ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?) -> ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
                  | [M < ::Temporal::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::_ToProto] (:activity_properties_modified_externally_event_attributes, M?) -> M?
+                 | (:workflow_properties_modified_event_attributes, ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?) -> ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
+                 | [M < ::Temporal::Api::History::V1::WorkflowPropertiesModifiedEventAttributes::_ToProto] (:workflow_properties_modified_event_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           def worker_may_ignore?: () -> bool

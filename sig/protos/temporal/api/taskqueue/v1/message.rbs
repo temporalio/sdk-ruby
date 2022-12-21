@@ -246,23 +246,30 @@ module Temporal
           # If a worker has specified an ID for use with the worker versioning feature while polling,
           #  that id must appear here.
           #
-          attr_accessor worker_versioning_build_id(): ::String
+          attr_accessor worker_versioning_id(): ::Temporal::Api::TaskQueue::V1::VersionId?
 
-          def worker_versioning_build_id!: () -> ::String?
+          # If a worker has specified an ID for use with the worker versioning feature while polling,
+          #  that id must appear here.
+          #
+          def worker_versioning_id=: [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
+                                   | ...
 
-          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float, ?worker_versioning_build_id: ::String) -> void
+          def worker_versioning_id!: () -> ::Temporal::Api::TaskQueue::V1::VersionId?
+
+          def initialize: (?last_access_time: ::Google::Protobuf::Timestamp::init?, ?identity: ::String, ?rate_per_second: ::Float, ?worker_versioning_id: ::Temporal::Api::TaskQueue::V1::VersionId::init?) -> void
 
           def []: (:last_access_time) -> ::Google::Protobuf::Timestamp?
                 | (:identity) -> ::String
                 | (:rate_per_second) -> ::Float
-                | (:worker_versioning_build_id) -> ::String
+                | (:worker_versioning_id) -> ::Temporal::Api::TaskQueue::V1::VersionId?
                 | (::Symbol) -> untyped
 
           def []=: (:last_access_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_access_time, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (:rate_per_second, ::Float) -> ::Float
-                 | (:worker_versioning_build_id, ::String) -> ::String
+                 | (:worker_versioning_id, ::Temporal::Api::TaskQueue::V1::VersionId?) -> ::Temporal::Api::TaskQueue::V1::VersionId?
+                 | [M < ::Temporal::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

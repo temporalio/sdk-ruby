@@ -9,19 +9,14 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED, 0
       value :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE, 1
     end
-    add_enum "temporal.api.enums.v1.WorkflowUpdateDurabilityPreference" do
-      value :WORKFLOW_UPDATE_DURABILITY_PREFERENCE_UNSPECIFIED, 0
-      value :WORKFLOW_UPDATE_DURABILITY_PREFERENCE_BYPASS, 1
-    end
   end
 end
 
-module Temporal
+module Temporalio
   module Api
     module Enums
       module V1
         WorkflowUpdateResultAccessStyle = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.enums.v1.WorkflowUpdateResultAccessStyle").enummodule
-        WorkflowUpdateDurabilityPreference = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.enums.v1.WorkflowUpdateDurabilityPreference").enummodule
       end
     end
   end

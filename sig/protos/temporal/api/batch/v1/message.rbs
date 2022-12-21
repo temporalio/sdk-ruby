@@ -82,12 +82,6 @@ module Temporal
         #  Ignore first_execution_run_id because this is used for single workflow operation.
         #
         class BatchOperationTermination < ::Protobuf::Message
-          # Reason of terminate workflows
-          #
-          attr_accessor reason(): ::String
-
-          def reason!: () -> ::String?
-
           # Serialized value(s) to provide to the termination event
           #
           attr_accessor details(): ::Temporal::Api::Common::V1::Payloads?
@@ -105,15 +99,13 @@ module Temporal
 
           def identity!: () -> ::String?
 
-          def initialize: (?reason: ::String, ?details: ::Temporal::Api::Common::V1::Payloads::init?, ?identity: ::String) -> void
+          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?, ?identity: ::String) -> void
 
-          def []: (:reason) -> ::String
-                | (:details) -> ::Temporal::Api::Common::V1::Payloads?
+          def []: (:details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:identity) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:reason, ::String) -> ::String
-                 | (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+          def []=: (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
                  | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
@@ -215,26 +207,18 @@ module Temporal
         #  Ignore first_execution_run_id because this is used for single workflow operation.
         #
         class BatchOperationCancellation < ::Protobuf::Message
-          # Reason of cancel workflows
-          #
-          attr_accessor reason(): ::String
-
-          def reason!: () -> ::String?
-
           # The identity of the worker/client
           #
           attr_accessor identity(): ::String
 
           def identity!: () -> ::String?
 
-          def initialize: (?reason: ::String, ?identity: ::String) -> void
+          def initialize: (?identity: ::String) -> void
 
-          def []: (:reason) -> ::String
-                | (:identity) -> ::String
+          def []: (:identity) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:reason, ::String) -> ::String
-                 | (:identity, ::String) -> ::String
+          def []=: (:identity, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -253,6 +237,42 @@ module Temporal
           type array = ::Array[BatchOperationCancellation | _ToProto]
 
           type hash[KEY] = ::Hash[KEY, BatchOperationCancellation | _ToProto]
+        end
+
+        # BatchOperationDeletion sends deletion requests to batch workflows.
+        #  Keep the parameter in sync with temporal.api.workflowservice.v1.DeleteWorkflowExecutionRequest.
+        #
+        class BatchOperationDeletion < ::Protobuf::Message
+          # The identity of the worker/client
+          #
+          attr_accessor identity(): ::String
+
+          def identity!: () -> ::String?
+
+          def initialize: (?identity: ::String) -> void
+
+          def []: (:identity) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:identity, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> BatchOperationDeletion
+          end
+
+          # The type of `#initialize` parameter.
+          type init = BatchOperationDeletion | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[BatchOperationDeletion, BatchOperationDeletion | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, BatchOperationDeletion, BatchOperationDeletion | _ToProto]
+
+          type array = ::Array[BatchOperationDeletion | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, BatchOperationDeletion | _ToProto]
         end
       end
     end

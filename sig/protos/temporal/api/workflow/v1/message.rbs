@@ -89,7 +89,11 @@ module Temporal
 
           def state_transition_count!: () -> ::Integer?
 
-          def initialize: (?execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init, ?history_length: ::Integer, ?parent_namespace_id: ::String, ?parent_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?execution_time: ::Google::Protobuf::Timestamp::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?auto_reset_points: ::Temporal::Api::Workflow::V1::ResetPoints::init?, ?task_queue: ::String, ?state_transition_count: ::Integer) -> void
+          attr_accessor history_size_bytes(): ::Integer
+
+          def history_size_bytes!: () -> ::Integer?
+
+          def initialize: (?execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?, ?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init, ?history_length: ::Integer, ?parent_namespace_id: ::String, ?parent_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?execution_time: ::Google::Protobuf::Timestamp::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?auto_reset_points: ::Temporal::Api::Workflow::V1::ResetPoints::init?, ?task_queue: ::String, ?state_transition_count: ::Integer, ?history_size_bytes: ::Integer) -> void
 
           def []: (:execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:type) -> ::Temporal::Api::Common::V1::WorkflowType?
@@ -105,6 +109,7 @@ module Temporal
                 | (:auto_reset_points) -> ::Temporal::Api::Workflow::V1::ResetPoints?
                 | (:task_queue) -> ::String
                 | (:state_transition_count) -> ::Integer
+                | (:history_size_bytes) -> ::Integer
                 | (::Symbol) -> untyped
 
           def []=: (:execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
@@ -131,6 +136,7 @@ module Temporal
                  | [M < ::Temporal::Api::Workflow::V1::ResetPoints::_ToProto] (:auto_reset_points, M?) -> M?
                  | (:task_queue, ::String) -> ::String
                  | (:state_transition_count, ::Integer) -> ::Integer
+                 | (:history_size_bytes, ::Integer) -> ::Integer
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

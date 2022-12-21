@@ -60,22 +60,22 @@ module Coresdk
     class Success < ::Protobuf::Message
       # A list of commands to send back to the temporal server
       #
-      attr_accessor commands(): ::Coresdk::Workflow_commands::WorkflowCommand::field_array
+      attr_accessor commands(): ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
 
       # A list of commands to send back to the temporal server
       #
-      def commands=: (::Coresdk::Workflow_commands::WorkflowCommand::array) -> ::Coresdk::Workflow_commands::WorkflowCommand::array
+      def commands=: (::Coresdk::WorkflowCommands::WorkflowCommand::array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::array
                    | ...
 
-      def commands!: () -> ::Coresdk::Workflow_commands::WorkflowCommand::field_array?
+      def commands!: () -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array?
 
-      def initialize: (?commands: ::Coresdk::Workflow_commands::WorkflowCommand::array) -> void
+      def initialize: (?commands: ::Coresdk::WorkflowCommands::WorkflowCommand::array) -> void
 
-      def []: (:commands) -> ::Coresdk::Workflow_commands::WorkflowCommand::field_array
+      def []: (:commands) -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
             | (::Symbol) -> untyped
 
-      def []=: (:commands, ::Coresdk::Workflow_commands::WorkflowCommand::field_array) -> ::Coresdk::Workflow_commands::WorkflowCommand::field_array
-             | (:commands, ::Coresdk::Workflow_commands::WorkflowCommand::array) -> ::Coresdk::Workflow_commands::WorkflowCommand::array
+      def []=: (:commands, ::Coresdk::WorkflowCommands::WorkflowCommand::field_array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
+             | (:commands, ::Coresdk::WorkflowCommands::WorkflowCommand::array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::array
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
