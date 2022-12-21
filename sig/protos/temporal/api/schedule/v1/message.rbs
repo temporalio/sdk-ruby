@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Schedule
       module V1
@@ -179,84 +179,84 @@ module Temporal
         class StructuredCalendarSpec < ::Protobuf::Message
           # Match seconds (0-59)
           #
-          attr_accessor second(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor second(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match seconds (0-59)
           #
-          def second=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def second=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                      | ...
 
-          def second!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def second!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match minutes (0-59)
           #
-          attr_accessor minute(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor minute(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match minutes (0-59)
           #
-          def minute=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def minute=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                      | ...
 
-          def minute!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def minute!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match hours (0-23)
           #
-          attr_accessor hour(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor hour(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match hours (0-23)
           #
-          def hour=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def hour=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                    | ...
 
-          def hour!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def hour!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match days of the month (1-31)
           #  (-- api-linter: core::0140::prepositions=disabled
           #      aip.dev/not-precedent: standard name of field --)
           #
-          attr_accessor day_of_month(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor day_of_month(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match days of the month (1-31)
           #  (-- api-linter: core::0140::prepositions=disabled
           #      aip.dev/not-precedent: standard name of field --)
           #
-          def day_of_month=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def day_of_month=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                            | ...
 
-          def day_of_month!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def day_of_month!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match months (1-12)
           #
-          attr_accessor month(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor month(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match months (1-12)
           #
-          def month=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def month=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                     | ...
 
-          def month!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def month!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match years.
           #
-          attr_accessor year(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor year(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match years.
           #
-          def year=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def year=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                    | ...
 
-          def year!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def year!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Match days of the week (0-6; 0 is Sunday).
           #
-          attr_accessor day_of_week(): ::Temporal::Api::Schedule::V1::Range::field_array
+          attr_accessor day_of_week(): ::Temporalio::Api::Schedule::V1::Range::field_array
 
           # Match days of the week (0-6; 0 is Sunday).
           #
-          def day_of_week=: (::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def day_of_week=: (::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                           | ...
 
-          def day_of_week!: () -> ::Temporal::Api::Schedule::V1::Range::field_array?
+          def day_of_week!: () -> ::Temporalio::Api::Schedule::V1::Range::field_array?
 
           # Free-form comment describing the intention of this spec.
           #
@@ -264,32 +264,32 @@ module Temporal
 
           def comment!: () -> ::String?
 
-          def initialize: (?second: ::Temporal::Api::Schedule::V1::Range::array, ?minute: ::Temporal::Api::Schedule::V1::Range::array, ?hour: ::Temporal::Api::Schedule::V1::Range::array, ?day_of_month: ::Temporal::Api::Schedule::V1::Range::array, ?month: ::Temporal::Api::Schedule::V1::Range::array, ?year: ::Temporal::Api::Schedule::V1::Range::array, ?day_of_week: ::Temporal::Api::Schedule::V1::Range::array, ?comment: ::String) -> void
+          def initialize: (?second: ::Temporalio::Api::Schedule::V1::Range::array, ?minute: ::Temporalio::Api::Schedule::V1::Range::array, ?hour: ::Temporalio::Api::Schedule::V1::Range::array, ?day_of_month: ::Temporalio::Api::Schedule::V1::Range::array, ?month: ::Temporalio::Api::Schedule::V1::Range::array, ?year: ::Temporalio::Api::Schedule::V1::Range::array, ?day_of_week: ::Temporalio::Api::Schedule::V1::Range::array, ?comment: ::String) -> void
 
-          def []: (:second) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:minute) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:hour) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:day_of_month) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:month) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:year) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                | (:day_of_week) -> ::Temporal::Api::Schedule::V1::Range::field_array
+          def []: (:second) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:minute) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:hour) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:day_of_month) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:month) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:year) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                | (:day_of_week) -> ::Temporalio::Api::Schedule::V1::Range::field_array
                 | (:comment) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:second, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:second, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:minute, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:minute, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:hour, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:hour, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:day_of_month, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:day_of_month, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:month, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:month, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:year, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:year, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
-                 | (:day_of_week, ::Temporal::Api::Schedule::V1::Range::field_array) -> ::Temporal::Api::Schedule::V1::Range::field_array
-                 | (:day_of_week, ::Temporal::Api::Schedule::V1::Range::array) -> ::Temporal::Api::Schedule::V1::Range::array
+          def []=: (:second, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:second, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:minute, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:minute, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:hour, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:hour, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:day_of_month, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:day_of_month, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:month, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:month, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:year, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:year, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
+                 | (:day_of_week, ::Temporalio::Api::Schedule::V1::Range::field_array) -> ::Temporalio::Api::Schedule::V1::Range::field_array
+                 | (:day_of_week, ::Temporalio::Api::Schedule::V1::Range::array) -> ::Temporalio::Api::Schedule::V1::Range::array
                  | (:comment, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -387,14 +387,14 @@ module Temporal
         class ScheduleSpec < ::Protobuf::Message
           # Calendar-based specifications of times.
           #
-          attr_accessor structured_calendar(): ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
+          attr_accessor structured_calendar(): ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
 
           # Calendar-based specifications of times.
           #
-          def structured_calendar=: (::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array
+          def structured_calendar=: (::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array
                                   | ...
 
-          def structured_calendar!: () -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array?
+          def structured_calendar!: () -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array?
 
           # cron_string holds a traditional cron specification as a string. It
           #  accepts 5, 6, or 7 fields, separated by spaces, and interprets them the
@@ -447,25 +447,25 @@ module Temporal
 
           # Calendar-based specifications of times.
           #
-          attr_accessor calendar(): ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+          attr_accessor calendar(): ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
 
           # Calendar-based specifications of times.
           #
-          def calendar=: (::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+          def calendar=: (::Temporalio::Api::Schedule::V1::CalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::array
                        | ...
 
-          def calendar!: () -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array?
+          def calendar!: () -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array?
 
           # Interval-based specifications of times.
           #
-          attr_accessor interval(): ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
+          attr_accessor interval(): ::Temporalio::Api::Schedule::V1::IntervalSpec::field_array
 
           # Interval-based specifications of times.
           #
-          def interval=: (::Temporal::Api::Schedule::V1::IntervalSpec::array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::array
+          def interval=: (::Temporalio::Api::Schedule::V1::IntervalSpec::array) -> ::Temporalio::Api::Schedule::V1::IntervalSpec::array
                        | ...
 
-          def interval!: () -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array?
+          def interval!: () -> ::Temporalio::Api::Schedule::V1::IntervalSpec::field_array?
 
           # Any timestamps matching any of exclude_* will be skipped.
           #
@@ -477,7 +477,7 @@ module Temporal
           #
           # - `deprecated = true`
           #
-          attr_accessor exclude_calendar(): ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
+          attr_accessor exclude_calendar(): ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
 
           # Any timestamps matching any of exclude_* will be skipped.
           #
@@ -489,17 +489,17 @@ module Temporal
           #
           # - `deprecated = true`
           #
-          def exclude_calendar=: (::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
+          def exclude_calendar=: (::Temporalio::Api::Schedule::V1::CalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::array
                                | ...
 
-          def exclude_calendar!: () -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array?
+          def exclude_calendar!: () -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array?
 
-          attr_accessor exclude_structured_calendar(): ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
+          attr_accessor exclude_structured_calendar(): ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
 
-          def exclude_structured_calendar=: (::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array
+          def exclude_structured_calendar=: (::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array
                                           | ...
 
-          def exclude_structured_calendar!: () -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array?
+          def exclude_structured_calendar!: () -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array?
 
           # If start_time is set, any timestamps before start_time will be skipped.
           #  (Together, start_time and end_time make an inclusive interval.)
@@ -569,14 +569,14 @@ module Temporal
 
           def timezone_data!: () -> ::String?
 
-          def initialize: (?structured_calendar: ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array, ?cron_string: ::Array[::String], ?calendar: ::Temporal::Api::Schedule::V1::CalendarSpec::array, ?interval: ::Temporal::Api::Schedule::V1::IntervalSpec::array, ?exclude_calendar: ::Temporal::Api::Schedule::V1::CalendarSpec::array, ?exclude_structured_calendar: ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array, ?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?jitter: ::Google::Protobuf::Duration::init?, ?timezone_name: ::String, ?timezone_data: ::String) -> void
+          def initialize: (?structured_calendar: ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array, ?cron_string: ::Array[::String], ?calendar: ::Temporalio::Api::Schedule::V1::CalendarSpec::array, ?interval: ::Temporalio::Api::Schedule::V1::IntervalSpec::array, ?exclude_calendar: ::Temporalio::Api::Schedule::V1::CalendarSpec::array, ?exclude_structured_calendar: ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array, ?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?jitter: ::Google::Protobuf::Duration::init?, ?timezone_name: ::String, ?timezone_data: ::String) -> void
 
-          def []: (:structured_calendar) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
+          def []: (:structured_calendar) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
                 | (:cron_string) -> ::Protobuf::field_array[::String]
-                | (:calendar) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
-                | (:interval) -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
-                | (:exclude_calendar) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
-                | (:exclude_structured_calendar) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
+                | (:calendar) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
+                | (:interval) -> ::Temporalio::Api::Schedule::V1::IntervalSpec::field_array
+                | (:exclude_calendar) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
+                | (:exclude_structured_calendar) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
                 | (:start_time) -> ::Google::Protobuf::Timestamp?
                 | (:end_time) -> ::Google::Protobuf::Timestamp?
                 | (:jitter) -> ::Google::Protobuf::Duration?
@@ -584,18 +584,18 @@ module Temporal
                 | (:timezone_data) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:structured_calendar, ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
-                 | (:structured_calendar, ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array
+          def []=: (:structured_calendar, ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
+                 | (:structured_calendar, ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array
                  | (:cron_string, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
                  | (:cron_string, ::Array[::String]) -> ::Array[::String]
-                 | (:calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
-                 | (:calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
-                 | (:interval, ::Temporal::Api::Schedule::V1::IntervalSpec::field_array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::field_array
-                 | (:interval, ::Temporal::Api::Schedule::V1::IntervalSpec::array) -> ::Temporal::Api::Schedule::V1::IntervalSpec::array
-                 | (:exclude_calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::field_array
-                 | (:exclude_calendar, ::Temporal::Api::Schedule::V1::CalendarSpec::array) -> ::Temporal::Api::Schedule::V1::CalendarSpec::array
-                 | (:exclude_structured_calendar, ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::field_array
-                 | (:exclude_structured_calendar, ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporal::Api::Schedule::V1::StructuredCalendarSpec::array
+                 | (:calendar, ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
+                 | (:calendar, ::Temporalio::Api::Schedule::V1::CalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::array
+                 | (:interval, ::Temporalio::Api::Schedule::V1::IntervalSpec::field_array) -> ::Temporalio::Api::Schedule::V1::IntervalSpec::field_array
+                 | (:interval, ::Temporalio::Api::Schedule::V1::IntervalSpec::array) -> ::Temporalio::Api::Schedule::V1::IntervalSpec::array
+                 | (:exclude_calendar, ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::field_array
+                 | (:exclude_calendar, ::Temporalio::Api::Schedule::V1::CalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::CalendarSpec::array
+                 | (:exclude_structured_calendar, ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::field_array
+                 | (:exclude_structured_calendar, ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array) -> ::Temporalio::Api::Schedule::V1::StructuredCalendarSpec::array
                  | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
                  | (:end_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
@@ -630,17 +630,17 @@ module Temporal
           #  and some changes might produce unintuitive results. In general, the later
           #  policy overrides the earlier policy.
           #
-          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+          attr_accessor overlap_policy(): ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
 
           # Policy for overlaps.
           #  Note that this can be changed after a schedule has taken some actions,
           #  and some changes might produce unintuitive results. In general, the later
           #  policy overrides the earlier policy.
           #
-          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+          def overlap_policy=: (::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                              | ...
 
-          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+          def overlap_policy!: () -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy?
 
           # Policy for catchups:
           #  If the Temporal server misses an action due to one or more components
@@ -669,15 +669,15 @@ module Temporal
 
           def pause_on_failure!: () -> bool?
 
-          def initialize: (?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init, ?catchup_window: ::Google::Protobuf::Duration::init?, ?pause_on_failure: bool) -> void
+          def initialize: (?overlap_policy: ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::init, ?catchup_window: ::Google::Protobuf::Duration::init?, ?pause_on_failure: bool) -> void
 
-          def []: (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+          def []: (:overlap_policy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
                 | (:catchup_window) -> ::Google::Protobuf::Duration?
                 | (:pause_on_failure) -> bool
                 | (::Symbol) -> untyped
 
-          def []=: (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
-                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+          def []=: (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                  | (:catchup_window, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:catchup_window, M?) -> M?
                  | (:pause_on_failure, bool) -> bool
@@ -710,7 +710,7 @@ module Temporal
           #  The workflow id of the started workflow may not match this exactly,
           #  it may have a timestamp appended for uniqueness.
           #
-          attr_accessor start_workflow(): ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+          attr_accessor start_workflow(): ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo?
 
           # All fields of NewWorkflowExecutionInfo are valid except for:
           #  - workflow_id_reuse_policy
@@ -718,18 +718,18 @@ module Temporal
           #  The workflow id of the started workflow may not match this exactly,
           #  it may have a timestamp appended for uniqueness.
           #
-          def start_workflow=: [M < ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (M?) -> M?
+          def start_workflow=: [M < ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (M?) -> M?
                              | ...
 
-          def start_workflow!: () -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+          def start_workflow!: () -> ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo?
 
-          def initialize: (?start_workflow: ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::init?) -> void
+          def initialize: (?start_workflow: ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo::init?) -> void
 
-          def []: (:start_workflow) -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
+          def []: (:start_workflow) -> ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo?
                 | (::Symbol) -> untyped
 
-          def []=: (:start_workflow, ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?) -> ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo?
-                 | [M < ::Temporal::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (:start_workflow, M?) -> M?
+          def []=: (:start_workflow, ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo?) -> ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo?
+                 | [M < ::Temporalio::Api::Workflow::V1::NewWorkflowExecutionInfo::_ToProto] (:start_workflow, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -775,28 +775,28 @@ module Temporal
 
           # If action was start_workflow:
           #
-          attr_accessor start_workflow_result(): ::Temporal::Api::Common::V1::WorkflowExecution?
+          attr_accessor start_workflow_result(): ::Temporalio::Api::Common::V1::WorkflowExecution?
 
           # If action was start_workflow:
           #
-          def start_workflow_result=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+          def start_workflow_result=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                                     | ...
 
-          def start_workflow_result!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
+          def start_workflow_result!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
 
-          def initialize: (?schedule_time: ::Google::Protobuf::Timestamp::init?, ?actual_time: ::Google::Protobuf::Timestamp::init?, ?start_workflow_result: ::Temporal::Api::Common::V1::WorkflowExecution::init?) -> void
+          def initialize: (?schedule_time: ::Google::Protobuf::Timestamp::init?, ?actual_time: ::Google::Protobuf::Timestamp::init?, ?start_workflow_result: ::Temporalio::Api::Common::V1::WorkflowExecution::init?) -> void
 
           def []: (:schedule_time) -> ::Google::Protobuf::Timestamp?
                 | (:actual_time) -> ::Google::Protobuf::Timestamp?
-                | (:start_workflow_result) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:start_workflow_result) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
                 | (::Symbol) -> untyped
 
           def []=: (:schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:schedule_time, M?) -> M?
                  | (:actual_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:actual_time, M?) -> M?
-                 | (:start_workflow_result, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:start_workflow_result, M?) -> M?
+                 | (:start_workflow_result, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:start_workflow_result, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -885,22 +885,22 @@ module Temporal
         class TriggerImmediatelyRequest < ::Protobuf::Message
           # Override overlap policy for this one request.
           #
-          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+          attr_accessor overlap_policy(): ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
 
           # Override overlap policy for this one request.
           #
-          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+          def overlap_policy=: (::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                              | ...
 
-          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+          def overlap_policy!: () -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy?
 
-          def initialize: (?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
+          def initialize: (?overlap_policy: ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
 
-          def []: (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+          def []: (:overlap_policy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
                 | (::Symbol) -> untyped
 
-          def []=: (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
-                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+          def []=: (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -942,28 +942,28 @@ module Temporal
 
           # Override overlap policy for this request.
           #
-          attr_accessor overlap_policy(): ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+          attr_accessor overlap_policy(): ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
 
           # Override overlap policy for this request.
           #
-          def overlap_policy=: (::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+          def overlap_policy=: (::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                              | ...
 
-          def overlap_policy!: () -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy?
+          def overlap_policy!: () -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy?
 
-          def initialize: (?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?overlap_policy: ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
+          def initialize: (?start_time: ::Google::Protobuf::Timestamp::init?, ?end_time: ::Google::Protobuf::Timestamp::init?, ?overlap_policy: ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::init) -> void
 
           def []: (:start_time) -> ::Google::Protobuf::Timestamp?
                 | (:end_time) -> ::Google::Protobuf::Timestamp?
-                | (:overlap_policy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
+                | (:overlap_policy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
                 | (::Symbol) -> untyped
 
           def []=: (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
                  | (:end_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:end_time, M?) -> M?
-                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy
-                 | (:overlap_policy, ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporal::Api::Enums::V1::ScheduleOverlapPolicy::values
+                 | (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy
+                 | (:overlap_policy, ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values) -> ::Temporalio::Api::Enums::V1::ScheduleOverlapPolicy::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -987,29 +987,29 @@ module Temporal
         class SchedulePatch < ::Protobuf::Message
           # If set, trigger one action immediately.
           #
-          attr_accessor trigger_immediately(): ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+          attr_accessor trigger_immediately(): ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest?
 
           # If set, trigger one action immediately.
           #
-          def trigger_immediately=: [M < ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (M?) -> M?
+          def trigger_immediately=: [M < ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (M?) -> M?
                                   | ...
 
-          def trigger_immediately!: () -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
+          def trigger_immediately!: () -> ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest?
 
           # If set, runs though the specified time period(s) and takes actions as if that time
           #  passed by right now, all at once. The overlap policy can be overridden for the
           #  scope of the backfill.
           #
-          attr_accessor backfill_request(): ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
+          attr_accessor backfill_request(): ::Temporalio::Api::Schedule::V1::BackfillRequest::field_array
 
           # If set, runs though the specified time period(s) and takes actions as if that time
           #  passed by right now, all at once. The overlap policy can be overridden for the
           #  scope of the backfill.
           #
-          def backfill_request=: (::Temporal::Api::Schedule::V1::BackfillRequest::array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::array
+          def backfill_request=: (::Temporalio::Api::Schedule::V1::BackfillRequest::array) -> ::Temporalio::Api::Schedule::V1::BackfillRequest::array
                                | ...
 
-          def backfill_request!: () -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array?
+          def backfill_request!: () -> ::Temporalio::Api::Schedule::V1::BackfillRequest::field_array?
 
           # If set, change the state to paused or unpaused (respectively) and set the
           #  notes field to the value of the string.
@@ -1022,18 +1022,18 @@ module Temporal
 
           def unpause!: () -> ::String?
 
-          def initialize: (?trigger_immediately: ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::init?, ?backfill_request: ::Temporal::Api::Schedule::V1::BackfillRequest::array, ?pause: ::String, ?unpause: ::String) -> void
+          def initialize: (?trigger_immediately: ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest::init?, ?backfill_request: ::Temporalio::Api::Schedule::V1::BackfillRequest::array, ?pause: ::String, ?unpause: ::String) -> void
 
-          def []: (:trigger_immediately) -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
-                | (:backfill_request) -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
+          def []: (:trigger_immediately) -> ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest?
+                | (:backfill_request) -> ::Temporalio::Api::Schedule::V1::BackfillRequest::field_array
                 | (:pause) -> ::String
                 | (:unpause) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:trigger_immediately, ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?) -> ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest?
-                 | [M < ::Temporal::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (:trigger_immediately, M?) -> M?
-                 | (:backfill_request, ::Temporal::Api::Schedule::V1::BackfillRequest::field_array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::field_array
-                 | (:backfill_request, ::Temporal::Api::Schedule::V1::BackfillRequest::array) -> ::Temporal::Api::Schedule::V1::BackfillRequest::array
+          def []=: (:trigger_immediately, ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest?) -> ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest?
+                 | [M < ::Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest::_ToProto] (:trigger_immediately, M?) -> M?
+                 | (:backfill_request, ::Temporalio::Api::Schedule::V1::BackfillRequest::field_array) -> ::Temporalio::Api::Schedule::V1::BackfillRequest::field_array
+                 | (:backfill_request, ::Temporalio::Api::Schedule::V1::BackfillRequest::array) -> ::Temporalio::Api::Schedule::V1::BackfillRequest::array
                  | (:pause, ::String) -> ::String
                  | (:unpause, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
@@ -1081,7 +1081,7 @@ module Temporal
           #  started by the schedule. If the workflows retried, did continue-as-new,
           #  or were reset, they might still be running but with a different run_id.
           #
-          attr_accessor running_workflows(): ::Temporal::Api::Common::V1::WorkflowExecution::field_array
+          attr_accessor running_workflows(): ::Temporalio::Api::Common::V1::WorkflowExecution::field_array
 
           # Currently-running workflows started by this schedule. (There might be
           #  more than one if the overlap policy allows overlaps.)
@@ -1089,21 +1089,21 @@ module Temporal
           #  started by the schedule. If the workflows retried, did continue-as-new,
           #  or were reset, they might still be running but with a different run_id.
           #
-          def running_workflows=: (::Temporal::Api::Common::V1::WorkflowExecution::array) -> ::Temporal::Api::Common::V1::WorkflowExecution::array
+          def running_workflows=: (::Temporalio::Api::Common::V1::WorkflowExecution::array) -> ::Temporalio::Api::Common::V1::WorkflowExecution::array
                                 | ...
 
-          def running_workflows!: () -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array?
+          def running_workflows!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution::field_array?
 
           # Most recent ten actual action times (including manual triggers).
           #
-          attr_accessor recent_actions(): ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+          attr_accessor recent_actions(): ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
 
           # Most recent ten actual action times (including manual triggers).
           #
-          def recent_actions=: (::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+          def recent_actions=: (::Temporalio::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array
                              | ...
 
-          def recent_actions!: () -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array?
+          def recent_actions!: () -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array?
 
           # Next ten scheduled action times.
           #
@@ -1142,13 +1142,13 @@ module Temporal
 
           def invalid_schedule_error!: () -> ::String?
 
-          def initialize: (?action_count: ::Integer, ?missed_catchup_window: ::Integer, ?overlap_skipped: ::Integer, ?running_workflows: ::Temporal::Api::Common::V1::WorkflowExecution::array, ?recent_actions: ::Temporal::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array, ?create_time: ::Google::Protobuf::Timestamp::init?, ?update_time: ::Google::Protobuf::Timestamp::init?, ?invalid_schedule_error: ::String) -> void
+          def initialize: (?action_count: ::Integer, ?missed_catchup_window: ::Integer, ?overlap_skipped: ::Integer, ?running_workflows: ::Temporalio::Api::Common::V1::WorkflowExecution::array, ?recent_actions: ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array, ?create_time: ::Google::Protobuf::Timestamp::init?, ?update_time: ::Google::Protobuf::Timestamp::init?, ?invalid_schedule_error: ::String) -> void
 
           def []: (:action_count) -> ::Integer
                 | (:missed_catchup_window) -> ::Integer
                 | (:overlap_skipped) -> ::Integer
-                | (:running_workflows) -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array
-                | (:recent_actions) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                | (:running_workflows) -> ::Temporalio::Api::Common::V1::WorkflowExecution::field_array
+                | (:recent_actions) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
                 | (:future_action_times) -> ::Google::Protobuf::Timestamp::field_array
                 | (:create_time) -> ::Google::Protobuf::Timestamp?
                 | (:update_time) -> ::Google::Protobuf::Timestamp?
@@ -1158,10 +1158,10 @@ module Temporal
           def []=: (:action_count, ::Integer) -> ::Integer
                  | (:missed_catchup_window, ::Integer) -> ::Integer
                  | (:overlap_skipped, ::Integer) -> ::Integer
-                 | (:running_workflows, ::Temporal::Api::Common::V1::WorkflowExecution::field_array) -> ::Temporal::Api::Common::V1::WorkflowExecution::field_array
-                 | (:running_workflows, ::Temporal::Api::Common::V1::WorkflowExecution::array) -> ::Temporal::Api::Common::V1::WorkflowExecution::array
-                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
-                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                 | (:running_workflows, ::Temporalio::Api::Common::V1::WorkflowExecution::field_array) -> ::Temporalio::Api::Common::V1::WorkflowExecution::field_array
+                 | (:running_workflows, ::Temporalio::Api::Common::V1::WorkflowExecution::array) -> ::Temporalio::Api::Common::V1::WorkflowExecution::array
+                 | (:recent_actions, ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
+                 | (:recent_actions, ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array
                  | (:future_action_times, ::Google::Protobuf::Timestamp::field_array) -> ::Google::Protobuf::Timestamp::field_array
                  | (:future_action_times, ::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
                  | (:create_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
@@ -1190,50 +1190,50 @@ module Temporal
         end
 
         class Schedule < ::Protobuf::Message
-          attr_accessor spec(): ::Temporal::Api::Schedule::V1::ScheduleSpec?
+          attr_accessor spec(): ::Temporalio::Api::Schedule::V1::ScheduleSpec?
 
-          def spec=: [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
+          def spec=: [M < ::Temporalio::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
                    | ...
 
-          def spec!: () -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+          def spec!: () -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
 
-          attr_accessor action(): ::Temporal::Api::Schedule::V1::ScheduleAction?
+          attr_accessor action(): ::Temporalio::Api::Schedule::V1::ScheduleAction?
 
-          def action=: [M < ::Temporal::Api::Schedule::V1::ScheduleAction::_ToProto] (M?) -> M?
+          def action=: [M < ::Temporalio::Api::Schedule::V1::ScheduleAction::_ToProto] (M?) -> M?
                      | ...
 
-          def action!: () -> ::Temporal::Api::Schedule::V1::ScheduleAction?
+          def action!: () -> ::Temporalio::Api::Schedule::V1::ScheduleAction?
 
-          attr_accessor policies(): ::Temporal::Api::Schedule::V1::SchedulePolicies?
+          attr_accessor policies(): ::Temporalio::Api::Schedule::V1::SchedulePolicies?
 
-          def policies=: [M < ::Temporal::Api::Schedule::V1::SchedulePolicies::_ToProto] (M?) -> M?
+          def policies=: [M < ::Temporalio::Api::Schedule::V1::SchedulePolicies::_ToProto] (M?) -> M?
                        | ...
 
-          def policies!: () -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
+          def policies!: () -> ::Temporalio::Api::Schedule::V1::SchedulePolicies?
 
-          attr_accessor state(): ::Temporal::Api::Schedule::V1::ScheduleState?
+          attr_accessor state(): ::Temporalio::Api::Schedule::V1::ScheduleState?
 
-          def state=: [M < ::Temporal::Api::Schedule::V1::ScheduleState::_ToProto] (M?) -> M?
+          def state=: [M < ::Temporalio::Api::Schedule::V1::ScheduleState::_ToProto] (M?) -> M?
                     | ...
 
-          def state!: () -> ::Temporal::Api::Schedule::V1::ScheduleState?
+          def state!: () -> ::Temporalio::Api::Schedule::V1::ScheduleState?
 
-          def initialize: (?spec: ::Temporal::Api::Schedule::V1::ScheduleSpec::init?, ?action: ::Temporal::Api::Schedule::V1::ScheduleAction::init?, ?policies: ::Temporal::Api::Schedule::V1::SchedulePolicies::init?, ?state: ::Temporal::Api::Schedule::V1::ScheduleState::init?) -> void
+          def initialize: (?spec: ::Temporalio::Api::Schedule::V1::ScheduleSpec::init?, ?action: ::Temporalio::Api::Schedule::V1::ScheduleAction::init?, ?policies: ::Temporalio::Api::Schedule::V1::SchedulePolicies::init?, ?state: ::Temporalio::Api::Schedule::V1::ScheduleState::init?) -> void
 
-          def []: (:spec) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
-                | (:action) -> ::Temporal::Api::Schedule::V1::ScheduleAction?
-                | (:policies) -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
-                | (:state) -> ::Temporal::Api::Schedule::V1::ScheduleState?
+          def []: (:spec) -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
+                | (:action) -> ::Temporalio::Api::Schedule::V1::ScheduleAction?
+                | (:policies) -> ::Temporalio::Api::Schedule::V1::SchedulePolicies?
+                | (:state) -> ::Temporalio::Api::Schedule::V1::ScheduleState?
                 | (::Symbol) -> untyped
 
-          def []=: (:spec, ::Temporal::Api::Schedule::V1::ScheduleSpec?) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
-                 | [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
-                 | (:action, ::Temporal::Api::Schedule::V1::ScheduleAction?) -> ::Temporal::Api::Schedule::V1::ScheduleAction?
-                 | [M < ::Temporal::Api::Schedule::V1::ScheduleAction::_ToProto] (:action, M?) -> M?
-                 | (:policies, ::Temporal::Api::Schedule::V1::SchedulePolicies?) -> ::Temporal::Api::Schedule::V1::SchedulePolicies?
-                 | [M < ::Temporal::Api::Schedule::V1::SchedulePolicies::_ToProto] (:policies, M?) -> M?
-                 | (:state, ::Temporal::Api::Schedule::V1::ScheduleState?) -> ::Temporal::Api::Schedule::V1::ScheduleState?
-                 | [M < ::Temporal::Api::Schedule::V1::ScheduleState::_ToProto] (:state, M?) -> M?
+          def []=: (:spec, ::Temporalio::Api::Schedule::V1::ScheduleSpec?) -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
+                 | [M < ::Temporalio::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
+                 | (:action, ::Temporalio::Api::Schedule::V1::ScheduleAction?) -> ::Temporalio::Api::Schedule::V1::ScheduleAction?
+                 | [M < ::Temporalio::Api::Schedule::V1::ScheduleAction::_ToProto] (:action, M?) -> M?
+                 | (:policies, ::Temporalio::Api::Schedule::V1::SchedulePolicies?) -> ::Temporalio::Api::Schedule::V1::SchedulePolicies?
+                 | [M < ::Temporalio::Api::Schedule::V1::SchedulePolicies::_ToProto] (:policies, M?) -> M?
+                 | (:state, ::Temporalio::Api::Schedule::V1::ScheduleState?) -> ::Temporalio::Api::Schedule::V1::ScheduleState?
+                 | [M < ::Temporalio::Api::Schedule::V1::ScheduleState::_ToProto] (:state, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1261,30 +1261,30 @@ module Temporal
           # From spec:
           #  Some fields are dropped from this copy of spec: timezone_data
           #
-          attr_accessor spec(): ::Temporal::Api::Schedule::V1::ScheduleSpec?
+          attr_accessor spec(): ::Temporalio::Api::Schedule::V1::ScheduleSpec?
 
           # From spec:
           #  Some fields are dropped from this copy of spec: timezone_data
           #
-          def spec=: [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
+          def spec=: [M < ::Temporalio::Api::Schedule::V1::ScheduleSpec::_ToProto] (M?) -> M?
                    | ...
 
-          def spec!: () -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
+          def spec!: () -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
 
           # From action:
           #  Action is a oneof field, but we need to encode this in JSON and oneof fields don't work
           #  well with JSON. If action is start_workflow, this is set:
           #
-          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
+          attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
 
           # From action:
           #  Action is a oneof field, but we need to encode this in JSON and oneof fields don't work
           #  well with JSON. If action is start_workflow, this is set:
           #
-          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+          def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
                             | ...
 
-          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
+          def workflow_type!: () -> ::Temporalio::Api::Common::V1::WorkflowType?
 
           # From state:
           #
@@ -1298,14 +1298,14 @@ module Temporal
 
           # From info (maybe fewer entries):
           #
-          attr_accessor recent_actions(): ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+          attr_accessor recent_actions(): ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
 
           # From info (maybe fewer entries):
           #
-          def recent_actions=: (::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+          def recent_actions=: (::Temporalio::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array
                              | ...
 
-          def recent_actions!: () -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array?
+          def recent_actions!: () -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array?
 
           attr_accessor future_action_times(): ::Google::Protobuf::Timestamp::field_array
 
@@ -1314,24 +1314,24 @@ module Temporal
 
           def future_action_times!: () -> ::Google::Protobuf::Timestamp::field_array?
 
-          def initialize: (?spec: ::Temporal::Api::Schedule::V1::ScheduleSpec::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?notes: ::String, ?paused: bool, ?recent_actions: ::Temporal::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array) -> void
+          def initialize: (?spec: ::Temporalio::Api::Schedule::V1::ScheduleSpec::init?, ?workflow_type: ::Temporalio::Api::Common::V1::WorkflowType::init?, ?notes: ::String, ?paused: bool, ?recent_actions: ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array, ?future_action_times: ::Google::Protobuf::Timestamp::array) -> void
 
-          def []: (:spec) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
-                | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
+          def []: (:spec) -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
+                | (:workflow_type) -> ::Temporalio::Api::Common::V1::WorkflowType?
                 | (:notes) -> ::String
                 | (:paused) -> bool
-                | (:recent_actions) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
+                | (:recent_actions) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
                 | (:future_action_times) -> ::Google::Protobuf::Timestamp::field_array
                 | (::Symbol) -> untyped
 
-          def []=: (:spec, ::Temporal::Api::Schedule::V1::ScheduleSpec?) -> ::Temporal::Api::Schedule::V1::ScheduleSpec?
-                 | [M < ::Temporal::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
-                 | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
-                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+          def []=: (:spec, ::Temporalio::Api::Schedule::V1::ScheduleSpec?) -> ::Temporalio::Api::Schedule::V1::ScheduleSpec?
+                 | [M < ::Temporalio::Api::Schedule::V1::ScheduleSpec::_ToProto] (:spec, M?) -> M?
+                 | (:workflow_type, ::Temporalio::Api::Common::V1::WorkflowType?) -> ::Temporalio::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
                  | (:notes, ::String) -> ::String
                  | (:paused, bool) -> bool
-                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::field_array
-                 | (:recent_actions, ::Temporal::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporal::Api::Schedule::V1::ScheduleActionResult::array
+                 | (:recent_actions, ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::field_array
+                 | (:recent_actions, ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array) -> ::Temporalio::Api::Schedule::V1::ScheduleActionResult::array
                  | (:future_action_times, ::Google::Protobuf::Timestamp::field_array) -> ::Google::Protobuf::Timestamp::field_array
                  | (:future_action_times, ::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
                  | (::Symbol, untyped) -> untyped
@@ -1363,42 +1363,42 @@ module Temporal
 
           def schedule_id!: () -> ::String?
 
-          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+          attr_accessor memo(): ::Temporalio::Api::Common::V1::Memo?
 
-          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+          def memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                    | ...
 
-          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+          def memo!: () -> ::Temporalio::Api::Common::V1::Memo?
 
-          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
 
-          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+          def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                                 | ...
 
-          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+          def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
 
-          attr_accessor info(): ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+          attr_accessor info(): ::Temporalio::Api::Schedule::V1::ScheduleListInfo?
 
-          def info=: [M < ::Temporal::Api::Schedule::V1::ScheduleListInfo::_ToProto] (M?) -> M?
+          def info=: [M < ::Temporalio::Api::Schedule::V1::ScheduleListInfo::_ToProto] (M?) -> M?
                    | ...
 
-          def info!: () -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+          def info!: () -> ::Temporalio::Api::Schedule::V1::ScheduleListInfo?
 
-          def initialize: (?schedule_id: ::String, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?info: ::Temporal::Api::Schedule::V1::ScheduleListInfo::init?) -> void
+          def initialize: (?schedule_id: ::String, ?memo: ::Temporalio::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?, ?info: ::Temporalio::Api::Schedule::V1::ScheduleListInfo::init?) -> void
 
           def []: (:schedule_id) -> ::String
-                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
-                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
-                | (:info) -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
+                | (:memo) -> ::Temporalio::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+                | (:info) -> ::Temporalio::Api::Schedule::V1::ScheduleListInfo?
                 | (::Symbol) -> untyped
 
           def []=: (:schedule_id, ::String) -> ::String
-                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
-                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
-                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
-                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
-                 | (:info, ::Temporal::Api::Schedule::V1::ScheduleListInfo?) -> ::Temporal::Api::Schedule::V1::ScheduleListInfo?
-                 | [M < ::Temporal::Api::Schedule::V1::ScheduleListInfo::_ToProto] (:info, M?) -> M?
+                 | (:memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
+                 | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:info, ::Temporalio::Api::Schedule::V1::ScheduleListInfo?) -> ::Temporalio::Api::Schedule::V1::ScheduleListInfo?
+                 | [M < ::Temporalio::Api::Schedule::V1::ScheduleListInfo::_ToProto] (:info, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

@@ -1,16 +1,16 @@
 require 'support/helpers/test_rpc'
-require 'temporal/activity'
-require 'temporal/bridge'
-require 'temporal/client'
-require 'temporal/worker'
+require 'temporalio/activity'
+require 'temporalio/bridge'
+require 'temporalio/client'
+require 'temporalio/worker'
 
-class TestBasicActivity < Temporal::Activity
+class TestBasicActivity < Temporalio::Activity
   def execute(name)
     "Hello, #{name}!"
   end
 end
 
-class TestCustomNameActivity < Temporal::Activity
+class TestCustomNameActivity < Temporalio::Activity
   activity_name 'test-activity'
 
   def execute(one, two)
@@ -18,13 +18,13 @@ class TestCustomNameActivity < Temporal::Activity
   end
 end
 
-class TestBasicFailingActivity < Temporal::Activity
+class TestBasicFailingActivity < Temporalio::Activity
   def execute
     raise 'test error'
   end
 end
 
-class TestHeartbeatActivity < Temporal::Activity
+class TestHeartbeatActivity < Temporalio::Activity
   def execute
     if activity.info.heartbeat_details.empty?
       activity.heartbeat('foo', 'bar')
@@ -36,7 +36,7 @@ class TestHeartbeatActivity < Temporal::Activity
 end
 
 # This activity will get interrupted by a Thread#raise
-class TestCancellingActivity < Temporal::Activity
+class TestCancellingActivity < Temporalio::Activity
   def execute(cycles)
     cycles.times do
       sleep 0.2
@@ -46,7 +46,7 @@ class TestCancellingActivity < Temporal::Activity
 end
 
 # The shielded block will execute in full without interruption
-class TestCancellingActivityWithShield < Temporal::Activity
+class TestCancellingActivityWithShield < Temporalio::Activity
   def execute(cycles)
     i = 0
     activity.shield do
@@ -57,13 +57,13 @@ class TestCancellingActivityWithShield < Temporal::Activity
       end
     end
     i += 1 # this line will not get executed
-  rescue Temporal::Error::CancelledError
+  rescue Temporalio::Error::CancelledError
     i.to_s # expected to eq '10'
   end
 end
 
 # Responding to cancellation by failing activity
-class TestManuallyCancellingActivityWithShield < Temporal::Activity
+class TestManuallyCancellingActivityWithShield < Temporalio::Activity
   def execute(cycles)
     activity.shield do
       cycles.times do
@@ -76,7 +76,7 @@ class TestManuallyCancellingActivityWithShield < Temporal::Activity
 end
 
 # A shielded activity will not get cancelled
-class TestCancellingShieldedActivity < Temporal::Activity
+class TestCancellingShieldedActivity < Temporalio::Activity
   shielded!
 
   def execute(cycles)
@@ -90,7 +90,7 @@ class TestCancellingShieldedActivity < Temporal::Activity
 end
 
 # Manually handling cancellation (while completing activity)
-class TestCancellationIgnoringActivity < Temporal::Activity
+class TestCancellationIgnoringActivity < Temporalio::Activity
   def execute(cycles)
     i = 0
     cycles.times do
@@ -98,12 +98,12 @@ class TestCancellationIgnoringActivity < Temporal::Activity
       activity.heartbeat
       i += 1
     end
-  rescue Temporal::Error::CancelledError
+  rescue Temporalio::Error::CancelledError
     i.to_s # expected to be less than '10'
   end
 end
 
-describe Temporal::Worker::ActivityWorker do
+describe Temporalio::Worker::ActivityWorker do
   support_path = 'spec/support'.freeze
   port = 5555
   task_queue = 'test-worker'.freeze
@@ -111,7 +111,7 @@ describe Temporal::Worker::ActivityWorker do
   url = "localhost:#{port}".freeze
 
   subject do
-    Temporal::Worker.new(
+    Temporalio::Worker.new(
       connection,
       namespace,
       activity_task_queue,
@@ -130,13 +130,13 @@ describe Temporal::Worker::ActivityWorker do
   end
 
   let(:activity_task_queue) { 'test-activity-worker' }
-  let(:client) { Temporal::Client.new(connection, namespace) }
-  let(:connection) { Temporal::Connection.new(url) }
+  let(:client) { Temporalio::Client.new(connection, namespace) }
+  let(:connection) { Temporalio::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
 
   before(:all) do
-    Temporal::Bridge.init_telemetry
+    Temporalio::Bridge.init_telemetry
 
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
     Helpers::TestRPC.wait(url, 10, 0.5)
@@ -200,9 +200,9 @@ describe Temporal::Worker::ActivityWorker do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
         expect { handle.result }.to raise_error do |error|
-          expect(error).to be_a(Temporal::Error::WorkflowFailure)
-          expect(error.cause).to be_a(Temporal::Error::ActivityError)
-          expect(error.cause.cause).to be_a(Temporal::Error::ApplicationError)
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.cause).to be_a(Temporalio::Error::ApplicationError)
           expect(error.cause.cause.message).to eq('test error')
         end
       end
@@ -250,8 +250,8 @@ describe Temporal::Worker::ActivityWorker do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
         expect { handle.result }.to raise_error do |error|
-          expect(error).to be_a(Temporal::Error::WorkflowFailure)
-          expect(error.cause).to be_a(Temporal::Error::CancelledError)
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::CancelledError)
         end
       end
     end
@@ -273,9 +273,9 @@ describe Temporal::Worker::ActivityWorker do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
         expect { handle.result }.to raise_error do |error|
-          expect(error).to be_a(Temporal::Error::WorkflowFailure)
-          expect(error.cause).to be_a(Temporal::Error::ActivityError)
-          expect(error.cause.cause).to be_a(Temporal::Error::ApplicationError)
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.cause).to be_a(Temporalio::Error::ApplicationError)
           expect(error.cause.cause.message).to eq('Manually failed')
         end
       end

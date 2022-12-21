@@ -1,7 +1,7 @@
-require 'temporal/interceptor/client'
+require 'temporalio/interceptor/client'
 
 module Helpers
-  class TestSimpleInterceptor < Temporal::Interceptor::Client
+  class TestSimpleInterceptor < Temporalio::Interceptor::Client
     def initialize(name)
       @name = name
       super()

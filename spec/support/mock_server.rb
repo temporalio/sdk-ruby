@@ -6,7 +6,7 @@ end
 require 'grpc'
 require 'support/grpc/temporal/api/workflowservice/v1/service_services_pb'
 
-class MockServer < Temporal::Api::WorkflowService::V1::WorkflowService::Service
+class MockServer < Temporalio::Api::WorkflowService::V1::WorkflowService::Service
   def self.run(address)
     server = GRPC::RpcServer.new
     server.add_http2_port(address, :this_port_is_insecure)

@@ -1,0 +1,14 @@
+module Temporalio
+  module PayloadConverter
+    interface _EncodingPayloadConverter
+      def class: -> Class
+      def encoding: -> String
+      def to_payload: (untyped) -> Temporalio::Api::Common::V1::Payload?
+      def from_payload: (Temporalio::Api::Common::V1::Payload) -> untyped
+    end
+
+    class EncodingBase
+      include _EncodingPayloadConverter
+    end
+  end
+end

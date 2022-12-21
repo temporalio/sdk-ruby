@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module WorkflowService
       module V1

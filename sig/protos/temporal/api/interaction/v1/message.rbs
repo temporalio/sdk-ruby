@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Interaction
       module V1
@@ -22,14 +22,14 @@ module Temporal
 
           # The type of this interaction.
           #
-          attr_accessor interaction_type(): ::Temporal::Api::Enums::V1::InteractionType
+          attr_accessor interaction_type(): ::Temporalio::Api::Enums::V1::InteractionType
 
           # The type of this interaction.
           #
-          def interaction_type=: (::Temporal::Api::Enums::V1::InteractionType::values) -> ::Temporal::Api::Enums::V1::InteractionType::values
+          def interaction_type=: (::Temporalio::Api::Enums::V1::InteractionType::values) -> ::Temporalio::Api::Enums::V1::InteractionType::values
                                | ...
 
-          def interaction_type!: () -> ::Temporal::Api::Enums::V1::InteractionType?
+          def interaction_type!: () -> ::Temporalio::Api::Enums::V1::InteractionType?
 
           # A string identifying the agent that requested this interaction.
           #
@@ -41,19 +41,19 @@ module Temporal
 
           def request_id!: () -> ::String?
 
-          def initialize: (?id: ::String, ?event_id: ::Integer, ?interaction_type: ::Temporal::Api::Enums::V1::InteractionType::init, ?identity: ::String, ?request_id: ::String) -> void
+          def initialize: (?id: ::String, ?event_id: ::Integer, ?interaction_type: ::Temporalio::Api::Enums::V1::InteractionType::init, ?identity: ::String, ?request_id: ::String) -> void
 
           def []: (:id) -> ::String
                 | (:event_id) -> ::Integer
-                | (:interaction_type) -> ::Temporal::Api::Enums::V1::InteractionType
+                | (:interaction_type) -> ::Temporalio::Api::Enums::V1::InteractionType
                 | (:identity) -> ::String
                 | (:request_id) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:id, ::String) -> ::String
                  | (:event_id, ::Integer) -> ::Integer
-                 | (:interaction_type, ::Temporal::Api::Enums::V1::InteractionType) -> ::Temporal::Api::Enums::V1::InteractionType
-                 | (:interaction_type, ::Temporal::Api::Enums::V1::InteractionType::values) -> ::Temporal::Api::Enums::V1::InteractionType::values
+                 | (:interaction_type, ::Temporalio::Api::Enums::V1::InteractionType) -> ::Temporalio::Api::Enums::V1::InteractionType
+                 | (:interaction_type, ::Temporalio::Api::Enums::V1::InteractionType::values) -> ::Temporalio::Api::Enums::V1::InteractionType::values
                  | (:identity, ::String) -> ::String
                  | (:request_id, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
@@ -82,15 +82,15 @@ module Temporal
           # Headers that are passed with the interaction to and from the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
 
           # Headers that are passed with the interaction to and from the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
+          def header!: () -> ::Temporalio::Api::Common::V1::Header?
 
           # The name of the input handler to invoke on the target workflow
           #
@@ -100,27 +100,27 @@ module Temporal
 
           # The arguments to pass to the named handler.
           #
-          attr_accessor args(): ::Temporal::Api::Common::V1::Payloads?
+          attr_accessor args(): ::Temporalio::Api::Common::V1::Payloads?
 
           # The arguments to pass to the named handler.
           #
-          def args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def args=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                    | ...
 
-          def args!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def args!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
-          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporal::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?header: ::Temporalio::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+          def []: (:header) -> ::Temporalio::Api::Common::V1::Header?
                 | (:name) -> ::String
-                | (:args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:args) -> ::Temporalio::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+          def []=: (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
+                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (:name, ::String) -> ::String
-                 | (:args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
+                 | (:args, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -147,43 +147,43 @@ module Temporal
           # Headers that are passed with the interaction to and from the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
 
           # Headers that are passed with the interaction to and from the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
+          def header!: () -> ::Temporalio::Api::Common::V1::Header?
 
-          attr_accessor success(): ::Temporal::Api::Common::V1::Payloads?
+          attr_accessor success(): ::Temporalio::Api::Common::V1::Payloads?
 
-          def success=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def success=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                       | ...
 
-          def success!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def success!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
-          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
-          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                       | ...
 
-          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?success: ::Temporal::Api::Common::V1::Payloads::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+          def initialize: (?header: ::Temporalio::Api::Common::V1::Header::init?, ?success: ::Temporalio::Api::Common::V1::Payloads::init?, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
-          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
-                | (:success) -> ::Temporal::Api::Common::V1::Payloads?
-                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+          def []: (:header) -> ::Temporalio::Api::Common::V1::Header?
+                | (:success) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
                 | (::Symbol) -> untyped
 
-          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:success, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
-                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+          def []=: (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
+                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:success, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:success, M?) -> M?
+                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -205,30 +205,30 @@ module Temporal
         end
 
         class Invocation < ::Protobuf::Message
-          attr_accessor meta(): ::Temporal::Api::Interaction::V1::Meta?
+          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
 
-          def meta=: [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
+          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
                    | ...
 
-          def meta!: () -> ::Temporal::Api::Interaction::V1::Meta?
+          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
 
-          attr_accessor input(): ::Temporal::Api::Interaction::V1::Input?
+          attr_accessor input(): ::Temporalio::Api::Interaction::V1::Input?
 
-          def input=: [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporal::Api::Interaction::V1::Input?
+          def input!: () -> ::Temporalio::Api::Interaction::V1::Input?
 
-          def initialize: (?meta: ::Temporal::Api::Interaction::V1::Meta::init?, ?input: ::Temporal::Api::Interaction::V1::Input::init?) -> void
+          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?input: ::Temporalio::Api::Interaction::V1::Input::init?) -> void
 
-          def []: (:meta) -> ::Temporal::Api::Interaction::V1::Meta?
-                | (:input) -> ::Temporal::Api::Interaction::V1::Input?
+          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
+                | (:input) -> ::Temporalio::Api::Interaction::V1::Input?
                 | (::Symbol) -> untyped
 
-          def []=: (:meta, ::Temporal::Api::Interaction::V1::Meta?) -> ::Temporal::Api::Interaction::V1::Meta?
-                 | [M < ::Temporal::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:input, ::Temporal::Api::Interaction::V1::Input?) -> ::Temporal::Api::Interaction::V1::Input?
-                 | [M < ::Temporal::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
+          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
+                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:input, ::Temporalio::Api::Interaction::V1::Input?) -> ::Temporalio::Api::Interaction::V1::Input?
+                 | [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

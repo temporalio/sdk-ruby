@@ -20,162 +20,162 @@ class Coresdk::ActivityHeartbeat
   def self.encode: (Coresdk::ActivityHeartbeat) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RegisterNamespaceRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::DescribeNamespaceRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::DescribeNamespaceRequest) -> String
+class Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListNamespacesRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListNamespacesRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListNamespacesRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListNamespacesRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::UpdateNamespaceRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::UpdateNamespaceRequest) -> String
+class Temporalio::Api::WorkflowService::V1::UpdateNamespaceRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::UpdateNamespaceRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::DeprecateNamespaceRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::DeprecateNamespaceRequest) -> String
+class Temporalio::Api::WorkflowService::V1::DeprecateNamespaceRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::DeprecateNamespaceRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::StartWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::StartWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest) -> String
+class Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest) -> String
+class Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest) -> String
+class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::PollActivityTaskQueueRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::PollActivityTaskQueueRequest) -> String
+class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskFailedRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskFailedRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::SignalWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::SignalWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ResetWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ResetWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::CountWorkflowExecutionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::CountWorkflowExecutionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::GetSearchAttributesRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::GetSearchAttributesRequest) -> String
+class Temporalio::Api::WorkflowService::V1::GetSearchAttributesRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::GetSearchAttributesRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest) -> String
+class Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ResetStickyTaskQueueRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ResetStickyTaskQueueRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::QueryWorkflowRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::QueryWorkflowRequest) -> String
+class Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest) -> String
+class Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::DescribeTaskQueueRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::DescribeTaskQueueRequest) -> String
+class Temporalio::Api::WorkflowService::V1::DescribeTaskQueueRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::DescribeTaskQueueRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::GetClusterInfoRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::GetClusterInfoRequest) -> String
+class Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::GetSystemInfoRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::GetSystemInfoRequest) -> String
+class Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest) -> String
 end
 
-class Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest
-  def self.encode: (Temporal::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest) -> String
+class Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest) -> String
 end

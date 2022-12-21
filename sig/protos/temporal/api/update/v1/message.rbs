@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Update
       module V1
@@ -6,15 +6,15 @@ module Temporal
           # Headers that are passed with the update to the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
 
           # Headers that are passed with the update to the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
+          def header!: () -> ::Temporalio::Api::Common::V1::Header?
 
           # The name of the update function to invoke on the target workflow.
           #
@@ -24,27 +24,27 @@ module Temporal
 
           # The arguments to pass to the named update function.
           #
-          attr_accessor args(): ::Temporal::Api::Common::V1::Payloads?
+          attr_accessor args(): ::Temporalio::Api::Common::V1::Payloads?
 
           # The arguments to pass to the named update function.
           #
-          def args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def args=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                    | ...
 
-          def args!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def args!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
-          def initialize: (?header: ::Temporal::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporal::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?header: ::Temporalio::Api::Common::V1::Header::init?, ?name: ::String, ?args: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:header) -> ::Temporal::Api::Common::V1::Header?
+          def []: (:header) -> ::Temporalio::Api::Common::V1::Header?
                 | (:name) -> ::String
-                | (:args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:args) -> ::Temporalio::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+          def []=: (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
+                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (:name, ::String) -> ::String
-                 | (:args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
+                 | (:args, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:args, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

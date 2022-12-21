@@ -1,0 +1,9 @@
+module Temporalio
+  module PayloadConverter
+    class Nil
+      include _EncodingPayloadConverter
+
+      ENCODING: String
+    end
+  end
+end

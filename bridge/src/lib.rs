@@ -20,13 +20,13 @@ use worker::{Worker, WorkerError, WorkerResult};
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn raise_bridge_exception(message: &str) {
-    VM::raise_ex(AnyException::new("Temporal::Bridge::Error", Some(message)));
+    VM::raise_ex(AnyException::new("Temporalio::Bridge::Error", Some(message)));
 }
 
 fn wrap_worker_error(e: &WorkerError) -> AnyException {
     let name = match e {
-        WorkerError::Shutdown() => "Temporal::Bridge::Error::WorkerShutdown",
-        _ => "Temporal::Bridge::Error"
+        WorkerError::Shutdown() => "Temporalio::Bridge::Error::WorkerShutdown",
+        _ => "Temporalio::Bridge::Error"
     };
 
     AnyException::new(name, Some(&format!("[{:?}] {}", e, e)))

@@ -1,12 +1,12 @@
 require 'securerandom'
-require 'temporal/client'
-require 'temporal/connection'
-require 'temporal/error/failure'
-require 'temporal/error/workflow_failure'
-require 'temporal/interceptor/client'
+require 'temporalio/client'
+require 'temporalio/connection'
+require 'temporalio/error/failure'
+require 'temporalio/error/workflow_failure'
+require 'temporalio/interceptor/client'
 require 'support/helpers/test_rpc'
 
-class TestInterceptor < Temporal::Interceptor::Client
+class TestInterceptor < Temporalio::Interceptor::Client
   attr_reader :results
 
   def initialize
@@ -45,7 +45,7 @@ class TestInterceptor < Temporal::Interceptor::Client
   end
 end
 
-describe Temporal::Client do
+describe Temporalio::Client do
   support_path = 'spec/support'.freeze
   port = 5555
   task_queue = 'test-client'.freeze
@@ -54,7 +54,7 @@ describe Temporal::Client do
 
   subject { described_class.new(connection, namespace) }
 
-  let(:connection) { Temporal::Connection.new(url) }
+  let(:connection) { Temporalio::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
 
@@ -94,10 +94,10 @@ describe Temporal::Client do
           input,
           id: id,
           task_queue: task_queue,
-          id_reuse_policy: Temporal::Workflow::IDReusePolicy::REJECT_DUPLICATE,
+          id_reuse_policy: Temporalio::Workflow::IDReusePolicy::REJECT_DUPLICATE,
         )
       end.to raise_error(
-        Temporal::Error::WorkflowExecutionAlreadyStarted,
+        Temporalio::Error::WorkflowExecutionAlreadyStarted,
         'Workflow execution already started'
       )
 
@@ -136,7 +136,7 @@ describe Temporal::Client do
       expect(info.id).to eq(id)
       expect(info.run_id).to eq(handle.first_execution_run_id)
       expect(info).to be_completed
-      expect(info.status).to eq(Temporal::Workflow::ExecutionStatus::COMPLETED)
+      expect(info.status).to eq(Temporalio::Workflow::ExecutionStatus::COMPLETED)
       expect(Time.now - info.start_time).to be < 5
       expect(Time.now - info.close_time).to be < 5
       expect(Time.now - info.execution_time).to be < 5
@@ -149,8 +149,8 @@ describe Temporal::Client do
       handle = subject.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
       expect { handle.result }.to raise_error do |error|
-        expect(error).to be_a(Temporal::Error::WorkflowFailure)
-        expect(error.cause).to be_a(Temporal::Error::ApplicationError)
+        expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporalio::Error::ApplicationError)
         expect(error.cause.message).to eq('test return value')
       end
     end
@@ -169,7 +169,7 @@ describe Temporal::Client do
       # Calling without following runs raises as expected
       expect do
         handle.result(follow_runs: false)
-      end.to raise_error(Temporal::Error, 'Workflow execution continued as new')
+      end.to raise_error(Temporalio::Error, 'Workflow execution continued as new')
     end
   end
 
@@ -188,7 +188,7 @@ describe Temporal::Client do
       handle.result
 
       expect { handle.query('other test query', 'test query arg') }.to raise_error do |error|
-        expect(error).to be_a(Temporal::Error::QueryFailed)
+        expect(error).to be_a(Temporalio::Error::QueryFailed)
         expect(error.message).to include('unknown queryType other test query')
       end
     end
@@ -213,8 +213,8 @@ describe Temporal::Client do
       handle.cancel
 
       expect { handle.result }.to raise_error do |error|
-        expect(error).to be_a(Temporal::Error::WorkflowFailure)
-        expect(error.cause).to be_a(Temporal::Error::CancelledError)
+        expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporalio::Error::CancelledError)
         expect(error.cause.message).to eq('Workflow execution cancelled')
       end
     end
@@ -227,8 +227,8 @@ describe Temporal::Client do
       handle.terminate('test reason')
 
       expect { handle.result }.to raise_error do |error|
-        expect(error).to be_a(Temporal::Error::WorkflowFailure)
-        expect(error.cause).to be_a(Temporal::Error::TerminatedError)
+        expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporalio::Error::TerminatedError)
         expect(error.cause.message).to eq('test reason')
       end
     end
@@ -251,8 +251,8 @@ describe Temporal::Client do
       handle.result
       handle.cancel
       handle.describe
-      # TODO: Wrap this error in a Temporal::Error
-      expect { handle.terminate }.to raise_error(Temporal::Bridge::Error)
+      # TODO: Wrap this error in a Temporalio::Error
+      expect { handle.terminate }.to raise_error(Temporalio::Bridge::Error)
 
       expect(interceptor.results.length).to eq(6)
       expect(interceptor.results[0]).to eq([:start_workflow, workflow])

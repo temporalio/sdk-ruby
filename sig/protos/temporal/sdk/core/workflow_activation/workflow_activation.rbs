@@ -320,14 +320,14 @@ module Coresdk
 
       # Inputs to the workflow code
       #
-      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # Inputs to the workflow code
       #
-      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # The seed must be used to initialize the random generator used by SDK.
       #  RandomSeedUpdatedAttributes are used to deliver seed updates.
@@ -338,14 +338,14 @@ module Coresdk
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # Used to add metadata e.g. for tracing and auth, meant to be read and written to by interceptors.
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
       # Identity of the client who requested this execution
       #
@@ -406,36 +406,36 @@ module Coresdk
 
       # If this workflow was a continuation, indicates the type of continuation.
       #
-      attr_accessor continued_initiator(): ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
+      attr_accessor continued_initiator(): ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
 
       # If this workflow was a continuation, indicates the type of continuation.
       #
-      def continued_initiator=: (::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
+      def continued_initiator=: (::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
                               | ...
 
-      def continued_initiator!: () -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator?
+      def continued_initiator!: () -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator?
 
       # If this workflow was a continuation and that continuation failed, the details of that.
       #
-      attr_accessor continued_failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor continued_failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # If this workflow was a continuation and that continuation failed, the details of that.
       #
-      def continued_failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def continued_failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                             | ...
 
-      def continued_failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def continued_failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
       # If this workflow was a continuation and that continuation completed, the details of that.
       #
-      attr_accessor last_completion_result(): ::Temporal::Api::Common::V1::Payloads?
+      attr_accessor last_completion_result(): ::Temporalio::Api::Common::V1::Payloads?
 
       # If this workflow was a continuation and that continuation completed, the details of that.
       #
-      def last_completion_result=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+      def last_completion_result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                                  | ...
 
-      def last_completion_result!: () -> ::Temporal::Api::Common::V1::Payloads?
+      def last_completion_result!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
       # This is the very first run id the workflow ever had, following continuation chains.
       #
@@ -445,14 +445,14 @@ module Coresdk
 
       # This workflow's retry policy
       #
-      attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # This workflow's retry policy
       #
-      def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                        | ...
 
-      def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
 
       # Starting at 1, the number of times we have tried to execute this workflow
       #
@@ -494,25 +494,25 @@ module Coresdk
 
       # User-defined memo
       #
-      attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
+      attr_accessor memo(): ::Temporalio::Api::Common::V1::Memo?
 
       # User-defined memo
       #
-      def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+      def memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                | ...
 
-      def memo!: () -> ::Temporal::Api::Common::V1::Memo?
+      def memo!: () -> ::Temporalio::Api::Common::V1::Memo?
 
       # Search attributes created/updated when this workflow was started
       #
-      attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
+      attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
 
       # Search attributes created/updated when this workflow was started
       #
-      def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+      def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                             | ...
 
-      def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
+      def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
 
       # When the workflow execution started event was first written
       #
@@ -525,40 +525,40 @@ module Coresdk
 
       def start_time!: () -> ::Google::Protobuf::Timestamp?
 
-      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?, ?start_time: ::Google::Protobuf::Timestamp::init?) -> void
+      def initialize: (?workflow_type: ::String, ?workflow_id: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?randomness_seed: ::Integer, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?identity: ::String, ?parent_workflow_info: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?continued_from_execution_run_id: ::String, ?continued_initiator: ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::init, ?continued_failure: ::Temporalio::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporalio::Api::Common::V1::Payloads::init?, ?first_execution_run_id: ::String, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?attempt: ::Integer, ?cron_schedule: ::String, ?workflow_execution_expiration_time: ::Google::Protobuf::Timestamp::init?, ?cron_schedule_to_schedule_interval: ::Google::Protobuf::Duration::init?, ?memo: ::Temporalio::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?, ?start_time: ::Google::Protobuf::Timestamp::init?) -> void
 
       def []: (:workflow_type) -> ::String
             | (:workflow_id) -> ::String
-            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (:randomness_seed) -> ::Integer
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (:identity) -> ::String
             | (:parent_workflow_info) -> ::Coresdk::Common::NamespacedWorkflowExecution?
             | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
             | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
             | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
             | (:continued_from_execution_run_id) -> ::String
-            | (:continued_initiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
-            | (:continued_failure) -> ::Temporal::Api::Failure::V1::Failure?
-            | (:last_completion_result) -> ::Temporal::Api::Common::V1::Payloads?
+            | (:continued_initiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
+            | (:continued_failure) -> ::Temporalio::Api::Failure::V1::Failure?
+            | (:last_completion_result) -> ::Temporalio::Api::Common::V1::Payloads?
             | (:first_execution_run_id) -> ::String
-            | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
             | (:attempt) -> ::Integer
             | (:cron_schedule) -> ::String
             | (:workflow_execution_expiration_time) -> ::Google::Protobuf::Timestamp?
             | (:cron_schedule_to_schedule_interval) -> ::Google::Protobuf::Duration?
-            | (:memo) -> ::Temporal::Api::Common::V1::Memo?
-            | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
+            | (:memo) -> ::Temporalio::Api::Common::V1::Memo?
+            | (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | (:start_time) -> ::Google::Protobuf::Timestamp?
             | (::Symbol) -> untyped
 
       def []=: (:workflow_type, ::String) -> ::String
              | (:workflow_id, ::String) -> ::String
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (:randomness_seed, ::Integer) -> ::Integer
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (:identity, ::String) -> ::String
              | (:parent_workflow_info, ::Coresdk::Common::NamespacedWorkflowExecution?) -> ::Coresdk::Common::NamespacedWorkflowExecution?
              | [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (:parent_workflow_info, M?) -> M?
@@ -569,25 +569,25 @@ module Coresdk
              | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
              | (:continued_from_execution_run_id, ::String) -> ::String
-             | (:continued_initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
-             | (:continued_initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
-             | (:continued_failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:continued_failure, M?) -> M?
-             | (:last_completion_result, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-             | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
+             | (:continued_initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
+             | (:continued_initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
+             | (:continued_failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:continued_failure, M?) -> M?
+             | (:last_completion_result, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+             | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
              | (:first_execution_run_id, ::String) -> ::String
-             | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
              | (:attempt, ::Integer) -> ::Integer
              | (:cron_schedule, ::String) -> ::String
              | (:workflow_execution_expiration_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:workflow_execution_expiration_time, M?) -> M?
              | (:cron_schedule_to_schedule_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
              | [M < ::Google::Protobuf::Duration::_ToProto] (:cron_schedule_to_schedule_interval, M?) -> M?
-             | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
-             | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
-             | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
-             | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+             | (:memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
+             | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+             | (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+             | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
              | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
              | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
              | (::Symbol, untyped) -> untyped
@@ -845,20 +845,20 @@ module Coresdk
     # / The failure is constructed in core for lang's convenience.
     #
     class ResolveChildWorkflowExecutionStartCancelled < ::Protobuf::Message
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -974,38 +974,38 @@ module Coresdk
 
       def query_type!: () -> ::String?
 
-      attr_accessor arguments(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      def arguments=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                     | ...
 
-      def arguments!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # / Headers attached to the query
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # / Headers attached to the query
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Temporal::Api::Common::V1::Payload::array, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+      def initialize: (?query_id: ::String, ?query_type: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:query_id) -> ::String
             | (:query_type) -> ::String
-            | (:arguments) -> ::Temporal::Api::Common::V1::Payload::field_array
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:query_id, ::String) -> ::String
              | (:query_type, ::String) -> ::String
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1031,22 +1031,22 @@ module Coresdk
     class CancelWorkflow < ::Protobuf::Message
       # / Information from the cancellation request
       #
-      attr_accessor details(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor details(): ::Temporalio::Api::Common::V1::Payload::field_array
 
       # / Information from the cancellation request
       #
-      def details=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def details=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                   | ...
 
-      def details!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def details!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-      def initialize: (?details: ::Temporal::Api::Common::V1::Payload::array) -> void
+      def initialize: (?details: ::Temporalio::Api::Common::V1::Payload::array) -> void
 
-      def []: (:details) -> ::Temporal::Api::Common::V1::Payload::field_array
+      def []: (:details) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (::Symbol) -> untyped
 
-      def []=: (:details, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:details, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def []=: (:details, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:details, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1074,12 +1074,12 @@ module Coresdk
 
       def signal_name!: () -> ::String?
 
-      attr_accessor input(): ::Temporal::Api::Common::V1::Payload::field_array
+      attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      def input=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+      def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                 | ...
 
-      def input!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+      def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
       # Identity of the sender of the signal
       #
@@ -1089,29 +1089,29 @@ module Coresdk
 
       # Headers attached to the signal
       #
-      attr_accessor headers(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
       # Headers attached to the signal
       #
-      def headers=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                   | ...
 
-      def headers!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      def initialize: (?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payload::array, ?identity: ::String, ?headers: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+      def initialize: (?signal_name: ::String, ?input: ::Temporalio::Api::Common::V1::Payload::array, ?identity: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
       def []: (:signal_name) -> ::String
-            | (:input) -> ::Temporal::Api::Common::V1::Payload::field_array
+            | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
             | (:identity) -> ::String
-            | (:headers) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
             | (::Symbol) -> untyped
 
       def []=: (:signal_name, ::String) -> ::String
-             | (:input, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:input, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+             | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+             | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
              | (:identity, ::String) -> ::String
-             | (:headers, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1177,25 +1177,25 @@ module Coresdk
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?seq: ::Integer, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?seq: ::Integer, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1227,25 +1227,25 @@ module Coresdk
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
       # / If populated, this signal either failed to be sent or was cancelled depending on failure
       # / type / info.
       #
-      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
 
-      def initialize: (?seq: ::Integer, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?seq: ::Integer, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
 
       def []: (:seq) -> ::Integer
-            | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:seq, ::Integer) -> ::Integer
-             | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
-             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

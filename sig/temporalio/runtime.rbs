@@ -1,0 +1,12 @@
+module Temporalio
+  class Runtime
+    attr_reader core_runtime: Temporalio::Bridge::Runtime
+    attr_reader reactor: Temporalio::Worker::Reactor
+
+    @thread: Thread
+
+    def self.instance: () -> Runtime
+    def initialize: () -> void
+    def ensure_callback_loop: () -> void
+  end
+end

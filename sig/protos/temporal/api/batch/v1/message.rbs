@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Batch
       module V1
@@ -11,14 +11,14 @@ module Temporal
 
           # Batch operation state
           #
-          attr_accessor state(): ::Temporal::Api::Enums::V1::BatchOperationState
+          attr_accessor state(): ::Temporalio::Api::Enums::V1::BatchOperationState
 
           # Batch operation state
           #
-          def state=: (::Temporal::Api::Enums::V1::BatchOperationState::values) -> ::Temporal::Api::Enums::V1::BatchOperationState::values
+          def state=: (::Temporalio::Api::Enums::V1::BatchOperationState::values) -> ::Temporalio::Api::Enums::V1::BatchOperationState::values
                     | ...
 
-          def state!: () -> ::Temporal::Api::Enums::V1::BatchOperationState?
+          def state!: () -> ::Temporalio::Api::Enums::V1::BatchOperationState?
 
           # Batch operation start time
           #
@@ -42,17 +42,17 @@ module Temporal
 
           def close_time!: () -> ::Google::Protobuf::Timestamp?
 
-          def initialize: (?job_id: ::String, ?state: ::Temporal::Api::Enums::V1::BatchOperationState::init, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?) -> void
+          def initialize: (?job_id: ::String, ?state: ::Temporalio::Api::Enums::V1::BatchOperationState::init, ?start_time: ::Google::Protobuf::Timestamp::init?, ?close_time: ::Google::Protobuf::Timestamp::init?) -> void
 
           def []: (:job_id) -> ::String
-                | (:state) -> ::Temporal::Api::Enums::V1::BatchOperationState
+                | (:state) -> ::Temporalio::Api::Enums::V1::BatchOperationState
                 | (:start_time) -> ::Google::Protobuf::Timestamp?
                 | (:close_time) -> ::Google::Protobuf::Timestamp?
                 | (::Symbol) -> untyped
 
           def []=: (:job_id, ::String) -> ::String
-                 | (:state, ::Temporal::Api::Enums::V1::BatchOperationState) -> ::Temporal::Api::Enums::V1::BatchOperationState
-                 | (:state, ::Temporal::Api::Enums::V1::BatchOperationState::values) -> ::Temporal::Api::Enums::V1::BatchOperationState::values
+                 | (:state, ::Temporalio::Api::Enums::V1::BatchOperationState) -> ::Temporalio::Api::Enums::V1::BatchOperationState
+                 | (:state, ::Temporalio::Api::Enums::V1::BatchOperationState::values) -> ::Temporalio::Api::Enums::V1::BatchOperationState::values
                  | (:start_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:start_time, M?) -> M?
                  | (:close_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
@@ -84,14 +84,14 @@ module Temporal
         class BatchOperationTermination < ::Protobuf::Message
           # Serialized value(s) to provide to the termination event
           #
-          attr_accessor details(): ::Temporal::Api::Common::V1::Payloads?
+          attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
 
           # Serialized value(s) to provide to the termination event
           #
-          def details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                       | ...
 
-          def details!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def details!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
           # The identity of the worker/client
           #
@@ -99,14 +99,14 @@ module Temporal
 
           def identity!: () -> ::String?
 
-          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?, ?identity: ::String) -> void
+          def initialize: (?details: ::Temporalio::Api::Common::V1::Payloads::init?, ?identity: ::String) -> void
 
-          def []: (:details) -> ::Temporal::Api::Common::V1::Payloads?
+          def []: (:details) -> ::Temporalio::Api::Common::V1::Payloads?
                 | (:identity) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
+          def []=: (:details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -140,27 +140,27 @@ module Temporal
 
           # Serialized value(s) to provide with the signal
           #
-          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
+          attr_accessor input(): ::Temporalio::Api::Common::V1::Payloads?
 
           # Serialized value(s) to provide with the signal
           #
-          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
+          def input!: () -> ::Temporalio::Api::Common::V1::Payloads?
 
           # Headers that are passed with the signal to the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
 
           # Headers that are passed with the signal to the processing workflow.
           #  These can include things like auth or tracing tokens.
           #
-          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporal::Api::Common::V1::Header?
+          def header!: () -> ::Temporalio::Api::Common::V1::Header?
 
           # The identity of the worker/client
           #
@@ -168,19 +168,19 @@ module Temporal
 
           def identity!: () -> ::String?
 
-          def initialize: (?signal: ::String, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?identity: ::String) -> void
+          def initialize: (?signal: ::String, ?input: ::Temporalio::Api::Common::V1::Payloads::init?, ?header: ::Temporalio::Api::Common::V1::Header::init?, ?identity: ::String) -> void
 
           def []: (:signal) -> ::String
-                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
-                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:input) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:header) -> ::Temporalio::Api::Common::V1::Header?
                 | (:identity) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:signal, ::String) -> ::String
-                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
-                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
-                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
-                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:input, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
+                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
+                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (:identity, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 

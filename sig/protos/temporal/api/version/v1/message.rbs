@@ -1,4 +1,4 @@
-module Temporal
+module Temporalio
   module Api
     module Version
       module V1
@@ -58,22 +58,22 @@ module Temporal
 
           def message!: () -> ::String?
 
-          attr_accessor severity(): ::Temporal::Api::Enums::V1::Severity
+          attr_accessor severity(): ::Temporalio::Api::Enums::V1::Severity
 
-          def severity=: (::Temporal::Api::Enums::V1::Severity::values) -> ::Temporal::Api::Enums::V1::Severity::values
+          def severity=: (::Temporalio::Api::Enums::V1::Severity::values) -> ::Temporalio::Api::Enums::V1::Severity::values
                        | ...
 
-          def severity!: () -> ::Temporal::Api::Enums::V1::Severity?
+          def severity!: () -> ::Temporalio::Api::Enums::V1::Severity?
 
-          def initialize: (?message: ::String, ?severity: ::Temporal::Api::Enums::V1::Severity::init) -> void
+          def initialize: (?message: ::String, ?severity: ::Temporalio::Api::Enums::V1::Severity::init) -> void
 
           def []: (:message) -> ::String
-                | (:severity) -> ::Temporal::Api::Enums::V1::Severity
+                | (:severity) -> ::Temporalio::Api::Enums::V1::Severity
                 | (::Symbol) -> untyped
 
           def []=: (:message, ::String) -> ::String
-                 | (:severity, ::Temporal::Api::Enums::V1::Severity) -> ::Temporal::Api::Enums::V1::Severity
-                 | (:severity, ::Temporal::Api::Enums::V1::Severity::values) -> ::Temporal::Api::Enums::V1::Severity::values
+                 | (:severity, ::Temporalio::Api::Enums::V1::Severity) -> ::Temporalio::Api::Enums::V1::Severity
+                 | (:severity, ::Temporalio::Api::Enums::V1::Severity::values) -> ::Temporalio::Api::Enums::V1::Severity::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -97,30 +97,30 @@ module Temporal
         # VersionInfo contains details about current and recommended release versions as well as alerts and upgrade instructions.
         #
         class VersionInfo < ::Protobuf::Message
-          attr_accessor current(): ::Temporal::Api::Version::V1::ReleaseInfo?
+          attr_accessor current(): ::Temporalio::Api::Version::V1::ReleaseInfo?
 
-          def current=: [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
+          def current=: [M < ::Temporalio::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
                       | ...
 
-          def current!: () -> ::Temporal::Api::Version::V1::ReleaseInfo?
+          def current!: () -> ::Temporalio::Api::Version::V1::ReleaseInfo?
 
-          attr_accessor recommended(): ::Temporal::Api::Version::V1::ReleaseInfo?
+          attr_accessor recommended(): ::Temporalio::Api::Version::V1::ReleaseInfo?
 
-          def recommended=: [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
+          def recommended=: [M < ::Temporalio::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?
                           | ...
 
-          def recommended!: () -> ::Temporal::Api::Version::V1::ReleaseInfo?
+          def recommended!: () -> ::Temporalio::Api::Version::V1::ReleaseInfo?
 
           attr_accessor instructions(): ::String
 
           def instructions!: () -> ::String?
 
-          attr_accessor alerts(): ::Temporal::Api::Version::V1::Alert::field_array
+          attr_accessor alerts(): ::Temporalio::Api::Version::V1::Alert::field_array
 
-          def alerts=: (::Temporal::Api::Version::V1::Alert::array) -> ::Temporal::Api::Version::V1::Alert::array
+          def alerts=: (::Temporalio::Api::Version::V1::Alert::array) -> ::Temporalio::Api::Version::V1::Alert::array
                      | ...
 
-          def alerts!: () -> ::Temporal::Api::Version::V1::Alert::field_array?
+          def alerts!: () -> ::Temporalio::Api::Version::V1::Alert::field_array?
 
           attr_accessor last_update_time(): ::Google::Protobuf::Timestamp?
 
@@ -129,22 +129,22 @@ module Temporal
 
           def last_update_time!: () -> ::Google::Protobuf::Timestamp?
 
-          def initialize: (?current: ::Temporal::Api::Version::V1::ReleaseInfo::init?, ?recommended: ::Temporal::Api::Version::V1::ReleaseInfo::init?, ?instructions: ::String, ?alerts: ::Temporal::Api::Version::V1::Alert::array, ?last_update_time: ::Google::Protobuf::Timestamp::init?) -> void
+          def initialize: (?current: ::Temporalio::Api::Version::V1::ReleaseInfo::init?, ?recommended: ::Temporalio::Api::Version::V1::ReleaseInfo::init?, ?instructions: ::String, ?alerts: ::Temporalio::Api::Version::V1::Alert::array, ?last_update_time: ::Google::Protobuf::Timestamp::init?) -> void
 
-          def []: (:current) -> ::Temporal::Api::Version::V1::ReleaseInfo?
-                | (:recommended) -> ::Temporal::Api::Version::V1::ReleaseInfo?
+          def []: (:current) -> ::Temporalio::Api::Version::V1::ReleaseInfo?
+                | (:recommended) -> ::Temporalio::Api::Version::V1::ReleaseInfo?
                 | (:instructions) -> ::String
-                | (:alerts) -> ::Temporal::Api::Version::V1::Alert::field_array
+                | (:alerts) -> ::Temporalio::Api::Version::V1::Alert::field_array
                 | (:last_update_time) -> ::Google::Protobuf::Timestamp?
                 | (::Symbol) -> untyped
 
-          def []=: (:current, ::Temporal::Api::Version::V1::ReleaseInfo?) -> ::Temporal::Api::Version::V1::ReleaseInfo?
-                 | [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (:current, M?) -> M?
-                 | (:recommended, ::Temporal::Api::Version::V1::ReleaseInfo?) -> ::Temporal::Api::Version::V1::ReleaseInfo?
-                 | [M < ::Temporal::Api::Version::V1::ReleaseInfo::_ToProto] (:recommended, M?) -> M?
+          def []=: (:current, ::Temporalio::Api::Version::V1::ReleaseInfo?) -> ::Temporalio::Api::Version::V1::ReleaseInfo?
+                 | [M < ::Temporalio::Api::Version::V1::ReleaseInfo::_ToProto] (:current, M?) -> M?
+                 | (:recommended, ::Temporalio::Api::Version::V1::ReleaseInfo?) -> ::Temporalio::Api::Version::V1::ReleaseInfo?
+                 | [M < ::Temporalio::Api::Version::V1::ReleaseInfo::_ToProto] (:recommended, M?) -> M?
                  | (:instructions, ::String) -> ::String
-                 | (:alerts, ::Temporal::Api::Version::V1::Alert::field_array) -> ::Temporal::Api::Version::V1::Alert::field_array
-                 | (:alerts, ::Temporal::Api::Version::V1::Alert::array) -> ::Temporal::Api::Version::V1::Alert::array
+                 | (:alerts, ::Temporalio::Api::Version::V1::Alert::field_array) -> ::Temporalio::Api::Version::V1::Alert::field_array
+                 | (:alerts, ::Temporalio::Api::Version::V1::Alert::array) -> ::Temporalio::Api::Version::V1::Alert::array
                  | (:last_update_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                  | [M < ::Google::Protobuf::Timestamp::_ToProto] (:last_update_time, M?) -> M?
                  | (::Symbol, untyped) -> untyped

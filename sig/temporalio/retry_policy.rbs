@@ -1,0 +1,23 @@
+module Temporalio
+  class RetryPolicy
+    Invalid: Temporalio::Error
+
+    attr_reader initial_interval: Integer
+    attr_reader backoff: Float
+    attr_reader max_interval: Integer?
+    attr_reader max_attempts: Integer
+    attr_reader non_retriable_errors: Array[Class]
+
+    def initialize: (
+      ?initial_interval: Integer,
+      ?backoff: Float,
+      ?max_interval: nil,
+      ?max_attempts: Integer,
+      ?non_retriable_errors: Array[Class]
+    ) -> void
+
+    def validate!: -> nil
+
+    def to_proto: -> Temporalio::Api::Common::V1::RetryPolicy
+  end
+end

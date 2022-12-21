@@ -1,0 +1,37 @@
+module Temporalio
+  class Worker
+    class ActivityWorker
+      @running: bool
+
+      def initialize: (
+        String task_queue,
+        Temporalio::Bridge::Worker core_worker,
+        Array[singleton(Temporalio::Activity)] activities,
+        Temporalio::DataConverter converter,
+        Temporalio::Worker::_ActivityExecutor executor
+      ) -> void
+      def run: (Async::Task reactor) -> void
+      def shutdown: -> void
+
+      private
+
+      attr_reader task_queue: String
+      attr_reader worker: SyncWorker
+      attr_reader activities: Hash[String, singleton(Temporalio::Activity)]
+      attr_reader converter: Temporalio::DataConverter
+      attr_reader executor: Temporalio::Worker::_ActivityExecutor
+      attr_reader running_activities: Hash[String, Temporalio::Worker::ActivityRunner]
+      attr_reader cancellations: Array[String]
+      attr_reader shutdown_queue: Thread::Queue
+
+      def running?: -> bool
+      def prepare_activities: (Array[singleton(Temporalio::Activity)] activities)
+        -> Hash[String, singleton(Temporalio::Activity)]
+      def lookup_activity: (String activity_type) -> singleton(Temporalio::Activity)
+      def run_activity: (String token, Coresdk::ActivityTask::Start task)
+        -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
+      def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
+      def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
+    end
+  end
+end
