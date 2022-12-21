@@ -106,6 +106,7 @@ async fn make_rpc_call(mut client: Client, params: RpcParams) -> RpcResult {
         "signal_with_start_workflow_execution" => rpc_call!(client, signal_with_start_workflow_execution, params),
         "reset_workflow_execution" => rpc_call!(client, reset_workflow_execution, params),
         "terminate_workflow_execution" => rpc_call!(client, terminate_workflow_execution, params),
+        "delete_workflow_execution" => rpc_call!(client, delete_workflow_execution, params),
         "list_open_workflow_executions" => rpc_call!(client, list_open_workflow_executions, params),
         "list_closed_workflow_executions" => rpc_call!(client, list_closed_workflow_executions, params),
         "list_workflow_executions" => rpc_call!(client, list_workflow_executions, params),

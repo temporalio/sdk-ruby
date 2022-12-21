@@ -136,8 +136,6 @@ describe Temporalio::Worker::ActivityWorker do
   let(:workflow) { 'kitchen_sink' }
 
   before(:all) do
-    Temporalio::Bridge.init_telemetry
-
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
     Helpers::TestRPC.wait(url, 10, 0.5)
 

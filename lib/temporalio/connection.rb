@@ -345,6 +345,19 @@ module Temporalio
       Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionResponse.decode(response)
     end
 
+    # @param request [Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest]
+    # @param metadata [Hash<String, String>] Headers used on the RPC call.
+    #   Keys here override client-level RPC metadata keys.
+    # @param timeout [Integer] Optional RPC deadline to set for each RPC call.
+    #
+    # @return [Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionResponse]
+    def delete_workflow_execution(request, metadata: {}, timeout: nil)
+      encoded = Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest.encode(request)
+      response = core_connection.call(:delete_workflow_execution, encoded, metadata, timeout)
+
+      Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionResponse.decode(response)
+    end
+
     # @param request [Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest]
     # @param metadata [Hash<String, String>] Headers used on the RPC call.
     #   Keys here override client-level RPC metadata keys.

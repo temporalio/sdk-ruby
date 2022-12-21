@@ -120,6 +120,10 @@ class Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest
   def self.encode: (Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest) -> String
 end
 
+class Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest
+  def self.encode: (Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest) -> String
+end
+
 class Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest
   def self.encode: (Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest) -> String
 end
