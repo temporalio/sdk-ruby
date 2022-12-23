@@ -177,6 +177,22 @@ describe Temporalio::Worker::Runner do
       expect(handle_1.result).to eq('1')
       expect(handle_2.result).to eq('2')
     end
+
+    it 'stops when a specified signal is received and waits for all the tasks to finish' do
+      handle_1 = client.start_workflow(workflow, input_1, id: SecureRandom.uuid, task_queue: task_queue)
+      handle_2 = client.start_workflow(workflow, input_2, id: SecureRandom.uuid, task_queue: task_queue)
+
+      Thread.new do
+        $activity_start_queue.pop
+        $activity_start_queue.pop
+        Process.kill('USR2', Process.pid)
+      end
+
+      Temporalio::Worker.run(worker_1, worker_2, stop_on_signal: %w[USR2])
+
+      expect(handle_1.result).to eq('1')
+      expect(handle_2.result).to eq('2')
+    end
   end
 end
 # rubocop:enable Style/GlobalVars

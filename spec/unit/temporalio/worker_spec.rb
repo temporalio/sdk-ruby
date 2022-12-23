@@ -36,6 +36,17 @@ describe Temporalio::Worker do
         expect(block).to eq(run_block)
       end
     end
+
+    context 'when stop_on_signal is provided' do
+      it 'initializes a Runner and runs it' do
+        described_class.run(worker_one, worker_two, stop_on_signal: %w[USR2])
+
+        expect(Temporalio::Worker::Runner).to have_received(:new).with(worker_one, worker_two)
+        expect(runner).to have_received(:run) do |&block|
+          expect(block).to an_instance_of(Proc)
+        end
+      end
+    end
   end
 
   describe '#initialize' do

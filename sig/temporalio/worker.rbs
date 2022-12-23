@@ -1,6 +1,9 @@
 module Temporalio
   class Worker
-    def self.run: (*Temporalio::Worker workers) { -> void } -> void
+    def self.run: (
+      *Temporalio::Worker workers,
+      ?stop_on_signal: Array[String]
+    ) ?{ -> void } -> void
 
     def initialize: (
       Temporalio::Connection connection,
@@ -11,7 +14,7 @@ module Temporalio
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?max_concurrent_activities: Integer
     ) -> void
-    def run: { -> void } -> void
+    def run: ?{ -> void } -> void
     def start: (?Temporalio::Worker::Runner? runner) -> void
     def shutdown: (?Exception exception) -> void
 
