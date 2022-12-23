@@ -15,7 +15,7 @@ end
 class TestWrongSuperclassActivity < Object; end
 
 describe Temporalio::Worker::ActivityWorker do
-  subject { described_class.new(task_queue, core_worker, activities, converter, executor) }
+  subject { described_class.new(task_queue, core_worker, activities, converter, executor, graceful_timeout) }
 
   let(:task_queue) { 'test-task-queue' }
   let(:activities) { [TestActivity] }
@@ -23,6 +23,7 @@ describe Temporalio::Worker::ActivityWorker do
   let(:core_worker) { instance_double(Temporalio::Bridge::Worker) }
   let(:runner) { instance_double(Temporalio::Worker::ActivityRunner) }
   let(:executor) { Temporalio::Worker::ThreadPoolExecutor.new(1) }
+  let(:graceful_timeout) { nil }
   let(:converter) { Temporalio::DataConverter.new }
 
   describe '#initialize' do

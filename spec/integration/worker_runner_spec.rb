@@ -32,6 +32,7 @@ describe Temporalio::Worker::Runner do
       namespace,
       activity_task_queue_1,
       activities: [TestWorkerIntegrationActivity],
+      graceful_shutdown_timeout: graceful_timeout,
     )
   end
   let(:worker_2) do
@@ -40,12 +41,14 @@ describe Temporalio::Worker::Runner do
       namespace,
       activity_task_queue_2,
       activities: [TestWorkerIntegrationActivity],
+      graceful_shutdown_timeout: graceful_timeout,
     )
   end
   let(:activity_task_queue_1) { 'test-activity-worker-1' }
   let(:activity_task_queue_2) { 'test-activity-worker-2' }
   let(:client) { Temporalio::Client.new(connection, namespace) }
   let(:connection) { Temporalio::Connection.new(url) }
+  let(:graceful_timeout) { nil }
   let(:workflow) { 'kitchen_sink' }
   let(:input_1) do
     {
@@ -192,6 +195,31 @@ describe Temporalio::Worker::Runner do
 
       expect(handle_1.result).to eq('1')
       expect(handle_2.result).to eq('2')
+    end
+
+    context 'when graceful_shutdown_timeout is provided' do
+      let(:graceful_timeout) { 0 }
+
+      it 'cancels running activities' do
+        handle_1 = client.start_workflow(workflow, input_1, id: SecureRandom.uuid, task_queue: task_queue)
+        handle_2 = client.start_workflow(workflow, input_2, id: SecureRandom.uuid, task_queue: task_queue)
+
+        Thread.new do
+          $activity_start_queue.pop
+          $activity_start_queue.pop
+          subject.shutdown
+        end
+
+        subject.run
+
+        # TODO: finish this after figuring out why a cancellation isn't propagated
+        # expect { handle_1.result }.to raise_error do |error|
+        #   # TODO: Fill in error details
+        # end
+        # expect { handle_2.result }.to raise_error do |error|
+        #   # TODO: Fill in error details
+        # end
+      end
     end
   end
 end
