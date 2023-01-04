@@ -18,5 +18,10 @@ module Temporalio
         @status = status
       end
     end
+
+    # Superclass for internal errors
+    class Internal < Error; end
+
+    class WorkerShutdown < Internal; end
   end
 end

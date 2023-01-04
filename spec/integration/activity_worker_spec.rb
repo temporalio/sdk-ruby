@@ -149,9 +149,6 @@ describe Temporalio::Worker::ActivityWorker do
     Process.wait(@server_pid)
   end
 
-  before { subject.start }
-  after { subject.shutdown }
-
   describe 'running an activity' do
     it 'runs an activity and returns a result' do
       input = {
@@ -165,7 +162,7 @@ describe Temporalio::Worker::ActivityWorker do
       }
       handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-      expect(handle.result).to eq('Hello, test!')
+      expect(subject.run { handle.result }).to eq('Hello, test!')
     end
 
     context 'when activity has a custom name' do
@@ -181,7 +178,7 @@ describe Temporalio::Worker::ActivityWorker do
         }
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect(handle.result).to eq('foo, bar')
+        expect(subject.run { handle.result }).to eq('foo, bar')
       end
     end
 
@@ -197,7 +194,9 @@ describe Temporalio::Worker::ActivityWorker do
         }
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect { handle.result }.to raise_error do |error|
+        expect do
+          subject.run { handle.result }
+        end.to raise_error do |error|
           expect(error).to be_a(Temporalio::Error::WorkflowFailure)
           expect(error.cause).to be_a(Temporalio::Error::ActivityError)
           expect(error.cause.cause).to be_a(Temporalio::Error::ApplicationError)
@@ -220,7 +219,7 @@ describe Temporalio::Worker::ActivityWorker do
       }
       handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-      expect(handle.result).to eq('foo bar')
+      expect(subject.run { handle.result }).to eq('foo bar')
     end
   end
 
@@ -247,7 +246,9 @@ describe Temporalio::Worker::ActivityWorker do
       it 'raises from within an activity' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect { handle.result }.to raise_error do |error|
+        expect do
+          subject.run { handle.result }
+        end.to raise_error do |error|
           expect(error).to be_a(Temporalio::Error::WorkflowFailure)
           expect(error.cause).to be_a(Temporalio::Error::CancelledError)
         end
@@ -260,7 +261,7 @@ describe Temporalio::Worker::ActivityWorker do
       it 'performs all cycles' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect(handle.result.to_i).to eq(cycles)
+        expect(subject.run { handle.result }.to_i).to eq(cycles)
       end
     end
 
@@ -270,7 +271,9 @@ describe Temporalio::Worker::ActivityWorker do
       it 'raises' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect { handle.result }.to raise_error do |error|
+        expect do
+          subject.run { handle.result }
+        end.to raise_error do |error|
           expect(error).to be_a(Temporalio::Error::WorkflowFailure)
           expect(error.cause).to be_a(Temporalio::Error::ActivityError)
           expect(error.cause.cause).to be_a(Temporalio::Error::ApplicationError)
@@ -285,7 +288,7 @@ describe Temporalio::Worker::ActivityWorker do
       it 'does not affect activity' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect(handle.result).to eq('completed')
+        expect(subject.run { handle.result }).to eq('completed')
       end
     end
 
@@ -295,7 +298,7 @@ describe Temporalio::Worker::ActivityWorker do
       it 'return a number of performed cycles' do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
-        expect(handle.result.to_i).to be < cycles
+        expect(subject.run { handle.result }.to_i).to be < cycles
       end
     end
   end

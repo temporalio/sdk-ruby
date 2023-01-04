@@ -11,7 +11,7 @@ module Temporalio
         Temporalio::Worker::_ActivityExecutor executor
       ) -> void
       def run: (Async::Task reactor) -> void
-      def shutdown: -> void
+      def drain: -> void
 
       private
 
@@ -22,7 +22,7 @@ module Temporalio
       attr_reader executor: Temporalio::Worker::_ActivityExecutor
       attr_reader running_activities: Hash[String, Temporalio::Worker::ActivityRunner]
       attr_reader cancellations: Array[String]
-      attr_reader shutdown_queue: Thread::Queue
+      attr_reader drain_queue: Thread::Queue
 
       def running?: -> bool
       def prepare_activities: (Array[singleton(Temporalio::Activity)] activities)

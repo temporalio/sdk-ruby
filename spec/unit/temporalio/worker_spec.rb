@@ -16,8 +16,27 @@ describe Temporalio::Worker do
   let(:namespace) { 'test-namespace' }
   let(:task_queue) { 'test-task-queue' }
   let(:activities) { [TestActivity] }
+  let(:runner) { instance_double(Temporalio::Worker::Runner, run: nil) }
 
   before { allow(Temporalio::Bridge::Worker).to receive(:create).and_return(core_worker) }
+
+  describe '.run' do
+    let(:worker_one) { described_class.new(connection, namespace, task_queue, activities: activities) }
+    let(:worker_two) { described_class.new(connection, namespace, task_queue, activities: activities) }
+
+    before { allow(Temporalio::Worker::Runner).to receive(:new).and_return(runner) }
+
+    it 'initializes a Runner and runs it' do
+      run_block = -> {}
+
+      described_class.run(worker_one, worker_two, &run_block)
+
+      expect(Temporalio::Worker::Runner).to have_received(:new).with(worker_one, worker_two)
+      expect(runner).to have_received(:run) do |&block|
+        expect(block).to eq(run_block)
+      end
+    end
+  end
 
   describe '#initialize' do
     before do
@@ -62,55 +81,111 @@ describe Temporalio::Worker do
   end
 
   describe '#run' do
-    let(:activity_worker) { instance_double(Temporalio::Worker::ActivityWorker, run: nil) }
+    before { allow(Temporalio::Worker::Runner).to receive(:new).and_return(runner) }
 
-    before { allow(Temporalio::Worker::ActivityWorker).to receive(:new).and_return(activity_worker) }
+    it 'initializes a Runner and runs it' do
+      run_block = -> {}
 
-    it 'runs the workers inside a new reactor' do
-      subject.run
+      subject.run(&run_block)
 
-      expect(activity_worker).to have_received(:run).with(Async::Task)
+      expect(Temporalio::Worker::Runner).to have_received(:new).with(subject)
+      expect(runner).to have_received(:run) do |&block|
+        expect(block).to eq(run_block)
+      end
     end
   end
 
   describe '#start' do
-    let(:activity_worker) { instance_double(Temporalio::Worker::ActivityWorker) }
     let(:queue) { Queue.new }
+    let(:reactor) { Temporalio::Runtime.instance.reactor }
 
     before do
-      allow(activity_worker).to receive(:run) { queue << 'done!' }
-      allow(Temporalio::Worker::ActivityWorker).to receive(:new).and_return(activity_worker)
+      allow(core_worker)
+        .to receive(:poll_activity_task)
+        .and_raise(Temporalio::Bridge::Error::WorkerShutdown)
+
+      allow(core_worker).to receive(:initiate_shutdown)
+      allow(core_worker).to receive(:shutdown)
+
+      allow(reactor).to receive(:async).and_call_original
     end
+
+    after { subject.shutdown } # wait for shutdown
 
     it 'runs the workers inside a shared reactor' do
       subject.start
 
-      expect(queue.pop).to eq('done!')
-      expect(activity_worker).to have_received(:run).with(Async::Task)
+      expect(subject).to be_started
+      expect(subject).to be_running
+
+      expect(reactor).to have_received(:async)
     end
 
     it 'raises when attempting to start twice' do
       subject.start
 
-      expect { subject.start }.to raise_error('Worker is already running')
+      expect { subject.start }.to raise_error('Worker is already started')
     end
   end
 
   describe '#shutdown' do
-    let(:activity_worker) { instance_double(Temporalio::Worker::ActivityWorker, shutdown: nil) }
+    let(:activity_executor) { Temporalio::Worker::ThreadPoolExecutor.new(1) }
+    let(:activity_worker) { instance_double(Temporalio::Worker::ActivityWorker, drain: nil) }
 
     before do
       allow(core_worker).to receive(:initiate_shutdown)
       allow(core_worker).to receive(:shutdown)
       allow(Temporalio::Worker::ActivityWorker).to receive(:new).and_return(activity_worker)
+      allow(activity_worker).to receive(:run).and_return(nil)
+      allow(Temporalio::Worker::ThreadPoolExecutor).to receive(:new).and_return(activity_executor)
+      allow(activity_executor).to receive(:shutdown).and_call_original
+
+      subject.start
     end
 
     it 'calls shutdown on all workers' do
       subject.shutdown
 
       expect(core_worker).to have_received(:initiate_shutdown).ordered
-      expect(activity_worker).to have_received(:shutdown).ordered
+      expect(activity_worker).to have_received(:drain).ordered
+      expect(activity_executor).to have_received(:shutdown).ordered
       expect(core_worker).to have_received(:shutdown).ordered
+    end
+  end
+
+  describe '#started?' do
+    it 'returns true when worker is started' do
+      subject.instance_variable_set(:@started, true)
+
+      expect(subject).to be_started
+    end
+
+    it 'returns false when worker is not started' do
+      subject.instance_variable_set(:@started, false)
+
+      expect(subject).not_to be_started
+    end
+  end
+
+  describe '#running?' do
+    it 'returns true when worker is started and not shuting down' do
+      subject.instance_variable_set(:@started, true)
+      subject.instance_variable_set(:@shutdown, false)
+
+      expect(subject).to be_running
+    end
+
+    it 'returns false when worker is not started' do
+      subject.instance_variable_set(:@started, false)
+
+      expect(subject).not_to be_running
+    end
+
+    it 'returns false when worker is started but not shutting down' do
+      subject.instance_variable_set(:@started, true)
+      subject.instance_variable_set(:@shutdown, true)
+
+      expect(subject).not_to be_running
     end
   end
 end

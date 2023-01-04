@@ -1,6 +1,6 @@
 module Temporalio
   class Worker
-    @running: bool
+    def self.run: (*Temporalio::Worker workers) { -> void } -> void
 
     def initialize: (
       Temporalio::Connection connection,
@@ -11,19 +11,26 @@ module Temporalio
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?max_concurrent_activities: Integer
     ) -> void
-    def run: -> void
-    def start: (?Temporalio::Worker::_Reactor? reactor) -> void
-    def shutdown: -> void
+    def run: { -> void } -> void
+    def start: (?Temporalio::Worker::Runner? runner) -> void
+    def shutdown: (?Exception exception) -> void
+
+    def started?: -> bool
+    def running?: -> bool
 
     private
 
+    @started: bool
+    @shutdown: bool
+
     attr_reader mutex: Thread::Mutex
     attr_reader runtime: Temporalio::Runtime
+    attr_reader activity_executor: Temporalio::Worker::_ActivityExecutor
     attr_reader core_worker: Temporalio::Bridge::Worker
     attr_reader activity_worker: Temporalio::Worker::ActivityWorker?
     attr_reader workflow_worker: untyped
+    attr_reader runner: Temporalio::Worker::Runner?
 
-    def running?: -> bool
     def init_activity_worker: (
       String task_queue,
       Temporalio::Bridge::Worker core_worker,

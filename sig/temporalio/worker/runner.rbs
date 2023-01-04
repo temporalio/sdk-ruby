@@ -1,0 +1,21 @@
+module Temporalio
+  class Worker
+    class Runner
+      @started: bool
+      @shutdown: bool
+
+      def initialize: (*Temporalio::Worker workers) -> void
+      def run: { -> void } -> void
+      def shutdown: (?Exception exception) -> void
+
+      private
+
+      attr_reader workers: Array[Temporalio::Worker]
+      attr_reader mutex: Thread::Mutex
+      attr_reader thread: Thread
+
+      def running?: -> bool
+      def shutdown_workers: -> void
+    end
+  end
+end
