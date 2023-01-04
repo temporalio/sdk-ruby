@@ -32,6 +32,7 @@ describe Temporalio::Worker::Runner do
       namespace,
       activity_task_queue_1,
       activities: [TestWorkerIntegrationActivity],
+      graceful_shutdown_timeout: graceful_timeout,
     )
   end
   let(:worker_2) do
@@ -40,12 +41,14 @@ describe Temporalio::Worker::Runner do
       namespace,
       activity_task_queue_2,
       activities: [TestWorkerIntegrationActivity],
+      graceful_shutdown_timeout: graceful_timeout,
     )
   end
   let(:activity_task_queue_1) { 'test-activity-worker-1' }
   let(:activity_task_queue_2) { 'test-activity-worker-2' }
   let(:client) { Temporalio::Client.new(connection, namespace) }
   let(:connection) { Temporalio::Connection.new(url) }
+  let(:graceful_timeout) { nil }
   let(:workflow) { 'kitchen_sink' }
   let(:input_1) do
     {
@@ -176,6 +179,50 @@ describe Temporalio::Worker::Runner do
 
       expect(handle_1.result).to eq('1')
       expect(handle_2.result).to eq('2')
+    end
+
+    it 'stops when a specified signal is received and waits for all the tasks to finish' do
+      handle_1 = client.start_workflow(workflow, input_1, id: SecureRandom.uuid, task_queue: task_queue)
+      handle_2 = client.start_workflow(workflow, input_2, id: SecureRandom.uuid, task_queue: task_queue)
+
+      Thread.new do
+        $activity_start_queue.pop
+        $activity_start_queue.pop
+        Process.kill('USR2', Process.pid)
+      end
+
+      Temporalio::Worker.run(worker_1, worker_2, shutdown_signals: %w[USR2])
+
+      expect(handle_1.result).to eq('1')
+      expect(handle_2.result).to eq('2')
+    end
+
+    context 'when graceful_shutdown_timeout is provided' do
+      let(:graceful_timeout) { 0 }
+
+      it 'cancels running activities' do
+        handle_1 = client.start_workflow(workflow, input_1, id: SecureRandom.uuid, task_queue: task_queue)
+        handle_2 = client.start_workflow(workflow, input_2, id: SecureRandom.uuid, task_queue: task_queue)
+
+        Thread.new do
+          $activity_start_queue.pop
+          $activity_start_queue.pop
+          subject.shutdown
+        end
+
+        subject.run
+
+        expect { handle_1.result }.to raise_error do |error|
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.message).to eq('activity error')
+        end
+        expect { handle_2.result }.to raise_error do |error|
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.message).to eq('activity error')
+        end
+      end
     end
   end
 end

@@ -57,7 +57,7 @@ class TestCancellingActivityWithShield < Temporalio::Activity
       end
     end
     i += 1 # this line will not get executed
-  rescue Temporalio::Error::CancelledError
+  rescue Temporalio::Error::ActivityCancelled
     i.to_s # expected to eq '10'
   end
 end
@@ -98,7 +98,7 @@ class TestCancellationIgnoringActivity < Temporalio::Activity
       activity.heartbeat
       i += 1
     end
-  rescue Temporalio::Error::CancelledError
+  rescue Temporalio::Error::ActivityCancelled
     i.to_s # expected to be less than '10'
   end
 end

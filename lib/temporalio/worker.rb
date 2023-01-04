@@ -17,11 +17,26 @@ module Temporalio
     # finished) and will raise if any of the workers raises a fatal error.
     #
     # @param workers [Array<Temporalio::Worker>] A list of the workers to be run.
+    # @param shutdown_signals [Array<String>] A list of process signals for the worker to stop on.
+    #   This argument can not be used with a custom block.
     #
     # @yield Optionally you can provide a block by the end of which all the workers will be shut
     #   down. Any errors raised from this block will be re-raised by this method.
-    def self.run(*workers, &block)
-      # TODO: Add signal handling
+    def self.run(*workers, shutdown_signals: [], &block)
+      unless shutdown_signals.empty?
+        if block
+          raise ArgumentError, 'Temporalio::Worker.run accepts :shutdown_signals or a block, but not both'
+        end
+
+        signal_queue = Queue.new
+
+        shutdown_signals.each do |signal|
+          Signal.trap(signal) { signal_queue.close }
+        end
+
+        block = -> { signal_queue.pop }
+      end
+
       Runner.new(*workers).run(&block)
     end
 
@@ -36,6 +51,9 @@ module Temporalio
     # @param activity_executor [ThreadPoolExecutor] Concurrent executor for all activities. Defaults
     #   to a {ThreadPoolExecutor} with `:max_concurrent_activities` available threads.
     # @param max_concurrent_activities [Integer] Number of concurrently running activities.
+    # @param graceful_shutdown_timeout [Integer] Amount of time (in seconds) activities are given
+    #   after a shutdown to complete before they are cancelled. A default value of `nil` means that
+    #   activities are never cancelled when handling a shutdown.
     #
     # @raise [ArgumentError] When no activities or workflows have been provided.
     def initialize(
@@ -45,7 +63,8 @@ module Temporalio
       activities: [],
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
-      max_concurrent_activities: 100
+      max_concurrent_activities: 100,
+      graceful_shutdown_timeout: nil
     )
       # TODO: Add worker interceptors
       @started = false
@@ -59,13 +78,17 @@ module Temporalio
         namespace,
         task_queue,
       )
-      @activity_worker = init_activity_worker(
-        task_queue,
-        @core_worker,
-        activities,
-        data_converter,
-        @activity_executor,
-      )
+      @activity_worker =
+        unless activities.empty?
+          Worker::ActivityWorker.new(
+            task_queue,
+            @core_worker,
+            activities,
+            data_converter,
+            @activity_executor,
+            graceful_shutdown_timeout,
+          )
+        end
       @workflow_worker = nil
 
       if !@activity_worker && !@workflow_worker
@@ -171,11 +194,5 @@ module Temporalio
 
     attr_reader :mutex, :runtime, :activity_executor, :core_worker, :activity_worker,
                 :workflow_worker, :runner
-
-    def init_activity_worker(task_queue, core_worker, activities, data_converter, executor)
-      return if activities.empty?
-
-      Worker::ActivityWorker.new(task_queue, core_worker, activities, data_converter, executor)
-    end
   end
 end

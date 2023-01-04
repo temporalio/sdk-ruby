@@ -7,12 +7,13 @@ module Temporalio
   class Worker
     # @api private
     class ActivityWorker
-      def initialize(task_queue, core_worker, activities, converter, executor)
+      def initialize(task_queue, core_worker, activities, converter, executor, graceful_timeout)
         @task_queue = task_queue
         @worker = SyncWorker.new(core_worker)
         @activities = prepare_activities(activities)
         @converter = converter
         @executor = executor
+        @graceful_timeout = graceful_timeout
         @running_activities = {}
         @cancellations = []
         @drain_queue = Queue.new
@@ -37,8 +38,19 @@ module Temporalio
       rescue Temporalio::Bridge::Error::WorkerShutdown
         # No need to re-raise this error, it's a part of a normal shutdown
       ensure
-        reactor.async do
+        reactor.async do |async_task|
+          cancelation_task =
+            if graceful_timeout
+              async_task.async do
+                sleep graceful_timeout
+                running_activities.each_value do |activity_runner|
+                  activity_runner.cancel('Worker is shutting down', by_request: false)
+                end
+              end
+            end
+
           outstanding_tasks.each(&:wait)
+          cancelation_task&.stop # all tasks completed, stop cancellations
           drain_queue.close
         end
       end
@@ -49,8 +61,8 @@ module Temporalio
 
       private
 
-      attr_reader :task_queue, :worker, :activities, :converter, :executor, :running_activities,
-                  :cancellations, :drain_queue
+      attr_reader :task_queue, :worker, :activities, :converter, :executor, :graceful_timeout,
+                  :running_activities, :cancellations, :drain_queue
 
       def prepare_activities(activities)
         activities.each_with_object({}) do |activity, result|
@@ -119,7 +131,7 @@ module Temporalio
         end
 
         cancellations << task_token
-        runner&.cancel
+        runner&.cancel('Activity cancellation requested', by_request: true)
       end
     end
   end

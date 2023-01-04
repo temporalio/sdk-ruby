@@ -1,4 +1,5 @@
 require 'temporalio/error/failure'
+require 'temporalio/errors'
 
 module Temporalio
   class Activity
@@ -14,7 +15,7 @@ module Temporalio
         @thread = Thread.current
         @info = info
         @heartbeat_proc = heartbeat_proc
-        @cancelled = false
+        @pending_cancellation = nil
         @shielded = shielded
         @mutex = Mutex.new
       end
@@ -41,7 +42,7 @@ module Temporalio
       def shield(&block)
         # The whole activity is shielded, called from a nested shield
         #   or while handling a CancelledError (in a rescue or ensure blocks)
-        return block.call if @shielded || @cancelled
+        return block.call if @shielded || cancelled?
 
         if Thread.current != thread
           # TODO: Use logger instead when implemented
@@ -52,7 +53,8 @@ module Temporalio
         mutex.synchronize do
           @shielded = true
           result = block.call
-          raise Temporalio::Error::CancelledError, 'Unhandled cancellation' if @cancelled
+          # RBS: StandardError fallback is only needed to satisfy steep - https://github.com/soutaro/steep/issues/477
+          raise @pending_cancellation || StandardError if cancelled?
 
           result
         ensure # runs while still holding the lock
@@ -64,19 +66,23 @@ module Temporalio
       #
       # @return [Boolean] true if the activity has had a cancellation request, false otherwise.
       def cancelled?
-        @cancelled
+        !!@pending_cancellation
       end
 
-      # Cancel the running activity.
+      # Cancel the running activity by raising a provided error.
+      #
+      # @param reason [String] Reason for cancellation.
+      # @param by_request [Boolean] Cancellation requested by the server or not.
       #
       # @api private
-      def cancel
-        @cancelled = true
+      def cancel(reason, by_request: false)
+        error = Temporalio::Error::ActivityCancelled.new(reason, by_request)
+        @pending_cancellation = error
 
         locked = mutex.try_lock
         # @shielded inside the lock means the whole activity is shielded
         if locked && !@shielded
-          thread.raise(Temporalio::Error::CancelledError.new('Unhandled cancellation'))
+          thread.raise(error)
         end
       ensure
         # only release the lock if we locked it

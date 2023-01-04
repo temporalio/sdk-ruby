@@ -23,5 +23,18 @@ module Temporalio
     class Internal < Error; end
 
     class WorkerShutdown < Internal; end
+
+    # This error is used within the SDK to communicate Activity cancellations
+    # (and whether it was requested by server or not)
+    class ActivityCancelled < Internal
+      def initialize(reason, by_request)
+        super(reason)
+        @by_request = by_request
+      end
+
+      def by_request?
+        @by_request
+      end
+    end
   end
 end

@@ -29,7 +29,7 @@ func run(endpoint, namespace, taskQueue string) error {
 	defer cl.Close()
 
 	log.Printf("Creating worker")
-	w := worker.New(cl, taskQueue, worker.Options{})
+	w := worker.New(cl, taskQueue, worker.Options{MaxConcurrentWorkflowTaskPollers: 4})
 	w.RegisterWorkflowWithOptions(KitchenSinkWorkflow, workflow.RegisterOptions{Name: "kitchen_sink"})
 	defer log.Printf("Stopping worker")
 

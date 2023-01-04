@@ -5,7 +5,7 @@ module Temporalio
       @shutdown: bool
 
       def initialize: (*Temporalio::Worker workers) -> void
-      def run: { -> void } -> void
+      def run: ?{ -> void } -> void
       def shutdown: (?Exception exception) -> void
 
       private

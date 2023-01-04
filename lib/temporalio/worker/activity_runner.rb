@@ -1,6 +1,8 @@
 require 'google/protobuf/well_known_types'
 require 'temporalio/activity/context'
 require 'temporalio/activity/info'
+require 'temporalio/error/failure'
+require 'temporalio/errors'
 
 module Temporalio
   class Worker
@@ -27,11 +29,21 @@ module Temporalio
 
         converter.to_payload(result)
       rescue StandardError => e
+        # Temporal server ignores cancellation failures that were not requested by the server.
+        # However within the SDK cancellations are also used during the worker shutdown. In order
+        # to provide a seamless handling experience (same error raised within the Activity) we are
+        # using the ActivityCancelled error and then swapping it with a CancelledError here.
+        #
+        # In the future this will be handled by the SDK Core — https://github.com/temporalio/sdk-core/issues/461
+        if e.is_a?(Temporalio::Error::ActivityCancelled) && e.by_request?
+          e = Temporalio::Error::CancelledError.new(e.message)
+        end
+
         converter.to_failure(e)
       end
 
-      def cancel
-        context.cancel
+      def cancel(reason, by_request:)
+        context.cancel(reason, by_request: by_request)
       end
 
       private

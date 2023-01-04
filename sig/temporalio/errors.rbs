@@ -23,5 +23,14 @@ module Temporalio
 
     class WorkerShutdown < Internal
     end
+
+    class ActivityCancelled < Internal
+      def initialize: (String reason, bool by_request) -> void
+      def by_request?: -> bool
+
+      private
+
+      @by_request: bool
+    end
   end
 end

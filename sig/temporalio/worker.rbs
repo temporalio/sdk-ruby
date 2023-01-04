@@ -1,6 +1,9 @@
 module Temporalio
   class Worker
-    def self.run: (*Temporalio::Worker workers) { -> void } -> void
+    def self.run: (
+      *Temporalio::Worker workers,
+      ?shutdown_signals: Array[String]
+    ) ?{ -> void } -> void
 
     def initialize: (
       Temporalio::Connection connection,
@@ -9,9 +12,10 @@ module Temporalio
       ?activities: Array[singleton(Temporalio::Activity)],
       ?data_converter: Temporalio::DataConverter,
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
-      ?max_concurrent_activities: Integer
+      ?max_concurrent_activities: Integer,
+      ?graceful_shutdown_timeout: Integer?
     ) -> void
-    def run: { -> void } -> void
+    def run: ?{ -> void } -> void
     def start: (?Temporalio::Worker::Runner? runner) -> void
     def shutdown: (?Exception exception) -> void
 
@@ -30,13 +34,5 @@ module Temporalio
     attr_reader activity_worker: Temporalio::Worker::ActivityWorker?
     attr_reader workflow_worker: untyped
     attr_reader runner: Temporalio::Worker::Runner?
-
-    def init_activity_worker: (
-      String task_queue,
-      Temporalio::Bridge::Worker core_worker,
-      Array[singleton(Temporalio::Activity)] activities,
-      Temporalio::DataConverter data_converter,
-      Temporalio::Worker::_ActivityExecutor executor
-    ) -> Temporalio::Worker::ActivityWorker?
   end
 end
