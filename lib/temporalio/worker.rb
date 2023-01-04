@@ -17,20 +17,20 @@ module Temporalio
     # finished) and will raise if any of the workers raises a fatal error.
     #
     # @param workers [Array<Temporalio::Worker>] A list of the workers to be run.
-    # @param stop_on_signal [Array<String>] A list of process signals for the worker to stop on.
+    # @param shutdown_signals [Array<String>] A list of process signals for the worker to stop on.
     #   This argument can not be used with a custom block.
     #
     # @yield Optionally you can provide a block by the end of which all the workers will be shut
     #   down. Any errors raised from this block will be re-raised by this method.
-    def self.run(*workers, stop_on_signal: [], &block)
-      unless stop_on_signal.empty?
+    def self.run(*workers, shutdown_signals: [], &block)
+      unless shutdown_signals.empty?
         if block
-          raise ArgumentError, 'Temporalio::Worker.run accepts stop_on_signal: or a block, but not both'
+          raise ArgumentError, 'Temporalio::Worker.run accepts :shutdown_signals or a block, but not both'
         end
 
         signal_queue = Queue.new
 
-        stop_on_signal.each do |signal|
+        shutdown_signals.each do |signal|
           Signal.trap(signal) { signal_queue.close }
         end
 

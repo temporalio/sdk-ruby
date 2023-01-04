@@ -191,7 +191,7 @@ describe Temporalio::Worker::Runner do
         Process.kill('USR2', Process.pid)
       end
 
-      Temporalio::Worker.run(worker_1, worker_2, stop_on_signal: %w[USR2])
+      Temporalio::Worker.run(worker_1, worker_2, shutdown_signals: %w[USR2])
 
       expect(handle_1.result).to eq('1')
       expect(handle_2.result).to eq('2')

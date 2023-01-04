@@ -157,7 +157,7 @@ behaves the same way — the workers will be shut down when the block finishes.
 You can also configure your worker to listen on process signals to initiate a shutdown:
 
 ```ruby
-Temporal::Worker.run(worker_1, worker_2, worker_3, stop_on_signal: %w[INT TERM])
+Temporal::Worker.run(worker_1, worker_2, worker_3, shutdown_signals: %w[INT TERM])
 ```
 
 #### Worker Shutdown

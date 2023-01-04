@@ -37,9 +37,9 @@ describe Temporalio::Worker do
       end
     end
 
-    context 'when stop_on_signal is provided' do
+    context 'when shutdown_signals is provided' do
       it 'initializes a Runner and runs it' do
-        described_class.run(worker_one, worker_two, stop_on_signal: %w[USR2])
+        described_class.run(worker_one, worker_two, shutdown_signals: %w[USR2])
 
         expect(Temporalio::Worker::Runner).to have_received(:new).with(worker_one, worker_two)
         expect(runner).to have_received(:run) do |&block|

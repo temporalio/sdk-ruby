@@ -2,7 +2,7 @@ module Temporalio
   class Worker
     def self.run: (
       *Temporalio::Worker workers,
-      ?stop_on_signal: Array[String]
+      ?shutdown_signals: Array[String]
     ) ?{ -> void } -> void
 
     def initialize: (
