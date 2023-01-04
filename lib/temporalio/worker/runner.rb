@@ -1,3 +1,5 @@
+require 'temporalio/errors'
+
 module Temporalio
   class Worker
     # A class used to manage the lifecycle of running any number of workers.

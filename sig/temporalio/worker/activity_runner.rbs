@@ -10,7 +10,7 @@ module Temporalio
         Temporalio::DataConverter converter
       ) -> void
       def run: -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
-      def cancel: -> void
+      def cancel: (String reason, by_request: bool) -> void
 
       private
 

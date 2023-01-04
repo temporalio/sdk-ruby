@@ -37,9 +37,9 @@ describe Temporalio::Activity::Context do
       it 'raises after finishing the block' do
         expect do
           subject.shield do
-            subject.cancel
+            subject.cancel('Test cancellation')
           end
-        end.to raise_error(Temporalio::Error::CancelledError, 'Unhandled cancellation')
+        end.to raise_error(Temporalio::Error::ActivityCancelled, 'Test cancellation')
       end
     end
 
@@ -49,7 +49,7 @@ describe Temporalio::Activity::Context do
       it 'ignores cancellation' do
         expect(
           subject.shield do
-            subject.cancel
+            subject.cancel('Test cancellation')
             42
           end
         ).to eq(42)
@@ -61,19 +61,19 @@ describe Temporalio::Activity::Context do
         expect do
           subject.shield do
             result = subject.shield do
-              subject.cancel
+              subject.cancel('Test cancellation')
               42
             end
 
             expect(result).to eq(42)
-          end.to raise_error(Temporalio::Error::CancelledError, 'Unhandled cancellation')
+          end.to raise_error(Temporalio::Error::ActivityCancelled, 'Test cancellation')
         end
       end
     end
 
     context 'when called on an already cancelled context' do
       it 'has no effect' do
-        subject.cancel rescue nil # rubocop:disable Style/RescueModifier
+        subject.cancel('Test cancellation', true) rescue nil # rubocop:disable Style/RescueModifier
 
         expect(subject.shield { 42 }).to eq(42)
       end
@@ -99,23 +99,37 @@ describe Temporalio::Activity::Context do
     end
 
     it 'returns true when cancelled' do
-      subject.cancel rescue nil # rubocop:disable Style/RescueModifier
+      subject.cancel('Test cancellation') rescue nil # rubocop:disable Style/RescueModifier
       expect(subject).to be_cancelled
     end
   end
 
   describe '#cancel' do
-    it 'raises an error' do
+    it 'raises a non-requested cancellation error' do
       expect do
-        subject.cancel
-      end.to raise_error(Temporalio::Error::CancelledError, 'Unhandled cancellation')
+        subject.cancel('Test cancellation', by_request: false)
+      end.to raise_error do |error|
+        expect(error).to be_a(Temporalio::Error::ActivityCancelled)
+        expect(error.message).to eq('Test cancellation')
+        expect(error).not_to be_by_request
+      end
+    end
+
+    it 'raises a cancellation by request' do
+      expect do
+        subject.cancel('Test cancellation', by_request: true)
+      end.to raise_error do |error|
+        expect(error).to be_a(Temporalio::Error::ActivityCancelled)
+        expect(error.message).to eq('Test cancellation')
+        expect(error).to be_by_request
+      end
     end
 
     context 'when shielded' do
       before { subject.instance_variable_set(:@shielded, true) }
 
       it 'does not raise an error' do
-        subject.cancel
+        subject.cancel('Test cancellation')
         expect(subject).to be_cancelled
       end
     end

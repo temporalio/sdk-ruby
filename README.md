@@ -166,6 +166,11 @@ The `Temporal::Worker#run` (as well as `Temporal::Worker#shutdown`) invocation w
 activities to complete, so if a long-running activity does not at least respect cancellation, the
 shutdown may never complete.
 
+If a worker was initialized with a `graceful_shutdown_timeout` option then a cancellation will be
+issued for every running activity after the set timeout. The bahaviour is mostly identical to a
+server requested cancellation and should be handled accordingly. More on this in [Heartbeating and
+Cancellation](#heartbeating-and-cancellation).
+
 ### Activities
 
 #### Definition
@@ -212,7 +217,7 @@ persisted on the server for retrieval during activity retry. If an activity call
 return an array containing `123` and `456` on the next run.
 
 A cancellation is implemented using the `Thread#raise` method, which will raise a
-`Temporal::Error::CancelledError` during the execution of an activity. This means that your code
+`Temporal::Error::ActivityCancelled` during the execution of an activity. This means that your code
 might get interrupted at any point and never complete. In order to protect critical parts of your
 activities wrap them in `activity.shield`:
 
@@ -250,6 +255,9 @@ end
 
 For any long-running activity using this approach it is recommended to periodically check
 `activity.cancelled?` flag and respond accordingly.
+
+Please note that your activities can also get cancelled during a worker shutdown process ([if
+configured accordingly](#worker-shutdown)).
 
 
 ## Dev Setup

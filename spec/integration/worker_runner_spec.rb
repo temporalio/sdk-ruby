@@ -212,13 +212,16 @@ describe Temporalio::Worker::Runner do
 
         subject.run
 
-        # TODO: finish this after figuring out why a cancellation isn't propagated
-        # expect { handle_1.result }.to raise_error do |error|
-        #   # TODO: Fill in error details
-        # end
-        # expect { handle_2.result }.to raise_error do |error|
-        #   # TODO: Fill in error details
-        # end
+        expect { handle_1.result }.to raise_error do |error|
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.message).to eq('activity error')
+        end
+        expect { handle_2.result }.to raise_error do |error|
+          expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+          expect(error.cause).to be_a(Temporalio::Error::ActivityError)
+          expect(error.cause.message).to eq('activity error')
+        end
       end
     end
   end

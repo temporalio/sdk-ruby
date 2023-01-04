@@ -43,7 +43,9 @@ module Temporalio
             if graceful_timeout
               async_task.async do
                 sleep graceful_timeout
-                running_activities.each_value(&:cancel)
+                running_activities.each_value do |activity_runner|
+                  activity_runner.cancel('Worker is shutting down', by_request: false)
+                end
               end
             end
 
@@ -129,7 +131,7 @@ module Temporalio
         end
 
         cancellations << task_token
-        runner&.cancel
+        runner&.cancel('Activity cancellation requested', by_request: true)
       end
     end
   end
