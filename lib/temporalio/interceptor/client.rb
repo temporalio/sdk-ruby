@@ -1,5 +1,8 @@
 module Temporalio
   module Interceptor
+    # Base class for implementing Client side interceptors.
+    #
+    # @abstract
     class Client
       class StartWorkflowInput < Struct.new(
         :workflow,
@@ -74,26 +77,44 @@ module Temporalio
         keyword_init: true,
       ); end
 
+      # Interceptor for {Temporalio::Client#start_workflow}.
+      #
+      # @param input [StartWorkflowInput]
       def start_workflow(input)
         yield(input)
       end
 
+      # Interceptor for {Temporalio::Client::WorkflowHandle#describe}.
+      #
+      # @param input [DescribeWorkflowInput]
       def describe_workflow(input)
         yield(input)
       end
 
+      # Interceptor for {Temporalio::Client::WorkflowHandle#query}.
+      #
+      # @param input [QueryWorkflowInput]
       def query_workflow(input)
         yield(input)
       end
 
+      # Interceptor for {Temporalio::Client::WorkflowHandle#signal}.
+      #
+      # @param input [SignalWorkflowInput]
       def signal_workflow(input)
         yield(input)
       end
 
+      # Interceptor for {Temporalio::Client::WorkflowHandle#cancel}.
+      #
+      # @param input [CancelWorkflowInput]
       def cancel_workflow(input)
         yield(input)
       end
 
+      # Interceptor for {Temporalio::Client::WorkflowHandle#terminate}.
+      #
+      # @param input [TerminateWorkflowInput]
       def terminate_workflow(input)
         yield(input)
       end

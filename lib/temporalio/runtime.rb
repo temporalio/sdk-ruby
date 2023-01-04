@@ -3,6 +3,7 @@ require 'temporalio/bridge'
 require 'temporalio/worker/reactor'
 
 module Temporalio
+  # @api private
   class Runtime
     include Singleton
 

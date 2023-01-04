@@ -2,6 +2,7 @@ require 'temporalio/payload_converter/encoding_base'
 
 module Temporalio
   module PayloadConverter
+    # A payload converter for encoding/decoding byte strings.
     class Bytes < EncodingBase
       ENCODING = 'binary/plain'.freeze
 

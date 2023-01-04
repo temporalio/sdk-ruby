@@ -1,5 +1,6 @@
 module Temporalio
   module Interceptor
+    # @api private
     class Chain
       def initialize(interceptors = [])
         @interceptors = interceptors

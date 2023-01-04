@@ -2,10 +2,14 @@ require 'async'
 
 module Temporalio
   class Worker
-    # A shared reactor to allow multiple workers to access the same Async reactor
+    # A shared async reactor.
+    #
+    # This class allows multiple workers to access the same Async reactor
     # without forcing the SDK users to wrap their execution in an Async block. This
     # is handled using a queue that is polled from within a running Async reactor,
     # so all the blocks end up being executed within it.
+    #
+    # @api private
     class Reactor
       def initialize
         @queue = Queue.new

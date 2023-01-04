@@ -12,6 +12,7 @@ require 'temporalio/workflow/query_reject_condition'
 
 module Temporalio
   class Client
+    # @api private
     class Implementation
       def initialize(connection, namespace, converter, interceptors)
         @connection = connection

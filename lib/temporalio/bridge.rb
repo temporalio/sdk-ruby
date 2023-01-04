@@ -5,6 +5,7 @@ require 'temporalio/bridge/error'
 BRIDGE_DIR = File.expand_path('..', __dir__ || '.')
 
 module Temporalio
+  # @api private
   module Bridge
     Rutie
       .new(:bridge, lib_path: '', lib_suffix: 'so', lib_prefix: '')

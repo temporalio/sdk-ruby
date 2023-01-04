@@ -9,6 +9,8 @@ module Temporalio
     #
     # CAUTION: This class will block the thread its running in unless it is used from
     #          within an Async reactor.
+    #
+    # @api private
     class SyncWorker
       def initialize(core_worker)
         @core_worker = core_worker

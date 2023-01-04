@@ -2,9 +2,14 @@ require 'temporalio/error/failure'
 
 module Temporalio
   class Activity
+    # This class provides methods that can be called from activity classes.
     class Context
+      # Information about the running activity.
+      #
+      # @return [Temporalio::Activity::Info]
       attr_reader :info
 
+      # @api private
       def initialize(info, heartbeat_proc, shielded: false)
         @thread = Thread.current
         @info = info
@@ -14,10 +19,25 @@ module Temporalio
         @mutex = Mutex.new
       end
 
+      # Send a heartbeat for the current activity.
+      #
+      # @param details [Array<any>] Data to store with the heartbeat.
       def heartbeat(*details)
         heartbeat_proc.call(*details)
       end
 
+      # Protect a part of activity's implementation from cancellations.
+      #
+      # Activity cancellations are implemented using the `Thread#raise`, which can unsafely
+      # terminate your implementation. To disable this behaviour make sure to wrap critical parts of
+      # your business logic in this method.
+      #
+      # For shielding a whole activity consider using {Temporalio::Activity.shielded!}.
+      #
+      # A cancellation that got requested while in a shielded block will not interrupt the execution
+      # and will raise a {Temporalio::Error::CancelledError} right after the block has finished.
+      #
+      # @yield Block to be protected from cancellations.
       def shield(&block)
         # The whole activity is shielded, called from a nested shield
         #   or while handling a CancelledError (in a rescue or ensure blocks)
@@ -40,10 +60,16 @@ module Temporalio
         end
       end
 
+      # Whether a cancellation was ever requested on this activity.
+      #
+      # @return [Boolean] true if the activity has had a cancellation request, false otherwise.
       def cancelled?
         @cancelled
       end
 
+      # Cancel the running activity.
+      #
+      # @api private
       def cancel
         @cancelled = true
 
