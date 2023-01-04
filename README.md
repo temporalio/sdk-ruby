@@ -119,16 +119,20 @@ In order to have more control over running of a worker you can provide a block o
 which the worker will shut itself down:
 
 ```ruby
-# initialize worker as in the example above
+# Initialize worker_1, worker_2 and worker_3 as in the example above
 
 # Run the worker for 5 seconds, then shut down
-worker.run { sleep 5 }
+worker_1.run { sleep 5 }
 
+# Or shut the worker down when a workflow completes (very useful for running specs):
 client = Temporal::Client.new(connection, 'my-namespace')
 handle = client.start_workflow('MyWorkflow', 'some input', id: 'my-id', task_queue: 'my-task-queue')
+worker_2.run { handle.result }
 
-# Run the worker until MyWorkflow completes
-worker.run { handle.result }
+# Or wait for some external signal to stop the worker
+stop_queue = Queue.new
+Signal.trap('USR1') { stop_queue.close }
+worker_3.run { stop_queue.pop }
 ```
 
 You can also shut down a running worker by calling `Temporal::Worker#shutdown` from a separate
@@ -164,6 +168,10 @@ Activities are defined by subclassing `Temporal::Activity` class:
 
 ```ruby
 class SayHelloActivity < Temporal::Activity
+  # Optionally specify a custom activity name:
+  #   (The class name `SayHelloActivity` will be used by default)
+  activity_name 'say-hello'
+
   def execute(name)
     return "Hello, #{name}!"
   end
@@ -172,8 +180,6 @@ end
 
 Some things to note about activity definitions:
 
-- A custom name for the activity can be set with a class method `activity_name` from within the
-  class definition
 - Long running activities should regularly heartbeat and handle cancellation
 - Activities can only have positional arguments. Best practice is to only take a single argument
   that is an object/dataclass of fields that can be added to as needed.
