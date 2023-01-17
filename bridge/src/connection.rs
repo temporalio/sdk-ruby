@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, TemporalServiceClientWithMetrics
+    ConfiguredClient, TemporalServiceClientWithMetrics, TestService
 };
 use thiserror::Error;
 use tokio::{select};
@@ -27,8 +27,8 @@ pub enum ConnectionError {
     #[error(transparent)]
     InvalidConnectionOptions(#[from] ClientOptionsBuilderError),
 
-    #[error("`{0}` RPC call is not supported by the API")]
-    InvalidRpc(String),
+    #[error("`{0}`/`{1}` RPC call is not supported by the API")]
+    InvalidRpc(String, String),
 
     #[error(transparent)]
     InvalidRpcMetadataKey(#[from] tonic::metadata::errors::InvalidMetadataKey),
@@ -85,6 +85,7 @@ macro_rules! rpc_call {
 async fn make_rpc_call(client: Client, params: RpcParams) -> RpcResult {
     match params.service.as_str() {
         "workflow_service" => make_workflow_service_rpc(client, params).await,
+        "test_service" => make_test_service_rpc(client, params).await,
         _ => Err(ConnectionError::InvalidService(params.service.to_string()))
     }
 }
@@ -146,7 +147,19 @@ async fn make_workflow_service_rpc(mut client: Client, params: RpcParams) -> Rpc
         "stop_batch_operation" => rpc_call!(client, stop_batch_operation, params),
         "describe_batch_operation" => rpc_call!(client, describe_batch_operation, params),
         "list_batch_operations" => rpc_call!(client, list_batch_operations, params),
-        _ => Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
+        _ => Err(ConnectionError::InvalidRpc(params.service.to_string(), params.rpc.to_string()))
+    }
+}
+
+async fn make_test_service_rpc(mut client: Client, params: RpcParams) -> RpcResult {
+    match params.rpc.as_str() {
+        "lock_time_skipping" => rpc_call!(client, lock_time_skipping, params),
+        "unlock_time_skipping" => rpc_call!(client, unlock_time_skipping, params),
+        "sleep" => rpc_call!(client, sleep, params),
+        "sleep_until" => rpc_call!(client, sleep_until, params),
+        "unlock_time_skipping_with_sleep" => rpc_call!(client, unlock_time_skipping_with_sleep, params),
+        "get_current_time" => rpc_call!(client, get_current_time, params),
+        _ => Err(ConnectionError::InvalidRpc(params.service.to_string(), params.rpc.to_string()))
     }
 }
 

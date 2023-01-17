@@ -1,6 +1,6 @@
 module Temporal
   module Api
-    module Testservice
+    module TestService
       module V1
         # TestService API defines an interface supported only by the Temporal Test Server.
         #  It provides functionality needed or supported for testing purposes only.

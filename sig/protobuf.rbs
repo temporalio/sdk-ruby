@@ -20,6 +20,7 @@ class Coresdk::ActivityHeartbeat
   def self.encode: (Coresdk::ActivityHeartbeat) -> String
 end
 
+# Source: sig/protos/temporal/api/workflowservice/v1/request_response.rbs
 class Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest
   def self.encode: (Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest) -> String
 end
@@ -182,4 +183,21 @@ end
 
 class Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest
   def self.encode: (Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest) -> String
+end
+
+# Source: sig/protos/temporal/api/testservice/v1/request_response.rbs
+class Temporalio::Api::TestService::V1::LockTimeSkippingRequest
+  def self.encode: (Temporalio::Api::TestService::V1::LockTimeSkippingRequest) -> String
+end
+
+class Temporalio::Api::TestService::V1::UnlockTimeSkippingRequest
+  def self.encode: (Temporalio::Api::TestService::V1::UnlockTimeSkippingRequest) -> String
+end
+
+class Temporalio::Api::TestService::V1::SleepRequest
+  def self.encode: (Temporalio::Api::TestService::V1::SleepRequest) -> String
+end
+
+class Temporalio::Api::TestService::V1::SleepUntilRequest
+  def self.encode: (Temporalio::Api::TestService::V1::SleepUntilRequest) -> String
 end

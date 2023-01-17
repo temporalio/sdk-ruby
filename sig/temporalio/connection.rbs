@@ -4,10 +4,12 @@ module Temporalio
 
     def initialize: (String) -> void
     def workflow_service: -> Temporalio::Connection::WorkflowService
+    def test_service: -> Temporalio::Connection::TestService
 
     private
 
     @workflow_service: Temporalio::Connection::WorkflowService?
+    @test_service: Temporalio::Connection::TestService?
 
     def parse_url: (String) -> String
   end

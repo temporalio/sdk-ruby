@@ -19,7 +19,7 @@ describe Temporalio::Connection do
   describe 'WorkflowService' do
     let(:service) { subject.workflow_service }
 
-    MockServer.rpc_descs.each do |rpc, desc|
+    MockWorkflowService.rpc_descs.each do |rpc, desc|
       rpc = GRPC::GenericService.underscore(rpc.to_s)
 
       # TODO: Remove once https://github.com/temporalio/sdk-core/issues/335 fixed
@@ -42,6 +42,58 @@ describe Temporalio::Connection do
             expect(service.public_send(rpc, desc.input.new, timeout: 5_000))
               .to be_an_instance_of(desc.output)
           end
+        end
+      end
+    end
+  end
+
+  describe 'TestService' do
+    let(:service) { subject.test_service }
+
+    MockTestService.rpc_descs.each do |rpc, desc|
+      rpc = GRPC::GenericService.underscore(rpc.to_s)
+
+      # get_current_time does not take any inputs
+      next if rpc == 'get_current_time'
+
+      describe "##{rpc}" do
+        it 'makes an RPC call' do
+          expect(service.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)
+        end
+
+        context 'with metadata' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, metadata: { 'foo' => 'bar' }))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+
+        context 'with timeout' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, timeout: 5_000))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+      end
+    end
+
+    describe '#get_current_time' do
+      it 'makes an RPC call' do
+        expect(service.get_current_time)
+          .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
+      end
+
+      context 'with metadata' do
+        it 'makes an RPC call' do
+          expect(service.get_current_time(metadata: { 'foo' => 'bar' }))
+            .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
+        end
+      end
+
+      context 'with timeout' do
+        it 'makes an RPC call' do
+          expect(service.get_current_time(timeout: 5_000))
+            .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
         end
       end
     end

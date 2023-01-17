@@ -1,0 +1,13 @@
+module Temporalio
+  class Connection
+    class TestService < Service
+      def initialize: (Temporalio::Bridge::Connection core_connectio) -> void
+      def lock_time_skipping: (Temporalio::Api::TestService::V1::LockTimeSkippingRequest, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::LockTimeSkippingResponse
+      def unlock_time_skipping: (Temporalio::Api::TestService::V1::UnlockTimeSkippingRequest, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::UnlockTimeSkippingResponse
+      def sleep: (Temporalio::Api::TestService::V1::SleepRequest, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::SleepResponse
+      def sleep_until: (Temporalio::Api::TestService::V1::SleepUntilRequest, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::SleepResponse
+      def unlock_time_skipping_with_sleep: (Temporalio::Api::TestService::V1::SleepRequest, ?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::SleepResponse
+      def get_current_time: (?metadata: Hash[String, String], ?timeout: Integer?) -> Temporalio::Api::TestService::V1::GetCurrentTimeResponse
+    end
+  end
+end

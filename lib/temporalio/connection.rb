@@ -1,4 +1,5 @@
 require 'temporalio/bridge'
+require 'temporalio/connection/test_service'
 require 'temporalio/connection/workflow_service'
 require 'temporalio/errors'
 require 'temporalio/runtime'
@@ -8,7 +9,7 @@ module Temporalio
   # A connection to the Temporal server.
   #
   # This is used to instantiate a {Temporalio::Client}. But it also can be used for a direct
-  # interaction with the API.
+  # interaction with the API via one of the services (e.g. {#workflow_service}).
   class Connection
     # @api private
     attr_reader :core_connection
@@ -26,6 +27,13 @@ module Temporalio
     # @return [Temporalio::Connection::WorkflowService]
     def workflow_service
       @workflow_service ||= Temporalio::Connection::WorkflowService.new(core_connection)
+    end
+
+    # Get an object for making TestService RPCs.
+    #
+    # @return [Temporalio::Connection::TestService]
+    def test_service
+      @test_service ||= Temporalio::Connection::TestService.new(core_connection)
     end
 
     private
