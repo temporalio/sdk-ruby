@@ -13,7 +13,7 @@ module Temporalio
       attr_reader :core_connection, :service
 
       def call(rpc, bytes, metadata, timeout)
-        core_connection.call(rpc, bytes, metadata, timeout)
+        core_connection.call(rpc, service, bytes, metadata, timeout)
       end
     end
   end

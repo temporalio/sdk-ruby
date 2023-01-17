@@ -91,8 +91,9 @@ methods!(
             .wrap_data(connection, &*CONNECTION_WRAPPER)
     }
 
-    fn call_rpc(rpc: Symbol, request: RString, metadata: Hash, timeout: Integer) -> RString {
+    fn call_rpc(rpc: Symbol, service: Symbol, request: RString, metadata: Hash, timeout: Integer) -> RString {
         let rpc = rpc.map_err(VM::raise_ex).unwrap().to_string();
+        let service = service.map_err(VM::raise_ex).unwrap().to_string();
         let request = unwrap_bytes(request.map_err(VM::raise_ex).unwrap());
         let metadata = to_hash_map(metadata.map_err(VM::raise_ex).unwrap());
         let timeout = timeout.map_or(None, |v| Some(v.to_u64()));
@@ -102,6 +103,7 @@ methods!(
             let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
             let params = RpcParams {
                 rpc: rpc.clone(),
+                service: service.clone(),
                 request: request.clone(),
                 metadata: metadata.clone(),
                 timeout_millis: timeout

@@ -36,6 +36,9 @@ pub enum ConnectionError {
     #[error(transparent)]
     InvalidRpcMetadataValue(#[from] tonic::metadata::errors::InvalidMetadataValue),
 
+    #[error("`{0}` Service is not supported by the API")]
+    InvalidService(String),
+
     #[error(transparent)]
     UnableToConnect(#[from] ClientInitError),
 
@@ -79,7 +82,14 @@ macro_rules! rpc_call {
     };
 }
 
-async fn make_rpc_call(mut client: Client, params: RpcParams) -> RpcResult {
+async fn make_rpc_call(client: Client, params: RpcParams) -> RpcResult {
+    match params.service.as_str() {
+        "workflow_service" => make_workflow_service_rpc(client, params).await,
+        _ => Err(ConnectionError::InvalidService(params.service.to_string()))
+    }
+}
+
+async fn make_workflow_service_rpc(mut client: Client, params: RpcParams) -> RpcResult {
     match params.rpc.as_str() {
         "register_namespace" => rpc_call!(client, register_namespace, params),
         "describe_namespace" => rpc_call!(client, describe_namespace, params),
@@ -148,6 +158,7 @@ pub struct Connection {
 
 pub struct RpcParams {
     pub rpc: String,
+    pub service: String,
     pub request: Vec<u8>,
     pub metadata: HashMap<String, String>,
     pub timeout_millis: Option<u64>

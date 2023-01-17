@@ -17,7 +17,7 @@ module Temporalio
 
     class Connection
       def self.connect: (Runtime, String) -> Temporalio::Bridge::Connection
-      def call: (Symbol, String, Hash[String, String], Integer?) -> String
+      def call: (Symbol, Symbol, String, Hash[String, String], Integer?) -> String
     end
 
     class Runtime
