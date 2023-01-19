@@ -79,5 +79,8 @@ Metrics/PerceivedComplexity:
 Naming/MemoizedInstanceVariableName:
   Enabled: false
 
+Naming/MethodParameterName:
+  MinNameLength: 2
+
 Naming/VariableNumber:
   EnforcedStyle: snake_case

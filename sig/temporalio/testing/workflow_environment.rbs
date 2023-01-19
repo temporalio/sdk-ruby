@@ -1,0 +1,17 @@
+module Temporalio
+  module Testing
+    class WorkflowEnvironment
+      attr_reader connection: Temporalio::Connection
+      def initialize: (Temporalio::Bridge::TestServer server, Temporalio::Connection connection) -> void
+      def sleep: (Integer duration) -> void
+      def current_time: -> Time?
+      def supports_time_skipping?: -> bool
+      def shutdown: -> void
+      def with_time_skipping: { () -> untyped } -> untyped
+
+      private
+
+      attr_reader server: Temporalio::Bridge::TestServer
+    end
+  end
+end
