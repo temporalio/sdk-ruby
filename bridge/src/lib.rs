@@ -4,16 +4,18 @@ extern crate lazy_static;
 
 mod connection;
 mod runtime;
+mod test_server;
 mod worker;
 
 use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
     Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
-    NilClass, Hash, Integer,
+    NilClass, Hash, Integer, Boolean, Array,
 };
 use std::collections::HashMap;
 use temporal_sdk_core_api::telemetry::{Logger, TelemetryOptionsBuilder};
+use test_server::{TestServer, TestServerConfig, TemporaliteConfig};
 use tokio_util::sync::CancellationToken;
 use worker::{Worker, WorkerError, WorkerResult};
 
@@ -56,6 +58,16 @@ fn to_hash_map(hash: Hash) -> HashMap<String, String> {
     result
 }
 
+fn to_vec(array: Array) -> Vec<String> {
+    let mut result: Vec<String> = vec![];
+    for item in array.into_iter() {
+        let string = item.try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string();
+        result.push(string);
+    }
+
+    result
+}
+
 fn worker_result_to_proc_args(result: WorkerResult) -> [AnyObject; 2] {
     let ruby_nil = NilClass::new().to_any_object();
     match result {
@@ -64,9 +76,24 @@ fn worker_result_to_proc_args(result: WorkerResult) -> [AnyObject; 2] {
     }
 }
 
+fn unwrap_as_optional<T: rutie::VerifiedObject>(object: Result<AnyObject, AnyException>) -> Option<T> {
+    let object = object.map_err(VM::raise_ex).unwrap();
+    if object.is_nil() {
+        None
+    } else {
+        Some(
+            object
+                .try_convert_to::<T>()
+                .map_err(VM::raise_ex)
+                .unwrap()
+        )
+    }
+}
+
 wrappable_struct!(Connection, ConnectionWrapper, CONNECTION_WRAPPER);
 wrappable_struct!(Runtime, RuntimeWrapper, RUNTIME_WRAPPER);
 wrappable_struct!(Worker, WorkerWrapper, WORKER_WRAPPER);
+wrappable_struct!(TestServer, TestServerWrapper, TEST_SERVER_WRAPPER);
 
 class!(TemporalBridge);
 
@@ -214,6 +241,123 @@ methods!(
 
         NilClass::new()
     }
+
+    fn start_test_server(
+        runtime: AnyObject,
+        existing_path: AnyObject,
+        sdk_name: RString,
+        sdk_version: RString,
+        download_version: RString,
+        download_dir: AnyObject,
+        port: AnyObject,
+        extra_args: Array
+    ) -> AnyObject {
+        let runtime = runtime.unwrap();
+        let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
+
+        let existing_path = unwrap_as_optional::<RString>(existing_path).map(|v| v.to_string());
+        let sdk_name = sdk_name.map_err(VM::raise_ex).unwrap().to_string();
+        let sdk_version = sdk_version.map_err(VM::raise_ex).unwrap().to_string();
+        let download_version = download_version.map_err(VM::raise_ex).unwrap().to_string();
+        let download_dir = unwrap_as_optional::<RString>(download_dir).map(|v| v.to_string());
+        let port = unwrap_as_optional::<Integer>(port).map(|v| u16::try_from(v.to_u32()).unwrap());
+        let extra_args = to_vec(extra_args.map_err(VM::raise_ex).unwrap());
+
+        let test_server = TestServer::start(
+            runtime,
+            TestServerConfig {
+                existing_path,
+                sdk_name,
+                sdk_version,
+                download_version,
+                download_dir,
+                port,
+                extra_args,
+            }
+        ).map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        Module::from_existing("Temporalio")
+            .get_nested_module("Bridge")
+            .get_nested_class("TestServer")
+            .wrap_data(test_server, &*TEST_SERVER_WRAPPER)
+    }
+
+    fn start_temporalite_server(
+        runtime: AnyObject,
+        existing_path: AnyObject,
+        sdk_name: RString,
+        sdk_version: RString,
+        download_version: RString,
+        download_dir: AnyObject,
+        namespace: RString,
+        ip: RString,
+        port: AnyObject,
+        database_filename: AnyObject,
+        ui: Boolean,
+        log_format: RString,
+        log_level: RString,
+        extra_args: Array
+    ) -> AnyObject {
+        let runtime = runtime.unwrap();
+        let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
+
+        let existing_path = unwrap_as_optional::<RString>(existing_path).map(|v| v.to_string());
+        let sdk_name = sdk_name.map_err(VM::raise_ex).unwrap().to_string();
+        let sdk_version = sdk_version.map_err(VM::raise_ex).unwrap().to_string();
+        let download_version = download_version.map_err(VM::raise_ex).unwrap().to_string();
+        let download_dir = unwrap_as_optional::<RString>(download_dir).map(|v| v.to_string());
+        let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
+        let ip = ip.map_err(VM::raise_ex).unwrap().to_string();
+        let port = unwrap_as_optional::<Integer>(port).map(|v| u16::try_from(v.to_u32()).unwrap());
+        let database_filename = unwrap_as_optional::<RString>(database_filename).map(|v| v.to_string());
+        let ui = ui.map_err(VM::raise_ex).unwrap().to_bool();
+        let log_format = log_format.map_err(VM::raise_ex).unwrap().to_string();
+        let log_level = log_level.map_err(VM::raise_ex).unwrap().to_string();
+        let extra_args = to_vec(extra_args.map_err(VM::raise_ex).unwrap());
+
+        let test_server = TestServer::start_temporalite(
+            runtime,
+            TemporaliteConfig {
+                existing_path,
+                sdk_name,
+                sdk_version,
+                download_version,
+                download_dir,
+                namespace,
+                ip,
+                port,
+                database_filename,
+                ui,
+                log_format,
+                log_level,
+                extra_args,
+            }
+        ).map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        Module::from_existing("Temporalio")
+            .get_nested_module("Bridge")
+            .get_nested_class("TestServer")
+            .wrap_data(test_server, &*TEST_SERVER_WRAPPER)
+    }
+
+    fn test_server_has_test_service() -> Boolean {
+        let test_server = _rtself.get_data_mut(&*TEST_SERVER_WRAPPER);
+
+        Boolean::new(test_server.has_test_service())
+    }
+
+    fn test_server_target() -> RString {
+        let test_server = _rtself.get_data_mut(&*TEST_SERVER_WRAPPER);
+
+        RString::new_utf8(&test_server.target())
+    }
+
+    fn test_server_shutdown() -> NilClass {
+        let test_server = _rtself.get_data_mut(&*TEST_SERVER_WRAPPER);
+        test_server.shutdown().map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
 );
 
 #[no_mangle]
@@ -236,6 +380,14 @@ pub extern "C" fn init_bridge() {
             klass.def("record_activity_heartbeat", worker_record_activity_heartbeat);
             klass.def("initiate_shutdown", worker_initiate_shutdown);
             klass.def("shutdown", worker_shutdown);
+        });
+
+        module.define_nested_class("TestServer", None).define(|klass| {
+            klass.def_self("start", start_test_server);
+            klass.def_self("start_temporalite", start_temporalite_server);
+            klass.def("has_test_service?", test_server_has_test_service);
+            klass.def("target", test_server_target);
+            klass.def("shutdown", test_server_shutdown);
         });
     });
 }

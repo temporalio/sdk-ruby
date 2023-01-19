@@ -33,5 +33,37 @@ module Temporalio
       def initiate_shutdown: -> void
       def shutdown: -> void
     end
+
+    class TestServer
+      def self.start: (
+        Temporalio::Bridge::Runtime runtime,
+        String? existing_path,
+        String sdk_name,
+        String sdk_version,
+        String download_version,
+        String? download_dir,
+        Integer? port,
+        Array[String] extra_args
+      ) -> Temporalio::Bridge::TestServer
+      def self.start_temporalite: (
+        Temporalio::Bridge::Runtime runtime,
+        String? existing_path,
+        String sdk_name,
+        String sdk_version,
+        String download_version,
+        String? download_dir,
+        String namespace,
+        String ip,
+        Integer? port,
+        String? database_filename,
+        bool ui,
+        String log_format,
+        String log_level,
+        Array[String] extra_args
+      ) -> Temporalio::Bridge::TestServer
+      def has_test_service?: -> bool
+      def target: -> String
+      def shutdown: -> void
+    end
   end
 end

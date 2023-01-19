@@ -194,6 +194,7 @@ dependencies = [
 name = "bridge"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "lazy_static",
  "prost",
  "rutie",

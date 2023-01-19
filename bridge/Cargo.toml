@@ -6,6 +6,7 @@ edition = "2021"
 repository = "https://github.com/temporalio/sdk-ruby"
 
 [dependencies]
+anyhow = "1.0"
 lazy_static = "1.4.0"
 prost = "0.11"
 rutie = { version = "0.8.4", features = ["no-link"] }
