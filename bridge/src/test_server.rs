@@ -66,6 +66,7 @@ impl TestServer {
         //       the shutdown called immediately after will end up waiting for 10 seconds before the
         //       process dies. This might be related to Core's EphemeralServer not waiting long
         //       enough for the Temporalite to start before returning back the control to the SDK.
+        //       Reported here — https://github.com/temporalio/cli/issues/79.
         std::thread::sleep(std::time::Duration::from_millis(150));
 
         Ok(TestServer {
