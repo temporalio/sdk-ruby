@@ -1,6 +1,9 @@
+require 'fileutils'
 require 'temporalio/testing'
 
 describe Temporalio::Testing do
+  before(:all) { FileUtils.mkdir_p('./tmp') }
+
   describe '.start_local_environment' do
     it 'starts a new Temporalite server and returns a WorkflowEnvironment' do
       Temporalio::Testing.start_local_environment(
