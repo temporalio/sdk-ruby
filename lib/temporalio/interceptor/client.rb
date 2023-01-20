@@ -1,9 +1,7 @@
 module Temporalio
   module Interceptor
-    # Base class for implementing Client side interceptors.
-    #
-    # @abstract
-    class Client
+    # A mixin for implementing Client side interceptors.
+    module Client
       class StartWorkflowInput < Struct.new(
         :workflow,
         :args,

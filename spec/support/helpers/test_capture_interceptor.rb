@@ -1,7 +1,9 @@
 require 'temporalio/interceptor/client'
 
 module Helpers
-  class TestCaptureInterceptor < Temporalio::Interceptor::Client
+  class TestCaptureInterceptor
+    include Temporalio::Interceptor::Client
+
     attr_reader :called_methods
 
     def initialize

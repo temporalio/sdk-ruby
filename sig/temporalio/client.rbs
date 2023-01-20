@@ -5,7 +5,7 @@ module Temporalio
     def initialize: (
       Temporalio::Connection connection,
       String | Symbol namespace,
-      ?interceptors: Array[Temporalio::Interceptor::Client],
+      ?interceptors: Array[Temporalio::Interceptor::Client::_Interface],
       ?data_converter: Temporalio::DataConverter
     ) -> void
     def start_workflow: (

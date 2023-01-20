@@ -1,7 +1,9 @@
 require 'temporalio/interceptor/client'
 
 module Helpers
-  class TestSimpleInterceptor < Temporalio::Interceptor::Client
+  class TestSimpleInterceptor
+    include Temporalio::Interceptor::Client
+
     def initialize(name)
       @name = name
       super()

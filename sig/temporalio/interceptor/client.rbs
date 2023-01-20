@@ -1,6 +1,6 @@
 module Temporalio
   module Interceptor
-    class Client
+    module Client
       type interface_method = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
 
       interface _Interface
@@ -12,9 +12,6 @@ module Temporalio
         def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
         def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
       end
-
-      # Client implements its own interface
-      include _Interface
 
       class StartWorkflowInput < Struct[untyped]
         attr_accessor workflow(): String

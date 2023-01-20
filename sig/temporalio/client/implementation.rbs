@@ -5,7 +5,7 @@ module Temporalio
         Temporalio::Connection connection,
         Symbol | String namespace,
         Temporalio::DataConverter converter,
-        Array[Temporalio::Interceptor::Client] interceptors
+        Array[Temporalio::Interceptor::Client::_Interface] interceptors
       ) -> void
 
       def start_workflow: (Temporalio::Interceptor::Client::StartWorkflowInput input) -> Temporalio::Client::WorkflowHandle

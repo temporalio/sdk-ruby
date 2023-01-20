@@ -1,7 +1,11 @@
 require 'temporalio/interceptor/client'
 
+class TestClientInterceptor
+  include Temporalio::Interceptor::Client
+end
+
 describe Temporalio::Interceptor::Client do
-  subject { described_class.new }
+  subject { TestClientInterceptor.new }
 
   describe '#start_workflow' do
     let(:input) { Temporalio::Interceptor::Client::StartWorkflowInput.new }
