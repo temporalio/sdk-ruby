@@ -1,13 +1,13 @@
 module Temporalio
   module Interceptor
     class Chain
-      def initialize: (?Array[Temporalio::Interceptor::Client::_Interface]) -> void
+      def initialize: (?Array[Temporalio::Interceptor::Client]) -> void
       # TODO: RBS fails to interpret the inline block defined in #invoke
       def invoke: (Temporalio::Interceptor::Client::interface_method method, untyped input) { (untyped) -> untyped } -> untyped
 
       private
 
-      attr_reader interceptors: Array[Temporalio::Interceptor::Client::_Interface]
+      attr_reader interceptors: Array[Temporalio::Interceptor::Client]
     end
   end
 end

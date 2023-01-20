@@ -3,15 +3,13 @@ module Temporalio
     module Client
       type interface_method = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
 
-      interface _Interface
-        def public_send: (interface_method, untyped input) { (untyped) -> untyped } -> untyped
-        def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporalio::Client::WorkflowHandle } -> Temporalio::Client::WorkflowHandle
-        def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporalio::Workflow::ExecutionInfo } -> Temporalio::Workflow::ExecutionInfo
-        def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped
-        def signal_workflow: (SignalWorkflowInput input) ?{ (SignalWorkflowInput) -> void } -> void
-        def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
-        def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
-      end
+      def public_send: (interface_method, untyped input) { (untyped) -> untyped } -> untyped
+      def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporalio::Client::WorkflowHandle } -> Temporalio::Client::WorkflowHandle
+      def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporalio::Workflow::ExecutionInfo } -> Temporalio::Workflow::ExecutionInfo
+      def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped
+      def signal_workflow: (SignalWorkflowInput input) ?{ (SignalWorkflowInput) -> void } -> void
+      def cancel_workflow: (CancelWorkflowInput input) ?{ (CancelWorkflowInput) -> void } -> void
+      def terminate_workflow: (TerminateWorkflowInput input) ?{ (TerminateWorkflowInput) -> void } -> void
 
       class StartWorkflowInput < Struct[untyped]
         attr_accessor workflow(): String
