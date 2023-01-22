@@ -7,18 +7,21 @@ require 'uri'
 module Temporalio
   # A connection to the Temporal server.
   #
-  # This is used to instantiate a {Temporalio::Client}. But it also can be used for a direct
+  # This is used to instantiate a {Temporalio::Client} or a {Temporalio::Worker}. But it also can be used for a direct
   # interaction with the API.
   class Connection
+    CLIENT_NAME = 'temporal-ruby'.freeze
+
     # @api private
     attr_reader :core_connection
 
     # @param host [String] `host:port` for the Temporal server. For local development, this is
     #   often `"localhost:7233"`.
     def initialize(host)
-      url = parse_url(host)
       runtime = Temporalio::Runtime.instance
-      @core_connection = Temporalio::Bridge::Connection.connect(runtime.core_runtime, url)
+      @core_connection = Temporalio::Bridge::Connection.connect(
+        runtime.core_runtime, parse_url(host), Temporalio.identity, CLIENT_NAME, Temporalio::VERSION,
+      )
     end
 
     # @param request [Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest]

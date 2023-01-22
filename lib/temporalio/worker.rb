@@ -64,7 +64,8 @@ module Temporalio
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
       max_concurrent_activities: 100,
-      graceful_shutdown_timeout: nil
+      graceful_shutdown_timeout: nil,
+      build_id: nil
     )
       # TODO: Add worker interceptors
       @started = false
@@ -77,6 +78,7 @@ module Temporalio
         connection.core_connection,
         namespace,
         task_queue,
+        build_id || Temporalio::VERSION, # TODO: Implement me
       )
       @activity_worker =
         unless activities.empty?

@@ -4,28 +4,21 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
-    ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, TemporalServiceClientWithMetrics
+    ClientInitError, WorkflowService, RetryClient,
+    ConfiguredClient, TemporalServiceClientWithMetrics, ClientOptions as CoreClientOptions
 };
 use thiserror::Error;
 use tokio::{select};
 use tokio::runtime::{Runtime};
 use tokio_util::sync::CancellationToken;
 use tonic::metadata::{MetadataKey,MetadataValue};
-use url::Url;
 
 pub type Client = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;
 
 #[derive(Error, Debug)]
 pub enum ConnectionError {
     #[error(transparent)]
-    InvalidUrl(#[from] url::ParseError),
-
-    #[error(transparent)]
     InvalidProtobuf(#[from] prost::DecodeError),
-
-    #[error(transparent)]
-    InvalidConnectionOptions(#[from] ClientOptionsBuilderError),
 
     #[error("`{0}` RPC call is not supported by the API")]
     InvalidRpc(String),
@@ -153,22 +146,13 @@ pub struct RpcParams {
     pub timeout_millis: Option<u64>
 }
 
-async fn create_client(host: String) -> Result<Client, ConnectionError> {
-    let url = Url::try_from(&*host)?;
-    let options = ClientOptionsBuilder::default()
-        .identity("testtest".to_string())
-        .target_url(url)
-        .client_name("ruby-sdk".to_string())
-        .client_version("0.0.1".to_string())
-        .build()?;
-
+async fn create_client(options: CoreClientOptions) -> Result<Client, ConnectionError> {
     Ok(options.connect_no_namespace(None, None).await?)
 }
 
 impl Connection {
-    // TODO: Change the interface to accept a full configuration
-    pub fn connect(runtime: Arc<Runtime>, host: String) -> Result<Self, ConnectionError> {
-        let client = runtime.block_on(create_client(host))?;
+    pub fn connect(runtime: Arc<Runtime>, options: CoreClientOptions) -> Result<Self, ConnectionError> {
+        let client = runtime.block_on(create_client(options))?;
 
         Ok(Connection { client, runtime })
     }

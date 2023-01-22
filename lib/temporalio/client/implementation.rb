@@ -19,7 +19,7 @@ module Temporalio
         @namespace = namespace
         @converter = converter
         @interceptor_chain = Interceptor::Chain.new(interceptors)
-        @identity = "#{Process.pid}@#{Socket.gethostname} (Ruby SDK v#{VERSION})"
+        @identity = Temporalio.identity
       end
 
       def start_workflow(input)

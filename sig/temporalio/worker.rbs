@@ -13,7 +13,8 @@ module Temporalio
       ?data_converter: Temporalio::DataConverter,
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?max_concurrent_activities: Integer,
-      ?graceful_shutdown_timeout: Integer?
+      ?graceful_shutdown_timeout: Integer?,
+      ?build_id: String?
     ) -> void
     def run: ?{ -> void } -> void
     def start: (?Temporalio::Worker::Runner? runner) -> void

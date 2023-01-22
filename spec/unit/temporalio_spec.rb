@@ -1,7 +1,8 @@
 require 'temporalio'
 
 describe Temporalio do
-  it 'is awesome!' do
-    Temporalio
+  describe 'identity' do
+    let(:expected) { "#{Process.pid}@#{Socket.gethostname} (Ruby SDK v#{Temporalio::VERSION})" }
+    it { expect(described_class.identity).to eq(expected) }
   end
 end

@@ -1,5 +1,6 @@
 module Temporalio
   class Connection
+    CLIENT_NAME: String
     attr_reader core_connection: Temporalio::Bridge::Connection
 
     def initialize: (String) -> void

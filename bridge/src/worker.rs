@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::sync::mpsc::Sender;
 use temporal_sdk_core::api::{Worker as WorkerTrait};
 use temporal_sdk_core_api::errors::{PollActivityError};
-use temporal_sdk_core_api::worker::{WorkerConfigBuilder, WorkerConfigBuilderError};
+use temporal_sdk_core_api::worker::{WorkerConfig};
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use thiserror::Error;
 use tokio::runtime::{Runtime as TokioRuntime};
@@ -17,9 +17,6 @@ pub enum WorkerError {
 
     #[error(transparent)]
     DecodeError(#[from] prost::DecodeError),
-
-    #[error(transparent)]
-    InvalidWorkerOptions(#[from] WorkerConfigBuilderError),
 
     #[error(transparent)]
     UnableToPollActivityTask(#[from] temporal_sdk_core::api::errors::PollActivityError),
@@ -44,13 +41,7 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
-        let config = WorkerConfigBuilder::default()
-            .namespace(namespace)
-            .task_queue(task_queue)
-            .worker_build_id("test-worker-build") // TODO: replace this with an actual build id
-            .build()?;
-
+    pub fn new(runtime: &Runtime, client: &Client, config: WorkerConfig) -> Result<Worker, WorkerError> {
         let core_worker = runtime.tokio_runtime.block_on(async move {
             temporal_sdk_core::init_worker(&runtime.core_runtime, config, client.clone())
         }).expect("Failed to initialize Core Worker");

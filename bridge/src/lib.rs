@@ -15,13 +15,17 @@ use rutie::{
 use std::collections::HashMap;
 use temporal_sdk_core_api::telemetry::{Logger, TelemetryOptionsBuilder};
 use tokio_util::sync::CancellationToken;
+use temporal_sdk_core_api::worker::{WorkerConfigBuilder};
+use temporal_client::{ClientOptionsBuilder};
 use worker::{Worker, WorkerError, WorkerResult};
+use url::Url;
 
 const RUNTIME_THREAD_COUNT: u8 = 2;
 
 fn raise_bridge_exception(message: &str) {
     VM::raise_ex(AnyException::new("Temporalio::Bridge::Error", Some(message)));
 }
+
 
 fn wrap_worker_error(e: &WorkerError) -> AnyException {
     let name = match e {
@@ -74,13 +78,23 @@ methods!(
     TemporalBridge,
     _rtself, // somehow compiler is sure this is unused and insists on the "_"
 
-    fn create_connection(runtime: AnyObject, host: RString) -> AnyObject {
-        let host = host.map_err(VM::raise_ex).unwrap().to_string();
+     // TODO: Change the interface to accept a full configuration for ClientOptions
+    fn create_connection(runtime: AnyObject, host: RString, identity: RString, client_name: RString, client_version: RString) -> AnyObject {
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
+        let host = host.map_err(VM::raise_ex).unwrap().to_string();
+        let target_url = Url::try_from(&*host).unwrap();
+        let options = ClientOptionsBuilder::default()
+            .target_url(target_url)
+            .identity(identity.map_err(VM::raise_ex).unwrap().to_string())
+            .client_name(client_name.map_err(VM::raise_ex).unwrap().to_string())
+            .client_version(client_version.map_err(VM::raise_ex).unwrap().to_string())
+            .build()
+            .map_err(|err| raise_bridge_exception(&format!("[{:?}] {}", err, err)) )
+            .unwrap();
 
         let result = Thread::call_without_gvl(move || {
-            Connection::connect(runtime.tokio_runtime.clone(), host.clone())
+            Connection::connect(runtime.tokio_runtime.clone(), options.clone())
         }, Some(|| {}));
 
         let connection = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
@@ -136,14 +150,23 @@ methods!(
         NilClass::new()
     }
 
-    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
-        let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
-        let task_queue = task_queue.map_err(VM::raise_ex).unwrap().to_string();
+    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString, build_id: RString) -> AnyObject {
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue);
+
+        let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
+        let task_queue = task_queue.map_err(VM::raise_ex).unwrap().to_string();
+        let build_id = build_id.map_err(VM::raise_ex).unwrap().to_string();
+        let config = WorkerConfigBuilder::default()
+            .namespace(namespace)
+            .task_queue(task_queue)
+            .worker_build_id(build_id)
+            .build()
+            .map_err(|err| raise_bridge_exception(&format!("[{:?}] {}", err, err)) )
+            .unwrap();
+        let worker = Worker::new(runtime, &connection.client, config);
 
         Module::from_existing("Temporalio")
             .get_nested_module("Bridge")
