@@ -1,5 +1,9 @@
 module Temporalio
   class Worker
+    type worker_interceptor =
+      Temporalio::Interceptor::ActivityInbound |
+      Temporalio::Interceptor::ActivityOutbound
+
     def self.run: (
       *Temporalio::Worker workers,
       ?shutdown_signals: Array[String]

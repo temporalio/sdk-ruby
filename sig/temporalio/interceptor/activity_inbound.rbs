@@ -1,0 +1,21 @@
+module Temporalio
+  module Interceptor
+    module ActivityInbound
+      type methods = (:execute_activity)
+
+      def execute_activity: (ExecuteActivityInput input) ?{ (ExecuteActivityInput) -> untyped } -> untyped
+
+      class ExecuteActivityInput < Struct[untyped]
+        attr_accessor activity: singleton(Temporalio::Activity)
+        attr_accessor args: Array[untyped]
+        attr_accessor headers: Hash[String, Temporalio::Api::Common::V1::Payload]
+
+        def self.new: (
+          activity: singleton(Temporalio::Activity),
+          args: Array[untyped],
+          headers: Hash[String, Temporalio::Api::Common::V1::Payload],
+        ) -> ExecuteActivityInput
+      end
+    end
+  end
+end

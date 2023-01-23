@@ -1,9 +1,8 @@
 module Temporalio
   module Interceptor
     module Client
-      type interface_method = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
+      type methods = (:start_workflow | :describe_workflow | :query_workflow | :signal_workflow | :cancel_workflow | :terminate_workflow)
 
-      def public_send: (interface_method, untyped input) { (untyped) -> untyped } -> untyped
       def start_workflow: (StartWorkflowInput input) ?{ (StartWorkflowInput) -> Temporalio::Client::WorkflowHandle } -> Temporalio::Client::WorkflowHandle
       def describe_workflow: (DescribeWorkflowInput input) ?{ (DescribeWorkflowInput) -> Temporalio::Workflow::ExecutionInfo } -> Temporalio::Workflow::ExecutionInfo
       def query_workflow: (QueryWorkflowInput input) ?{ (QueryWorkflowInput) -> untyped } -> untyped

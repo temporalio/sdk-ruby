@@ -6,18 +6,18 @@ module Temporalio
         @interceptors = interceptors
       end
 
-      def invoke(method, input)
+      def invoke(method, *input)
         chain = interceptors.dup
 
-        traverse_chain = lambda do |i|
+        traverse_chain = lambda do |*i|
           if chain.empty?
-            yield(i)
+            yield(*i)
           else
-            chain.shift.public_send(method, i, &traverse_chain)
+            chain.shift.public_send(method, *i, &traverse_chain)
           end
         end
 
-        traverse_chain.call(input)
+        traverse_chain.call(*input)
       end
 
       private
