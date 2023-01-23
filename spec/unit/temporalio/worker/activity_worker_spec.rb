@@ -15,7 +15,17 @@ end
 class TestWrongSuperclassActivity < Object; end
 
 describe Temporalio::Worker::ActivityWorker do
-  subject { described_class.new(task_queue, core_worker, activities, converter, executor, graceful_timeout) }
+  subject do
+    described_class.new(
+      task_queue,
+      core_worker,
+      activities,
+      converter,
+      interceptors,
+      executor,
+      graceful_timeout,
+    )
+  end
 
   let(:task_queue) { 'test-task-queue' }
   let(:activities) { [TestActivity] }
@@ -25,6 +35,7 @@ describe Temporalio::Worker::ActivityWorker do
   let(:executor) { Temporalio::Worker::ThreadPoolExecutor.new(1) }
   let(:graceful_timeout) { nil }
   let(:converter) { Temporalio::DataConverter.new }
+  let(:interceptors) { [] }
 
   describe '#initialize' do
     context 'when initialized with an incorrect activity class' do

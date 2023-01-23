@@ -1,4 +1,5 @@
 require 'support/helpers/test_rpc'
+require 'support/helpers/test_capture_interceptor'
 require 'temporalio/activity'
 require 'temporalio/bridge'
 require 'temporalio/client'
@@ -126,6 +127,7 @@ describe Temporalio::Worker::ActivityWorker do
         TestCancellingShieldedActivity,
         TestCancellationIgnoringActivity,
       ],
+      interceptors: [interceptor],
     )
   end
 
@@ -134,6 +136,7 @@ describe Temporalio::Worker::ActivityWorker do
   let(:connection) { Temporalio::Connection.new(url) }
   let(:id) { SecureRandom.uuid }
   let(:workflow) { 'kitchen_sink' }
+  let(:interceptor) { Helpers::TestCaptureInterceptor.new }
 
   before(:all) do
     @server_pid = fork { exec("#{support_path}/go_server/main #{port} #{namespace}") }
@@ -163,6 +166,7 @@ describe Temporalio::Worker::ActivityWorker do
       handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
       expect(subject.run { handle.result }).to eq('Hello, test!')
+      expect(interceptor.called_methods).to eq(%i[execute_activity])
     end
 
     context 'when activity has a custom name' do
@@ -179,6 +183,7 @@ describe Temporalio::Worker::ActivityWorker do
         handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
         expect(subject.run { handle.result }).to eq('foo, bar')
+        expect(interceptor.called_methods).to eq(%i[execute_activity])
       end
     end
 
@@ -202,6 +207,7 @@ describe Temporalio::Worker::ActivityWorker do
           expect(error.cause.cause).to be_a(Temporalio::Error::ApplicationError)
           expect(error.cause.cause.message).to eq('test error')
         end
+        expect(interceptor.called_methods).to eq(%i[execute_activity])
       end
     end
   end
@@ -220,6 +226,8 @@ describe Temporalio::Worker::ActivityWorker do
       handle = client.start_workflow(workflow, input, id: id, task_queue: task_queue)
 
       expect(subject.run { handle.result }).to eq('foo bar')
+      # TestHeartbeatActivity calls info to access heartbeat_details and gets retried once
+      expect(interceptor.called_methods).to eq(%i[execute_activity info heartbeat execute_activity info info])
     end
   end
 

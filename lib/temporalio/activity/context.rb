@@ -5,26 +5,31 @@ module Temporalio
   class Activity
     # This class provides methods that can be called from activity classes.
     class Context
-      # Information about the running activity.
-      #
-      # @return [Temporalio::Activity::Info]
-      attr_reader :info
-
       # @api private
-      def initialize(info, heartbeat_proc, shielded: false)
+      def initialize(info, heartbeat_proc, interceptors, shielded: false)
         @thread = Thread.current
         @info = info
         @heartbeat_proc = heartbeat_proc
+        @interceptors = interceptors
         @pending_cancellation = nil
         @shielded = shielded
         @mutex = Mutex.new
+      end
+
+      # Information about the running activity.
+      #
+      # @return [Temporalio::Activity::Info]
+      def info
+        interceptors.invoke(:info) { @info }
       end
 
       # Send a heartbeat for the current activity.
       #
       # @param details [Array<any>] Data to store with the heartbeat.
       def heartbeat(*details)
-        heartbeat_proc.call(*details)
+        interceptors.invoke(:heartbeat, *details) do |*d|
+          @heartbeat_proc.call(*d)
+        end
       end
 
       # Protect a part of activity's implementation from cancellations.
@@ -91,7 +96,7 @@ module Temporalio
 
       private
 
-      attr_reader :thread, :heartbeat_proc, :mutex
+      attr_reader :thread, :interceptors, :mutex
     end
   end
 end

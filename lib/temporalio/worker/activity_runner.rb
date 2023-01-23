@@ -3,6 +3,7 @@ require 'temporalio/activity/context'
 require 'temporalio/activity/info'
 require 'temporalio/error/failure'
 require 'temporalio/errors'
+require 'temporalio/interceptor/activity_inbound'
 
 module Temporalio
   class Worker
@@ -12,20 +13,39 @@ module Temporalio
     #
     # @api private
     class ActivityRunner
-      def initialize(activity_class, start, task_queue, task_token, worker, converter)
+      def initialize(
+        activity_class,
+        start,
+        task_queue,
+        task_token,
+        worker,
+        converter,
+        inbound_interceptors,
+        outbound_interceptors
+      )
         @activity_class = activity_class
         @start = start
         @task_queue = task_queue
         @task_token = task_token
         @worker = worker
         @converter = converter
+        @inbound_interceptors = inbound_interceptors
+        @outbound_interceptors = outbound_interceptors
       end
 
       def run
         activity = activity_class.new(context)
-        input = converter.from_payload_array(start.input.to_a)
+        args = converter.from_payload_array(start.input.to_a)
+        headers = converter.from_payload_map(start.header_fields)
+        input = Temporalio::Interceptor::ActivityInbound::ExecuteActivityInput.new(
+          activity: activity_class,
+          args: args,
+          headers: headers || {},
+        )
 
-        result = activity.execute(*input)
+        result = inbound_interceptors.invoke(:execute_activity, input) do |i|
+          activity.execute(*i.args)
+        end
 
         converter.to_payload(result)
       rescue StandardError => e
@@ -48,7 +68,8 @@ module Temporalio
 
       private
 
-      attr_reader :activity_class, :start, :task_queue, :task_token, :worker, :converter
+      attr_reader :activity_class, :start, :task_queue, :task_token, :worker, :converter,
+                  :inbound_interceptors, :outbound_interceptors
 
       def context
         return @context if @context
@@ -57,6 +78,7 @@ module Temporalio
         @context = Temporalio::Activity::Context.new(
           generate_activity_info,
           heartbeat_proc,
+          outbound_interceptors,
           shielded: activity_class._shielded,
         )
       end

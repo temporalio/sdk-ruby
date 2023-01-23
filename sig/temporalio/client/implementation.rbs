@@ -21,7 +21,7 @@ module Temporalio
       attr_reader connection: Temporalio::Connection
       attr_reader namespace: Symbol | String
       attr_reader converter: Temporalio::DataConverter
-      attr_reader interceptor_chain: Interceptor::Chain
+      attr_reader interceptor_chain: Temporalio::Interceptor::Chain[Temporalio::Interceptor::Client]
       attr_reader identity: String
 
       def convert_headers: (Hash[Symbol | String, untyped]) -> Temporalio::Api::Common::V1::Header?
