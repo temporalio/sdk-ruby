@@ -78,6 +78,8 @@ module Temporalio
       # Interceptor for {Temporalio::Client#start_workflow}.
       #
       # @param input [StartWorkflowInput]
+      #
+      # @return [Temporalio::Client::WorkflowHandle] A handle to interact with the workflow.
       def start_workflow(input)
         yield(input)
       end
@@ -85,6 +87,8 @@ module Temporalio
       # Interceptor for {Temporalio::Client::WorkflowHandle#describe}.
       #
       # @param input [DescribeWorkflowInput]
+      #
+      # @return [Temporalio::Workflow::ExecutionInfo] Information about the workflow.
       def describe_workflow(input)
         yield(input)
       end
@@ -92,6 +96,8 @@ module Temporalio
       # Interceptor for {Temporalio::Client::WorkflowHandle#query}.
       #
       # @param input [QueryWorkflowInput]
+      #
+      # @return [any] Query result
       def query_workflow(input)
         yield(input)
       end
