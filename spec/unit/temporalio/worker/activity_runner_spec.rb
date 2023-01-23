@@ -3,8 +3,14 @@ require 'temporal/api/failure/v1/message_pb'
 require 'temporal/sdk/core/activity_task/activity_task_pb'
 require 'temporalio/activity'
 require 'temporalio/data_converter'
+require 'temporalio/interceptor/activity_inbound'
+require 'temporalio/interceptor/chain'
 require 'temporalio/worker/activity_runner'
 require 'temporalio/worker/sync_worker'
+
+class TestActivityRunnerInterceptor
+  include Temporalio::Interceptor::ActivityInbound
+end
 
 class TestRunnableActivity < Temporalio::Activity
   def execute(command)
@@ -20,7 +26,19 @@ class TestRunnableActivity < Temporalio::Activity
 end
 
 describe Temporalio::Worker::ActivityRunner do
-  subject { described_class.new(TestRunnableActivity, task, task_queue, token, worker, converter) }
+  subject do
+    described_class.new(
+      TestRunnableActivity,
+      task,
+      task_queue,
+      token,
+      worker,
+      converter,
+      Temporalio::Interceptor::Chain.new(interceptors),
+      Temporalio::Interceptor::Chain.new,
+    )
+  end
+  let(:interceptors) { [] }
 
   let(:task) do
     Coresdk::ActivityTask::Start.new(
@@ -29,7 +47,7 @@ describe Temporalio::Worker::ActivityRunner do
       workflow_execution: { workflow_id: 'test-workflow-id', run_id: 'test-run-id' },
       activity_id: '42',
       activity_type: 'TestRunnableActivity',
-      header_fields: converter.to_payload_map('foo' => 'bar'),
+      header_fields: converter.to_payload_map(headers),
       input: [converter.to_payload(command)],
       heartbeat_details: [converter.to_payload('heartbeat')],
       scheduled_time: Google::Protobuf::Timestamp.from_time(time),
@@ -47,6 +65,7 @@ describe Temporalio::Worker::ActivityRunner do
   let(:token) { 'test_token' }
   let(:worker) { instance_double(Temporalio::Worker::SyncWorker) }
   let(:converter) { Temporalio::DataConverter.new }
+  let(:headers) { { 'foo' => 'bar' } }
 
   describe '#run' do
     let(:command) { 'foo' }
@@ -82,6 +101,24 @@ describe Temporalio::Worker::ActivityRunner do
         expect(info.workflow_namespace).to eq('test-namespace')
         expect(info.workflow_run_id).to eq('test-run-id')
         expect(info.workflow_type).to eq('test-workflow')
+      end
+    end
+
+    context 'with interceptor' do
+      let(:interceptor) { TestActivityRunnerInterceptor.new }
+      let(:interceptors) { [interceptor] }
+
+      before { allow(interceptor).to receive(:execute_activity) }
+
+      it 'calls interceptor' do
+        subject.run
+
+        expect(interceptor).to have_received(:execute_activity) do |input|
+          expect(input).to be_a(Temporalio::Interceptor::ActivityInbound::ExecuteActivityInput)
+          expect(input.activity).to eq(TestRunnableActivity)
+          expect(input.args).to eq(['foo'])
+          expect(input.headers).to eq(headers)
+        end
       end
     end
 

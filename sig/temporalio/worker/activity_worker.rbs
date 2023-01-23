@@ -8,6 +8,7 @@ module Temporalio
         Temporalio::Bridge::Worker core_worker,
         Array[singleton(Temporalio::Activity)] activities,
         Temporalio::DataConverter converter,
+        Array[Temporalio::Worker::worker_interceptor] interceptors,
         Temporalio::Worker::_ActivityExecutor executor,
         Integer? graceful_timeout
       ) -> void
@@ -20,6 +21,8 @@ module Temporalio
       attr_reader worker: SyncWorker
       attr_reader activities: Hash[String, singleton(Temporalio::Activity)]
       attr_reader converter: Temporalio::DataConverter
+      attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityInbound]
+      attr_reader outbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound]
       attr_reader executor: Temporalio::Worker::_ActivityExecutor
       attr_reader graceful_timeout: Integer?
       attr_reader running_activities: Hash[String, Temporalio::Worker::ActivityRunner]
@@ -34,6 +37,10 @@ module Temporalio
         -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
       def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
       def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
+      def filter_inbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
+        -> Array[Temporalio::Interceptor::ActivityInbound]
+      def filter_outbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
+        -> Array[Temporalio::Interceptor::ActivityOutbound]
     end
   end
 end

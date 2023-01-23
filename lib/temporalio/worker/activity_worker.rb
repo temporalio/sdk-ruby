@@ -1,5 +1,7 @@
 require 'temporalio/error/failure'
 require 'temporalio/errors'
+require 'temporalio/interceptor/activity_inbound'
+require 'temporalio/interceptor/activity_outbound'
 require 'temporalio/worker/activity_runner'
 require 'temporalio/worker/sync_worker'
 
@@ -7,11 +9,21 @@ module Temporalio
   class Worker
     # @api private
     class ActivityWorker
-      def initialize(task_queue, core_worker, activities, converter, executor, graceful_timeout)
+      def initialize(
+        task_queue,
+        core_worker,
+        activities,
+        converter,
+        interceptors,
+        executor,
+        graceful_timeout
+      )
         @task_queue = task_queue
         @worker = SyncWorker.new(core_worker)
         @activities = prepare_activities(activities)
         @converter = converter
+        @inbound_interceptors = Temporalio::Interceptor::Chain.new(filter_inbound(interceptors))
+        @outbound_interceptors = Temporalio::Interceptor::Chain.new(filter_outbound(interceptors))
         @executor = executor
         @graceful_timeout = graceful_timeout
         @running_activities = {}
@@ -61,8 +73,9 @@ module Temporalio
 
       private
 
-      attr_reader :task_queue, :worker, :activities, :converter, :executor, :graceful_timeout,
-                  :running_activities, :cancellations, :drain_queue
+      attr_reader :task_queue, :worker, :activities, :converter, :inbound_interceptors,
+                  :outbound_interceptors, :executor, :graceful_timeout, :running_activities,
+                  :cancellations, :drain_queue
 
       def prepare_activities(activities)
         activities.each_with_object({}) do |activity, result|
@@ -79,6 +92,20 @@ module Temporalio
         end
       end
 
+      # NOTE: Using #each_with_object here and below instead of a simple #select because RBS can't
+      #       reconcile that resulting array only has ActivityInbound or ActivityOutbound in it.
+      def filter_inbound(interceptors)
+        interceptors.each_with_object([]) do |i, result|
+          result << i if i.is_a?(Temporalio::Interceptor::ActivityInbound)
+        end
+      end
+
+      def filter_outbound(interceptors)
+        interceptors.each_with_object([]) do |i, result|
+          result << i if i.is_a?(Temporalio::Interceptor::ActivityOutbound)
+        end
+      end
+
       def lookup_activity(activity_type)
         activities.fetch(activity_type) do
           activity_names = activities.keys.sort.join(', ')
@@ -91,7 +118,16 @@ module Temporalio
 
       def run_activity(token, start)
         activity_class = lookup_activity(start.activity_type)
-        runner = ActivityRunner.new(activity_class, start, task_queue, token, worker, converter)
+        runner = ActivityRunner.new(
+          activity_class,
+          start,
+          task_queue,
+          token,
+          worker,
+          converter,
+          inbound_interceptors,
+          outbound_interceptors,
+        )
         running_activities[token] = runner
         queue = Queue.new
 

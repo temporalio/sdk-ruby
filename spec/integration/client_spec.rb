@@ -6,7 +6,9 @@ require 'temporalio/error/workflow_failure'
 require 'temporalio/interceptor/client'
 require 'support/helpers/test_rpc'
 
-class TestInterceptor < Temporalio::Interceptor::Client
+class TestInterceptor
+  include Temporalio::Interceptor::Client
+
   attr_reader :results
 
   def initialize

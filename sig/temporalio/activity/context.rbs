@@ -1,9 +1,13 @@
 module Temporalio
   class Activity
     class Context
-      attr_reader info: Temporalio::Activity::Info
-
-      def initialize: (Temporalio::Activity::Info info, ^(*untyped) -> void, ?shielded: bool) -> void
+      def initialize: (
+        Temporalio::Activity::Info info,
+        ^(*untyped) -> void,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound],
+        ?shielded: bool
+      ) -> void
+      def info: -> Temporalio::Activity::Info
       def heartbeat: (*untyped details) -> void
       def shield: { -> untyped } -> untyped
       def cancelled?: -> bool
@@ -11,11 +15,13 @@ module Temporalio
 
       private
 
+      @info: Temporalio::Activity::Info
+      @heartbeat_proc: ^(*untyped) -> void
       @shielded: bool
       @pending_cancellation: Exception?
 
       attr_reader thread: Thread
-      attr_reader heartbeat_proc: ^(*untyped) -> void
+      attr_reader interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound]
       attr_reader mutex: Thread::Mutex
     end
   end

@@ -50,6 +50,8 @@ module Temporalio
     #   to/from payloads.
     # @param activity_executor [ThreadPoolExecutor] Concurrent executor for all activities. Defaults
     #   to a {ThreadPoolExecutor} with `:max_concurrent_activities` available threads.
+    # @param interceptors [Array<Temporalio::Interceptor::ActivityInbound, Temporalio::Interceptor::ActivityOutbound>]
+    #   Collection of interceptors for this worker.
     # @param max_concurrent_activities [Integer] Number of concurrently running activities.
     # @param graceful_shutdown_timeout [Integer] Amount of time (in seconds) activities are given
     #   after a shutdown to complete before they are cancelled. A default value of `nil` means that
@@ -63,10 +65,10 @@ module Temporalio
       activities: [],
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
+      interceptors: [],
       max_concurrent_activities: 100,
       graceful_shutdown_timeout: nil
     )
-      # TODO: Add worker interceptors
       @started = false
       @shutdown = false
       @mutex = Mutex.new
@@ -85,6 +87,7 @@ module Temporalio
             @core_worker,
             activities,
             data_converter,
+            interceptors,
             @activity_executor,
             graceful_shutdown_timeout,
           )

@@ -7,7 +7,9 @@ module Temporalio
         String task_queue,
         String task_token,
         Temporalio::Worker::SyncWorker worker,
-        Temporalio::DataConverter converter
+        Temporalio::DataConverter converter,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityInbound] inbound_interceptors,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound] outbound_interceptors
       ) -> void
       def run: -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
       def cancel: (String reason, by_request: bool) -> void
@@ -22,6 +24,8 @@ module Temporalio
       attr_reader task_token: String
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader converter: Temporalio::DataConverter
+      attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityInbound]
+      attr_reader outbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound]
 
       def context: -> Temporalio::Activity::Context
       def generate_activity_info: -> Temporalio::Activity::Info

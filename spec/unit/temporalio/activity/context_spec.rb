@@ -1,20 +1,57 @@
 require 'temporalio/activity/context'
 require 'temporalio/activity/info'
+require 'temporalio/interceptor/chain'
+require 'temporalio/interceptor/activity_outbound'
+
+class TestActivityContextInterceptor
+  include Temporalio::Interceptor::ActivityOutbound
+end
 
 describe Temporalio::Activity::Context do
-  subject { described_class.new(info, heartbeat) }
+  subject { described_class.new(info, heartbeat, chain) }
   let(:info) { Temporalio::Activity::Info.new }
   let(:heartbeat) { ->(*_) {} }
+  let(:chain) { Temporalio::Interceptor::Chain.new(interceptors) }
+  let(:interceptors) { [] }
+  let(:interceptor) { TestActivityContextInterceptor.new }
+
+  describe '#info' do
+    it 'returns info' do
+      expect(subject.info).to eq(info)
+    end
+
+    context 'with interceptor' do
+      let(:interceptors) { [interceptor] }
+      before { allow(interceptor).to receive(:info).and_call_original }
+
+      it 'calls interceptor' do
+        subject.info
+
+        expect(interceptor).to have_received(:info)
+      end
+    end
+  end
 
   describe '#heartbeat' do
     it 'calls the provided proc' do
       received_details = nil
       heartbeat = ->(*details) { received_details = details }
 
-      context = described_class.new(info, heartbeat)
+      context = described_class.new(info, heartbeat, chain)
       context.heartbeat('foo', 'bar')
 
       expect(received_details).to eq(%w[foo bar])
+    end
+
+    context 'with interceptor' do
+      let(:interceptors) { [interceptor] }
+      before { allow(interceptor).to receive(:heartbeat).and_call_original }
+
+      it 'calls interceptor' do
+        subject.heartbeat('foo', 'bar')
+
+        expect(interceptor).to have_received(:heartbeat).with('foo', 'bar')
+      end
     end
   end
 
@@ -44,7 +81,7 @@ describe Temporalio::Activity::Context do
     end
 
     context 'when whole context is shielded' do
-      subject { described_class.new(info, heartbeat, shielded: true) }
+      subject { described_class.new(info, heartbeat, chain, shielded: true) }
 
       it 'ignores cancellation' do
         expect(

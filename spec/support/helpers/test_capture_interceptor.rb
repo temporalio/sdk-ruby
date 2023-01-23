@@ -1,7 +1,13 @@
+require 'temporalio/interceptor/activity_inbound'
+require 'temporalio/interceptor/activity_outbound'
 require 'temporalio/interceptor/client'
 
 module Helpers
-  class TestCaptureInterceptor < Temporalio::Interceptor::Client
+  class TestCaptureInterceptor
+    include Temporalio::Interceptor::Client
+    include Temporalio::Interceptor::ActivityInbound
+    include Temporalio::Interceptor::ActivityOutbound
+
     attr_reader :called_methods
 
     def initialize
@@ -36,6 +42,21 @@ module Helpers
 
     def terminate_workflow(input)
       @called_methods << :terminate_workflow
+      super
+    end
+
+    def execute_activity(input)
+      @called_methods << :execute_activity
+      super
+    end
+
+    def info
+      @called_methods << :info
+      super
+    end
+
+    def heartbeat(*details)
+      @called_methods << :heartbeat
       super
     end
   end

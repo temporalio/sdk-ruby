@@ -7,6 +7,9 @@ AllCops:
     - vendor/**/*
     - spec/support/grpc/**/*
 
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
 Gemspec/RequireMFA:
   Enabled: false
 
