@@ -67,7 +67,8 @@ module Temporalio
       activity_executor: nil,
       interceptors: [],
       max_concurrent_activities: 100,
-      graceful_shutdown_timeout: nil
+      graceful_shutdown_timeout: nil,
+      build_id: nil
     )
       @started = false
       @shutdown = false
@@ -79,6 +80,7 @@ module Temporalio
         connection.core_connection,
         namespace,
         task_queue,
+        build_id || Temporalio::VERSION, # TODO: Implement me
       )
       @activity_worker =
         unless activities.empty?

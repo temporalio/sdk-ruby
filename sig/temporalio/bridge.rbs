@@ -16,7 +16,7 @@ module Temporalio
     end
 
     class Connection
-      def self.connect: (Runtime, String) -> Temporalio::Bridge::Connection
+      def self.connect: (Runtime, String, String, String, String) -> Temporalio::Bridge::Connection
       def call: (Symbol, String, Hash[String, String], Integer?) -> String
     end
 
@@ -26,7 +26,7 @@ module Temporalio
     end
 
     class Worker
-      def self.create: (Runtime, Connection, String, String) -> Temporalio::Bridge::Worker
+      def self.create: (Runtime, Connection, String, String, String) -> Temporalio::Bridge::Worker
       def poll_activity_task: { (String?, Exception?) -> void } -> void
       def complete_activity_task: (String) { (nil, Exception?) -> void } -> void
       def record_activity_heartbeat: (String) -> void

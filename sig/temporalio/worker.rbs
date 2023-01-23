@@ -18,7 +18,8 @@ module Temporalio
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?interceptors: Array[worker_interceptor],
       ?max_concurrent_activities: Integer,
-      ?graceful_shutdown_timeout: Integer?
+      ?graceful_shutdown_timeout: Integer?,
+      ?build_id: String?
     ) -> void
     def run: ?{ -> void } -> void
     def start: (?Temporalio::Worker::Runner? runner) -> void

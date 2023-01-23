@@ -13,6 +13,7 @@ describe Temporalio::Client::Implementation do
   subject { described_class.new(connection, namespace, converter, interceptors) }
 
   let(:connection) { instance_double(Temporalio::Connection) }
+  let(:identity) { 'RSpec Ruby SDK Identity' }
   let(:namespace) { 'test-namespace' }
   let(:converter) do
     Temporalio::DataConverter.new(
@@ -32,6 +33,10 @@ describe Temporalio::Client::Implementation do
   end
   let(:metadata) { { 'foo' => 'bar' } }
   let(:timeout) { 5_000 }
+
+  before do
+    allow(Temporalio).to receive(:identity).and_return(identity)
+  end
 
   describe '#start_workflow' do
     let(:input) do
@@ -77,7 +82,7 @@ describe Temporalio::Client::Implementation do
 
       expect(connection).to have_received(:start_workflow_execution) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest)
-        expect(request.identity).to include("(Ruby SDK v#{Temporalio::VERSION})")
+        expect(request.identity).to eq identity
         expect(request.request_id).to be_a(String)
         expect(request.workflow_type.name).to eq('TestWorkflow')
         expect(request.workflow_id).to eq(id)
@@ -448,7 +453,7 @@ describe Temporalio::Client::Implementation do
         expect(request.input.payloads[0].data).to eq('1')
         expect(request.input.payloads[1].data).to eq('2')
         expect(request.input.payloads[2].data).to eq('3')
-        expect(request.identity).to include("(Ruby SDK v#{Temporalio::VERSION})")
+        expect(request.identity).to eq identity
         expect(request.request_id).to be_a(String)
         expect(request.control).to eq('')
         expect(request.header).to eq(nil)
@@ -522,7 +527,7 @@ describe Temporalio::Client::Implementation do
         expect(request.namespace).to eq(namespace)
         expect(request.workflow_execution.workflow_id).to eq(id)
         expect(request.workflow_execution.run_id).to eq(run_id)
-        expect(request.identity).to include("(Ruby SDK v#{Temporalio::VERSION})")
+        expect(request.identity).to eq identity
         expect(request.request_id).to be_a(String)
         expect(request.first_execution_run_id).to eq(run_id)
         expect(request.reason).to eq('test reason')
@@ -587,7 +592,7 @@ describe Temporalio::Client::Implementation do
         expect(request.workflow_execution.run_id).to eq(run_id)
         expect(request.reason).to eq('test reason')
         expect(request.details).to eq(nil)
-        expect(request.identity).to include("(Ruby SDK v#{Temporalio::VERSION})")
+        expect(request.identity).to eq identity
         expect(request.first_execution_run_id).to eq(run_id)
       end
     end

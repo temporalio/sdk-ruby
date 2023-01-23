@@ -59,7 +59,7 @@ describe Temporalio::Worker do
 
       expect(Temporalio::Bridge::Worker)
         .to have_received(:create)
-        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue)
+        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue, Temporalio::VERSION)
     end
 
     it 'uses a default executor with a default size' do
@@ -87,6 +87,25 @@ describe Temporalio::Worker do
         )
 
         expect(Temporalio::Worker::ThreadPoolExecutor).to have_received(:new).with(42)
+      end
+    end
+
+    context 'with build id' do
+      let(:build_id) { 'custom-build-id' }
+
+      it 'initializes the core worker' do
+        described_class.new(
+          connection,
+          namespace,
+          task_queue,
+          activities: activities,
+          build_id: build_id
+        )
+
+        expect(Temporalio::Bridge::Worker).to have_received(:create).with(
+          an_instance_of(Temporalio::Bridge::Runtime), core_connection,
+          namespace, task_queue, 'custom-build-id'
+        )
       end
     end
   end
