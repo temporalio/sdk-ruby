@@ -1,7 +1,8 @@
 require 'temporalio/testing/workflow_environment'
 
 describe Temporalio::Testing::WorkflowEnvironment do
-  subject { described_class.new(core_server, connection) }
+  subject { described_class.new(core_server, connection, namespace) }
+  let(:namespace) { 'test-namespace' }
   let(:core_server) do
     instance_double(
       Temporalio::Bridge::TestServer,
@@ -13,6 +14,13 @@ describe Temporalio::Testing::WorkflowEnvironment do
   let(:time_skipping) { false }
   let(:connection) { instance_double(Temporalio::Connection, test_service: test_service) }
   let(:test_service) { instance_double(Temporalio::Connection::TestService) }
+
+  describe '#client' do
+    it 'returns a client' do
+      expect(subject.client).to be_a(Temporalio::Client)
+      expect(subject.client.namespace).to eq(namespace)
+    end
+  end
 
   describe '#sleep' do
     before { allow(Kernel).to receive(:sleep) }

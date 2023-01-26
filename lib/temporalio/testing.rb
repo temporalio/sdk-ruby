@@ -6,6 +6,8 @@ require 'temporalio/version'
 
 module Temporalio
   module Testing
+    DEFAULT_NAMESPACE = 'default'.freeze
+
     class << self
       # Start a full Temporal server locally, downloading if necessary.
       #
@@ -49,7 +51,7 @@ module Temporalio
       # @return [Temporalio::Testing::WorkflowEnvironment] The newly started Temporalite workflow
       #   environment.
       def start_local_environment(
-        namespace: 'default',
+        namespace: DEFAULT_NAMESPACE,
         ip: '127.0.0.1',
         port: nil,
         download_dir: nil,
@@ -80,7 +82,7 @@ module Temporalio
           temporalite_log_level,
           temporalite_extra_args,
         )
-        env = init_workflow_environment_for(server)
+        env = init_workflow_environment_for(server, namespace)
 
         return env unless block
 
@@ -146,7 +148,7 @@ module Temporalio
           port,
           test_server_extra_args,
         )
-        env = init_workflow_environment_for(server)
+        env = init_workflow_environment_for(server, DEFAULT_NAMESPACE)
 
         return env unless block
 
@@ -155,9 +157,9 @@ module Temporalio
 
       private
 
-      def init_workflow_environment_for(server)
+      def init_workflow_environment_for(server, namespace)
         connection = Temporalio::Connection.new(server.target)
-        Temporalio::Testing::WorkflowEnvironment.new(server, connection)
+        Temporalio::Testing::WorkflowEnvironment.new(server, connection, namespace)
       rescue Temporalio::Bridge::Error # Shutdown if unable to connect to the server
         server.shutdown
         raise

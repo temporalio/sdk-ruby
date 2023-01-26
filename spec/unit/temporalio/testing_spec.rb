@@ -22,6 +22,8 @@ describe Temporalio::Testing do
 
       expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
       expect(env.connection).to be_a(Temporalio::Connection)
+      expect(env.client).to be_a(Temporalio::Client)
+      expect(env.client.namespace).to eq(described_class::DEFAULT_NAMESPACE)
 
       expect(Temporalio::Bridge::TestServer)
         .to have_received(:start_temporalite)
@@ -32,7 +34,7 @@ describe Temporalio::Testing do
           Temporalio::VERSION,
           'default',
           nil,
-          'default',
+          described_class::DEFAULT_NAMESPACE,
           '127.0.0.1',
           nil,
           nil,
@@ -90,6 +92,7 @@ describe Temporalio::Testing do
         subject.start_local_environment do |env|
           expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
           expect(env.connection).to be_a(Temporalio::Connection)
+          expect(env.client).to be_a(Temporalio::Client)
         end
 
         expect(core_server).to have_received(:shutdown)
@@ -115,6 +118,8 @@ describe Temporalio::Testing do
 
       expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
       expect(env.connection).to be_a(Temporalio::Connection)
+      expect(env.client).to be_a(Temporalio::Client)
+      expect(env.client.namespace).to eq(described_class::DEFAULT_NAMESPACE)
 
       expect(Temporalio::Bridge::TestServer)
         .to have_received(:start)
@@ -165,6 +170,7 @@ describe Temporalio::Testing do
         subject.start_time_skipping_environment do |env|
           expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
           expect(env.connection).to be_a(Temporalio::Connection)
+          expect(env.client).to be_a(Temporalio::Client)
         end
 
         expect(core_server).to have_received(:shutdown)

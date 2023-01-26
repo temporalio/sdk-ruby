@@ -1,5 +1,7 @@
 module Temporalio
   module Testing
+    DEFAULT_NAMESPACE: String
+
     def self.start_local_environment: (
       ?namespace: String,
       ?ip: String,
@@ -24,7 +26,7 @@ module Temporalio
 
     private
 
-    def self.init_workflow_environment_for: (Temporalio::Bridge::TestServer server) -> WorkflowEnvironment
+    def self.init_workflow_environment_for: (Temporalio::Bridge::TestServer server, String namespace) -> WorkflowEnvironment
     def self.run_server: (
       Temporalio::Bridge::TestServer server,
       Temporalio::Testing::WorkflowEnvironment env

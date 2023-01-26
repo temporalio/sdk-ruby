@@ -1,4 +1,5 @@
 require 'google/protobuf/well_known_types'
+require 'temporalio/client'
 
 module Temporalio
   module Testing
@@ -15,10 +16,22 @@ module Temporalio
       # @return [Temporalio::Connection] A connection to this environment.
       attr_reader :connection
 
+      # @return [String] A namespace for this environment.
+      attr_reader :namespace
+
       # @api private
-      def initialize(server, connection)
+      def initialize(server, connection, namespace)
         @server = server
         @connection = connection
+        @namespace = namespace
+      end
+
+      # A default client to be used with this environment.
+      #
+      # @return [Temporalio::Client] A default client.
+      def client
+        # TODO: Add time-skipping interceptor
+        @client ||= Temporalio::Client.new(connection, namespace)
       end
 
       # Sleep in this environment.

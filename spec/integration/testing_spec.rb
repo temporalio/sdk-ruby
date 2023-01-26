@@ -15,6 +15,7 @@ describe Temporalio::Testing do
       ) do |env|
         expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
         expect(env.connection).to be_a(Temporalio::Connection)
+        expect(env.client).to be_a(Temporalio::Client)
         expect(env.current_time).to be_within(1).of(Time.now)
       end
     end
@@ -28,6 +29,7 @@ describe Temporalio::Testing do
       ) do |env|
         expect(env).to be_a(Temporalio::Testing::WorkflowEnvironment)
         expect(env.connection).to be_a(Temporalio::Connection)
+        expect(env.client).to be_a(Temporalio::Client)
         expect(env.current_time).to be_within(1).of(Time.now)
       end
     end
