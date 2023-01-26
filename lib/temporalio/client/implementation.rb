@@ -73,7 +73,7 @@ module Temporalio
         )
 
         loop do
-          response = connection.get_workflow_execution_history(request, **rpc_params)
+          response = connection.workflow_service.get_workflow_execution_history(request, **rpc_params)
           next_run_id = catch(:next) do
             # this will return out of the loop only if :next wasn't thrown
             return process_workflow_result_from(response, follow_runs)
@@ -137,12 +137,12 @@ module Temporalio
           klass = Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest
           request = klass.new(**params)
 
-          response = connection.signal_with_start_workflow_execution(request, **rpc_params)
+          response = connection.workflow_service.signal_with_start_workflow_execution(request, **rpc_params)
         else
           klass = Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
           request = klass.new(**params)
 
-          response = connection.start_workflow_execution(request, **rpc_params)
+          response = connection.workflow_service.start_workflow_execution(request, **rpc_params)
           first_execution_run_id = response.run_id
         end
 
@@ -171,7 +171,7 @@ module Temporalio
           ),
         )
 
-        response = connection.describe_workflow_execution(request, **rpc_params)
+        response = connection.workflow_service.describe_workflow_execution(request, **rpc_params)
 
         Workflow::ExecutionInfo.from_raw(response, converter)
       end
@@ -192,7 +192,7 @@ module Temporalio
           query_reject_condition: Workflow::QueryRejectCondition.to_raw(input.reject_condition),
         )
 
-        response = connection.query_workflow(request, **rpc_params)
+        response = connection.workflow_service.query_workflow(request, **rpc_params)
 
         if response.query_rejected
           status = Workflow::ExecutionStatus.from_raw(response.query_rejected.status)
@@ -220,7 +220,7 @@ module Temporalio
           header: convert_headers(input.headers),
         )
 
-        connection.signal_workflow_execution(request, **rpc_params)
+        connection.workflow_service.signal_workflow_execution(request, **rpc_params)
 
         return
       end
@@ -239,7 +239,7 @@ module Temporalio
           reason: input.reason,
         )
 
-        connection.request_cancel_workflow_execution(request, **rpc_params)
+        connection.workflow_service.request_cancel_workflow_execution(request, **rpc_params)
 
         return
       end
@@ -258,7 +258,7 @@ module Temporalio
           details: converter.to_payloads(input.args),
         )
 
-        connection.terminate_workflow_execution(request, **rpc_params)
+        connection.workflow_service.terminate_workflow_execution(request, **rpc_params)
 
         return
       end

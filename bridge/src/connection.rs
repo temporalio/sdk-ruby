@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
     ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, TemporalServiceClientWithMetrics
+    ConfiguredClient, TemporalServiceClientWithMetrics, TestService
 };
 use thiserror::Error;
 use tokio::{select};
@@ -27,14 +27,17 @@ pub enum ConnectionError {
     #[error(transparent)]
     InvalidConnectionOptions(#[from] ClientOptionsBuilderError),
 
-    #[error("`{0}` RPC call is not supported by the API")]
-    InvalidRpc(String),
+    #[error("`{0}`/`{1}` RPC call is not supported by the API")]
+    InvalidRpc(String, String),
 
     #[error(transparent)]
     InvalidRpcMetadataKey(#[from] tonic::metadata::errors::InvalidMetadataKey),
 
     #[error(transparent)]
     InvalidRpcMetadataValue(#[from] tonic::metadata::errors::InvalidMetadataValue),
+
+    #[error("`{0}` Service is not supported by the API")]
+    InvalidService(String),
 
     #[error(transparent)]
     UnableToConnect(#[from] ClientInitError),
@@ -79,7 +82,15 @@ macro_rules! rpc_call {
     };
 }
 
-async fn make_rpc_call(mut client: Client, params: RpcParams) -> RpcResult {
+async fn make_rpc_call(client: Client, params: RpcParams) -> RpcResult {
+    match params.service.as_str() {
+        "workflow_service" => make_workflow_service_rpc(client, params).await,
+        "test_service" => make_test_service_rpc(client, params).await,
+        _ => Err(ConnectionError::InvalidService(params.service.to_string()))
+    }
+}
+
+async fn make_workflow_service_rpc(mut client: Client, params: RpcParams) -> RpcResult {
     match params.rpc.as_str() {
         "register_namespace" => rpc_call!(client, register_namespace, params),
         "describe_namespace" => rpc_call!(client, describe_namespace, params),
@@ -88,7 +99,7 @@ async fn make_rpc_call(mut client: Client, params: RpcParams) -> RpcResult {
         "deprecate_namespace" => rpc_call!(client, deprecate_namespace, params),
         "start_workflow_execution" => rpc_call!(client, start_workflow_execution, params),
         "get_workflow_execution_history" => rpc_call!(client, get_workflow_execution_history, params),
-        // "get_workflow_execution_history_reverse" => rpc_call!(client, get_workflow_execution_history_reverse, params),
+        "get_workflow_execution_history_reverse" => rpc_call!(client, get_workflow_execution_history_reverse, params),
         "poll_workflow_task_queue" => rpc_call!(client, poll_workflow_task_queue, params),
         "respond_workflow_task_completed" => rpc_call!(client, respond_workflow_task_completed, params),
         "respond_workflow_task_failed" => rpc_call!(client, respond_workflow_task_failed, params),
@@ -136,7 +147,19 @@ async fn make_rpc_call(mut client: Client, params: RpcParams) -> RpcResult {
         "stop_batch_operation" => rpc_call!(client, stop_batch_operation, params),
         "describe_batch_operation" => rpc_call!(client, describe_batch_operation, params),
         "list_batch_operations" => rpc_call!(client, list_batch_operations, params),
-        _ => Err(ConnectionError::InvalidRpc(params.rpc.to_string()))
+        _ => Err(ConnectionError::InvalidRpc(params.service.to_string(), params.rpc.to_string()))
+    }
+}
+
+async fn make_test_service_rpc(mut client: Client, params: RpcParams) -> RpcResult {
+    match params.rpc.as_str() {
+        "lock_time_skipping" => rpc_call!(client, lock_time_skipping, params),
+        "unlock_time_skipping" => rpc_call!(client, unlock_time_skipping, params),
+        "sleep" => rpc_call!(client, sleep, params),
+        "sleep_until" => rpc_call!(client, sleep_until, params),
+        "unlock_time_skipping_with_sleep" => rpc_call!(client, unlock_time_skipping_with_sleep, params),
+        "get_current_time" => rpc_call!(client, get_current_time, params),
+        _ => Err(ConnectionError::InvalidRpc(params.service.to_string(), params.rpc.to_string()))
     }
 }
 
@@ -148,6 +171,7 @@ pub struct Connection {
 
 pub struct RpcParams {
     pub rpc: String,
+    pub service: String,
     pub request: Vec<u8>,
     pub metadata: HashMap<String, String>,
     pub timeout_millis: Option<u64>

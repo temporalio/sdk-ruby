@@ -1,0 +1,15 @@
+module Temporalio
+  module Testing
+    class TimeSkippingHandle
+      extend Forwardable
+      include Temporalio::Client::WorkflowHandle::_Interface
+
+      def initialize: (Temporalio::Client::WorkflowHandle, Temporalio::Testing::WorkflowEnvironment) -> void
+
+      private
+
+      attr_reader handle: Temporalio::Client::WorkflowHandle
+      attr_reader env: Temporalio::Testing::WorkflowEnvironment
+    end
+  end
+end

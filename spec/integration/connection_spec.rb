@@ -16,28 +16,81 @@ describe Temporalio::Connection do
   end
   after(:all) { Process.kill('QUIT', @pid) }
 
-  MockServer.rpc_descs.each do |rpc, desc|
-    rpc = GRPC::GenericService.underscore(rpc.to_s)
+  describe 'WorkflowService' do
+    let(:service) { subject.workflow_service }
 
-    # TODO: Remove once https://github.com/temporalio/sdk-core/issues/335 fixed
-    next if rpc == 'get_workflow_execution_history_reverse'
+    MockWorkflowService.rpc_descs.each do |rpc, desc|
+      rpc = GRPC::GenericService.underscore(rpc.to_s)
 
-    describe "##{rpc}" do
+      describe "##{rpc}" do
+        it 'makes an RPC call' do
+          expect(service.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)
+        end
+
+        context 'with metadata' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, metadata: { 'foo' => 'bar' }))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+
+        context 'with timeout' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, timeout: 5_000))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+      end
+    end
+  end
+
+  describe 'TestService' do
+    let(:service) { subject.test_service }
+
+    MockTestService.rpc_descs.each do |rpc, desc|
+      rpc = GRPC::GenericService.underscore(rpc.to_s)
+
+      # get_current_time does not take any inputs
+      next if rpc == 'get_current_time'
+
+      describe "##{rpc}" do
+        it 'makes an RPC call' do
+          expect(service.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)
+        end
+
+        context 'with metadata' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, metadata: { 'foo' => 'bar' }))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+
+        context 'with timeout' do
+          it 'makes an RPC call' do
+            expect(service.public_send(rpc, desc.input.new, timeout: 5_000))
+              .to be_an_instance_of(desc.output)
+          end
+        end
+      end
+    end
+
+    describe '#get_current_time' do
       it 'makes an RPC call' do
-        expect(subject.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)
+        expect(service.get_current_time)
+          .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
       end
 
       context 'with metadata' do
         it 'makes an RPC call' do
-          expect(subject.public_send(rpc, desc.input.new, metadata: { 'foo' => 'bar' }))
-            .to be_an_instance_of(desc.output)
+          expect(service.get_current_time(metadata: { 'foo' => 'bar' }))
+            .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
         end
       end
 
       context 'with timeout' do
         it 'makes an RPC call' do
-          expect(subject.public_send(rpc, desc.input.new, timeout: 5_000))
-            .to be_an_instance_of(desc.output)
+          expect(service.get_current_time(timeout: 5_000))
+            .to be_an_instance_of(Temporalio::Api::TestService::V1::GetCurrentTimeResponse)
         end
       end
     end
@@ -61,11 +114,11 @@ describe Temporalio::Connection do
     it 'raises when incorrect request was provided' do
       request = Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest.new
 
-      expect { subject.describe_namespace(request) }.to raise_error(ArgumentError)
+      expect { subject.workflow_service.describe_namespace(request) }.to raise_error(ArgumentError)
     end
 
     it 'raises when no request was provided' do
-      expect { subject.describe_namespace(nil) }.to raise_error(TypeError)
+      expect { subject.workflow_service.describe_namespace(nil) }.to raise_error(TypeError)
     end
   end
 end

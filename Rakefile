@@ -6,6 +6,7 @@ require_relative 'lib/thermite_patch'
 
 API_PROTO_ROOT = 'bridge/sdk-core/protos/api_upstream'.freeze
 CORE_PROTO_ROOT = 'bridge/sdk-core/protos/local'.freeze
+TEST_PROTO_ROOT = 'bridge/sdk-core/protos/testsrv_upstream'.freeze
 PROTOBUF_PATH = 'lib/gen'.freeze
 RBS_SIG_PATH = 'sig/protos'.freeze
 GRPC_PATH = 'spec/support/grpc'.freeze
@@ -54,12 +55,20 @@ namespace :proto do
 
     api_protos = Dir.glob("#{API_PROTO_ROOT}/**/*.proto")
     core_protos = Dir.glob("#{CORE_PROTO_ROOT}/**/*.proto")
-    protos = (api_protos + core_protos).uniq.sort.join(' ')
+    test_protos = Dir.glob("#{TEST_PROTO_ROOT}/**/*.proto")
+    protos = (api_protos + core_protos + test_protos).uniq do |path|
+      # Use relative path to check for uniqueness (to exclude duplicate dependencies)
+      path
+        .delete_prefix(API_PROTO_ROOT)
+        .delete_prefix(CORE_PROTO_ROOT)
+        .delete_prefix(TEST_PROTO_ROOT)
+    end.sort.join(' ')
 
     sh 'RBS_PROTOBUF_BACKEND=protobuf RBS_PROTOBUF_EXTENSION=true ' \
        'bundle exec grpc_tools_ruby_protoc ' \
        "--proto_path=#{API_PROTO_ROOT} " \
        "--proto_path=#{CORE_PROTO_ROOT} " \
+       "--proto_path=#{TEST_PROTO_ROOT} " \
        "--ruby_out=#{PROTOBUF_PATH} " \
        "--grpc_out=#{GRPC_PATH} " \
        "--rbs_out=#{RBS_SIG_PATH} #{protos}"

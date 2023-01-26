@@ -12,7 +12,8 @@ require 'temporalio/payload_converter'
 describe Temporalio::Client::Implementation do
   subject { described_class.new(connection, namespace, converter, interceptors) }
 
-  let(:connection) { instance_double(Temporalio::Connection) }
+  let(:connection) { instance_double(Temporalio::Connection, workflow_service: workflow_service) }
+  let(:workflow_service) { instance_double(Temporalio::Connection::WorkflowService) }
   let(:namespace) { 'test-namespace' }
   let(:converter) do
     Temporalio::DataConverter.new(
@@ -55,7 +56,7 @@ describe Temporalio::Client::Implementation do
     end
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:start_workflow_execution)
         .and_return(
           Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse.new(
@@ -63,7 +64,7 @@ describe Temporalio::Client::Implementation do
           )
         )
 
-      allow(connection)
+      allow(workflow_service)
         .to receive(:signal_with_start_workflow_execution)
         .and_return(
           Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionResponse.new(
@@ -75,7 +76,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.start_workflow(input)
 
-      expect(connection).to have_received(:start_workflow_execution) do |request|
+      expect(workflow_service).to have_received(:start_workflow_execution) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest)
         expect(request.identity).to include("(Ruby SDK v#{Temporalio::VERSION})")
         expect(request.request_id).to be_a(String)
@@ -113,7 +114,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized memo' do
         subject.start_workflow(input)
 
-        expect(connection).to have_received(:start_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:start_workflow_execution) do |request|
           expect(request.memo.fields['memo'].data).to eq('"test"')
         end
       end
@@ -125,7 +126,7 @@ describe Temporalio::Client::Implementation do
       it 'includes serialized search_attributes' do
         subject.start_workflow(input)
 
-        expect(connection).to have_received(:start_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:start_workflow_execution) do |request|
           expect(request.search_attributes.indexed_fields['search_attributes'].data).to eq('"test"')
         end
       end
@@ -137,7 +138,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized header' do
         subject.start_workflow(input)
 
-        expect(connection).to have_received(:start_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:start_workflow_execution) do |request|
           expect(request.header.fields['header'].data).to eq('"test"')
         end
       end
@@ -152,7 +153,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.start_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:start_workflow_execution)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -167,7 +168,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized header' do
         subject.start_workflow(input)
 
-        expect(connection).to have_received(:signal_with_start_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:signal_with_start_workflow_execution) do |request|
           expect(request)
             .to be_a(Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest)
           expect(request.signal_name).to eq('test-signal')
@@ -201,7 +202,7 @@ describe Temporalio::Client::Implementation do
 
     context 'when Workflow already exists' do
       before do
-        allow(connection)
+        allow(workflow_service)
           .to receive(:start_workflow_execution)
           .and_raise(Temporalio::Bridge::Error, 'status: AlreadyExists')
       end
@@ -215,7 +216,7 @@ describe Temporalio::Client::Implementation do
 
     context 'when RPC call fails' do
       before do
-        allow(connection)
+        allow(workflow_service)
           .to receive(:start_workflow_execution)
           .and_raise(Temporalio::Bridge::Error, 'Some other error')
       end
@@ -238,7 +239,7 @@ describe Temporalio::Client::Implementation do
     let(:time_now) { Time.now }
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:describe_workflow_execution)
         .and_return(
           Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse.new(
@@ -262,7 +263,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.describe_workflow(input)
 
-      expect(connection).to have_received(:describe_workflow_execution) do |request|
+      expect(workflow_service).to have_received(:describe_workflow_execution) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest)
         expect(request.namespace).to eq(namespace)
         expect(request.execution.workflow_id).to eq(id)
@@ -299,7 +300,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.describe_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:describe_workflow_execution)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -330,7 +331,7 @@ describe Temporalio::Client::Implementation do
     end
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:query_workflow)
         .and_return(
           Temporalio::Api::WorkflowService::V1::QueryWorkflowResponse.new(
@@ -342,7 +343,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.query_workflow(input)
 
-      expect(connection).to have_received(:query_workflow) do |request|
+      expect(workflow_service).to have_received(:query_workflow) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest)
         expect(request.namespace).to eq(namespace)
         expect(request.execution.workflow_id).to eq(id)
@@ -362,7 +363,7 @@ describe Temporalio::Client::Implementation do
 
     context 'when query is rejected' do
       before do
-        allow(connection)
+        allow(workflow_service)
           .to receive(:query_workflow)
           .and_return(
             Temporalio::Api::WorkflowService::V1::QueryWorkflowResponse.new(
@@ -386,7 +387,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized header' do
         subject.query_workflow(input)
 
-        expect(connection).to have_received(:query_workflow) do |request|
+        expect(workflow_service).to have_received(:query_workflow) do |request|
           expect(request.query.header.fields['header'].data).to eq('"test"')
         end
       end
@@ -401,7 +402,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.query_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:query_workflow)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -431,7 +432,7 @@ describe Temporalio::Client::Implementation do
     end
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:signal_workflow_execution)
         .and_return(Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionResponse.new)
     end
@@ -439,7 +440,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.signal_workflow(input)
 
-      expect(connection).to have_received(:signal_workflow_execution) do |request|
+      expect(workflow_service).to have_received(:signal_workflow_execution) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionRequest)
         expect(request.namespace).to eq(namespace)
         expect(request.workflow_execution.workflow_id).to eq(id)
@@ -465,7 +466,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized header' do
         subject.signal_workflow(input)
 
-        expect(connection).to have_received(:signal_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:signal_workflow_execution) do |request|
           expect(request.header.fields['header'].data).to eq('"test"')
         end
       end
@@ -480,7 +481,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.signal_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:signal_workflow_execution)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -509,7 +510,7 @@ describe Temporalio::Client::Implementation do
     end
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:request_cancel_workflow_execution)
         .and_return(Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionResponse.new)
     end
@@ -517,7 +518,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.cancel_workflow(input)
 
-      expect(connection).to have_received(:request_cancel_workflow_execution) do |request|
+      expect(workflow_service).to have_received(:request_cancel_workflow_execution) do |request|
         expect(request).to be_a(Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest)
         expect(request.namespace).to eq(namespace)
         expect(request.workflow_execution.workflow_id).to eq(id)
@@ -542,7 +543,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.cancel_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:request_cancel_workflow_execution)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -571,7 +572,7 @@ describe Temporalio::Client::Implementation do
     end
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:terminate_workflow_execution)
         .and_return(Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionResponse.new)
     end
@@ -579,7 +580,7 @@ describe Temporalio::Client::Implementation do
     it 'calls the RPC method' do
       subject.terminate_workflow(input)
 
-      expect(connection).to have_received(:terminate_workflow_execution) do |request|
+      expect(workflow_service).to have_received(:terminate_workflow_execution) do |request|
         expect(request)
           .to be_a(Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest)
         expect(request.namespace).to eq(namespace)
@@ -602,7 +603,7 @@ describe Temporalio::Client::Implementation do
       it 'includes a serialized header' do
         subject.terminate_workflow(input)
 
-        expect(connection).to have_received(:terminate_workflow_execution) do |request|
+        expect(workflow_service).to have_received(:terminate_workflow_execution) do |request|
           expect(request.details.payloads[0].data).to eq('1')
           expect(request.details.payloads[1].data).to eq('2')
           expect(request.details.payloads[2].data).to eq('3')
@@ -619,7 +620,7 @@ describe Temporalio::Client::Implementation do
       it 'passes RPC params to the connection' do
         subject.terminate_workflow(input)
 
-        expect(connection)
+        expect(workflow_service)
           .to have_received(:terminate_workflow_execution)
           .with(anything, metadata: metadata, timeout: timeout)
       end
@@ -651,7 +652,7 @@ describe Temporalio::Client::Implementation do
     let(:new_run_id) { '' }
 
     before do
-      allow(connection)
+      allow(workflow_service)
         .to receive(:get_workflow_execution_history)
         .and_return(
           Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new(
@@ -675,7 +676,7 @@ describe Temporalio::Client::Implementation do
       end
 
       before do
-        allow(connection)
+        allow(workflow_service)
           .to receive(:get_workflow_execution_history)
           .and_return(
             Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new(
@@ -691,7 +692,7 @@ describe Temporalio::Client::Implementation do
         result = subject.await_workflow_result(id, run_id, true, metadata, timeout)
 
         expect(result).to eq('new test')
-        expect(connection).to have_received(:get_workflow_execution_history).twice
+        expect(workflow_service).to have_received(:get_workflow_execution_history).twice
       end
     end
 
@@ -709,7 +710,7 @@ describe Temporalio::Client::Implementation do
       it 'calls the RPC method' do
         subject.await_workflow_result(id, run_id, false, metadata, timeout)
 
-        expect(connection).to have_received(:get_workflow_execution_history).once do |request, **rpc_params|
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once do |request, **rpc_params|
           expect(request)
             .to be_a(Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest)
           expect(request.namespace).to eq(namespace)
@@ -750,7 +751,7 @@ describe Temporalio::Client::Implementation do
           expect(error.cause.message).to eq('Test error')
         end
 
-        expect(connection).to have_received(:get_workflow_execution_history).once
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once
       end
 
       include_examples 'follow runs'
@@ -776,7 +777,7 @@ describe Temporalio::Client::Implementation do
           expect(error.cause.details).to eq(['test'])
         end
 
-        expect(connection).to have_received(:get_workflow_execution_history).once
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once
       end
     end
 
@@ -800,7 +801,7 @@ describe Temporalio::Client::Implementation do
           expect(error.cause.message).to eq('test reason')
         end
 
-        expect(connection).to have_received(:get_workflow_execution_history).once
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once
       end
     end
 
@@ -824,7 +825,7 @@ describe Temporalio::Client::Implementation do
           expect(error.cause.type).to eq(Temporalio::TimeoutType::START_TO_CLOSE)
         end
 
-        expect(connection).to have_received(:get_workflow_execution_history).once
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once
       end
 
       include_examples 'follow runs'
@@ -844,7 +845,7 @@ describe Temporalio::Client::Implementation do
         expect do
           subject.await_workflow_result(id, run_id, false, metadata, timeout)
         end.to raise_error(Temporalio::Error, 'Workflow execution continued as new')
-        expect(connection).to have_received(:get_workflow_execution_history).once
+        expect(workflow_service).to have_received(:get_workflow_execution_history).once
       end
 
       include_examples 'follow runs'

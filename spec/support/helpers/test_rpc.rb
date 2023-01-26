@@ -6,7 +6,7 @@ module Helpers
       request = Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest.new
       max_attempts.times do |i|
         connection = Temporalio::Connection.new(address)
-        connection.get_system_info(request)
+        connection.workflow_service.get_system_info(request)
         break
       rescue StandardError => e
         puts "Error connecting to a server: #{e}. Attempt #{i + 1} / #{max_attempts}"

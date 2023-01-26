@@ -1,0 +1,217 @@
+module Temporalio
+  module Api
+    module TestService
+      module V1
+        class LockTimeSkippingRequest < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> LockTimeSkippingRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = LockTimeSkippingRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[LockTimeSkippingRequest, LockTimeSkippingRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LockTimeSkippingRequest, LockTimeSkippingRequest | _ToProto]
+
+          type array = ::Array[LockTimeSkippingRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, LockTimeSkippingRequest | _ToProto]
+        end
+
+        class LockTimeSkippingResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> LockTimeSkippingResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = LockTimeSkippingResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[LockTimeSkippingResponse, LockTimeSkippingResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LockTimeSkippingResponse, LockTimeSkippingResponse | _ToProto]
+
+          type array = ::Array[LockTimeSkippingResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, LockTimeSkippingResponse | _ToProto]
+        end
+
+        class UnlockTimeSkippingRequest < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> UnlockTimeSkippingRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UnlockTimeSkippingRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UnlockTimeSkippingRequest, UnlockTimeSkippingRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UnlockTimeSkippingRequest, UnlockTimeSkippingRequest | _ToProto]
+
+          type array = ::Array[UnlockTimeSkippingRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UnlockTimeSkippingRequest | _ToProto]
+        end
+
+        class UnlockTimeSkippingResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> UnlockTimeSkippingResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UnlockTimeSkippingResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UnlockTimeSkippingResponse, UnlockTimeSkippingResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UnlockTimeSkippingResponse, UnlockTimeSkippingResponse | _ToProto]
+
+          type array = ::Array[UnlockTimeSkippingResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UnlockTimeSkippingResponse | _ToProto]
+        end
+
+        class SleepUntilRequest < ::Protobuf::Message
+          attr_accessor timestamp(): ::Google::Protobuf::Timestamp?
+
+          def timestamp=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                        | ...
+
+          def timestamp!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?timestamp: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:timestamp) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:timestamp, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:timestamp, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> SleepUntilRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SleepUntilRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SleepUntilRequest, SleepUntilRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SleepUntilRequest, SleepUntilRequest | _ToProto]
+
+          type array = ::Array[SleepUntilRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SleepUntilRequest | _ToProto]
+        end
+
+        class SleepRequest < ::Protobuf::Message
+          attr_accessor duration(): ::Google::Protobuf::Duration?
+
+          def duration=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                       | ...
+
+          def duration!: () -> ::Google::Protobuf::Duration?
+
+          def initialize: (?duration: ::Google::Protobuf::Duration::init?) -> void
+
+          def []: (:duration) -> ::Google::Protobuf::Duration?
+                | (::Symbol) -> untyped
+
+          def []=: (:duration, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:duration, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> SleepRequest
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SleepRequest | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SleepRequest, SleepRequest | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SleepRequest, SleepRequest | _ToProto]
+
+          type array = ::Array[SleepRequest | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SleepRequest | _ToProto]
+        end
+
+        class SleepResponse < ::Protobuf::Message
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> SleepResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SleepResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SleepResponse, SleepResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SleepResponse, SleepResponse | _ToProto]
+
+          type array = ::Array[SleepResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SleepResponse | _ToProto]
+        end
+
+        class GetCurrentTimeResponse < ::Protobuf::Message
+          attr_accessor time(): ::Google::Protobuf::Timestamp?
+
+          def time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                   | ...
+
+          def time!: () -> ::Google::Protobuf::Timestamp?
+
+          def initialize: (?time: ::Google::Protobuf::Timestamp::init?) -> void
+
+          def []: (:time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
+
+          def []=: (:time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> GetCurrentTimeResponse
+          end
+
+          # The type of `#initialize` parameter.
+          type init = GetCurrentTimeResponse | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[GetCurrentTimeResponse, GetCurrentTimeResponse | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, GetCurrentTimeResponse, GetCurrentTimeResponse | _ToProto]
+
+          type array = ::Array[GetCurrentTimeResponse | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, GetCurrentTimeResponse | _ToProto]
+        end
+      end
+    end
+  end
+end
