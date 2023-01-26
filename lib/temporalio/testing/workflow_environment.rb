@@ -1,5 +1,6 @@
 require 'google/protobuf/well_known_types'
 require 'temporalio/client'
+require 'temporalio/testing/time_skipping_interceptor'
 
 module Temporalio
   module Testing
@@ -30,8 +31,11 @@ module Temporalio
       #
       # @return [Temporalio::Client] A default client.
       def client
-        # TODO: Add time-skipping interceptor
-        @client ||= Temporalio::Client.new(connection, namespace)
+        @client ||= begin
+          # TODO: Add a workflow interceptor for interpreting assertion error
+          interceptors = [TimeSkippingInterceptor.new(self)]
+          Temporalio::Client.new(connection, namespace, interceptors: interceptors)
+        end
       end
 
       # Sleep in this environment.

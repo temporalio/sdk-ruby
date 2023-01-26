@@ -113,6 +113,10 @@ describe Temporalio::Testing::WorkflowEnvironment do
           .and_return(Temporalio::Api::TestService::V1::LockTimeSkippingResponse.new)
       end
 
+      it 'returns the result of a provided block' do
+        expect(subject.with_time_skipping { 42 }).to eq(42)
+      end
+
       it 'unlocks time skipping and then locks it' do
         subject.with_time_skipping do
           expect(test_service)
