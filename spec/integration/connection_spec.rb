@@ -22,9 +22,6 @@ describe Temporalio::Connection do
     MockWorkflowService.rpc_descs.each do |rpc, desc|
       rpc = GRPC::GenericService.underscore(rpc.to_s)
 
-      # TODO: Remove once https://github.com/temporalio/sdk-core/issues/335 fixed
-      next if rpc == 'get_workflow_execution_history_reverse'
-
       describe "##{rpc}" do
         it 'makes an RPC call' do
           expect(service.public_send(rpc, desc.input.new)).to be_an_instance_of(desc.output)

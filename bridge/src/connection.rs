@@ -99,7 +99,7 @@ async fn make_workflow_service_rpc(mut client: Client, params: RpcParams) -> Rpc
         "deprecate_namespace" => rpc_call!(client, deprecate_namespace, params),
         "start_workflow_execution" => rpc_call!(client, start_workflow_execution, params),
         "get_workflow_execution_history" => rpc_call!(client, get_workflow_execution_history, params),
-        // "get_workflow_execution_history_reverse" => rpc_call!(client, get_workflow_execution_history_reverse, params),
+        "get_workflow_execution_history_reverse" => rpc_call!(client, get_workflow_execution_history_reverse, params),
         "poll_workflow_task_queue" => rpc_call!(client, poll_workflow_task_queue, params),
         "respond_workflow_task_completed" => rpc_call!(client, respond_workflow_task_completed, params),
         "respond_workflow_task_failed" => rpc_call!(client, respond_workflow_task_failed, params),

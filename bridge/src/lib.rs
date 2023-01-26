@@ -31,7 +31,7 @@ fn wrap_worker_error(e: &WorkerError) -> AnyException {
         _ => "Temporalio::Bridge::Error"
     };
 
-    AnyException::new(name, Some(&format!("[{:?}] {}", e, e)))
+    AnyException::new(name, Some(&format!("[{e:?}] {e}")))
 }
 
 fn wrap_bytes(bytes: Vec<u8>) -> RString {
