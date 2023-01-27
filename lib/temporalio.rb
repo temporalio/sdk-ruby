@@ -7,6 +7,7 @@ require 'temporalio/client'
 require 'temporalio/connection'
 require 'temporalio/version'
 require 'temporalio/worker'
+require 'temporalio/workflow'
 
 module Temporalio
 end

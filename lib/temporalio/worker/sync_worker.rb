@@ -1,5 +1,7 @@
 require 'temporal/sdk/core/activity_task/activity_task_pb'
 require 'temporal/sdk/core/core_interface_pb'
+require 'temporal/sdk/core/workflow_activation/workflow_activation_pb'
+require 'temporal/sdk/core/workflow_completion/workflow_completion_pb'
 
 module Temporalio
   class Worker
@@ -58,6 +60,32 @@ module Temporalio
         core_worker.record_activity_heartbeat(encoded_proto)
       end
 
+      def poll_workflow_activation
+        with_queue do |done|
+          core_worker.poll_workflow_activation do |task, error|
+            done.call(task && Coresdk::WorkflowActivation::WorkflowActivation.decode(task), error)
+          end
+        end
+      end
+
+      def complete_workflow_activation_with_success(run_id, commands)
+        proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.new(
+          run_id: run_id,
+          successful: Coresdk::WorkflowCompletion::Success.new(commands: commands),
+        )
+
+        complete_workflow_activation(run_id, proto)
+      end
+
+      def complete_workflow_activation_with_failure(run_id, failure)
+        proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.new(
+          run_id: run_id,
+          failed: Coresdk::WorkflowCompletion::Failure.new(failure: failure),
+        )
+
+        complete_workflow_activation(run_id, proto)
+      end
+
       private
 
       attr_reader :core_worker
@@ -81,6 +109,14 @@ module Temporalio
 
         with_queue do |done|
           core_worker.complete_activity_task(encoded_proto, &done)
+        end
+      end
+
+      def complete_workflow_activation(run_id, proto)
+        encoded_proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.encode(proto)
+
+        with_queue do |done|
+          core_worker.complete_workflow_activation(encoded_proto, &done)
         end
       end
     end
