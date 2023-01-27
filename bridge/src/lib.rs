@@ -228,6 +228,43 @@ methods!(
         NilClass::new()
     }
 
+    fn worker_poll_workflow_activation() -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #poll_workflow_activation without a block");
+        }
+
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            ruby_callback.call(&worker_result_to_proc_args(result));
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.poll_workflow_activation(callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
+    fn worker_complete_workflow_activation(proto: RString) -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #worker_complete_workflow_activation without a block");
+        }
+
+        let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            ruby_callback.call(&worker_result_to_proc_args(result));
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.complete_workflow_activation(bytes, callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
     fn worker_initiate_shutdown() -> NilClass {
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
         worker.initiate_shutdown();
@@ -378,6 +415,8 @@ pub extern "C" fn init_bridge() {
             klass.def("poll_activity_task", worker_poll_activity_task);
             klass.def("complete_activity_task", worker_complete_activity_task);
             klass.def("record_activity_heartbeat", worker_record_activity_heartbeat);
+            klass.def("poll_workflow_activation", worker_poll_workflow_activation);
+            klass.def("complete_workflow_activation", worker_complete_workflow_activation);
             klass.def("initiate_shutdown", worker_initiate_shutdown);
             klass.def("shutdown", worker_shutdown);
         });

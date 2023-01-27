@@ -4,9 +4,10 @@ use prost::Message;
 use std::sync::Arc;
 use std::sync::mpsc::Sender;
 use temporal_sdk_core::api::{Worker as WorkerTrait};
-use temporal_sdk_core_api::errors::{PollActivityError};
+use temporal_sdk_core_api::errors::{PollActivityError, PollWfError};
 use temporal_sdk_core_api::worker::{WorkerConfigBuilder, WorkerConfigBuilderError};
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
+use temporal_sdk_core_protos::coresdk::workflow_completion::{WorkflowActivationCompletion};
 use thiserror::Error;
 use tokio::runtime::{Runtime as TokioRuntime};
 
@@ -25,7 +26,13 @@ pub enum WorkerError {
     UnableToPollActivityTask(#[from] temporal_sdk_core::api::errors::PollActivityError),
 
     #[error(transparent)]
+    UnableToPollWorkflowActivation(#[from] temporal_sdk_core::api::errors::PollWfError),
+
+    #[error(transparent)]
     UnableToCompleteActivityTask(#[from] temporal_sdk_core::api::errors::CompleteActivityError),
+
+    #[error(transparent)]
+    UnableToCompleteWorkflowActivation(#[from] temporal_sdk_core::api::errors::CompleteWfError),
 
     #[error("Unable to send a request. Channel is closed")]
     ChannelClosed(),
@@ -106,6 +113,47 @@ impl Worker {
     pub fn record_activity_heartbeat(&self, bytes: Vec<u8>) -> Result<(), WorkerError> {
         let proto = ActivityHeartbeat::decode(&*bytes)?;
         self.core_worker.record_activity_heartbeat(proto);
+
+        Ok(())
+    }
+
+    pub fn poll_workflow_activation<F>(&self, callback: F) -> Result<(), WorkerError> where F: FnOnce(WorkerResult) + Send + 'static {
+        let core_worker = self.core_worker.clone();
+        let callback_tx = self.callback_tx.clone();
+
+        self.tokio_runtime.spawn(async move {
+            let result = core_worker.poll_workflow_activation().await;
+
+            let callback: Callback = match result {
+                Ok(task) => {
+                    let bytes = task.encode_to_vec();
+                    Box::new(move || callback(Ok(bytes)))
+                },
+                Err(PollWfError::ShutDown) => Box::new(move || callback(Err(WorkerError::Shutdown()))),
+                Err(e) => Box::new(move || callback(Err(WorkerError::UnableToPollWorkflowActivation(e))))
+            };
+
+            callback_tx.send(Command::RunCallback(callback)).expect("Unable to send a callback");
+        });
+
+        Ok(())
+    }
+
+    pub fn complete_workflow_activation<F>(&self, bytes: Vec<u8>, callback: F) -> Result<(), WorkerError> where F: FnOnce(WorkerResult) + Send + 'static {
+        let core_worker = self.core_worker.clone();
+        let callback_tx = self.callback_tx.clone();
+        let proto = WorkflowActivationCompletion::decode(&*bytes)?;
+
+        self.tokio_runtime.spawn(async move {
+            let result = core_worker.complete_workflow_activation(proto).await;
+
+            let callback: Callback = match result {
+                Ok(()) => Box::new(move || callback(Ok(vec!()))),
+                Err(e) => Box::new(move || callback(Err(WorkerError::UnableToCompleteWorkflowActivation(e))))
+            };
+
+            callback_tx.send(Command::RunCallback(callback)).expect("Unable to send a callback");
+        });
 
         Ok(())
     }
