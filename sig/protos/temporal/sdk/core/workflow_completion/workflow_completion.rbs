@@ -1,5 +1,5 @@
 module Coresdk
-  module Workflow_completion
+  module WorkflowCompletion
     # / Result of a single workflow activation, reported from lang to core
     #
     class WorkflowActivationCompletion < ::Protobuf::Message
@@ -9,32 +9,32 @@ module Coresdk
 
       def run_id!: () -> ::String?
 
-      attr_accessor successful(): ::Coresdk::Workflow_completion::Success?
+      attr_accessor successful(): ::Coresdk::WorkflowCompletion::Success?
 
-      def successful=: [M < ::Coresdk::Workflow_completion::Success::_ToProto] (M?) -> M?
+      def successful=: [M < ::Coresdk::WorkflowCompletion::Success::_ToProto] (M?) -> M?
                      | ...
 
-      def successful!: () -> ::Coresdk::Workflow_completion::Success?
+      def successful!: () -> ::Coresdk::WorkflowCompletion::Success?
 
-      attr_accessor failed(): ::Coresdk::Workflow_completion::Failure?
+      attr_accessor failed(): ::Coresdk::WorkflowCompletion::Failure?
 
-      def failed=: [M < ::Coresdk::Workflow_completion::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Coresdk::WorkflowCompletion::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::Workflow_completion::Failure?
+      def failed!: () -> ::Coresdk::WorkflowCompletion::Failure?
 
-      def initialize: (?run_id: ::String, ?successful: ::Coresdk::Workflow_completion::Success::init?, ?failed: ::Coresdk::Workflow_completion::Failure::init?) -> void
+      def initialize: (?run_id: ::String, ?successful: ::Coresdk::WorkflowCompletion::Success::init?, ?failed: ::Coresdk::WorkflowCompletion::Failure::init?) -> void
 
       def []: (:run_id) -> ::String
-            | (:successful) -> ::Coresdk::Workflow_completion::Success?
-            | (:failed) -> ::Coresdk::Workflow_completion::Failure?
+            | (:successful) -> ::Coresdk::WorkflowCompletion::Success?
+            | (:failed) -> ::Coresdk::WorkflowCompletion::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:run_id, ::String) -> ::String
-             | (:successful, ::Coresdk::Workflow_completion::Success?) -> ::Coresdk::Workflow_completion::Success?
-             | [M < ::Coresdk::Workflow_completion::Success::_ToProto] (:successful, M?) -> M?
-             | (:failed, ::Coresdk::Workflow_completion::Failure?) -> ::Coresdk::Workflow_completion::Failure?
-             | [M < ::Coresdk::Workflow_completion::Failure::_ToProto] (:failed, M?) -> M?
+             | (:successful, ::Coresdk::WorkflowCompletion::Success?) -> ::Coresdk::WorkflowCompletion::Success?
+             | [M < ::Coresdk::WorkflowCompletion::Success::_ToProto] (:successful, M?) -> M?
+             | (:failed, ::Coresdk::WorkflowCompletion::Failure?) -> ::Coresdk::WorkflowCompletion::Failure?
+             | [M < ::Coresdk::WorkflowCompletion::Failure::_ToProto] (:failed, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

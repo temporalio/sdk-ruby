@@ -941,20 +941,20 @@ module Coresdk
     end
 
     class CompleteWorkflowActivationRequest < ::Protobuf::Message
-      attr_accessor completion(): ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+      attr_accessor completion(): ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
 
-      def completion=: [M < ::Coresdk::Workflow_completion::WorkflowActivationCompletion::_ToProto] (M?) -> M?
+      def completion=: [M < ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (M?) -> M?
                      | ...
 
-      def completion!: () -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+      def completion!: () -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
 
-      def initialize: (?completion: ::Coresdk::Workflow_completion::WorkflowActivationCompletion::init?) -> void
+      def initialize: (?completion: ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::init?) -> void
 
-      def []: (:completion) -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
+      def []: (:completion) -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
             | (::Symbol) -> untyped
 
-      def []=: (:completion, ::Coresdk::Workflow_completion::WorkflowActivationCompletion?) -> ::Coresdk::Workflow_completion::WorkflowActivationCompletion?
-             | [M < ::Coresdk::Workflow_completion::WorkflowActivationCompletion::_ToProto] (:completion, M?) -> M?
+      def []=: (:completion, ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?) -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
+             | [M < ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (:completion, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
