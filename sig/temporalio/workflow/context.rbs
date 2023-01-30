@@ -1,0 +1,15 @@
+module Temporalio
+  class Workflow
+    class Context
+      def initialize: (Temporalio::Worker::WorkflowRunner runner) -> void
+      def async: -> singleton(Temporalio::Workflow::Async)
+               | { () -> untyped } -> Temporalio::Workflow::Future
+      def sleep: (Integer duration) -> void
+      def start_timer: (Integer duration) -> Temporalio::Workflow::Future
+
+      private
+
+      attr_reader runner: Temporalio::Worker::WorkflowRunner
+    end
+  end
+end

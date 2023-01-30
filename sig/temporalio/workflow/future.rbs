@@ -1,0 +1,24 @@
+module Temporalio
+  class Workflow
+    class Future
+      def initialize: { (^() -> void resolve, ^() -> void reject) -> void } -> void
+      def then: { () -> untyped } -> void
+      def pending?: -> bool
+      # TODO: This should probably return resolved value or raise
+      def await: -> void
+
+      private
+
+      @resolved: bool
+      @rejected: bool
+
+      attr_reader blocked_fibers: Array[Fiber]
+      attr_reader callbacks: Array[^() -> untyped]
+
+      def run_callbacks: -> void
+      def resume_fibers: -> void
+      def resolve: -> void
+      def reject: -> void
+    end
+  end
+end

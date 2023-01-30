@@ -23,10 +23,8 @@ module Temporalio
         outstanding_tasks = []
 
         loop do
-          puts 'Polling for activations'
           workflow_activation = worker.poll_workflow_activation
           outstanding_tasks << reactor.async do |async_task|
-            puts 'Processing activation'
             handle_activation(workflow_activation)
           ensure
             outstanding_tasks.delete(async_task)
@@ -87,8 +85,6 @@ module Temporalio
       end
 
       def handle_activation(activation)
-        puts "Got activation: #{activation}"
-
         # TODO: Decode the whole activation on a separate thread
 
         commands = []
@@ -100,11 +96,9 @@ module Temporalio
 
         # TODO: Encode all commands on a separate thread
 
-        puts "Sending commands: #{commands}"
         worker.complete_workflow_activation_with_success(activation.run_id, commands)
 
         if activation.jobs.any?(&:remove_from_cache)
-          puts "Evicting workflow"
           running_workflows.delete(activation.run_id)
         end
       end

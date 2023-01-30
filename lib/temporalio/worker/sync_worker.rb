@@ -74,7 +74,7 @@ module Temporalio
           successful: Coresdk::WorkflowCompletion::Success.new(commands: commands),
         )
 
-        complete_workflow_activation(run_id, proto)
+        complete_workflow_activation(proto)
       end
 
       def complete_workflow_activation_with_failure(run_id, failure)
@@ -83,7 +83,7 @@ module Temporalio
           failed: Coresdk::WorkflowCompletion::Failure.new(failure: failure),
         )
 
-        complete_workflow_activation(run_id, proto)
+        complete_workflow_activation(proto)
       end
 
       private
@@ -112,7 +112,7 @@ module Temporalio
         end
       end
 
-      def complete_workflow_activation(run_id, proto)
+      def complete_workflow_activation(proto)
         encoded_proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.encode(proto)
 
         with_queue do |done|

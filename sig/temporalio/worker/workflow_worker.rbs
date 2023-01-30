@@ -1,0 +1,30 @@
+module Temporalio
+  class Worker
+    class WorkflowWorker
+      def initialize: (
+        String task_queue,
+        Temporalio::Bridge::Worker core_worker,
+        Array[singleton(Temporalio::Workflow)] workflows,
+        Temporalio::DataConverter converter
+      ) -> void
+      def run: (Async::Task reactor) -> void
+      def drain: -> void
+
+      private
+
+      attr_reader task_queue: String
+      attr_reader worker: Temporalio::Worker::SyncWorker
+      attr_reader workflows: Hash[String, singleton(Temporalio::Workflow)]
+      attr_reader converter: Temporalio::DataConverter
+      attr_reader drain_queue: Thread::Queue
+      attr_reader running_workflows: Hash[String, Temporalio::Worker::WorkflowRunner]
+
+      def prepare_workflows: (Array[singleton(Temporalio::Workflow)] workflows)
+        -> Hash[String, singleton(Temporalio::Workflow)]
+      def lookup_workflow: (String workflow_type) -> singleton(Temporalio::Workflow)
+      def get_or_create_workflow_runner: (Coresdk::WorkflowActivation::WorkflowActivation activation)
+        -> Temporalio::Worker::WorkflowRunner
+      def handle_activation: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> void
+    end
+  end
+end

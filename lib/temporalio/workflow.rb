@@ -1,5 +1,9 @@
+require 'forwardable'
+
 module Temporalio
   class Workflow
+    extend Forwardable
+
     def self.workflow_name(new_name)
       @workflow_name = new_name
     end
@@ -18,7 +22,13 @@ module Temporalio
       raise NoMethodError, 'must implement #execute'
     end
 
+    def_delegator :@context, :async
+
     private
+
+    def sleep(duration)
+      @context.sleep(duration)
+    end
 
     def workflow
       @context

@@ -1,0 +1,35 @@
+module Temporalio
+  class Worker
+    class WorkflowRunner
+      class Completion < Struct[untyped]
+        attr_accessor resolve(): ^() -> untyped
+        attr_accessor reject(): ^() -> untyped
+
+        def self.new: (^() -> untyped resolve, ^() -> untyped reject) -> Completion
+      end
+
+      def initialize: (
+        singleton(Temporalio::Workflow) workflow_class,
+        Temporalio::Worker::SyncWorker worker,
+        Temporalio::DataConverter converter
+      ) -> void
+      def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
+      def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
+      def add_completion: (Symbol type, ^() -> void resolve, ^() -> void reject) -> Integer
+
+      private
+
+      attr_reader workflow_class: singleton(Temporalio::Workflow)
+      attr_reader worker: Temporalio::Worker::SyncWorker
+      attr_reader converter: Temporalio::DataConverter
+      attr_reader commands: Array[Coresdk::WorkflowCommands::WorkflowCommand]
+      attr_reader completions: Hash[Symbol, Hash[Integer, Temporalio::Worker::WorkflowRunner::Completion]]
+      attr_reader fiber: Fiber?
+
+      def order_jobs: (Array[Coresdk::WorkflowActivation::WorkflowActivationJob] jobs) -> Array[Coresdk::WorkflowActivation::WorkflowActivationJob]
+      def apply: (Coresdk::WorkflowActivation::WorkflowActivationJob job) -> nil
+      def apply_start_workflow: (Coresdk::WorkflowActivation::StartWorkflow job) -> untyped
+      def apply_fire_timer: (Coresdk::WorkflowActivation::FireTimer job) -> untyped
+    end
+  end
+end

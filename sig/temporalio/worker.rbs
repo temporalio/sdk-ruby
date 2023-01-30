@@ -14,6 +14,7 @@ module Temporalio
       String namespace,
       String task_queue,
       ?activities: Array[singleton(Temporalio::Activity)],
+      ?workflows: Array[singleton(Temporalio::Workflow)],
       ?data_converter: Temporalio::DataConverter,
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?interceptors: Array[worker_interceptor],
