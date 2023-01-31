@@ -26,6 +26,8 @@ module Temporalio
 
     private
 
+    # TODO: implement now() method for fetching current local time
+
     def sleep(duration)
       @context.sleep(duration)
     end
