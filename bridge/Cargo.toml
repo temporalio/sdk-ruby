@@ -15,7 +15,7 @@ temporal-sdk-core = { version = "0.1.0", path = "./sdk-core/core" }
 temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api" }
 temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
 thiserror = "1.0.31"
-tokio = "1.23"
+tokio = "1.24"
 tokio-util = "0.7.4"
 tonic = "0.8"
 url = "2.2"
