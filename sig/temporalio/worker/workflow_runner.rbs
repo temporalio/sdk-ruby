@@ -2,10 +2,10 @@ module Temporalio
   class Worker
     class WorkflowRunner
       class Completion < Struct[untyped]
-        attr_accessor resolve(): ^() -> untyped
-        attr_accessor reject(): ^() -> untyped
+        attr_accessor resolve(): ^(untyped) -> untyped
+        attr_accessor reject(): ^(Exception) -> untyped
 
-        def self.new: (^() -> untyped resolve, ^() -> untyped reject) -> Completion
+        def self.new: (^(untyped) -> untyped resolve, ^(Exception) -> untyped reject) -> Completion
       end
 
       def initialize: (
@@ -15,7 +15,7 @@ module Temporalio
       ) -> void
       def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
       def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
-      def add_completion: (Symbol type, ^() -> void resolve, ^() -> void reject) -> Integer
+      def add_completion: (Symbol type, ^(untyped) -> void resolve, ^(Exception) -> void reject) -> Integer
 
       private
 

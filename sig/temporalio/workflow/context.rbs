@@ -3,9 +3,9 @@ module Temporalio
     class Context
       def initialize: (Temporalio::Worker::WorkflowRunner runner) -> void
       def async: -> singleton(Temporalio::Workflow::Async)
-               | { () -> untyped } -> Temporalio::Workflow::Future
+               | [T] { () -> T } -> Temporalio::Workflow::Future[T]
       def sleep: (Integer duration) -> void
-      def start_timer: (Integer duration) -> Temporalio::Workflow::Future
+      def start_timer: (Integer duration) -> Temporalio::Workflow::Future[nil]
 
       private
 

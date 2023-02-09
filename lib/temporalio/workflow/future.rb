@@ -1,16 +1,23 @@
 module Temporalio
   class Workflow
     class Future
+      class Rejected < StandardError; end
+
       # Revist the reason for combining futures and cancellation scopes, maybe they are separate?
       def initialize(&block)
         @resolved = false
+        @value = nil
         @rejected = false
+        @error = Rejected.new('Future rejected')
         @blocked_fibers = []
         @callbacks = []
 
         # NOTE: resolve and reject methods are accessible via procs to avoid exposing
         #       them via the public interface.
-        block.call(-> { resolve }, -> { reject })
+        block.call(
+          ->(value) { resolve(value) },
+          ->(error) { reject(error) },
+        )
       end
 
       def then(&block)
@@ -22,21 +29,32 @@ module Temporalio
       end
 
       def pending?
-        !@resolved && !@rejected
+        !resolved? && !rejected?
       end
 
-      # TODO: This should probably return resolved value or raise
-      def await
-        return unless pending?
+      def resolved?
+        @resolved
+      end
 
-        blocked_fibers << Fiber.current
-        # yield into the parent fiber
-        Fiber.yield while pending?
+      def rejected?
+        @rejected
+      end
+
+      def await
+        if pending?
+          blocked_fibers << Fiber.current
+          # yield into the parent fiber
+          Fiber.yield while pending?
+        end
+
+        raise error if rejected?
+
+        value
       end
 
       private
 
-      attr_reader :blocked_fibers, :callbacks
+      attr_reader :value, :error, :blocked_fibers, :callbacks
 
       # TODO: Run callbacks in a Fiber to allow blocking calls
       def run_callbacks
@@ -48,17 +66,19 @@ module Temporalio
         blocked_fibers.each(&:resume)
       end
 
-      def resolve
+      def resolve(value)
         return unless pending?
 
+        @value = value
         @resolved = true
         run_callbacks
         resume_fibers
       end
 
-      def reject
+      def reject(error)
         return unless pending?
 
+        @error = error
         @rejected = true
         run_callbacks
         resume_fibers

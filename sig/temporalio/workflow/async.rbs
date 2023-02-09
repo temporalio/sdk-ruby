@@ -1,9 +1,9 @@
 module Temporalio
   class Workflow
     module Async
-      def self.run: { () -> untyped } -> Temporalio::Workflow::Future
-      def self.all: (*Temporalio::Workflow::Future futures) -> Temporalio::Workflow::Future
-      def self.any: (*Temporalio::Workflow::Future futures) -> Temporalio::Workflow::Future
+      def self.run: [T] { () -> T } -> Temporalio::Workflow::Future[T]
+      def self.all: (*Temporalio::Workflow::Future[untyped] futures) -> Temporalio::Workflow::Future[nil]
+      def self.any: (*Temporalio::Workflow::Future[untyped] futures) -> Temporalio::Workflow::Future[nil]
     end
   end
 end

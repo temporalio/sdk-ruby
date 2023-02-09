@@ -116,7 +116,7 @@ module Temporalio
 
       def apply_fire_timer(job)
         # TODO: [maybe] Send ready Fibers to a queue instead of resuming in place
-        completions[:timer][job.seq].resolve.call
+        completions[:timer][job.seq].resolve.call(nil)
       end
     end
   end

@@ -6,10 +6,10 @@ module Temporalio
       def self.run(&block)
         Future.new do |resolve, reject|
           Fiber.new do
-            block.call
-            resolve.call
-          rescue StandardError
-            reject.call
+            result = block.call
+            resolve.call(result)
+          rescue StandardError => e
+            reject.call(e)
           end.resume
         end
       end
@@ -19,7 +19,7 @@ module Temporalio
           futures.each do |future|
             future.then do
               # Resolve the aggregate once all futures have been fulfilled
-              resolve.call if futures.none?(&:pending?)
+              resolve.call(nil) if futures.none?(&:pending?)
             end
           end
         end
@@ -30,7 +30,7 @@ module Temporalio
           futures.each do |future|
             # Resolve the aggregate once the first future fulfills
             # All subsequent calls to `resolve` will have no effect
-            future.then { resolve.call }
+            future.then { resolve.call(nil) }
           end
         end
       end
