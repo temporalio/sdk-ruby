@@ -98,7 +98,7 @@ module Temporalio
 
         worker.complete_workflow_activation_with_success(activation.run_id, commands)
 
-        if activation.jobs.any?(&:remove_from_cache)
+        if runner&.finished? || activation.jobs.any?(&:remove_from_cache)
           running_workflows.delete(activation.run_id)
         end
       end

@@ -69,6 +69,7 @@ module Temporalio
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
       interceptors: [],
+      max_cached_workflows: 1_000,
       max_concurrent_activities: 100,
       graceful_shutdown_timeout: nil
     )
@@ -82,6 +83,7 @@ module Temporalio
         connection.core_connection,
         namespace,
         task_queue,
+        max_cached_workflows,
       )
       @activity_worker =
         unless activities.empty?

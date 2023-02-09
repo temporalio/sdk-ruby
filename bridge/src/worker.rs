@@ -51,11 +51,12 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str) -> Result<Worker, WorkerError> {
+    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str, max_cached_workflows: u32) -> Result<Worker, WorkerError> {
         let config = WorkerConfigBuilder::default()
             .namespace(namespace)
             .task_queue(task_queue)
             .worker_build_id("test-worker-build") // TODO: replace this with an actual build id
+            .max_cached_workflows(usize::try_from(max_cached_workflows).unwrap())
             .build()?;
 
         let core_worker = runtime.tokio_runtime.block_on(async move {

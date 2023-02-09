@@ -23,6 +23,7 @@ module Temporalio
         # TODO: Encapsulate logic for adding new completions
         @completions = Hash.new({})
         @fiber = nil # the root Fiber for executing a workflow
+        @finished = false
       end
 
       # TODO: Move this to a thread dedicated to workflows to avoid blocking the main reactor
@@ -47,6 +48,10 @@ module Temporalio
         next_seq = (completions[type].keys.max || 0) + 1
         completions[type][next_seq] = Completion.new(resolve, reject)
         next_seq
+      end
+
+      def finished?
+        @finished
       end
 
       # def schedule_fiber(fiber, value)
@@ -109,6 +114,8 @@ module Temporalio
               ),
             ),
           )
+        ensure
+          @finished = true
         end
 
         @fiber&.resume

@@ -16,8 +16,11 @@ module Temporalio
       def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
       def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
       def add_completion: (Symbol type, ^(untyped) -> void resolve, ^(Exception) -> void reject) -> Integer
+      def finished?: -> bool
 
       private
+
+      @finished: bool
 
       attr_reader workflow_class: singleton(Temporalio::Workflow)
       attr_reader worker: Temporalio::Worker::SyncWorker
