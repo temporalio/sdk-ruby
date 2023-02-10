@@ -12,6 +12,8 @@ module Temporalio
       # Interceptor for {Temporalio::Activity#execute}.
       #
       # @param input [ExecuteActivityInput]
+      #
+      # @return [any] Activity execution result
       def execute_activity(input)
         yield(input)
       end

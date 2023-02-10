@@ -104,6 +104,7 @@ module Temporalio
             @core_worker,
             workflows,
             data_converter,
+            interceptors,
           )
         end
 

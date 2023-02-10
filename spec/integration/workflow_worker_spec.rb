@@ -1,4 +1,5 @@
 require 'support/helpers/test_rpc'
+require 'support/helpers/test_capture_interceptor'
 require 'temporalio/workflow'
 require 'temporalio/bridge'
 require 'temporalio/client'
@@ -78,6 +79,7 @@ describe Temporalio::Worker::WorkflowWorker do
         TestCancellationsWorkflow,
         TestCombinedCancellationsWorkflow,
       ],
+      interceptors: [interceptor],
     )
   end
 
@@ -87,6 +89,7 @@ describe Temporalio::Worker::WorkflowWorker do
   let(:connection) { @env.connection }
   let(:client) { @env.client }
   let(:id) { SecureRandom.uuid }
+  let(:interceptor) { Helpers::TestCaptureInterceptor.new }
 
   before(:all) do
     @env = Temporalio::Testing.start_time_skipping_environment(download_dir: './tmp/')
@@ -101,12 +104,14 @@ describe Temporalio::Worker::WorkflowWorker do
       handle = client.start_workflow(TestBasicWorkflow, 'test', id: id, task_queue: task_queue)
 
       expect(subject.run { handle.result }).to eq('Hello, test!')
+      expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
 
     it 'runs a workflow with multiple params and returns a result' do
       handle = client.start_workflow(TestMultiParamWorkflow, 'one', 2, :three, id: id, task_queue: task_queue)
 
       expect(subject.run { handle.result }).to eq('one-2-three')
+      expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
 
     it 'runs a workflow with a timer' do
@@ -117,6 +122,7 @@ describe Temporalio::Worker::WorkflowWorker do
 
       expect(handle_1.result).to eq('first timer wins')
       expect(handle_2.result).to eq('second timer wins')
+      expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
     it 'runs a workflow that cancels timers' do
@@ -127,6 +133,7 @@ describe Temporalio::Worker::WorkflowWorker do
 
       expect(handle_1.result).to eq('second timer cancelled')
       expect(handle_2.result).to eq('first timer cancelled')
+      expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
     it 'runs a workflow that cancels a combined future' do
@@ -135,6 +142,7 @@ describe Temporalio::Worker::WorkflowWorker do
       subject.run { handle.result }
 
       expect(handle.result).to eq(true)
+      expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
   end
 end

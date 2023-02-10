@@ -11,7 +11,9 @@ module Temporalio
       def initialize: (
         singleton(Temporalio::Workflow) workflow_class,
         Temporalio::Worker::SyncWorker worker,
-        Temporalio::DataConverter converter
+        Temporalio::DataConverter converter,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound] inbound_interceptors,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound] outbound_interceptors
       ) -> void
       def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
       def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
@@ -26,6 +28,8 @@ module Temporalio
       attr_reader workflow_class: singleton(Temporalio::Workflow)
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader converter: Temporalio::DataConverter
+      attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound]
+      attr_reader outbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound]
       attr_reader commands: Array[Coresdk::WorkflowCommands::WorkflowCommand]
       attr_reader sequences: Hash[Symbol, Integer]
       attr_reader completions: Hash[Symbol, Hash[Integer, Temporalio::Worker::WorkflowRunner::Completion]]

@@ -1,9 +1,6 @@
-# require 'google/protobuf/well_known_types'
+require 'temporal/sdk/core/workflow_commands/workflow_commands_pb'
+require 'temporalio/interceptor/workflow_inbound'
 require 'temporalio/workflow/context'
-# require 'temporalio/workflow/info'
-# require 'temporalio/error/failure'
-# require 'temporalio/errors'
-# require 'temporalio/interceptor/workflow_inbound'
 
 module Temporalio
   class Worker
@@ -14,11 +11,15 @@ module Temporalio
       def initialize(
         workflow_class,
         worker,
-        converter
+        converter,
+        inbound_interceptors,
+        outbound_interceptors
       )
         @workflow_class = workflow_class
         @worker = worker
         @converter = converter
+        @inbound_interceptors = inbound_interceptors
+        @outbound_interceptors = outbound_interceptors
         @commands = []
         @sequences = Hash.new(0)
         # TODO: Encapsulate logic for adding new completions
@@ -59,13 +60,10 @@ module Temporalio
         @finished
       end
 
-      # def schedule_fiber(fiber, value)
-
-      # end
-
       private
 
-      attr_reader :workflow_class, :worker, :converter, :commands, :completions, :sequences, :fiber
+      attr_reader :workflow_class, :worker, :converter, :inbound_interceptors,
+                  :outbound_interceptors, :commands, :completions, :sequences, :fiber
 
       def order_jobs(jobs)
         # Process patches first, then signals, then non-queries and finally queries
@@ -100,9 +98,17 @@ module Temporalio
         context = Temporalio::Workflow::Context.new(self)
         workflow = workflow_class.new(context)
         args = converter.from_payload_array(job.arguments.to_a)
+        headers = converter.from_payload_map(job.headers)
+        input = Temporalio::Interceptor::WorkflowInbound::ExecuteWorkflowInput.new(
+          workflow: workflow_class,
+          args: args,
+          headers: headers || {},
+        )
 
         @fiber = Fiber.new do
-          result = workflow.execute(*args)
+          result = inbound_interceptors.invoke(:execute_workflow, input) do |i|
+            workflow.execute(*i.args)
+          end
 
           push_command(
             Coresdk::WorkflowCommands::WorkflowCommand.new(

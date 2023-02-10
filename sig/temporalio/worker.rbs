@@ -2,7 +2,9 @@ module Temporalio
   class Worker
     type worker_interceptor =
       Temporalio::Interceptor::ActivityInbound |
-      Temporalio::Interceptor::ActivityOutbound
+      Temporalio::Interceptor::ActivityOutbound |
+      Temporalio::Interceptor::WorkflowInbound |
+      Temporalio::Interceptor::WorkflowOutbound
 
     def self.run: (
       *Temporalio::Worker workers,

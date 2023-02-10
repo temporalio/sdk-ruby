@@ -4,7 +4,9 @@ module Temporalio
       type interceptor_methods =
         Temporalio::Interceptor::Client::methods |
         Temporalio::Interceptor::ActivityInbound::methods |
-        Temporalio::Interceptor::ActivityOutbound::methods
+        Temporalio::Interceptor::ActivityOutbound::methods |
+        Temporalio::Interceptor::WorkflowInbound::methods
+        # Temporalio::Interceptor::WorkflowOutbound::methods
 
       # NOTE: RBS is not smart enough to figure out which methods are callable per each interceptor
       #       class, so we're just allowing any of them to be called on any interceptor.

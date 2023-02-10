@@ -5,7 +5,8 @@ module Temporalio
         String task_queue,
         Temporalio::Bridge::Worker core_worker,
         Array[singleton(Temporalio::Workflow)] workflows,
-        Temporalio::DataConverter converter
+        Temporalio::DataConverter converter,
+        Array[Temporalio::Worker::worker_interceptor] interceptors
       ) -> void
       def run: (Async::Task reactor) -> void
       def drain: -> void
@@ -16,6 +17,8 @@ module Temporalio
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader workflows: Hash[String, singleton(Temporalio::Workflow)]
       attr_reader converter: Temporalio::DataConverter
+      attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound]
+      attr_reader outbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound]
       attr_reader drain_queue: Thread::Queue
       attr_reader running_workflows: Hash[String, Temporalio::Worker::WorkflowRunner]
 
@@ -25,6 +28,10 @@ module Temporalio
       def get_or_create_workflow_runner: (Coresdk::WorkflowActivation::WorkflowActivation activation)
         -> Temporalio::Worker::WorkflowRunner
       def handle_activation: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> void
+      def filter_inbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
+        -> Array[Temporalio::Interceptor::WorkflowInbound]
+      def filter_outbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
+        -> Array[Temporalio::Interceptor::WorkflowOutbound]
     end
   end
 end

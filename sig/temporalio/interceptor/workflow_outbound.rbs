@@ -1,0 +1,6 @@
+module Temporalio
+  module Interceptor
+    module WorkflowOutbound
+    end
+  end
+end
