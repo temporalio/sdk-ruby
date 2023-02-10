@@ -4,8 +4,9 @@ module Temporalio
   class Workflow
     module Async
       def self.run(&block)
-        Future.new do |resolve, reject|
+        Future.new do |future, resolve, reject|
           Fiber.new do
+            Future.current = future
             result = block.call
             resolve.call(result)
           rescue StandardError => e
@@ -14,8 +15,9 @@ module Temporalio
         end
       end
 
+      # TODO: Figure out cancellation for combined futures
       def self.all(*futures)
-        Future.new do |resolve, _reject|
+        Future.new do |_future, resolve, _reject|
           futures.each do |future|
             future.then do
               # Resolve the aggregate once all futures have been fulfilled
@@ -26,7 +28,7 @@ module Temporalio
       end
 
       def self.any(*futures)
-        Future.new do |resolve, _reject|
+        Future.new do |_future, resolve, _reject|
           futures.each do |future|
             # Resolve the aggregate once the first future fulfills
             # All subsequent calls to `resolve` will have no effect

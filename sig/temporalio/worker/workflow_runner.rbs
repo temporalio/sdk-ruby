@@ -16,6 +16,7 @@ module Temporalio
       def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
       def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
       def add_completion: (Symbol type, ^(untyped) -> void resolve, ^(Exception) -> void reject) -> Integer
+      def remove_completion: (Symbol type, Integer seq) -> bool
       def finished?: -> bool
 
       private
@@ -26,6 +27,7 @@ module Temporalio
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader converter: Temporalio::DataConverter
       attr_reader commands: Array[Coresdk::WorkflowCommands::WorkflowCommand]
+      attr_reader sequences: Hash[Symbol, Integer]
       attr_reader completions: Hash[Symbol, Hash[Integer, Temporalio::Worker::WorkflowRunner::Completion]]
       attr_reader fiber: Fiber?
 

@@ -34,6 +34,21 @@ class TestAsyncWorkflow < Temporalio::Workflow
   end
 end
 
+class TestCancellationsWorkflow < Temporalio::Workflow
+  # TODO: add current time to check that up to [duration_1, duration_2].max has passed
+  def execute(duration_1, duration_2)
+    timer_1 = workflow.start_timer(duration_1)
+    timer_2 = async { workflow.sleep(duration_2) }
+
+    timer_1.then { timer_2.cancel }
+    timer_2.then { timer_1.cancel }
+
+    async.all(timer_1, timer_2).await
+
+    timer_1.rejected? ? 'first timer cancelled' : 'second timer cancelled'
+  end
+end
+
 describe Temporalio::Worker::WorkflowWorker do
   subject do
     Temporalio::Worker.new(
@@ -44,6 +59,7 @@ describe Temporalio::Worker::WorkflowWorker do
         TestBasicWorkflow,
         TestMultiParamWorkflow,
         TestAsyncWorkflow,
+        TestCancellationsWorkflow,
       ],
     )
   end
@@ -84,6 +100,16 @@ describe Temporalio::Worker::WorkflowWorker do
 
       expect(handle_1.result).to eq('first timer wins')
       expect(handle_2.result).to eq('second timer wins')
+    end
+
+    it 'runs a workflow that cancels timers' do
+      handle_1 = client.start_workflow(TestCancellationsWorkflow, 1, 2, id: SecureRandom.uuid, task_queue: task_queue)
+      handle_2 = client.start_workflow(TestCancellationsWorkflow, 2, 1, id: SecureRandom.uuid, task_queue: task_queue)
+
+      subject.run { handle_1.result && handle_2.result }
+
+      expect(handle_1.result).to eq('second timer cancelled')
+      expect(handle_2.result).to eq('first timer cancelled')
     end
   end
 end

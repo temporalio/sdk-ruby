@@ -20,6 +20,7 @@ module Temporalio
         @worker = worker
         @converter = converter
         @commands = []
+        @sequences = Hash.new(0)
         # TODO: Encapsulate logic for adding new completions
         @completions = Hash.new({})
         @fiber = nil # the root Fiber for executing a workflow
@@ -45,9 +46,13 @@ module Temporalio
       end
 
       def add_completion(type, resolve, reject)
-        next_seq = (completions[type].keys.max || 0) + 1
+        next_seq = sequences[type] += 1
         completions[type][next_seq] = Completion.new(resolve, reject)
         next_seq
+      end
+
+      def remove_completion(type, seq)
+        !!completions[type].delete(seq)
       end
 
       def finished?
@@ -60,7 +65,7 @@ module Temporalio
 
       private
 
-      attr_reader :workflow_class, :worker, :converter, :commands, :completions, :fiber
+      attr_reader :workflow_class, :worker, :converter, :commands, :completions, :sequences, :fiber
 
       def order_jobs(jobs)
         # Process patches first, then signals, then non-queries and finally queries
@@ -123,7 +128,10 @@ module Temporalio
 
       def apply_fire_timer(job)
         # TODO: [maybe] Send ready Fibers to a queue instead of resuming in place
-        completions[:timer][job.seq].resolve.call(nil)
+        completion = completions[:timer][job.seq]
+        return unless completion
+
+        completion.resolve.call(nil)
       end
     end
   end

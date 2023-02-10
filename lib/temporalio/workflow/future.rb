@@ -3,18 +3,32 @@ module Temporalio
     class Future
       class Rejected < StandardError; end
 
+      def self.current
+        Thread.current[:future]
+      end
+
+      def self.current=(future)
+        Thread.current[:future] = future
+      end
+
       # Revist the reason for combining futures and cancellation scopes, maybe they are separate?
       def initialize(&block)
         @resolved = false
         @value = nil
         @rejected = false
         @error = Rejected.new('Future rejected')
+        @cancel_requested = false
         @blocked_fibers = []
         @callbacks = []
+        @cancel_callbacks = []
+
+        # Chain cancellation into parent future if one exists
+        Future.current&.on_cancel { cancel }
 
         # NOTE: resolve and reject methods are accessible via procs to avoid exposing
         #       them via the public interface.
         block.call(
+          self,
           ->(value) { resolve(value) },
           ->(error) { reject(error) },
         )
@@ -23,6 +37,14 @@ module Temporalio
       def then(&block)
         if pending?
           callbacks << block
+        else
+          block.call
+        end
+      end
+
+      def on_cancel(&block)
+        if pending? && !cancel_requested?
+          cancel_callbacks << block
         else
           block.call
         end
@@ -52,9 +74,20 @@ module Temporalio
         value
       end
 
+      def cancel
+        return unless pending?
+
+        @cancel_requested = true
+        cancel_callbacks.each(&:call)
+      end
+
       private
 
-      attr_reader :value, :error, :blocked_fibers, :callbacks
+      attr_reader :value, :error, :blocked_fibers, :callbacks, :cancel_callbacks
+
+      def cancel_requested?
+        @cancel_requested
+      end
 
       # TODO: Run callbacks in a Fiber to allow blocking calls
       def run_callbacks

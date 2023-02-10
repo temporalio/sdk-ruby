@@ -22,8 +22,21 @@ module Temporalio
       end
 
       def start_timer(duration)
-        Future.new do |resolve, reject|
+        Future.new do |future, resolve, reject|
           seq = runner.add_completion(:timer, resolve, reject)
+
+          future.on_cancel do
+            if runner.remove_completion(:timer, seq)
+              runner.push_command(
+                Coresdk::WorkflowCommands::WorkflowCommand.new(
+                  cancel_timer: Coresdk::WorkflowCommands::CancelTimer.new(
+                    seq: seq,
+                  ),
+                ),
+              )
+              reject.call(Future::Rejected.new('Timer canceled'))
+            end
+          end
 
           # TODO: Do we need our own struct interface for commands?
           runner.push_command(

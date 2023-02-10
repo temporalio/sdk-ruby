@@ -4,23 +4,31 @@ module Temporalio
       class Rejected < StandardError
       end
 
-      def initialize: { (^(T) -> void resolve, ^(Exception) -> void reject) -> void } -> void
+      def self.current: -> Future[untyped]?
+      def self.current=: (Future[untyped]) -> void
+
+      def initialize: { (Future[T] future, ^(T) -> void resolve, ^(Exception) -> void reject) -> void } -> void
       def then: { () -> untyped } -> void
+      def on_cancel: { () -> untyped } -> void
       def pending?: -> bool
       def resolved?: -> bool
       def rejected?: -> bool
       def await: -> T?
+      def cancel: -> void
 
       private
 
       @resolved: bool
       @rejected: bool
+      @cancel_requested: bool
 
       attr_reader value: T?
       attr_reader error: Exception
       attr_reader blocked_fibers: Array[Fiber]
       attr_reader callbacks: Array[^() -> untyped]
+      attr_reader cancel_callbacks: Array[^() -> untyped]
 
+      def cancel_requested?: -> bool
       def run_callbacks: -> void
       def resume_fibers: -> void
       def resolve: (T value) -> void
