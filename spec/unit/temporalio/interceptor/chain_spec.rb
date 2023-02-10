@@ -23,7 +23,7 @@ describe Temporalio::Interceptor::Chain do
     end
 
     it 'works for methods that take no arguments' do
-      result = subject.invoke(:info) do
+      result = subject.invoke(:activity_info) do
         Temporalio::Activity::Info.new(heartbeat_details: ['main'])
       end
 
@@ -44,7 +44,7 @@ describe Temporalio::Interceptor::Chain do
       end
 
       it 'works for methods that take no arguments' do
-        result = subject.invoke(:info) do
+        result = subject.invoke(:activity_info) do
           Temporalio::Activity::Info.new(heartbeat_details: ['main'])
         end
 

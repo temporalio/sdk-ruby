@@ -18,7 +18,7 @@ module Helpers
       result
     end
 
-    def info
+    def activity_info
       info = yield
       info.heartbeat_details << @name
       info

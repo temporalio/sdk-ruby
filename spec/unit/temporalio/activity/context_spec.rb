@@ -22,12 +22,12 @@ describe Temporalio::Activity::Context do
 
     context 'with interceptor' do
       let(:interceptors) { [interceptor] }
-      before { allow(interceptor).to receive(:info).and_call_original }
+      before { allow(interceptor).to receive(:activity_info).and_call_original }
 
       it 'calls interceptor' do
         subject.info
 
-        expect(interceptor).to have_received(:info)
+        expect(interceptor).to have_received(:activity_info)
       end
     end
   end

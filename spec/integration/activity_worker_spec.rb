@@ -227,7 +227,9 @@ describe Temporalio::Worker::ActivityWorker do
 
       expect(subject.run { handle.result }).to eq('foo bar')
       # TestHeartbeatActivity calls info to access heartbeat_details and gets retried once
-      expect(interceptor.called_methods).to eq(%i[execute_activity info heartbeat execute_activity info info])
+      expect(interceptor.called_methods).to eq(
+        %i[execute_activity activity_info heartbeat execute_activity activity_info activity_info]
+      )
     end
   end
 

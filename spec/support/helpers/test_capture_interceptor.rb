@@ -60,8 +60,8 @@ module Helpers
 
     # Temporalio::Interceptor::ActivityOutbound
 
-    def info
-      @called_methods << :info
+    def activity_info
+      @called_methods << :activity_info
       super
     end
 

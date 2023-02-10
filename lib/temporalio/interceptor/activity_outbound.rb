@@ -5,7 +5,7 @@ module Temporalio
       # Interceptor for {Temporalio::Activity::Context#info}.
       #
       # @return [Temporalio::Activity::Info]
-      def info
+      def activity_info
         yield
       end
 
