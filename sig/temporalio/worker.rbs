@@ -6,6 +6,12 @@ module Temporalio
       Temporalio::Interceptor::WorkflowInbound |
       Temporalio::Interceptor::WorkflowOutbound
 
+    type interceptor_classes =
+      singleton(Temporalio::Interceptor::ActivityInbound) |
+      singleton(Temporalio::Interceptor::ActivityOutbound) |
+      singleton(Temporalio::Interceptor::WorkflowInbound) |
+      singleton(Temporalio::Interceptor::WorkflowOutbound)
+
     def self.run: (
       *Temporalio::Worker workers,
       ?shutdown_signals: Array[String]

@@ -28,10 +28,6 @@ module Temporalio
       def get_or_create_workflow_runner: (Coresdk::WorkflowActivation::WorkflowActivation activation)
         -> Temporalio::Worker::WorkflowRunner
       def handle_activation: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> void
-      def filter_inbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
-        -> Array[Temporalio::Interceptor::WorkflowInbound]
-      def filter_outbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
-        -> Array[Temporalio::Interceptor::WorkflowOutbound]
     end
   end
 end

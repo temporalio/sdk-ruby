@@ -1,9 +1,8 @@
 require 'temporal/sdk/core/workflow_commands/workflow_commands_pb'
 require 'temporalio/error/failure'
 require 'temporalio/errors'
+require 'temporalio/interceptor'
 require 'temporalio/interceptor/chain'
-require 'temporalio/interceptor/workflow_inbound'
-require 'temporalio/interceptor/workflow_outbound'
 require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/workflow_runner'
 
@@ -17,8 +16,12 @@ module Temporalio
         @worker = SyncWorker.new(core_worker)
         @workflows = prepare_workflows(workflows)
         @converter = converter
-        @inbound_interceptors = Temporalio::Interceptor::Chain.new(filter_inbound(interceptors))
-        @outbound_interceptors = Temporalio::Interceptor::Chain.new(filter_outbound(interceptors))
+        @inbound_interceptors = Temporalio::Interceptor::Chain.new(
+          Temporalio::Interceptor.filter(interceptors, :workflow_inbound),
+        )
+        @outbound_interceptors = Temporalio::Interceptor::Chain.new(
+          Temporalio::Interceptor.filter(interceptors, :workflow_outbound),
+        )
         @drain_queue = Queue.new
         @running_workflows = {}
       end
@@ -63,20 +66,6 @@ module Temporalio
 
           result[workflow._name] = workflow
           result
-        end
-      end
-
-      # NOTE: Using #each_with_object here and below instead of a simple #select because RBS can't
-      #       reconcile that resulting array only has WorkflowInbound or WorkflowOutbound in it.
-      def filter_inbound(interceptors)
-        interceptors.each_with_object([]) do |i, result|
-          result << i if i.is_a?(Temporalio::Interceptor::WorkflowInbound)
-        end
-      end
-
-      def filter_outbound(interceptors)
-        interceptors.each_with_object([]) do |i, result|
-          result << i if i.is_a?(Temporalio::Interceptor::WorkflowOutbound)
         end
       end
 
