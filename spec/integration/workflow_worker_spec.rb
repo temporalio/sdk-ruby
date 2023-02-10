@@ -49,6 +49,22 @@ class TestCancellationsWorkflow < Temporalio::Workflow
   end
 end
 
+class TestCombinedCancellationsWorkflow < Temporalio::Workflow
+  # TODO: add current time to check that duration_1 has passed
+  def execute(duration_1, duration_2)
+    timer_1 = workflow.start_timer(duration_2)
+    timer_2 = async { workflow.sleep(duration_2) }
+
+    workflow.sleep(duration_1)
+
+    combined_future = async.all(timer_1, timer_2)
+    combined_future.cancel
+    combined_future.await
+
+    timer_1.rejected? && timer_2.rejected?
+  end
+end
+
 describe Temporalio::Worker::WorkflowWorker do
   subject do
     Temporalio::Worker.new(
@@ -60,6 +76,7 @@ describe Temporalio::Worker::WorkflowWorker do
         TestMultiParamWorkflow,
         TestAsyncWorkflow,
         TestCancellationsWorkflow,
+        TestCombinedCancellationsWorkflow,
       ],
     )
   end
@@ -110,6 +127,14 @@ describe Temporalio::Worker::WorkflowWorker do
 
       expect(handle_1.result).to eq('second timer cancelled')
       expect(handle_2.result).to eq('first timer cancelled')
+    end
+
+    it 'runs a workflow that cancels a combined future' do
+      handle = client.start_workflow(TestCombinedCancellationsWorkflow, 1, 2, id: id, task_queue: task_queue)
+
+      subject.run { handle.result }
+
+      expect(handle.result).to eq(true)
     end
   end
 end

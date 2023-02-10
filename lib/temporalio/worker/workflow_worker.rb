@@ -64,7 +64,7 @@ module Temporalio
         workflows.fetch(workflow_type) do
           workflow_names = workflows.keys.sort.join(', ')
           raise Temporalio::Error::ApplicationError.new(
-            "Activity #{workflow_type} is not registered on this worker, available workflows: #{workflow_names}",
+            "Workflow #{workflow_type} is not registered on this worker, available workflows: #{workflow_names}",
             type: 'NotFoundError',
           )
         end

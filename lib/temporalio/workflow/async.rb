@@ -15,11 +15,13 @@ module Temporalio
         end
       end
 
-      # TODO: Figure out cancellation for combined futures
+      # TODO: Do we need to reject this if any future is rejected?
       def self.all(*futures)
-        Future.new do |_future, resolve, _reject|
-          futures.each do |future|
-            future.then do
+        Future.new do |future, resolve, _reject|
+          future.on_cancel { futures.each(&:cancel) }
+
+          futures.each do |f|
+            f.then do
               # Resolve the aggregate once all futures have been fulfilled
               resolve.call(nil) if futures.none?(&:pending?)
             end
@@ -27,12 +29,15 @@ module Temporalio
         end
       end
 
+      # TODO: Do we need to reject this if any future is rejected?
       def self.any(*futures)
-        Future.new do |_future, resolve, _reject|
-          futures.each do |future|
+        Future.new do |future, resolve, _reject|
+          future.on_cancel { futures.each(&:cancel) }
+
+          futures.each do |f|
             # Resolve the aggregate once the first future fulfills
             # All subsequent calls to `resolve` will have no effect
-            future.then { resolve.call(nil) }
+            f.then { resolve.call(nil) }
           end
         end
       end
