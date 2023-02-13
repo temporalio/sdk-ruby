@@ -8,7 +8,7 @@ module Temporalio
       def self.current=: (Future[untyped]) -> void
 
       def initialize: { (Future[T] future, ^(T) -> void resolve, ^(Exception) -> void reject) -> void } -> void
-      def then: { () -> untyped } -> void
+      def then: [X] { (Future[T]) -> X } -> Future[X]
       def on_cancel: { () -> untyped } -> void
       def pending?: -> bool
       def resolved?: -> bool
@@ -25,8 +25,8 @@ module Temporalio
       attr_reader value: T?
       attr_reader error: Exception
       attr_reader blocked_fibers: Array[Fiber]
-      attr_reader callbacks: Array[^() -> untyped]
-      attr_reader cancel_callbacks: Array[^() -> untyped]
+      attr_reader callbacks: Array[^() -> void]
+      attr_reader cancel_callbacks: Array[^() -> void]
 
       def cancel_requested?: -> bool
       def run_callbacks: -> void

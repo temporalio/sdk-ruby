@@ -35,10 +35,24 @@ module Temporalio
       end
 
       def then(&block)
-        if pending?
-          callbacks << block
-        else
-          block.call
+        Future.new do |future, resolve, reject|
+          # @type var wrapped_block: ^() -> void
+          wrapped_block = -> do # rubocop:disable Style/Lambda
+            Fiber.new do
+              Future.current = future
+              # The block is provided the Future on which #then was called
+              result = block.call(self)
+              resolve.call(result)
+            rescue StandardError => e
+              reject.call(e)
+            end.resume
+          end
+
+          if pending?
+            callbacks << wrapped_block
+          else
+            wrapped_block.call
+          end
         end
       end
 
