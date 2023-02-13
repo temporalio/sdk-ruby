@@ -19,8 +19,9 @@ class TestMultiParamWorkflow < Temporalio::Workflow
 end
 
 class TestAsyncWorkflow < Temporalio::Workflow
-  # TODO: add current time to check that up to [duration_1, duration_2].max has passed
   def execute(duration_1, duration_2)
+    start_time = workflow.time
+
     timer_1 = workflow.start_timer(duration_1)
     timer_2 = async { workflow.sleep(duration_2) }
 
@@ -31,13 +32,14 @@ class TestAsyncWorkflow < Temporalio::Workflow
     # Make sure all timers finish
     async.all(timer_1, timer_2).await
 
-    result
+    [result, workflow.time - start_time]
   end
 end
 
 class TestCancellationsWorkflow < Temporalio::Workflow
-  # TODO: add current time to check that up to [duration_1, duration_2].max has passed
   def execute(duration_1, duration_2)
+    start_time = workflow.time
+
     timer_1 = workflow.start_timer(duration_1)
     timer_2 = async { workflow.sleep(duration_2) }
 
@@ -46,13 +48,16 @@ class TestCancellationsWorkflow < Temporalio::Workflow
 
     async.all(timer_1, timer_2).await
 
-    timer_1.rejected? ? 'first timer cancelled' : 'second timer cancelled'
+    result = timer_1.rejected? ? 'first timer cancelled' : 'second timer cancelled'
+
+    [result, workflow.time - start_time]
   end
 end
 
 class TestCombinedCancellationsWorkflow < Temporalio::Workflow
-  # TODO: add current time to check that duration_1 has passed
   def execute(duration_1, duration_2)
+    start_time = workflow.time
+
     timer_1 = workflow.start_timer(duration_2)
     timer_2 = async { workflow.sleep(duration_2) }
 
@@ -62,7 +67,7 @@ class TestCombinedCancellationsWorkflow < Temporalio::Workflow
     combined_future.cancel
     combined_future.await
 
-    timer_1.rejected? && timer_2.rejected?
+    [timer_1.rejected? && timer_2.rejected?, workflow.time - start_time]
   end
 end
 
@@ -120,8 +125,10 @@ describe Temporalio::Worker::WorkflowWorker do
 
       subject.run { handle_1.result && handle_2.result }
 
-      expect(handle_1.result).to eq('first timer wins')
-      expect(handle_2.result).to eq('second timer wins')
+      expect(handle_1.result.first).to eq('first timer wins')
+      expect(handle_1.result.last).to be_within(0.01).of(2) # Make sure we didn't wait serially
+      expect(handle_2.result.first).to eq('second timer wins')
+      expect(handle_2.result.last).to be_within(0.01).of(2) # Make sure we didn't wait serially
       expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
@@ -131,8 +138,10 @@ describe Temporalio::Worker::WorkflowWorker do
 
       subject.run { handle_1.result && handle_2.result }
 
-      expect(handle_1.result).to eq('second timer cancelled')
-      expect(handle_2.result).to eq('first timer cancelled')
+      expect(handle_1.result.first).to eq('second timer cancelled')
+      expect(handle_1.result.last).to be_within(0.01).of(1) # Make sure we didn't wait for the longer timer
+      expect(handle_2.result.first).to eq('first timer cancelled')
+      expect(handle_2.result.last).to be_within(0.01).of(1) # Make sure we didn't wait for the longer timer
       expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
@@ -141,7 +150,8 @@ describe Temporalio::Worker::WorkflowWorker do
 
       subject.run { handle.result }
 
-      expect(handle.result).to eq(true)
+      expect(handle.result.first).to eq(true)
+      expect(handle.result.last).to be_within(0.01).of(1) # Make sure we only waited for the first timer
       expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
   end

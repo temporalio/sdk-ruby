@@ -8,6 +8,8 @@ module Temporalio
         def self.new: (^(untyped) -> untyped resolve, ^(Exception) -> untyped reject) -> Completion
       end
 
+      attr_reader time: Time?
+
       def initialize: (
         String namespace,
         String task_queue,
@@ -23,9 +25,11 @@ module Temporalio
       def add_completion: (Symbol type, ^(untyped) -> void resolve, ^(Exception) -> void reject) -> Integer
       def remove_completion: (Symbol type, Integer seq) -> bool
       def finished?: -> bool
+      def replay?: -> bool
 
       private
 
+      @replay: bool
       @finished: bool
 
       attr_reader namespace: String

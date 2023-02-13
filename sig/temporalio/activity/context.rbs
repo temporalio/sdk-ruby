@@ -7,6 +7,7 @@ module Temporalio
         Temporalio::Interceptor::Chain[Temporalio::Interceptor::ActivityOutbound],
         ?shielded: bool
       ) -> void
+      def time: -> Time
       def info: -> Temporalio::Activity::Info
       def heartbeat: (*untyped details) -> void
       def shield: { -> untyped } -> untyped

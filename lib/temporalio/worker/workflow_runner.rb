@@ -9,6 +9,8 @@ module Temporalio
     class WorkflowRunner
       class Completion < Struct.new(:resolve, :reject); end # rubocop:disable Lint/StructNewOverride
 
+      attr_reader :time
+
       def initialize(
         namespace,
         task_queue,
@@ -33,12 +35,17 @@ module Temporalio
         @completions = Hash.new({})
         @fiber = nil # the root Fiber for executing a workflow
         @finished = false
+        @time = nil
+        @replay = false
       end
 
       # TODO: Move this to a thread dedicated to workflows to avoid blocking the main reactor
       def process(activation)
         # Each activation produces its own list of commands, clear previous ones
         commands.clear
+
+        @time = activation.timestamp&.to_time
+        @replay = activation.is_replaying
 
         order_jobs(activation.jobs).each do |job|
           apply(job)
@@ -65,6 +72,10 @@ module Temporalio
 
       def finished?
         @finished
+      end
+
+      def replay?
+        @replay
       end
 
       private

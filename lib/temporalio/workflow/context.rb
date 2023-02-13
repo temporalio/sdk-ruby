@@ -18,6 +18,11 @@ module Temporalio
         end
       end
 
+      def time
+        runner.time
+      end
+      alias now time
+
       def info
         interceptors.invoke(:workflow_info) { @info }
       end
