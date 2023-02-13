@@ -3,7 +3,6 @@ require 'temporalio/errors'
 require 'temporalio/interceptor'
 require 'temporalio/interceptor/chain'
 require 'temporalio/worker/activity_runner'
-require 'temporalio/worker/sync_worker'
 
 module Temporalio
   class Worker
@@ -11,7 +10,7 @@ module Temporalio
     class ActivityWorker
       def initialize(
         task_queue,
-        core_worker,
+        worker,
         activities,
         converter,
         interceptors,
@@ -19,7 +18,7 @@ module Temporalio
         graceful_timeout
       )
         @task_queue = task_queue
-        @worker = SyncWorker.new(core_worker)
+        @worker = worker
         @activities = prepare_activities(activities)
         @converter = converter
         @inbound_interceptors = Temporalio::Interceptor::Chain.new(

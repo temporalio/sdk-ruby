@@ -5,7 +5,7 @@ module Temporalio
 
       def initialize: (
         String task_queue,
-        Temporalio::Bridge::Worker core_worker,
+        Temporalio::Worker::SyncWorker worker,
         Array[singleton(Temporalio::Activity)] activities,
         Temporalio::DataConverter converter,
         Array[Temporalio::Worker::worker_interceptor] interceptors,

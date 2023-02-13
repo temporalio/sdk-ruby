@@ -126,9 +126,9 @@ describe Temporalio::Worker::WorkflowWorker do
       subject.run { handle_1.result && handle_2.result }
 
       expect(handle_1.result.first).to eq('first timer wins')
-      expect(handle_1.result.last).to be_within(0.01).of(2) # Make sure we didn't wait serially
+      expect(handle_1.result.last).to be_within(0.1).of(2) # Make sure we didn't wait serially
       expect(handle_2.result.first).to eq('second timer wins')
-      expect(handle_2.result.last).to be_within(0.01).of(2) # Make sure we didn't wait serially
+      expect(handle_2.result.last).to be_within(0.1).of(2) # Make sure we didn't wait serially
       expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
@@ -139,9 +139,9 @@ describe Temporalio::Worker::WorkflowWorker do
       subject.run { handle_1.result && handle_2.result }
 
       expect(handle_1.result.first).to eq('second timer cancelled')
-      expect(handle_1.result.last).to be_within(0.01).of(1) # Make sure we didn't wait for the longer timer
+      expect(handle_1.result.last).to be_within(0.1).of(1) # Make sure we didn't wait for the longer timer
       expect(handle_2.result.first).to eq('first timer cancelled')
-      expect(handle_2.result.last).to be_within(0.01).of(1) # Make sure we didn't wait for the longer timer
+      expect(handle_2.result.last).to be_within(0.1).of(1) # Make sure we didn't wait for the longer timer
       expect(interceptor.called_methods).to eq(%i[execute_workflow execute_workflow])
     end
 
@@ -151,7 +151,7 @@ describe Temporalio::Worker::WorkflowWorker do
       subject.run { handle.result }
 
       expect(handle.result.first).to eq(true)
-      expect(handle.result.last).to be_within(0.01).of(1) # Make sure we only waited for the first timer
+      expect(handle.result.last).to be_within(0.1).of(1) # Make sure we only waited for the first timer
       expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
   end

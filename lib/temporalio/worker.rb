@@ -4,6 +4,7 @@ require 'temporalio/data_converter'
 require 'temporalio/runtime'
 require 'temporalio/worker/activity_worker'
 require 'temporalio/worker/runner'
+require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/thread_pool_executor'
 require 'temporalio/worker/workflow_worker'
 
@@ -85,11 +86,12 @@ module Temporalio
         task_queue,
         max_cached_workflows,
       )
+      sync_worker = Worker::SyncWorker.new(@core_worker)
       @activity_worker =
         unless activities.empty?
           Worker::ActivityWorker.new(
             task_queue,
-            @core_worker,
+            sync_worker,
             activities,
             data_converter,
             interceptors,
@@ -102,7 +104,7 @@ module Temporalio
           Worker::WorkflowWorker.new(
             namespace,
             task_queue,
-            @core_worker,
+            sync_worker,
             workflows,
             data_converter,
             interceptors,

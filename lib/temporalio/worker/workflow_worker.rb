@@ -3,18 +3,16 @@ require 'temporalio/error/failure'
 require 'temporalio/errors'
 require 'temporalio/interceptor'
 require 'temporalio/interceptor/chain'
-require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/workflow_runner'
 
 module Temporalio
   class Worker
     # @api private
     class WorkflowWorker
-      def initialize(namespace, task_queue, core_worker, workflows, converter, interceptors)
+      def initialize(namespace, task_queue, worker, workflows, converter, interceptors)
         @namespace = namespace
         @task_queue = task_queue
-        # TODO: Make activity/workflow share the same instance
-        @worker = SyncWorker.new(core_worker)
+        @worker = worker
         @workflows = prepare_workflows(workflows)
         @converter = converter
         @inbound_interceptors = Temporalio::Interceptor::Chain.new(
@@ -110,6 +108,7 @@ module Temporalio
 
         if activation.jobs.any? { |job| !job.remove_from_cache }
           runner = get_or_create_workflow_runner(activation)
+          # TODO: Potentially move this to a dedicated thread for processing workflow activations
           commands += runner.process(activation)
         end
 
