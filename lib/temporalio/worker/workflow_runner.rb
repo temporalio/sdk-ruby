@@ -1,6 +1,7 @@
 require 'temporal/sdk/core/workflow_commands/workflow_commands_pb'
 require 'temporalio/interceptor/workflow_inbound'
 require 'temporalio/workflow/context'
+require 'temporalio/workflow/info'
 
 module Temporalio
   class Worker
@@ -9,13 +10,19 @@ module Temporalio
       class Completion < Struct.new(:resolve, :reject); end # rubocop:disable Lint/StructNewOverride
 
       def initialize(
+        namespace,
+        task_queue,
         workflow_class,
+        run_id,
         worker,
         converter,
         inbound_interceptors,
         outbound_interceptors
       )
+        @namespace = namespace
+        @task_queue = task_queue
         @workflow_class = workflow_class
+        @run_id = run_id
         @worker = worker
         @converter = converter
         @inbound_interceptors = inbound_interceptors
@@ -62,8 +69,9 @@ module Temporalio
 
       private
 
-      attr_reader :workflow_class, :worker, :converter, :inbound_interceptors,
-                  :outbound_interceptors, :commands, :completions, :sequences, :fiber
+      attr_reader :namespace, :task_queue, :workflow_class, :run_id, :worker, :converter,
+                  :inbound_interceptors, :outbound_interceptors, :commands, :completions,
+                  :sequences, :fiber
 
       def order_jobs(jobs)
         # Process patches first, then signals, then non-queries and finally queries
@@ -94,15 +102,14 @@ module Temporalio
       end
 
       def apply_start_workflow(job)
-        # TODO: Generate workflow info
-        context = Temporalio::Workflow::Context.new(self)
+        info = generate_workflow_info(job)
+        context = Temporalio::Workflow::Context.new(self, info, outbound_interceptors)
         workflow = workflow_class.new(context)
         args = converter.from_payload_array(job.arguments.to_a)
-        headers = converter.from_payload_map(job.headers)
         input = Temporalio::Interceptor::WorkflowInbound::ExecuteWorkflowInput.new(
           workflow: workflow_class,
           args: args,
-          headers: headers || {},
+          headers: info.headers,
         )
 
         @fiber = Fiber.new do
@@ -138,6 +145,32 @@ module Temporalio
         return unless completion
 
         completion.resolve.call(nil)
+      end
+
+      def generate_workflow_info(job)
+        Temporalio::Workflow::Info.new(
+          attempt: job.attempt,
+          continued_run_id: job.continued_from_execution_run_id,
+          cron_schedule: job.cron_schedule,
+          execution_timeout: job.workflow_execution_timeout&.to_f,
+          headers: converter.from_payload_map(job.headers) || {},
+          namespace: namespace,
+          parent: Temporalio::Workflow::ParentInfo.new(
+            namespace: job.parent_workflow_info&.namespace,
+            run_id: job.parent_workflow_info&.run_id,
+            workflow_id: job.parent_workflow_info&.workflow_id,
+          ),
+          raw_memo: converter.from_payload_map(job.memo&.fields) || {},
+          retry_policy: job.retry_policy ? Temporalio::RetryPolicy.from_proto(job.retry_policy) : nil,
+          run_id: run_id,
+          run_timeout: job.workflow_run_timeout&.to_f,
+          search_attributes: converter.from_payload_map(job.search_attributes&.indexed_fields) || {},
+          start_time: job.start_time&.to_time,
+          task_queue: task_queue,
+          task_timeout: job.workflow_task_timeout&.to_f,
+          workflow_id: job.workflow_id,
+          workflow_type: job.workflow_type,
+        ).freeze
       end
     end
   end

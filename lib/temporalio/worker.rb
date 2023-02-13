@@ -100,6 +100,7 @@ module Temporalio
       @workflow_worker =
         unless workflows.empty?
           Worker::WorkflowWorker.new(
+            namespace,
             task_queue,
             @core_worker,
             workflows,

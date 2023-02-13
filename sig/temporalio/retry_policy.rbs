@@ -6,14 +6,16 @@ module Temporalio
     attr_reader backoff: Float
     attr_reader max_interval: Integer?
     attr_reader max_attempts: Integer
-    attr_reader non_retriable_errors: Array[Class]
+    attr_reader non_retriable_errors: Array[String]
+
+    def self.from_proto: (Temporalio::Api::Common::V1::RetryPolicy) -> RetryPolicy
 
     def initialize: (
       ?initial_interval: Integer,
       ?backoff: Float,
-      ?max_interval: nil,
+      ?max_interval: Integer?,
       ?max_attempts: Integer,
-      ?non_retriable_errors: Array[Class]
+      ?non_retriable_errors: Array[Class | String]
     ) -> void
 
     def validate!: -> nil

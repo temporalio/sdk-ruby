@@ -4,8 +4,10 @@ require 'temporalio/workflow/future'
 module Temporalio
   class Workflow
     class Context
-      def initialize(runner)
+      def initialize(runner, info, interceptors)
         @runner = runner
+        @info = info
+        @interceptors = interceptors
       end
 
       def async(&block)
@@ -14,6 +16,10 @@ module Temporalio
         else
           Temporalio::Workflow::Async
         end
+      end
+
+      def info
+        interceptors.invoke(:workflow_info) { @info }
       end
 
       def sleep(duration)
@@ -52,7 +58,7 @@ module Temporalio
 
       private
 
-      attr_reader :runner
+      attr_reader :runner, :interceptors
     end
   end
 end

@@ -40,7 +40,7 @@ module Temporalio
       # @!attribute [r] scheduled_time
       #   @return [Time] Time when activity was first scheduled.
       # @!attribute [r] start_to_close_timeout
-      #   @return [Floaat] Max time of a single invocation (in seconds).
+      #   @return [Float] Max time of a single invocation (in seconds).
       # @!attribute [r] started_time
       #   @return [Time] Time when activity was started.
       # @!attribute [r] task_queue

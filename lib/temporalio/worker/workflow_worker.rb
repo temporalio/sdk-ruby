@@ -10,7 +10,8 @@ module Temporalio
   class Worker
     # @api private
     class WorkflowWorker
-      def initialize(task_queue, core_worker, workflows, converter, interceptors)
+      def initialize(namespace, task_queue, core_worker, workflows, converter, interceptors)
+        @namespace = namespace
         @task_queue = task_queue
         # TODO: Make activity/workflow share the same instance
         @worker = SyncWorker.new(core_worker)
@@ -51,7 +52,7 @@ module Temporalio
 
       private
 
-      attr_reader :task_queue, :worker, :workflows, :converter, :inbound_interceptors,
+      attr_reader :namespace, :task_queue, :worker, :workflows, :converter, :inbound_interceptors,
                   :outbound_interceptors, :drain_queue, :running_workflows
 
       def prepare_workflows(workflows)
@@ -88,7 +89,10 @@ module Temporalio
 
           workflow = lookup_workflow(start.workflow_type)
           runner = WorkflowRunner.new(
+            namespace,
+            task_queue,
             workflow,
+            activation.run_id,
             worker,
             converter,
             inbound_interceptors,

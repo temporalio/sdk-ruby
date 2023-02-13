@@ -9,7 +9,10 @@ module Temporalio
       end
 
       def initialize: (
+        String namespace,
+        String task_queue,
         singleton(Temporalio::Workflow) workflow_class,
+        String run_id,
         Temporalio::Worker::SyncWorker worker,
         Temporalio::DataConverter converter,
         Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound] inbound_interceptors,
@@ -25,7 +28,10 @@ module Temporalio
 
       @finished: bool
 
+      attr_reader namespace: String
+      attr_reader task_queue: String
       attr_reader workflow_class: singleton(Temporalio::Workflow)
+      attr_reader run_id: String
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader converter: Temporalio::DataConverter
       attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound]
@@ -39,6 +45,7 @@ module Temporalio
       def apply: (Coresdk::WorkflowActivation::WorkflowActivationJob job) -> nil
       def apply_start_workflow: (Coresdk::WorkflowActivation::StartWorkflow job) -> untyped
       def apply_fire_timer: (Coresdk::WorkflowActivation::FireTimer job) -> untyped
+      def generate_workflow_info: (Coresdk::WorkflowActivation::StartWorkflow) -> Temporalio::Workflow::Info
     end
   end
 end

@@ -2,6 +2,7 @@ module Temporalio
   class Worker
     class WorkflowWorker
       def initialize: (
+        String namespace,
         String task_queue,
         Temporalio::Bridge::Worker core_worker,
         Array[singleton(Temporalio::Workflow)] workflows,
@@ -13,6 +14,7 @@ module Temporalio
 
       private
 
+      attr_reader namespace: String
       attr_reader task_queue: String
       attr_reader worker: Temporalio::Worker::SyncWorker
       attr_reader workflows: Hash[String, singleton(Temporalio::Workflow)]
