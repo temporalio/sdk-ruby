@@ -114,7 +114,8 @@ module Temporalio
 
       def apply_start_workflow(job)
         info = generate_workflow_info(job)
-        context = Temporalio::Workflow::Context.new(self, info, outbound_interceptors)
+        rand_seed = job.randomness_seed
+        context = Temporalio::Workflow::Context.new(self, rand_seed, info, outbound_interceptors)
         workflow = workflow_class.new(context)
         args = converter.from_payload_array(job.arguments.to_a)
         input = Temporalio::Interceptor::WorkflowInbound::ExecuteWorkflowInput.new(

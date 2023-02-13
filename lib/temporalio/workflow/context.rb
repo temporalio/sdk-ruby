@@ -1,11 +1,15 @@
+require 'forwardable'
 require 'temporalio/workflow/async'
 require 'temporalio/workflow/future'
 
 module Temporalio
   class Workflow
     class Context
-      def initialize(runner, info, interceptors)
+      extend Forwardable
+
+      def initialize(runner, rand_seed, info, interceptors)
         @runner = runner
+        @random = Random.new(rand_seed)
         @info = info
         @interceptors = interceptors
       end
@@ -22,6 +26,8 @@ module Temporalio
         runner.time
       end
       alias now time
+
+      def_delegator :@random, :rand
 
       def info
         interceptors.invoke(:workflow_info) { @info }
