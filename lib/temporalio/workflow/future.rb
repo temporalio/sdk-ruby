@@ -1,14 +1,16 @@
 module Temporalio
   class Workflow
     class Future
+      THREAD_KEY = :temporalio_workflow_future
+
       class Rejected < StandardError; end
 
       def self.current
-        Thread.current[:future]
+        Thread.current[THREAD_KEY]
       end
 
       def self.current=(future)
-        Thread.current[:future] = future
+        Thread.current[THREAD_KEY] = future
       end
 
       # Revist the reason for combining futures and cancellation scopes, maybe they are separate?
@@ -90,6 +92,7 @@ module Temporalio
 
       def cancel
         return unless pending?
+        return if cancel_requested?
 
         @cancel_requested = true
         cancel_callbacks.each(&:call)

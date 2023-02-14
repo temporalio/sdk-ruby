@@ -22,15 +22,9 @@ module Temporalio
       raise NoMethodError, 'must implement #execute'
     end
 
-    def_delegator :@context, :async
+    def_delegators :@context, :async, :sleep, :now
 
     private
-
-    # TODO: implement now() method for fetching current local time
-
-    def sleep(duration)
-      @context.sleep(duration)
-    end
 
     def workflow
       @context

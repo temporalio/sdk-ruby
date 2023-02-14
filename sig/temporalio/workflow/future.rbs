@@ -4,6 +4,8 @@ module Temporalio
       class Rejected < StandardError
       end
 
+      THREAD_KEY: Symbol
+
       def self.current: -> Future[untyped]?
       def self.current=: (Future[untyped]) -> void
 
