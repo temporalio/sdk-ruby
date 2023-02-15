@@ -22,11 +22,8 @@ module Temporalio
         end
       end
 
-      def time
-        runner.time
-      end
+      def_delegator :@runner, :time
       alias now time
-
       def_delegator :@random, :rand
 
       def info

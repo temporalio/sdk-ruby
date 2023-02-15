@@ -76,5 +76,12 @@ module Helpers
       @called_methods << :execute_workflow
       super
     end
+
+    # Temporalio::Interceptor::WorkflowOutbound
+
+    def workflow_info
+      @called_methods << :workflow_info
+      super
+    end
   end
 end
