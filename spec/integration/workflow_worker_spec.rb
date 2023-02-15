@@ -18,6 +18,12 @@ class TestMultiParamWorkflow < Temporalio::Workflow
   end
 end
 
+class TestFailingWorkflow < Temporalio::Workflow
+  def execute
+    raise 'test error'
+  end
+end
+
 class TestAsyncWorkflow < Temporalio::Workflow
   def execute(duration_1, duration_2)
     start_time = workflow.time
@@ -80,6 +86,7 @@ describe Temporalio::Worker::WorkflowWorker do
       workflows: [
         TestBasicWorkflow,
         TestMultiParamWorkflow,
+        TestFailingWorkflow,
         TestAsyncWorkflow,
         TestCancellationsWorkflow,
         TestCombinedCancellationsWorkflow,
@@ -116,6 +123,17 @@ describe Temporalio::Worker::WorkflowWorker do
       handle = client.start_workflow(TestMultiParamWorkflow, 'one', 2, :three, id: id, task_queue: task_queue)
 
       expect(subject.run { handle.result }).to eq('one-2-three')
+      expect(interceptor.called_methods).to eq(%i[execute_workflow])
+    end
+
+    it 'runs a failing and returns the failure' do
+      handle = client.start_workflow(TestFailingWorkflow, id: id, task_queue: task_queue)
+
+      expect { subject.run { handle.result } }.to raise_error do |error|
+        expect(error).to be_a(Temporalio::Error::WorkflowFailure)
+        expect(error.cause).to be_a(Temporalio::Error::ApplicationError)
+        expect(error.cause.message).to eq('test error')
+      end
       expect(interceptor.called_methods).to eq(%i[execute_workflow])
     end
 

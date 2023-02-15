@@ -119,6 +119,8 @@ module Temporalio
         if runner&.finished? || activation.jobs.any?(&:remove_from_cache)
           running_workflows.delete(activation.run_id)
         end
+      rescue StandardError => e
+        worker.complete_workflow_activation_with_failure(activation.run_id, converter.to_failure(e))
       end
     end
   end
