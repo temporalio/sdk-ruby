@@ -1,0 +1,27 @@
+module Temporalio
+  class Workflow
+    class Context
+      extend Forwardable
+
+      def initialize: (
+        Temporalio::Worker::WorkflowRunner runner,
+        Integer rand_seed,
+        Temporalio::Workflow::Info info,
+        Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound] interceptors,
+      ) -> void
+      def info: -> Temporalio::Workflow::Info
+      def async: -> singleton(Temporalio::Workflow::Async)
+               | [T] { () -> T } -> Temporalio::Workflow::Future[T]
+      def sleep: (Integer duration) -> void
+      def start_timer: (Integer duration) -> Temporalio::Workflow::Future[nil]
+
+      private
+
+      @random: Random
+      @info: Temporalio::Workflow::Info
+
+      attr_reader runner: Temporalio::Worker::WorkflowRunner
+      attr_reader interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound]
+    end
+  end
+end

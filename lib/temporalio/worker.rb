@@ -4,7 +4,9 @@ require 'temporalio/data_converter'
 require 'temporalio/runtime'
 require 'temporalio/worker/activity_worker'
 require 'temporalio/worker/runner'
+require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/thread_pool_executor'
+require 'temporalio/worker/workflow_worker'
 
 module Temporalio
   # Worker to process workflows and/or activities.
@@ -46,6 +48,7 @@ module Temporalio
     # @param namespace [String] A namespace.
     # @param task_queue [String] A task queue.
     # @param activities [Array<Class>] A list of activities (subclasses of {Temporalio::Activity}).
+    # @param workflows [Array<Class>] A list of workflows (subclasses of {Temporalio::Workflow}).
     # @param data_converter [Temporalio::DataConverter] Data converter to use for all data conversions
     #   to/from payloads.
     # @param activity_executor [ThreadPoolExecutor] Concurrent executor for all activities. Defaults
@@ -63,9 +66,11 @@ module Temporalio
       namespace,
       task_queue,
       activities: [],
+      workflows: [],
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
       interceptors: [],
+      max_cached_workflows: 1_000,
       max_concurrent_activities: 100,
       graceful_shutdown_timeout: nil
     )
@@ -79,12 +84,14 @@ module Temporalio
         connection.core_connection,
         namespace,
         task_queue,
+        max_cached_workflows,
       )
+      sync_worker = Worker::SyncWorker.new(@core_worker)
       @activity_worker =
         unless activities.empty?
           Worker::ActivityWorker.new(
             task_queue,
-            @core_worker,
+            sync_worker,
             activities,
             data_converter,
             interceptors,
@@ -92,7 +99,17 @@ module Temporalio
             graceful_shutdown_timeout,
           )
         end
-      @workflow_worker = nil
+      @workflow_worker =
+        unless workflows.empty?
+          Worker::WorkflowWorker.new(
+            namespace,
+            task_queue,
+            sync_worker,
+            workflows,
+            data_converter,
+            interceptors,
+          )
+        end
 
       if !@activity_worker && !@workflow_worker
         raise ArgumentError, 'At least one activity or workflow must be specified'
@@ -145,7 +162,6 @@ module Temporalio
           end
         end
 
-        # TODO: Pending implementation
         task.async { |task| workflow_worker.run(task) } if workflow_worker
       end
     end

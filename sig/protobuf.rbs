@@ -20,6 +20,14 @@ class Coresdk::ActivityHeartbeat
   def self.encode: (Coresdk::ActivityHeartbeat) -> String
 end
 
+class Coresdk::WorkflowCompletion::WorkflowActivationCompletion
+  def self.encode: (Coresdk::WorkflowCompletion::WorkflowActivationCompletion) -> String
+end
+
+class Coresdk::WorkflowActivation::WorkflowActivationJob
+  def variant: -> Symbol
+end
+
 # Source: sig/protos/temporal/api/workflowservice/v1/request_response.rbs
 class Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest
   def self.encode: (Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest) -> String

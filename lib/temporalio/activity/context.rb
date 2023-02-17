@@ -20,7 +20,7 @@ module Temporalio
       #
       # @return [Temporalio::Activity::Info]
       def info
-        interceptors.invoke(:info) { @info }
+        interceptors.invoke(:activity_info) { @info }
       end
 
       # Send a heartbeat for the current activity.

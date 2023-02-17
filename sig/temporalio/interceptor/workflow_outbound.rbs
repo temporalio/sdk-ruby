@@ -1,0 +1,9 @@
+module Temporalio
+  module Interceptor
+    module WorkflowOutbound
+      type methods = (:workflow_info)
+
+      def workflow_info: ?{ () -> Temporalio::Workflow::Info } -> Temporalio::Workflow::Info
+    end
+  end
+end

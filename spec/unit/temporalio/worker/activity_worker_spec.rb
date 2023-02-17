@@ -4,6 +4,7 @@ require 'temporalio/bridge'
 require 'temporalio/data_converter'
 require 'temporalio/worker/activity_worker'
 require 'temporalio/worker/activity_runner'
+require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/thread_pool_executor'
 
 class TestActivity < Temporalio::Activity; end
@@ -18,7 +19,7 @@ describe Temporalio::Worker::ActivityWorker do
   subject do
     described_class.new(
       task_queue,
-      core_worker,
+      sync_worker,
       activities,
       converter,
       interceptors,
@@ -30,6 +31,7 @@ describe Temporalio::Worker::ActivityWorker do
   let(:task_queue) { 'test-task-queue' }
   let(:activities) { [TestActivity] }
   let(:token) { 'test_token' }
+  let(:sync_worker) { Temporalio::Worker::SyncWorker.new(core_worker) }
   let(:core_worker) { instance_double(Temporalio::Bridge::Worker) }
   let(:runner) { instance_double(Temporalio::Worker::ActivityRunner) }
   let(:executor) { Temporalio::Worker::ThreadPoolExecutor.new(1) }

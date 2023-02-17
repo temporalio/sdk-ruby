@@ -2,7 +2,15 @@ module Temporalio
   class Worker
     type worker_interceptor =
       Temporalio::Interceptor::ActivityInbound |
-      Temporalio::Interceptor::ActivityOutbound
+      Temporalio::Interceptor::ActivityOutbound |
+      Temporalio::Interceptor::WorkflowInbound |
+      Temporalio::Interceptor::WorkflowOutbound
+
+    type interceptor_classes =
+      singleton(Temporalio::Interceptor::ActivityInbound) |
+      singleton(Temporalio::Interceptor::ActivityOutbound) |
+      singleton(Temporalio::Interceptor::WorkflowInbound) |
+      singleton(Temporalio::Interceptor::WorkflowOutbound)
 
     def self.run: (
       *Temporalio::Worker workers,
@@ -14,9 +22,11 @@ module Temporalio
       String namespace,
       String task_queue,
       ?activities: Array[singleton(Temporalio::Activity)],
+      ?workflows: Array[singleton(Temporalio::Workflow)],
       ?data_converter: Temporalio::DataConverter,
       ?activity_executor: Temporalio::Worker::_ActivityExecutor?,
       ?interceptors: Array[worker_interceptor],
+      ?max_cached_workflows: Integer,
       ?max_concurrent_activities: Integer,
       ?graceful_shutdown_timeout: Integer?
     ) -> void

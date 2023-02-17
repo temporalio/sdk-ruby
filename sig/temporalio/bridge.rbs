@@ -26,10 +26,12 @@ module Temporalio
     end
 
     class Worker
-      def self.create: (Runtime, Connection, String, String) -> Temporalio::Bridge::Worker
+      def self.create: (Runtime, Connection, String, String, Integer) -> Temporalio::Bridge::Worker
       def poll_activity_task: { (String?, Exception?) -> void } -> void
       def complete_activity_task: (String) { (nil, Exception?) -> void } -> void
       def record_activity_heartbeat: (String) -> void
+      def poll_workflow_activation: { (String?, Exception?) -> void } -> void
+      def complete_workflow_activation: (String) { (nil, Exception?) -> void } -> void
       def initiate_shutdown: -> void
       def shutdown: -> void
     end

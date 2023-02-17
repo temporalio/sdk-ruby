@@ -1,0 +1,20 @@
+module Temporalio
+  class Workflow
+    extend Forwardable
+
+    self.@workflow_name: String
+
+    def self.workflow_name: (String new_name) -> void
+    def self._name: -> String
+
+    def initialize: (Temporalio::Workflow::Context context) -> void
+    def execute: (*untyped _args) -> untyped
+
+    private
+
+    @context: Temporalio::Workflow::Context
+
+    def sleep: (Integer duration) -> untyped
+    def workflow: -> Temporalio::Workflow::Context
+  end
+end

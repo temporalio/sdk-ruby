@@ -1,9 +1,8 @@
 require 'temporalio/error/failure'
 require 'temporalio/errors'
-require 'temporalio/interceptor/activity_inbound'
-require 'temporalio/interceptor/activity_outbound'
+require 'temporalio/interceptor'
+require 'temporalio/interceptor/chain'
 require 'temporalio/worker/activity_runner'
-require 'temporalio/worker/sync_worker'
 
 module Temporalio
   class Worker
@@ -11,7 +10,7 @@ module Temporalio
     class ActivityWorker
       def initialize(
         task_queue,
-        core_worker,
+        worker,
         activities,
         converter,
         interceptors,
@@ -19,11 +18,15 @@ module Temporalio
         graceful_timeout
       )
         @task_queue = task_queue
-        @worker = SyncWorker.new(core_worker)
+        @worker = worker
         @activities = prepare_activities(activities)
         @converter = converter
-        @inbound_interceptors = Temporalio::Interceptor::Chain.new(filter_inbound(interceptors))
-        @outbound_interceptors = Temporalio::Interceptor::Chain.new(filter_outbound(interceptors))
+        @inbound_interceptors = Temporalio::Interceptor::Chain.new(
+          Temporalio::Interceptor.filter(interceptors, :activity_inbound),
+        )
+        @outbound_interceptors = Temporalio::Interceptor::Chain.new(
+          Temporalio::Interceptor.filter(interceptors, :activity_outbound),
+        )
         @executor = executor
         @graceful_timeout = graceful_timeout
         @running_activities = {}
@@ -89,20 +92,6 @@ module Temporalio
 
           result[activity._name] = activity
           result
-        end
-      end
-
-      # NOTE: Using #each_with_object here and below instead of a simple #select because RBS can't
-      #       reconcile that resulting array only has ActivityInbound or ActivityOutbound in it.
-      def filter_inbound(interceptors)
-        interceptors.each_with_object([]) do |i, result|
-          result << i if i.is_a?(Temporalio::Interceptor::ActivityInbound)
-        end
-      end
-
-      def filter_outbound(interceptors)
-        interceptors.each_with_object([]) do |i, result|
-          result << i if i.is_a?(Temporalio::Interceptor::ActivityOutbound)
         end
       end
 

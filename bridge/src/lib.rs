@@ -165,14 +165,15 @@ methods!(
         NilClass::new()
     }
 
-    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString) -> AnyObject {
+    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString, max_cached_workflows: Integer) -> AnyObject {
         let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
         let task_queue = task_queue.map_err(VM::raise_ex).unwrap().to_string();
+        let max_cached_workflows = max_cached_workflows.map_err(VM::raise_ex).unwrap().to_u32();
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue);
+        let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue, max_cached_workflows);
 
         Module::from_existing("Temporalio")
             .get_nested_module("Bridge")
@@ -222,6 +223,43 @@ methods!(
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
 
         let result = worker.record_activity_heartbeat(bytes);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
+    fn worker_poll_workflow_activation() -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #poll_workflow_activation without a block");
+        }
+
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            ruby_callback.call(&worker_result_to_proc_args(result));
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.poll_workflow_activation(callback);
+
+        result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        NilClass::new()
+    }
+
+    fn worker_complete_workflow_activation(proto: RString) -> NilClass {
+        if !VM::is_block_given() {
+            panic!("Called #worker_complete_workflow_activation without a block");
+        }
+
+        let bytes = unwrap_bytes(proto.map_err(VM::raise_ex).unwrap());
+        let ruby_callback = VM::block_proc();
+        let callback = move |result: WorkerResult| {
+            ruby_callback.call(&worker_result_to_proc_args(result));
+        };
+
+        let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
+        let result = worker.complete_workflow_activation(bytes, callback);
 
         result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
@@ -378,6 +416,8 @@ pub extern "C" fn init_bridge() {
             klass.def("poll_activity_task", worker_poll_activity_task);
             klass.def("complete_activity_task", worker_complete_activity_task);
             klass.def("record_activity_heartbeat", worker_record_activity_heartbeat);
+            klass.def("poll_workflow_activation", worker_poll_workflow_activation);
+            klass.def("complete_workflow_activation", worker_complete_workflow_activation);
             klass.def("initiate_shutdown", worker_initiate_shutdown);
             klass.def("shutdown", worker_shutdown);
         });

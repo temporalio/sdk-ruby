@@ -7,9 +7,9 @@ end
 describe Temporalio::Interceptor::ActivityOutbound do
   subject { TestActivityOutboundInterceptor.new }
 
-  describe '#info' do
+  describe '#activity_info' do
     it 'yields' do
-      expect { |b| subject.info(&b) }.to yield_control
+      expect { |b| subject.activity_info(&b) }.to yield_control
     end
   end
 

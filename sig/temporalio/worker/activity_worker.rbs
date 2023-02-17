@@ -5,7 +5,7 @@ module Temporalio
 
       def initialize: (
         String task_queue,
-        Temporalio::Bridge::Worker core_worker,
+        Temporalio::Worker::SyncWorker worker,
         Array[singleton(Temporalio::Activity)] activities,
         Temporalio::DataConverter converter,
         Array[Temporalio::Worker::worker_interceptor] interceptors,
@@ -37,10 +37,6 @@ module Temporalio
         -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
       def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
       def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
-      def filter_inbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
-        -> Array[Temporalio::Interceptor::ActivityInbound]
-      def filter_outbound: (Array[Temporalio::Worker::worker_interceptor] interceptors)
-        -> Array[Temporalio::Interceptor::ActivityOutbound]
     end
   end
 end

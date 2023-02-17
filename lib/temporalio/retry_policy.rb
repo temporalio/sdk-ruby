@@ -24,13 +24,23 @@ module Temporalio
     # @return [Array<String>] List of error types that are not retryable.
     attr_reader :non_retriable_errors
 
+    def self.from_proto(proto)
+      new(
+        initial_interval: proto.initial_interval&.to_f&.round || 0,
+        backoff: proto.backoff_coefficient&.to_f || 0.0,
+        max_interval: proto.maximum_interval&.to_f&.round || 0,
+        max_attempts: proto.maximum_attempts || 1,
+        non_retriable_errors: proto.non_retryable_error_types || [],
+      ).freeze
+    end
+
     # @param initial_interval [Integer] Backoff interval (in seconds) for the first retry.
     # @param backoff [Float] Coefficient to multiply previous backoff interval by to get new
     #   interval.
     # @param max_interval [Integer] Maximum backoff interval between retries. Default 100x
     #   {#initial_interval}.
     # @param max_attempts [Integer] Maximum number of attempts. If 0, there is no maximum.
-    # @param non_retriable_errors [Array<String>] List of error types that are not retryable.
+    # @param non_retriable_errors [Array<Class, String>] List of error types that are not retryable.
     def initialize(
       initial_interval: 1,
       backoff: 2.0,
@@ -42,7 +52,7 @@ module Temporalio
       @backoff = backoff
       @max_interval = max_interval
       @max_attempts = max_attempts
-      @non_retriable_errors = non_retriable_errors
+      @non_retriable_errors = non_retriable_errors.map(&:to_s).compact
     end
 
     def validate!
@@ -75,7 +85,7 @@ module Temporalio
         backoff_coefficient: backoff,
         maximum_interval: max_interval ? Google::Protobuf::Duration.new(seconds: max_interval) : nil,
         maximum_attempts: max_attempts,
-        non_retryable_error_types: non_retriable_errors.map(&:name).compact,
+        non_retryable_error_types: non_retriable_errors,
       )
     end
   end

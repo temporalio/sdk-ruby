@@ -13,6 +13,27 @@ describe Temporalio::RetryPolicy do
     }
   end
 
+  describe '.from_proto' do
+    it 'returns a new RetryPolicy' do
+      input = Temporalio::Api::Common::V1::RetryPolicy.new(
+        initial_interval: 1,
+        backoff_coefficient: 2,
+        maximum_interval: 10,
+        maximum_attempts: 5,
+        non_retryable_error_types: %w[Foo Bar],
+      )
+
+      result = described_class.from_proto(input)
+
+      expect(result).to be_a(described_class)
+      expect(result.initial_interval).to eq(1)
+      expect(result.backoff).to eq(2)
+      expect(result.max_interval).to eq(10)
+      expect(result.max_attempts).to eq(5)
+      expect(result.non_retriable_errors).to eq(%w[Foo Bar])
+    end
+  end
+
   describe '#validate!' do
     subject { described_class.new(**attributes) }
 
@@ -22,7 +43,7 @@ describe Temporalio::RetryPolicy do
         backoff: 2.0,
         max_interval: 10,
         max_attempts: 0,
-        non_retriable_errors: nil,
+        non_retriable_errors: [],
       }
     end
 

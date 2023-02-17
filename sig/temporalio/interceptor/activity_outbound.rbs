@@ -1,9 +1,9 @@
 module Temporalio
   module Interceptor
     module ActivityOutbound
-      type methods = (:info | :heartbeat)
+      type methods = (:activity_info | :heartbeat)
 
-      def info: ?{ () -> Temporalio::Activity::Info } -> Temporalio::Activity::Info
+      def activity_info: ?{ () -> Temporalio::Activity::Info } -> Temporalio::Activity::Info
       def heartbeat: (*untyped details) ?{ (*untyped) -> void } -> void
     end
   end
