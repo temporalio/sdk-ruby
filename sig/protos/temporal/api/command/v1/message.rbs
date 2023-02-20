@@ -1,4 +1,4 @@
-module Temporalio
+module Temporal
   module Api
     module Command
       module V1
@@ -7,33 +7,33 @@ module Temporalio
 
           def activity_id!: () -> ::String?
 
-          attr_accessor activity_type(): ::Temporalio::Api::Common::V1::ActivityType?
+          attr_accessor activity_type(): ::Temporal::Api::Common::V1::ActivityType?
 
-          def activity_type=: [M < ::Temporalio::Api::Common::V1::ActivityType::_ToProto] (M?) -> M?
+          def activity_type=: [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (M?) -> M?
                             | ...
 
-          def activity_type!: () -> ::Temporalio::Api::Common::V1::ActivityType?
+          def activity_type!: () -> ::Temporal::Api::Common::V1::ActivityType?
 
-          attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          attr_accessor input(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
-          def input=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Indicates how long the caller is willing to wait for activity completion. The "schedule" time
           #  is when the activity is initially scheduled, not when the most recent retry is scheduled.
@@ -121,16 +121,16 @@ module Temporalio
           #  dynamic configuration. Retries will be attempted until `schedule_to_close_timeout` has
           #  elapsed. To disable retries set retry_policy.maximum_attempts to 1.
           #
-          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+          attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
 
           # Activities are provided by a default retry policy which is controlled through the service's
           #  dynamic configuration. Retries will be attempted until `schedule_to_close_timeout` has
           #  elapsed. To disable retries set retry_policy.maximum_attempts to 1.
           #
-          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+          def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                            | ...
 
-          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+          def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
 
           # Request to start the activity directly bypassing matching service and worker polling
           #  The slot for executing the activity should be reserved when setting this field to true.
@@ -139,30 +139,30 @@ module Temporalio
 
           def request_eager_execution!: () -> bool?
 
-          def initialize: (?activity_id: ::String, ?activity_type: ::Temporalio::Api::Common::V1::ActivityType::init?, ?task_queue: ::Temporalio::Api::TaskQueue::V1::TaskQueue::init?, ?header: ::Temporalio::Api::Common::V1::Header::init?, ?input: ::Temporalio::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?request_eager_execution: bool) -> void
+          def initialize: (?activity_id: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?header: ::Temporal::Api::Common::V1::Header::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?request_eager_execution: bool) -> void
 
           def []: (:activity_id) -> ::String
-                | (:activity_type) -> ::Temporalio::Api::Common::V1::ActivityType?
-                | (:task_queue) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
-                | (:input) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:activity_type) -> ::Temporal::Api::Common::V1::ActivityType?
+                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
                 | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
                 | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
                 | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
-                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
                 | (:request_eager_execution) -> bool
                 | (::Symbol) -> untyped
 
           def []=: (:activity_id, ::String) -> ::String
-                 | (:activity_type, ::Temporalio::Api::Common::V1::ActivityType?) -> ::Temporalio::Api::Common::V1::ActivityType?
-                 | [M < ::Temporalio::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
-                 | (:task_queue, ::Temporalio::Api::TaskQueue::V1::TaskQueue?) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                 | [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:input, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+                 | (:activity_type, ::Temporal::Api::Common::V1::ActivityType?) -> ::Temporal::Api::Common::V1::ActivityType?
+                 | [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
                  | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
@@ -171,8 +171,8 @@ module Temporalio
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
                  | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
-                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
                  | (:request_eager_execution, bool) -> bool
                  | (::Symbol, untyped) -> untyped
 
@@ -284,20 +284,20 @@ module Temporalio
         end
 
         class CompleteWorkflowExecutionCommandAttributes < ::Protobuf::Message
-          attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor result(): ::Temporal::Api::Common::V1::Payloads?
 
-          def result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def result=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                      | ...
 
-          def result!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def result!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?result: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?result: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:result) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:result) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:result, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:result, M?) -> M?
+          def []=: (:result, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:result, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -319,20 +319,20 @@ module Temporalio
         end
 
         class FailWorkflowExecutionCommandAttributes < ::Protobuf::Message
-          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                       | ...
 
-          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-          def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+          def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
-          def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+          def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
                 | (::Symbol) -> untyped
 
-          def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+          def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -387,20 +387,20 @@ module Temporalio
         end
 
         class CancelWorkflowExecutionCommandAttributes < ::Protobuf::Message
-          attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor details(): ::Temporal::Api::Common::V1::Payloads?
 
-          def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                       | ...
 
-          def details!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?details: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:details) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
+          def []=: (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -497,12 +497,12 @@ module Temporalio
 
           def namespace!: () -> ::String?
 
-          attr_accessor execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
+          attr_accessor execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
-          def execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+          def execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                         | ...
 
-          def execution!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
 
           # The workflow author-defined name of the signal to send to the workflow.
           #
@@ -512,14 +512,14 @@ module Temporalio
 
           # Serialized value(s) to provide with the signal.
           #
-          attr_accessor input(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
           # Serialized value(s) to provide with the signal.
           #
-          def input=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Deprecated
           #
@@ -538,37 +538,37 @@ module Temporalio
           # Headers that are passed by the workflow that is sending a signal to the external 
           #  workflow that is receiving this signal.
           #
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
           # Headers that are passed by the workflow that is sending a signal to the external 
           #  workflow that is receiving this signal.
           #
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?namespace: ::String, ?execution: ::Temporalio::Api::Common::V1::WorkflowExecution::init?, ?signal_name: ::String, ?input: ::Temporalio::Api::Common::V1::Payloads::init?, ?control: ::String, ?child_workflow_only: bool, ?header: ::Temporalio::Api::Common::V1::Header::init?) -> void
+          def initialize: (?namespace: ::String, ?execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?signal_name: ::String, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?control: ::String, ?child_workflow_only: bool, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:namespace) -> ::String
-                | (:execution) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+                | (:execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:signal_name) -> ::String
-                | (:input) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:control) -> ::String
                 | (:child_workflow_only) -> bool
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:execution, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:execution, M?) -> M?
+                 | (:execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:execution, M?) -> M?
                  | (:signal_name, ::String) -> ::String
-                 | (:input, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:control, ::String) -> ::String
                  | (:child_workflow_only, bool) -> bool
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           def child_workflow_only?: () -> bool
@@ -592,20 +592,20 @@ module Temporalio
         end
 
         class UpsertWorkflowSearchAttributesCommandAttributes < ::Protobuf::Message
-          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                                 | ...
 
-          def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
-          def []: (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+          def []: (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
                 | (::Symbol) -> untyped
 
-          def []=: (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
-                 | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+          def []=: (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -631,24 +631,24 @@ module Temporalio
           #  the existing memo. If the user wants to delete values, a default/empty Payload should be
           #  used as the value for the key being deleted.
           #
-          attr_accessor upserted_memo(): ::Temporalio::Api::Common::V1::Memo?
+          attr_accessor upserted_memo(): ::Temporal::Api::Common::V1::Memo?
 
           # If set, update the workflow memo with the provided values. The values will be merged with
           #  the existing memo. If the user wants to delete values, a default/empty Payload should be
           #  used as the value for the key being deleted.
           #
-          def upserted_memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+          def upserted_memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                             | ...
 
-          def upserted_memo!: () -> ::Temporalio::Api::Common::V1::Memo?
+          def upserted_memo!: () -> ::Temporal::Api::Common::V1::Memo?
 
-          def initialize: (?upserted_memo: ::Temporalio::Api::Common::V1::Memo::init?) -> void
+          def initialize: (?upserted_memo: ::Temporal::Api::Common::V1::Memo::init?) -> void
 
-          def []: (:upserted_memo) -> ::Temporalio::Api::Common::V1::Memo?
+          def []: (:upserted_memo) -> ::Temporal::Api::Common::V1::Memo?
                 | (::Symbol) -> untyped
 
-          def []=: (:upserted_memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
-                 | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
+          def []=: (:upserted_memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -674,42 +674,42 @@ module Temporalio
 
           def marker_name!: () -> ::String?
 
-          attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads::field_hash[::String]
+          attr_accessor details(): ::Temporal::Api::Common::V1::Payloads::field_hash[::String]
 
-          def details=: (::Temporalio::Api::Common::V1::Payloads::hash[::String]) -> ::Temporalio::Api::Common::V1::Payloads::hash[::String]
+          def details=: (::Temporal::Api::Common::V1::Payloads::hash[::String]) -> ::Temporal::Api::Common::V1::Payloads::hash[::String]
                       | ...
 
-          def details!: () -> ::Temporalio::Api::Common::V1::Payloads::field_hash[::String]?
+          def details!: () -> ::Temporal::Api::Common::V1::Payloads::field_hash[::String]?
 
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                       | ...
 
-          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-          def initialize: (?marker_name: ::String, ?details: ::Temporalio::Api::Common::V1::Payloads::hash[::String], ?header: ::Temporalio::Api::Common::V1::Header::init?, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+          def initialize: (?marker_name: ::String, ?details: ::Temporal::Api::Common::V1::Payloads::hash[::String], ?header: ::Temporal::Api::Common::V1::Header::init?, ?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
           def []: (:marker_name) -> ::String
-                | (:details) -> ::Temporalio::Api::Common::V1::Payloads::field_hash[::String]
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
-                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (:details) -> ::Temporal::Api::Common::V1::Payloads::field_hash[::String]
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
                 | (::Symbol) -> untyped
 
           def []=: (:marker_name, ::String) -> ::String
-                 | (:details, ::Temporalio::Api::Common::V1::Payloads::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payloads::field_hash[::String]
-                 | (:details, ::Temporalio::Api::Common::V1::Payloads::hash[::String]) -> ::Temporalio::Api::Common::V1::Payloads::hash[::String]
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (:details, ::Temporal::Api::Common::V1::Payloads::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payloads::field_hash[::String]
+                 | (:details, ::Temporal::Api::Common::V1::Payloads::hash[::String]) -> ::Temporal::Api::Common::V1::Payloads::hash[::String]
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -731,26 +731,26 @@ module Temporalio
         end
 
         class ContinueAsNewWorkflowExecutionCommandAttributes < ::Protobuf::Message
-          attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
+          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
 
-          def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
                             | ...
 
-          def workflow_type!: () -> ::Temporalio::Api::Common::V1::WorkflowType?
+          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          attr_accessor input(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
-          def input=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Timeout of a single workflow run.
           #
@@ -785,45 +785,45 @@ module Temporalio
 
           def backoff_start_interval!: () -> ::Google::Protobuf::Duration?
 
-          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+          attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
 
-          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+          def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                            | ...
 
-          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+          def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
 
           # Should be removed
           #
-          attr_accessor initiator(): ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
+          attr_accessor initiator(): ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
 
           # Should be removed
           #
-          def initiator=: (::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
+          def initiator=: (::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
                         | ...
 
-          def initiator!: () -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator?
+          def initiator!: () -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator?
 
           # Should be removed
           #
-          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+          attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
           # Should be removed
           #
-          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+          def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                       | ...
 
-          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+          def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
           # Should be removed
           #
-          attr_accessor last_completion_result(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor last_completion_result(): ::Temporal::Api::Common::V1::Payloads?
 
           # Should be removed
           #
-          def last_completion_result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def last_completion_result=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                                      | ...
 
-          def last_completion_result!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def last_completion_result!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Should be removed. Not necessarily unused but unclear and not exposed by SDKs.
           #
@@ -831,72 +831,72 @@ module Temporalio
 
           def cron_schedule!: () -> ::String?
 
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          attr_accessor memo(): ::Temporalio::Api::Common::V1::Memo?
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
 
-          def memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                    | ...
 
-          def memo!: () -> ::Temporalio::Api::Common::V1::Memo?
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
 
-          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                                 | ...
 
-          def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?workflow_type: ::Temporalio::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporalio::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporalio::Api::Common::V1::Payloads::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?backoff_start_interval: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?initiator: ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::init, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporalio::Api::Common::V1::Payloads::init?, ?cron_schedule: ::String, ?header: ::Temporalio::Api::Common::V1::Header::init?, ?memo: ::Temporalio::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?backoff_start_interval: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?initiator: ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::init, ?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?last_completion_result: ::Temporal::Api::Common::V1::Payloads::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
-          def []: (:workflow_type) -> ::Temporalio::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                | (:input) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
+                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
                 | (:backoff_start_interval) -> ::Google::Protobuf::Duration?
-                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-                | (:initiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
-                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-                | (:last_completion_result) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                | (:initiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
+                | (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+                | (:last_completion_result) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:cron_schedule) -> ::String
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
-                | (:memo) -> ::Temporalio::Api::Common::V1::Memo?
-                | (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
                 | (::Symbol) -> untyped
 
-          def []=: (:workflow_type, ::Temporalio::Api::Common::V1::WorkflowType?) -> ::Temporalio::Api::Common::V1::WorkflowType?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporalio::Api::TaskQueue::V1::TaskQueue?) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                 | [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
-                 | (:input, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+          def []=: (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
                  | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
                  | (:backoff_start_interval, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:backoff_start_interval, M?) -> M?
-                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-                 | (:initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator
-                 | (:initiator, ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporalio::Api::Enums::V1::ContinueAsNewInitiator::values
-                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-                 | (:last_completion_result, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
+                 | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator
+                 | (:initiator, ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values) -> ::Temporal::Api::Enums::V1::ContinueAsNewInitiator::values
+                 | (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (:last_completion_result, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:last_completion_result, M?) -> M?
                  | (:cron_schedule, ::String) -> ::String
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
-                 | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
-                 | (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
-                 | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -926,26 +926,26 @@ module Temporalio
 
           def workflow_id!: () -> ::String?
 
-          attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
+          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
 
-          def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
                             | ...
 
-          def workflow_type!: () -> ::Temporalio::Api::Common::V1::WorkflowType?
+          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
-          attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          attr_accessor task_queue(): ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          def task_queue=: [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
+          def task_queue=: [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (M?) -> M?
                          | ...
 
-          def task_queue!: () -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
+          def task_queue!: () -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
 
-          attr_accessor input(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor input(): ::Temporal::Api::Common::V1::Payloads?
 
-          def input=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def input=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                     | ...
 
-          def input!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def input!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Total workflow execution timeout including retries and continue as new.
           #
@@ -982,14 +982,14 @@ module Temporalio
 
           # Default: PARENT_CLOSE_POLICY_TERMINATE.
           #
-          attr_accessor parent_close_policy(): ::Temporalio::Api::Enums::V1::ParentClosePolicy
+          attr_accessor parent_close_policy(): ::Temporal::Api::Enums::V1::ParentClosePolicy
 
           # Default: PARENT_CLOSE_POLICY_TERMINATE.
           #
-          def parent_close_policy=: (::Temporalio::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporalio::Api::Enums::V1::ParentClosePolicy::values
+          def parent_close_policy=: (::Temporal::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporal::Api::Enums::V1::ParentClosePolicy::values
                                   | ...
 
-          def parent_close_policy!: () -> ::Temporalio::Api::Enums::V1::ParentClosePolicy?
+          def parent_close_policy!: () -> ::Temporal::Api::Enums::V1::ParentClosePolicy?
 
           attr_accessor control(): ::String
 
@@ -997,21 +997,21 @@ module Temporalio
 
           # Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
           #
-          attr_accessor workflow_id_reuse_policy(): ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
+          attr_accessor workflow_id_reuse_policy(): ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
 
           # Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
           #
-          def workflow_id_reuse_policy=: (::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
+          def workflow_id_reuse_policy=: (::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values
                                        | ...
 
-          def workflow_id_reuse_policy!: () -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy?
+          def workflow_id_reuse_policy!: () -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy?
 
-          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+          attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
 
-          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+          def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
                            | ...
 
-          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+          def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
 
           # Establish a cron schedule for the child workflow.
           #
@@ -1019,75 +1019,75 @@ module Temporalio
 
           def cron_schedule!: () -> ::String?
 
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          attr_accessor memo(): ::Temporalio::Api::Common::V1::Memo?
+          attr_accessor memo(): ::Temporal::Api::Common::V1::Memo?
 
-          def memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+          def memo=: [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (M?) -> M?
                    | ...
 
-          def memo!: () -> ::Temporalio::Api::Common::V1::Memo?
+          def memo!: () -> ::Temporal::Api::Common::V1::Memo?
 
-          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
+          attr_accessor search_attributes(): ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def search_attributes=: [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
+          def search_attributes=: [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (M?) -> M?
                                 | ...
 
-          def search_attributes!: () -> ::Temporalio::Api::Common::V1::SearchAttributes?
+          def search_attributes!: () -> ::Temporal::Api::Common::V1::SearchAttributes?
 
-          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporalio::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporalio::Api::TaskQueue::V1::TaskQueue::init?, ?input: ::Temporalio::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporalio::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_id_reuse_policy: ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporalio::Api::Common::V1::Header::init?, ?memo: ::Temporalio::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporalio::Api::Common::V1::SearchAttributes::init?) -> void
+          def initialize: (?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?task_queue: ::Temporal::Api::Taskqueue::V1::TaskQueue::init?, ?input: ::Temporal::Api::Common::V1::Payloads::init?, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporal::Api::Enums::V1::ParentClosePolicy::init, ?control: ::String, ?workflow_id_reuse_policy: ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?header: ::Temporal::Api::Common::V1::Header::init?, ?memo: ::Temporal::Api::Common::V1::Memo::init?, ?search_attributes: ::Temporal::Api::Common::V1::SearchAttributes::init?) -> void
 
           def []: (:namespace) -> ::String
                 | (:workflow_id) -> ::String
-                | (:workflow_type) -> ::Temporalio::Api::Common::V1::WorkflowType?
-                | (:task_queue) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                | (:input) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
+                | (:task_queue) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                | (:input) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
                 | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
-                | (:parent_close_policy) -> ::Temporalio::Api::Enums::V1::ParentClosePolicy
+                | (:parent_close_policy) -> ::Temporal::Api::Enums::V1::ParentClosePolicy
                 | (:control) -> ::String
-                | (:workflow_id_reuse_policy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
-                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:workflow_id_reuse_policy) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
+                | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
                 | (:cron_schedule) -> ::String
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
-                | (:memo) -> ::Temporalio::Api::Common::V1::Memo?
-                | (:search_attributes) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
+                | (:memo) -> ::Temporal::Api::Common::V1::Memo?
+                | (:search_attributes) -> ::Temporal::Api::Common::V1::SearchAttributes?
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
                  | (:workflow_id, ::String) -> ::String
-                 | (:workflow_type, ::Temporalio::Api::Common::V1::WorkflowType?) -> ::Temporalio::Api::Common::V1::WorkflowType?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
-                 | (:task_queue, ::Temporalio::Api::TaskQueue::V1::TaskQueue?) -> ::Temporalio::Api::TaskQueue::V1::TaskQueue?
-                 | [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
-                 | (:input, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
+                 | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+                 | (:task_queue, ::Temporal::Api::Taskqueue::V1::TaskQueue?) -> ::Temporal::Api::Taskqueue::V1::TaskQueue?
+                 | [M < ::Temporal::Api::Taskqueue::V1::TaskQueue::_ToProto] (:task_queue, M?) -> M?
+                 | (:input, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:input, M?) -> M?
                  | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
                  | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
                  | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
                  | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
-                 | (:parent_close_policy, ::Temporalio::Api::Enums::V1::ParentClosePolicy) -> ::Temporalio::Api::Enums::V1::ParentClosePolicy
-                 | (:parent_close_policy, ::Temporalio::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporalio::Api::Enums::V1::ParentClosePolicy::values
+                 | (:parent_close_policy, ::Temporal::Api::Enums::V1::ParentClosePolicy) -> ::Temporal::Api::Enums::V1::ParentClosePolicy
+                 | (:parent_close_policy, ::Temporal::Api::Enums::V1::ParentClosePolicy::values) -> ::Temporal::Api::Enums::V1::ParentClosePolicy::values
                  | (:control, ::String) -> ::String
-                 | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
-                 | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
-                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:workflow_id_reuse_policy, ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy
+                 | (:workflow_id_reuse_policy, ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporal::Api::Enums::V1::WorkflowIdReusePolicy::values
+                 | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
                  | (:cron_schedule, ::String) -> ::String
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
-                 | (:memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
-                 | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
-                 | (:search_attributes, ::Temporalio::Api::Common::V1::SearchAttributes?) -> ::Temporalio::Api::Common::V1::SearchAttributes?
-                 | [M < ::Temporalio::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:memo, ::Temporal::Api::Common::V1::Memo?) -> ::Temporal::Api::Common::V1::Memo?
+                 | [M < ::Temporal::Api::Common::V1::Memo::_ToProto] (:memo, M?) -> M?
+                 | (:search_attributes, ::Temporal::Api::Common::V1::SearchAttributes?) -> ::Temporal::Api::Common::V1::SearchAttributes?
+                 | [M < ::Temporal::Api::Common::V1::SearchAttributes::_ToProto] (:search_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -1108,326 +1108,208 @@ module Temporalio
           type hash[KEY] = ::Hash[KEY, StartChildWorkflowExecutionCommandAttributes | _ToProto]
         end
 
-        class AcceptWorkflowUpdateCommandAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
+        class ProtocolMessageCommandAttributes < ::Protobuf::Message
+          # The message ID of the message to which this command is a pointer.
+          #
+          attr_accessor message_id(): ::String
 
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
+          def message_id!: () -> ::String?
 
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
+          def initialize: (?message_id: ::String) -> void
 
-          attr_accessor input(): ::Temporalio::Api::Interaction::V1::Input?
-
-          def input=: [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
-                    | ...
-
-          def input!: () -> ::Temporalio::Api::Interaction::V1::Input?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?input: ::Temporalio::Api::Interaction::V1::Input::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:input) -> ::Temporalio::Api::Interaction::V1::Input?
+          def []: (:message_id) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:input, ::Temporalio::Api::Interaction::V1::Input?) -> ::Temporalio::Api::Interaction::V1::Input?
-                 | [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
+          def []=: (:message_id, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
-            def to_proto: () -> AcceptWorkflowUpdateCommandAttributes
+            def to_proto: () -> ProtocolMessageCommandAttributes
           end
 
           # The type of `#initialize` parameter.
-          type init = AcceptWorkflowUpdateCommandAttributes | _ToProto
+          type init = ProtocolMessageCommandAttributes | _ToProto
 
           # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[AcceptWorkflowUpdateCommandAttributes, AcceptWorkflowUpdateCommandAttributes | _ToProto]
+          type field_array = ::Protobuf::Field::FieldArray[ProtocolMessageCommandAttributes, ProtocolMessageCommandAttributes | _ToProto]
 
           # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, AcceptWorkflowUpdateCommandAttributes, AcceptWorkflowUpdateCommandAttributes | _ToProto]
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ProtocolMessageCommandAttributes, ProtocolMessageCommandAttributes | _ToProto]
 
-          type array = ::Array[AcceptWorkflowUpdateCommandAttributes | _ToProto]
+          type array = ::Array[ProtocolMessageCommandAttributes | _ToProto]
 
-          type hash[KEY] = ::Hash[KEY, AcceptWorkflowUpdateCommandAttributes | _ToProto]
-        end
-
-        class CompleteWorkflowUpdateCommandAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
-
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
-
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
-
-          attr_accessor output(): ::Temporalio::Api::Interaction::V1::Output?
-
-          def output=: [M < ::Temporalio::Api::Interaction::V1::Output::_ToProto] (M?) -> M?
-                     | ...
-
-          def output!: () -> ::Temporalio::Api::Interaction::V1::Output?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?output: ::Temporalio::Api::Interaction::V1::Output::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:output) -> ::Temporalio::Api::Interaction::V1::Output?
-                | (::Symbol) -> untyped
-
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:output, ::Temporalio::Api::Interaction::V1::Output?) -> ::Temporalio::Api::Interaction::V1::Output?
-                 | [M < ::Temporalio::Api::Interaction::V1::Output::_ToProto] (:output, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> CompleteWorkflowUpdateCommandAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = CompleteWorkflowUpdateCommandAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[CompleteWorkflowUpdateCommandAttributes, CompleteWorkflowUpdateCommandAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteWorkflowUpdateCommandAttributes, CompleteWorkflowUpdateCommandAttributes | _ToProto]
-
-          type array = ::Array[CompleteWorkflowUpdateCommandAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, CompleteWorkflowUpdateCommandAttributes | _ToProto]
-        end
-
-        class RejectWorkflowUpdateCommandAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
-
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
-
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
-
-          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
-
-          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                      | ...
-
-          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-                | (::Symbol) -> untyped
-
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> RejectWorkflowUpdateCommandAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = RejectWorkflowUpdateCommandAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[RejectWorkflowUpdateCommandAttributes, RejectWorkflowUpdateCommandAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RejectWorkflowUpdateCommandAttributes, RejectWorkflowUpdateCommandAttributes | _ToProto]
-
-          type array = ::Array[RejectWorkflowUpdateCommandAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, RejectWorkflowUpdateCommandAttributes | _ToProto]
+          type hash[KEY] = ::Hash[KEY, ProtocolMessageCommandAttributes | _ToProto]
         end
 
         class Command < ::Protobuf::Message
-          attr_accessor command_type(): ::Temporalio::Api::Enums::V1::CommandType
+          attr_accessor command_type(): ::Temporal::Api::Enums::V1::CommandType
 
-          def command_type=: (::Temporalio::Api::Enums::V1::CommandType::values) -> ::Temporalio::Api::Enums::V1::CommandType::values
+          def command_type=: (::Temporal::Api::Enums::V1::CommandType::values) -> ::Temporal::Api::Enums::V1::CommandType::values
                            | ...
 
-          def command_type!: () -> ::Temporalio::Api::Enums::V1::CommandType?
+          def command_type!: () -> ::Temporal::Api::Enums::V1::CommandType?
 
-          attr_accessor schedule_activity_task_command_attributes(): ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
+          attr_accessor schedule_activity_task_command_attributes(): ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
 
-          def schedule_activity_task_command_attributes=: [M < ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes::_ToProto] (M?) -> M?
+          def schedule_activity_task_command_attributes=: [M < ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes::_ToProto] (M?) -> M?
                                                         | ...
 
-          def schedule_activity_task_command_attributes!: () -> ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
+          def schedule_activity_task_command_attributes!: () -> ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
 
-          attr_accessor start_timer_command_attributes(): ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?
+          attr_accessor start_timer_command_attributes(): ::Temporal::Api::Command::V1::StartTimerCommandAttributes?
 
-          def start_timer_command_attributes=: [M < ::Temporalio::Api::Command::V1::StartTimerCommandAttributes::_ToProto] (M?) -> M?
+          def start_timer_command_attributes=: [M < ::Temporal::Api::Command::V1::StartTimerCommandAttributes::_ToProto] (M?) -> M?
                                              | ...
 
-          def start_timer_command_attributes!: () -> ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?
+          def start_timer_command_attributes!: () -> ::Temporal::Api::Command::V1::StartTimerCommandAttributes?
 
-          attr_accessor complete_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
+          attr_accessor complete_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
 
-          def complete_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def complete_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                              | ...
 
-          def complete_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
+          def complete_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
 
-          attr_accessor fail_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
+          attr_accessor fail_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
 
-          def fail_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def fail_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                          | ...
 
-          def fail_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
+          def fail_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
 
-          attr_accessor request_cancel_activity_task_command_attributes(): ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
+          attr_accessor request_cancel_activity_task_command_attributes(): ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
 
-          def request_cancel_activity_task_command_attributes=: [M < ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::_ToProto] (M?) -> M?
+          def request_cancel_activity_task_command_attributes=: [M < ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::_ToProto] (M?) -> M?
                                                               | ...
 
-          def request_cancel_activity_task_command_attributes!: () -> ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
+          def request_cancel_activity_task_command_attributes!: () -> ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
 
-          attr_accessor cancel_timer_command_attributes(): ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes?
+          attr_accessor cancel_timer_command_attributes(): ::Temporal::Api::Command::V1::CancelTimerCommandAttributes?
 
-          def cancel_timer_command_attributes=: [M < ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes::_ToProto] (M?) -> M?
+          def cancel_timer_command_attributes=: [M < ::Temporal::Api::Command::V1::CancelTimerCommandAttributes::_ToProto] (M?) -> M?
                                               | ...
 
-          def cancel_timer_command_attributes!: () -> ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes?
+          def cancel_timer_command_attributes!: () -> ::Temporal::Api::Command::V1::CancelTimerCommandAttributes?
 
-          attr_accessor cancel_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
+          attr_accessor cancel_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
 
-          def cancel_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def cancel_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                            | ...
 
-          def cancel_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
+          def cancel_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
 
-          attr_accessor request_cancel_external_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
+          attr_accessor request_cancel_external_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
 
-          def request_cancel_external_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def request_cancel_external_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                                             | ...
 
-          def request_cancel_external_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
+          def request_cancel_external_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
 
-          attr_accessor record_marker_command_attributes(): ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes?
+          attr_accessor record_marker_command_attributes(): ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes?
 
-          def record_marker_command_attributes=: [M < ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes::_ToProto] (M?) -> M?
+          def record_marker_command_attributes=: [M < ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes::_ToProto] (M?) -> M?
                                                | ...
 
-          def record_marker_command_attributes!: () -> ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes?
+          def record_marker_command_attributes!: () -> ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes?
 
-          attr_accessor continue_as_new_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
+          attr_accessor continue_as_new_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
 
-          def continue_as_new_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def continue_as_new_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                                     | ...
 
-          def continue_as_new_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
+          def continue_as_new_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
 
-          attr_accessor start_child_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
+          attr_accessor start_child_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
 
-          def start_child_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def start_child_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                                 | ...
 
-          def start_child_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
+          def start_child_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
 
-          attr_accessor signal_external_workflow_execution_command_attributes(): ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
+          attr_accessor signal_external_workflow_execution_command_attributes(): ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
 
-          def signal_external_workflow_execution_command_attributes=: [M < ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
+          def signal_external_workflow_execution_command_attributes=: [M < ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::_ToProto] (M?) -> M?
                                                                     | ...
 
-          def signal_external_workflow_execution_command_attributes!: () -> ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
+          def signal_external_workflow_execution_command_attributes!: () -> ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
 
-          attr_accessor upsert_workflow_search_attributes_command_attributes(): ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
+          attr_accessor upsert_workflow_search_attributes_command_attributes(): ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
 
-          def upsert_workflow_search_attributes_command_attributes=: [M < ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::_ToProto] (M?) -> M?
+          def upsert_workflow_search_attributes_command_attributes=: [M < ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::_ToProto] (M?) -> M?
                                                                    | ...
 
-          def upsert_workflow_search_attributes_command_attributes!: () -> ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
+          def upsert_workflow_search_attributes_command_attributes!: () -> ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
 
-          attr_accessor accept_workflow_update_command_attributes(): ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes?
+          attr_accessor protocol_message_command_attributes(): ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes?
 
-          def accept_workflow_update_command_attributes=: [M < ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes::_ToProto] (M?) -> M?
-                                                        | ...
+          def protocol_message_command_attributes=: [M < ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes::_ToProto] (M?) -> M?
+                                                  | ...
 
-          def accept_workflow_update_command_attributes!: () -> ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes?
+          def protocol_message_command_attributes!: () -> ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes?
 
-          attr_accessor complete_workflow_update_command_attributes(): ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes?
+          # 16 is available for use - it was used as part of a prototype that never made it into a release
+          #
+          attr_accessor modify_workflow_properties_command_attributes(): ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
 
-          def complete_workflow_update_command_attributes=: [M < ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes::_ToProto] (M?) -> M?
-                                                          | ...
-
-          def complete_workflow_update_command_attributes!: () -> ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes?
-
-          attr_accessor modify_workflow_properties_command_attributes(): ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
-
-          def modify_workflow_properties_command_attributes=: [M < ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::_ToProto] (M?) -> M?
+          # 16 is available for use - it was used as part of a prototype that never made it into a release
+          #
+          def modify_workflow_properties_command_attributes=: [M < ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::_ToProto] (M?) -> M?
                                                             | ...
 
-          def modify_workflow_properties_command_attributes!: () -> ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
+          def modify_workflow_properties_command_attributes!: () -> ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
 
-          attr_accessor reject_workflow_update_command_attributes(): ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes?
+          def initialize: (?command_type: ::Temporal::Api::Enums::V1::CommandType::init, ?schedule_activity_task_command_attributes: ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes::init?, ?start_timer_command_attributes: ::Temporal::Api::Command::V1::StartTimerCommandAttributes::init?, ?complete_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::init?, ?fail_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes::init?, ?request_cancel_activity_task_command_attributes: ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::init?, ?cancel_timer_command_attributes: ::Temporal::Api::Command::V1::CancelTimerCommandAttributes::init?, ?cancel_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::init?, ?request_cancel_external_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::init?, ?record_marker_command_attributes: ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes::init?, ?continue_as_new_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::init?, ?start_child_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::init?, ?signal_external_workflow_execution_command_attributes: ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::init?, ?upsert_workflow_search_attributes_command_attributes: ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::init?, ?protocol_message_command_attributes: ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes::init?, ?modify_workflow_properties_command_attributes: ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::init?) -> void
 
-          def reject_workflow_update_command_attributes=: [M < ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes::_ToProto] (M?) -> M?
-                                                        | ...
-
-          def reject_workflow_update_command_attributes!: () -> ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes?
-
-          def initialize: (?command_type: ::Temporalio::Api::Enums::V1::CommandType::init, ?schedule_activity_task_command_attributes: ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes::init?, ?start_timer_command_attributes: ::Temporalio::Api::Command::V1::StartTimerCommandAttributes::init?, ?complete_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::init?, ?fail_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes::init?, ?request_cancel_activity_task_command_attributes: ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::init?, ?cancel_timer_command_attributes: ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes::init?, ?cancel_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::init?, ?request_cancel_external_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::init?, ?record_marker_command_attributes: ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes::init?, ?continue_as_new_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::init?, ?start_child_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::init?, ?signal_external_workflow_execution_command_attributes: ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::init?, ?upsert_workflow_search_attributes_command_attributes: ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::init?, ?accept_workflow_update_command_attributes: ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes::init?, ?complete_workflow_update_command_attributes: ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes::init?, ?modify_workflow_properties_command_attributes: ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::init?, ?reject_workflow_update_command_attributes: ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes::init?) -> void
-
-          def []: (:command_type) -> ::Temporalio::Api::Enums::V1::CommandType
-                | (:schedule_activity_task_command_attributes) -> ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
-                | (:start_timer_command_attributes) -> ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?
-                | (:complete_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
-                | (:fail_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
-                | (:request_cancel_activity_task_command_attributes) -> ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
-                | (:cancel_timer_command_attributes) -> ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes?
-                | (:cancel_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
-                | (:request_cancel_external_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
-                | (:record_marker_command_attributes) -> ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes?
-                | (:continue_as_new_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
-                | (:start_child_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
-                | (:signal_external_workflow_execution_command_attributes) -> ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
-                | (:upsert_workflow_search_attributes_command_attributes) -> ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
-                | (:accept_workflow_update_command_attributes) -> ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes?
-                | (:complete_workflow_update_command_attributes) -> ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes?
-                | (:modify_workflow_properties_command_attributes) -> ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
-                | (:reject_workflow_update_command_attributes) -> ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes?
+          def []: (:command_type) -> ::Temporal::Api::Enums::V1::CommandType
+                | (:schedule_activity_task_command_attributes) -> ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
+                | (:start_timer_command_attributes) -> ::Temporal::Api::Command::V1::StartTimerCommandAttributes?
+                | (:complete_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
+                | (:fail_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
+                | (:request_cancel_activity_task_command_attributes) -> ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
+                | (:cancel_timer_command_attributes) -> ::Temporal::Api::Command::V1::CancelTimerCommandAttributes?
+                | (:cancel_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
+                | (:request_cancel_external_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
+                | (:record_marker_command_attributes) -> ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes?
+                | (:continue_as_new_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
+                | (:start_child_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
+                | (:signal_external_workflow_execution_command_attributes) -> ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
+                | (:upsert_workflow_search_attributes_command_attributes) -> ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
+                | (:protocol_message_command_attributes) -> ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes?
+                | (:modify_workflow_properties_command_attributes) -> ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
                 | (::Symbol) -> untyped
 
-          def []=: (:command_type, ::Temporalio::Api::Enums::V1::CommandType) -> ::Temporalio::Api::Enums::V1::CommandType
-                 | (:command_type, ::Temporalio::Api::Enums::V1::CommandType::values) -> ::Temporalio::Api::Enums::V1::CommandType::values
-                 | (:schedule_activity_task_command_attributes, ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?) -> ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes::_ToProto] (:schedule_activity_task_command_attributes, M?) -> M?
-                 | (:start_timer_command_attributes, ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?) -> ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::StartTimerCommandAttributes::_ToProto] (:start_timer_command_attributes, M?) -> M?
-                 | (:complete_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::_ToProto] (:complete_workflow_execution_command_attributes, M?) -> M?
-                 | (:fail_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::FailWorkflowExecutionCommandAttributes::_ToProto] (:fail_workflow_execution_command_attributes, M?) -> M?
-                 | (:request_cancel_activity_task_command_attributes, ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?) -> ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::_ToProto] (:request_cancel_activity_task_command_attributes, M?) -> M?
-                 | (:cancel_timer_command_attributes, ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes?) -> ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::CancelTimerCommandAttributes::_ToProto] (:cancel_timer_command_attributes, M?) -> M?
-                 | (:cancel_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::_ToProto] (:cancel_workflow_execution_command_attributes, M?) -> M?
-                 | (:request_cancel_external_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::_ToProto] (:request_cancel_external_workflow_execution_command_attributes, M?) -> M?
-                 | (:record_marker_command_attributes, ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes?) -> ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::RecordMarkerCommandAttributes::_ToProto] (:record_marker_command_attributes, M?) -> M?
-                 | (:continue_as_new_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::_ToProto] (:continue_as_new_workflow_execution_command_attributes, M?) -> M?
-                 | (:start_child_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::_ToProto] (:start_child_workflow_execution_command_attributes, M?) -> M?
-                 | (:signal_external_workflow_execution_command_attributes, ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?) -> ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::_ToProto] (:signal_external_workflow_execution_command_attributes, M?) -> M?
-                 | (:upsert_workflow_search_attributes_command_attributes, ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?) -> ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::_ToProto] (:upsert_workflow_search_attributes_command_attributes, M?) -> M?
-                 | (:accept_workflow_update_command_attributes, ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes?) -> ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::AcceptWorkflowUpdateCommandAttributes::_ToProto] (:accept_workflow_update_command_attributes, M?) -> M?
-                 | (:complete_workflow_update_command_attributes, ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes?) -> ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::CompleteWorkflowUpdateCommandAttributes::_ToProto] (:complete_workflow_update_command_attributes, M?) -> M?
-                 | (:modify_workflow_properties_command_attributes, ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?) -> ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::_ToProto] (:modify_workflow_properties_command_attributes, M?) -> M?
-                 | (:reject_workflow_update_command_attributes, ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes?) -> ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes?
-                 | [M < ::Temporalio::Api::Command::V1::RejectWorkflowUpdateCommandAttributes::_ToProto] (:reject_workflow_update_command_attributes, M?) -> M?
+          def []=: (:command_type, ::Temporal::Api::Enums::V1::CommandType) -> ::Temporal::Api::Enums::V1::CommandType
+                 | (:command_type, ::Temporal::Api::Enums::V1::CommandType::values) -> ::Temporal::Api::Enums::V1::CommandType::values
+                 | (:schedule_activity_task_command_attributes, ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes?) -> ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::ScheduleActivityTaskCommandAttributes::_ToProto] (:schedule_activity_task_command_attributes, M?) -> M?
+                 | (:start_timer_command_attributes, ::Temporal::Api::Command::V1::StartTimerCommandAttributes?) -> ::Temporal::Api::Command::V1::StartTimerCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::StartTimerCommandAttributes::_ToProto] (:start_timer_command_attributes, M?) -> M?
+                 | (:complete_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes::_ToProto] (:complete_workflow_execution_command_attributes, M?) -> M?
+                 | (:fail_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::FailWorkflowExecutionCommandAttributes::_ToProto] (:fail_workflow_execution_command_attributes, M?) -> M?
+                 | (:request_cancel_activity_task_command_attributes, ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?) -> ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::RequestCancelActivityTaskCommandAttributes::_ToProto] (:request_cancel_activity_task_command_attributes, M?) -> M?
+                 | (:cancel_timer_command_attributes, ::Temporal::Api::Command::V1::CancelTimerCommandAttributes?) -> ::Temporal::Api::Command::V1::CancelTimerCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::CancelTimerCommandAttributes::_ToProto] (:cancel_timer_command_attributes, M?) -> M?
+                 | (:cancel_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::CancelWorkflowExecutionCommandAttributes::_ToProto] (:cancel_workflow_execution_command_attributes, M?) -> M?
+                 | (:request_cancel_external_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::RequestCancelExternalWorkflowExecutionCommandAttributes::_ToProto] (:request_cancel_external_workflow_execution_command_attributes, M?) -> M?
+                 | (:record_marker_command_attributes, ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes?) -> ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::RecordMarkerCommandAttributes::_ToProto] (:record_marker_command_attributes, M?) -> M?
+                 | (:continue_as_new_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::ContinueAsNewWorkflowExecutionCommandAttributes::_ToProto] (:continue_as_new_workflow_execution_command_attributes, M?) -> M?
+                 | (:start_child_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes::_ToProto] (:start_child_workflow_execution_command_attributes, M?) -> M?
+                 | (:signal_external_workflow_execution_command_attributes, ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?) -> ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::SignalExternalWorkflowExecutionCommandAttributes::_ToProto] (:signal_external_workflow_execution_command_attributes, M?) -> M?
+                 | (:upsert_workflow_search_attributes_command_attributes, ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?) -> ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::UpsertWorkflowSearchAttributesCommandAttributes::_ToProto] (:upsert_workflow_search_attributes_command_attributes, M?) -> M?
+                 | (:protocol_message_command_attributes, ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes?) -> ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::ProtocolMessageCommandAttributes::_ToProto] (:protocol_message_command_attributes, M?) -> M?
+                 | (:modify_workflow_properties_command_attributes, ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?) -> ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes?
+                 | [M < ::Temporal::Api::Command::V1::ModifyWorkflowPropertiesCommandAttributes::_ToProto] (:modify_workflow_properties_command_attributes, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

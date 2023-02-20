@@ -41,7 +41,7 @@ describe Temporalio::Worker::ActivityRunner do
   let(:interceptors) { [] }
 
   let(:task) do
-    Coresdk::ActivityTask::Start.new(
+    Temporalio::Bridge::Api::ActivityTask::Start.new(
       workflow_namespace: 'test-namespace',
       workflow_type: 'test-workflow',
       workflow_execution: { workflow_id: 'test-workflow-id', run_id: 'test-run-id' },

@@ -12,19 +12,19 @@ class Google::Protobuf::Duration
 end
 
 # Source: google/protobuf
-class Coresdk::ActivityTaskCompletion
-  def self.encode: (Coresdk::ActivityTaskCompletion) -> String
+class Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion
+  def self.encode: (Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion) -> String
 end
 
-class Coresdk::ActivityHeartbeat
-  def self.encode: (Coresdk::ActivityHeartbeat) -> String
+class Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat
+  def self.encode: (Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat) -> String
 end
 
-class Coresdk::WorkflowCompletion::WorkflowActivationCompletion
-  def self.encode: (Coresdk::WorkflowCompletion::WorkflowActivationCompletion) -> String
+class Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion
+  def self.encode: (Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion) -> String
 end
 
-class Coresdk::WorkflowActivation::WorkflowActivationJob
+class Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob
   def variant: -> Symbol
 end
 

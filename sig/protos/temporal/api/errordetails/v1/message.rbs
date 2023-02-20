@@ -1,6 +1,6 @@
-module Temporalio
+module Temporal
   module Api
-    module ErrorDetails
+    module Errordetails
       module V1
         class NotFoundFailure < ::Protobuf::Message
           attr_accessor current_cluster(): ::String
@@ -126,40 +126,40 @@ module Temporalio
 
           # Current state of the requested namespace.
           #
-          attr_accessor state(): ::Temporalio::Api::Enums::V1::NamespaceState
+          attr_accessor state(): ::Temporal::Api::Enums::V1::NamespaceState
 
           # Current state of the requested namespace.
           #
-          def state=: (::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
+          def state=: (::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
                     | ...
 
-          def state!: () -> ::Temporalio::Api::Enums::V1::NamespaceState?
+          def state!: () -> ::Temporal::Api::Enums::V1::NamespaceState?
 
           # Allowed namespace states for requested operation.
           #  For example NAMESPACE_STATE_DELETED is forbidden for most operations but allowed for DescribeNamespace.
           #
-          attr_accessor allowed_states(): ::Temporalio::Api::Enums::V1::NamespaceState::field_array
+          attr_accessor allowed_states(): ::Temporal::Api::Enums::V1::NamespaceState::field_array
 
           # Allowed namespace states for requested operation.
           #  For example NAMESPACE_STATE_DELETED is forbidden for most operations but allowed for DescribeNamespace.
           #
-          def allowed_states=: (::Temporalio::Api::Enums::V1::NamespaceState::array) -> ::Temporalio::Api::Enums::V1::NamespaceState::array
+          def allowed_states=: (::Temporal::Api::Enums::V1::NamespaceState::array) -> ::Temporal::Api::Enums::V1::NamespaceState::array
                              | ...
 
-          def allowed_states!: () -> ::Temporalio::Api::Enums::V1::NamespaceState::field_array?
+          def allowed_states!: () -> ::Temporal::Api::Enums::V1::NamespaceState::field_array?
 
-          def initialize: (?namespace: ::String, ?state: ::Temporalio::Api::Enums::V1::NamespaceState::init, ?allowed_states: ::Temporalio::Api::Enums::V1::NamespaceState::array) -> void
+          def initialize: (?namespace: ::String, ?state: ::Temporal::Api::Enums::V1::NamespaceState::init, ?allowed_states: ::Temporal::Api::Enums::V1::NamespaceState::array) -> void
 
           def []: (:namespace) -> ::String
-                | (:state) -> ::Temporalio::Api::Enums::V1::NamespaceState
-                | (:allowed_states) -> ::Temporalio::Api::Enums::V1::NamespaceState::field_array
+                | (:state) -> ::Temporal::Api::Enums::V1::NamespaceState
+                | (:allowed_states) -> ::Temporal::Api::Enums::V1::NamespaceState::field_array
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState) -> ::Temporalio::Api::Enums::V1::NamespaceState
-                 | (:state, ::Temporalio::Api::Enums::V1::NamespaceState::values) -> ::Temporalio::Api::Enums::V1::NamespaceState::values
-                 | (:allowed_states, ::Temporalio::Api::Enums::V1::NamespaceState::field_array) -> ::Temporalio::Api::Enums::V1::NamespaceState::field_array
-                 | (:allowed_states, ::Temporalio::Api::Enums::V1::NamespaceState::array) -> ::Temporalio::Api::Enums::V1::NamespaceState::array
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState) -> ::Temporal::Api::Enums::V1::NamespaceState
+                 | (:state, ::Temporal::Api::Enums::V1::NamespaceState::values) -> ::Temporal::Api::Enums::V1::NamespaceState::values
+                 | (:allowed_states, ::Temporal::Api::Enums::V1::NamespaceState::field_array) -> ::Temporal::Api::Enums::V1::NamespaceState::field_array
+                 | (:allowed_states, ::Temporal::Api::Enums::V1::NamespaceState::array) -> ::Temporal::Api::Enums::V1::NamespaceState::array
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -386,20 +386,20 @@ module Temporalio
         end
 
         class ResourceExhaustedFailure < ::Protobuf::Message
-          attr_accessor cause(): ::Temporalio::Api::Enums::V1::ResourceExhaustedCause
+          attr_accessor cause(): ::Temporal::Api::Enums::V1::ResourceExhaustedCause
 
-          def cause=: (::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values
+          def cause=: (::Temporal::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values
                     | ...
 
-          def cause!: () -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause?
+          def cause!: () -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause?
 
-          def initialize: (?cause: ::Temporalio::Api::Enums::V1::ResourceExhaustedCause::init) -> void
+          def initialize: (?cause: ::Temporal::Api::Enums::V1::ResourceExhaustedCause::init) -> void
 
-          def []: (:cause) -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause
+          def []: (:cause) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause
                 | (::Symbol) -> untyped
 
-          def []=: (:cause, ::Temporalio::Api::Enums::V1::ResourceExhaustedCause) -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause
-                 | (:cause, ::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values
+          def []=: (:cause, ::Temporal::Api::Enums::V1::ResourceExhaustedCause) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause
+                 | (:cause, ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporal::Api::Enums::V1::ResourceExhaustedCause::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -424,15 +424,15 @@ module Temporalio
           # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
           #  Looking up the info of the system workflow run may help identify the issue causing the failure.
           #
-          attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
+          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
           # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
           #  Looking up the info of the system workflow run may help identify the issue causing the failure.
           #
-          def workflow_execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                                  | ...
 
-          def workflow_execution!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
 
           # Serialized error returned by the system workflow performing the underlying operation.
           #
@@ -440,14 +440,14 @@ module Temporalio
 
           def workflow_error!: () -> ::String?
 
-          def initialize: (?workflow_execution: ::Temporalio::Api::Common::V1::WorkflowExecution::init?, ?workflow_error: ::String) -> void
+          def initialize: (?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_error: ::String) -> void
 
-          def []: (:workflow_execution) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def []: (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
                 | (:workflow_error) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:workflow_execution, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+          def []=: (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
                  | (:workflow_error, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 

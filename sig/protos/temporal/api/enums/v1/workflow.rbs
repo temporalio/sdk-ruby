@@ -1,4 +1,4 @@
-module Temporalio
+module Temporal
   module Api
     module Enums
       module V1

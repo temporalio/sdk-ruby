@@ -28,7 +28,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  ActivityHeartbeat = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.ActivityHeartbeat").msgclass
-  ActivityTaskCompletion = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.ActivityTaskCompletion").msgclass
+module Temporalio
+  module Bridge
+    module Api
+      module CoreInterface
+        ActivityHeartbeat = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.ActivityHeartbeat").msgclass
+        ActivityTaskCompletion = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.ActivityTaskCompletion").msgclass
+      end
+    end
+  end
 end

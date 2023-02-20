@@ -5,9 +5,11 @@ require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/api/enums/v1/update.proto", :syntax => :proto3) do
-    add_enum "temporal.api.enums.v1.WorkflowUpdateResultAccessStyle" do
-      value :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED, 0
-      value :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE, 1
+    add_enum "temporal.api.enums.v1.UpdateWorkflowExecutionLifecycleStage" do
+      value :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED, 0
+      value :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ADMITTED, 1
+      value :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ACCEPTED, 2
+      value :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_COMPLETED, 3
     end
   end
 end
@@ -16,7 +18,7 @@ module Temporalio
   module Api
     module Enums
       module V1
-        WorkflowUpdateResultAccessStyle = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.enums.v1.WorkflowUpdateResultAccessStyle").enummodule
+        UpdateWorkflowExecutionLifecycleStage = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.enums.v1.UpdateWorkflowExecutionLifecycleStage").enummodule
       end
     end
   end

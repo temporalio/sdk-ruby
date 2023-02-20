@@ -1,53 +1,53 @@
 module Coresdk
-  module ActivityResult
+  module Activity_result
     # *
     #  Used to report activity completions to core
     #
     class ActivityExecutionResult < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::ActivityResult::Success?
+      attr_accessor completed(): ::Temporalio::Bridge::Api::ActivityResult::Success?
 
-      def completed=: [M < ::Coresdk::ActivityResult::Success::_ToProto] (M?) -> M?
+      def completed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (M?) -> M?
                     | ...
 
-      def completed!: () -> ::Coresdk::ActivityResult::Success?
+      def completed!: () -> ::Temporalio::Bridge::Api::ActivityResult::Success?
 
-      attr_accessor failed(): ::Coresdk::ActivityResult::Failure?
+      attr_accessor failed(): ::Temporalio::Bridge::Api::ActivityResult::Failure?
 
-      def failed=: [M < ::Coresdk::ActivityResult::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::ActivityResult::Failure?
+      def failed!: () -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
 
-      attr_accessor cancelled(): ::Coresdk::ActivityResult::Cancellation?
+      attr_accessor cancelled(): ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
 
-      def cancelled=: [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Temporalio::Bridge::Api::ActivityResult::Cancellation::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::ActivityResult::Cancellation?
+      def cancelled!: () -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
 
-      attr_accessor will_complete_async(): ::Coresdk::ActivityResult::WillCompleteAsync?
+      attr_accessor will_complete_async(): ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync?
 
-      def will_complete_async=: [M < ::Coresdk::ActivityResult::WillCompleteAsync::_ToProto] (M?) -> M?
+      def will_complete_async=: [M < ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync::_ToProto] (M?) -> M?
                               | ...
 
-      def will_complete_async!: () -> ::Coresdk::ActivityResult::WillCompleteAsync?
+      def will_complete_async!: () -> ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync?
 
-      def initialize: (?completed: ::Coresdk::ActivityResult::Success::init?, ?failed: ::Coresdk::ActivityResult::Failure::init?, ?cancelled: ::Coresdk::ActivityResult::Cancellation::init?, ?will_complete_async: ::Coresdk::ActivityResult::WillCompleteAsync::init?) -> void
+      def initialize: (?completed: ::Temporalio::Bridge::Api::ActivityResult::Success::init?, ?failed: ::Temporalio::Bridge::Api::ActivityResult::Failure::init?, ?cancelled: ::Temporalio::Bridge::Api::ActivityResult::Cancellation::init?, ?will_complete_async: ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync::init?) -> void
 
-      def []: (:completed) -> ::Coresdk::ActivityResult::Success?
-            | (:failed) -> ::Coresdk::ActivityResult::Failure?
-            | (:cancelled) -> ::Coresdk::ActivityResult::Cancellation?
-            | (:will_complete_async) -> ::Coresdk::ActivityResult::WillCompleteAsync?
+      def []: (:completed) -> ::Temporalio::Bridge::Api::ActivityResult::Success?
+            | (:failed) -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
+            | (:cancelled) -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
+            | (:will_complete_async) -> ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync?
             | (::Symbol) -> untyped
 
-      def []=: (:completed, ::Coresdk::ActivityResult::Success?) -> ::Coresdk::ActivityResult::Success?
-             | [M < ::Coresdk::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::ActivityResult::Failure?) -> ::Coresdk::ActivityResult::Failure?
-             | [M < ::Coresdk::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::ActivityResult::Cancellation?) -> ::Coresdk::ActivityResult::Cancellation?
-             | [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
-             | (:will_complete_async, ::Coresdk::ActivityResult::WillCompleteAsync?) -> ::Coresdk::ActivityResult::WillCompleteAsync?
-             | [M < ::Coresdk::ActivityResult::WillCompleteAsync::_ToProto] (:will_complete_async, M?) -> M?
+      def []=: (:completed, ::Temporalio::Bridge::Api::ActivityResult::Success?) -> ::Temporalio::Bridge::Api::ActivityResult::Success?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Temporalio::Bridge::Api::ActivityResult::Failure?) -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Temporalio::Bridge::Api::ActivityResult::Cancellation?) -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:will_complete_async, ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync?) -> ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::WillCompleteAsync::_ToProto] (:will_complete_async, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -72,50 +72,50 @@ module Coresdk
     #  in the workflow.
     #
     class ActivityResolution < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::ActivityResult::Success?
+      attr_accessor completed(): ::Temporalio::Bridge::Api::ActivityResult::Success?
 
-      def completed=: [M < ::Coresdk::ActivityResult::Success::_ToProto] (M?) -> M?
+      def completed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (M?) -> M?
                     | ...
 
-      def completed!: () -> ::Coresdk::ActivityResult::Success?
+      def completed!: () -> ::Temporalio::Bridge::Api::ActivityResult::Success?
 
-      attr_accessor failed(): ::Coresdk::ActivityResult::Failure?
+      attr_accessor failed(): ::Temporalio::Bridge::Api::ActivityResult::Failure?
 
-      def failed=: [M < ::Coresdk::ActivityResult::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::ActivityResult::Failure?
+      def failed!: () -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
 
-      attr_accessor cancelled(): ::Coresdk::ActivityResult::Cancellation?
+      attr_accessor cancelled(): ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
 
-      def cancelled=: [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Temporalio::Bridge::Api::ActivityResult::Cancellation::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::ActivityResult::Cancellation?
+      def cancelled!: () -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
 
-      attr_accessor backoff(): ::Coresdk::ActivityResult::DoBackoff?
+      attr_accessor backoff(): ::Temporalio::Bridge::Api::ActivityResult::DoBackoff?
 
-      def backoff=: [M < ::Coresdk::ActivityResult::DoBackoff::_ToProto] (M?) -> M?
+      def backoff=: [M < ::Temporalio::Bridge::Api::ActivityResult::DoBackoff::_ToProto] (M?) -> M?
                   | ...
 
-      def backoff!: () -> ::Coresdk::ActivityResult::DoBackoff?
+      def backoff!: () -> ::Temporalio::Bridge::Api::ActivityResult::DoBackoff?
 
-      def initialize: (?completed: ::Coresdk::ActivityResult::Success::init?, ?failed: ::Coresdk::ActivityResult::Failure::init?, ?cancelled: ::Coresdk::ActivityResult::Cancellation::init?, ?backoff: ::Coresdk::ActivityResult::DoBackoff::init?) -> void
+      def initialize: (?completed: ::Temporalio::Bridge::Api::ActivityResult::Success::init?, ?failed: ::Temporalio::Bridge::Api::ActivityResult::Failure::init?, ?cancelled: ::Temporalio::Bridge::Api::ActivityResult::Cancellation::init?, ?backoff: ::Temporalio::Bridge::Api::ActivityResult::DoBackoff::init?) -> void
 
-      def []: (:completed) -> ::Coresdk::ActivityResult::Success?
-            | (:failed) -> ::Coresdk::ActivityResult::Failure?
-            | (:cancelled) -> ::Coresdk::ActivityResult::Cancellation?
-            | (:backoff) -> ::Coresdk::ActivityResult::DoBackoff?
+      def []: (:completed) -> ::Temporalio::Bridge::Api::ActivityResult::Success?
+            | (:failed) -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
+            | (:cancelled) -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
+            | (:backoff) -> ::Temporalio::Bridge::Api::ActivityResult::DoBackoff?
             | (::Symbol) -> untyped
 
-      def []=: (:completed, ::Coresdk::ActivityResult::Success?) -> ::Coresdk::ActivityResult::Success?
-             | [M < ::Coresdk::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::ActivityResult::Failure?) -> ::Coresdk::ActivityResult::Failure?
-             | [M < ::Coresdk::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::ActivityResult::Cancellation?) -> ::Coresdk::ActivityResult::Cancellation?
-             | [M < ::Coresdk::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
-             | (:backoff, ::Coresdk::ActivityResult::DoBackoff?) -> ::Coresdk::ActivityResult::DoBackoff?
-             | [M < ::Coresdk::ActivityResult::DoBackoff::_ToProto] (:backoff, M?) -> M?
+      def []=: (:completed, ::Temporalio::Bridge::Api::ActivityResult::Success?) -> ::Temporalio::Bridge::Api::ActivityResult::Success?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Temporalio::Bridge::Api::ActivityResult::Failure?) -> ::Temporalio::Bridge::Api::ActivityResult::Failure?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Temporalio::Bridge::Api::ActivityResult::Cancellation?) -> ::Temporalio::Bridge::Api::ActivityResult::Cancellation?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::Cancellation::_ToProto] (:cancelled, M?) -> M?
+             | (:backoff, ::Temporalio::Bridge::Api::ActivityResult::DoBackoff?) -> ::Temporalio::Bridge::Api::ActivityResult::DoBackoff?
+             | [M < ::Temporalio::Bridge::Api::ActivityResult::DoBackoff::_ToProto] (:backoff, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -139,20 +139,20 @@ module Coresdk
     # * Used to report successful completion either when executing or resolving
     #
     class Success < ::Protobuf::Message
-      attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
+      attr_accessor result(): ::Temporal::Api::Common::V1::Payload?
 
-      def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+      def result=: [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (M?) -> M?
                  | ...
 
-      def result!: () -> ::Temporalio::Api::Common::V1::Payload?
+      def result!: () -> ::Temporal::Api::Common::V1::Payload?
 
-      def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
+      def initialize: (?result: ::Temporal::Api::Common::V1::Payload::init?) -> void
 
-      def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
+      def []: (:result) -> ::Temporal::Api::Common::V1::Payload?
             | (::Symbol) -> untyped
 
-      def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-             | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
+      def []=: (:result, ::Temporal::Api::Common::V1::Payload?) -> ::Temporal::Api::Common::V1::Payload?
+             | [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -176,20 +176,20 @@ module Coresdk
     # * Used to report activity failure either when executing or resolving
     #
     class Failure < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -217,20 +217,20 @@ module Coresdk
     #  as the cause in the failure field.
     #
     class Cancellation < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

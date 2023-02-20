@@ -26,6 +26,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :history_archival_uri, :string, 4
       optional :visibility_archival_state, :enum, 5, "temporal.api.enums.v1.ArchivalState"
       optional :visibility_archival_uri, :string, 6
+      map :custom_search_attribute_aliases, :string, :string, 7
     end
     add_message "temporal.api.namespace.v1.BadBinaries" do
       map :binaries, :string, :message, 1, "temporal.api.namespace.v1.BadBinaryInfo"

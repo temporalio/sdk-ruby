@@ -168,29 +168,33 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module WorkflowCommands
-    WorkflowCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.WorkflowCommand").msgclass
-    StartTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.StartTimer").msgclass
-    CancelTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelTimer").msgclass
-    ScheduleActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ScheduleActivity").msgclass
-    ScheduleLocalActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ScheduleLocalActivity").msgclass
-    RequestCancelActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelActivity").msgclass
-    RequestCancelLocalActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelLocalActivity").msgclass
-    QueryResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.QueryResult").msgclass
-    QuerySuccess = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.QuerySuccess").msgclass
-    CompleteWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CompleteWorkflowExecution").msgclass
-    FailWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.FailWorkflowExecution").msgclass
-    ContinueAsNewWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ContinueAsNewWorkflowExecution").msgclass
-    CancelWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelWorkflowExecution").msgclass
-    SetPatchMarker = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.SetPatchMarker").msgclass
-    StartChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.StartChildWorkflowExecution").msgclass
-    CancelChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelChildWorkflowExecution").msgclass
-    RequestCancelExternalWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelExternalWorkflowExecution").msgclass
-    SignalExternalWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.SignalExternalWorkflowExecution").msgclass
-    CancelSignalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelSignalWorkflow").msgclass
-    UpsertWorkflowSearchAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.UpsertWorkflowSearchAttributes").msgclass
-    ModifyWorkflowProperties = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ModifyWorkflowProperties").msgclass
-    ActivityCancellationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ActivityCancellationType").enummodule
+module Temporalio
+  module Bridge
+    module Api
+      module WorkflowCommands
+        WorkflowCommand = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.WorkflowCommand").msgclass
+        StartTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.StartTimer").msgclass
+        CancelTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelTimer").msgclass
+        ScheduleActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ScheduleActivity").msgclass
+        ScheduleLocalActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ScheduleLocalActivity").msgclass
+        RequestCancelActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelActivity").msgclass
+        RequestCancelLocalActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelLocalActivity").msgclass
+        QueryResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.QueryResult").msgclass
+        QuerySuccess = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.QuerySuccess").msgclass
+        CompleteWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CompleteWorkflowExecution").msgclass
+        FailWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.FailWorkflowExecution").msgclass
+        ContinueAsNewWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ContinueAsNewWorkflowExecution").msgclass
+        CancelWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelWorkflowExecution").msgclass
+        SetPatchMarker = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.SetPatchMarker").msgclass
+        StartChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.StartChildWorkflowExecution").msgclass
+        CancelChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelChildWorkflowExecution").msgclass
+        RequestCancelExternalWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.RequestCancelExternalWorkflowExecution").msgclass
+        SignalExternalWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.SignalExternalWorkflowExecution").msgclass
+        CancelSignalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.CancelSignalWorkflow").msgclass
+        UpsertWorkflowSearchAttributes = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.UpsertWorkflowSearchAttributes").msgclass
+        ModifyWorkflowProperties = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ModifyWorkflowProperties").msgclass
+        ActivityCancellationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_commands.ActivityCancellationType").enummodule
+      end
+    end
   end
 end

@@ -1,4 +1,4 @@
-module Temporalio
+module Temporal
   module Api
     module Query
       module V1
@@ -13,40 +13,40 @@ module Temporalio
 
           # Serialized arguments that will be provided to the query handler.
           #
-          attr_accessor query_args(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor query_args(): ::Temporal::Api::Common::V1::Payloads?
 
           # Serialized arguments that will be provided to the query handler.
           #
-          def query_args=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def query_args=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                          | ...
 
-          def query_args!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def query_args!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Headers that were passed by the caller of the query and copied by temporal 
           #  server into the workflow task.
           #
-          attr_accessor header(): ::Temporalio::Api::Common::V1::Header?
+          attr_accessor header(): ::Temporal::Api::Common::V1::Header?
 
           # Headers that were passed by the caller of the query and copied by temporal 
           #  server into the workflow task.
           #
-          def header=: [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (M?) -> M?
+          def header=: [M < ::Temporal::Api::Common::V1::Header::_ToProto] (M?) -> M?
                      | ...
 
-          def header!: () -> ::Temporalio::Api::Common::V1::Header?
+          def header!: () -> ::Temporal::Api::Common::V1::Header?
 
-          def initialize: (?query_type: ::String, ?query_args: ::Temporalio::Api::Common::V1::Payloads::init?, ?header: ::Temporalio::Api::Common::V1::Header::init?) -> void
+          def initialize: (?query_type: ::String, ?query_args: ::Temporal::Api::Common::V1::Payloads::init?, ?header: ::Temporal::Api::Common::V1::Header::init?) -> void
 
           def []: (:query_type) -> ::String
-                | (:query_args) -> ::Temporalio::Api::Common::V1::Payloads?
-                | (:header) -> ::Temporalio::Api::Common::V1::Header?
+                | (:query_args) -> ::Temporal::Api::Common::V1::Payloads?
+                | (:header) -> ::Temporal::Api::Common::V1::Header?
                 | (::Symbol) -> untyped
 
           def []=: (:query_type, ::String) -> ::String
-                 | (:query_args, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:query_args, M?) -> M?
-                 | (:header, ::Temporalio::Api::Common::V1::Header?) -> ::Temporalio::Api::Common::V1::Header?
-                 | [M < ::Temporalio::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
+                 | (:query_args, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:query_args, M?) -> M?
+                 | (:header, ::Temporal::Api::Common::V1::Header?) -> ::Temporal::Api::Common::V1::Header?
+                 | [M < ::Temporal::Api::Common::V1::Header::_ToProto] (:header, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -72,25 +72,25 @@ module Temporalio
         class WorkflowQueryResult < ::Protobuf::Message
           # Did the query succeed or fail?
           #
-          attr_accessor result_type(): ::Temporalio::Api::Enums::V1::QueryResultType
+          attr_accessor result_type(): ::Temporal::Api::Enums::V1::QueryResultType
 
           # Did the query succeed or fail?
           #
-          def result_type=: (::Temporalio::Api::Enums::V1::QueryResultType::values) -> ::Temporalio::Api::Enums::V1::QueryResultType::values
+          def result_type=: (::Temporal::Api::Enums::V1::QueryResultType::values) -> ::Temporal::Api::Enums::V1::QueryResultType::values
                           | ...
 
-          def result_type!: () -> ::Temporalio::Api::Enums::V1::QueryResultType?
+          def result_type!: () -> ::Temporal::Api::Enums::V1::QueryResultType?
 
           # Set when the query succeeds with the results
           #
-          attr_accessor answer(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor answer(): ::Temporal::Api::Common::V1::Payloads?
 
           # Set when the query succeeds with the results
           #
-          def answer=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def answer=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                      | ...
 
-          def answer!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def answer!: () -> ::Temporal::Api::Common::V1::Payloads?
 
           # Mutually exclusive with `answer`. Set when the query fails.
           #
@@ -98,17 +98,17 @@ module Temporalio
 
           def error_message!: () -> ::String?
 
-          def initialize: (?result_type: ::Temporalio::Api::Enums::V1::QueryResultType::init, ?answer: ::Temporalio::Api::Common::V1::Payloads::init?, ?error_message: ::String) -> void
+          def initialize: (?result_type: ::Temporal::Api::Enums::V1::QueryResultType::init, ?answer: ::Temporal::Api::Common::V1::Payloads::init?, ?error_message: ::String) -> void
 
-          def []: (:result_type) -> ::Temporalio::Api::Enums::V1::QueryResultType
-                | (:answer) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:result_type) -> ::Temporal::Api::Enums::V1::QueryResultType
+                | (:answer) -> ::Temporal::Api::Common::V1::Payloads?
                 | (:error_message) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:result_type, ::Temporalio::Api::Enums::V1::QueryResultType) -> ::Temporalio::Api::Enums::V1::QueryResultType
-                 | (:result_type, ::Temporalio::Api::Enums::V1::QueryResultType::values) -> ::Temporalio::Api::Enums::V1::QueryResultType::values
-                 | (:answer, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:answer, M?) -> M?
+          def []=: (:result_type, ::Temporal::Api::Enums::V1::QueryResultType) -> ::Temporal::Api::Enums::V1::QueryResultType
+                 | (:result_type, ::Temporal::Api::Enums::V1::QueryResultType::values) -> ::Temporal::Api::Enums::V1::QueryResultType::values
+                 | (:answer, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:answer, M?) -> M?
                  | (:error_message, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -131,20 +131,20 @@ module Temporalio
         end
 
         class QueryRejected < ::Protobuf::Message
-          attr_accessor status(): ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
+          attr_accessor status(): ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
 
-          def status=: (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values
+          def status=: (::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
                      | ...
 
-          def status!: () -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus?
+          def status!: () -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus?
 
-          def initialize: (?status: ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
+          def initialize: (?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
 
-          def []: (:status) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
+          def []: (:status) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
                 | (::Symbol) -> untyped
 
-          def []=: (:status, ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
-                 | (:status, ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values
+          def []=: (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

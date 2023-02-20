@@ -130,40 +130,40 @@ module Coresdk
     #  Used by core to resolve child workflow executions.
     #
     class ChildWorkflowResult < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::Child_workflow::Success?
+      attr_accessor completed(): ::Temporalio::Bridge::Api::ChildWorkflow::Success?
 
-      def completed=: [M < ::Coresdk::Child_workflow::Success::_ToProto] (M?) -> M?
+      def completed=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Success::_ToProto] (M?) -> M?
                     | ...
 
-      def completed!: () -> ::Coresdk::Child_workflow::Success?
+      def completed!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
 
-      attr_accessor failed(): ::Coresdk::Child_workflow::Failure?
+      attr_accessor failed(): ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
 
-      def failed=: [M < ::Coresdk::Child_workflow::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::Child_workflow::Failure?
+      def failed!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
 
-      attr_accessor cancelled(): ::Coresdk::Child_workflow::Cancellation?
+      attr_accessor cancelled(): ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
 
-      def cancelled=: [M < ::Coresdk::Child_workflow::Cancellation::_ToProto] (M?) -> M?
+      def cancelled=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::_ToProto] (M?) -> M?
                     | ...
 
-      def cancelled!: () -> ::Coresdk::Child_workflow::Cancellation?
+      def cancelled!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
 
-      def initialize: (?completed: ::Coresdk::Child_workflow::Success::init?, ?failed: ::Coresdk::Child_workflow::Failure::init?, ?cancelled: ::Coresdk::Child_workflow::Cancellation::init?) -> void
+      def initialize: (?completed: ::Temporalio::Bridge::Api::ChildWorkflow::Success::init?, ?failed: ::Temporalio::Bridge::Api::ChildWorkflow::Failure::init?, ?cancelled: ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::init?) -> void
 
-      def []: (:completed) -> ::Coresdk::Child_workflow::Success?
-            | (:failed) -> ::Coresdk::Child_workflow::Failure?
-            | (:cancelled) -> ::Coresdk::Child_workflow::Cancellation?
+      def []: (:completed) -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
+            | (:failed) -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
+            | (:cancelled) -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
             | (::Symbol) -> untyped
 
-      def []=: (:completed, ::Coresdk::Child_workflow::Success?) -> ::Coresdk::Child_workflow::Success?
-             | [M < ::Coresdk::Child_workflow::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::Child_workflow::Failure?) -> ::Coresdk::Child_workflow::Failure?
-             | [M < ::Coresdk::Child_workflow::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::Child_workflow::Cancellation?) -> ::Coresdk::Child_workflow::Cancellation?
-             | [M < ::Coresdk::Child_workflow::Cancellation::_ToProto] (:cancelled, M?) -> M?
+      def []=: (:completed, ::Temporalio::Bridge::Api::ChildWorkflow::Success?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
+             | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Success::_ToProto] (:completed, M?) -> M?
+             | (:failed, ::Temporalio::Bridge::Api::ChildWorkflow::Failure?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
+             | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Failure::_ToProto] (:failed, M?) -> M?
+             | (:cancelled, ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
+             | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::_ToProto] (:cancelled, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -188,20 +188,20 @@ module Coresdk
     #  Used in ChildWorkflowResult to report successful completion.
     #
     class Success < ::Protobuf::Message
-      attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
+      attr_accessor result(): ::Temporal::Api::Common::V1::Payload?
 
-      def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+      def result=: [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (M?) -> M?
                  | ...
 
-      def result!: () -> ::Temporalio::Api::Common::V1::Payload?
+      def result!: () -> ::Temporal::Api::Common::V1::Payload?
 
-      def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
+      def initialize: (?result: ::Temporal::Api::Common::V1::Payload::init?) -> void
 
-      def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
+      def []: (:result) -> ::Temporal::Api::Common::V1::Payload?
             | (::Symbol) -> untyped
 
-      def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-             | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
+      def []=: (:result, ::Temporal::Api::Common::V1::Payload?) -> ::Temporal::Api::Common::V1::Payload?
+             | [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -227,20 +227,20 @@ module Coresdk
     #  application failures, timeouts, terminations, and cancellations.
     #
     class Failure < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -266,20 +266,20 @@ module Coresdk
     #  Failure should be ChildWorkflowFailure with a CanceledFailure cause.
     #
     class Cancellation < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?) -> void
 
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

@@ -1,28 +1,34 @@
-module Temporalio
+module Temporal
   module Api
-    module OperatorService
+    module Operatorservice
       module V1
         # (-- Search Attribute --)
         #
         class AddSearchAttributesRequest < ::Protobuf::Message
           # Mapping between search attribute name and its IndexedValueType.
           #
-          attr_accessor search_attributes(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+          attr_accessor search_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
 
           # Mapping between search attribute name and its IndexedValueType.
           #
-          def search_attributes=: (::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+          def search_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
                                 | ...
 
-          def search_attributes!: () -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+          def search_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
 
-          def initialize: (?search_attributes: ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> void
+          attr_accessor namespace(): ::String
 
-          def []: (:search_attributes) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+          def namespace!: () -> ::String?
+
+          def initialize: (?search_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String], ?namespace: ::String) -> void
+
+          def []: (:search_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (:namespace) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:search_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
-                 | (:search_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+          def []=: (:search_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:search_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (:namespace, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -76,13 +82,19 @@ module Temporalio
 
           def search_attributes!: () -> ::Protobuf::field_array[::String]?
 
-          def initialize: (?search_attributes: ::Array[::String]) -> void
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?search_attributes: ::Array[::String], ?namespace: ::String) -> void
 
           def []: (:search_attributes) -> ::Protobuf::field_array[::String]
+                | (:namespace) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:search_attributes, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
                  | (:search_attributes, ::Array[::String]) -> ::Array[::String]
+                 | (:namespace, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -125,7 +137,17 @@ module Temporalio
         end
 
         class ListSearchAttributesRequest < ::Protobuf::Message
-          def initialize: () -> void
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?namespace: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
 
           interface _ToProto
             def to_proto: () -> ListSearchAttributesRequest
@@ -148,25 +170,25 @@ module Temporalio
         class ListSearchAttributesResponse < ::Protobuf::Message
           # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
           #
-          attr_accessor custom_attributes(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+          attr_accessor custom_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
 
           # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
           #
-          def custom_attributes=: (::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+          def custom_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
                                 | ...
 
-          def custom_attributes!: () -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+          def custom_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
 
           # Mapping between system (predefined) search attribute name to its IndexedValueType.
           #
-          attr_accessor system_attributes(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+          attr_accessor system_attributes(): ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
 
           # Mapping between system (predefined) search attribute name to its IndexedValueType.
           #
-          def system_attributes=: (::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+          def system_attributes=: (::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
                                 | ...
 
-          def system_attributes!: () -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]?
+          def system_attributes!: () -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]?
 
           # Mapping from the attribute name to the visibility storage native type.
           #
@@ -179,17 +201,17 @@ module Temporalio
 
           def storage_schema!: () -> ::Protobuf::field_hash[::String, ::String]?
 
-          def initialize: (?custom_attributes: ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String], ?system_attributes: ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String], ?storage_schema: ::Hash[::String, ::String]) -> void
+          def initialize: (?custom_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String], ?system_attributes: ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String], ?storage_schema: ::Hash[::String, ::String]) -> void
 
-          def []: (:custom_attributes) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
-                | (:system_attributes) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+          def []: (:custom_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (:system_attributes) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
                 | (:storage_schema) -> ::Protobuf::field_hash[::String, ::String]
                 | (::Symbol) -> untyped
 
-          def []=: (:custom_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
-                 | (:custom_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
-                 | (:system_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
-                 | (:system_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+          def []=: (:custom_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:custom_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (:system_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                 | (:system_attributes, ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporal::Api::Enums::V1::IndexedValueType::hash[::String]
                  | (:storage_schema, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
                  | (:storage_schema, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
                  | (::Symbol, untyped) -> untyped
@@ -439,27 +461,27 @@ module Temporalio
         class ListClustersResponse < ::Protobuf::Message
           # List of all cluster information
           #
-          attr_accessor clusters(): ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array
+          attr_accessor clusters(): ::Temporal::Api::Operatorservice::V1::ClusterMetadata::field_array
 
           # List of all cluster information
           #
-          def clusters=: (::Temporalio::Api::OperatorService::V1::ClusterMetadata::array) -> ::Temporalio::Api::OperatorService::V1::ClusterMetadata::array
+          def clusters=: (::Temporal::Api::Operatorservice::V1::ClusterMetadata::array) -> ::Temporal::Api::Operatorservice::V1::ClusterMetadata::array
                        | ...
 
-          def clusters!: () -> ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array?
+          def clusters!: () -> ::Temporal::Api::Operatorservice::V1::ClusterMetadata::field_array?
 
           attr_accessor next_page_token(): ::String
 
           def next_page_token!: () -> ::String?
 
-          def initialize: (?clusters: ::Temporalio::Api::OperatorService::V1::ClusterMetadata::array, ?next_page_token: ::String) -> void
+          def initialize: (?clusters: ::Temporal::Api::Operatorservice::V1::ClusterMetadata::array, ?next_page_token: ::String) -> void
 
-          def []: (:clusters) -> ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array
+          def []: (:clusters) -> ::Temporal::Api::Operatorservice::V1::ClusterMetadata::field_array
                 | (:next_page_token) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:clusters, ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array) -> ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array
-                 | (:clusters, ::Temporalio::Api::OperatorService::V1::ClusterMetadata::array) -> ::Temporalio::Api::OperatorService::V1::ClusterMetadata::array
+          def []=: (:clusters, ::Temporal::Api::Operatorservice::V1::ClusterMetadata::field_array) -> ::Temporal::Api::Operatorservice::V1::ClusterMetadata::field_array
+                 | (:clusters, ::Temporal::Api::Operatorservice::V1::ClusterMetadata::array) -> ::Temporal::Api::Operatorservice::V1::ClusterMetadata::array
                  | (:next_page_token, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 

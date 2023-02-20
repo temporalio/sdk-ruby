@@ -1,4 +1,4 @@
-module Temporalio
+module Temporal
   module Api
     module Failure
       module V1
@@ -11,24 +11,24 @@ module Temporalio
 
           def non_retryable!: () -> bool?
 
-          attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor details(): ::Temporal::Api::Common::V1::Payloads?
 
-          def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                       | ...
 
-          def details!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?type: ::String, ?non_retryable: bool, ?details: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?type: ::String, ?non_retryable: bool, ?details: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
           def []: (:type) -> ::String
                 | (:non_retryable) -> bool
-                | (:details) -> ::Temporalio::Api::Common::V1::Payloads?
+                | (:details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
           def []=: (:type, ::String) -> ::String
                  | (:non_retryable, bool) -> bool
-                 | (:details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
+                 | (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           def non_retryable?: () -> bool
@@ -52,30 +52,30 @@ module Temporalio
         end
 
         class TimeoutFailureInfo < ::Protobuf::Message
-          attr_accessor timeout_type(): ::Temporalio::Api::Enums::V1::TimeoutType
+          attr_accessor timeout_type(): ::Temporal::Api::Enums::V1::TimeoutType
 
-          def timeout_type=: (::Temporalio::Api::Enums::V1::TimeoutType::values) -> ::Temporalio::Api::Enums::V1::TimeoutType::values
+          def timeout_type=: (::Temporal::Api::Enums::V1::TimeoutType::values) -> ::Temporal::Api::Enums::V1::TimeoutType::values
                            | ...
 
-          def timeout_type!: () -> ::Temporalio::Api::Enums::V1::TimeoutType?
+          def timeout_type!: () -> ::Temporal::Api::Enums::V1::TimeoutType?
 
-          attr_accessor last_heartbeat_details(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor last_heartbeat_details(): ::Temporal::Api::Common::V1::Payloads?
 
-          def last_heartbeat_details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def last_heartbeat_details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                                      | ...
 
-          def last_heartbeat_details!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def last_heartbeat_details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?timeout_type: ::Temporalio::Api::Enums::V1::TimeoutType::init, ?last_heartbeat_details: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?timeout_type: ::Temporal::Api::Enums::V1::TimeoutType::init, ?last_heartbeat_details: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:timeout_type) -> ::Temporalio::Api::Enums::V1::TimeoutType
-                | (:last_heartbeat_details) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:timeout_type) -> ::Temporal::Api::Enums::V1::TimeoutType
+                | (:last_heartbeat_details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:timeout_type, ::Temporalio::Api::Enums::V1::TimeoutType) -> ::Temporalio::Api::Enums::V1::TimeoutType
-                 | (:timeout_type, ::Temporalio::Api::Enums::V1::TimeoutType::values) -> ::Temporalio::Api::Enums::V1::TimeoutType::values
-                 | (:last_heartbeat_details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:last_heartbeat_details, M?) -> M?
+          def []=: (:timeout_type, ::Temporal::Api::Enums::V1::TimeoutType) -> ::Temporal::Api::Enums::V1::TimeoutType
+                 | (:timeout_type, ::Temporal::Api::Enums::V1::TimeoutType::values) -> ::Temporal::Api::Enums::V1::TimeoutType::values
+                 | (:last_heartbeat_details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:last_heartbeat_details, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -97,20 +97,20 @@ module Temporalio
         end
 
         class CanceledFailureInfo < ::Protobuf::Message
-          attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor details(): ::Temporal::Api::Common::V1::Payloads?
 
-          def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                       | ...
 
-          def details!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?details: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?details: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:details) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
+          def []=: (:details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:details, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -186,20 +186,20 @@ module Temporalio
         end
 
         class ResetWorkflowFailureInfo < ::Protobuf::Message
-          attr_accessor last_heartbeat_details(): ::Temporalio::Api::Common::V1::Payloads?
+          attr_accessor last_heartbeat_details(): ::Temporal::Api::Common::V1::Payloads?
 
-          def last_heartbeat_details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
+          def last_heartbeat_details=: [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
                                      | ...
 
-          def last_heartbeat_details!: () -> ::Temporalio::Api::Common::V1::Payloads?
+          def last_heartbeat_details!: () -> ::Temporal::Api::Common::V1::Payloads?
 
-          def initialize: (?last_heartbeat_details: ::Temporalio::Api::Common::V1::Payloads::init?) -> void
+          def initialize: (?last_heartbeat_details: ::Temporal::Api::Common::V1::Payloads::init?) -> void
 
-          def []: (:last_heartbeat_details) -> ::Temporalio::Api::Common::V1::Payloads?
+          def []: (:last_heartbeat_details) -> ::Temporal::Api::Common::V1::Payloads?
                 | (::Symbol) -> untyped
 
-          def []=: (:last_heartbeat_details, ::Temporalio::Api::Common::V1::Payloads?) -> ::Temporalio::Api::Common::V1::Payloads?
-                 | [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (:last_heartbeat_details, M?) -> M?
+          def []=: (:last_heartbeat_details, ::Temporal::Api::Common::V1::Payloads?) -> ::Temporal::Api::Common::V1::Payloads?
+                 | [M < ::Temporal::Api::Common::V1::Payloads::_ToProto] (:last_heartbeat_details, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -233,42 +233,42 @@ module Temporalio
 
           def identity!: () -> ::String?
 
-          attr_accessor activity_type(): ::Temporalio::Api::Common::V1::ActivityType?
+          attr_accessor activity_type(): ::Temporal::Api::Common::V1::ActivityType?
 
-          def activity_type=: [M < ::Temporalio::Api::Common::V1::ActivityType::_ToProto] (M?) -> M?
+          def activity_type=: [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (M?) -> M?
                             | ...
 
-          def activity_type!: () -> ::Temporalio::Api::Common::V1::ActivityType?
+          def activity_type!: () -> ::Temporal::Api::Common::V1::ActivityType?
 
           attr_accessor activity_id(): ::String
 
           def activity_id!: () -> ::String?
 
-          attr_accessor retry_state(): ::Temporalio::Api::Enums::V1::RetryState
+          attr_accessor retry_state(): ::Temporal::Api::Enums::V1::RetryState
 
-          def retry_state=: (::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
+          def retry_state=: (::Temporal::Api::Enums::V1::RetryState::values) -> ::Temporal::Api::Enums::V1::RetryState::values
                           | ...
 
-          def retry_state!: () -> ::Temporalio::Api::Enums::V1::RetryState?
+          def retry_state!: () -> ::Temporal::Api::Enums::V1::RetryState?
 
-          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?activity_type: ::Temporalio::Api::Common::V1::ActivityType::init?, ?activity_id: ::String, ?retry_state: ::Temporalio::Api::Enums::V1::RetryState::init) -> void
+          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?activity_type: ::Temporal::Api::Common::V1::ActivityType::init?, ?activity_id: ::String, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
 
           def []: (:scheduled_event_id) -> ::Integer
                 | (:started_event_id) -> ::Integer
                 | (:identity) -> ::String
-                | (:activity_type) -> ::Temporalio::Api::Common::V1::ActivityType?
+                | (:activity_type) -> ::Temporal::Api::Common::V1::ActivityType?
                 | (:activity_id) -> ::String
-                | (:retry_state) -> ::Temporalio::Api::Enums::V1::RetryState
+                | (:retry_state) -> ::Temporal::Api::Enums::V1::RetryState
                 | (::Symbol) -> untyped
 
           def []=: (:scheduled_event_id, ::Integer) -> ::Integer
                  | (:started_event_id, ::Integer) -> ::Integer
                  | (:identity, ::String) -> ::String
-                 | (:activity_type, ::Temporalio::Api::Common::V1::ActivityType?) -> ::Temporalio::Api::Common::V1::ActivityType?
-                 | [M < ::Temporalio::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
+                 | (:activity_type, ::Temporal::Api::Common::V1::ActivityType?) -> ::Temporal::Api::Common::V1::ActivityType?
+                 | [M < ::Temporal::Api::Common::V1::ActivityType::_ToProto] (:activity_type, M?) -> M?
                  | (:activity_id, ::String) -> ::String
-                 | (:retry_state, ::Temporalio::Api::Enums::V1::RetryState) -> ::Temporalio::Api::Enums::V1::RetryState
-                 | (:retry_state, ::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
+                 | (:retry_state, ::Temporal::Api::Enums::V1::RetryState) -> ::Temporal::Api::Enums::V1::RetryState
+                 | (:retry_state, ::Temporal::Api::Enums::V1::RetryState::values) -> ::Temporal::Api::Enums::V1::RetryState::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -294,19 +294,19 @@ module Temporalio
 
           def namespace!: () -> ::String?
 
-          attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
+          attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
 
-          def workflow_execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
+          def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                                  | ...
 
-          def workflow_execution!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
 
-          attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
+          attr_accessor workflow_type(): ::Temporal::Api::Common::V1::WorkflowType?
 
-          def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
+          def workflow_type=: [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
                             | ...
 
-          def workflow_type!: () -> ::Temporalio::Api::Common::V1::WorkflowType?
+          def workflow_type!: () -> ::Temporal::Api::Common::V1::WorkflowType?
 
           attr_accessor initiated_event_id(): ::Integer
 
@@ -316,32 +316,32 @@ module Temporalio
 
           def started_event_id!: () -> ::Integer?
 
-          attr_accessor retry_state(): ::Temporalio::Api::Enums::V1::RetryState
+          attr_accessor retry_state(): ::Temporal::Api::Enums::V1::RetryState
 
-          def retry_state=: (::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
+          def retry_state=: (::Temporal::Api::Enums::V1::RetryState::values) -> ::Temporal::Api::Enums::V1::RetryState::values
                           | ...
 
-          def retry_state!: () -> ::Temporalio::Api::Enums::V1::RetryState?
+          def retry_state!: () -> ::Temporal::Api::Enums::V1::RetryState?
 
-          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporalio::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporalio::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporalio::Api::Enums::V1::RetryState::init) -> void
+          def initialize: (?namespace: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?workflow_type: ::Temporal::Api::Common::V1::WorkflowType::init?, ?initiated_event_id: ::Integer, ?started_event_id: ::Integer, ?retry_state: ::Temporal::Api::Enums::V1::RetryState::init) -> void
 
           def []: (:namespace) -> ::String
-                | (:workflow_execution) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
-                | (:workflow_type) -> ::Temporalio::Api::Common::V1::WorkflowType?
+                | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                | (:workflow_type) -> ::Temporal::Api::Common::V1::WorkflowType?
                 | (:initiated_event_id) -> ::Integer
                 | (:started_event_id) -> ::Integer
-                | (:retry_state) -> ::Temporalio::Api::Enums::V1::RetryState
+                | (:retry_state) -> ::Temporal::Api::Enums::V1::RetryState
                 | (::Symbol) -> untyped
 
           def []=: (:namespace, ::String) -> ::String
-                 | (:workflow_execution, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
-                 | (:workflow_type, ::Temporalio::Api::Common::V1::WorkflowType?) -> ::Temporalio::Api::Common::V1::WorkflowType?
-                 | [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
+                 | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:workflow_type, ::Temporal::Api::Common::V1::WorkflowType?) -> ::Temporal::Api::Common::V1::WorkflowType?
+                 | [M < ::Temporal::Api::Common::V1::WorkflowType::_ToProto] (:workflow_type, M?) -> M?
                  | (:initiated_event_id, ::Integer) -> ::Integer
                  | (:started_event_id, ::Integer) -> ::Integer
-                 | (:retry_state, ::Temporalio::Api::Enums::V1::RetryState) -> ::Temporalio::Api::Enums::V1::RetryState
-                 | (:retry_state, ::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
+                 | (:retry_state, ::Temporal::Api::Enums::V1::RetryState) -> ::Temporal::Api::Enums::V1::RetryState
+                 | (:retry_state, ::Temporal::Api::Enums::V1::RetryState::values) -> ::Temporal::Api::Enums::V1::RetryState::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -394,7 +394,7 @@ module Temporalio
           #  - If there's demand, we could allow overriding the default SDK implementation to encode other opaque Failure attributes.
           #  (-- api-linter: core::0203::optional=disabled --)
           #
-          attr_accessor encoded_attributes(): ::Temporalio::Api::Common::V1::Payload?
+          attr_accessor encoded_attributes(): ::Temporal::Api::Common::V1::Payload?
 
           # Alternative way to supply `message` and `stack_trace` and possibly other attributes, used for encryption of
           #  errors originating in user code which might contain sensitive information.
@@ -412,114 +412,114 @@ module Temporalio
           #  - If there's demand, we could allow overriding the default SDK implementation to encode other opaque Failure attributes.
           #  (-- api-linter: core::0203::optional=disabled --)
           #
-          def encoded_attributes=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+          def encoded_attributes=: [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (M?) -> M?
                                  | ...
 
-          def encoded_attributes!: () -> ::Temporalio::Api::Common::V1::Payload?
+          def encoded_attributes!: () -> ::Temporal::Api::Common::V1::Payload?
 
-          attr_accessor cause(): ::Temporalio::Api::Failure::V1::Failure?
+          attr_accessor cause(): ::Temporal::Api::Failure::V1::Failure?
 
-          def cause=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+          def cause=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                     | ...
 
-          def cause!: () -> ::Temporalio::Api::Failure::V1::Failure?
+          def cause!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-          attr_accessor application_failure_info(): ::Temporalio::Api::Failure::V1::ApplicationFailureInfo?
+          attr_accessor application_failure_info(): ::Temporal::Api::Failure::V1::ApplicationFailureInfo?
 
-          def application_failure_info=: [M < ::Temporalio::Api::Failure::V1::ApplicationFailureInfo::_ToProto] (M?) -> M?
+          def application_failure_info=: [M < ::Temporal::Api::Failure::V1::ApplicationFailureInfo::_ToProto] (M?) -> M?
                                        | ...
 
-          def application_failure_info!: () -> ::Temporalio::Api::Failure::V1::ApplicationFailureInfo?
+          def application_failure_info!: () -> ::Temporal::Api::Failure::V1::ApplicationFailureInfo?
 
-          attr_accessor timeout_failure_info(): ::Temporalio::Api::Failure::V1::TimeoutFailureInfo?
+          attr_accessor timeout_failure_info(): ::Temporal::Api::Failure::V1::TimeoutFailureInfo?
 
-          def timeout_failure_info=: [M < ::Temporalio::Api::Failure::V1::TimeoutFailureInfo::_ToProto] (M?) -> M?
+          def timeout_failure_info=: [M < ::Temporal::Api::Failure::V1::TimeoutFailureInfo::_ToProto] (M?) -> M?
                                    | ...
 
-          def timeout_failure_info!: () -> ::Temporalio::Api::Failure::V1::TimeoutFailureInfo?
+          def timeout_failure_info!: () -> ::Temporal::Api::Failure::V1::TimeoutFailureInfo?
 
-          attr_accessor canceled_failure_info(): ::Temporalio::Api::Failure::V1::CanceledFailureInfo?
+          attr_accessor canceled_failure_info(): ::Temporal::Api::Failure::V1::CanceledFailureInfo?
 
-          def canceled_failure_info=: [M < ::Temporalio::Api::Failure::V1::CanceledFailureInfo::_ToProto] (M?) -> M?
+          def canceled_failure_info=: [M < ::Temporal::Api::Failure::V1::CanceledFailureInfo::_ToProto] (M?) -> M?
                                     | ...
 
-          def canceled_failure_info!: () -> ::Temporalio::Api::Failure::V1::CanceledFailureInfo?
+          def canceled_failure_info!: () -> ::Temporal::Api::Failure::V1::CanceledFailureInfo?
 
-          attr_accessor terminated_failure_info(): ::Temporalio::Api::Failure::V1::TerminatedFailureInfo?
+          attr_accessor terminated_failure_info(): ::Temporal::Api::Failure::V1::TerminatedFailureInfo?
 
-          def terminated_failure_info=: [M < ::Temporalio::Api::Failure::V1::TerminatedFailureInfo::_ToProto] (M?) -> M?
+          def terminated_failure_info=: [M < ::Temporal::Api::Failure::V1::TerminatedFailureInfo::_ToProto] (M?) -> M?
                                       | ...
 
-          def terminated_failure_info!: () -> ::Temporalio::Api::Failure::V1::TerminatedFailureInfo?
+          def terminated_failure_info!: () -> ::Temporal::Api::Failure::V1::TerminatedFailureInfo?
 
-          attr_accessor server_failure_info(): ::Temporalio::Api::Failure::V1::ServerFailureInfo?
+          attr_accessor server_failure_info(): ::Temporal::Api::Failure::V1::ServerFailureInfo?
 
-          def server_failure_info=: [M < ::Temporalio::Api::Failure::V1::ServerFailureInfo::_ToProto] (M?) -> M?
+          def server_failure_info=: [M < ::Temporal::Api::Failure::V1::ServerFailureInfo::_ToProto] (M?) -> M?
                                   | ...
 
-          def server_failure_info!: () -> ::Temporalio::Api::Failure::V1::ServerFailureInfo?
+          def server_failure_info!: () -> ::Temporal::Api::Failure::V1::ServerFailureInfo?
 
-          attr_accessor reset_workflow_failure_info(): ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo?
+          attr_accessor reset_workflow_failure_info(): ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo?
 
-          def reset_workflow_failure_info=: [M < ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo::_ToProto] (M?) -> M?
+          def reset_workflow_failure_info=: [M < ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo::_ToProto] (M?) -> M?
                                           | ...
 
-          def reset_workflow_failure_info!: () -> ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo?
+          def reset_workflow_failure_info!: () -> ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo?
 
-          attr_accessor activity_failure_info(): ::Temporalio::Api::Failure::V1::ActivityFailureInfo?
+          attr_accessor activity_failure_info(): ::Temporal::Api::Failure::V1::ActivityFailureInfo?
 
-          def activity_failure_info=: [M < ::Temporalio::Api::Failure::V1::ActivityFailureInfo::_ToProto] (M?) -> M?
+          def activity_failure_info=: [M < ::Temporal::Api::Failure::V1::ActivityFailureInfo::_ToProto] (M?) -> M?
                                     | ...
 
-          def activity_failure_info!: () -> ::Temporalio::Api::Failure::V1::ActivityFailureInfo?
+          def activity_failure_info!: () -> ::Temporal::Api::Failure::V1::ActivityFailureInfo?
 
-          attr_accessor child_workflow_execution_failure_info(): ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
+          attr_accessor child_workflow_execution_failure_info(): ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
 
-          def child_workflow_execution_failure_info=: [M < ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::_ToProto] (M?) -> M?
+          def child_workflow_execution_failure_info=: [M < ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::_ToProto] (M?) -> M?
                                                     | ...
 
-          def child_workflow_execution_failure_info!: () -> ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
+          def child_workflow_execution_failure_info!: () -> ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
 
-          def initialize: (?message: ::String, ?source: ::String, ?stack_trace: ::String, ?encoded_attributes: ::Temporalio::Api::Common::V1::Payload::init?, ?cause: ::Temporalio::Api::Failure::V1::Failure::init?, ?application_failure_info: ::Temporalio::Api::Failure::V1::ApplicationFailureInfo::init?, ?timeout_failure_info: ::Temporalio::Api::Failure::V1::TimeoutFailureInfo::init?, ?canceled_failure_info: ::Temporalio::Api::Failure::V1::CanceledFailureInfo::init?, ?terminated_failure_info: ::Temporalio::Api::Failure::V1::TerminatedFailureInfo::init?, ?server_failure_info: ::Temporalio::Api::Failure::V1::ServerFailureInfo::init?, ?reset_workflow_failure_info: ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo::init?, ?activity_failure_info: ::Temporalio::Api::Failure::V1::ActivityFailureInfo::init?, ?child_workflow_execution_failure_info: ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::init?) -> void
+          def initialize: (?message: ::String, ?source: ::String, ?stack_trace: ::String, ?encoded_attributes: ::Temporal::Api::Common::V1::Payload::init?, ?cause: ::Temporal::Api::Failure::V1::Failure::init?, ?application_failure_info: ::Temporal::Api::Failure::V1::ApplicationFailureInfo::init?, ?timeout_failure_info: ::Temporal::Api::Failure::V1::TimeoutFailureInfo::init?, ?canceled_failure_info: ::Temporal::Api::Failure::V1::CanceledFailureInfo::init?, ?terminated_failure_info: ::Temporal::Api::Failure::V1::TerminatedFailureInfo::init?, ?server_failure_info: ::Temporal::Api::Failure::V1::ServerFailureInfo::init?, ?reset_workflow_failure_info: ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo::init?, ?activity_failure_info: ::Temporal::Api::Failure::V1::ActivityFailureInfo::init?, ?child_workflow_execution_failure_info: ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::init?) -> void
 
           def []: (:message) -> ::String
                 | (:source) -> ::String
                 | (:stack_trace) -> ::String
-                | (:encoded_attributes) -> ::Temporalio::Api::Common::V1::Payload?
-                | (:cause) -> ::Temporalio::Api::Failure::V1::Failure?
-                | (:application_failure_info) -> ::Temporalio::Api::Failure::V1::ApplicationFailureInfo?
-                | (:timeout_failure_info) -> ::Temporalio::Api::Failure::V1::TimeoutFailureInfo?
-                | (:canceled_failure_info) -> ::Temporalio::Api::Failure::V1::CanceledFailureInfo?
-                | (:terminated_failure_info) -> ::Temporalio::Api::Failure::V1::TerminatedFailureInfo?
-                | (:server_failure_info) -> ::Temporalio::Api::Failure::V1::ServerFailureInfo?
-                | (:reset_workflow_failure_info) -> ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo?
-                | (:activity_failure_info) -> ::Temporalio::Api::Failure::V1::ActivityFailureInfo?
-                | (:child_workflow_execution_failure_info) -> ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
+                | (:encoded_attributes) -> ::Temporal::Api::Common::V1::Payload?
+                | (:cause) -> ::Temporal::Api::Failure::V1::Failure?
+                | (:application_failure_info) -> ::Temporal::Api::Failure::V1::ApplicationFailureInfo?
+                | (:timeout_failure_info) -> ::Temporal::Api::Failure::V1::TimeoutFailureInfo?
+                | (:canceled_failure_info) -> ::Temporal::Api::Failure::V1::CanceledFailureInfo?
+                | (:terminated_failure_info) -> ::Temporal::Api::Failure::V1::TerminatedFailureInfo?
+                | (:server_failure_info) -> ::Temporal::Api::Failure::V1::ServerFailureInfo?
+                | (:reset_workflow_failure_info) -> ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo?
+                | (:activity_failure_info) -> ::Temporal::Api::Failure::V1::ActivityFailureInfo?
+                | (:child_workflow_execution_failure_info) -> ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
                 | (::Symbol) -> untyped
 
           def []=: (:message, ::String) -> ::String
                  | (:source, ::String) -> ::String
                  | (:stack_trace, ::String) -> ::String
-                 | (:encoded_attributes, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-                 | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:encoded_attributes, M?) -> M?
-                 | (:cause, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:cause, M?) -> M?
-                 | (:application_failure_info, ::Temporalio::Api::Failure::V1::ApplicationFailureInfo?) -> ::Temporalio::Api::Failure::V1::ApplicationFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::ApplicationFailureInfo::_ToProto] (:application_failure_info, M?) -> M?
-                 | (:timeout_failure_info, ::Temporalio::Api::Failure::V1::TimeoutFailureInfo?) -> ::Temporalio::Api::Failure::V1::TimeoutFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::TimeoutFailureInfo::_ToProto] (:timeout_failure_info, M?) -> M?
-                 | (:canceled_failure_info, ::Temporalio::Api::Failure::V1::CanceledFailureInfo?) -> ::Temporalio::Api::Failure::V1::CanceledFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::CanceledFailureInfo::_ToProto] (:canceled_failure_info, M?) -> M?
-                 | (:terminated_failure_info, ::Temporalio::Api::Failure::V1::TerminatedFailureInfo?) -> ::Temporalio::Api::Failure::V1::TerminatedFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::TerminatedFailureInfo::_ToProto] (:terminated_failure_info, M?) -> M?
-                 | (:server_failure_info, ::Temporalio::Api::Failure::V1::ServerFailureInfo?) -> ::Temporalio::Api::Failure::V1::ServerFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::ServerFailureInfo::_ToProto] (:server_failure_info, M?) -> M?
-                 | (:reset_workflow_failure_info, ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo?) -> ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::ResetWorkflowFailureInfo::_ToProto] (:reset_workflow_failure_info, M?) -> M?
-                 | (:activity_failure_info, ::Temporalio::Api::Failure::V1::ActivityFailureInfo?) -> ::Temporalio::Api::Failure::V1::ActivityFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::ActivityFailureInfo::_ToProto] (:activity_failure_info, M?) -> M?
-                 | (:child_workflow_execution_failure_info, ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?) -> ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
-                 | [M < ::Temporalio::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::_ToProto] (:child_workflow_execution_failure_info, M?) -> M?
+                 | (:encoded_attributes, ::Temporal::Api::Common::V1::Payload?) -> ::Temporal::Api::Common::V1::Payload?
+                 | [M < ::Temporal::Api::Common::V1::Payload::_ToProto] (:encoded_attributes, M?) -> M?
+                 | (:cause, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+                 | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:cause, M?) -> M?
+                 | (:application_failure_info, ::Temporal::Api::Failure::V1::ApplicationFailureInfo?) -> ::Temporal::Api::Failure::V1::ApplicationFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::ApplicationFailureInfo::_ToProto] (:application_failure_info, M?) -> M?
+                 | (:timeout_failure_info, ::Temporal::Api::Failure::V1::TimeoutFailureInfo?) -> ::Temporal::Api::Failure::V1::TimeoutFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::TimeoutFailureInfo::_ToProto] (:timeout_failure_info, M?) -> M?
+                 | (:canceled_failure_info, ::Temporal::Api::Failure::V1::CanceledFailureInfo?) -> ::Temporal::Api::Failure::V1::CanceledFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::CanceledFailureInfo::_ToProto] (:canceled_failure_info, M?) -> M?
+                 | (:terminated_failure_info, ::Temporal::Api::Failure::V1::TerminatedFailureInfo?) -> ::Temporal::Api::Failure::V1::TerminatedFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::TerminatedFailureInfo::_ToProto] (:terminated_failure_info, M?) -> M?
+                 | (:server_failure_info, ::Temporal::Api::Failure::V1::ServerFailureInfo?) -> ::Temporal::Api::Failure::V1::ServerFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::ServerFailureInfo::_ToProto] (:server_failure_info, M?) -> M?
+                 | (:reset_workflow_failure_info, ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo?) -> ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::ResetWorkflowFailureInfo::_ToProto] (:reset_workflow_failure_info, M?) -> M?
+                 | (:activity_failure_info, ::Temporal::Api::Failure::V1::ActivityFailureInfo?) -> ::Temporal::Api::Failure::V1::ActivityFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::ActivityFailureInfo::_ToProto] (:activity_failure_info, M?) -> M?
+                 | (:child_workflow_execution_failure_info, ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?) -> ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo?
+                 | [M < ::Temporal::Api::Failure::V1::ChildWorkflowExecutionFailureInfo::_ToProto] (:child_workflow_execution_failure_info, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

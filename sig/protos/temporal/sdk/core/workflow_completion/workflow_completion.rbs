@@ -1,5 +1,5 @@
 module Coresdk
-  module WorkflowCompletion
+  module Workflow_completion
     # / Result of a single workflow activation, reported from lang to core
     #
     class WorkflowActivationCompletion < ::Protobuf::Message
@@ -9,32 +9,32 @@ module Coresdk
 
       def run_id!: () -> ::String?
 
-      attr_accessor successful(): ::Coresdk::WorkflowCompletion::Success?
+      attr_accessor successful(): ::Temporalio::Bridge::Api::WorkflowCompletion::Success?
 
-      def successful=: [M < ::Coresdk::WorkflowCompletion::Success::_ToProto] (M?) -> M?
+      def successful=: [M < ::Temporalio::Bridge::Api::WorkflowCompletion::Success::_ToProto] (M?) -> M?
                      | ...
 
-      def successful!: () -> ::Coresdk::WorkflowCompletion::Success?
+      def successful!: () -> ::Temporalio::Bridge::Api::WorkflowCompletion::Success?
 
-      attr_accessor failed(): ::Coresdk::WorkflowCompletion::Failure?
+      attr_accessor failed(): ::Temporalio::Bridge::Api::WorkflowCompletion::Failure?
 
-      def failed=: [M < ::Coresdk::WorkflowCompletion::Failure::_ToProto] (M?) -> M?
+      def failed=: [M < ::Temporalio::Bridge::Api::WorkflowCompletion::Failure::_ToProto] (M?) -> M?
                  | ...
 
-      def failed!: () -> ::Coresdk::WorkflowCompletion::Failure?
+      def failed!: () -> ::Temporalio::Bridge::Api::WorkflowCompletion::Failure?
 
-      def initialize: (?run_id: ::String, ?successful: ::Coresdk::WorkflowCompletion::Success::init?, ?failed: ::Coresdk::WorkflowCompletion::Failure::init?) -> void
+      def initialize: (?run_id: ::String, ?successful: ::Temporalio::Bridge::Api::WorkflowCompletion::Success::init?, ?failed: ::Temporalio::Bridge::Api::WorkflowCompletion::Failure::init?) -> void
 
       def []: (:run_id) -> ::String
-            | (:successful) -> ::Coresdk::WorkflowCompletion::Success?
-            | (:failed) -> ::Coresdk::WorkflowCompletion::Failure?
+            | (:successful) -> ::Temporalio::Bridge::Api::WorkflowCompletion::Success?
+            | (:failed) -> ::Temporalio::Bridge::Api::WorkflowCompletion::Failure?
             | (::Symbol) -> untyped
 
       def []=: (:run_id, ::String) -> ::String
-             | (:successful, ::Coresdk::WorkflowCompletion::Success?) -> ::Coresdk::WorkflowCompletion::Success?
-             | [M < ::Coresdk::WorkflowCompletion::Success::_ToProto] (:successful, M?) -> M?
-             | (:failed, ::Coresdk::WorkflowCompletion::Failure?) -> ::Coresdk::WorkflowCompletion::Failure?
-             | [M < ::Coresdk::WorkflowCompletion::Failure::_ToProto] (:failed, M?) -> M?
+             | (:successful, ::Temporalio::Bridge::Api::WorkflowCompletion::Success?) -> ::Temporalio::Bridge::Api::WorkflowCompletion::Success?
+             | [M < ::Temporalio::Bridge::Api::WorkflowCompletion::Success::_ToProto] (:successful, M?) -> M?
+             | (:failed, ::Temporalio::Bridge::Api::WorkflowCompletion::Failure?) -> ::Temporalio::Bridge::Api::WorkflowCompletion::Failure?
+             | [M < ::Temporalio::Bridge::Api::WorkflowCompletion::Failure::_ToProto] (:failed, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -60,22 +60,36 @@ module Coresdk
     class Success < ::Protobuf::Message
       # A list of commands to send back to the temporal server
       #
-      attr_accessor commands(): ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
+      attr_accessor commands(): ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::field_array
 
       # A list of commands to send back to the temporal server
       #
-      def commands=: (::Coresdk::WorkflowCommands::WorkflowCommand::array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::array
+      def commands=: (::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::array) -> ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::array
                    | ...
 
-      def commands!: () -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array?
+      def commands!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::field_array?
 
-      def initialize: (?commands: ::Coresdk::WorkflowCommands::WorkflowCommand::array) -> void
+      # Any internal flags which the lang SDK used in the processing of this activation
+      #
+      attr_accessor used_internal_flags(): ::Protobuf::field_array[::Integer]
 
-      def []: (:commands) -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
+      # Any internal flags which the lang SDK used in the processing of this activation
+      #
+      def used_internal_flags=: (::Array[::Integer]) -> ::Array[::Integer]
+                              | ...
+
+      def used_internal_flags!: () -> ::Protobuf::field_array[::Integer]?
+
+      def initialize: (?commands: ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::array, ?used_internal_flags: ::Array[::Integer]) -> void
+
+      def []: (:commands) -> ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::field_array
+            | (:used_internal_flags) -> ::Protobuf::field_array[::Integer]
             | (::Symbol) -> untyped
 
-      def []=: (:commands, ::Coresdk::WorkflowCommands::WorkflowCommand::field_array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::field_array
-             | (:commands, ::Coresdk::WorkflowCommands::WorkflowCommand::array) -> ::Coresdk::WorkflowCommands::WorkflowCommand::array
+      def []=: (:commands, ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::field_array) -> ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::field_array
+             | (:commands, ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::array) -> ::Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand::array
+             | (:used_internal_flags, ::Protobuf::field_array[::Integer]) -> ::Protobuf::field_array[::Integer]
+             | (:used_internal_flags, ::Array[::Integer]) -> ::Array[::Integer]
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -99,20 +113,34 @@ module Coresdk
     # / Failure to activate or execute a workflow
     #
     class Failure < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+      attr_accessor failure(): ::Temporal::Api::Failure::V1::Failure?
 
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+      def failure=: [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
                   | ...
 
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+      def failure!: () -> ::Temporal::Api::Failure::V1::Failure?
 
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+      # Forces overriding the WFT failure cause
+      #
+      attr_accessor force_cause(): ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause
 
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+      # Forces overriding the WFT failure cause
+      #
+      def force_cause=: (::Temporal::Api::Enums::V1::WorkflowTaskFailedCause::values) -> ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause::values
+                      | ...
+
+      def force_cause!: () -> ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause?
+
+      def initialize: (?failure: ::Temporal::Api::Failure::V1::Failure::init?, ?force_cause: ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause::init) -> void
+
+      def []: (:failure) -> ::Temporal::Api::Failure::V1::Failure?
+            | (:force_cause) -> ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause
             | (::Symbol) -> untyped
 
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+      def []=: (:failure, ::Temporal::Api::Failure::V1::Failure?) -> ::Temporal::Api::Failure::V1::Failure?
+             | [M < ::Temporal::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+             | (:force_cause, ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause) -> ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause
+             | (:force_cause, ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause::values) -> ::Temporal::Api::Enums::V1::WorkflowTaskFailedCause::values
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

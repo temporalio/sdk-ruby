@@ -20,6 +20,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :is_replaying, :bool, 3
       optional :history_length, :uint32, 4
       repeated :jobs, :message, 5, "coresdk.workflow_activation.WorkflowActivationJob"
+      repeated :available_internal_flags, :uint32, 6
     end
     add_message "coresdk.workflow_activation.WorkflowActivationJob" do
       oneof :variant do
@@ -136,30 +137,35 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       value :TASK_NOT_FOUND, 6
       value :UNHANDLED_COMMAND, 7
       value :FATAL, 8
+      value :PAGINATION_OR_HISTORY_FETCH, 9
     end
   end
 end
 
-module Coresdk
-  module WorkflowActivation
-    WorkflowActivation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.WorkflowActivation").msgclass
-    WorkflowActivationJob = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.WorkflowActivationJob").msgclass
-    StartWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.StartWorkflow").msgclass
-    FireTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.FireTimer").msgclass
-    ResolveActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveActivity").msgclass
-    ResolveChildWorkflowExecutionStart = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStart").msgclass
-    ResolveChildWorkflowExecutionStartSuccess = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartSuccess").msgclass
-    ResolveChildWorkflowExecutionStartFailure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartFailure").msgclass
-    ResolveChildWorkflowExecutionStartCancelled = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartCancelled").msgclass
-    ResolveChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecution").msgclass
-    UpdateRandomSeed = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.UpdateRandomSeed").msgclass
-    QueryWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.QueryWorkflow").msgclass
-    CancelWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.CancelWorkflow").msgclass
-    SignalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.SignalWorkflow").msgclass
-    NotifyHasPatch = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.NotifyHasPatch").msgclass
-    ResolveSignalExternalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveSignalExternalWorkflow").msgclass
-    ResolveRequestCancelExternalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveRequestCancelExternalWorkflow").msgclass
-    RemoveFromCache = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.RemoveFromCache").msgclass
-    RemoveFromCache::EvictionReason = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.RemoveFromCache.EvictionReason").enummodule
+module Temporalio
+  module Bridge
+    module Api
+      module WorkflowActivation
+        WorkflowActivation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.WorkflowActivation").msgclass
+        WorkflowActivationJob = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.WorkflowActivationJob").msgclass
+        StartWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.StartWorkflow").msgclass
+        FireTimer = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.FireTimer").msgclass
+        ResolveActivity = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveActivity").msgclass
+        ResolveChildWorkflowExecutionStart = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStart").msgclass
+        ResolveChildWorkflowExecutionStartSuccess = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartSuccess").msgclass
+        ResolveChildWorkflowExecutionStartFailure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartFailure").msgclass
+        ResolveChildWorkflowExecutionStartCancelled = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecutionStartCancelled").msgclass
+        ResolveChildWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveChildWorkflowExecution").msgclass
+        UpdateRandomSeed = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.UpdateRandomSeed").msgclass
+        QueryWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.QueryWorkflow").msgclass
+        CancelWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.CancelWorkflow").msgclass
+        SignalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.SignalWorkflow").msgclass
+        NotifyHasPatch = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.NotifyHasPatch").msgclass
+        ResolveSignalExternalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveSignalExternalWorkflow").msgclass
+        ResolveRequestCancelExternalWorkflow = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.ResolveRequestCancelExternalWorkflow").msgclass
+        RemoveFromCache = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.RemoveFromCache").msgclass
+        RemoveFromCache::EvictionReason = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_activation.RemoveFromCache.EvictionReason").enummodule
+      end
+    end
   end
 end

@@ -1,6 +1,6 @@
-module Temporalio
+module Temporal
   module Api
-    module OperatorService
+    module Operatorservice
       module V1
         # OperatorService API defines how Temporal SDKs and other clients interact with the Temporal server
         #  to perform administrative functions like registering a search attribute or a namespace.

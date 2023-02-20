@@ -142,7 +142,7 @@ async fn make_workflow_service_rpc(mut client: Client, params: RpcParams) -> Rpc
         "list_schedules" => rpc_call!(client, list_schedules, params),
         "update_worker_build_id_ordering" => rpc_call!(client, update_worker_build_id_ordering, params),
         "get_worker_build_id_ordering" => rpc_call!(client, get_worker_build_id_ordering, params),
-        "update_workflow" => rpc_call!(client, update_workflow, params),
+        "update_workflow_execution" => rpc_call!(client, update_workflow_execution, params),
         "start_batch_operation" => rpc_call!(client, start_batch_operation, params),
         "stop_batch_operation" => rpc_call!(client, stop_batch_operation, params),
         "describe_batch_operation" => rpc_call!(client, describe_batch_operation, params),

@@ -85,8 +85,8 @@ module Temporalio
             # GetWorkflowExecutionHistory returns the history of specified workflow execution. Fails with
             # `NotFound` if the specified workflow execution is unknown to the service.
             rpc :GetWorkflowExecutionHistory, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse
-            # GetWorkflowExecutionHistoryReverse returns the history of specified workflow execution in reverse 
-            # order (starting from last event). Fails with`NotFound` if the specified workflow execution is 
+            # GetWorkflowExecutionHistoryReverse returns the history of specified workflow execution in reverse
+            # order (starting from last event). Fails with`NotFound` if the specified workflow execution is
             # unknown to the service.
             rpc :GetWorkflowExecutionHistoryReverse, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseResponse
             # PollWorkflowTaskQueue is called by workers to make progress on workflows.
@@ -300,8 +300,8 @@ module Temporalio
             rpc :GetWorkerBuildIdOrdering, ::Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdOrderingRequest, ::Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdOrderingResponse
             # Invokes the specified update function on user workflow code.
             # (-- api-linter: core::0134=disabled
-            #     aip.dev/not-precedent: UpdateWorkflow doesn't follow Google API format --)
-            rpc :UpdateWorkflow, ::Temporalio::Api::WorkflowService::V1::UpdateWorkflowRequest, ::Temporalio::Api::WorkflowService::V1::UpdateWorkflowResponse
+            #     aip.dev/not-precedent: UpdateWorkflowExecution doesn't follow Google API format --)
+            rpc :UpdateWorkflowExecution, ::Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest, ::Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
             # StartBatchOperation starts a new batch operation
             rpc :StartBatchOperation, ::Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest, ::Temporalio::Api::WorkflowService::V1::StartBatchOperationResponse
             # StopBatchOperation stops a batch operation

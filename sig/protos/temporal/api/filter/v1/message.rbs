@@ -1,4 +1,4 @@
-module Temporalio
+module Temporal
   module Api
     module Filter
       module V1
@@ -116,20 +116,20 @@ module Temporalio
         end
 
         class StatusFilter < ::Protobuf::Message
-          attr_accessor status(): ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
+          attr_accessor status(): ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
 
-          def status=: (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values
+          def status=: (::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
                      | ...
 
-          def status!: () -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus?
+          def status!: () -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus?
 
-          def initialize: (?status: ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
+          def initialize: (?status: ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::init) -> void
 
-          def []: (:status) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
+          def []: (:status) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
                 | (::Symbol) -> untyped
 
-          def []=: (:status, ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
-                 | (:status, ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values
+          def []=: (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus
+                 | (:status, ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporal::Api::Enums::V1::WorkflowExecutionStatus::values
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

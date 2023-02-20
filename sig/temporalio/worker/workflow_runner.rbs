@@ -20,8 +20,8 @@ module Temporalio
         Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound] inbound_interceptors,
         Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound] outbound_interceptors
       ) -> void
-      def process: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> Array[Coresdk::WorkflowCommands::WorkflowCommand]
-      def push_command: (Coresdk::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
+      def process: (Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation activation) -> Array[Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand]
+      def push_command: (Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand command) -> Array[untyped]
       def add_completion: (Symbol type, ^(untyped) -> void resolve, ^(Exception) -> void reject) -> Integer
       def remove_completion: (Symbol type, Integer seq) -> bool
       def finished?: -> bool
@@ -40,16 +40,16 @@ module Temporalio
       attr_reader converter: Temporalio::DataConverter
       attr_reader inbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowInbound]
       attr_reader outbound_interceptors: Temporalio::Interceptor::Chain[Temporalio::Interceptor::WorkflowOutbound]
-      attr_reader commands: Array[Coresdk::WorkflowCommands::WorkflowCommand]
+      attr_reader commands: Array[Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand]
       attr_reader sequences: Hash[Symbol, Integer]
       attr_reader completions: Hash[Symbol, Hash[Integer, Temporalio::Worker::WorkflowRunner::Completion]]
       attr_reader fiber: Fiber?
 
-      def order_jobs: (Array[Coresdk::WorkflowActivation::WorkflowActivationJob] jobs) -> Array[Coresdk::WorkflowActivation::WorkflowActivationJob]
-      def apply: (Coresdk::WorkflowActivation::WorkflowActivationJob job) -> nil
-      def apply_start_workflow: (Coresdk::WorkflowActivation::StartWorkflow job) -> untyped
-      def apply_fire_timer: (Coresdk::WorkflowActivation::FireTimer job) -> untyped
-      def generate_workflow_info: (Coresdk::WorkflowActivation::StartWorkflow) -> Temporalio::Workflow::Info
+      def order_jobs: (Array[Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob] jobs) -> Array[Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob]
+      def apply: (Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob job) -> nil
+      def apply_start_workflow: (Temporalio::Bridge::Api::WorkflowActivation::StartWorkflow job) -> untyped
+      def apply_fire_timer: (Temporalio::Bridge::Api::WorkflowActivation::FireTimer job) -> untyped
+      def generate_workflow_info: (Temporalio::Bridge::Api::WorkflowActivation::StartWorkflow) -> Temporalio::Workflow::Info
     end
   end
 end

@@ -2,13 +2,13 @@ module Temporalio
   class Worker
     class SyncWorker
       def initialize: (Temporalio::Bridge::Worker core_worker) -> void
-      def poll_activity_task: -> Coresdk::ActivityTask::ActivityTask
+      def poll_activity_task: -> Temporalio::Bridge::Api::ActivityTask::ActivityTask
       def complete_activity_task_with_success: (String task_token, Temporalio::Api::Common::V1::Payload payload) -> void
       def complete_activity_task_with_failure: (String task_token, Temporalio::Api::Failure::V1::Failure failure) -> void
       def complete_activity_task_with_cancellation: (String task_token, Temporalio::Api::Failure::V1::Failure failure) -> void
       def record_activity_heartbeat: (String task_token, Array[Temporalio::Api::Common::V1::Payload] payloads) -> void
-      def poll_workflow_activation: -> Coresdk::WorkflowActivation::WorkflowActivation
-      def complete_workflow_activation_with_success: (String, Array[Coresdk::WorkflowCommands::WorkflowCommand]) -> void
+      def poll_workflow_activation: -> Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation
+      def complete_workflow_activation_with_success: (String, Array[Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand]) -> void
       def complete_workflow_activation_with_failure: (String, Temporalio::Api::Failure::V1::Failure) -> void
 
       private
@@ -16,8 +16,8 @@ module Temporalio
       attr_reader core_worker: Temporalio::Bridge::Worker
 
       def with_queue: { (^(untyped?, Exception?) -> void) -> void } -> untyped
-      def complete_activity_task: (String task_token, Coresdk::ActivityResult::ActivityExecutionResult result) -> void
-      def complete_workflow_activation: (Coresdk::WorkflowCompletion::WorkflowActivationCompletion) -> void
+      def complete_activity_task: (String task_token, Temporalio::Bridge::Api::ActivityResult::ActivityExecutionResult result) -> void
+      def complete_workflow_activation: (Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion) -> void
     end
   end
 end

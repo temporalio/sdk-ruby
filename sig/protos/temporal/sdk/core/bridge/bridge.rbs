@@ -64,20 +64,20 @@ module Coresdk
       end
 
       class ForwardLoggerOptions < ::Protobuf::Message
-        attr_accessor level(): ::Coresdk::Bridge::LogLevel
+        attr_accessor level(): ::Temporalio::Bridge::Api::Bridge::LogLevel
 
-        def level=: (::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+        def level=: (::Temporalio::Bridge::Api::Bridge::LogLevel::values) -> ::Temporalio::Bridge::Api::Bridge::LogLevel::values
                   | ...
 
-        def level!: () -> ::Coresdk::Bridge::LogLevel?
+        def level!: () -> ::Temporalio::Bridge::Api::Bridge::LogLevel?
 
-        def initialize: (?level: ::Coresdk::Bridge::LogLevel::init) -> void
+        def initialize: (?level: ::Temporalio::Bridge::Api::Bridge::LogLevel::init) -> void
 
-        def []: (:level) -> ::Coresdk::Bridge::LogLevel
+        def []: (:level) -> ::Temporalio::Bridge::Api::Bridge::LogLevel
               | (::Symbol) -> untyped
 
-        def []=: (:level, ::Coresdk::Bridge::LogLevel) -> ::Coresdk::Bridge::LogLevel
-               | (:level, ::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+        def []=: (:level, ::Temporalio::Bridge::Api::Bridge::LogLevel) -> ::Temporalio::Bridge::Api::Bridge::LogLevel
+               | (:level, ::Temporalio::Bridge::Api::Bridge::LogLevel::values) -> ::Temporalio::Bridge::Api::Bridge::LogLevel::values
                | (::Symbol, untyped) -> untyped
 
         interface _ToProto
@@ -174,62 +174,62 @@ module Coresdk
 
       def tracing_filter!: () -> ::String?
 
-      attr_accessor console(): ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+      attr_accessor console(): ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
 
-      def console=: [M < ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (M?) -> M?
+      def console=: [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (M?) -> M?
                   | ...
 
-      def console!: () -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+      def console!: () -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
 
-      attr_accessor forward(): ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+      attr_accessor forward(): ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
 
-      def forward=: [M < ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (M?) -> M?
+      def forward=: [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (M?) -> M?
                   | ...
 
-      def forward!: () -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+      def forward!: () -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
 
-      attr_accessor otel_tracing(): ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+      attr_accessor otel_tracing(): ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
 
-      def otel_tracing=: [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
+      def otel_tracing=: [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
                        | ...
 
-      def otel_tracing!: () -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+      def otel_tracing!: () -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
 
-      attr_accessor otel_metrics(): ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+      attr_accessor otel_metrics(): ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
 
-      def otel_metrics=: [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
+      def otel_metrics=: [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (M?) -> M?
                        | ...
 
-      def otel_metrics!: () -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+      def otel_metrics!: () -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
 
-      attr_accessor prometheus(): ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+      attr_accessor prometheus(): ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions?
 
-      def prometheus=: [M < ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (M?) -> M?
+      def prometheus=: [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (M?) -> M?
                      | ...
 
-      def prometheus!: () -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+      def prometheus!: () -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions?
 
-      def initialize: (?tracing_filter: ::String, ?console: ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::init?, ?forward: ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::init?, ?otel_tracing: ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?otel_metrics: ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?prometheus: ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::init?) -> void
+      def initialize: (?tracing_filter: ::String, ?console: ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::init?, ?forward: ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions::init?, ?otel_tracing: ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?otel_metrics: ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::init?, ?prometheus: ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions::init?) -> void
 
       def []: (:tracing_filter) -> ::String
-            | (:console) -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
-            | (:forward) -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
-            | (:otel_tracing) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
-            | (:otel_metrics) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
-            | (:prometheus) -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
+            | (:console) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+            | (:forward) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+            | (:otel_tracing) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+            | (:otel_metrics) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+            | (:prometheus) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions?
             | (::Symbol) -> untyped
 
       def []=: (:tracing_filter, ::String) -> ::String
-             | (:console, ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
-             | [M < ::Coresdk::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (:console, M?) -> M?
-             | (:forward, ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
-             | [M < ::Coresdk::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (:forward, M?) -> M?
-             | (:otel_tracing, ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
-             | [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_tracing, M?) -> M?
-             | (:otel_metrics, ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions?
-             | [M < ::Coresdk::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_metrics, M?) -> M?
-             | (:prometheus, ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?) -> ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions?
-             | [M < ::Coresdk::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (:prometheus, M?) -> M?
+             | (:console, ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ConsoleLoggerOptions::_ToProto] (:console, M?) -> M?
+             | (:forward, ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions?) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::ForwardLoggerOptions::_ToProto] (:forward, M?) -> M?
+             | (:otel_tracing, ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_tracing, M?) -> M?
+             | (:otel_metrics, ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::OtelCollectorOptions::_ToProto] (:otel_metrics, M?) -> M?
+             | (:prometheus, ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions?) -> ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitTelemetryRequest::PrometheusOptions::_ToProto] (:prometheus, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -405,29 +405,29 @@ module Coresdk
 
       def identity!: () -> ::String?
 
-      attr_accessor tls_config(): ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+      attr_accessor tls_config(): ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig?
 
-      def tls_config=: [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (M?) -> M?
+      def tls_config=: [M < ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig::_ToProto] (M?) -> M?
                      | ...
 
-      def tls_config!: () -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
+      def tls_config!: () -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig?
 
-      attr_accessor retry_config(): ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+      attr_accessor retry_config(): ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig?
 
-      def retry_config=: [M < ::Coresdk::Bridge::CreateClientRequest::RetryConfig::_ToProto] (M?) -> M?
+      def retry_config=: [M < ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig::_ToProto] (M?) -> M?
                        | ...
 
-      def retry_config!: () -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+      def retry_config!: () -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig?
 
-      def initialize: (?target_url: ::String, ?namespace: ::String, ?client_name: ::String, ?client_version: ::String, ?identity: ::String, ?tls_config: ::Coresdk::Bridge::CreateClientRequest::TlsConfig::init?, ?retry_config: ::Coresdk::Bridge::CreateClientRequest::RetryConfig::init?) -> void
+      def initialize: (?target_url: ::String, ?namespace: ::String, ?client_name: ::String, ?client_version: ::String, ?identity: ::String, ?tls_config: ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig::init?, ?retry_config: ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig::init?) -> void
 
       def []: (:target_url) -> ::String
             | (:namespace) -> ::String
             | (:client_name) -> ::String
             | (:client_version) -> ::String
             | (:identity) -> ::String
-            | (:tls_config) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
-            | (:retry_config) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
+            | (:tls_config) -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig?
+            | (:retry_config) -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig?
             | (::Symbol) -> untyped
 
       def []=: (:target_url, ::String) -> ::String
@@ -435,10 +435,10 @@ module Coresdk
              | (:client_name, ::String) -> ::String
              | (:client_version, ::String) -> ::String
              | (:identity, ::String) -> ::String
-             | (:tls_config, ::Coresdk::Bridge::CreateClientRequest::TlsConfig?) -> ::Coresdk::Bridge::CreateClientRequest::TlsConfig?
-             | [M < ::Coresdk::Bridge::CreateClientRequest::TlsConfig::_ToProto] (:tls_config, M?) -> M?
-             | (:retry_config, ::Coresdk::Bridge::CreateClientRequest::RetryConfig?) -> ::Coresdk::Bridge::CreateClientRequest::RetryConfig?
-             | [M < ::Coresdk::Bridge::CreateClientRequest::RetryConfig::_ToProto] (:retry_config, M?) -> M?
+             | (:tls_config, ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig?) -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig?
+             | [M < ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::TlsConfig::_ToProto] (:tls_config, M?) -> M?
+             | (:retry_config, ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig?) -> ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig?
+             | [M < ::Temporalio::Bridge::Api::Bridge::CreateClientRequest::RetryConfig::_ToProto] (:retry_config, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -491,20 +491,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::InitResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::InitResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::InitResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::InitResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::InitResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::InitResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::InitResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::InitResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::InitResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::InitResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::InitResponse::Error?) -> ::Coresdk::Bridge::InitResponse::Error?
-             | [M < ::Coresdk::Bridge::InitResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::InitResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::InitResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::InitResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -696,20 +696,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::RegisterWorkerResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::RegisterWorkerResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::RegisterWorkerResponse::Error?) -> ::Coresdk::Bridge::RegisterWorkerResponse::Error?
-             | [M < ::Coresdk::Bridge::RegisterWorkerResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::RegisterWorkerResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -791,30 +791,30 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor activation(): ::Coresdk::WorkflowActivation::WorkflowActivation?
+      attr_accessor activation(): ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation?
 
-      def activation=: [M < ::Coresdk::WorkflowActivation::WorkflowActivation::_ToProto] (M?) -> M?
+      def activation=: [M < ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation::_ToProto] (M?) -> M?
                      | ...
 
-      def activation!: () -> ::Coresdk::WorkflowActivation::WorkflowActivation?
+      def activation!: () -> ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation?
 
-      attr_accessor error(): ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error?
 
-      def initialize: (?activation: ::Coresdk::WorkflowActivation::WorkflowActivation::init?, ?error: ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::init?) -> void
+      def initialize: (?activation: ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation::init?, ?error: ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error::init?) -> void
 
-      def []: (:activation) -> ::Coresdk::WorkflowActivation::WorkflowActivation?
-            | (:error) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
+      def []: (:activation) -> ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation?
+            | (:error) -> ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:activation, ::Coresdk::WorkflowActivation::WorkflowActivation?) -> ::Coresdk::WorkflowActivation::WorkflowActivation?
-             | [M < ::Coresdk::WorkflowActivation::WorkflowActivation::_ToProto] (:activation, M?) -> M?
-             | (:error, ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?) -> ::Coresdk::Bridge::PollWorkflowActivationResponse::Error?
-             | [M < ::Coresdk::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:activation, ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation?) -> ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation?
+             | [M < ::Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation::_ToProto] (:activation, M?) -> M?
+             | (:error, ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::PollWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -896,30 +896,30 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor task(): ::Coresdk::ActivityTask::ActivityTask?
+      attr_accessor task(): ::Temporalio::Bridge::Api::ActivityTask::ActivityTask?
 
-      def task=: [M < ::Coresdk::ActivityTask::ActivityTask::_ToProto] (M?) -> M?
+      def task=: [M < ::Temporalio::Bridge::Api::ActivityTask::ActivityTask::_ToProto] (M?) -> M?
                | ...
 
-      def task!: () -> ::Coresdk::ActivityTask::ActivityTask?
+      def task!: () -> ::Temporalio::Bridge::Api::ActivityTask::ActivityTask?
 
-      attr_accessor error(): ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::PollActivityTaskResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error?
 
-      def initialize: (?task: ::Coresdk::ActivityTask::ActivityTask::init?, ?error: ::Coresdk::Bridge::PollActivityTaskResponse::Error::init?) -> void
+      def initialize: (?task: ::Temporalio::Bridge::Api::ActivityTask::ActivityTask::init?, ?error: ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error::init?) -> void
 
-      def []: (:task) -> ::Coresdk::ActivityTask::ActivityTask?
-            | (:error) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
+      def []: (:task) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityTask?
+            | (:error) -> ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:task, ::Coresdk::ActivityTask::ActivityTask?) -> ::Coresdk::ActivityTask::ActivityTask?
-             | [M < ::Coresdk::ActivityTask::ActivityTask::_ToProto] (:task, M?) -> M?
-             | (:error, ::Coresdk::Bridge::PollActivityTaskResponse::Error?) -> ::Coresdk::Bridge::PollActivityTaskResponse::Error?
-             | [M < ::Coresdk::Bridge::PollActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:task, ::Temporalio::Bridge::Api::ActivityTask::ActivityTask?) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityTask?
+             | [M < ::Temporalio::Bridge::Api::ActivityTask::ActivityTask::_ToProto] (:task, M?) -> M?
+             | (:error, ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::PollActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -941,20 +941,20 @@ module Coresdk
     end
 
     class CompleteWorkflowActivationRequest < ::Protobuf::Message
-      attr_accessor completion(): ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
+      attr_accessor completion(): ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion?
 
-      def completion=: [M < ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (M?) -> M?
+      def completion=: [M < ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (M?) -> M?
                      | ...
 
-      def completion!: () -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
+      def completion!: () -> ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion?
 
-      def initialize: (?completion: ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::init?) -> void
+      def initialize: (?completion: ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion::init?) -> void
 
-      def []: (:completion) -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
+      def []: (:completion) -> ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion?
             | (::Symbol) -> untyped
 
-      def []=: (:completion, ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?) -> ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion?
-             | [M < ::Coresdk::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (:completion, M?) -> M?
+      def []=: (:completion, ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion?) -> ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion?
+             | [M < ::Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion::_ToProto] (:completion, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1007,20 +1007,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?) -> ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error?
-             | [M < ::Coresdk::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::CompleteWorkflowActivationResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1042,20 +1042,20 @@ module Coresdk
     end
 
     class CompleteActivityTaskRequest < ::Protobuf::Message
-      attr_accessor completion(): ::Coresdk::ActivityTaskCompletion?
+      attr_accessor completion(): ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion?
 
-      def completion=: [M < ::Coresdk::ActivityTaskCompletion::_ToProto] (M?) -> M?
+      def completion=: [M < ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion::_ToProto] (M?) -> M?
                      | ...
 
-      def completion!: () -> ::Coresdk::ActivityTaskCompletion?
+      def completion!: () -> ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion?
 
-      def initialize: (?completion: ::Coresdk::ActivityTaskCompletion::init?) -> void
+      def initialize: (?completion: ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion::init?) -> void
 
-      def []: (:completion) -> ::Coresdk::ActivityTaskCompletion?
+      def []: (:completion) -> ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion?
             | (::Symbol) -> untyped
 
-      def []=: (:completion, ::Coresdk::ActivityTaskCompletion?) -> ::Coresdk::ActivityTaskCompletion?
-             | [M < ::Coresdk::ActivityTaskCompletion::_ToProto] (:completion, M?) -> M?
+      def []=: (:completion, ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion?) -> ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion?
+             | [M < ::Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion::_ToProto] (:completion, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1108,20 +1108,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?) -> ::Coresdk::Bridge::CompleteActivityTaskResponse::Error?
-             | [M < ::Coresdk::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::CompleteActivityTaskResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1143,20 +1143,20 @@ module Coresdk
     end
 
     class RecordActivityHeartbeatRequest < ::Protobuf::Message
-      attr_accessor heartbeat(): ::Coresdk::ActivityHeartbeat?
+      attr_accessor heartbeat(): ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat?
 
-      def heartbeat=: [M < ::Coresdk::ActivityHeartbeat::_ToProto] (M?) -> M?
+      def heartbeat=: [M < ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat::_ToProto] (M?) -> M?
                     | ...
 
-      def heartbeat!: () -> ::Coresdk::ActivityHeartbeat?
+      def heartbeat!: () -> ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat?
 
-      def initialize: (?heartbeat: ::Coresdk::ActivityHeartbeat::init?) -> void
+      def initialize: (?heartbeat: ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat::init?) -> void
 
-      def []: (:heartbeat) -> ::Coresdk::ActivityHeartbeat?
+      def []: (:heartbeat) -> ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat?
             | (::Symbol) -> untyped
 
-      def []=: (:heartbeat, ::Coresdk::ActivityHeartbeat?) -> ::Coresdk::ActivityHeartbeat?
-             | [M < ::Coresdk::ActivityHeartbeat::_ToProto] (:heartbeat, M?) -> M?
+      def []=: (:heartbeat, ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat?) -> ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat?
+             | [M < ::Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat::_ToProto] (:heartbeat, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1209,20 +1209,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?) -> ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error?
-             | [M < ::Coresdk::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::RecordActivityHeartbeatResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1306,20 +1306,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?) -> ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error?
-             | [M < ::Coresdk::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::RequestWorkflowEvictionResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1393,20 +1393,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, Error | _ToProto]
       end
 
-      attr_accessor error(): ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+      attr_accessor error(): ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error?
 
-      def error=: [M < ::Coresdk::Bridge::ShutdownWorkerResponse::Error::_ToProto] (M?) -> M?
+      def error=: [M < ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error::_ToProto] (M?) -> M?
                 | ...
 
-      def error!: () -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+      def error!: () -> ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error?
 
-      def initialize: (?error: ::Coresdk::Bridge::ShutdownWorkerResponse::Error::init?) -> void
+      def initialize: (?error: ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error::init?) -> void
 
-      def []: (:error) -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
+      def []: (:error) -> ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error?
             | (::Symbol) -> untyped
 
-      def []=: (:error, ::Coresdk::Bridge::ShutdownWorkerResponse::Error?) -> ::Coresdk::Bridge::ShutdownWorkerResponse::Error?
-             | [M < ::Coresdk::Bridge::ShutdownWorkerResponse::Error::_ToProto] (:error, M?) -> M?
+      def []=: (:error, ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error?) -> ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error?
+             | [M < ::Temporalio::Bridge::Api::Bridge::ShutdownWorkerResponse::Error::_ToProto] (:error, M?) -> M?
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto
@@ -1461,25 +1461,25 @@ module Coresdk
 
         def timestamp!: () -> ::Google::Protobuf::Timestamp?
 
-        attr_accessor level(): ::Coresdk::Bridge::LogLevel
+        attr_accessor level(): ::Temporalio::Bridge::Api::Bridge::LogLevel
 
-        def level=: (::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+        def level=: (::Temporalio::Bridge::Api::Bridge::LogLevel::values) -> ::Temporalio::Bridge::Api::Bridge::LogLevel::values
                   | ...
 
-        def level!: () -> ::Coresdk::Bridge::LogLevel?
+        def level!: () -> ::Temporalio::Bridge::Api::Bridge::LogLevel?
 
-        def initialize: (?message: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?level: ::Coresdk::Bridge::LogLevel::init) -> void
+        def initialize: (?message: ::String, ?timestamp: ::Google::Protobuf::Timestamp::init?, ?level: ::Temporalio::Bridge::Api::Bridge::LogLevel::init) -> void
 
         def []: (:message) -> ::String
               | (:timestamp) -> ::Google::Protobuf::Timestamp?
-              | (:level) -> ::Coresdk::Bridge::LogLevel
+              | (:level) -> ::Temporalio::Bridge::Api::Bridge::LogLevel
               | (::Symbol) -> untyped
 
         def []=: (:message, ::String) -> ::String
                | (:timestamp, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
                | [M < ::Google::Protobuf::Timestamp::_ToProto] (:timestamp, M?) -> M?
-               | (:level, ::Coresdk::Bridge::LogLevel) -> ::Coresdk::Bridge::LogLevel
-               | (:level, ::Coresdk::Bridge::LogLevel::values) -> ::Coresdk::Bridge::LogLevel::values
+               | (:level, ::Temporalio::Bridge::Api::Bridge::LogLevel) -> ::Temporalio::Bridge::Api::Bridge::LogLevel
+               | (:level, ::Temporalio::Bridge::Api::Bridge::LogLevel::values) -> ::Temporalio::Bridge::Api::Bridge::LogLevel::values
                | (::Symbol, untyped) -> untyped
 
         interface _ToProto
@@ -1500,20 +1500,20 @@ module Coresdk
         type hash[KEY] = ::Hash[KEY, LogEntry | _ToProto]
       end
 
-      attr_accessor entries(): ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+      attr_accessor entries(): ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
 
-      def entries=: (::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array
+      def entries=: (::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::array
                   | ...
 
-      def entries!: () -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array?
+      def entries!: () -> ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::field_array?
 
-      def initialize: (?entries: ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> void
+      def initialize: (?entries: ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> void
 
-      def []: (:entries) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+      def []: (:entries) -> ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
             | (::Symbol) -> untyped
 
-      def []=: (:entries, ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
-             | (:entries, ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Coresdk::Bridge::FetchBufferedLogsResponse::LogEntry::array
+      def []=: (:entries, ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::field_array) -> ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::field_array
+             | (:entries, ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::array) -> ::Temporalio::Bridge::Api::Bridge::FetchBufferedLogsResponse::LogEntry::array
              | (::Symbol, untyped) -> untyped
 
       interface _ToProto

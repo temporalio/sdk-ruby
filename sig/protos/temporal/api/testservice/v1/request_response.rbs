@@ -1,6 +1,6 @@
-module Temporalio
+module Temporal
   module Api
-    module TestService
+    module Testservice
       module V1
         class LockTimeSkippingRequest < ::Protobuf::Message
           def initialize: () -> void

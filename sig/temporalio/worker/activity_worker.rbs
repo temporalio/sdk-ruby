@@ -33,10 +33,10 @@ module Temporalio
       def prepare_activities: (Array[singleton(Temporalio::Activity)] activities)
         -> Hash[String, singleton(Temporalio::Activity)]
       def lookup_activity: (String activity_type) -> singleton(Temporalio::Activity)
-      def run_activity: (String token, Coresdk::ActivityTask::Start task)
+      def run_activity: (String token, Temporalio::Bridge::Api::ActivityTask::Start task)
         -> (Temporalio::Api::Common::V1::Payload | Temporalio::Api::Failure::V1::Failure)
-      def handle_start_activity: (String task_token, Coresdk::ActivityTask::Start task) -> void
-      def handle_cancel_activity: (String task_token, Coresdk::ActivityTask::Cancel task) -> void
+      def handle_start_activity: (String task_token, Temporalio::Bridge::Api::ActivityTask::Start task) -> void
+      def handle_cancel_activity: (String task_token, Temporalio::Bridge::Api::ActivityTask::Cancel task) -> void
     end
   end
 end

@@ -47,11 +47,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module ActivityTask
-    ActivityTask = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.ActivityTask").msgclass
-    Start = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.Start").msgclass
-    Cancel = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.Cancel").msgclass
-    ActivityCancelReason = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.ActivityCancelReason").enummodule
+module Temporalio
+  module Bridge
+    module Api
+      module ActivityTask
+        ActivityTask = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.ActivityTask").msgclass
+        Start = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.Start").msgclass
+        Cancel = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.Cancel").msgclass
+        ActivityCancelReason = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_task.ActivityCancelReason").enummodule
+      end
+    end
   end
 end

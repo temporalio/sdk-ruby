@@ -9,15 +9,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_file("temporal/api/operatorservice/v1/request_response.proto", :syntax => :proto3) do
     add_message "temporal.api.operatorservice.v1.AddSearchAttributesRequest" do
       map :search_attributes, :string, :enum, 1, "temporal.api.enums.v1.IndexedValueType"
+      optional :namespace, :string, 2
     end
     add_message "temporal.api.operatorservice.v1.AddSearchAttributesResponse" do
     end
     add_message "temporal.api.operatorservice.v1.RemoveSearchAttributesRequest" do
       repeated :search_attributes, :string, 1
+      optional :namespace, :string, 2
     end
     add_message "temporal.api.operatorservice.v1.RemoveSearchAttributesResponse" do
     end
     add_message "temporal.api.operatorservice.v1.ListSearchAttributesRequest" do
+      optional :namespace, :string, 1
     end
     add_message "temporal.api.operatorservice.v1.ListSearchAttributesResponse" do
       map :custom_attributes, :string, :enum, 1, "temporal.api.enums.v1.IndexedValueType"
