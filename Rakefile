@@ -46,6 +46,7 @@ namespace :test_server do
   end
 end
 
+# rubocop:disable Metrics/BlockLength
 namespace :proto do
   desc 'Generate API and Core protobufs'
   task :generate do
@@ -78,7 +79,7 @@ namespace :proto do
     # directives in our input proto files.
 
     # Collect package names and determine the corresponding Ruby package names
-    package_map = Hash.new
+    package_map = {}
     protos.each do |path|
       content = File.read(path)
 
@@ -94,7 +95,7 @@ namespace :proto do
     end
 
     # Copy and fix all proto files to a temporary directory
-    protos.each do |path|
+    protos.each do |path| # rubocop:disable Style/CombinableLoops
       content = File.read(path)
 
       original_package = content.match(/^\s*package\s+([^;]+)\s*;/).match(1)
@@ -128,19 +129,25 @@ namespace :proto do
     rbs_files.each do |path|
       content = File.read(path)
 
-      # protobuf_rbs will have created some module directive like "Workflow_service". Rewrite those to proper camelcase.
+      # protobuf_rbs will have created some module directive like
+      # "Workflow_service". Rewrite those to proper camelcase.
       content = content.gsub(/module ([a-z0-9]+_[a-z0-9_]+)/i) do
         module_name = Regexp.last_match(1)
         camelcase_name = module_name.split('_').map(&:capitalize).join
         "module #{camelcase_name}"
       end
 
-      # Also fix references such as Temporalio::Api::Task_queue::V1::TaskQueue to Temporalio::Api::TaskQueue::V1::TaskQueue
+      # Also fix references such as Temporalio::Api::Task_queue::V1::TaskQueue
+      # by rewriting them to proper camelcase.
       content = content.gsub(/Temporalio(::[a-z0-9][a-z0-9_]+)+(?=::)/i) do
         Regexp.last_match(0).split('::').map do |segment|
-          segment.match(/_/) ?
-            segment.split('_').map(&:capitalize).join :
+          if segment.match(/_/)
+            segment.split('_').map(&:capitalize).join
+          else
+            # Some segments are already camelcase.
+            # Calling capitalize on them would lowercase inner words.
             segment
+          end
         end.join('::')
       end
 
@@ -150,12 +157,12 @@ namespace :proto do
         class_name = Regexp.last_match(2)
         original_line = Regexp.last_match(0)
 
-        <<~EOS
+        <<~EXTRA_METHODS
           #{original_line}
           #{indent}  # Encode the message to a binary string
-          #{indent}  # 
+          #{indent}  #
           #{indent}  def self.encode: (#{class_name}) -> String
-        EOS
+        EXTRA_METHODS
       end
 
       File.write(path, content)
@@ -165,3 +172,4 @@ namespace :proto do
     FileUtils.rm_rf('tmp')
   end
 end
+# rubocop:enable Metrics/BlockLength
