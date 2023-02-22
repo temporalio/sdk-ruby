@@ -56,21 +56,98 @@ namespace :proto do
     api_protos = Dir.glob("#{API_PROTO_ROOT}/**/*.proto")
     core_protos = Dir.glob("#{CORE_PROTO_ROOT}/**/*.proto")
     test_protos = Dir.glob("#{TEST_PROTO_ROOT}/**/*.proto")
+
+    # Some files exist in more than one directories. Get rid of duplicates.
     protos = (api_protos + core_protos + test_protos).uniq do |path|
-      # Use relative path to check for uniqueness (to exclude duplicate dependencies)
       path
         .delete_prefix(API_PROTO_ROOT)
         .delete_prefix(CORE_PROTO_ROOT)
         .delete_prefix(TEST_PROTO_ROOT)
-    end.sort.join(' ')
+    end.sort
 
-    sh 'RBS_PROTOBUF_BACKEND=protobuf RBS_PROTOBUF_EXTENSION=true ' \
-       'bundle exec grpc_tools_ruby_protoc ' \
+    sh 'bundle exec grpc_tools_ruby_protoc ' \
        "--proto_path=#{API_PROTO_ROOT} " \
        "--proto_path=#{CORE_PROTO_ROOT} " \
        "--proto_path=#{TEST_PROTO_ROOT} " \
        "--ruby_out=#{PROTOBUF_PATH} " \
        "--grpc_out=#{GRPC_PATH} " \
-       "--rbs_out=#{RBS_SIG_PATH} #{protos}"
+       "#{protos.join(' ')}"
+
+    # protobuf_rbs doesn't honour the ruby_package directive, which means that .rbs files modules
+    # would not match modules in .rb files. For now, we work around that by rewriting package
+    # directives in our input proto files.
+
+    # Collect package names and determine the corresponding Ruby package names
+    package_map = Hash.new
+    protos.each do |path|
+      content = File.read(path)
+
+      original_package = content.match(/^\s*package\s+([^;]+)\s*;/).match(1)
+      ruby_package = content.match(/^\s*option\s+ruby_package\s*=\s*"([^"]+)"\s*;/)&.match(1)
+
+      if ruby_package
+        normalized_package = ruby_package.gsub(/::/, '.').gsub(/(?<=[a-zA-Z])([A-Z])/, '_\1').downcase
+        package_map[original_package] = normalized_package
+      else
+        package_map[original_package] = original_package
+      end
+    end
+
+    # Copy and fix all proto files to a temporary directory
+    protos.each do |path|
+      content = File.read(path)
+
+      original_package = content.match(/^\s*package\s+([^;]+)\s*;/).match(1)
+      normalized_package = package_map[original_package]
+
+      # Rewrite the package directive
+      content = content.gsub(/^\s*package\s+([^;]+)\s*;/, "package #{normalized_package};")
+
+      # Fix references to renamed packages
+      content = content.gsub(/(?<![.a-z])(temporal\.api\.[a-z0-9.]+)\.([a-z0-9]+)/i) do
+        package = Regexp.last_match(1)
+        element_name = Regexp.last_match(2)
+        "#{package_map[package]}.#{element_name}"
+      end
+
+      # Write out the file for processing
+      FileUtils.mkdir_p(File.dirname("tmp/#{path}"))
+      File.write("tmp/#{path}", content)
+    end
+
+    sh 'RBS_PROTOBUF_BACKEND=protobuf RBS_PROTOBUF_EXTENSION=true' \
+       'bundle exec grpc_tools_ruby_protoc ' \
+       "--proto_path=tmp/#{API_PROTO_ROOT} " \
+       "--proto_path=tmp/#{CORE_PROTO_ROOT} " \
+       "--proto_path=tmp/#{TEST_PROTO_ROOT} " \
+       "--rbs_out=#{RBS_SIG_PATH} " \
+       "#{protos.map { |x| "tmp/#{x}" }.join(' ')}"
+
+    # Fix generated RBS files
+    rbs_files = Dir.glob("#{RBS_SIG_PATH}/**/*.rbs")
+    rbs_files.each do |path|
+      content = File.read(path)
+
+      # protobuf_rbs will have created some module directive like "Workflow_service". Rewrite those to proper camelcase.
+      content = content.gsub(/module ([a-z0-9]+_[a-z0-9_]+)/i) do
+        module_name = Regexp.last_match(1)
+        camelcase_name = module_name.split('_').map(&:capitalize).join
+        "module #{camelcase_name}"
+      end
+
+      # Also fix references such as Temporalio::Api::Task_queue::V1::TaskQueue to Temporalio::Api::TaskQueue::V1::TaskQueue
+      content = content.gsub(/Temporalio(::[a-z0-9][a-z0-9_]+)+(?=::)/i) do
+        Regexp.last_match(0).split('::').map do |segment|
+          segment.match(/_/) ?
+            segment.split('_').map(&:capitalize).join :
+            segment
+        end.join('::')
+      end
+
+      File.write(path, content)
+    end
+
+    # Remove temporary files
+    FileUtils.rm_rf('tmp')
   end
 end

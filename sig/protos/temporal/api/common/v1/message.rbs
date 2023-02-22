@@ -1,27 +1,27 @@
-module Temporal
+module Temporalio
   module Api
     module Common
       module V1
         class DataBlob < ::Protobuf::Message
-          attr_accessor encoding_type(): ::Temporal::Api::Enums::V1::EncodingType
+          attr_accessor encoding_type(): ::Temporalio::Api::Enums::V1::EncodingType
 
-          def encoding_type=: (::Temporal::Api::Enums::V1::EncodingType::values) -> ::Temporal::Api::Enums::V1::EncodingType::values
+          def encoding_type=: (::Temporalio::Api::Enums::V1::EncodingType::values) -> ::Temporalio::Api::Enums::V1::EncodingType::values
                             | ...
 
-          def encoding_type!: () -> ::Temporal::Api::Enums::V1::EncodingType?
+          def encoding_type!: () -> ::Temporalio::Api::Enums::V1::EncodingType?
 
           attr_accessor data(): ::String
 
           def data!: () -> ::String?
 
-          def initialize: (?encoding_type: ::Temporal::Api::Enums::V1::EncodingType::init, ?data: ::String) -> void
+          def initialize: (?encoding_type: ::Temporalio::Api::Enums::V1::EncodingType::init, ?data: ::String) -> void
 
-          def []: (:encoding_type) -> ::Temporal::Api::Enums::V1::EncodingType
+          def []: (:encoding_type) -> ::Temporalio::Api::Enums::V1::EncodingType
                 | (:data) -> ::String
                 | (::Symbol) -> untyped
 
-          def []=: (:encoding_type, ::Temporal::Api::Enums::V1::EncodingType) -> ::Temporal::Api::Enums::V1::EncodingType
-                 | (:encoding_type, ::Temporal::Api::Enums::V1::EncodingType::values) -> ::Temporal::Api::Enums::V1::EncodingType::values
+          def []=: (:encoding_type, ::Temporalio::Api::Enums::V1::EncodingType) -> ::Temporalio::Api::Enums::V1::EncodingType
+                 | (:encoding_type, ::Temporalio::Api::Enums::V1::EncodingType::values) -> ::Temporalio::Api::Enums::V1::EncodingType::values
                  | (:data, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
@@ -46,20 +46,20 @@ module Temporal
         # See `Payload`
         #
         class Payloads < ::Protobuf::Message
-          attr_accessor payloads(): ::Temporal::Api::Common::V1::Payload::field_array
+          attr_accessor payloads(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-          def payloads=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+          def payloads=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                        | ...
 
-          def payloads!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
+          def payloads!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-          def initialize: (?payloads: ::Temporal::Api::Common::V1::Payload::array) -> void
+          def initialize: (?payloads: ::Temporalio::Api::Common::V1::Payload::array) -> void
 
-          def []: (:payloads) -> ::Temporal::Api::Common::V1::Payload::field_array
+          def []: (:payloads) -> ::Temporalio::Api::Common::V1::Payload::field_array
                 | (::Symbol) -> untyped
 
-          def []=: (:payloads, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-                 | (:payloads, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
+          def []=: (:payloads, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:payloads, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -129,20 +129,20 @@ module Temporal
         #  The payload is not serialized in a user-defined way.
         #
         class SearchAttributes < ::Protobuf::Message
-          attr_accessor indexed_fields(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          attr_accessor indexed_fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
-          def indexed_fields=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def indexed_fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                              | ...
 
-          def indexed_fields!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+          def indexed_fields!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-          def initialize: (?indexed_fields: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+          def initialize: (?indexed_fields: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
-          def []: (:indexed_fields) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          def []: (:indexed_fields) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
                 | (::Symbol) -> untyped
 
-          def []=: (:indexed_fields, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-                 | (:indexed_fields, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def []=: (:indexed_fields, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:indexed_fields, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -166,20 +166,20 @@ module Temporal
         # A user-defined set of *unindexed* fields that are exposed when listing/searching workflows
         #
         class Memo < ::Protobuf::Message
-          attr_accessor fields(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
-          def fields=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                      | ...
 
-          def fields!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+          def fields!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-          def initialize: (?fields: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+          def initialize: (?fields: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
-          def []: (:fields) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          def []: (:fields) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
                 | (::Symbol) -> untyped
 
-          def []=: (:fields, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-                 | (:fields, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def []=: (:fields, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:fields, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -204,20 +204,20 @@ module Temporal
         #  can be propagated between, for example, workflows and activities.
         #
         class Header < ::Protobuf::Message
-          attr_accessor fields(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
-          def fields=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                      | ...
 
-          def fields!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
+          def fields!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-          def initialize: (?fields: ::Temporal::Api::Common::V1::Payload::hash[::String]) -> void
+          def initialize: (?fields: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
 
-          def []: (:fields) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
+          def []: (:fields) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
                 | (::Symbol) -> untyped
 
-          def []=: (:fields, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-                 | (:fields, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
+          def []=: (:fields, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:fields, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto

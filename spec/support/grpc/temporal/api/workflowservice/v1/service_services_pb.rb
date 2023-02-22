@@ -85,8 +85,8 @@ module Temporalio
             # GetWorkflowExecutionHistory returns the history of specified workflow execution. Fails with
             # `NotFound` if the specified workflow execution is unknown to the service.
             rpc :GetWorkflowExecutionHistory, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse
-            # GetWorkflowExecutionHistoryReverse returns the history of specified workflow execution in reverse
-            # order (starting from last event). Fails with`NotFound` if the specified workflow execution is
+            # GetWorkflowExecutionHistoryReverse returns the history of specified workflow execution in reverse 
+            # order (starting from last event). Fails with`NotFound` if the specified workflow execution is 
             # unknown to the service.
             rpc :GetWorkflowExecutionHistoryReverse, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest, ::Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseResponse
             # PollWorkflowTaskQueue is called by workers to make progress on workflows.

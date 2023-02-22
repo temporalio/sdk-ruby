@@ -1,6 +1,6 @@
-module Temporal
+module Temporalio
   module Api
-    module Workflowservice
+    module WorkflowService
       module V1
         # WorkflowService API defines how Temporal SDKs and other clients interact with the Temporal server
         #  to create and interact with workflows and activities.

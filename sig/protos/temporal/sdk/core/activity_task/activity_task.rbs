@@ -1,370 +1,374 @@
-module Coresdk
-  module Activity_task
-    class ActivityCancelReason < ::Protobuf::Enum
-      type names = :NOT_FOUND | :CANCELLED | :TIMED_OUT
+module Temporalio
+  module Bridge
+    module Api
+      module ActivityTask
+        class ActivityCancelReason < ::Protobuf::Enum
+          type names = :NOT_FOUND | :CANCELLED | :TIMED_OUT
 
-      type strings = "NOT_FOUND" | "CANCELLED" | "TIMED_OUT"
+          type strings = "NOT_FOUND" | "CANCELLED" | "TIMED_OUT"
 
-      type tags = 0 | 1 | 2
+          type tags = 0 | 1 | 2
 
-      type values = names | strings | tags
+          type values = names | strings | tags
 
-      attr_reader name(): names
+          attr_reader name(): names
 
-      attr_reader tag(): tags
+          attr_reader tag(): tags
 
-      # / The activity no longer exists according to server (may be already completed)
-      #
-      NOT_FOUND: ActivityCancelReason
+          # / The activity no longer exists according to server (may be already completed)
+          #
+          NOT_FOUND: ActivityCancelReason
 
-      # / Activity was explicitly cancelled
-      #
-      CANCELLED: ActivityCancelReason
+          # / Activity was explicitly cancelled
+          #
+          CANCELLED: ActivityCancelReason
 
-      # / Activity timed out
-      #
-      TIMED_OUT: ActivityCancelReason
+          # / Activity timed out
+          #
+          TIMED_OUT: ActivityCancelReason
 
-      # The type of `#initialize` parameter.
-      type init = ActivityCancelReason | values
+          # The type of `#initialize` parameter.
+          type init = ActivityCancelReason | values
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ActivityCancelReason, ActivityCancelReason | values]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ActivityCancelReason, ActivityCancelReason | values]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityCancelReason, ActivityCancelReason | values]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityCancelReason, ActivityCancelReason | values]
 
-      type array = ::Array[ActivityCancelReason | values]
+          type array = ::Array[ActivityCancelReason | values]
 
-      type hash[KEY] = ::Hash[KEY, ActivityCancelReason | values]
-    end
+          type hash[KEY] = ::Hash[KEY, ActivityCancelReason | values]
+        end
 
-    class ActivityTask < ::Protobuf::Message
-      # / A unique identifier for this task
-      #
-      attr_accessor task_token(): ::String
+        class ActivityTask < ::Protobuf::Message
+          # / A unique identifier for this task
+          #
+          attr_accessor task_token(): ::String
 
-      def task_token!: () -> ::String?
+          def task_token!: () -> ::String?
 
-      # / Start activity execution.
-      #
-      attr_accessor start(): ::Temporalio::Bridge::Api::ActivityTask::Start?
+          # / Start activity execution.
+          #
+          attr_accessor start(): ::Temporalio::Bridge::Api::ActivityTask::Start?
 
-      # / Start activity execution.
-      #
-      def start=: [M < ::Temporalio::Bridge::Api::ActivityTask::Start::_ToProto] (M?) -> M?
-                | ...
+          # / Start activity execution.
+          #
+          def start=: [M < ::Temporalio::Bridge::Api::ActivityTask::Start::_ToProto] (M?) -> M?
+                    | ...
 
-      def start!: () -> ::Temporalio::Bridge::Api::ActivityTask::Start?
+          def start!: () -> ::Temporalio::Bridge::Api::ActivityTask::Start?
 
-      # / Attempt to cancel activity execution.
-      #
-      attr_accessor cancel(): ::Temporalio::Bridge::Api::ActivityTask::Cancel?
+          # / Attempt to cancel activity execution.
+          #
+          attr_accessor cancel(): ::Temporalio::Bridge::Api::ActivityTask::Cancel?
 
-      # / Attempt to cancel activity execution.
-      #
-      def cancel=: [M < ::Temporalio::Bridge::Api::ActivityTask::Cancel::_ToProto] (M?) -> M?
-                 | ...
+          # / Attempt to cancel activity execution.
+          #
+          def cancel=: [M < ::Temporalio::Bridge::Api::ActivityTask::Cancel::_ToProto] (M?) -> M?
+                     | ...
 
-      def cancel!: () -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
+          def cancel!: () -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
 
-      def initialize: (?task_token: ::String, ?start: ::Temporalio::Bridge::Api::ActivityTask::Start::init?, ?cancel: ::Temporalio::Bridge::Api::ActivityTask::Cancel::init?) -> void
+          def initialize: (?task_token: ::String, ?start: ::Temporalio::Bridge::Api::ActivityTask::Start::init?, ?cancel: ::Temporalio::Bridge::Api::ActivityTask::Cancel::init?) -> void
 
-      def []: (:task_token) -> ::String
-            | (:start) -> ::Temporalio::Bridge::Api::ActivityTask::Start?
-            | (:cancel) -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
-            | (::Symbol) -> untyped
+          def []: (:task_token) -> ::String
+                | (:start) -> ::Temporalio::Bridge::Api::ActivityTask::Start?
+                | (:cancel) -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
+                | (::Symbol) -> untyped
 
-      def []=: (:task_token, ::String) -> ::String
-             | (:start, ::Temporalio::Bridge::Api::ActivityTask::Start?) -> ::Temporalio::Bridge::Api::ActivityTask::Start?
-             | [M < ::Temporalio::Bridge::Api::ActivityTask::Start::_ToProto] (:start, M?) -> M?
-             | (:cancel, ::Temporalio::Bridge::Api::ActivityTask::Cancel?) -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
-             | [M < ::Temporalio::Bridge::Api::ActivityTask::Cancel::_ToProto] (:cancel, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def []=: (:task_token, ::String) -> ::String
+                 | (:start, ::Temporalio::Bridge::Api::ActivityTask::Start?) -> ::Temporalio::Bridge::Api::ActivityTask::Start?
+                 | [M < ::Temporalio::Bridge::Api::ActivityTask::Start::_ToProto] (:start, M?) -> M?
+                 | (:cancel, ::Temporalio::Bridge::Api::ActivityTask::Cancel?) -> ::Temporalio::Bridge::Api::ActivityTask::Cancel?
+                 | [M < ::Temporalio::Bridge::Api::ActivityTask::Cancel::_ToProto] (:cancel, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
 
-      interface _ToProto
-        def to_proto: () -> ActivityTask
-      end
+          interface _ToProto
+            def to_proto: () -> ActivityTask
+          end
 
-      # The type of `#initialize` parameter.
-      type init = ActivityTask | _ToProto
+          # The type of `#initialize` parameter.
+          type init = ActivityTask | _ToProto
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ActivityTask, ActivityTask | _ToProto]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ActivityTask, ActivityTask | _ToProto]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityTask, ActivityTask | _ToProto]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityTask, ActivityTask | _ToProto]
 
-      type array = ::Array[ActivityTask | _ToProto]
+          type array = ::Array[ActivityTask | _ToProto]
 
-      type hash[KEY] = ::Hash[KEY, ActivityTask | _ToProto]
-    end
+          type hash[KEY] = ::Hash[KEY, ActivityTask | _ToProto]
+        end
 
-    # Begin executing an activity
-    #
-    class Start < ::Protobuf::Message
-      # The namespace the workflow lives in
-      #
-      attr_accessor workflow_namespace(): ::String
+        # Begin executing an activity
+        #
+        class Start < ::Protobuf::Message
+          # The namespace the workflow lives in
+          #
+          attr_accessor workflow_namespace(): ::String
 
-      def workflow_namespace!: () -> ::String?
+          def workflow_namespace!: () -> ::String?
 
-      # The workflow's type name or function identifier
-      #
-      attr_accessor workflow_type(): ::String
+          # The workflow's type name or function identifier
+          #
+          attr_accessor workflow_type(): ::String
 
-      def workflow_type!: () -> ::String?
+          def workflow_type!: () -> ::String?
 
-      # The workflow execution which requested this activity
-      #
-      attr_accessor workflow_execution(): ::Temporal::Api::Common::V1::WorkflowExecution?
+          # The workflow execution which requested this activity
+          #
+          attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
 
-      # The workflow execution which requested this activity
-      #
-      def workflow_execution=: [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
-                             | ...
-
-      def workflow_execution!: () -> ::Temporal::Api::Common::V1::WorkflowExecution?
-
-      # The activity's ID
-      #
-      attr_accessor activity_id(): ::String
-
-      def activity_id!: () -> ::String?
-
-      # The activity's type name or function identifier
-      #
-      attr_accessor activity_type(): ::String
-
-      def activity_type!: () -> ::String?
-
-      attr_accessor header_fields(): ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-
-      def header_fields=: (::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
-                        | ...
-
-      def header_fields!: () -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]?
-
-      # Arguments to the activity
-      #
-      attr_accessor input(): ::Temporal::Api::Common::V1::Payload::field_array
-
-      # Arguments to the activity
-      #
-      def input=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-                | ...
-
-      def input!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
-
-      # The last details that were recorded by a heartbeat when this task was generated
-      #
-      attr_accessor heartbeat_details(): ::Temporal::Api::Common::V1::Payload::field_array
-
-      # The last details that were recorded by a heartbeat when this task was generated
-      #
-      def heartbeat_details=: (::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-                            | ...
-
-      def heartbeat_details!: () -> ::Temporal::Api::Common::V1::Payload::field_array?
-
-      # When the task was *first* scheduled
-      #
-      attr_accessor scheduled_time(): ::Google::Protobuf::Timestamp?
-
-      # When the task was *first* scheduled
-      #
-      def scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                         | ...
-
-      def scheduled_time!: () -> ::Google::Protobuf::Timestamp?
-
-      # When this current attempt at the task was scheduled
-      #
-      attr_accessor current_attempt_scheduled_time(): ::Google::Protobuf::Timestamp?
-
-      # When this current attempt at the task was scheduled
-      #
-      def current_attempt_scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                                         | ...
-
-      def current_attempt_scheduled_time!: () -> ::Google::Protobuf::Timestamp?
-
-      # When this attempt was started, which is to say when core received it by polling.
-      #
-      attr_accessor started_time(): ::Google::Protobuf::Timestamp?
-
-      # When this attempt was started, which is to say when core received it by polling.
-      #
-      def started_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                       | ...
-
-      def started_time!: () -> ::Google::Protobuf::Timestamp?
-
-      attr_accessor attempt(): ::Integer
-
-      def attempt!: () -> ::Integer?
-
-      # Timeout from the first schedule time to completion
-      #
-      attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # Timeout from the first schedule time to completion
-      #
-      def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                    | ...
-
-      def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # Timeout from starting an attempt to reporting its result
-      #
-      attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # Timeout from starting an attempt to reporting its result
-      #
-      def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+          # The workflow execution which requested this activity
+          #
+          def workflow_execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
                                  | ...
 
-      def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+          def workflow_execution!: () -> ::Temporalio::Api::Common::V1::WorkflowExecution?
 
-      # If set a heartbeat must be reported within this interval
-      #
-      attr_accessor heartbeat_timeout(): ::Google::Protobuf::Duration?
+          # The activity's ID
+          #
+          attr_accessor activity_id(): ::String
 
-      # If set a heartbeat must be reported within this interval
-      #
-      def heartbeat_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+          def activity_id!: () -> ::String?
+
+          # The activity's type name or function identifier
+          #
+          attr_accessor activity_type(): ::String
+
+          def activity_type!: () -> ::String?
+
+          attr_accessor header_fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          def header_fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
                             | ...
 
-      def heartbeat_timeout!: () -> ::Google::Protobuf::Duration?
+          def header_fields!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      # This is an actual retry policy the service uses. It can be different from the one provided
-      #  (or not) during activity scheduling as the service can override the provided one in case its
-      #  values are not specified or exceed configured system limits.
-      #
-      attr_accessor retry_policy(): ::Temporal::Api::Common::V1::RetryPolicy?
+          # Arguments to the activity
+          #
+          attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      # This is an actual retry policy the service uses. It can be different from the one provided
-      #  (or not) during activity scheduling as the service can override the provided one in case its
-      #  values are not specified or exceed configured system limits.
-      #
-      def retry_policy=: [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
-                       | ...
+          # Arguments to the activity
+          #
+          def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                    | ...
 
-      def retry_policy!: () -> ::Temporal::Api::Common::V1::RetryPolicy?
+          def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-      # Set to true if this is a local activity. Note that heartbeating does not apply to local
-      #  activities.
-      #
-      attr_accessor is_local(): bool
+          # The last details that were recorded by a heartbeat when this task was generated
+          #
+          attr_accessor heartbeat_details(): ::Temporalio::Api::Common::V1::Payload::field_array
 
-      def is_local!: () -> bool?
+          # The last details that were recorded by a heartbeat when this task was generated
+          #
+          def heartbeat_details=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                                | ...
 
-      def initialize: (?workflow_namespace: ::String, ?workflow_type: ::String, ?workflow_execution: ::Temporal::Api::Common::V1::WorkflowExecution::init?, ?activity_id: ::String, ?activity_type: ::String, ?header_fields: ::Temporal::Api::Common::V1::Payload::hash[::String], ?input: ::Temporal::Api::Common::V1::Payload::array, ?heartbeat_details: ::Temporal::Api::Common::V1::Payload::array, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?current_attempt_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporal::Api::Common::V1::RetryPolicy::init?, ?is_local: bool) -> void
+          def heartbeat_details!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-      def []: (:workflow_namespace) -> ::String
-            | (:workflow_type) -> ::String
-            | (:workflow_execution) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-            | (:activity_id) -> ::String
-            | (:activity_type) -> ::String
-            | (:header_fields) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-            | (:input) -> ::Temporal::Api::Common::V1::Payload::field_array
-            | (:heartbeat_details) -> ::Temporal::Api::Common::V1::Payload::field_array
-            | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
-            | (:current_attempt_scheduled_time) -> ::Google::Protobuf::Timestamp?
-            | (:started_time) -> ::Google::Protobuf::Timestamp?
-            | (:attempt) -> ::Integer
-            | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
-            | (:retry_policy) -> ::Temporal::Api::Common::V1::RetryPolicy?
-            | (:is_local) -> bool
-            | (::Symbol) -> untyped
+          # When the task was *first* scheduled
+          #
+          attr_accessor scheduled_time(): ::Google::Protobuf::Timestamp?
 
-      def []=: (:workflow_namespace, ::String) -> ::String
-             | (:workflow_type, ::String) -> ::String
-             | (:workflow_execution, ::Temporal::Api::Common::V1::WorkflowExecution?) -> ::Temporal::Api::Common::V1::WorkflowExecution?
-             | [M < ::Temporal::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
-             | (:activity_id, ::String) -> ::String
-             | (:activity_type, ::String) -> ::String
-             | (:header_fields, ::Temporal::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporal::Api::Common::V1::Payload::field_hash[::String]
-             | (:header_fields, ::Temporal::Api::Common::V1::Payload::hash[::String]) -> ::Temporal::Api::Common::V1::Payload::hash[::String]
-             | (:input, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:input, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-             | (:heartbeat_details, ::Temporal::Api::Common::V1::Payload::field_array) -> ::Temporal::Api::Common::V1::Payload::field_array
-             | (:heartbeat_details, ::Temporal::Api::Common::V1::Payload::array) -> ::Temporal::Api::Common::V1::Payload::array
-             | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
-             | (:current_attempt_scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:current_attempt_scheduled_time, M?) -> M?
-             | (:started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:started_time, M?) -> M?
-             | (:attempt, ::Integer) -> ::Integer
-             | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
-             | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
-             | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
-             | (:retry_policy, ::Temporal::Api::Common::V1::RetryPolicy?) -> ::Temporal::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporal::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (:is_local, bool) -> bool
-             | (::Symbol, untyped) -> untyped
+          # When the task was *first* scheduled
+          #
+          def scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                             | ...
 
-      def is_local?: () -> bool
+          def scheduled_time!: () -> ::Google::Protobuf::Timestamp?
 
-      interface _ToProto
-        def to_proto: () -> Start
+          # When this current attempt at the task was scheduled
+          #
+          attr_accessor current_attempt_scheduled_time(): ::Google::Protobuf::Timestamp?
+
+          # When this current attempt at the task was scheduled
+          #
+          def current_attempt_scheduled_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                             | ...
+
+          def current_attempt_scheduled_time!: () -> ::Google::Protobuf::Timestamp?
+
+          # When this attempt was started, which is to say when core received it by polling.
+          #
+          attr_accessor started_time(): ::Google::Protobuf::Timestamp?
+
+          # When this attempt was started, which is to say when core received it by polling.
+          #
+          def started_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                           | ...
+
+          def started_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor attempt(): ::Integer
+
+          def attempt!: () -> ::Integer?
+
+          # Timeout from the first schedule time to completion
+          #
+          attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout from the first schedule time to completion
+          #
+          def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # Timeout from starting an attempt to reporting its result
+          #
+          attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout from starting an attempt to reporting its result
+          #
+          def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                     | ...
+
+          def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # If set a heartbeat must be reported within this interval
+          #
+          attr_accessor heartbeat_timeout(): ::Google::Protobuf::Duration?
+
+          # If set a heartbeat must be reported within this interval
+          #
+          def heartbeat_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                | ...
+
+          def heartbeat_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # This is an actual retry policy the service uses. It can be different from the one provided
+          #  (or not) during activity scheduling as the service can override the provided one in case its
+          #  values are not specified or exceed configured system limits.
+          #
+          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # This is an actual retry policy the service uses. It can be different from the one provided
+          #  (or not) during activity scheduling as the service can override the provided one in case its
+          #  values are not specified or exceed configured system limits.
+          #
+          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # Set to true if this is a local activity. Note that heartbeating does not apply to local
+          #  activities.
+          #
+          attr_accessor is_local(): bool
+
+          def is_local!: () -> bool?
+
+          def initialize: (?workflow_namespace: ::String, ?workflow_type: ::String, ?workflow_execution: ::Temporalio::Api::Common::V1::WorkflowExecution::init?, ?activity_id: ::String, ?activity_type: ::String, ?header_fields: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?input: ::Temporalio::Api::Common::V1::Payload::array, ?heartbeat_details: ::Temporalio::Api::Common::V1::Payload::array, ?scheduled_time: ::Google::Protobuf::Timestamp::init?, ?current_attempt_scheduled_time: ::Google::Protobuf::Timestamp::init?, ?started_time: ::Google::Protobuf::Timestamp::init?, ?attempt: ::Integer, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?is_local: bool) -> void
+
+          def []: (:workflow_namespace) -> ::String
+                | (:workflow_type) -> ::String
+                | (:workflow_execution) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+                | (:activity_id) -> ::String
+                | (:activity_type) -> ::String
+                | (:header_fields) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:heartbeat_details) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:scheduled_time) -> ::Google::Protobuf::Timestamp?
+                | (:current_attempt_scheduled_time) -> ::Google::Protobuf::Timestamp?
+                | (:started_time) -> ::Google::Protobuf::Timestamp?
+                | (:attempt) -> ::Integer
+                | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
+                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:is_local) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_namespace, ::String) -> ::String
+                 | (:workflow_type, ::String) -> ::String
+                 | (:workflow_execution, ::Temporalio::Api::Common::V1::WorkflowExecution?) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+                 | [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:activity_id, ::String) -> ::String
+                 | (:activity_type, ::String) -> ::String
+                 | (:header_fields, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:header_fields, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:heartbeat_details, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:heartbeat_details, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:scheduled_time, M?) -> M?
+                 | (:current_attempt_scheduled_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:current_attempt_scheduled_time, M?) -> M?
+                 | (:started_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:started_time, M?) -> M?
+                 | (:attempt, ::Integer) -> ::Integer
+                 | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
+                 | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
+                 | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
+                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:is_local, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def is_local?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> Start
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Start | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Start, Start | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Start, Start | _ToProto]
+
+          type array = ::Array[Start | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Start | _ToProto]
+        end
+
+        # / Attempt to cancel a running activity
+        #
+        class Cancel < ::Protobuf::Message
+          attr_accessor reason(): ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
+
+          def reason=: (::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values
+                     | ...
+
+          def reason!: () -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason?
+
+          def initialize: (?reason: ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::init) -> void
+
+          def []: (:reason) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
+                | (::Symbol) -> untyped
+
+          def []=: (:reason, ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
+                 | (:reason, ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Cancel
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Cancel | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Cancel, Cancel | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancel, Cancel | _ToProto]
+
+          type array = ::Array[Cancel | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Cancel | _ToProto]
+        end
       end
-
-      # The type of `#initialize` parameter.
-      type init = Start | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[Start, Start | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Start, Start | _ToProto]
-
-      type array = ::Array[Start | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, Start | _ToProto]
-    end
-
-    # / Attempt to cancel a running activity
-    #
-    class Cancel < ::Protobuf::Message
-      attr_accessor reason(): ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
-
-      def reason=: (::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values
-                 | ...
-
-      def reason!: () -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason?
-
-      def initialize: (?reason: ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::init) -> void
-
-      def []: (:reason) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
-            | (::Symbol) -> untyped
-
-      def []=: (:reason, ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason
-             | (:reason, ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values) -> ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::values
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> Cancel
-      end
-
-      # The type of `#initialize` parameter.
-      type init = Cancel | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[Cancel, Cancel | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancel, Cancel | _ToProto]
-
-      type array = ::Array[Cancel | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, Cancel | _ToProto]
     end
   end
 end
