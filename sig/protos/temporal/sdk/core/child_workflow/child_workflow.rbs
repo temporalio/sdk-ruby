@@ -132,6 +132,10 @@ module Temporalio
         #  Used by core to resolve child workflow executions.
         #
         class ChildWorkflowResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowResult) -> String
+
           attr_accessor completed(): ::Temporalio::Bridge::Api::ChildWorkflow::Success?
 
           def completed=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Success::_ToProto] (M?) -> M?
@@ -190,6 +194,10 @@ module Temporalio
         #  Used in ChildWorkflowResult to report successful completion.
         #
         class Success < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Success) -> String
+
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
 
           def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
@@ -229,6 +237,10 @@ module Temporalio
         #  application failures, timeouts, terminations, and cancellations.
         #
         class Failure < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Failure) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -268,6 +280,10 @@ module Temporalio
         #  Failure should be ChildWorkflowFailure with a CanceledFailure cause.
         #
         class Cancellation < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Cancellation) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?

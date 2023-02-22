@@ -5,6 +5,10 @@ module Google
     #  The JSON representation for `DoubleValue` is JSON number.
     #
     class DoubleValue < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (DoubleValue) -> String
+
       # The double value.
       #
       attr_accessor value(): ::Float
@@ -42,6 +46,10 @@ module Google
     #  The JSON representation for `FloatValue` is JSON number.
     #
     class FloatValue < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FloatValue) -> String
+
       # The float value.
       #
       attr_accessor value(): ::Float
@@ -227,6 +235,10 @@ module Google
     #  The JSON representation for `BoolValue` is JSON `true` and `false`.
     #
     class BoolValue < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (BoolValue) -> String
+
       # The bool value.
       #
       attr_accessor value(): bool
@@ -266,6 +278,10 @@ module Google
     #  The JSON representation for `StringValue` is JSON string.
     #
     class StringValue < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (StringValue) -> String
+
       # The string value.
       #
       attr_accessor value(): ::String
@@ -303,6 +319,10 @@ module Google
     #  The JSON representation for `BytesValue` is JSON string.
     #
     class BytesValue < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (BytesValue) -> String
+
       # The bytes value.
       #
       attr_accessor value(): ::String

@@ -5,6 +5,10 @@ module Temporalio
         # See https://docs.temporal.io/docs/concepts/queries/
         #
         class WorkflowQuery < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowQuery) -> String
+
           # The workflow-author-defined identifier of the query. Typically a function name.
           #
           attr_accessor query_type(): ::String
@@ -70,6 +74,10 @@ module Temporalio
         # Answer to a `WorkflowQuery`
         #
         class WorkflowQueryResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowQueryResult) -> String
+
           # Did the query succeed or fail?
           #
           attr_accessor result_type(): ::Temporalio::Api::Enums::V1::QueryResultType
@@ -131,6 +139,10 @@ module Temporalio
         end
 
         class QueryRejected < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QueryRejected) -> String
+
           attr_accessor status(): ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
 
           def status=: (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values

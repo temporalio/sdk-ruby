@@ -6,6 +6,10 @@ module Temporalio
         #  Used to report activity completions to core
         #
         class ActivityExecutionResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityExecutionResult) -> String
+
           attr_accessor completed(): ::Temporalio::Bridge::Api::ActivityResult::Success?
 
           def completed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (M?) -> M?
@@ -74,6 +78,10 @@ module Temporalio
         #  in the workflow.
         #
         class ActivityResolution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityResolution) -> String
+
           attr_accessor completed(): ::Temporalio::Bridge::Api::ActivityResult::Success?
 
           def completed=: [M < ::Temporalio::Bridge::Api::ActivityResult::Success::_ToProto] (M?) -> M?
@@ -141,6 +149,10 @@ module Temporalio
         # * Used to report successful completion either when executing or resolving
         #
         class Success < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Success) -> String
+
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
 
           def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
@@ -178,6 +190,10 @@ module Temporalio
         # * Used to report activity failure either when executing or resolving
         #
         class Failure < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Failure) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -219,6 +235,10 @@ module Temporalio
         #  as the cause in the failure field.
         #
         class Cancellation < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Cancellation) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -258,6 +278,10 @@ module Temporalio
         #  Core will forget about this Activity and free up resources used to track this Activity.
         #
         class WillCompleteAsync < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WillCompleteAsync) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -288,6 +312,10 @@ module Temporalio
         #  from lang. So expecting lang to start the timer / next pass of the activity fits more smoothly.
         #
         class DoBackoff < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DoBackoff) -> String
+
           # The attempt number that lang should provide when scheduling the retry. If the LA failed
           #  on attempt 4 and we told lang to back off with a timer, this number will be 5.
           #

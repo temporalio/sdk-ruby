@@ -3,6 +3,10 @@ module Temporalio
     module Namespace
       module V1
         class NamespaceInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (NamespaceInfo) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -87,6 +91,10 @@ module Temporalio
         end
 
         class NamespaceConfig < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (NamespaceConfig) -> String
+
           attr_accessor workflow_execution_retention_ttl(): ::Google::Protobuf::Duration?
 
           def workflow_execution_retention_ttl=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
@@ -186,6 +194,10 @@ module Temporalio
         end
 
         class BadBinaries < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (BadBinaries) -> String
+
           attr_accessor binaries(): ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
 
           def binaries=: (::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]
@@ -221,6 +233,10 @@ module Temporalio
         end
 
         class BadBinaryInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (BadBinaryInfo) -> String
+
           attr_accessor reason(): ::String
 
           def reason!: () -> ::String?
@@ -268,6 +284,10 @@ module Temporalio
         end
 
         class UpdateNamespaceInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateNamespaceInfo) -> String
+
           attr_accessor description(): ::String
 
           def description!: () -> ::String?
@@ -345,6 +365,10 @@ module Temporalio
         end
 
         class NamespaceFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (NamespaceFilter) -> String
+
           # By default namespaces in NAMESPACE_STATE_DELETED state are not included.
           #  Setting include_deleted to true will include deleted namespaces.
           #  Note: Namespace is in NAMESPACE_STATE_DELETED state when it was deleted from the system but associated data is not deleted yet.

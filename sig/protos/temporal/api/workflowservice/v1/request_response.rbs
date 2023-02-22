@@ -3,6 +3,10 @@ module Temporalio
     module WorkflowService
       module V1
         class RegisterNamespaceRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RegisterNamespaceRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -140,6 +144,10 @@ module Temporalio
         end
 
         class RegisterNamespaceResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RegisterNamespaceResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -161,6 +169,10 @@ module Temporalio
         end
 
         class ListNamespacesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListNamespacesRequest) -> String
+
           attr_accessor page_size(): ::Integer
 
           def page_size!: () -> ::Integer?
@@ -208,6 +220,10 @@ module Temporalio
         end
 
         class ListNamespacesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListNamespacesResponse) -> String
+
           attr_accessor namespaces(): ::Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse::field_array
 
           def namespaces=: (::Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse::array) -> ::Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse::array
@@ -249,6 +265,10 @@ module Temporalio
         end
 
         class DescribeNamespaceRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeNamespaceRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -286,6 +306,10 @@ module Temporalio
         end
 
         class DescribeNamespaceResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeNamespaceResponse) -> String
+
           attr_accessor namespace_info(): ::Temporalio::Api::Namespace::V1::NamespaceInfo?
 
           def namespace_info=: [M < ::Temporalio::Api::Namespace::V1::NamespaceInfo::_ToProto] (M?) -> M?
@@ -376,6 +400,10 @@ module Temporalio
         #      aip.dev/not-precedent: UpdateNamespace RPC doesn't follow Google API format. --)
         #
         class UpdateNamespaceRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateNamespaceRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -459,6 +487,10 @@ module Temporalio
         end
 
         class UpdateNamespaceResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateNamespaceResponse) -> String
+
           attr_accessor namespace_info(): ::Temporalio::Api::Namespace::V1::NamespaceInfo?
 
           def namespace_info=: [M < ::Temporalio::Api::Namespace::V1::NamespaceInfo::_ToProto] (M?) -> M?
@@ -530,6 +562,10 @@ module Temporalio
         # Deprecated.
         #
         class DeprecateNamespaceRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeprecateNamespaceRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -569,6 +605,10 @@ module Temporalio
         # Deprecated.
         #
         class DeprecateNamespaceResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeprecateNamespaceResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -590,6 +630,10 @@ module Temporalio
         end
 
         class StartWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -828,6 +872,10 @@ module Temporalio
         end
 
         class StartWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartWorkflowExecutionResponse) -> String
+
           attr_accessor run_id(): ::String
 
           def run_id!: () -> ::String?
@@ -877,6 +925,10 @@ module Temporalio
         end
 
         class GetWorkflowExecutionHistoryRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkflowExecutionHistoryRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -968,6 +1020,10 @@ module Temporalio
         end
 
         class GetWorkflowExecutionHistoryResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkflowExecutionHistoryResponse) -> String
+
           attr_accessor history(): ::Temporalio::Api::History::V1::History?
 
           def history=: [M < ::Temporalio::Api::History::V1::History::_ToProto] (M?) -> M?
@@ -1035,6 +1091,10 @@ module Temporalio
         end
 
         class GetWorkflowExecutionHistoryReverseRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkflowExecutionHistoryReverseRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -1088,6 +1148,10 @@ module Temporalio
         end
 
         class GetWorkflowExecutionHistoryReverseResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkflowExecutionHistoryReverseResponse) -> String
+
           attr_accessor history(): ::Temporalio::Api::History::V1::History?
 
           def history=: [M < ::Temporalio::Api::History::V1::History::_ToProto] (M?) -> M?
@@ -1131,6 +1195,10 @@ module Temporalio
         end
 
         class PollWorkflowTaskQueueRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PollWorkflowTaskQueueRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -1211,6 +1279,10 @@ module Temporalio
         end
 
         class PollWorkflowTaskQueueResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PollWorkflowTaskQueueResponse) -> String
+
           # A unique identifier for this task
           #
           attr_accessor task_token(): ::String
@@ -1420,6 +1492,10 @@ module Temporalio
         end
 
         class RespondWorkflowTaskCompletedRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondWorkflowTaskCompletedRequest) -> String
+
           # The task token as received in `PollWorkflowTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -1593,6 +1669,10 @@ module Temporalio
         end
 
         class RespondWorkflowTaskCompletedResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondWorkflowTaskCompletedResponse) -> String
+
           # See `RespondWorkflowTaskCompletedResponse::return_new_workflow_task`
           #
           attr_accessor workflow_task(): ::Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse?
@@ -1652,6 +1732,10 @@ module Temporalio
         end
 
         class RespondWorkflowTaskFailedRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondWorkflowTaskFailedRequest) -> String
+
           # The task token as received in `PollWorkflowTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -1751,6 +1835,10 @@ module Temporalio
         end
 
         class RespondWorkflowTaskFailedResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondWorkflowTaskFailedResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -1772,6 +1860,10 @@ module Temporalio
         end
 
         class PollActivityTaskQueueRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PollActivityTaskQueueRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -1849,6 +1941,10 @@ module Temporalio
         end
 
         class PollActivityTaskQueueResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PollActivityTaskQueueResponse) -> String
+
           # A unique identifier for this task
           #
           attr_accessor task_token(): ::String
@@ -2106,6 +2202,10 @@ module Temporalio
         end
 
         class RecordActivityTaskHeartbeatRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RecordActivityTaskHeartbeatRequest) -> String
+
           # The task token as received in `PollActivityTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -2167,6 +2267,10 @@ module Temporalio
         end
 
         class RecordActivityTaskHeartbeatResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RecordActivityTaskHeartbeatResponse) -> String
+
           # Will be set to true if the activity has been asked to cancel itself. The SDK should then
           #  notify the activity of cancellation if it is still running.
           #
@@ -2203,6 +2307,10 @@ module Temporalio
         end
 
         class RecordActivityTaskHeartbeatByIdRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RecordActivityTaskHeartbeatByIdRequest) -> String
+
           # Namespace of the workflow which scheduled this activity
           #
           attr_accessor namespace(): ::String
@@ -2282,6 +2390,10 @@ module Temporalio
         end
 
         class RecordActivityTaskHeartbeatByIdResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RecordActivityTaskHeartbeatByIdResponse) -> String
+
           # Will be set to true if the activity has been asked to cancel itself. The SDK should then
           #  notify the activity of cancellation if it is still running.
           #
@@ -2318,6 +2430,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCompletedRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCompletedRequest) -> String
+
           # The task token as received in `PollActivityTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -2379,6 +2495,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCompletedResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCompletedResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -2400,6 +2520,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCompletedByIdRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCompletedByIdRequest) -> String
+
           # Namespace of the workflow which scheduled this activity
           #
           attr_accessor namespace(): ::String
@@ -2479,6 +2603,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCompletedByIdResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCompletedByIdResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -2500,6 +2628,10 @@ module Temporalio
         end
 
         class RespondActivityTaskFailedRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskFailedRequest) -> String
+
           # The task token as received in `PollActivityTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -2575,6 +2707,10 @@ module Temporalio
         end
 
         class RespondActivityTaskFailedResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskFailedResponse) -> String
+
           # Server validation failures could include
           #  last_heartbeat_details payload is too large, request failure is too large
           #
@@ -2616,6 +2752,10 @@ module Temporalio
         end
 
         class RespondActivityTaskFailedByIdRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskFailedByIdRequest) -> String
+
           # Namespace of the workflow which scheduled this activity
           #
           attr_accessor namespace(): ::String
@@ -2709,6 +2849,10 @@ module Temporalio
         end
 
         class RespondActivityTaskFailedByIdResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskFailedByIdResponse) -> String
+
           # Server validation failures could include
           #  last_heartbeat_details payload is too large, request failure is too large
           #
@@ -2750,6 +2894,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCanceledRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCanceledRequest) -> String
+
           # The task token as received in `PollActivityTaskQueueResponse`
           #
           attr_accessor task_token(): ::String
@@ -2811,6 +2959,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCanceledResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCanceledResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -2832,6 +2984,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCanceledByIdRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCanceledByIdRequest) -> String
+
           # Namespace of the workflow which scheduled this activity
           #
           attr_accessor namespace(): ::String
@@ -2911,6 +3067,10 @@ module Temporalio
         end
 
         class RespondActivityTaskCanceledByIdResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondActivityTaskCanceledByIdResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -2932,6 +3092,10 @@ module Temporalio
         end
 
         class RequestCancelWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3007,6 +3171,10 @@ module Temporalio
         end
 
         class RequestCancelWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelWorkflowExecutionResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -3028,6 +3196,10 @@ module Temporalio
         end
 
         class SignalWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3131,6 +3303,10 @@ module Temporalio
         end
 
         class SignalWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalWorkflowExecutionResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -3152,6 +3328,10 @@ module Temporalio
         end
 
         class SignalWithStartWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalWithStartWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3377,6 +3557,10 @@ module Temporalio
         end
 
         class SignalWithStartWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalWithStartWorkflowExecutionResponse) -> String
+
           attr_accessor run_id(): ::String
 
           def run_id!: () -> ::String?
@@ -3408,6 +3592,10 @@ module Temporalio
         end
 
         class ResetWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResetWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3486,6 +3674,10 @@ module Temporalio
         end
 
         class ResetWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResetWorkflowExecutionResponse) -> String
+
           attr_accessor run_id(): ::String
 
           def run_id!: () -> ::String?
@@ -3517,6 +3709,10 @@ module Temporalio
         end
 
         class TerminateWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TerminateWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3596,6 +3792,10 @@ module Temporalio
         end
 
         class TerminateWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TerminateWorkflowExecutionResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -3622,6 +3822,10 @@ module Temporalio
         #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
         #
         class DeleteWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeleteWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3667,6 +3871,10 @@ module Temporalio
         end
 
         class DeleteWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeleteWorkflowExecutionResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -3688,6 +3896,10 @@ module Temporalio
         end
 
         class ListOpenWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListOpenWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3761,6 +3973,10 @@ module Temporalio
         end
 
         class ListOpenWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListOpenWorkflowExecutionsResponse) -> String
+
           attr_accessor executions(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::field_array
 
           def executions=: (::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array
@@ -3802,6 +4018,10 @@ module Temporalio
         end
 
         class ListClosedWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListClosedWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3885,6 +4105,10 @@ module Temporalio
         end
 
         class ListClosedWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListClosedWorkflowExecutionsResponse) -> String
+
           attr_accessor executions(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::field_array
 
           def executions=: (::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array
@@ -3926,6 +4150,10 @@ module Temporalio
         end
 
         class ListWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -3975,6 +4203,10 @@ module Temporalio
         end
 
         class ListWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListWorkflowExecutionsResponse) -> String
+
           attr_accessor executions(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::field_array
 
           def executions=: (::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array
@@ -4016,6 +4248,10 @@ module Temporalio
         end
 
         class ListArchivedWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListArchivedWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4065,6 +4301,10 @@ module Temporalio
         end
 
         class ListArchivedWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListArchivedWorkflowExecutionsResponse) -> String
+
           attr_accessor executions(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::field_array
 
           def executions=: (::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array
@@ -4106,6 +4346,10 @@ module Temporalio
         end
 
         class ScanWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ScanWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4155,6 +4399,10 @@ module Temporalio
         end
 
         class ScanWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ScanWorkflowExecutionsResponse) -> String
+
           attr_accessor executions(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::field_array
 
           def executions=: (::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionInfo::array
@@ -4196,6 +4444,10 @@ module Temporalio
         end
 
         class CountWorkflowExecutionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CountWorkflowExecutionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4233,6 +4485,10 @@ module Temporalio
         end
 
         class CountWorkflowExecutionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CountWorkflowExecutionsResponse) -> String
+
           attr_accessor count(): ::Integer
 
           def count!: () -> ::Integer?
@@ -4264,6 +4520,10 @@ module Temporalio
         end
 
         class GetSearchAttributesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetSearchAttributesRequest) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -4285,6 +4545,10 @@ module Temporalio
         end
 
         class GetSearchAttributesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetSearchAttributesResponse) -> String
+
           attr_accessor keys(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
 
           def keys=: (::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
@@ -4320,6 +4584,10 @@ module Temporalio
         end
 
         class RespondQueryTaskCompletedRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondQueryTaskCompletedRequest) -> String
+
           attr_accessor task_token(): ::String
 
           def task_token!: () -> ::String?
@@ -4383,6 +4651,10 @@ module Temporalio
         end
 
         class RespondQueryTaskCompletedResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RespondQueryTaskCompletedResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -4404,6 +4676,10 @@ module Temporalio
         end
 
         class ResetStickyTaskQueueRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResetStickyTaskQueueRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4445,6 +4721,10 @@ module Temporalio
         end
 
         class ResetStickyTaskQueueResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResetStickyTaskQueueResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -4466,6 +4746,10 @@ module Temporalio
         end
 
         class QueryWorkflowRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QueryWorkflowRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4533,6 +4817,10 @@ module Temporalio
         end
 
         class QueryWorkflowResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QueryWorkflowResponse) -> String
+
           attr_accessor query_result(): ::Temporalio::Api::Common::V1::Payloads?
 
           def query_result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -4578,6 +4866,10 @@ module Temporalio
         end
 
         class DescribeWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeWorkflowExecutionRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4619,6 +4911,10 @@ module Temporalio
         end
 
         class DescribeWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeWorkflowExecutionResponse) -> String
+
           attr_accessor execution_config(): ::Temporalio::Api::Workflow::V1::WorkflowExecutionConfig?
 
           def execution_config=: [M < ::Temporalio::Api::Workflow::V1::WorkflowExecutionConfig::_ToProto] (M?) -> M?
@@ -4694,6 +4990,10 @@ module Temporalio
         end
 
         class DescribeTaskQueueRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeTaskQueueRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -4753,6 +5053,10 @@ module Temporalio
         end
 
         class DescribeTaskQueueResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeTaskQueueResponse) -> String
+
           attr_accessor pollers(): ::Temporalio::Api::TaskQueue::V1::PollerInfo::field_array
 
           def pollers=: (::Temporalio::Api::TaskQueue::V1::PollerInfo::array) -> ::Temporalio::Api::TaskQueue::V1::PollerInfo::array
@@ -4798,6 +5102,10 @@ module Temporalio
         end
 
         class GetClusterInfoRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetClusterInfoRequest) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -4821,6 +5129,10 @@ module Temporalio
         # GetClusterInfoResponse contains information about Temporal cluster.
         #
         class GetClusterInfoResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetClusterInfoResponse) -> String
+
           # Key is client name i.e "temporal-go", "temporal-java", or "temporal-cli".
           #  Value is ranges of supported versions of this client i.e ">1.1.1 <=1.4.0 || ^5.0.0".
           #
@@ -4908,6 +5220,10 @@ module Temporalio
         end
 
         class GetSystemInfoRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetSystemInfoRequest) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -4929,9 +5245,17 @@ module Temporalio
         end
 
         class GetSystemInfoResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetSystemInfoResponse) -> String
+
           # System capability details.
           #
           class Capabilities < ::Protobuf::Message
+            # Encode the message to a binary string
+            # 
+            def self.encode: (Capabilities) -> String
+
             # True if signal and query headers are supported.
             #
             attr_accessor signal_and_query_header(): bool
@@ -5100,6 +5424,10 @@ module Temporalio
         end
 
         class ListTaskQueuePartitionsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListTaskQueuePartitionsRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -5141,6 +5469,10 @@ module Temporalio
         end
 
         class ListTaskQueuePartitionsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListTaskQueuePartitionsResponse) -> String
+
           attr_accessor activity_task_queue_partitions(): ::Temporalio::Api::TaskQueue::V1::TaskQueuePartitionMetadata::field_array
 
           def activity_task_queue_partitions=: (::Temporalio::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array) -> ::Temporalio::Api::TaskQueue::V1::TaskQueuePartitionMetadata::array
@@ -5195,6 +5527,10 @@ module Temporalio
         #      aip.dev/not-precedent: field_behavior annotation not available in our gogo fork --)
         #
         class CreateScheduleRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CreateScheduleRequest) -> String
+
           # The namespace the schedule should be created in.
           #
           attr_accessor namespace(): ::String
@@ -5304,6 +5640,10 @@ module Temporalio
         end
 
         class CreateScheduleResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CreateScheduleResponse) -> String
+
           attr_accessor conflict_token(): ::String
 
           def conflict_token!: () -> ::String?
@@ -5335,6 +5675,10 @@ module Temporalio
         end
 
         class DescribeScheduleRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeScheduleRequest) -> String
+
           # The namespace of the schedule to describe.
           #
           attr_accessor namespace(): ::String
@@ -5376,6 +5720,10 @@ module Temporalio
         end
 
         class DescribeScheduleResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeScheduleResponse) -> String
+
           # The complete current schedule details. This may not match the schedule as
           #  created because:
           #  - some types of schedule specs may get compiled into others (e.g.
@@ -5478,6 +5826,10 @@ module Temporalio
         #      aip.dev/not-precedent: UpdateSchedule doesn't follow Google API format --)
         #
         class UpdateScheduleRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateScheduleRequest) -> String
+
           # The namespace of the schedule to update.
           #
           attr_accessor namespace(): ::String
@@ -5562,6 +5914,10 @@ module Temporalio
         end
 
         class UpdateScheduleResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateScheduleResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -5583,6 +5939,10 @@ module Temporalio
         end
 
         class PatchScheduleRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PatchScheduleRequest) -> String
+
           # The namespace of the schedule to patch.
           #
           attr_accessor namespace(): ::String
@@ -5650,6 +6010,10 @@ module Temporalio
         end
 
         class PatchScheduleResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PatchScheduleResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -5671,6 +6035,10 @@ module Temporalio
         end
 
         class ListScheduleMatchingTimesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListScheduleMatchingTimesRequest) -> String
+
           # The namespace of the schedule to query.
           #
           attr_accessor namespace(): ::String
@@ -5736,6 +6104,10 @@ module Temporalio
         end
 
         class ListScheduleMatchingTimesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListScheduleMatchingTimesResponse) -> String
+
           attr_accessor start_time(): ::Google::Protobuf::Timestamp::field_array
 
           def start_time=: (::Google::Protobuf::Timestamp::array) -> ::Google::Protobuf::Timestamp::array
@@ -5776,6 +6148,10 @@ module Temporalio
         #      aip.dev/not-precedent: DeleteSchedule doesn't follow Google API format --)
         #
         class DeleteScheduleRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeleteScheduleRequest) -> String
+
           # The namespace of the schedule to delete.
           #
           attr_accessor namespace(): ::String
@@ -5825,6 +6201,10 @@ module Temporalio
         end
 
         class DeleteScheduleResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DeleteScheduleResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -5846,6 +6226,10 @@ module Temporalio
         end
 
         class ListSchedulesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListSchedulesRequest) -> String
+
           # The namespace to list schedules in.
           #
           attr_accessor namespace(): ::String
@@ -5895,6 +6279,10 @@ module Temporalio
         end
 
         class ListSchedulesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListSchedulesResponse) -> String
+
           attr_accessor schedules(): ::Temporalio::Api::Schedule::V1::ScheduleListEntry::field_array
 
           def schedules=: (::Temporalio::Api::Schedule::V1::ScheduleListEntry::array) -> ::Temporalio::Api::Schedule::V1::ScheduleListEntry::array
@@ -5941,6 +6329,10 @@ module Temporalio
         #      aip.dev/not-precedent: UpdateWorkerBuildIdOrderingRequest RPC doesn't follow Google API format. --)
         #
         class UpdateWorkerBuildIdOrderingRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateWorkerBuildIdOrderingRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -6029,6 +6421,10 @@ module Temporalio
         end
 
         class UpdateWorkerBuildIdOrderingResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateWorkerBuildIdOrderingResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -6053,6 +6449,10 @@ module Temporalio
         #      aip.dev/not-precedent: GetWorkerBuildIdOrderingRequest RPC doesn't follow Google API format. --)
         #
         class GetWorkerBuildIdOrderingRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkerBuildIdOrderingRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -6101,6 +6501,10 @@ module Temporalio
         end
 
         class GetWorkerBuildIdOrderingResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetWorkerBuildIdOrderingResponse) -> String
+
           # The currently established default version
           #
           attr_accessor current_default(): ::Temporalio::Api::TaskQueue::V1::VersionIdNode?
@@ -6161,6 +6565,10 @@ module Temporalio
         #      aip.dev/not-precedent: Update RPCs don't follow Google API format. --)
         #
         class UpdateWorkflowExecutionRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateWorkflowExecutionRequest) -> String
+
           # The namespace name of the target workflow
           #
           attr_accessor namespace(): ::String
@@ -6254,6 +6662,10 @@ module Temporalio
         end
 
         class UpdateWorkflowExecutionResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateWorkflowExecutionResponse) -> String
+
           # Enough information for subsequent poll calls if needed. Never null.
           #
           attr_accessor update_ref(): ::Temporalio::Api::Update::V1::UpdateRef?
@@ -6311,6 +6723,10 @@ module Temporalio
         end
 
         class StartBatchOperationRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartBatchOperationRequest) -> String
+
           # Namespace that contains the batch operation
           #
           attr_accessor namespace(): ::String
@@ -6425,6 +6841,10 @@ module Temporalio
         end
 
         class StartBatchOperationResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartBatchOperationResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -6446,6 +6866,10 @@ module Temporalio
         end
 
         class StopBatchOperationRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StopBatchOperationRequest) -> String
+
           # Namespace that contains the batch operation
           #
           attr_accessor namespace(): ::String
@@ -6503,6 +6927,10 @@ module Temporalio
         end
 
         class StopBatchOperationResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StopBatchOperationResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -6524,6 +6952,10 @@ module Temporalio
         end
 
         class DescribeBatchOperationRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeBatchOperationRequest) -> String
+
           # Namespace that contains the batch operation
           #
           attr_accessor namespace(): ::String
@@ -6565,6 +6997,10 @@ module Temporalio
         end
 
         class DescribeBatchOperationResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DescribeBatchOperationResponse) -> String
+
           # Batch operation type
           #
           attr_accessor operation_type(): ::Temporalio::Api::Enums::V1::BatchOperationType
@@ -6694,6 +7130,10 @@ module Temporalio
         end
 
         class ListBatchOperationsRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListBatchOperationsRequest) -> String
+
           # Namespace that contains the batch operation
           #
           attr_accessor namespace(): ::String
@@ -6743,6 +7183,10 @@ module Temporalio
         end
 
         class ListBatchOperationsResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ListBatchOperationsResponse) -> String
+
           # BatchOperationInfo contains the basic info about batch operation
           #
           attr_accessor operation_info(): ::Temporalio::Api::Batch::V1::BatchOperationInfo::field_array

@@ -5,6 +5,10 @@ module Temporalio
         # See https://docs.temporal.io/docs/concepts/task-queues/
         #
         class TaskQueue < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TaskQueue) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -52,6 +56,10 @@ module Temporalio
         # Only applies to activity task queues
         #
         class TaskQueueMetadata < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TaskQueueMetadata) -> String
+
           # Allows throttling dispatch of tasks from this queue
           #
           attr_accessor max_tasks_per_second(): ::Google::Protobuf::DoubleValue?
@@ -91,6 +99,10 @@ module Temporalio
         end
 
         class TaskQueueStatus < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TaskQueueStatus) -> String
+
           attr_accessor backlog_count_hint(): ::Integer
 
           def backlog_count_hint!: () -> ::Integer?
@@ -150,6 +162,10 @@ module Temporalio
         end
 
         class TaskIdBlock < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TaskIdBlock) -> String
+
           attr_accessor start_id(): ::Integer
 
           def start_id!: () -> ::Integer?
@@ -187,6 +203,10 @@ module Temporalio
         end
 
         class TaskQueuePartitionMetadata < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TaskQueuePartitionMetadata) -> String
+
           attr_accessor key(): ::String
 
           def key!: () -> ::String?
@@ -224,6 +244,10 @@ module Temporalio
         end
 
         class PollerInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (PollerInfo) -> String
+
           # Unix Nano
           #
           attr_accessor last_access_time(): ::Google::Protobuf::Timestamp?
@@ -291,6 +315,10 @@ module Temporalio
         end
 
         class StickyExecutionAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StickyExecutionAttributes) -> String
+
           attr_accessor worker_task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
 
           def worker_task_queue=: [M < ::Temporalio::Api::TaskQueue::V1::TaskQueue::_ToProto] (M?) -> M?
@@ -345,6 +373,10 @@ module Temporalio
         #  task queue
         #
         class VersionIdNode < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (VersionIdNode) -> String
+
           attr_accessor version(): ::Temporalio::Api::TaskQueue::V1::VersionId?
 
           def version=: [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (M?) -> M?
@@ -413,6 +445,10 @@ module Temporalio
         #  message may become a oneof of different version types.
         #
         class VersionId < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (VersionId) -> String
+
           # An opaque whole-worker identifier
           #
           attr_accessor worker_build_id(): ::String

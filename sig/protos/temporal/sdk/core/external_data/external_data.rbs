@@ -7,6 +7,10 @@ module Temporalio
         #  for consumers which would like to just depend on the proto package to make sense of marker data.
         #
         class LocalActivityMarkerData < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (LocalActivityMarkerData) -> String
+
           attr_accessor seq(): ::Integer
 
           def seq!: () -> ::Integer?

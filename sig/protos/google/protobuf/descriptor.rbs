@@ -4,6 +4,10 @@ module Google
     #  files it parses.
     #
     class FileDescriptorSet < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FileDescriptorSet) -> String
+
       attr_accessor file(): ::Google::Protobuf::FileDescriptorProto::field_array
 
       def file=: (::Google::Protobuf::FileDescriptorProto::array) -> ::Google::Protobuf::FileDescriptorProto::array
@@ -41,6 +45,10 @@ module Google
     # Describes a complete .proto file.
     #
     class FileDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FileDescriptorProto) -> String
+
       # file name, relative to root of source tree
       #
       attr_accessor name(): ::String
@@ -211,7 +219,15 @@ module Google
     # Describes a message type.
     #
     class DescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (DescriptorProto) -> String
+
       class ExtensionRange < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (ExtensionRange) -> String
+
         # Inclusive.
         #
         attr_accessor start(): ::Integer
@@ -267,6 +283,10 @@ module Google
       #  not overlap.
       #
       class ReservedRange < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (ReservedRange) -> String
+
         # Inclusive.
         #
         attr_accessor start(): ::Integer
@@ -434,6 +454,10 @@ module Google
     end
 
     class ExtensionRangeOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (ExtensionRangeOptions) -> String
+
       # The parser stores options it doesn't recognize here. See above.
       #
       attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
@@ -475,6 +499,10 @@ module Google
     # Describes a field within a message.
     #
     class FieldDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FieldDescriptorProto) -> String
+
       class Type < ::Protobuf::Enum
         type names = :TYPE_DOUBLE | :TYPE_FLOAT | :TYPE_INT64 | :TYPE_UINT64 | :TYPE_INT32 | :TYPE_FIXED64 | :TYPE_FIXED32 | :TYPE_BOOL | :TYPE_STRING | :TYPE_GROUP | :TYPE_MESSAGE | :TYPE_BYTES | :TYPE_UINT32 | :TYPE_ENUM | :TYPE_SFIXED32 | :TYPE_SFIXED64 | :TYPE_SINT32 | :TYPE_SINT64
 
@@ -752,6 +780,10 @@ module Google
     # Describes a oneof.
     #
     class OneofDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (OneofDescriptorProto) -> String
+
       attr_accessor name(): ::String
 
       def name!: () -> ::String?
@@ -795,6 +827,10 @@ module Google
     # Describes an enum type.
     #
     class EnumDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (EnumDescriptorProto) -> String
+
       # Range of reserved numeric values. Reserved values may not be used by
       #  entries in the same enum. Reserved ranges may not overlap.
       #
@@ -803,6 +839,10 @@ module Google
       #  domain.
       #
       class EnumReservedRange < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (EnumReservedRange) -> String
+
         # Inclusive.
         #
         attr_accessor start(): ::Integer
@@ -930,6 +970,10 @@ module Google
     # Describes a value within an enum.
     #
     class EnumValueDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (EnumValueDescriptorProto) -> String
+
       attr_accessor name(): ::String
 
       def name!: () -> ::String?
@@ -979,6 +1023,10 @@ module Google
     # Describes a service.
     #
     class ServiceDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (ServiceDescriptorProto) -> String
+
       attr_accessor name(): ::String
 
       def name!: () -> ::String?
@@ -1032,6 +1080,10 @@ module Google
     # Describes a method of a service.
     #
     class MethodDescriptorProto < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (MethodDescriptorProto) -> String
+
       attr_accessor name(): ::String
 
       def name!: () -> ::String?
@@ -1141,6 +1193,10 @@ module Google
     #    to automatically assign option numbers.
     #
     class FileOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FileOptions) -> String
+
       # Generated classes can be optimized for speed or code size.
       #
       class OptimizeMode < ::Protobuf::Enum
@@ -1450,6 +1506,10 @@ module Google
     end
 
     class MessageOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (MessageOptions) -> String
+
       # Set true to use the old proto1 MessageSet wire format for extensions.
       #  This is provided for backwards-compatibility with the MessageSet wire
       #  format.  You should not use this for any other reason:  It's less
@@ -1571,6 +1631,10 @@ module Google
     end
 
     class FieldOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (FieldOptions) -> String
+
       class CType < ::Protobuf::Enum
         type names = :STRING | :CORD | :STRING_PIECE
 
@@ -1830,6 +1894,10 @@ module Google
     end
 
     class OneofOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (OneofOptions) -> String
+
       # The parser stores options it doesn't recognize here. See above.
       #
       attr_accessor uninterpreted_option(): ::Google::Protobuf::UninterpretedOption::field_array
@@ -1869,6 +1937,10 @@ module Google
     end
 
     class EnumOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (EnumOptions) -> String
+
       # Set this option to true to allow mapping different tag names to the same
       #  value.
       #
@@ -1932,6 +2004,10 @@ module Google
     end
 
     class EnumValueOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (EnumValueOptions) -> String
+
       # Is this enum value deprecated?
       #  Depending on the target platform, this can emit Deprecated annotations
       #  for the enum value, or it will be completely ignored; in the very least,
@@ -1984,6 +2060,10 @@ module Google
     end
 
     class ServiceOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (ServiceOptions) -> String
+
       # Is this service deprecated?
       #  Depending on the target platform, this can emit Deprecated annotations
       #  for the service, or it will be completely ignored; in the very least,
@@ -2036,6 +2116,10 @@ module Google
     end
 
     class MethodOptions < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (MethodOptions) -> String
+
       # Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
       #  or neither? HTTP based RPC implementation may choose GET verb for safe
       #  methods, and PUT verb for idempotent methods instead of the default POST.
@@ -2146,6 +2230,10 @@ module Google
     #  in them.
     #
     class UninterpretedOption < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (UninterpretedOption) -> String
+
       # The name of the uninterpreted option.  Each string represents a segment in
       #  a dot-separated name.  is_extension is true iff a segment represents an
       #  extension (denoted with parentheses in options specs in .proto files).
@@ -2153,6 +2241,10 @@ module Google
       #  "foo.(bar.baz).moo".
       #
       class NamePart < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (NamePart) -> String
+
         attr_accessor name_part(): ::String
 
         def name_part!: () -> ::String?
@@ -2268,7 +2360,15 @@ module Google
     #  FileDescriptorProto was generated.
     #
     class SourceCodeInfo < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (SourceCodeInfo) -> String
+
       class Location < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (Location) -> String
+
         # Identifies which part of the FileDescriptorProto was defined at this
         #  location.
         #
@@ -2594,7 +2694,15 @@ module Google
     #  source file, but may contain references to different source .proto files.
     #
     class GeneratedCodeInfo < ::Protobuf::Message
+      # Encode the message to a binary string
+      # 
+      def self.encode: (GeneratedCodeInfo) -> String
+
       class Annotation < ::Protobuf::Message
+        # Encode the message to a binary string
+        # 
+        def self.encode: (Annotation) -> String
+
         # Identifies the element in the original source .proto file. This field
         #  is formatted the same as SourceCodeInfo.Location.path.
         #

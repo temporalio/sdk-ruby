@@ -3,6 +3,10 @@ module Temporalio
     module TestService
       module V1
         class LockTimeSkippingRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (LockTimeSkippingRequest) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -24,6 +28,10 @@ module Temporalio
         end
 
         class LockTimeSkippingResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (LockTimeSkippingResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -45,6 +53,10 @@ module Temporalio
         end
 
         class UnlockTimeSkippingRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UnlockTimeSkippingRequest) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -66,6 +78,10 @@ module Temporalio
         end
 
         class UnlockTimeSkippingResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UnlockTimeSkippingResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -87,6 +103,10 @@ module Temporalio
         end
 
         class SleepUntilRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SleepUntilRequest) -> String
+
           attr_accessor timestamp(): ::Google::Protobuf::Timestamp?
 
           def timestamp=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
@@ -122,6 +142,10 @@ module Temporalio
         end
 
         class SleepRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SleepRequest) -> String
+
           attr_accessor duration(): ::Google::Protobuf::Duration?
 
           def duration=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
@@ -157,6 +181,10 @@ module Temporalio
         end
 
         class SleepResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SleepResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -178,6 +206,10 @@ module Temporalio
         end
 
         class GetCurrentTimeResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (GetCurrentTimeResponse) -> String
+
           attr_accessor time(): ::Google::Protobuf::Timestamp?
 
           def time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?

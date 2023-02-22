@@ -144,6 +144,20 @@ namespace :proto do
         end.join('::')
       end
 
+      # Add some missing methods to the generated RBS files
+      content = content.gsub(/([ \t]*)class ([a-z]+) < ::Protobuf::Message/i) do
+        indent = Regexp.last_match(1)
+        class_name = Regexp.last_match(2)
+        original_line = Regexp.last_match(0)
+
+        <<~EOS
+          #{original_line}
+          #{indent}  # Encode the message to a binary string
+          #{indent}  # 
+          #{indent}  def self.encode: (#{class_name}) -> String
+        EOS
+      end
+
       File.write(path, content)
     end
 

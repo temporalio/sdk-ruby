@@ -6,6 +6,10 @@ module Temporalio
         # / a cached state.
         #
         class WorkflowActivation < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowActivation) -> String
+
           # / The id of the currently active run of the workflow. Also used as a cache key. There may
           # / only ever be one active workflow task (and hence activation) of a run at one time.
           #
@@ -105,6 +109,10 @@ module Temporalio
         end
 
         class WorkflowActivationJob < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowActivationJob) -> String
+
           # / Begin a workflow for the first time
           #
           attr_accessor start_workflow(): ::Temporalio::Bridge::Api::WorkflowActivation::StartWorkflow?
@@ -326,6 +334,10 @@ module Temporalio
         # Start a new workflow
         #
         class StartWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartWorkflow) -> String
+
           # The identifier the lang-specific sdk uses to execute workflow code
           #
           attr_accessor workflow_type(): ::String
@@ -633,6 +645,10 @@ module Temporalio
         # / Notify a workflow that a timer has fired
         #
         class FireTimer < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (FireTimer) -> String
+
           # / Sequence number as provided by lang in the corresponding StartTimer command
           #
           attr_accessor seq(): ::Integer
@@ -668,6 +684,10 @@ module Temporalio
         # / Notify a workflow that an activity has been resolved
         #
         class ResolveActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveActivity) -> String
+
           # / Sequence number as provided by lang in the corresponding ScheduleActivity command
           #
           attr_accessor seq(): ::Integer
@@ -714,6 +734,10 @@ module Temporalio
         # / cancelled.
         #
         class ResolveChildWorkflowExecutionStart < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveChildWorkflowExecutionStart) -> String
+
           # / Sequence number as provided by lang in the corresponding StartChildWorkflowExecution command
           #
           attr_accessor seq(): ::Integer
@@ -779,6 +803,10 @@ module Temporalio
         # / Simply pass the run_id to lang
         #
         class ResolveChildWorkflowExecutionStartSuccess < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveChildWorkflowExecutionStartSuccess) -> String
+
           attr_accessor run_id(): ::String
 
           def run_id!: () -> ::String?
@@ -812,6 +840,10 @@ module Temporalio
         # / Provide lang the cause of failure
         #
         class ResolveChildWorkflowExecutionStartFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveChildWorkflowExecutionStartFailure) -> String
+
           # / Lang should have this information but it's more convenient to pass it back
           # / for error construction on the lang side.
           #
@@ -865,6 +897,10 @@ module Temporalio
         # / The failure is constructed in core for lang's convenience.
         #
         class ResolveChildWorkflowExecutionStartCancelled < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveChildWorkflowExecutionStartCancelled) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -902,6 +938,10 @@ module Temporalio
         # / Notify a workflow that a child workflow execution has been resolved
         #
         class ResolveChildWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveChildWorkflowExecution) -> String
+
           # / Sequence number as provided by lang in the corresponding StartChildWorkflowExecution command
           #
           attr_accessor seq(): ::Integer
@@ -947,6 +987,10 @@ module Temporalio
         # / Update the workflow's random seed
         #
         class UpdateRandomSeed < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateRandomSeed) -> String
+
           attr_accessor randomness_seed(): ::Integer
 
           def randomness_seed!: () -> ::Integer?
@@ -980,6 +1024,10 @@ module Temporalio
         # / Query a workflow
         #
         class QueryWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QueryWorkflow) -> String
+
           # / For PollWFTResp `query` field, this will be set to the special value `legacy`. For the
           # / `queries` field, the server provides a unique identifier. If it is a `legacy` query,
           # / lang cannot issue any commands in response other than to answer the query.
@@ -1049,6 +1097,10 @@ module Temporalio
         # / Cancel a running workflow
         #
         class CancelWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CancelWorkflow) -> String
+
           # / Information from the cancellation request
           #
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payload::field_array
@@ -1090,6 +1142,10 @@ module Temporalio
         # Send a signal to a workflow
         #
         class SignalWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalWorkflow) -> String
+
           attr_accessor signal_name(): ::String
 
           def signal_name!: () -> ::String?
@@ -1156,6 +1212,10 @@ module Temporalio
         #  sent pre-emptively, so any time it is sent the change is present
         #
         class NotifyHasPatch < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (NotifyHasPatch) -> String
+
           attr_accessor patch_id(): ::String
 
           def patch_id!: () -> ::String?
@@ -1187,6 +1247,10 @@ module Temporalio
         end
 
         class ResolveSignalExternalWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveSignalExternalWorkflow) -> String
+
           # / Sequence number as provided by lang in the corresponding SignalExternalWorkflowExecution
           # / command
           #
@@ -1237,6 +1301,10 @@ module Temporalio
         end
 
         class ResolveRequestCancelExternalWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ResolveRequestCancelExternalWorkflow) -> String
+
           # / Sequence number as provided by lang in the corresponding
           # / RequestCancelExternalWorkflowExecution command
           #
@@ -1287,6 +1355,10 @@ module Temporalio
         end
 
         class RemoveFromCache < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RemoveFromCache) -> String
+
           class EvictionReason < ::Protobuf::Enum
             type names = :UNSPECIFIED | :CACHE_FULL | :CACHE_MISS | :NONDETERMINISM | :LANG_FAIL | :LANG_REQUESTED | :TASK_NOT_FOUND | :UNHANDLED_COMMAND | :FATAL | :PAGINATION_OR_HISTORY_FETCH
 

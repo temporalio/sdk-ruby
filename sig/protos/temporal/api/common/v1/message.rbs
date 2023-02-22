@@ -3,6 +3,10 @@ module Temporalio
     module Common
       module V1
         class DataBlob < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (DataBlob) -> String
+
           attr_accessor encoding_type(): ::Temporalio::Api::Enums::V1::EncodingType
 
           def encoding_type=: (::Temporalio::Api::Enums::V1::EncodingType::values) -> ::Temporalio::Api::Enums::V1::EncodingType::values
@@ -46,6 +50,10 @@ module Temporalio
         # See `Payload`
         #
         class Payloads < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Payloads) -> String
+
           attr_accessor payloads(): ::Temporalio::Api::Common::V1::Payload::field_array
 
           def payloads=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
@@ -85,6 +93,10 @@ module Temporalio
         #  of the data may be user-defined.
         #
         class Payload < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Payload) -> String
+
           attr_accessor metadata(): ::Protobuf::field_hash[::String, ::String]
 
           def metadata=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
@@ -129,6 +141,10 @@ module Temporalio
         #  The payload is not serialized in a user-defined way.
         #
         class SearchAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SearchAttributes) -> String
+
           attr_accessor indexed_fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
           def indexed_fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
@@ -166,6 +182,10 @@ module Temporalio
         # A user-defined set of *unindexed* fields that are exposed when listing/searching workflows
         #
         class Memo < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Memo) -> String
+
           attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
           def fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
@@ -204,6 +224,10 @@ module Temporalio
         #  can be propagated between, for example, workflows and activities.
         #
         class Header < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Header) -> String
+
           attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
           def fields=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
@@ -243,6 +267,10 @@ module Temporalio
         #  run id as a way of saying "target the latest run of the workflow".
         #
         class WorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecution) -> String
+
           attr_accessor workflow_id(): ::String
 
           def workflow_id!: () -> ::String?
@@ -283,6 +311,10 @@ module Temporalio
         #  name of a function. This is sometimes referred to as the workflow's "name"
         #
         class WorkflowType < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowType) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -317,6 +349,10 @@ module Temporalio
         #  name of a function. This is sometimes referred to as the activity's "name"
         #
         class ActivityType < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityType) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -350,6 +386,10 @@ module Temporalio
         # How retries ought to be handled, usable by both workflows and activities
         #
         class RetryPolicy < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RetryPolicy) -> String
+
           # Interval of the first retry. If retryBackoffCoefficient is 1.0 then it is used for all retries.
           #
           attr_accessor initial_interval(): ::Google::Protobuf::Duration?

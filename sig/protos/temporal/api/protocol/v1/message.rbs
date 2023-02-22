@@ -6,6 +6,10 @@ module Temporalio
         #      aip.dev/not-precedent: We want runtime extensibility for the body field --)
         #
         class Message < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Message) -> String
+
           # An ID for this specific message.
           #
           attr_accessor id(): ::String

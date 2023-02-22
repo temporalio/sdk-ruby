@@ -5,6 +5,10 @@ module Temporalio
         # Identifying information about a particular workflow execution, including namespace
         #
         class NamespacedWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (NamespacedWorkflowExecution) -> String
+
           # Namespace the workflow run is located in
           #
           attr_accessor namespace(): ::String

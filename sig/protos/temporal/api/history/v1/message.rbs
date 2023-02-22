@@ -5,6 +5,10 @@ module Temporalio
         # Always the first event in workflow history
         #
         class WorkflowExecutionStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionStartedEventAttributes) -> String
+
           attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
 
           def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
@@ -318,6 +322,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionCompletedEventAttributes) -> String
+
           # Serialized result of workflow completion (ie: The return value of the workflow function)
           #
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
@@ -373,6 +381,10 @@ module Temporalio
         end
 
         class WorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionFailedEventAttributes) -> String
+
           # Serialized result of workflow failure (ex: An exception thrown, or error returned)
           #
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
@@ -438,6 +450,10 @@ module Temporalio
         end
 
         class WorkflowExecutionTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionTimedOutEventAttributes) -> String
+
           attr_accessor retry_state(): ::Temporalio::Api::Enums::V1::RetryState
 
           def retry_state=: (::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
@@ -481,6 +497,10 @@ module Temporalio
         end
 
         class WorkflowExecutionContinuedAsNewEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionContinuedAsNewEventAttributes) -> String
+
           # The run ID of the new workflow started by this continue-as-new
           #
           attr_accessor new_execution_run_id(): ::String
@@ -668,6 +688,10 @@ module Temporalio
         end
 
         class WorkflowTaskScheduledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowTaskScheduledEventAttributes) -> String
+
           # The task queue this workflow task was enqueued in, which could be a normal or sticky queue
           #
           attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
@@ -735,6 +759,10 @@ module Temporalio
         end
 
         class WorkflowTaskStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowTaskStartedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -805,6 +833,10 @@ module Temporalio
         end
 
         class WorkflowTaskCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowTaskCompletedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -894,6 +926,10 @@ module Temporalio
         end
 
         class WorkflowTaskTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowTaskTimedOutEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -945,6 +981,10 @@ module Temporalio
         end
 
         class WorkflowTaskFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowTaskFailedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1050,6 +1090,10 @@ module Temporalio
         end
 
         class ActivityTaskScheduledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskScheduledEventAttributes) -> String
+
           # The worker/user assigned identifier for the activity
           #
           attr_accessor activity_id(): ::String
@@ -1235,6 +1279,10 @@ module Temporalio
         end
 
         class ActivityTaskStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskStartedEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1308,6 +1356,10 @@ module Temporalio
         end
 
         class ActivityTaskCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskCompletedEventAttributes) -> String
+
           # Serialized results of the activity. IE: The return value of the activity function
           #
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
@@ -1371,6 +1423,10 @@ module Temporalio
         end
 
         class ActivityTaskFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskFailedEventAttributes) -> String
+
           # Failure details
           #
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
@@ -1444,6 +1500,10 @@ module Temporalio
         end
 
         class ActivityTaskTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskTimedOutEventAttributes) -> String
+
           # If this activity had failed, was retried, and then timed out, that failure is stored as the
           #  `cause` in here.
           #
@@ -1511,6 +1571,10 @@ module Temporalio
         end
 
         class ActivityTaskCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskCancelRequestedEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this cancel request corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1552,6 +1616,10 @@ module Temporalio
         end
 
         class ActivityTaskCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskCanceledEventAttributes) -> String
+
           # Additional information that the activity reported upon confirming cancellation
           #
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
@@ -1624,6 +1692,10 @@ module Temporalio
         end
 
         class TimerStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TimerStartedEventAttributes) -> String
+
           # The worker/user assigned id for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1685,6 +1757,10 @@ module Temporalio
         end
 
         class TimerFiredEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TimerFiredEventAttributes) -> String
+
           # Will match the `timer_id` from `TIMER_STARTED` event for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1726,6 +1802,10 @@ module Temporalio
         end
 
         class TimerCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (TimerCanceledEventAttributes) -> String
+
           # Will match the `timer_id` from `TIMER_STARTED` event for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1783,6 +1863,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionCancelRequestedEventAttributes) -> String
+
           # User provided reason for requesting cancellation
           #  TODO: shall we create a new field with name "reason" and deprecate this one?
           #
@@ -1843,6 +1927,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionCanceledEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -1886,6 +1974,10 @@ module Temporalio
         end
 
         class MarkerRecordedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (MarkerRecordedEventAttributes) -> String
+
           # Workers use this to identify the "types" of various markers. Ex: Local activity, side effect.
           #
           attr_accessor marker_name(): ::String
@@ -1965,6 +2057,10 @@ module Temporalio
         end
 
         class WorkflowExecutionSignaledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionSignaledEventAttributes) -> String
+
           # The name/type of the signal to fire
           #
           attr_accessor signal_name(): ::String
@@ -2036,6 +2132,10 @@ module Temporalio
         end
 
         class WorkflowExecutionTerminatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionTerminatedEventAttributes) -> String
+
           # User/client provided reason for termination
           #
           attr_accessor reason(): ::String
@@ -2087,6 +2187,10 @@ module Temporalio
         end
 
         class RequestCancelExternalWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelExternalWorkflowExecutionInitiatedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2172,6 +2276,10 @@ module Temporalio
         end
 
         class RequestCancelExternalWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelExternalWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause
 
           def cause=: (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values) -> ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values
@@ -2257,6 +2365,10 @@ module Temporalio
         end
 
         class ExternalWorkflowExecutionCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ExternalWorkflowExecutionCancelRequestedEventAttributes) -> String
+
           # id of the `REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED` event this event corresponds
           #  to
           #
@@ -2316,6 +2428,10 @@ module Temporalio
         end
 
         class SignalExternalWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalExternalWorkflowExecutionInitiatedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2425,6 +2541,10 @@ module Temporalio
         end
 
         class SignalExternalWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalExternalWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause
 
           def cause=: (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values) -> ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values
@@ -2507,6 +2627,10 @@ module Temporalio
         end
 
         class ExternalWorkflowExecutionSignaledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ExternalWorkflowExecutionSignaledEventAttributes) -> String
+
           # id of the `SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED` event this event corresponds to
           #
           attr_accessor initiated_event_id(): ::Integer
@@ -2573,6 +2697,10 @@ module Temporalio
         end
 
         class UpsertWorkflowSearchAttributesEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpsertWorkflowSearchAttributesEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2616,6 +2744,10 @@ module Temporalio
         end
 
         class WorkflowPropertiesModifiedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowPropertiesModifiedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2667,6 +2799,10 @@ module Temporalio
         end
 
         class StartChildWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartChildWorkflowExecutionInitiatedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -2877,6 +3013,10 @@ module Temporalio
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartChildWorkflowExecutionFailedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -2967,6 +3107,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionStartedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3045,6 +3189,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionCompletedEventAttributes) -> String
+
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
 
           def result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -3131,6 +3279,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -3227,6 +3379,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionCanceledEventAttributes) -> String
+
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
 
           def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -3313,6 +3469,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionTimedOutEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3399,6 +3559,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionTerminatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ChildWorkflowExecutionTerminatedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3475,6 +3639,10 @@ module Temporalio
         end
 
         class WorkflowPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowPropertiesModifiedExternallyEventAttributes) -> String
+
           # If set to a nonempty string, future workflow tasks for this workflow shall be dispatched on
           #  the provided queue.
           #
@@ -3569,6 +3737,10 @@ module Temporalio
         end
 
         class ActivityPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityPropertiesModifiedExternallyEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this modification corresponds to.
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -3618,6 +3790,10 @@ module Temporalio
         end
 
         class WorkflowExecutionUpdateAcceptedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionUpdateAcceptedEventAttributes) -> String
+
           # The instance ID of the update protocol that generated this event.
           #
           attr_accessor protocol_instance_id(): ::String
@@ -3685,6 +3861,10 @@ module Temporalio
         end
 
         class WorkflowExecutionUpdateCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionUpdateCompletedEventAttributes) -> String
+
           # The metadata about this update.
           #
           attr_accessor meta(): ::Temporalio::Api::Update::V1::Meta?
@@ -3738,6 +3918,10 @@ module Temporalio
         end
 
         class WorkflowExecutionUpdateRejectedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowExecutionUpdateRejectedEventAttributes) -> String
+
           # The instance ID of the update protocol that generated this event.
           #
           attr_accessor protocol_instance_id(): ::String
@@ -3822,6 +4006,10 @@ module Temporalio
         #  See the `EventType` enum for more info about what each event is for.
         #
         class HistoryEvent < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (HistoryEvent) -> String
+
           # Monotonically increasing event number, starts at 1.
           #
           attr_accessor event_id(): ::Integer
@@ -4364,6 +4552,10 @@ module Temporalio
         end
 
         class History < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (History) -> String
+
           attr_accessor events(): ::Temporalio::Api::History::V1::HistoryEvent::field_array
 
           def events=: (::Temporalio::Api::History::V1::HistoryEvent::array) -> ::Temporalio::Api::History::V1::HistoryEvent::array

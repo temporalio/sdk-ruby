@@ -6,6 +6,10 @@ module Temporalio
         #  call to wait before returning control to the caller.
         #
         class WaitPolicy < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WaitPolicy) -> String
+
           # Indicates the update lifecycle stage that the gRPC call should wait for
           #  before returning.
           #
@@ -50,6 +54,10 @@ module Temporalio
         #  execution update process.
         #
         class UpdateRef < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpdateRef) -> String
+
           attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
 
           def workflow_execution=: [M < ::Temporalio::Api::Common::V1::WorkflowExecution::_ToProto] (M?) -> M?
@@ -93,6 +101,10 @@ module Temporalio
         # The outcome of a workflow update - success or failure.
         #
         class Outcome < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Outcome) -> String
+
           attr_accessor success(): ::Temporalio::Api::Common::V1::Payloads?
 
           def success=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -140,6 +152,10 @@ module Temporalio
         # Metadata about a workflow execution update.
         #
         class Meta < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Meta) -> String
+
           # An ID with workflow-scoped uniqueness for this update
           #
           attr_accessor update_id(): ::String
@@ -181,6 +197,10 @@ module Temporalio
         end
 
         class Input < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Input) -> String
+
           # Headers that are passed with the update from the requesting entity.
           #  These can include things like auth or tracing tokens.
           #
@@ -246,6 +266,10 @@ module Temporalio
         # The client request that triggers a workflow execution update
         #
         class Request < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Request) -> String
+
           attr_accessor meta(): ::Temporalio::Api::Update::V1::Meta?
 
           def meta=: [M < ::Temporalio::Api::Update::V1::Meta::_ToProto] (M?) -> M?
@@ -294,6 +318,10 @@ module Temporalio
         #  been rejected.
         #
         class Rejection < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Rejection) -> String
+
           attr_accessor rejected_request_message_id(): ::String
 
           def rejected_request_message_id!: () -> ::String?
@@ -354,6 +382,10 @@ module Temporalio
         #  been accepted (i.e. passed the worker-side validation phase).
         #
         class Acceptance < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Acceptance) -> String
+
           attr_accessor accepted_request_message_id(): ::String
 
           def accepted_request_message_id!: () -> ::String?
@@ -404,6 +436,10 @@ module Temporalio
         #  completed with the contained outcome.
         #
         class Response < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (Response) -> String
+
           attr_accessor meta(): ::Temporalio::Api::Update::V1::Meta?
 
           def meta=: [M < ::Temporalio::Api::Update::V1::Meta::_ToProto] (M?) -> M?

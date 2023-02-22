@@ -45,6 +45,10 @@ module Temporalio
         end
 
         class WorkflowCommand < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (WorkflowCommand) -> String
+
           attr_accessor start_timer(): ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?
 
           def start_timer=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer::_ToProto] (M?) -> M?
@@ -260,6 +264,10 @@ module Temporalio
         end
 
         class StartTimer < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartTimer) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -303,6 +311,10 @@ module Temporalio
         end
 
         class CancelTimer < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CancelTimer) -> String
+
           # / Lang's incremental sequence number as passed to `StartTimer`
           #
           attr_accessor seq(): ::Integer
@@ -336,6 +348,10 @@ module Temporalio
         end
 
         class ScheduleActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ScheduleActivity) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -523,6 +539,10 @@ module Temporalio
         end
 
         class ScheduleLocalActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ScheduleLocalActivity) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -730,6 +750,10 @@ module Temporalio
         end
 
         class RequestCancelActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelActivity) -> String
+
           # / Lang's incremental sequence number as passed to `ScheduleActivity`
           #
           attr_accessor seq(): ::Integer
@@ -763,6 +787,10 @@ module Temporalio
         end
 
         class RequestCancelLocalActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelLocalActivity) -> String
+
           # / Lang's incremental sequence number as passed to `ScheduleLocalActivity`
           #
           attr_accessor seq(): ::Integer
@@ -796,6 +824,10 @@ module Temporalio
         end
 
         class QueryResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QueryResult) -> String
+
           # / Corresponds to the id provided in the activation job
           #
           attr_accessor query_id(): ::String
@@ -849,6 +881,10 @@ module Temporalio
         end
 
         class QuerySuccess < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (QuerySuccess) -> String
+
           attr_accessor response(): ::Temporalio::Api::Common::V1::Payload?
 
           def response=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
@@ -886,6 +922,10 @@ module Temporalio
         # / Issued when the workflow completes successfully
         #
         class CompleteWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CompleteWorkflowExecution) -> String
+
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
 
           def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
@@ -923,6 +963,10 @@ module Temporalio
         # / Issued when the workflow errors out
         #
         class FailWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (FailWorkflowExecution) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -960,6 +1004,10 @@ module Temporalio
         # Continue the workflow as a new execution
         #
         class ContinueAsNewWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ContinueAsNewWorkflowExecution) -> String
+
           # The identifier the lang-specific sdk uses to execute workflow code
           #
           attr_accessor workflow_type(): ::String
@@ -1110,6 +1158,10 @@ module Temporalio
         # / containing a cancellation job.
         #
         class CancelWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CancelWorkflowExecution) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -1133,6 +1185,10 @@ module Temporalio
         # / A request to set/check if a certain patch is present or not
         #
         class SetPatchMarker < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SetPatchMarker) -> String
+
           # A user-chosen identifier for this patch. If the same identifier is used in multiple places in
           #  the code, those places are considered to be versioned as one unit. IE: The check call will
           #  return the same result for all of them
@@ -1181,6 +1237,10 @@ module Temporalio
         # / Start a child workflow execution
         #
         class StartChildWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (StartChildWorkflowExecution) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -1394,6 +1454,10 @@ module Temporalio
         # / Cancel a child workflow
         #
         class CancelChildWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CancelChildWorkflowExecution) -> String
+
           # Sequence number as given to the `StartChildWorkflowExecution` command
           #
           attr_accessor child_workflow_seq(): ::Integer
@@ -1429,6 +1493,10 @@ module Temporalio
         # / Request cancellation of an external workflow execution (which may be a started child)
         #
         class RequestCancelExternalWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (RequestCancelExternalWorkflowExecution) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -1486,6 +1554,10 @@ module Temporalio
         # / Send a signal to an external or child workflow
         #
         class SignalExternalWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (SignalExternalWorkflowExecution) -> String
+
           # / Lang's incremental sequence number, used as the operation identifier
           #
           attr_accessor seq(): ::Integer
@@ -1579,6 +1651,10 @@ module Temporalio
         # / Can be used to cancel not-already-sent `SignalExternalWorkflowExecution` commands
         #
         class CancelSignalWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (CancelSignalWorkflow) -> String
+
           # / Lang's incremental sequence number as passed to `SignalExternalWorkflowExecution`
           #
           attr_accessor seq(): ::Integer
@@ -1612,6 +1688,10 @@ module Temporalio
         end
 
         class UpsertWorkflowSearchAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (UpsertWorkflowSearchAttributes) -> String
+
           # / SearchAttributes fields - equivalent to indexed_fields on api. Key = search index, Value =
           # / value?
           #
@@ -1653,6 +1733,10 @@ module Temporalio
         end
 
         class ModifyWorkflowProperties < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ModifyWorkflowProperties) -> String
+
           # If set, update the workflow memo with the provided values. The values will be merged with
           #  the existing memo. If the user wants to delete values, a default/empty Payload should be
           #  used as the value for the key being deleted.

@@ -5,6 +5,10 @@ module Temporalio
         # A request as given to `record_activity_heartbeat`
         #
         class ActivityHeartbeat < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityHeartbeat) -> String
+
           attr_accessor task_token(): ::String
 
           def task_token!: () -> ::String?
@@ -48,6 +52,10 @@ module Temporalio
         # A request as given to `complete_activity_task`
         #
         class ActivityTaskCompletion < ::Protobuf::Message
+          # Encode the message to a binary string
+          # 
+          def self.encode: (ActivityTaskCompletion) -> String
+
           attr_accessor task_token(): ::String
 
           def task_token!: () -> ::String?
