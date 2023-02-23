@@ -51,12 +51,13 @@ pub struct Worker {
 
 impl Worker {
     // TODO: Extend this to include full worker config
-    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str, max_cached_workflows: u32) -> Result<Worker, WorkerError> {
+    pub fn new(runtime: &Runtime, client: &Client, namespace: &str, task_queue: &str, max_cached_workflows: u32, no_remote_activity: bool) -> Result<Worker, WorkerError> {
         let config = WorkerConfigBuilder::default()
             .namespace(namespace)
             .task_queue(task_queue)
             .worker_build_id("test-worker-build") // TODO: replace this with an actual build id
             .max_cached_workflows(usize::try_from(max_cached_workflows).unwrap())
+            .no_remote_activities(no_remote_activity)
             .build()?;
 
         let core_worker = runtime.tokio_runtime.block_on(async move {
@@ -163,6 +164,7 @@ impl Worker {
         self.core_worker.initiate_shutdown();
     }
 
+    // FIXME: Replace with finalize_shutdown()
     pub fn shutdown(&self) {
         let core_worker = self.core_worker.clone();
 
