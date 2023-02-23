@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class NamespaceInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceInfo) -> String
 
           attr_accessor name(): ::String
@@ -92,7 +92,7 @@ module Temporalio
 
         class NamespaceConfig < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceConfig) -> String
 
           attr_accessor workflow_execution_retention_ttl(): ::Google::Protobuf::Duration?
@@ -195,7 +195,7 @@ module Temporalio
 
         class BadBinaries < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (BadBinaries) -> String
 
           attr_accessor binaries(): ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
@@ -234,7 +234,7 @@ module Temporalio
 
         class BadBinaryInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (BadBinaryInfo) -> String
 
           attr_accessor reason(): ::String
@@ -285,7 +285,7 @@ module Temporalio
 
         class UpdateNamespaceInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (UpdateNamespaceInfo) -> String
 
           attr_accessor description(): ::String
@@ -366,7 +366,7 @@ module Temporalio
 
         class NamespaceFilter < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceFilter) -> String
 
           # By default namespaces in NAMESPACE_STATE_DELETED state are not included.

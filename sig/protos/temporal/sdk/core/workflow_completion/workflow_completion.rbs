@@ -6,7 +6,7 @@ module Temporalio
         #
         class WorkflowActivationCompletion < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowActivationCompletion) -> String
 
           # The run id from the workflow activation you are completing
@@ -65,7 +65,7 @@ module Temporalio
         #
         class Success < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Success) -> String
 
           # A list of commands to send back to the temporal server
@@ -124,7 +124,7 @@ module Temporalio
         #
         class Failure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Failure) -> String
 
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?

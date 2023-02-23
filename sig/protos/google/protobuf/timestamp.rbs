@@ -94,7 +94,7 @@ module Google
     #
     class Timestamp < ::Protobuf::Message
       # Encode the message to a binary string
-      # 
+      #
       def self.encode: (Timestamp) -> String
 
       # Represents seconds of UTC time since Unix epoch

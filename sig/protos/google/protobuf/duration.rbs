@@ -61,7 +61,7 @@ module Google
     #
     class Duration < ::Protobuf::Message
       # Encode the message to a binary string
-      # 
+      #
       def self.encode: (Duration) -> String
 
       # Signed seconds of the span of time. Must be from -315,576,000,000

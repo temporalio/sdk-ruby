@@ -8,7 +8,7 @@ module Temporalio
         #
         class LocalActivityMarkerData < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (LocalActivityMarkerData) -> String
 
           attr_accessor seq(): ::Integer

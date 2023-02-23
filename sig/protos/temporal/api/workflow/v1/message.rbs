@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class WorkflowExecutionInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowExecutionInfo) -> String
 
           attr_accessor execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
@@ -163,7 +163,7 @@ module Temporalio
 
         class WorkflowExecutionConfig < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowExecutionConfig) -> String
 
           attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
@@ -232,7 +232,7 @@ module Temporalio
 
         class PendingActivityInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (PendingActivityInfo) -> String
 
           attr_accessor activity_id(): ::String
@@ -365,7 +365,7 @@ module Temporalio
 
         class PendingChildExecutionInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (PendingChildExecutionInfo) -> String
 
           attr_accessor workflow_id(): ::String
@@ -432,7 +432,7 @@ module Temporalio
 
         class PendingWorkflowTaskInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (PendingWorkflowTaskInfo) -> String
 
           attr_accessor state(): ::Temporalio::Api::Enums::V1::PendingWorkflowTaskState
@@ -517,7 +517,7 @@ module Temporalio
 
         class ResetPoints < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ResetPoints) -> String
 
           attr_accessor points(): ::Temporalio::Api::Workflow::V1::ResetPointInfo::field_array
@@ -556,7 +556,7 @@ module Temporalio
 
         class ResetPointInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ResetPointInfo) -> String
 
           attr_accessor binary_checksum(): ::String
@@ -644,7 +644,7 @@ module Temporalio
         #
         class NewWorkflowExecutionInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NewWorkflowExecutionInfo) -> String
 
           attr_accessor workflow_id(): ::String

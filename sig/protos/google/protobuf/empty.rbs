@@ -10,7 +10,7 @@ module Google
     #
     class Empty < ::Protobuf::Message
       # Encode the message to a binary string
-      # 
+      #
       def self.encode: (Empty) -> String
 
       def initialize: () -> void

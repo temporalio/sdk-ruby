@@ -6,7 +6,7 @@ module Temporalio
         #
         class TaskQueue < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TaskQueue) -> String
 
           attr_accessor name(): ::String
@@ -57,7 +57,7 @@ module Temporalio
         #
         class TaskQueueMetadata < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TaskQueueMetadata) -> String
 
           # Allows throttling dispatch of tasks from this queue
@@ -100,7 +100,7 @@ module Temporalio
 
         class TaskQueueStatus < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TaskQueueStatus) -> String
 
           attr_accessor backlog_count_hint(): ::Integer
@@ -163,7 +163,7 @@ module Temporalio
 
         class TaskIdBlock < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TaskIdBlock) -> String
 
           attr_accessor start_id(): ::Integer
@@ -204,7 +204,7 @@ module Temporalio
 
         class TaskQueuePartitionMetadata < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TaskQueuePartitionMetadata) -> String
 
           attr_accessor key(): ::String
@@ -245,7 +245,7 @@ module Temporalio
 
         class PollerInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (PollerInfo) -> String
 
           # Unix Nano
@@ -316,7 +316,7 @@ module Temporalio
 
         class StickyExecutionAttributes < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (StickyExecutionAttributes) -> String
 
           attr_accessor worker_task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
@@ -374,7 +374,7 @@ module Temporalio
         #
         class VersionIdNode < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (VersionIdNode) -> String
 
           attr_accessor version(): ::Temporalio::Api::TaskQueue::V1::VersionId?
@@ -446,7 +446,7 @@ module Temporalio
         #
         class VersionId < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (VersionId) -> String
 
           # An opaque whole-worker identifier

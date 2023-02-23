@@ -105,10 +105,11 @@ namespace :proto do
       content = content.gsub(/^\s*package\s+([^;]+)\s*;/, "package #{normalized_package};")
 
       # Fix references to renamed packages
-      content = content.gsub(/(?<![.a-z])(temporal\.api\.[a-z0-9.]+)\.([a-z0-9]+)/i) do
-        package = Regexp.last_match(1)
-        element_name = Regexp.last_match(2)
-        "#{package_map[package]}.#{element_name}"
+      content = content.gsub(%r{(//.*?\R)|(?<![.a-z])(temporal\.api\.[a-z0-9.]+)\.([a-z0-9]+)}im) do
+        comment = Regexp.last_match(1)
+        package = Regexp.last_match(2)
+        element_name = Regexp.last_match(3)
+        comment || "#{package_map[package]}.#{element_name}"
       end
 
       # Write out the file for processing
@@ -139,7 +140,7 @@ namespace :proto do
 
       # Also fix references such as Temporalio::Api::Task_queue::V1::TaskQueue
       # by rewriting them to proper camelcase.
-      content = content.gsub(/Temporalio(::[a-z0-9][a-z0-9_]+)+(?=::)/i) do
+      content = content.gsub(/Temporalio(?:::[a-z0-9][a-z0-9_]+)+(?=::)/im) do
         Regexp.last_match(0).split('::').map do |segment|
           if segment.match(/_/)
             segment.split('_').map(&:capitalize).join

@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class ClusterReplicationConfig < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ClusterReplicationConfig) -> String
 
           attr_accessor cluster_name(): ::String
@@ -39,7 +39,7 @@ module Temporalio
 
         class NamespaceReplicationConfig < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceReplicationConfig) -> String
 
           attr_accessor active_cluster_name(): ::String
@@ -96,7 +96,7 @@ module Temporalio
         #
         class FailoverStatus < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (FailoverStatus) -> String
 
           # Timestamp when the Cluster switched to the following failover_version

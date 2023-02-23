@@ -6,7 +6,7 @@ module Temporalio
         #
         class AddSearchAttributesRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (AddSearchAttributesRequest) -> String
 
           # Mapping between search attribute name and its IndexedValueType.
@@ -55,7 +55,7 @@ module Temporalio
 
         class AddSearchAttributesResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (AddSearchAttributesResponse) -> String
 
           def initialize: () -> void
@@ -80,7 +80,7 @@ module Temporalio
 
         class RemoveSearchAttributesRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (RemoveSearchAttributesRequest) -> String
 
           # Search attribute names to delete.
@@ -129,7 +129,7 @@ module Temporalio
 
         class RemoveSearchAttributesResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (RemoveSearchAttributesResponse) -> String
 
           def initialize: () -> void
@@ -154,7 +154,7 @@ module Temporalio
 
         class ListSearchAttributesRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ListSearchAttributesRequest) -> String
 
           attr_accessor namespace(): ::String
@@ -189,7 +189,7 @@ module Temporalio
 
         class ListSearchAttributesResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ListSearchAttributesResponse) -> String
 
           # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
@@ -265,7 +265,7 @@ module Temporalio
         #
         class DeleteNamespaceRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (DeleteNamespaceRequest) -> String
 
           attr_accessor namespace(): ::String
@@ -300,7 +300,7 @@ module Temporalio
 
         class DeleteNamespaceResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (DeleteNamespaceResponse) -> String
 
           # Temporary namespace name that is used during reclaim resources step.
@@ -337,7 +337,7 @@ module Temporalio
 
         class AddOrUpdateRemoteClusterRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (AddOrUpdateRemoteClusterRequest) -> String
 
           # Frontend Address is a cross cluster accessible address.
@@ -384,7 +384,7 @@ module Temporalio
 
         class AddOrUpdateRemoteClusterResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (AddOrUpdateRemoteClusterResponse) -> String
 
           def initialize: () -> void
@@ -409,7 +409,7 @@ module Temporalio
 
         class RemoveRemoteClusterRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (RemoveRemoteClusterRequest) -> String
 
           # Remote cluster name to be removed.
@@ -446,7 +446,7 @@ module Temporalio
 
         class RemoveRemoteClusterResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (RemoveRemoteClusterResponse) -> String
 
           def initialize: () -> void
@@ -471,7 +471,7 @@ module Temporalio
 
         class ListClustersRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ListClustersRequest) -> String
 
           attr_accessor page_size(): ::Integer
@@ -512,7 +512,7 @@ module Temporalio
 
         class ListClustersResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ListClustersResponse) -> String
 
           # List of all cluster information
@@ -561,7 +561,7 @@ module Temporalio
 
         class ClusterMetadata < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ClusterMetadata) -> String
 
           # Name of the cluster name.

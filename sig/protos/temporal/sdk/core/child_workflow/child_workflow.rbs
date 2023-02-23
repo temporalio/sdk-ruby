@@ -133,7 +133,7 @@ module Temporalio
         #
         class ChildWorkflowResult < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ChildWorkflowResult) -> String
 
           attr_accessor completed(): ::Temporalio::Bridge::Api::ChildWorkflow::Success?
@@ -195,7 +195,7 @@ module Temporalio
         #
         class Success < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Success) -> String
 
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
@@ -238,7 +238,7 @@ module Temporalio
         #
         class Failure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Failure) -> String
 
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
@@ -281,7 +281,7 @@ module Temporalio
         #
         class Cancellation < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Cancellation) -> String
 
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?

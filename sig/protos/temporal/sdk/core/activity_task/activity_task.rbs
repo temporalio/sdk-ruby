@@ -43,7 +43,7 @@ module Temporalio
 
         class ActivityTask < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ActivityTask) -> String
 
           # / A unique identifier for this task
@@ -110,7 +110,7 @@ module Temporalio
         #
         class Start < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Start) -> String
 
           # The namespace the workflow lives in
@@ -344,7 +344,7 @@ module Temporalio
         #
         class Cancel < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Cancel) -> String
 
           attr_accessor reason(): ::Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason

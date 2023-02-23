@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class WorkflowExecutionFilter < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowExecutionFilter) -> String
 
           attr_accessor workflow_id(): ::String
@@ -45,7 +45,7 @@ module Temporalio
 
         class WorkflowTypeFilter < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowTypeFilter) -> String
 
           attr_accessor name(): ::String
@@ -80,7 +80,7 @@ module Temporalio
 
         class StartTimeFilter < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (StartTimeFilter) -> String
 
           attr_accessor earliest_time(): ::Google::Protobuf::Timestamp?
@@ -129,7 +129,7 @@ module Temporalio
 
         class StatusFilter < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (StatusFilter) -> String
 
           attr_accessor status(): ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus

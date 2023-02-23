@@ -7,7 +7,7 @@ module Temporalio
         #
         class Message < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Message) -> String
 
           # An ID for this specific message.

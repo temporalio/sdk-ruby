@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class DataBlob < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (DataBlob) -> String
 
           attr_accessor encoding_type(): ::Temporalio::Api::Enums::V1::EncodingType
@@ -51,7 +51,7 @@ module Temporalio
         #
         class Payloads < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Payloads) -> String
 
           attr_accessor payloads(): ::Temporalio::Api::Common::V1::Payload::field_array
@@ -94,7 +94,7 @@ module Temporalio
         #
         class Payload < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Payload) -> String
 
           attr_accessor metadata(): ::Protobuf::field_hash[::String, ::String]
@@ -142,7 +142,7 @@ module Temporalio
         #
         class SearchAttributes < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SearchAttributes) -> String
 
           attr_accessor indexed_fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
@@ -183,7 +183,7 @@ module Temporalio
         #
         class Memo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Memo) -> String
 
           attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
@@ -225,7 +225,7 @@ module Temporalio
         #
         class Header < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Header) -> String
 
           attr_accessor fields(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
@@ -268,7 +268,7 @@ module Temporalio
         #
         class WorkflowExecution < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowExecution) -> String
 
           attr_accessor workflow_id(): ::String
@@ -312,7 +312,7 @@ module Temporalio
         #
         class WorkflowType < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowType) -> String
 
           attr_accessor name(): ::String
@@ -350,7 +350,7 @@ module Temporalio
         #
         class ActivityType < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ActivityType) -> String
 
           attr_accessor name(): ::String
@@ -387,7 +387,7 @@ module Temporalio
         #
         class RetryPolicy < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (RetryPolicy) -> String
 
           # Interval of the first retry. If retryBackoffCoefficient is 1.0 then it is used for all retries.

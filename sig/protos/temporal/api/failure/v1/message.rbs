@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class ApplicationFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ApplicationFailureInfo) -> String
 
           attr_accessor type(): ::String
@@ -57,7 +57,7 @@ module Temporalio
 
         class TimeoutFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TimeoutFailureInfo) -> String
 
           attr_accessor timeout_type(): ::Temporalio::Api::Enums::V1::TimeoutType
@@ -106,7 +106,7 @@ module Temporalio
 
         class CanceledFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (CanceledFailureInfo) -> String
 
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
@@ -145,7 +145,7 @@ module Temporalio
 
         class TerminatedFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TerminatedFailureInfo) -> String
 
           def initialize: () -> void
@@ -170,7 +170,7 @@ module Temporalio
 
         class ServerFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ServerFailureInfo) -> String
 
           attr_accessor non_retryable(): bool
@@ -207,7 +207,7 @@ module Temporalio
 
         class ResetWorkflowFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ResetWorkflowFailureInfo) -> String
 
           attr_accessor last_heartbeat_details(): ::Temporalio::Api::Common::V1::Payloads?
@@ -246,7 +246,7 @@ module Temporalio
 
         class ActivityFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ActivityFailureInfo) -> String
 
           attr_accessor scheduled_event_id(): ::Integer
@@ -319,7 +319,7 @@ module Temporalio
 
         class ChildWorkflowExecutionFailureInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ChildWorkflowExecutionFailureInfo) -> String
 
           attr_accessor namespace(): ::String
@@ -396,7 +396,7 @@ module Temporalio
 
         class Failure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Failure) -> String
 
           attr_accessor message(): ::String

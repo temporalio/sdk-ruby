@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class WorkflowTaskCompletedMetadata < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowTaskCompletedMetadata) -> String
 
           # Internal flags used by the core SDK. SDKs using flags must comply with the following behavior:

@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class NotFoundFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NotFoundFailure) -> String
 
           attr_accessor current_cluster(): ::String
@@ -45,7 +45,7 @@ module Temporalio
 
         class WorkflowExecutionAlreadyStartedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowExecutionAlreadyStartedFailure) -> String
 
           attr_accessor start_request_id(): ::String
@@ -86,7 +86,7 @@ module Temporalio
 
         class NamespaceNotActiveFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceNotActiveFailure) -> String
 
           attr_accessor namespace(): ::String
@@ -133,7 +133,7 @@ module Temporalio
 
         class NamespaceInvalidStateFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceInvalidStateFailure) -> String
 
           attr_accessor namespace(): ::String
@@ -198,7 +198,7 @@ module Temporalio
 
         class NamespaceNotFoundFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceNotFoundFailure) -> String
 
           attr_accessor namespace(): ::String
@@ -233,7 +233,7 @@ module Temporalio
 
         class NamespaceAlreadyExistsFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (NamespaceAlreadyExistsFailure) -> String
 
           def initialize: () -> void
@@ -258,7 +258,7 @@ module Temporalio
 
         class ClientVersionNotSupportedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ClientVersionNotSupportedFailure) -> String
 
           attr_accessor client_version(): ::String
@@ -305,7 +305,7 @@ module Temporalio
 
         class ServerVersionNotSupportedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ServerVersionNotSupportedFailure) -> String
 
           attr_accessor server_version(): ::String
@@ -346,7 +346,7 @@ module Temporalio
 
         class CancellationAlreadyRequestedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (CancellationAlreadyRequestedFailure) -> String
 
           def initialize: () -> void
@@ -371,7 +371,7 @@ module Temporalio
 
         class QueryFailedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (QueryFailedFailure) -> String
 
           def initialize: () -> void
@@ -396,7 +396,7 @@ module Temporalio
 
         class PermissionDeniedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (PermissionDeniedFailure) -> String
 
           attr_accessor reason(): ::String
@@ -431,7 +431,7 @@ module Temporalio
 
         class ResourceExhaustedFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ResourceExhaustedFailure) -> String
 
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::ResourceExhaustedCause
@@ -470,7 +470,7 @@ module Temporalio
 
         class SystemWorkflowFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SystemWorkflowFailure) -> String
 
           # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
@@ -523,7 +523,7 @@ module Temporalio
 
         class WorkflowNotReadyFailure < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (WorkflowNotReadyFailure) -> String
 
           def initialize: () -> void

@@ -4,7 +4,7 @@ module Temporalio
       module V1
         class LockTimeSkippingRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (LockTimeSkippingRequest) -> String
 
           def initialize: () -> void
@@ -29,7 +29,7 @@ module Temporalio
 
         class LockTimeSkippingResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (LockTimeSkippingResponse) -> String
 
           def initialize: () -> void
@@ -54,7 +54,7 @@ module Temporalio
 
         class UnlockTimeSkippingRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (UnlockTimeSkippingRequest) -> String
 
           def initialize: () -> void
@@ -79,7 +79,7 @@ module Temporalio
 
         class UnlockTimeSkippingResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (UnlockTimeSkippingResponse) -> String
 
           def initialize: () -> void
@@ -104,7 +104,7 @@ module Temporalio
 
         class SleepUntilRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SleepUntilRequest) -> String
 
           attr_accessor timestamp(): ::Google::Protobuf::Timestamp?
@@ -143,7 +143,7 @@ module Temporalio
 
         class SleepRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SleepRequest) -> String
 
           attr_accessor duration(): ::Google::Protobuf::Duration?
@@ -182,7 +182,7 @@ module Temporalio
 
         class SleepResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SleepResponse) -> String
 
           def initialize: () -> void
@@ -207,7 +207,7 @@ module Temporalio
 
         class GetCurrentTimeResponse < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (GetCurrentTimeResponse) -> String
 
           attr_accessor time(): ::Google::Protobuf::Timestamp?

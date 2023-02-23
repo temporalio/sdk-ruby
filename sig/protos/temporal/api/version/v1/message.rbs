@@ -6,7 +6,7 @@ module Temporalio
         #
         class ReleaseInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ReleaseInfo) -> String
 
           attr_accessor version(): ::String
@@ -59,7 +59,7 @@ module Temporalio
         #
         class Alert < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Alert) -> String
 
           attr_accessor message(): ::String
@@ -106,7 +106,7 @@ module Temporalio
         #
         class VersionInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (VersionInfo) -> String
 
           attr_accessor current(): ::Temporalio::Api::Version::V1::ReleaseInfo?

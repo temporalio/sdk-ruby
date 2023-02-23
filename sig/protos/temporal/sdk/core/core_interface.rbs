@@ -6,7 +6,7 @@ module Temporalio
         #
         class ActivityHeartbeat < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ActivityHeartbeat) -> String
 
           attr_accessor task_token(): ::String
@@ -53,7 +53,7 @@ module Temporalio
         #
         class ActivityTaskCompletion < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ActivityTaskCompletion) -> String
 
           attr_accessor task_token(): ::String

@@ -23,7 +23,7 @@ module Temporalio
         #
         class CalendarSpec < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (CalendarSpec) -> String
 
           # Expression to match seconds. Default: 0
@@ -123,7 +123,7 @@ module Temporalio
         #
         class Range < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Range) -> String
 
           # Start of range (inclusive).
@@ -186,7 +186,7 @@ module Temporalio
         #
         class StructuredCalendarSpec < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (StructuredCalendarSpec) -> String
 
           # Match seconds (0-59)
@@ -337,7 +337,7 @@ module Temporalio
         #
         class IntervalSpec < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (IntervalSpec) -> String
 
           attr_accessor interval(): ::Google::Protobuf::Duration?
@@ -402,7 +402,7 @@ module Temporalio
         #
         class ScheduleSpec < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleSpec) -> String
 
           # Calendar-based specifications of times.
@@ -646,7 +646,7 @@ module Temporalio
 
         class SchedulePolicies < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SchedulePolicies) -> String
 
           # Policy for overlaps.
@@ -729,7 +729,7 @@ module Temporalio
 
         class ScheduleAction < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleAction) -> String
 
           # All fields of NewWorkflowExecutionInfo are valid except for:
@@ -780,7 +780,7 @@ module Temporalio
 
         class ScheduleActionResult < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleActionResult) -> String
 
           # Time that the action was taken (according to the schedule, including jitter).
@@ -851,7 +851,7 @@ module Temporalio
 
         class ScheduleState < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleState) -> String
 
           # Informative human-readable message with contextual notes, e.g. the reason
@@ -920,7 +920,7 @@ module Temporalio
 
         class TriggerImmediatelyRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (TriggerImmediatelyRequest) -> String
 
           # Override overlap policy for this one request.
@@ -963,7 +963,7 @@ module Temporalio
 
         class BackfillRequest < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (BackfillRequest) -> String
 
           # Time range to evaluate schedule in.
@@ -1030,7 +1030,7 @@ module Temporalio
 
         class SchedulePatch < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (SchedulePatch) -> String
 
           # If set, trigger one action immediately.
@@ -1106,7 +1106,7 @@ module Temporalio
 
         class ScheduleInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleInfo) -> String
 
           # Number of actions taken so far.
@@ -1243,7 +1243,7 @@ module Temporalio
 
         class Schedule < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (Schedule) -> String
 
           attr_accessor spec(): ::Temporalio::Api::Schedule::V1::ScheduleSpec?
@@ -1315,7 +1315,7 @@ module Temporalio
         #
         class ScheduleListInfo < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleListInfo) -> String
 
           # From spec:
@@ -1420,7 +1420,7 @@ module Temporalio
         #
         class ScheduleListEntry < ::Protobuf::Message
           # Encode the message to a binary string
-          # 
+          #
           def self.encode: (ScheduleListEntry) -> String
 
           attr_accessor schedule_id(): ::String

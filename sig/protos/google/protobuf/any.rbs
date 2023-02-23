@@ -85,7 +85,7 @@ module Google
     #
     class Any < ::Protobuf::Message
       # Encode the message to a binary string
-      # 
+      #
       def self.encode: (Any) -> String
 
       # A URL/resource name that uniquely identifies the type of the serialized
