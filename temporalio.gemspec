@@ -35,11 +35,12 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'protobuf' # Ruby implementation of protobufs (for rbs_protobuf)
   spec.add_development_dependency 'pry' # Debugger
   spec.add_development_dependency 'rake' # rake tasks
+  spec.add_development_dependency 'rbs', '>= 2.8.0', '< 3.0.0' # RBS - steep 1.3.0 crashes with RBS 3.0.0
   spec.add_development_dependency 'rbs_protobuf' # RBS generator for protobufs
   spec.add_development_dependency 'rspec' # specs
   spec.add_development_dependency 'rubocop' # linter
   spec.add_development_dependency 'rubocop-rspec' # spec linter
-  spec.add_development_dependency 'steep' # type checker
+  spec.add_development_dependency 'steep', '~> 1.3.0' # type checker
   spec.add_development_dependency 'typeprof' # type generator
   spec.add_development_dependency 'yard' # docs
 end
