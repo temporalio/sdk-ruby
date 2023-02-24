@@ -44,14 +44,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module ChildWorkflow
-    ChildWorkflowResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ChildWorkflowResult").msgclass
-    Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Success").msgclass
-    Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Failure").msgclass
-    Cancellation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Cancellation").msgclass
-    ParentClosePolicy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ParentClosePolicy").enummodule
-    StartChildWorkflowExecutionFailedCause = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.StartChildWorkflowExecutionFailedCause").enummodule
-    ChildWorkflowCancellationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ChildWorkflowCancellationType").enummodule
+module Temporalio
+  module Bridge
+    module Api
+      module ChildWorkflow
+        ChildWorkflowResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ChildWorkflowResult").msgclass
+        Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Success").msgclass
+        Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Failure").msgclass
+        Cancellation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.Cancellation").msgclass
+        ParentClosePolicy = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ParentClosePolicy").enummodule
+        StartChildWorkflowExecutionFailedCause = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.StartChildWorkflowExecutionFailedCause").enummodule
+        ChildWorkflowCancellationType = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.child_workflow.ChildWorkflowCancellationType").enummodule
+      end
+    end
   end
 end

@@ -20,8 +20,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module ExternalData
-    LocalActivityMarkerData = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.external_data.LocalActivityMarkerData").msgclass
+module Temporalio
+  module Bridge
+    module Api
+      module ExternalData
+        LocalActivityMarkerData = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.external_data.LocalActivityMarkerData").msgclass
+      end
+    end
   end
 end

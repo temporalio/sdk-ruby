@@ -130,16 +130,16 @@ module Temporalio
           end
 
           push_command(
-            Coresdk::WorkflowCommands::WorkflowCommand.new(
-              complete_workflow_execution: Coresdk::WorkflowCommands::CompleteWorkflowExecution.new(
+            Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+              complete_workflow_execution: Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution.new(
                 result: converter.to_payload(result),
               ),
             ),
           )
         rescue StandardError => e
           push_command(
-            Coresdk::WorkflowCommands::WorkflowCommand.new(
-              fail_workflow_execution: Coresdk::WorkflowCommands::FailWorkflowExecution.new(
+            Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+              fail_workflow_execution: Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution.new(
                 failure: converter.to_failure(e),
               ),
             ),

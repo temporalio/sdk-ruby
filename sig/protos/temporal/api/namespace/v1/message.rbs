@@ -3,6 +3,10 @@ module Temporalio
     module Namespace
       module V1
         class NamespaceInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceInfo) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -87,6 +91,10 @@ module Temporalio
         end
 
         class NamespaceConfig < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceConfig) -> String
+
           attr_accessor workflow_execution_retention_ttl(): ::Google::Protobuf::Duration?
 
           def workflow_execution_retention_ttl=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
@@ -131,7 +139,18 @@ module Temporalio
 
           def visibility_archival_uri!: () -> ::String?
 
-          def initialize: (?workflow_execution_retention_ttl: ::Google::Protobuf::Duration::init?, ?bad_binaries: ::Temporalio::Api::Namespace::V1::BadBinaries::init?, ?history_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?history_archival_uri: ::String, ?visibility_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?visibility_archival_uri: ::String) -> void
+          # Map from field name to alias.
+          #
+          attr_accessor custom_search_attribute_aliases(): ::Protobuf::field_hash[::String, ::String]
+
+          # Map from field name to alias.
+          #
+          def custom_search_attribute_aliases=: (::Hash[::String, ::String]) -> ::Hash[::String, ::String]
+                                              | ...
+
+          def custom_search_attribute_aliases!: () -> ::Protobuf::field_hash[::String, ::String]?
+
+          def initialize: (?workflow_execution_retention_ttl: ::Google::Protobuf::Duration::init?, ?bad_binaries: ::Temporalio::Api::Namespace::V1::BadBinaries::init?, ?history_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?history_archival_uri: ::String, ?visibility_archival_state: ::Temporalio::Api::Enums::V1::ArchivalState::init, ?visibility_archival_uri: ::String, ?custom_search_attribute_aliases: ::Hash[::String, ::String]) -> void
 
           def []: (:workflow_execution_retention_ttl) -> ::Google::Protobuf::Duration?
                 | (:bad_binaries) -> ::Temporalio::Api::Namespace::V1::BadBinaries?
@@ -139,6 +158,7 @@ module Temporalio
                 | (:history_archival_uri) -> ::String
                 | (:visibility_archival_state) -> ::Temporalio::Api::Enums::V1::ArchivalState
                 | (:visibility_archival_uri) -> ::String
+                | (:custom_search_attribute_aliases) -> ::Protobuf::field_hash[::String, ::String]
                 | (::Symbol) -> untyped
 
           def []=: (:workflow_execution_retention_ttl, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
@@ -151,6 +171,8 @@ module Temporalio
                  | (:visibility_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState) -> ::Temporalio::Api::Enums::V1::ArchivalState
                  | (:visibility_archival_state, ::Temporalio::Api::Enums::V1::ArchivalState::values) -> ::Temporalio::Api::Enums::V1::ArchivalState::values
                  | (:visibility_archival_uri, ::String) -> ::String
+                 | (:custom_search_attribute_aliases, ::Protobuf::field_hash[::String, ::String]) -> ::Protobuf::field_hash[::String, ::String]
+                 | (:custom_search_attribute_aliases, ::Hash[::String, ::String]) -> ::Hash[::String, ::String]
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -172,6 +194,10 @@ module Temporalio
         end
 
         class BadBinaries < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (BadBinaries) -> String
+
           attr_accessor binaries(): ::Temporalio::Api::Namespace::V1::BadBinaryInfo::field_hash[::String]
 
           def binaries=: (::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]) -> ::Temporalio::Api::Namespace::V1::BadBinaryInfo::hash[::String]
@@ -207,6 +233,10 @@ module Temporalio
         end
 
         class BadBinaryInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (BadBinaryInfo) -> String
+
           attr_accessor reason(): ::String
 
           def reason!: () -> ::String?
@@ -254,6 +284,10 @@ module Temporalio
         end
 
         class UpdateNamespaceInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (UpdateNamespaceInfo) -> String
+
           attr_accessor description(): ::String
 
           def description!: () -> ::String?
@@ -331,6 +365,10 @@ module Temporalio
         end
 
         class NamespaceFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceFilter) -> String
+
           # By default namespaces in NAMESPACE_STATE_DELETED state are not included.
           #  Setting include_deleted to true will include deleted namespaces.
           #  Note: Namespace is in NAMESPACE_STATE_DELETED state when it was deleted from the system but associated data is not deleted yet.

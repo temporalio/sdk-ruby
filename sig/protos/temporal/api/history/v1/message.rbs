@@ -5,6 +5,10 @@ module Temporalio
         # Always the first event in workflow history
         #
         class WorkflowExecutionStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionStartedEventAttributes) -> String
+
           attr_accessor workflow_type(): ::Temporalio::Api::Common::V1::WorkflowType?
 
           def workflow_type=: [M < ::Temporalio::Api::Common::V1::WorkflowType::_ToProto] (M?) -> M?
@@ -318,6 +322,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionCompletedEventAttributes) -> String
+
           # Serialized result of workflow completion (ie: The return value of the workflow function)
           #
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
@@ -373,6 +381,10 @@ module Temporalio
         end
 
         class WorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionFailedEventAttributes) -> String
+
           # Serialized result of workflow failure (ex: An exception thrown, or error returned)
           #
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
@@ -438,6 +450,10 @@ module Temporalio
         end
 
         class WorkflowExecutionTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionTimedOutEventAttributes) -> String
+
           attr_accessor retry_state(): ::Temporalio::Api::Enums::V1::RetryState
 
           def retry_state=: (::Temporalio::Api::Enums::V1::RetryState::values) -> ::Temporalio::Api::Enums::V1::RetryState::values
@@ -481,6 +497,10 @@ module Temporalio
         end
 
         class WorkflowExecutionContinuedAsNewEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionContinuedAsNewEventAttributes) -> String
+
           # The run ID of the new workflow started by this continue-as-new
           #
           attr_accessor new_execution_run_id(): ::String
@@ -668,6 +688,10 @@ module Temporalio
         end
 
         class WorkflowTaskScheduledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTaskScheduledEventAttributes) -> String
+
           # The task queue this workflow task was enqueued in, which could be a normal or sticky queue
           #
           attr_accessor task_queue(): ::Temporalio::Api::TaskQueue::V1::TaskQueue?
@@ -735,6 +759,10 @@ module Temporalio
         end
 
         class WorkflowTaskStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTaskStartedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -805,6 +833,10 @@ module Temporalio
         end
 
         class WorkflowTaskCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTaskCompletedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -842,13 +874,27 @@ module Temporalio
 
           def worker_versioning_id!: () -> ::Temporalio::Api::TaskQueue::V1::VersionId?
 
-          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_id: ::Temporalio::Api::TaskQueue::V1::VersionId::init?) -> void
+          # Data the SDK wishes to record for itself, but server need not interpret, and does not
+          #  directly impact workflow state.
+          #
+          attr_accessor sdk_metadata(): ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
+
+          # Data the SDK wishes to record for itself, but server need not interpret, and does not
+          #  directly impact workflow state.
+          #
+          def sdk_metadata=: [M < ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::_ToProto] (M?) -> M?
+                           | ...
+
+          def sdk_metadata!: () -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
+
+          def initialize: (?scheduled_event_id: ::Integer, ?started_event_id: ::Integer, ?identity: ::String, ?binary_checksum: ::String, ?worker_versioning_id: ::Temporalio::Api::TaskQueue::V1::VersionId::init?, ?sdk_metadata: ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::init?) -> void
 
           def []: (:scheduled_event_id) -> ::Integer
                 | (:started_event_id) -> ::Integer
                 | (:identity) -> ::String
                 | (:binary_checksum) -> ::String
                 | (:worker_versioning_id) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
+                | (:sdk_metadata) -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
                 | (::Symbol) -> untyped
 
           def []=: (:scheduled_event_id, ::Integer) -> ::Integer
@@ -857,6 +903,8 @@ module Temporalio
                  | (:binary_checksum, ::String) -> ::String
                  | (:worker_versioning_id, ::Temporalio::Api::TaskQueue::V1::VersionId?) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
                  | [M < ::Temporalio::Api::TaskQueue::V1::VersionId::_ToProto] (:worker_versioning_id, M?) -> M?
+                 | (:sdk_metadata, ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?) -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
+                 | [M < ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::_ToProto] (:sdk_metadata, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -878,6 +926,10 @@ module Temporalio
         end
 
         class WorkflowTaskTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTaskTimedOutEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -929,6 +981,10 @@ module Temporalio
         end
 
         class WorkflowTaskFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTaskFailedEventAttributes) -> String
+
           # The id of the `WORKFLOW_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1034,6 +1090,10 @@ module Temporalio
         end
 
         class ActivityTaskScheduledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskScheduledEventAttributes) -> String
+
           # The worker/user assigned identifier for the activity
           #
           attr_accessor activity_id(): ::String
@@ -1219,6 +1279,10 @@ module Temporalio
         end
 
         class ActivityTaskStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskStartedEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this task corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1292,6 +1356,10 @@ module Temporalio
         end
 
         class ActivityTaskCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskCompletedEventAttributes) -> String
+
           # Serialized results of the activity. IE: The return value of the activity function
           #
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
@@ -1355,6 +1423,10 @@ module Temporalio
         end
 
         class ActivityTaskFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskFailedEventAttributes) -> String
+
           # Failure details
           #
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
@@ -1428,6 +1500,10 @@ module Temporalio
         end
 
         class ActivityTaskTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskTimedOutEventAttributes) -> String
+
           # If this activity had failed, was retried, and then timed out, that failure is stored as the
           #  `cause` in here.
           #
@@ -1495,6 +1571,10 @@ module Temporalio
         end
 
         class ActivityTaskCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskCancelRequestedEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this cancel request corresponds to
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -1536,6 +1616,10 @@ module Temporalio
         end
 
         class ActivityTaskCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityTaskCanceledEventAttributes) -> String
+
           # Additional information that the activity reported upon confirming cancellation
           #
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
@@ -1608,6 +1692,10 @@ module Temporalio
         end
 
         class TimerStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (TimerStartedEventAttributes) -> String
+
           # The worker/user assigned id for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1669,6 +1757,10 @@ module Temporalio
         end
 
         class TimerFiredEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (TimerFiredEventAttributes) -> String
+
           # Will match the `timer_id` from `TIMER_STARTED` event for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1710,6 +1802,10 @@ module Temporalio
         end
 
         class TimerCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (TimerCanceledEventAttributes) -> String
+
           # Will match the `timer_id` from `TIMER_STARTED` event for this timer
           #
           attr_accessor timer_id(): ::String
@@ -1767,6 +1863,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionCancelRequestedEventAttributes) -> String
+
           # User provided reason for requesting cancellation
           #  TODO: shall we create a new field with name "reason" and deprecate this one?
           #
@@ -1827,6 +1927,10 @@ module Temporalio
         end
 
         class WorkflowExecutionCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionCanceledEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -1870,6 +1974,10 @@ module Temporalio
         end
 
         class MarkerRecordedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (MarkerRecordedEventAttributes) -> String
+
           # Workers use this to identify the "types" of various markers. Ex: Local activity, side effect.
           #
           attr_accessor marker_name(): ::String
@@ -1949,6 +2057,10 @@ module Temporalio
         end
 
         class WorkflowExecutionSignaledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionSignaledEventAttributes) -> String
+
           # The name/type of the signal to fire
           #
           attr_accessor signal_name(): ::String
@@ -2020,6 +2132,10 @@ module Temporalio
         end
 
         class WorkflowExecutionTerminatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionTerminatedEventAttributes) -> String
+
           # User/client provided reason for termination
           #
           attr_accessor reason(): ::String
@@ -2071,6 +2187,10 @@ module Temporalio
         end
 
         class RequestCancelExternalWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RequestCancelExternalWorkflowExecutionInitiatedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2156,6 +2276,10 @@ module Temporalio
         end
 
         class RequestCancelExternalWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RequestCancelExternalWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause
 
           def cause=: (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values) -> ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::values
@@ -2241,6 +2365,10 @@ module Temporalio
         end
 
         class ExternalWorkflowExecutionCancelRequestedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ExternalWorkflowExecutionCancelRequestedEventAttributes) -> String
+
           # id of the `REQUEST_CANCEL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED` event this event corresponds
           #  to
           #
@@ -2300,6 +2428,10 @@ module Temporalio
         end
 
         class SignalExternalWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (SignalExternalWorkflowExecutionInitiatedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2409,6 +2541,10 @@ module Temporalio
         end
 
         class SignalExternalWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (SignalExternalWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause
 
           def cause=: (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values) -> ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::values
@@ -2491,6 +2627,10 @@ module Temporalio
         end
 
         class ExternalWorkflowExecutionSignaledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ExternalWorkflowExecutionSignaledEventAttributes) -> String
+
           # id of the `SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_INITIATED` event this event corresponds to
           #
           attr_accessor initiated_event_id(): ::Integer
@@ -2557,6 +2697,10 @@ module Temporalio
         end
 
         class UpsertWorkflowSearchAttributesEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (UpsertWorkflowSearchAttributesEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2600,6 +2744,10 @@ module Temporalio
         end
 
         class WorkflowPropertiesModifiedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowPropertiesModifiedEventAttributes) -> String
+
           # The `WORKFLOW_TASK_COMPLETED` event which this command was reported with
           #
           attr_accessor workflow_task_completed_event_id(): ::Integer
@@ -2651,6 +2799,10 @@ module Temporalio
         end
 
         class StartChildWorkflowExecutionInitiatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StartChildWorkflowExecutionInitiatedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -2861,6 +3013,10 @@ module Temporalio
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StartChildWorkflowExecutionFailedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -2951,6 +3107,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionStartedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionStartedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3029,6 +3189,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionCompletedEventAttributes) -> String
+
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payloads?
 
           def result=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -3115,6 +3279,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionFailedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionFailedEventAttributes) -> String
+
           attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
 
           def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
@@ -3211,6 +3379,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionCanceledEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionCanceledEventAttributes) -> String
+
           attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
 
           def details=: [M < ::Temporalio::Api::Common::V1::Payloads::_ToProto] (M?) -> M?
@@ -3297,6 +3469,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionTimedOutEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionTimedOutEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3383,6 +3559,10 @@ module Temporalio
         end
 
         class ChildWorkflowExecutionTerminatedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowExecutionTerminatedEventAttributes) -> String
+
           # Namespace of the child workflow.
           #  SDKs and UI tools should use `namespace` field but server must use `namespace_id` only.
           #
@@ -3458,142 +3638,11 @@ module Temporalio
           type hash[KEY] = ::Hash[KEY, ChildWorkflowExecutionTerminatedEventAttributes | _ToProto]
         end
 
-        class WorkflowUpdateAcceptedEventAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
-
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
-
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
-
-          attr_accessor input(): ::Temporalio::Api::Interaction::V1::Input?
-
-          def input=: [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (M?) -> M?
-                    | ...
-
-          def input!: () -> ::Temporalio::Api::Interaction::V1::Input?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?input: ::Temporalio::Api::Interaction::V1::Input::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:input) -> ::Temporalio::Api::Interaction::V1::Input?
-                | (::Symbol) -> untyped
-
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:input, ::Temporalio::Api::Interaction::V1::Input?) -> ::Temporalio::Api::Interaction::V1::Input?
-                 | [M < ::Temporalio::Api::Interaction::V1::Input::_ToProto] (:input, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> WorkflowUpdateAcceptedEventAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = WorkflowUpdateAcceptedEventAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateAcceptedEventAttributes, WorkflowUpdateAcceptedEventAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateAcceptedEventAttributes, WorkflowUpdateAcceptedEventAttributes | _ToProto]
-
-          type array = ::Array[WorkflowUpdateAcceptedEventAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, WorkflowUpdateAcceptedEventAttributes | _ToProto]
-        end
-
-        class WorkflowUpdateCompletedEventAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
-
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
-
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
-
-          attr_accessor output(): ::Temporalio::Api::Interaction::V1::Output?
-
-          def output=: [M < ::Temporalio::Api::Interaction::V1::Output::_ToProto] (M?) -> M?
-                     | ...
-
-          def output!: () -> ::Temporalio::Api::Interaction::V1::Output?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?output: ::Temporalio::Api::Interaction::V1::Output::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:output) -> ::Temporalio::Api::Interaction::V1::Output?
-                | (::Symbol) -> untyped
-
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:output, ::Temporalio::Api::Interaction::V1::Output?) -> ::Temporalio::Api::Interaction::V1::Output?
-                 | [M < ::Temporalio::Api::Interaction::V1::Output::_ToProto] (:output, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> WorkflowUpdateCompletedEventAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = WorkflowUpdateCompletedEventAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateCompletedEventAttributes, WorkflowUpdateCompletedEventAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateCompletedEventAttributes, WorkflowUpdateCompletedEventAttributes | _ToProto]
-
-          type array = ::Array[WorkflowUpdateCompletedEventAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, WorkflowUpdateCompletedEventAttributes | _ToProto]
-        end
-
-        class WorkflowUpdateRejectedEventAttributes < ::Protobuf::Message
-          attr_accessor meta(): ::Temporalio::Api::Interaction::V1::Meta?
-
-          def meta=: [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (M?) -> M?
-                   | ...
-
-          def meta!: () -> ::Temporalio::Api::Interaction::V1::Meta?
-
-          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
-
-          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                      | ...
-
-          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
-
-          def initialize: (?meta: ::Temporalio::Api::Interaction::V1::Meta::init?, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
-
-          def []: (:meta) -> ::Temporalio::Api::Interaction::V1::Meta?
-                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-                | (::Symbol) -> untyped
-
-          def []=: (:meta, ::Temporalio::Api::Interaction::V1::Meta?) -> ::Temporalio::Api::Interaction::V1::Meta?
-                 | [M < ::Temporalio::Api::Interaction::V1::Meta::_ToProto] (:meta, M?) -> M?
-                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-                 | (::Symbol, untyped) -> untyped
-
-          interface _ToProto
-            def to_proto: () -> WorkflowUpdateRejectedEventAttributes
-          end
-
-          # The type of `#initialize` parameter.
-          type init = WorkflowUpdateRejectedEventAttributes | _ToProto
-
-          # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateRejectedEventAttributes, WorkflowUpdateRejectedEventAttributes | _ToProto]
-
-          # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateRejectedEventAttributes, WorkflowUpdateRejectedEventAttributes | _ToProto]
-
-          type array = ::Array[WorkflowUpdateRejectedEventAttributes | _ToProto]
-
-          type hash[KEY] = ::Hash[KEY, WorkflowUpdateRejectedEventAttributes | _ToProto]
-        end
-
         class WorkflowPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowPropertiesModifiedExternallyEventAttributes) -> String
+
           # If set to a nonempty string, future workflow tasks for this workflow shall be dispatched on
           #  the provided queue.
           #
@@ -3688,6 +3737,10 @@ module Temporalio
         end
 
         class ActivityPropertiesModifiedExternallyEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ActivityPropertiesModifiedExternallyEventAttributes) -> String
+
           # The id of the `ACTIVITY_TASK_SCHEDULED` event this modification corresponds to.
           #
           attr_accessor scheduled_event_id(): ::Integer
@@ -3736,10 +3789,227 @@ module Temporalio
           type hash[KEY] = ::Hash[KEY, ActivityPropertiesModifiedExternallyEventAttributes | _ToProto]
         end
 
+        class WorkflowExecutionUpdateAcceptedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionUpdateAcceptedEventAttributes) -> String
+
+          # The instance ID of the update protocol that generated this event.
+          #
+          attr_accessor protocol_instance_id(): ::String
+
+          def protocol_instance_id!: () -> ::String?
+
+          # The message ID of the original request message that initiated this
+          #  update. Needed so that the worker can recreate and deliver that same
+          #  message as part of replay.
+          #
+          attr_accessor accepted_request_message_id(): ::String
+
+          def accepted_request_message_id!: () -> ::String?
+
+          # The event ID used to sequence the original request message.
+          #
+          attr_accessor accepted_request_sequencing_event_id(): ::Integer
+
+          def accepted_request_sequencing_event_id!: () -> ::Integer?
+
+          # The message payload of the original request message that initiated this
+          #  update.
+          #
+          attr_accessor accepted_request(): ::Temporalio::Api::Update::V1::Request?
+
+          # The message payload of the original request message that initiated this
+          #  update.
+          #
+          def accepted_request=: [M < ::Temporalio::Api::Update::V1::Request::_ToProto] (M?) -> M?
+                               | ...
+
+          def accepted_request!: () -> ::Temporalio::Api::Update::V1::Request?
+
+          def initialize: (?protocol_instance_id: ::String, ?accepted_request_message_id: ::String, ?accepted_request_sequencing_event_id: ::Integer, ?accepted_request: ::Temporalio::Api::Update::V1::Request::init?) -> void
+
+          def []: (:protocol_instance_id) -> ::String
+                | (:accepted_request_message_id) -> ::String
+                | (:accepted_request_sequencing_event_id) -> ::Integer
+                | (:accepted_request) -> ::Temporalio::Api::Update::V1::Request?
+                | (::Symbol) -> untyped
+
+          def []=: (:protocol_instance_id, ::String) -> ::String
+                 | (:accepted_request_message_id, ::String) -> ::String
+                 | (:accepted_request_sequencing_event_id, ::Integer) -> ::Integer
+                 | (:accepted_request, ::Temporalio::Api::Update::V1::Request?) -> ::Temporalio::Api::Update::V1::Request?
+                 | [M < ::Temporalio::Api::Update::V1::Request::_ToProto] (:accepted_request, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionUpdateAcceptedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionUpdateAcceptedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionUpdateAcceptedEventAttributes, WorkflowExecutionUpdateAcceptedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionUpdateAcceptedEventAttributes, WorkflowExecutionUpdateAcceptedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowExecutionUpdateAcceptedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionUpdateAcceptedEventAttributes | _ToProto]
+        end
+
+        class WorkflowExecutionUpdateCompletedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionUpdateCompletedEventAttributes) -> String
+
+          # The metadata about this update.
+          #
+          attr_accessor meta(): ::Temporalio::Api::Update::V1::Meta?
+
+          # The metadata about this update.
+          #
+          def meta=: [M < ::Temporalio::Api::Update::V1::Meta::_ToProto] (M?) -> M?
+                   | ...
+
+          def meta!: () -> ::Temporalio::Api::Update::V1::Meta?
+
+          # The outcome of executing the workflow update function.
+          #
+          attr_accessor outcome(): ::Temporalio::Api::Update::V1::Outcome?
+
+          # The outcome of executing the workflow update function.
+          #
+          def outcome=: [M < ::Temporalio::Api::Update::V1::Outcome::_ToProto] (M?) -> M?
+                      | ...
+
+          def outcome!: () -> ::Temporalio::Api::Update::V1::Outcome?
+
+          def initialize: (?meta: ::Temporalio::Api::Update::V1::Meta::init?, ?outcome: ::Temporalio::Api::Update::V1::Outcome::init?) -> void
+
+          def []: (:meta) -> ::Temporalio::Api::Update::V1::Meta?
+                | (:outcome) -> ::Temporalio::Api::Update::V1::Outcome?
+                | (::Symbol) -> untyped
+
+          def []=: (:meta, ::Temporalio::Api::Update::V1::Meta?) -> ::Temporalio::Api::Update::V1::Meta?
+                 | [M < ::Temporalio::Api::Update::V1::Meta::_ToProto] (:meta, M?) -> M?
+                 | (:outcome, ::Temporalio::Api::Update::V1::Outcome?) -> ::Temporalio::Api::Update::V1::Outcome?
+                 | [M < ::Temporalio::Api::Update::V1::Outcome::_ToProto] (:outcome, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionUpdateCompletedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionUpdateCompletedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionUpdateCompletedEventAttributes, WorkflowExecutionUpdateCompletedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionUpdateCompletedEventAttributes, WorkflowExecutionUpdateCompletedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowExecutionUpdateCompletedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionUpdateCompletedEventAttributes | _ToProto]
+        end
+
+        class WorkflowExecutionUpdateRejectedEventAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionUpdateRejectedEventAttributes) -> String
+
+          # The instance ID of the update protocol that generated this event.
+          #
+          attr_accessor protocol_instance_id(): ::String
+
+          def protocol_instance_id!: () -> ::String?
+
+          # The message ID of the original request message that initiated this
+          #  update. Needed so that the worker can recreate and deliver that same
+          #  message as part of replay.
+          #
+          attr_accessor rejected_request_message_id(): ::String
+
+          def rejected_request_message_id!: () -> ::String?
+
+          # The event ID used to sequence the original request message.
+          #
+          attr_accessor rejected_request_sequencing_event_id(): ::Integer
+
+          def rejected_request_sequencing_event_id!: () -> ::Integer?
+
+          # The message payload of the original request message that initiated this
+          #  update.
+          #
+          attr_accessor rejected_request(): ::Temporalio::Api::Update::V1::Request?
+
+          # The message payload of the original request message that initiated this
+          #  update.
+          #
+          def rejected_request=: [M < ::Temporalio::Api::Update::V1::Request::_ToProto] (M?) -> M?
+                               | ...
+
+          def rejected_request!: () -> ::Temporalio::Api::Update::V1::Request?
+
+          # The cause of rejection.
+          #
+          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+
+          # The cause of rejection.
+          #
+          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+
+          def initialize: (?protocol_instance_id: ::String, ?rejected_request_message_id: ::String, ?rejected_request_sequencing_event_id: ::Integer, ?rejected_request: ::Temporalio::Api::Update::V1::Request::init?, ?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:protocol_instance_id) -> ::String
+                | (:rejected_request_message_id) -> ::String
+                | (:rejected_request_sequencing_event_id) -> ::Integer
+                | (:rejected_request) -> ::Temporalio::Api::Update::V1::Request?
+                | (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:protocol_instance_id, ::String) -> ::String
+                 | (:rejected_request_message_id, ::String) -> ::String
+                 | (:rejected_request_sequencing_event_id, ::Integer) -> ::Integer
+                 | (:rejected_request, ::Temporalio::Api::Update::V1::Request?) -> ::Temporalio::Api::Update::V1::Request?
+                 | [M < ::Temporalio::Api::Update::V1::Request::_ToProto] (:rejected_request, M?) -> M?
+                 | (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> WorkflowExecutionUpdateRejectedEventAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = WorkflowExecutionUpdateRejectedEventAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowExecutionUpdateRejectedEventAttributes, WorkflowExecutionUpdateRejectedEventAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowExecutionUpdateRejectedEventAttributes, WorkflowExecutionUpdateRejectedEventAttributes | _ToProto]
+
+          type array = ::Array[WorkflowExecutionUpdateRejectedEventAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, WorkflowExecutionUpdateRejectedEventAttributes | _ToProto]
+        end
+
         # History events are the method by which Temporal SDKs advance (or recreate) workflow state.
         #  See the `EventType` enum for more info about what each event is for.
         #
         class HistoryEvent < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (HistoryEvent) -> String
+
           # Monotonically increasing event number, starts at 1.
           #
           attr_accessor event_id(): ::Integer
@@ -4061,26 +4331,26 @@ module Temporalio
 
           def upsert_workflow_search_attributes_event_attributes!: () -> ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
 
-          attr_accessor workflow_update_rejected_event_attributes(): ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
+          attr_accessor workflow_execution_update_accepted_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes?
 
-          def workflow_update_rejected_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes::_ToProto] (M?) -> M?
-                                                        | ...
+          def workflow_execution_update_accepted_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes::_ToProto] (M?) -> M?
+                                                                  | ...
 
-          def workflow_update_rejected_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
+          def workflow_execution_update_accepted_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes?
 
-          attr_accessor workflow_update_accepted_event_attributes(): ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+          attr_accessor workflow_execution_update_rejected_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes?
 
-          def workflow_update_accepted_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::_ToProto] (M?) -> M?
-                                                        | ...
+          def workflow_execution_update_rejected_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes::_ToProto] (M?) -> M?
+                                                                  | ...
 
-          def workflow_update_accepted_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
+          def workflow_execution_update_rejected_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes?
 
-          attr_accessor workflow_update_completed_event_attributes(): ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+          attr_accessor workflow_execution_update_completed_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes?
 
-          def workflow_update_completed_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes::_ToProto] (M?) -> M?
-                                                         | ...
+          def workflow_execution_update_completed_event_attributes=: [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes::_ToProto] (M?) -> M?
+                                                                   | ...
 
-          def workflow_update_completed_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+          def workflow_execution_update_completed_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes?
 
           attr_accessor workflow_properties_modified_externally_event_attributes(): ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
 
@@ -4103,7 +4373,7 @@ module Temporalio
 
           def workflow_properties_modified_event_attributes!: () -> ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
 
-          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporalio::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?worker_may_ignore: bool, ?workflow_execution_started_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporalio::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporalio::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporalio::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporalio::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?, ?workflow_update_rejected_event_attributes: ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes::init?, ?workflow_update_accepted_event_attributes: ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::init?, ?workflow_update_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes::init?, ?workflow_properties_modified_externally_event_attributes: ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::init?, ?activity_properties_modified_externally_event_attributes: ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::init?, ?workflow_properties_modified_event_attributes: ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes::init?) -> void
+          def initialize: (?event_id: ::Integer, ?event_time: ::Google::Protobuf::Timestamp::init?, ?event_type: ::Temporalio::Api::Enums::V1::EventType::init, ?version: ::Integer, ?task_id: ::Integer, ?worker_may_ignore: bool, ?workflow_execution_started_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init?, ?workflow_execution_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init?, ?workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes::init?, ?workflow_execution_timed_out_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionTimedOutEventAttributes::init?, ?workflow_task_scheduled_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskScheduledEventAttributes::init?, ?workflow_task_started_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskStartedEventAttributes::init?, ?workflow_task_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskCompletedEventAttributes::init?, ?workflow_task_timed_out_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskTimedOutEventAttributes::init?, ?workflow_task_failed_event_attributes: ::Temporalio::Api::History::V1::WorkflowTaskFailedEventAttributes::init?, ?activity_task_scheduled_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskScheduledEventAttributes::init?, ?activity_task_started_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskStartedEventAttributes::init?, ?activity_task_completed_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCompletedEventAttributes::init?, ?activity_task_failed_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes::init?, ?activity_task_timed_out_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskTimedOutEventAttributes::init?, ?timer_started_event_attributes: ::Temporalio::Api::History::V1::TimerStartedEventAttributes::init?, ?timer_fired_event_attributes: ::Temporalio::Api::History::V1::TimerFiredEventAttributes::init?, ?activity_task_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCancelRequestedEventAttributes::init?, ?activity_task_canceled_event_attributes: ::Temporalio::Api::History::V1::ActivityTaskCanceledEventAttributes::init?, ?timer_canceled_event_attributes: ::Temporalio::Api::History::V1::TimerCanceledEventAttributes::init?, ?marker_recorded_event_attributes: ::Temporalio::Api::History::V1::MarkerRecordedEventAttributes::init?, ?workflow_execution_signaled_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionSignaledEventAttributes::init?, ?workflow_execution_terminated_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionTerminatedEventAttributes::init?, ?workflow_execution_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_canceled_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionCanceledEventAttributes::init?, ?request_cancel_external_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes::init?, ?request_cancel_external_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_cancel_requested_event_attributes: ::Temporalio::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes::init?, ?workflow_execution_continued_as_new_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes::init?, ?start_child_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes::init?, ?start_child_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_started_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes::init?, ?child_workflow_execution_completed_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes::init?, ?child_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes::init?, ?child_workflow_execution_canceled_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes::init?, ?child_workflow_execution_timed_out_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes::init?, ?child_workflow_execution_terminated_event_attributes: ::Temporalio::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes::init?, ?signal_external_workflow_execution_initiated_event_attributes: ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes::init?, ?signal_external_workflow_execution_failed_event_attributes: ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes::init?, ?external_workflow_execution_signaled_event_attributes: ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::init?, ?upsert_workflow_search_attributes_event_attributes: ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::init?, ?workflow_execution_update_accepted_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes::init?, ?workflow_execution_update_rejected_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes::init?, ?workflow_execution_update_completed_event_attributes: ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes::init?, ?workflow_properties_modified_externally_event_attributes: ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::init?, ?activity_properties_modified_externally_event_attributes: ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes::init?, ?workflow_properties_modified_event_attributes: ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes::init?) -> void
 
           def []: (:event_id) -> ::Integer
                 | (:event_time) -> ::Google::Protobuf::Timestamp?
@@ -4151,9 +4421,9 @@ module Temporalio
                 | (:signal_external_workflow_execution_failed_event_attributes) -> ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes?
                 | (:external_workflow_execution_signaled_event_attributes) -> ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes?
                 | (:upsert_workflow_search_attributes_event_attributes) -> ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
-                | (:workflow_update_rejected_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
-                | (:workflow_update_accepted_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
-                | (:workflow_update_completed_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
+                | (:workflow_execution_update_accepted_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes?
+                | (:workflow_execution_update_rejected_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes?
+                | (:workflow_execution_update_completed_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes?
                 | (:workflow_properties_modified_externally_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
                 | (:activity_properties_modified_externally_event_attributes) -> ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
                 | (:workflow_properties_modified_event_attributes) -> ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes?
@@ -4247,12 +4517,12 @@ module Temporalio
                  | [M < ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes::_ToProto] (:external_workflow_execution_signaled_event_attributes, M?) -> M?
                  | (:upsert_workflow_search_attributes_event_attributes, ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?) -> ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes?
                  | [M < ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes::_ToProto] (:upsert_workflow_search_attributes_event_attributes, M?) -> M?
-                 | (:workflow_update_rejected_event_attributes, ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes?
-                 | [M < ::Temporalio::Api::History::V1::WorkflowUpdateRejectedEventAttributes::_ToProto] (:workflow_update_rejected_event_attributes, M?) -> M?
-                 | (:workflow_update_accepted_event_attributes, ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes?
-                 | [M < ::Temporalio::Api::History::V1::WorkflowUpdateAcceptedEventAttributes::_ToProto] (:workflow_update_accepted_event_attributes, M?) -> M?
-                 | (:workflow_update_completed_event_attributes, ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes?
-                 | [M < ::Temporalio::Api::History::V1::WorkflowUpdateCompletedEventAttributes::_ToProto] (:workflow_update_completed_event_attributes, M?) -> M?
+                 | (:workflow_execution_update_accepted_event_attributes, ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes?
+                 | [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes::_ToProto] (:workflow_execution_update_accepted_event_attributes, M?) -> M?
+                 | (:workflow_execution_update_rejected_event_attributes, ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes?
+                 | [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes::_ToProto] (:workflow_execution_update_rejected_event_attributes, M?) -> M?
+                 | (:workflow_execution_update_completed_event_attributes, ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes?
+                 | [M < ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes::_ToProto] (:workflow_execution_update_completed_event_attributes, M?) -> M?
                  | (:workflow_properties_modified_externally_event_attributes, ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?) -> ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes?
                  | [M < ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes::_ToProto] (:workflow_properties_modified_externally_event_attributes, M?) -> M?
                  | (:activity_properties_modified_externally_event_attributes, ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?) -> ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes?
@@ -4282,6 +4552,10 @@ module Temporalio
         end
 
         class History < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (History) -> String
+
           attr_accessor events(): ::Temporalio::Api::History::V1::HistoryEvent::field_array
 
           def events=: (::Temporalio::Api::History::V1::HistoryEvent::array) -> ::Temporalio::Api::History::V1::HistoryEvent::array

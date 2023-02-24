@@ -1,1696 +1,1784 @@
-module Coresdk
-  module WorkflowCommands
-    class ActivityCancellationType < ::Protobuf::Enum
-      type names = :TRY_CANCEL | :WAIT_CANCELLATION_COMPLETED | :ABANDON
+module Temporalio
+  module Bridge
+    module Api
+      module WorkflowCommands
+        class ActivityCancellationType < ::Protobuf::Enum
+          type names = :TRY_CANCEL | :WAIT_CANCELLATION_COMPLETED | :ABANDON
 
-      type strings = "TRY_CANCEL" | "WAIT_CANCELLATION_COMPLETED" | "ABANDON"
+          type strings = "TRY_CANCEL" | "WAIT_CANCELLATION_COMPLETED" | "ABANDON"
 
-      type tags = 0 | 1 | 2
+          type tags = 0 | 1 | 2
 
-      type values = names | strings | tags
+          type values = names | strings | tags
 
-      attr_reader name(): names
+          attr_reader name(): names
 
-      attr_reader tag(): tags
+          attr_reader tag(): tags
 
-      # / Initiate a cancellation request and immediately report cancellation to the workflow.
-      #
-      TRY_CANCEL: ActivityCancellationType
+          # / Initiate a cancellation request and immediately report cancellation to the workflow.
+          #
+          TRY_CANCEL: ActivityCancellationType
 
-      # / Wait for activity cancellation completion. Note that activity must heartbeat to receive a
-      # / cancellation notification. This can block the cancellation for a long time if activity
-      # / doesn't heartbeat or chooses to ignore the cancellation request.
-      #
-      WAIT_CANCELLATION_COMPLETED: ActivityCancellationType
+          # / Wait for activity cancellation completion. Note that activity must heartbeat to receive a
+          # / cancellation notification. This can block the cancellation for a long time if activity
+          # / doesn't heartbeat or chooses to ignore the cancellation request.
+          #
+          WAIT_CANCELLATION_COMPLETED: ActivityCancellationType
 
-      # / Do not request cancellation of the activity and immediately report cancellation to the
-      # / workflow
-      #
-      ABANDON: ActivityCancellationType
+          # / Do not request cancellation of the activity and immediately report cancellation to the
+          # / workflow
+          #
+          ABANDON: ActivityCancellationType
 
-      # The type of `#initialize` parameter.
-      type init = ActivityCancellationType | values
+          # The type of `#initialize` parameter.
+          type init = ActivityCancellationType | values
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ActivityCancellationType, ActivityCancellationType | values]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ActivityCancellationType, ActivityCancellationType | values]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityCancellationType, ActivityCancellationType | values]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ActivityCancellationType, ActivityCancellationType | values]
 
-      type array = ::Array[ActivityCancellationType | values]
+          type array = ::Array[ActivityCancellationType | values]
 
-      type hash[KEY] = ::Hash[KEY, ActivityCancellationType | values]
-    end
+          type hash[KEY] = ::Hash[KEY, ActivityCancellationType | values]
+        end
 
-    class WorkflowCommand < ::Protobuf::Message
-      attr_accessor start_timer(): ::Coresdk::WorkflowCommands::StartTimer?
+        class WorkflowCommand < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowCommand) -> String
 
-      def start_timer=: [M < ::Coresdk::WorkflowCommands::StartTimer::_ToProto] (M?) -> M?
-                      | ...
+          attr_accessor start_timer(): ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?
 
-      def start_timer!: () -> ::Coresdk::WorkflowCommands::StartTimer?
+          def start_timer=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer::_ToProto] (M?) -> M?
+                          | ...
 
-      attr_accessor schedule_activity(): ::Coresdk::WorkflowCommands::ScheduleActivity?
+          def start_timer!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?
 
-      def schedule_activity=: [M < ::Coresdk::WorkflowCommands::ScheduleActivity::_ToProto] (M?) -> M?
-                            | ...
+          attr_accessor schedule_activity(): ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity?
 
-      def schedule_activity!: () -> ::Coresdk::WorkflowCommands::ScheduleActivity?
+          def schedule_activity=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity::_ToProto] (M?) -> M?
+                                | ...
 
-      attr_accessor respond_to_query(): ::Coresdk::WorkflowCommands::QueryResult?
+          def schedule_activity!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity?
 
-      def respond_to_query=: [M < ::Coresdk::WorkflowCommands::QueryResult::_ToProto] (M?) -> M?
-                           | ...
+          attr_accessor respond_to_query(): ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult?
 
-      def respond_to_query!: () -> ::Coresdk::WorkflowCommands::QueryResult?
+          def respond_to_query=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult::_ToProto] (M?) -> M?
+                               | ...
 
-      attr_accessor request_cancel_activity(): ::Coresdk::WorkflowCommands::RequestCancelActivity?
+          def respond_to_query!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult?
 
-      def request_cancel_activity=: [M < ::Coresdk::WorkflowCommands::RequestCancelActivity::_ToProto] (M?) -> M?
-                                  | ...
+          attr_accessor request_cancel_activity(): ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity?
 
-      def request_cancel_activity!: () -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
-
-      attr_accessor cancel_timer(): ::Coresdk::WorkflowCommands::CancelTimer?
-
-      def cancel_timer=: [M < ::Coresdk::WorkflowCommands::CancelTimer::_ToProto] (M?) -> M?
-                       | ...
-
-      def cancel_timer!: () -> ::Coresdk::WorkflowCommands::CancelTimer?
-
-      attr_accessor complete_workflow_execution(): ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
-
-      def complete_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (M?) -> M?
+          def request_cancel_activity=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity::_ToProto] (M?) -> M?
                                       | ...
 
-      def complete_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
+          def request_cancel_activity!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity?
 
-      attr_accessor fail_workflow_execution(): ::Coresdk::WorkflowCommands::FailWorkflowExecution?
+          attr_accessor cancel_timer(): ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer?
 
-      def fail_workflow_execution=: [M < ::Coresdk::WorkflowCommands::FailWorkflowExecution::_ToProto] (M?) -> M?
-                                  | ...
-
-      def fail_workflow_execution!: () -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
-
-      attr_accessor continue_as_new_workflow_execution(): ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
-
-      def continue_as_new_workflow_execution=: [M < ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (M?) -> M?
-                                             | ...
-
-      def continue_as_new_workflow_execution!: () -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
-
-      attr_accessor cancel_workflow_execution(): ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
-
-      def cancel_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CancelWorkflowExecution::_ToProto] (M?) -> M?
-                                    | ...
-
-      def cancel_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
-
-      attr_accessor set_patch_marker(): ::Coresdk::WorkflowCommands::SetPatchMarker?
-
-      def set_patch_marker=: [M < ::Coresdk::WorkflowCommands::SetPatchMarker::_ToProto] (M?) -> M?
+          def cancel_timer=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer::_ToProto] (M?) -> M?
                            | ...
 
-      def set_patch_marker!: () -> ::Coresdk::WorkflowCommands::SetPatchMarker?
+          def cancel_timer!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer?
 
-      attr_accessor start_child_workflow_execution(): ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
+          attr_accessor complete_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution?
 
-      def start_child_workflow_execution=: [M < ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (M?) -> M?
-                                         | ...
-
-      def start_child_workflow_execution!: () -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
-
-      attr_accessor cancel_child_workflow_execution(): ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
-
-      def cancel_child_workflow_execution=: [M < ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (M?) -> M?
+          def complete_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (M?) -> M?
                                           | ...
 
-      def cancel_child_workflow_execution!: () -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
+          def complete_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution?
 
-      attr_accessor request_cancel_external_workflow_execution(): ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+          attr_accessor fail_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution?
 
-      def request_cancel_external_workflow_execution=: [M < ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (M?) -> M?
-                                                     | ...
+          def fail_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution::_ToProto] (M?) -> M?
+                                      | ...
 
-      def request_cancel_external_workflow_execution!: () -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+          def fail_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution?
 
-      attr_accessor signal_external_workflow_execution(): ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
+          attr_accessor continue_as_new_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution?
 
-      def signal_external_workflow_execution=: [M < ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (M?) -> M?
-                                             | ...
+          def continue_as_new_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (M?) -> M?
+                                                 | ...
 
-      def signal_external_workflow_execution!: () -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
+          def continue_as_new_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution?
 
-      attr_accessor cancel_signal_workflow(): ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
+          attr_accessor cancel_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution?
 
-      def cancel_signal_workflow=: [M < ::Coresdk::WorkflowCommands::CancelSignalWorkflow::_ToProto] (M?) -> M?
-                                 | ...
-
-      def cancel_signal_workflow!: () -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
-
-      attr_accessor schedule_local_activity(): ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
-
-      def schedule_local_activity=: [M < ::Coresdk::WorkflowCommands::ScheduleLocalActivity::_ToProto] (M?) -> M?
-                                  | ...
-
-      def schedule_local_activity!: () -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
-
-      attr_accessor request_cancel_local_activity(): ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
-
-      def request_cancel_local_activity=: [M < ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (M?) -> M?
+          def cancel_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution::_ToProto] (M?) -> M?
                                         | ...
 
-      def request_cancel_local_activity!: () -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
+          def cancel_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution?
 
-      attr_accessor upsert_workflow_search_attributes(): ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
+          attr_accessor set_patch_marker(): ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker?
 
-      def upsert_workflow_search_attributes=: [M < ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (M?) -> M?
+          def set_patch_marker=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker::_ToProto] (M?) -> M?
+                               | ...
+
+          def set_patch_marker!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker?
+
+          attr_accessor start_child_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution?
+
+          def start_child_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (M?) -> M?
+                                             | ...
+
+          def start_child_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution?
+
+          attr_accessor cancel_child_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution?
+
+          def cancel_child_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (M?) -> M?
+                                              | ...
+
+          def cancel_child_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution?
+
+          attr_accessor request_cancel_external_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+
+          def request_cancel_external_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (M?) -> M?
+                                                         | ...
+
+          def request_cancel_external_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+
+          attr_accessor signal_external_workflow_execution(): ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution?
+
+          def signal_external_workflow_execution=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (M?) -> M?
+                                                 | ...
+
+          def signal_external_workflow_execution!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution?
+
+          attr_accessor cancel_signal_workflow(): ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow?
+
+          def cancel_signal_workflow=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow::_ToProto] (M?) -> M?
+                                     | ...
+
+          def cancel_signal_workflow!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow?
+
+          attr_accessor schedule_local_activity(): ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity?
+
+          def schedule_local_activity=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity::_ToProto] (M?) -> M?
+                                      | ...
+
+          def schedule_local_activity!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity?
+
+          attr_accessor request_cancel_local_activity(): ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity?
+
+          def request_cancel_local_activity=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (M?) -> M?
                                             | ...
 
-      def upsert_workflow_search_attributes!: () -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
+          def request_cancel_local_activity!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity?
 
-      attr_accessor modify_workflow_properties(): ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
+          attr_accessor upsert_workflow_search_attributes(): ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes?
 
-      def modify_workflow_properties=: [M < ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (M?) -> M?
-                                     | ...
+          def upsert_workflow_search_attributes=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (M?) -> M?
+                                                | ...
 
-      def modify_workflow_properties!: () -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
+          def upsert_workflow_search_attributes!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes?
 
-      def initialize: (?start_timer: ::Coresdk::WorkflowCommands::StartTimer::init?, ?schedule_activity: ::Coresdk::WorkflowCommands::ScheduleActivity::init?, ?respond_to_query: ::Coresdk::WorkflowCommands::QueryResult::init?, ?request_cancel_activity: ::Coresdk::WorkflowCommands::RequestCancelActivity::init?, ?cancel_timer: ::Coresdk::WorkflowCommands::CancelTimer::init?, ?complete_workflow_execution: ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::init?, ?fail_workflow_execution: ::Coresdk::WorkflowCommands::FailWorkflowExecution::init?, ?continue_as_new_workflow_execution: ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::init?, ?cancel_workflow_execution: ::Coresdk::WorkflowCommands::CancelWorkflowExecution::init?, ?set_patch_marker: ::Coresdk::WorkflowCommands::SetPatchMarker::init?, ?start_child_workflow_execution: ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::init?, ?cancel_child_workflow_execution: ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::init?, ?request_cancel_external_workflow_execution: ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::init?, ?signal_external_workflow_execution: ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::init?, ?cancel_signal_workflow: ::Coresdk::WorkflowCommands::CancelSignalWorkflow::init?, ?schedule_local_activity: ::Coresdk::WorkflowCommands::ScheduleLocalActivity::init?, ?request_cancel_local_activity: ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::init?, ?upsert_workflow_search_attributes: ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::init?, ?modify_workflow_properties: ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::init?) -> void
+          attr_accessor modify_workflow_properties(): ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties?
 
-      def []: (:start_timer) -> ::Coresdk::WorkflowCommands::StartTimer?
-            | (:schedule_activity) -> ::Coresdk::WorkflowCommands::ScheduleActivity?
-            | (:respond_to_query) -> ::Coresdk::WorkflowCommands::QueryResult?
-            | (:request_cancel_activity) -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
-            | (:cancel_timer) -> ::Coresdk::WorkflowCommands::CancelTimer?
-            | (:complete_workflow_execution) -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
-            | (:fail_workflow_execution) -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
-            | (:continue_as_new_workflow_execution) -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
-            | (:cancel_workflow_execution) -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
-            | (:set_patch_marker) -> ::Coresdk::WorkflowCommands::SetPatchMarker?
-            | (:start_child_workflow_execution) -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
-            | (:cancel_child_workflow_execution) -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
-            | (:request_cancel_external_workflow_execution) -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
-            | (:signal_external_workflow_execution) -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
-            | (:cancel_signal_workflow) -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
-            | (:schedule_local_activity) -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
-            | (:request_cancel_local_activity) -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
-            | (:upsert_workflow_search_attributes) -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
-            | (:modify_workflow_properties) -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
-            | (::Symbol) -> untyped
+          def modify_workflow_properties=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (M?) -> M?
+                                         | ...
 
-      def []=: (:start_timer, ::Coresdk::WorkflowCommands::StartTimer?) -> ::Coresdk::WorkflowCommands::StartTimer?
-             | [M < ::Coresdk::WorkflowCommands::StartTimer::_ToProto] (:start_timer, M?) -> M?
-             | (:schedule_activity, ::Coresdk::WorkflowCommands::ScheduleActivity?) -> ::Coresdk::WorkflowCommands::ScheduleActivity?
-             | [M < ::Coresdk::WorkflowCommands::ScheduleActivity::_ToProto] (:schedule_activity, M?) -> M?
-             | (:respond_to_query, ::Coresdk::WorkflowCommands::QueryResult?) -> ::Coresdk::WorkflowCommands::QueryResult?
-             | [M < ::Coresdk::WorkflowCommands::QueryResult::_ToProto] (:respond_to_query, M?) -> M?
-             | (:request_cancel_activity, ::Coresdk::WorkflowCommands::RequestCancelActivity?) -> ::Coresdk::WorkflowCommands::RequestCancelActivity?
-             | [M < ::Coresdk::WorkflowCommands::RequestCancelActivity::_ToProto] (:request_cancel_activity, M?) -> M?
-             | (:cancel_timer, ::Coresdk::WorkflowCommands::CancelTimer?) -> ::Coresdk::WorkflowCommands::CancelTimer?
-             | [M < ::Coresdk::WorkflowCommands::CancelTimer::_ToProto] (:cancel_timer, M?) -> M?
-             | (:complete_workflow_execution, ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CompleteWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (:complete_workflow_execution, M?) -> M?
-             | (:fail_workflow_execution, ::Coresdk::WorkflowCommands::FailWorkflowExecution?) -> ::Coresdk::WorkflowCommands::FailWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::FailWorkflowExecution::_ToProto] (:fail_workflow_execution, M?) -> M?
-             | (:continue_as_new_workflow_execution, ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?) -> ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (:continue_as_new_workflow_execution, M?) -> M?
-             | (:cancel_workflow_execution, ::Coresdk::WorkflowCommands::CancelWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CancelWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::CancelWorkflowExecution::_ToProto] (:cancel_workflow_execution, M?) -> M?
-             | (:set_patch_marker, ::Coresdk::WorkflowCommands::SetPatchMarker?) -> ::Coresdk::WorkflowCommands::SetPatchMarker?
-             | [M < ::Coresdk::WorkflowCommands::SetPatchMarker::_ToProto] (:set_patch_marker, M?) -> M?
-             | (:start_child_workflow_execution, ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?) -> ::Coresdk::WorkflowCommands::StartChildWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (:start_child_workflow_execution, M?) -> M?
-             | (:cancel_child_workflow_execution, ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?) -> ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (:cancel_child_workflow_execution, M?) -> M?
-             | (:request_cancel_external_workflow_execution, ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?) -> ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (:request_cancel_external_workflow_execution, M?) -> M?
-             | (:signal_external_workflow_execution, ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?) -> ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution?
-             | [M < ::Coresdk::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (:signal_external_workflow_execution, M?) -> M?
-             | (:cancel_signal_workflow, ::Coresdk::WorkflowCommands::CancelSignalWorkflow?) -> ::Coresdk::WorkflowCommands::CancelSignalWorkflow?
-             | [M < ::Coresdk::WorkflowCommands::CancelSignalWorkflow::_ToProto] (:cancel_signal_workflow, M?) -> M?
-             | (:schedule_local_activity, ::Coresdk::WorkflowCommands::ScheduleLocalActivity?) -> ::Coresdk::WorkflowCommands::ScheduleLocalActivity?
-             | [M < ::Coresdk::WorkflowCommands::ScheduleLocalActivity::_ToProto] (:schedule_local_activity, M?) -> M?
-             | (:request_cancel_local_activity, ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?) -> ::Coresdk::WorkflowCommands::RequestCancelLocalActivity?
-             | [M < ::Coresdk::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (:request_cancel_local_activity, M?) -> M?
-             | (:upsert_workflow_search_attributes, ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?) -> ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes?
-             | [M < ::Coresdk::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (:upsert_workflow_search_attributes, M?) -> M?
-             | (:modify_workflow_properties, ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?) -> ::Coresdk::WorkflowCommands::ModifyWorkflowProperties?
-             | [M < ::Coresdk::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (:modify_workflow_properties, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def modify_workflow_properties!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties?
 
-      interface _ToProto
-        def to_proto: () -> WorkflowCommand
-      end
+          def initialize: (?start_timer: ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer::init?, ?schedule_activity: ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity::init?, ?respond_to_query: ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult::init?, ?request_cancel_activity: ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity::init?, ?cancel_timer: ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer::init?, ?complete_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution::init?, ?fail_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution::init?, ?continue_as_new_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution::init?, ?cancel_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution::init?, ?set_patch_marker: ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker::init?, ?start_child_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution::init?, ?cancel_child_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution::init?, ?request_cancel_external_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution::init?, ?signal_external_workflow_execution: ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution::init?, ?cancel_signal_workflow: ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow::init?, ?schedule_local_activity: ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity::init?, ?request_cancel_local_activity: ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity::init?, ?upsert_workflow_search_attributes: ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes::init?, ?modify_workflow_properties: ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties::init?) -> void
 
-      # The type of `#initialize` parameter.
-      type init = WorkflowCommand | _ToProto
+          def []: (:start_timer) -> ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?
+                | (:schedule_activity) -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity?
+                | (:respond_to_query) -> ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult?
+                | (:request_cancel_activity) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity?
+                | (:cancel_timer) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer?
+                | (:complete_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution?
+                | (:fail_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution?
+                | (:continue_as_new_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution?
+                | (:cancel_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution?
+                | (:set_patch_marker) -> ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker?
+                | (:start_child_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution?
+                | (:cancel_child_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution?
+                | (:request_cancel_external_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+                | (:signal_external_workflow_execution) -> ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution?
+                | (:cancel_signal_workflow) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow?
+                | (:schedule_local_activity) -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity?
+                | (:request_cancel_local_activity) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity?
+                | (:upsert_workflow_search_attributes) -> ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes?
+                | (:modify_workflow_properties) -> ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties?
+                | (::Symbol) -> untyped
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[WorkflowCommand, WorkflowCommand | _ToProto]
+          def []=: (:start_timer, ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?) -> ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::StartTimer::_ToProto] (:start_timer, M?) -> M?
+                 | (:schedule_activity, ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity?) -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleActivity::_ToProto] (:schedule_activity, M?) -> M?
+                 | (:respond_to_query, ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult?) -> ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::QueryResult::_ToProto] (:respond_to_query, M?) -> M?
+                 | (:request_cancel_activity, ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity?) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelActivity::_ToProto] (:request_cancel_activity, M?) -> M?
+                 | (:cancel_timer, ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer?) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelTimer::_ToProto] (:cancel_timer, M?) -> M?
+                 | (:complete_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::CompleteWorkflowExecution::_ToProto] (:complete_workflow_execution, M?) -> M?
+                 | (:fail_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::FailWorkflowExecution::_ToProto] (:fail_workflow_execution, M?) -> M?
+                 | (:continue_as_new_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution::_ToProto] (:continue_as_new_workflow_execution, M?) -> M?
+                 | (:cancel_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelWorkflowExecution::_ToProto] (:cancel_workflow_execution, M?) -> M?
+                 | (:set_patch_marker, ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker?) -> ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::SetPatchMarker::_ToProto] (:set_patch_marker, M?) -> M?
+                 | (:start_child_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::StartChildWorkflowExecution::_ToProto] (:start_child_workflow_execution, M?) -> M?
+                 | (:cancel_child_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution::_ToProto] (:cancel_child_workflow_execution, M?) -> M?
+                 | (:request_cancel_external_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution::_ToProto] (:request_cancel_external_workflow_execution, M?) -> M?
+                 | (:signal_external_workflow_execution, ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution?) -> ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution::_ToProto] (:signal_external_workflow_execution, M?) -> M?
+                 | (:cancel_signal_workflow, ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow?) -> ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::CancelSignalWorkflow::_ToProto] (:cancel_signal_workflow, M?) -> M?
+                 | (:schedule_local_activity, ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity?) -> ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::ScheduleLocalActivity::_ToProto] (:schedule_local_activity, M?) -> M?
+                 | (:request_cancel_local_activity, ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity?) -> ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::RequestCancelLocalActivity::_ToProto] (:request_cancel_local_activity, M?) -> M?
+                 | (:upsert_workflow_search_attributes, ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes?) -> ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes::_ToProto] (:upsert_workflow_search_attributes, M?) -> M?
+                 | (:modify_workflow_properties, ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties?) -> ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::ModifyWorkflowProperties::_ToProto] (:modify_workflow_properties, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowCommand, WorkflowCommand | _ToProto]
+          interface _ToProto
+            def to_proto: () -> WorkflowCommand
+          end
 
-      type array = ::Array[WorkflowCommand | _ToProto]
+          # The type of `#initialize` parameter.
+          type init = WorkflowCommand | _ToProto
 
-      type hash[KEY] = ::Hash[KEY, WorkflowCommand | _ToProto]
-    end
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[WorkflowCommand, WorkflowCommand | _ToProto]
 
-    class StartTimer < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowCommand, WorkflowCommand | _ToProto]
 
-      def seq!: () -> ::Integer?
+          type array = ::Array[WorkflowCommand | _ToProto]
 
-      attr_accessor start_to_fire_timeout(): ::Google::Protobuf::Duration?
+          type hash[KEY] = ::Hash[KEY, WorkflowCommand | _ToProto]
+        end
 
-      def start_to_fire_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                | ...
+        class StartTimer < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StartTimer) -> String
 
-      def start_to_fire_timeout!: () -> ::Google::Protobuf::Duration?
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
 
-      def initialize: (?seq: ::Integer, ?start_to_fire_timeout: ::Google::Protobuf::Duration::init?) -> void
+          def seq!: () -> ::Integer?
 
-      def []: (:seq) -> ::Integer
-            | (:start_to_fire_timeout) -> ::Google::Protobuf::Duration?
-            | (::Symbol) -> untyped
+          attr_accessor start_to_fire_timeout(): ::Google::Protobuf::Duration?
 
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:start_to_fire_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_fire_timeout, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> StartTimer
-      end
-
-      # The type of `#initialize` parameter.
-      type init = StartTimer | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[StartTimer, StartTimer | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartTimer, StartTimer | _ToProto]
-
-      type array = ::Array[StartTimer | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, StartTimer | _ToProto]
-    end
-
-    class CancelTimer < ::Protobuf::Message
-      # / Lang's incremental sequence number as passed to `StartTimer`
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      def initialize: (?seq: ::Integer) -> void
-
-      def []: (:seq) -> ::Integer
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> CancelTimer
-      end
-
-      # The type of `#initialize` parameter.
-      type init = CancelTimer | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[CancelTimer, CancelTimer | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelTimer, CancelTimer | _ToProto]
-
-      type array = ::Array[CancelTimer | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, CancelTimer | _ToProto]
-    end
-
-    class ScheduleActivity < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      attr_accessor activity_id(): ::String
-
-      def activity_id!: () -> ::String?
-
-      attr_accessor activity_type(): ::String
-
-      def activity_type!: () -> ::String?
-
-      # The name of the task queue to place this activity request in
-      #
-      attr_accessor task_queue(): ::String
-
-      def task_queue!: () -> ::String?
-
-      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                  | ...
-
-      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # / Arguments/input to the activity. Called "input" upstream.
-      #
-      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
-
-      # / Arguments/input to the activity. Called "input" upstream.
-      #
-      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-                    | ...
-
-      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
-
-      # / Indicates how long the caller is willing to wait for an activity completion. Limits how long
-      # / retries will be attempted. Either this or start_to_close_timeout_seconds must be specified.
-      # / When not specified defaults to the workflow execution timeout.
-      #
-      attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # / Indicates how long the caller is willing to wait for an activity completion. Limits how long
-      # / retries will be attempted. Either this or start_to_close_timeout_seconds must be specified.
-      # / When not specified defaults to the workflow execution timeout.
-      #
-      def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+          def start_to_fire_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
                                     | ...
 
-      def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Limits time an activity task can stay in a task queue before a worker picks it up. This
-      # / timeout is always non retryable as all a retry would achieve is to put it back into the same
-      # / queue. Defaults to schedule_to_close_timeout or workflow execution timeout if not specified.
-      #
-      attr_accessor schedule_to_start_timeout(): ::Google::Protobuf::Duration?
-
-      # / Limits time an activity task can stay in a task queue before a worker picks it up. This
-      # / timeout is always non retryable as all a retry would achieve is to put it back into the same
-      # / queue. Defaults to schedule_to_close_timeout or workflow execution timeout if not specified.
-      #
-      def schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                    | ...
-
-      def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Maximum time an activity is allowed to execute after a pick up by a worker. This timeout is
-      # / always retryable. Either this or schedule_to_close_timeout must be specified.
-      #
-      attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # / Maximum time an activity is allowed to execute after a pick up by a worker. This timeout is
-      # / always retryable. Either this or schedule_to_close_timeout must be specified.
-      #
-      def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                 | ...
-
-      def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Maximum time allowed between successful worker heartbeats.
-      #
-      attr_accessor heartbeat_timeout(): ::Google::Protobuf::Duration?
-
-      # / Maximum time allowed between successful worker heartbeats.
-      #
-      def heartbeat_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                            | ...
-
-      def heartbeat_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Activities are provided by a default retry policy controlled through the service dynamic
-      # / configuration. Retries are happening up to schedule_to_close_timeout. To disable retries set
-      # / retry_policy.maximum_attempts to 1.
-      #
-      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      # / Activities are provided by a default retry policy controlled through the service dynamic
-      # / configuration. Retries are happening up to schedule_to_close_timeout. To disable retries set
-      # / retry_policy.maximum_attempts to 1.
-      #
-      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
-                       | ...
-
-      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
-      #
-      attr_accessor cancellation_type(): ::Coresdk::WorkflowCommands::ActivityCancellationType
-
-      # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
-      #
-      def cancellation_type=: (::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
-                            | ...
-
-      def cancellation_type!: () -> ::Coresdk::WorkflowCommands::ActivityCancellationType?
-
-      # / If set, the worker will not tell the service that it can immediately start executing this
-      # / activity. When unset/default, workers will always attempt to do so if activity execution
-      # / slots are available.
-      #
-      attr_accessor do_not_eagerly_execute(): bool
-
-      def do_not_eagerly_execute!: () -> bool?
-
-      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?task_queue: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?cancellation_type: ::Coresdk::WorkflowCommands::ActivityCancellationType::init, ?do_not_eagerly_execute: bool) -> void
-
-      def []: (:seq) -> ::Integer
-            | (:activity_id) -> ::String
-            | (:activity_type) -> ::String
-            | (:task_queue) -> ::String
-            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
-            | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
-            | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
-            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-            | (:cancellation_type) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
-            | (:do_not_eagerly_execute) -> bool
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:activity_id, ::String) -> ::String
-             | (:activity_type, ::String) -> ::String
-             | (:task_queue, ::String) -> ::String
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-             | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
-             | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
-             | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
-             | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
-             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
-             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
-             | (:do_not_eagerly_execute, bool) -> bool
-             | (::Symbol, untyped) -> untyped
+          def start_to_fire_timeout!: () -> ::Google::Protobuf::Duration?
 
-      def do_not_eagerly_execute?: () -> bool
+          def initialize: (?seq: ::Integer, ?start_to_fire_timeout: ::Google::Protobuf::Duration::init?) -> void
 
-      interface _ToProto
-        def to_proto: () -> ScheduleActivity
-      end
-
-      # The type of `#initialize` parameter.
-      type init = ScheduleActivity | _ToProto
+          def []: (:seq) -> ::Integer
+                | (:start_to_fire_timeout) -> ::Google::Protobuf::Duration?
+                | (::Symbol) -> untyped
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ScheduleActivity, ScheduleActivity | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleActivity, ScheduleActivity | _ToProto]
-
-      type array = ::Array[ScheduleActivity | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, ScheduleActivity | _ToProto]
-    end
-
-    class ScheduleLocalActivity < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      attr_accessor activity_id(): ::String
-
-      def activity_id!: () -> ::String?
-
-      attr_accessor activity_type(): ::String
-
-      def activity_type!: () -> ::String?
-
-      # / Local activities can start with a non-1 attempt, if lang has been told to backoff using
-      # / a timer before retrying. It should pass the attempt number from a `DoBackoff` activity
-      # / resolution.
-      #
-      attr_accessor attempt(): ::Integer
-
-      def attempt!: () -> ::Integer?
-
-      # / If this local activity is a retry (as per the attempt field) this needs to be the original
-      # / scheduling time (as provided in `DoBackoff`)
-      #
-      attr_accessor original_schedule_time(): ::Google::Protobuf::Timestamp?
-
-      # / If this local activity is a retry (as per the attempt field) this needs to be the original
-      # / scheduling time (as provided in `DoBackoff`)
-      #
-      def original_schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                                 | ...
-
-      def original_schedule_time!: () -> ::Google::Protobuf::Timestamp?
-
-      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                  | ...
-
-      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # / Arguments/input to the activity.
-      #
-      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
-
-      # / Arguments/input to the activity.
-      #
-      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-                    | ...
-
-      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
-
-      # / Indicates how long the caller is willing to wait for local activity completion. Limits how
-      # / long retries will be attempted. When not specified defaults to the workflow execution
-      # / timeout (which may be unset).
-      #
-      attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # / Indicates how long the caller is willing to wait for local activity completion. Limits how
-      # / long retries will be attempted. When not specified defaults to the workflow execution
-      # / timeout (which may be unset).
-      #
-      def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                    | ...
-
-      def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Limits time the local activity can idle internally before being executed. That can happen if
-      # / the worker is currently at max concurrent local activity executions. This timeout is always
-      # / non retryable as all a retry would achieve is to put it back into the same queue. Defaults
-      # / to `schedule_to_close_timeout` if not specified and that is set. Must be <=
-      # / `schedule_to_close_timeout` when set, otherwise, it will be clamped down.
-      #
-      attr_accessor schedule_to_start_timeout(): ::Google::Protobuf::Duration?
-
-      # / Limits time the local activity can idle internally before being executed. That can happen if
-      # / the worker is currently at max concurrent local activity executions. This timeout is always
-      # / non retryable as all a retry would achieve is to put it back into the same queue. Defaults
-      # / to `schedule_to_close_timeout` if not specified and that is set. Must be <=
-      # / `schedule_to_close_timeout` when set, otherwise, it will be clamped down.
-      #
-      def schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                    | ...
-
-      def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Maximum time the local activity is allowed to execute after the task is dispatched. This
-      # / timeout is always retryable. Either or both of `schedule_to_close_timeout` and this must be
-      # / specified. If set, this must be <= `schedule_to_close_timeout`, otherwise, it will be
-      # / clamped down.
-      #
-      attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
-
-      # / Maximum time the local activity is allowed to execute after the task is dispatched. This
-      # / timeout is always retryable. Either or both of `schedule_to_close_timeout` and this must be
-      # / specified. If set, this must be <= `schedule_to_close_timeout`, otherwise, it will be
-      # / clamped down.
-      #
-      def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                 | ...
-
-      def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Specify a retry policy for the local activity. By default local activities will be retried
-      # / indefinitely.
-      #
-      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      # / Specify a retry policy for the local activity. By default local activities will be retried
-      # / indefinitely.
-      #
-      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
-                       | ...
-
-      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      # / If the activity is retrying and backoff would exceed this value, lang will be told to
-      # / schedule a timer and retry the activity after. Otherwise, backoff will happen internally in
-      # / core. Defaults to 1 minute.
-      #
-      attr_accessor local_retry_threshold(): ::Google::Protobuf::Duration?
-
-      # / If the activity is retrying and backoff would exceed this value, lang will be told to
-      # / schedule a timer and retry the activity after. Otherwise, backoff will happen internally in
-      # / core. Defaults to 1 minute.
-      #
-      def local_retry_threshold=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                | ...
-
-      def local_retry_threshold!: () -> ::Google::Protobuf::Duration?
-
-      # / Defines how the workflow will wait (or not) for cancellation of the activity to be
-      # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
-      # / will default to `TRY_CANCEL` automatically.
-      #
-      attr_accessor cancellation_type(): ::Coresdk::WorkflowCommands::ActivityCancellationType
-
-      # / Defines how the workflow will wait (or not) for cancellation of the activity to be
-      # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
-      # / will default to `TRY_CANCEL` automatically.
-      #
-      def cancellation_type=: (::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
-                            | ...
-
-      def cancellation_type!: () -> ::Coresdk::WorkflowCommands::ActivityCancellationType?
-
-      def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?attempt: ::Integer, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?local_retry_threshold: ::Google::Protobuf::Duration::init?, ?cancellation_type: ::Coresdk::WorkflowCommands::ActivityCancellationType::init) -> void
-
-      def []: (:seq) -> ::Integer
-            | (:activity_id) -> ::String
-            | (:activity_type) -> ::String
-            | (:attempt) -> ::Integer
-            | (:original_schedule_time) -> ::Google::Protobuf::Timestamp?
-            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
-            | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
-            | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
-            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-            | (:local_retry_threshold) -> ::Google::Protobuf::Duration?
-            | (:cancellation_type) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:activity_id, ::String) -> ::String
-             | (:activity_type, ::String) -> ::String
-             | (:attempt, ::Integer) -> ::Integer
-             | (:original_schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_schedule_time, M?) -> M?
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-             | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
-             | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
-             | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
-             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (:local_retry_threshold, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:local_retry_threshold, M?) -> M?
-             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType) -> ::Coresdk::WorkflowCommands::ActivityCancellationType
-             | (:cancellation_type, ::Coresdk::WorkflowCommands::ActivityCancellationType::values) -> ::Coresdk::WorkflowCommands::ActivityCancellationType::values
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> ScheduleLocalActivity
-      end
-
-      # The type of `#initialize` parameter.
-      type init = ScheduleLocalActivity | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ScheduleLocalActivity, ScheduleLocalActivity | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleLocalActivity, ScheduleLocalActivity | _ToProto]
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:start_to_fire_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_fire_timeout, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
 
-      type array = ::Array[ScheduleLocalActivity | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, ScheduleLocalActivity | _ToProto]
-    end
-
-    class RequestCancelActivity < ::Protobuf::Message
-      # / Lang's incremental sequence number as passed to `ScheduleActivity`
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      def initialize: (?seq: ::Integer) -> void
-
-      def []: (:seq) -> ::Integer
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (::Symbol, untyped) -> untyped
+          interface _ToProto
+            def to_proto: () -> StartTimer
+          end
 
-      interface _ToProto
-        def to_proto: () -> RequestCancelActivity
-      end
+          # The type of `#initialize` parameter.
+          type init = StartTimer | _ToProto
 
-      # The type of `#initialize` parameter.
-      type init = RequestCancelActivity | _ToProto
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartTimer, StartTimer | _ToProto]
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[RequestCancelActivity, RequestCancelActivity | _ToProto]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartTimer, StartTimer | _ToProto]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelActivity, RequestCancelActivity | _ToProto]
+          type array = ::Array[StartTimer | _ToProto]
 
-      type array = ::Array[RequestCancelActivity | _ToProto]
+          type hash[KEY] = ::Hash[KEY, StartTimer | _ToProto]
+        end
 
-      type hash[KEY] = ::Hash[KEY, RequestCancelActivity | _ToProto]
-    end
+        class CancelTimer < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CancelTimer) -> String
 
-    class RequestCancelLocalActivity < ::Protobuf::Message
-      # / Lang's incremental sequence number as passed to `ScheduleLocalActivity`
-      #
-      attr_accessor seq(): ::Integer
+          # / Lang's incremental sequence number as passed to `StartTimer`
+          #
+          attr_accessor seq(): ::Integer
 
-      def seq!: () -> ::Integer?
+          def seq!: () -> ::Integer?
 
-      def initialize: (?seq: ::Integer) -> void
+          def initialize: (?seq: ::Integer) -> void
 
-      def []: (:seq) -> ::Integer
-            | (::Symbol) -> untyped
+          def []: (:seq) -> ::Integer
+                | (::Symbol) -> untyped
 
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (::Symbol, untyped) -> untyped
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
 
-      interface _ToProto
-        def to_proto: () -> RequestCancelLocalActivity
-      end
+          interface _ToProto
+            def to_proto: () -> CancelTimer
+          end
 
-      # The type of `#initialize` parameter.
-      type init = RequestCancelLocalActivity | _ToProto
+          # The type of `#initialize` parameter.
+          type init = CancelTimer | _ToProto
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[RequestCancelLocalActivity, RequestCancelLocalActivity | _ToProto]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CancelTimer, CancelTimer | _ToProto]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelLocalActivity, RequestCancelLocalActivity | _ToProto]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelTimer, CancelTimer | _ToProto]
 
-      type array = ::Array[RequestCancelLocalActivity | _ToProto]
+          type array = ::Array[CancelTimer | _ToProto]
 
-      type hash[KEY] = ::Hash[KEY, RequestCancelLocalActivity | _ToProto]
-    end
+          type hash[KEY] = ::Hash[KEY, CancelTimer | _ToProto]
+        end
 
-    class QueryResult < ::Protobuf::Message
-      # / Corresponds to the id provided in the activation job
-      #
-      attr_accessor query_id(): ::String
+        class ScheduleActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ScheduleActivity) -> String
 
-      def query_id!: () -> ::String?
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
 
-      attr_accessor succeeded(): ::Coresdk::WorkflowCommands::QuerySuccess?
+          def seq!: () -> ::Integer?
 
-      def succeeded=: [M < ::Coresdk::WorkflowCommands::QuerySuccess::_ToProto] (M?) -> M?
-                    | ...
+          attr_accessor activity_id(): ::String
 
-      def succeeded!: () -> ::Coresdk::WorkflowCommands::QuerySuccess?
+          def activity_id!: () -> ::String?
 
-      attr_accessor failed(): ::Temporalio::Api::Failure::V1::Failure?
+          attr_accessor activity_type(): ::String
 
-      def failed=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                 | ...
+          def activity_type!: () -> ::String?
 
-      def failed!: () -> ::Temporalio::Api::Failure::V1::Failure?
+          # The name of the task queue to place this activity request in
+          #
+          attr_accessor task_queue(): ::String
 
-      def initialize: (?query_id: ::String, ?succeeded: ::Coresdk::WorkflowCommands::QuerySuccess::init?, ?failed: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+          def task_queue!: () -> ::String?
 
-      def []: (:query_id) -> ::String
-            | (:succeeded) -> ::Coresdk::WorkflowCommands::QuerySuccess?
-            | (:failed) -> ::Temporalio::Api::Failure::V1::Failure?
-            | (::Symbol) -> untyped
+          attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
 
-      def []=: (:query_id, ::String) -> ::String
-             | (:succeeded, ::Coresdk::WorkflowCommands::QuerySuccess?) -> ::Coresdk::WorkflowCommands::QuerySuccess?
-             | [M < ::Coresdk::WorkflowCommands::QuerySuccess::_ToProto] (:succeeded, M?) -> M?
-             | (:failed, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failed, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                      | ...
 
-      interface _ToProto
-        def to_proto: () -> QueryResult
-      end
+          def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
 
-      # The type of `#initialize` parameter.
-      type init = QueryResult | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[QueryResult, QueryResult | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QueryResult, QueryResult | _ToProto]
-
-      type array = ::Array[QueryResult | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, QueryResult | _ToProto]
-    end
-
-    class QuerySuccess < ::Protobuf::Message
-      attr_accessor response(): ::Temporalio::Api::Common::V1::Payload?
-
-      def response=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
-                   | ...
-
-      def response!: () -> ::Temporalio::Api::Common::V1::Payload?
-
-      def initialize: (?response: ::Temporalio::Api::Common::V1::Payload::init?) -> void
-
-      def []: (:response) -> ::Temporalio::Api::Common::V1::Payload?
-            | (::Symbol) -> untyped
-
-      def []=: (:response, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-             | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:response, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> QuerySuccess
-      end
-
-      # The type of `#initialize` parameter.
-      type init = QuerySuccess | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[QuerySuccess, QuerySuccess | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QuerySuccess, QuerySuccess | _ToProto]
-
-      type array = ::Array[QuerySuccess | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, QuerySuccess | _ToProto]
-    end
-
-    # / Issued when the workflow completes successfully
-    #
-    class CompleteWorkflowExecution < ::Protobuf::Message
-      attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
-
-      def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
-                 | ...
-
-      def result!: () -> ::Temporalio::Api::Common::V1::Payload?
-
-      def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
-
-      def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
-            | (::Symbol) -> untyped
-
-      def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-             | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> CompleteWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = CompleteWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[CompleteWorkflowExecution, CompleteWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteWorkflowExecution, CompleteWorkflowExecution | _ToProto]
-
-      type array = ::Array[CompleteWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, CompleteWorkflowExecution | _ToProto]
-    end
-
-    # / Issued when the workflow errors out
-    #
-    class FailWorkflowExecution < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
-
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                  | ...
-
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
-
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
-
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-            | (::Symbol) -> untyped
-
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> FailWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = FailWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[FailWorkflowExecution, FailWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FailWorkflowExecution, FailWorkflowExecution | _ToProto]
-
-      type array = ::Array[FailWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, FailWorkflowExecution | _ToProto]
-    end
-
-    # Continue the workflow as a new execution
-    #
-    class ContinueAsNewWorkflowExecution < ::Protobuf::Message
-      # The identifier the lang-specific sdk uses to execute workflow code
-      #
-      attr_accessor workflow_type(): ::String
-
-      def workflow_type!: () -> ::String?
-
-      # Task queue for the new workflow execution
-      #
-      attr_accessor task_queue(): ::String
-
-      def task_queue!: () -> ::String?
-
-      # Inputs to the workflow code. Should be specified. Will not re-use old arguments, as that
-      #  typically wouldn't make any sense.
-      #
-      attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
-
-      # Inputs to the workflow code. Should be specified. Will not re-use old arguments, as that
-      #  typically wouldn't make any sense.
-      #
-      def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-                    | ...
-
-      def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
-
-      # Timeout for a single run of the new workflow. Will not re-use current workflow's value.
-      #
-      attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
-
-      # Timeout for a single run of the new workflow. Will not re-use current workflow's value.
-      #
-      def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                               | ...
-
-      def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # Timeout of a single workflow task. Will not re-use current workflow's value.
-      #
-      attr_accessor workflow_task_timeout(): ::Google::Protobuf::Duration?
-
-      # Timeout of a single workflow task. Will not re-use current workflow's value.
-      #
-      def workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                | ...
-
-      def workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # If set, the new workflow will have this memo. If unset, re-uses the current workflow's memo
-      #
-      attr_accessor memo(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # If set, the new workflow will have this memo. If unset, re-uses the current workflow's memo
-      #
-      def memo=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-               | ...
-
-      def memo!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # If set, the new workflow will have these headers. Will *not* re-use current workflow's
-      #  headers otherwise.
-      #
-      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # If set, the new workflow will have these headers. Will *not* re-use current workflow's
-      #  headers otherwise.
-      #
-      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                  | ...
-
-      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # If set, the new workflow will have these search attributes. If unset, re-uses the current
-      #  workflow's search attributes.
-      #
-      attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # If set, the new workflow will have these search attributes. If unset, re-uses the current
-      #  workflow's search attributes.
-      #
-      def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                            | ...
-
-      def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # If set, the new workflow will have this retry policy. If unset, re-uses the current
-      #  workflow's retry policy.
-      #
-      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      # If set, the new workflow will have this retry policy. If unset, re-uses the current
-      #  workflow's retry policy.
-      #
-      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
-                       | ...
-
-      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      def initialize: (?workflow_type: ::String, ?task_queue: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?memo: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?) -> void
-
-      def []: (:workflow_type) -> ::String
-            | (:task_queue) -> ::String
-            | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
-            | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
-            | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
-            | (:memo) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-            | (::Symbol) -> untyped
-
-      def []=: (:workflow_type, ::String) -> ::String
-             | (:task_queue, ::String) -> ::String
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
-             | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-             | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
-             | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
-             | (:memo, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:memo, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> ContinueAsNewWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = ContinueAsNewWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ContinueAsNewWorkflowExecution, ContinueAsNewWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ContinueAsNewWorkflowExecution, ContinueAsNewWorkflowExecution | _ToProto]
-
-      type array = ::Array[ContinueAsNewWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, ContinueAsNewWorkflowExecution | _ToProto]
-    end
-
-    # / Indicate a workflow has completed as cancelled. Generally sent as a response to an activation
-    # / containing a cancellation job.
-    #
-    class CancelWorkflowExecution < ::Protobuf::Message
-      def initialize: () -> void
-
-      interface _ToProto
-        def to_proto: () -> CancelWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = CancelWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[CancelWorkflowExecution, CancelWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelWorkflowExecution, CancelWorkflowExecution | _ToProto]
-
-      type array = ::Array[CancelWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, CancelWorkflowExecution | _ToProto]
-    end
-
-    # / A request to set/check if a certain patch is present or not
-    #
-    class SetPatchMarker < ::Protobuf::Message
-      # A user-chosen identifier for this patch. If the same identifier is used in multiple places in
-      #  the code, those places are considered to be versioned as one unit. IE: The check call will
-      #  return the same result for all of them
-      #
-      attr_accessor patch_id(): ::String
-
-      def patch_id!: () -> ::String?
-
-      # Can be set to true to indicate that branches using this change are being removed, and all
-      #  future worker deployments will only have the "with change" code in them.
-      #
-      attr_accessor deprecated(): bool
-
-      def deprecated!: () -> bool?
-
-      def initialize: (?patch_id: ::String, ?deprecated: bool) -> void
-
-      def []: (:patch_id) -> ::String
-            | (:deprecated) -> bool
-            | (::Symbol) -> untyped
-
-      def []=: (:patch_id, ::String) -> ::String
-             | (:deprecated, bool) -> bool
-             | (::Symbol, untyped) -> untyped
-
-      def deprecated?: () -> bool
-
-      interface _ToProto
-        def to_proto: () -> SetPatchMarker
-      end
-
-      # The type of `#initialize` parameter.
-      type init = SetPatchMarker | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[SetPatchMarker, SetPatchMarker | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SetPatchMarker, SetPatchMarker | _ToProto]
-
-      type array = ::Array[SetPatchMarker | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, SetPatchMarker | _ToProto]
-    end
-
-    # / Start a child workflow execution
-    #
-    class StartChildWorkflowExecution < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      attr_accessor namespace(): ::String
-
-      def namespace!: () -> ::String?
-
-      attr_accessor workflow_id(): ::String
-
-      def workflow_id!: () -> ::String?
-
-      attr_accessor workflow_type(): ::String
-
-      def workflow_type!: () -> ::String?
-
-      attr_accessor task_queue(): ::String
-
-      def task_queue!: () -> ::String?
-
-      attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
-
-      def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-                | ...
-
-      def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
-
-      # / Total workflow execution timeout including retries and continue as new.
-      #
-      attr_accessor workflow_execution_timeout(): ::Google::Protobuf::Duration?
-
-      # / Total workflow execution timeout including retries and continue as new.
-      #
-      def workflow_execution_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                     | ...
-
-      def workflow_execution_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Timeout of a single workflow run.
-      #
-      attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
-
-      # / Timeout of a single workflow run.
-      #
-      def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                               | ...
-
-      def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Timeout of a single workflow task.
-      #
-      attr_accessor workflow_task_timeout(): ::Google::Protobuf::Duration?
-
-      # / Timeout of a single workflow task.
-      #
-      def workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                                | ...
-
-      def workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
-
-      # / Default: PARENT_CLOSE_POLICY_TERMINATE.
-      #
-      attr_accessor parent_close_policy(): ::Coresdk::Child_workflow::ParentClosePolicy
-
-      # / Default: PARENT_CLOSE_POLICY_TERMINATE.
-      #
-      def parent_close_policy=: (::Coresdk::Child_workflow::ParentClosePolicy::values) -> ::Coresdk::Child_workflow::ParentClosePolicy::values
-                              | ...
-
-      def parent_close_policy!: () -> ::Coresdk::Child_workflow::ParentClosePolicy?
-
-      # string control = 11; (unused from StartChildWorkflowExecutionCommandAttributes)
-      #  Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
-      #
-      attr_accessor workflow_id_reuse_policy(): ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
-
-      # string control = 11; (unused from StartChildWorkflowExecutionCommandAttributes)
-      #  Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
-      #
-      def workflow_id_reuse_policy=: (::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
-                                   | ...
-
-      def workflow_id_reuse_policy!: () -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy?
-
-      attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
-                       | ...
-
-      def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
-
-      attr_accessor cron_schedule(): ::String
-
-      def cron_schedule!: () -> ::String?
-
-      # / Header fields
-      #
-      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # / Header fields
-      #
-      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                  | ...
-
-      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # / Memo fields
-      #
-      attr_accessor memo(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # / Memo fields
-      #
-      def memo=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-               | ...
-
-      def memo!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # / Search attributes
-      #
-      attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # / Search attributes
-      #
-      def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                            | ...
-
-      def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      # / Defines behaviour of the underlying workflow when child workflow cancellation has been requested.
-      #
-      attr_accessor cancellation_type(): ::Coresdk::Child_workflow::ChildWorkflowCancellationType
-
-      # / Defines behaviour of the underlying workflow when child workflow cancellation has been requested.
-      #
-      def cancellation_type=: (::Coresdk::Child_workflow::ChildWorkflowCancellationType::values) -> ::Coresdk::Child_workflow::ChildWorkflowCancellationType::values
-                            | ...
-
-      def cancellation_type!: () -> ::Coresdk::Child_workflow::ChildWorkflowCancellationType?
-
-      def initialize: (?seq: ::Integer, ?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::String, ?task_queue: ::String, ?input: ::Temporalio::Api::Common::V1::Payload::array, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Coresdk::Child_workflow::ParentClosePolicy::init, ?workflow_id_reuse_policy: ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?memo: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?cancellation_type: ::Coresdk::Child_workflow::ChildWorkflowCancellationType::init) -> void
-
-      def []: (:seq) -> ::Integer
-            | (:namespace) -> ::String
-            | (:workflow_id) -> ::String
-            | (:workflow_type) -> ::String
-            | (:task_queue) -> ::String
-            | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
-            | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
-            | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
-            | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
-            | (:parent_close_policy) -> ::Coresdk::Child_workflow::ParentClosePolicy
-            | (:workflow_id_reuse_policy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
-            | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-            | (:cron_schedule) -> ::String
-            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:memo) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (:cancellation_type) -> ::Coresdk::Child_workflow::ChildWorkflowCancellationType
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:namespace, ::String) -> ::String
-             | (:workflow_id, ::String) -> ::String
-             | (:workflow_type, ::String) -> ::String
-             | (:task_queue, ::String) -> ::String
-             | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
-             | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-             | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
-             | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
-             | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
-             | (:parent_close_policy, ::Coresdk::Child_workflow::ParentClosePolicy) -> ::Coresdk::Child_workflow::ParentClosePolicy
-             | (:parent_close_policy, ::Coresdk::Child_workflow::ParentClosePolicy::values) -> ::Coresdk::Child_workflow::ParentClosePolicy::values
-             | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
-             | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
-             | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
-             | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
-             | (:cron_schedule, ::String) -> ::String
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:memo, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:memo, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (:cancellation_type, ::Coresdk::Child_workflow::ChildWorkflowCancellationType) -> ::Coresdk::Child_workflow::ChildWorkflowCancellationType
-             | (:cancellation_type, ::Coresdk::Child_workflow::ChildWorkflowCancellationType::values) -> ::Coresdk::Child_workflow::ChildWorkflowCancellationType::values
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> StartChildWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = StartChildWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[StartChildWorkflowExecution, StartChildWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartChildWorkflowExecution, StartChildWorkflowExecution | _ToProto]
-
-      type array = ::Array[StartChildWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, StartChildWorkflowExecution | _ToProto]
-    end
-
-    # / Cancel a child workflow
-    #
-    class CancelChildWorkflowExecution < ::Protobuf::Message
-      # Sequence number as given to the `StartChildWorkflowExecution` command
-      #
-      attr_accessor child_workflow_seq(): ::Integer
-
-      def child_workflow_seq!: () -> ::Integer?
-
-      def initialize: (?child_workflow_seq: ::Integer) -> void
-
-      def []: (:child_workflow_seq) -> ::Integer
-            | (::Symbol) -> untyped
-
-      def []=: (:child_workflow_seq, ::Integer) -> ::Integer
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> CancelChildWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = CancelChildWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[CancelChildWorkflowExecution, CancelChildWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelChildWorkflowExecution, CancelChildWorkflowExecution | _ToProto]
-
-      type array = ::Array[CancelChildWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, CancelChildWorkflowExecution | _ToProto]
-    end
-
-    # / Request cancellation of an external workflow execution (which may be a started child)
-    #
-    class RequestCancelExternalWorkflowExecution < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      # A specific workflow instance
-      #
-      attr_accessor workflow_execution(): ::Coresdk::Common::NamespacedWorkflowExecution?
-
-      # A specific workflow instance
-      #
-      def workflow_execution=: [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (M?) -> M?
-                             | ...
-
-      def workflow_execution!: () -> ::Coresdk::Common::NamespacedWorkflowExecution?
-
-      # The desired target must be a child of the issuing workflow, and this is its workflow id
-      #
-      attr_accessor child_workflow_id(): ::String
-
-      def child_workflow_id!: () -> ::String?
-
-      def initialize: (?seq: ::Integer, ?workflow_execution: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?child_workflow_id: ::String) -> void
-
-      def []: (:seq) -> ::Integer
-            | (:workflow_execution) -> ::Coresdk::Common::NamespacedWorkflowExecution?
-            | (:child_workflow_id) -> ::String
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:workflow_execution, ::Coresdk::Common::NamespacedWorkflowExecution?) -> ::Coresdk::Common::NamespacedWorkflowExecution?
-             | [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
-             | (:child_workflow_id, ::String) -> ::String
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> RequestCancelExternalWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = RequestCancelExternalWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[RequestCancelExternalWorkflowExecution, RequestCancelExternalWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelExternalWorkflowExecution, RequestCancelExternalWorkflowExecution | _ToProto]
-
-      type array = ::Array[RequestCancelExternalWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, RequestCancelExternalWorkflowExecution | _ToProto]
-    end
-
-    # / Send a signal to an external or child workflow
-    #
-    class SignalExternalWorkflowExecution < ::Protobuf::Message
-      # / Lang's incremental sequence number, used as the operation identifier
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      # A specific workflow instance
-      #
-      attr_accessor workflow_execution(): ::Coresdk::Common::NamespacedWorkflowExecution?
-
-      # A specific workflow instance
-      #
-      def workflow_execution=: [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (M?) -> M?
-                             | ...
-
-      def workflow_execution!: () -> ::Coresdk::Common::NamespacedWorkflowExecution?
-
-      # The desired target must be a child of the issuing workflow, and this is its workflow id
-      #
-      attr_accessor child_workflow_id(): ::String
-
-      def child_workflow_id!: () -> ::String?
-
-      # / Name of the signal handler
-      #
-      attr_accessor signal_name(): ::String
-
-      def signal_name!: () -> ::String?
-
-      # / Arguments for the handler
-      #
-      attr_accessor args(): ::Temporalio::Api::Common::V1::Payload::field_array
-
-      # / Arguments for the handler
-      #
-      def args=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-               | ...
-
-      def args!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
-
-      # / Headers to attach to the signal
-      #
-      attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # / Headers to attach to the signal
-      #
-      def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                  | ...
-
-      def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      def initialize: (?seq: ::Integer, ?workflow_execution: ::Coresdk::Common::NamespacedWorkflowExecution::init?, ?child_workflow_id: ::String, ?signal_name: ::String, ?args: ::Temporalio::Api::Common::V1::Payload::array, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
-
-      def []: (:seq) -> ::Integer
-            | (:workflow_execution) -> ::Coresdk::Common::NamespacedWorkflowExecution?
-            | (:child_workflow_id) -> ::String
-            | (:signal_name) -> ::String
-            | (:args) -> ::Temporalio::Api::Common::V1::Payload::field_array
-            | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:workflow_execution, ::Coresdk::Common::NamespacedWorkflowExecution?) -> ::Coresdk::Common::NamespacedWorkflowExecution?
-             | [M < ::Coresdk::Common::NamespacedWorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
-             | (:child_workflow_id, ::String) -> ::String
-             | (:signal_name, ::String) -> ::String
-             | (:args, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
-             | (:args, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> SignalExternalWorkflowExecution
-      end
-
-      # The type of `#initialize` parameter.
-      type init = SignalExternalWorkflowExecution | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[SignalExternalWorkflowExecution, SignalExternalWorkflowExecution | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SignalExternalWorkflowExecution, SignalExternalWorkflowExecution | _ToProto]
-
-      type array = ::Array[SignalExternalWorkflowExecution | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, SignalExternalWorkflowExecution | _ToProto]
-    end
-
-    # / Can be used to cancel not-already-sent `SignalExternalWorkflowExecution` commands
-    #
-    class CancelSignalWorkflow < ::Protobuf::Message
-      # / Lang's incremental sequence number as passed to `SignalExternalWorkflowExecution`
-      #
-      attr_accessor seq(): ::Integer
-
-      def seq!: () -> ::Integer?
-
-      def initialize: (?seq: ::Integer) -> void
-
-      def []: (:seq) -> ::Integer
-            | (::Symbol) -> untyped
-
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> CancelSignalWorkflow
-      end
-
-      # The type of `#initialize` parameter.
-      type init = CancelSignalWorkflow | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[CancelSignalWorkflow, CancelSignalWorkflow | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelSignalWorkflow, CancelSignalWorkflow | _ToProto]
-
-      type array = ::Array[CancelSignalWorkflow | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, CancelSignalWorkflow | _ToProto]
-    end
-
-    class UpsertWorkflowSearchAttributes < ::Protobuf::Message
-      # / SearchAttributes fields - equivalent to indexed_fields on api. Key = search index, Value =
-      # / value?
-      #
-      attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-
-      # / SearchAttributes fields - equivalent to indexed_fields on api. Key = search index, Value =
-      # / value?
-      #
-      def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-                            | ...
-
-      def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
-
-      def initialize: (?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
-
-      def []: (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-            | (::Symbol) -> untyped
-
-      def []=: (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
-             | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> UpsertWorkflowSearchAttributes
-      end
-
-      # The type of `#initialize` parameter.
-      type init = UpsertWorkflowSearchAttributes | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[UpsertWorkflowSearchAttributes, UpsertWorkflowSearchAttributes | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpsertWorkflowSearchAttributes, UpsertWorkflowSearchAttributes | _ToProto]
-
-      type array = ::Array[UpsertWorkflowSearchAttributes | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, UpsertWorkflowSearchAttributes | _ToProto]
-    end
-
-    class ModifyWorkflowProperties < ::Protobuf::Message
-      # If set, update the workflow memo with the provided values. The values will be merged with
-      #  the existing memo. If the user wants to delete values, a default/empty Payload should be
-      #  used as the value for the key being deleted.
-      #
-      attr_accessor upserted_memo(): ::Temporalio::Api::Common::V1::Memo?
-
-      # If set, update the workflow memo with the provided values. The values will be merged with
-      #  the existing memo. If the user wants to delete values, a default/empty Payload should be
-      #  used as the value for the key being deleted.
-      #
-      def upserted_memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+          # / Arguments/input to the activity. Called "input" upstream.
+          #
+          attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
+
+          # / Arguments/input to the activity. Called "input" upstream.
+          #
+          def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
                         | ...
 
-      def upserted_memo!: () -> ::Temporalio::Api::Common::V1::Memo?
+          def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
 
-      def initialize: (?upserted_memo: ::Temporalio::Api::Common::V1::Memo::init?) -> void
+          # / Indicates how long the caller is willing to wait for an activity completion. Limits how long
+          # / retries will be attempted. Either this or start_to_close_timeout_seconds must be specified.
+          # / When not specified defaults to the workflow execution timeout.
+          #
+          attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
 
-      def []: (:upserted_memo) -> ::Temporalio::Api::Common::V1::Memo?
-            | (::Symbol) -> untyped
+          # / Indicates how long the caller is willing to wait for an activity completion. Limits how long
+          # / retries will be attempted. Either this or start_to_close_timeout_seconds must be specified.
+          # / When not specified defaults to the workflow execution timeout.
+          #
+          def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
 
-      def []=: (:upserted_memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
-             | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
 
-      interface _ToProto
-        def to_proto: () -> ModifyWorkflowProperties
+          # / Limits time an activity task can stay in a task queue before a worker picks it up. This
+          # / timeout is always non retryable as all a retry would achieve is to put it back into the same
+          # / queue. Defaults to schedule_to_close_timeout or workflow execution timeout if not specified.
+          #
+          attr_accessor schedule_to_start_timeout(): ::Google::Protobuf::Duration?
+
+          # / Limits time an activity task can stay in a task queue before a worker picks it up. This
+          # / timeout is always non retryable as all a retry would achieve is to put it back into the same
+          # / queue. Defaults to schedule_to_close_timeout or workflow execution timeout if not specified.
+          #
+          def schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Maximum time an activity is allowed to execute after a pick up by a worker. This timeout is
+          # / always retryable. Either this or schedule_to_close_timeout must be specified.
+          #
+          attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
+
+          # / Maximum time an activity is allowed to execute after a pick up by a worker. This timeout is
+          # / always retryable. Either this or schedule_to_close_timeout must be specified.
+          #
+          def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                     | ...
+
+          def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Maximum time allowed between successful worker heartbeats.
+          #
+          attr_accessor heartbeat_timeout(): ::Google::Protobuf::Duration?
+
+          # / Maximum time allowed between successful worker heartbeats.
+          #
+          def heartbeat_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                | ...
+
+          def heartbeat_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Activities are provided by a default retry policy controlled through the service dynamic
+          # / configuration. Retries are happening up to schedule_to_close_timeout. To disable retries set
+          # / retry_policy.maximum_attempts to 1.
+          #
+          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # / Activities are provided by a default retry policy controlled through the service dynamic
+          # / configuration. Retries are happening up to schedule_to_close_timeout. To disable retries set
+          # / retry_policy.maximum_attempts to 1.
+          #
+          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
+          #
+          attr_accessor cancellation_type(): ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+
+          # / Defines how the workflow will wait (or not) for cancellation of the activity to be confirmed
+          #
+          def cancellation_type=: (::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values
+                                | ...
+
+          def cancellation_type!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType?
+
+          # / If set, the worker will not tell the service that it can immediately start executing this
+          # / activity. When unset/default, workers will always attempt to do so if activity execution
+          # / slots are available.
+          #
+          attr_accessor do_not_eagerly_execute(): bool
+
+          def do_not_eagerly_execute!: () -> bool?
+
+          def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?task_queue: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?heartbeat_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?cancellation_type: ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::init, ?do_not_eagerly_execute: bool) -> void
+
+          def []: (:seq) -> ::Integer
+                | (:activity_id) -> ::String
+                | (:activity_type) -> ::String
+                | (:task_queue) -> ::String
+                | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
+                | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:heartbeat_timeout) -> ::Google::Protobuf::Duration?
+                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:cancellation_type) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+                | (:do_not_eagerly_execute) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:activity_id, ::String) -> ::String
+                 | (:activity_type, ::String) -> ::String
+                 | (:task_queue, ::String) -> ::String
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
+                 | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
+                 | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
+                 | (:heartbeat_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:heartbeat_timeout, M?) -> M?
+                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values
+                 | (:do_not_eagerly_execute, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def do_not_eagerly_execute?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> ScheduleActivity
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleActivity | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleActivity, ScheduleActivity | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleActivity, ScheduleActivity | _ToProto]
+
+          type array = ::Array[ScheduleActivity | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleActivity | _ToProto]
+        end
+
+        class ScheduleLocalActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ScheduleLocalActivity) -> String
+
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          attr_accessor activity_id(): ::String
+
+          def activity_id!: () -> ::String?
+
+          attr_accessor activity_type(): ::String
+
+          def activity_type!: () -> ::String?
+
+          # / Local activities can start with a non-1 attempt, if lang has been told to backoff using
+          # / a timer before retrying. It should pass the attempt number from a `DoBackoff` activity
+          # / resolution.
+          #
+          attr_accessor attempt(): ::Integer
+
+          def attempt!: () -> ::Integer?
+
+          # / If this local activity is a retry (as per the attempt field) this needs to be the original
+          # / scheduling time (as provided in `DoBackoff`)
+          #
+          attr_accessor original_schedule_time(): ::Google::Protobuf::Timestamp?
+
+          # / If this local activity is a retry (as per the attempt field) this needs to be the original
+          # / scheduling time (as provided in `DoBackoff`)
+          #
+          def original_schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                     | ...
+
+          def original_schedule_time!: () -> ::Google::Protobuf::Timestamp?
+
+          attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                      | ...
+
+          def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # / Arguments/input to the activity.
+          #
+          attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
+
+          # / Arguments/input to the activity.
+          #
+          def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                        | ...
+
+          def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
+
+          # / Indicates how long the caller is willing to wait for local activity completion. Limits how
+          # / long retries will be attempted. When not specified defaults to the workflow execution
+          # / timeout (which may be unset).
+          #
+          attr_accessor schedule_to_close_timeout(): ::Google::Protobuf::Duration?
+
+          # / Indicates how long the caller is willing to wait for local activity completion. Limits how
+          # / long retries will be attempted. When not specified defaults to the workflow execution
+          # / timeout (which may be unset).
+          #
+          def schedule_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def schedule_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Limits time the local activity can idle internally before being executed. That can happen if
+          # / the worker is currently at max concurrent local activity executions. This timeout is always
+          # / non retryable as all a retry would achieve is to put it back into the same queue. Defaults
+          # / to `schedule_to_close_timeout` if not specified and that is set. Must be <=
+          # / `schedule_to_close_timeout` when set, otherwise, it will be clamped down.
+          #
+          attr_accessor schedule_to_start_timeout(): ::Google::Protobuf::Duration?
+
+          # / Limits time the local activity can idle internally before being executed. That can happen if
+          # / the worker is currently at max concurrent local activity executions. This timeout is always
+          # / non retryable as all a retry would achieve is to put it back into the same queue. Defaults
+          # / to `schedule_to_close_timeout` if not specified and that is set. Must be <=
+          # / `schedule_to_close_timeout` when set, otherwise, it will be clamped down.
+          #
+          def schedule_to_start_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                        | ...
+
+          def schedule_to_start_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Maximum time the local activity is allowed to execute after the task is dispatched. This
+          # / timeout is always retryable. Either or both of `schedule_to_close_timeout` and this must be
+          # / specified. If set, this must be <= `schedule_to_close_timeout`, otherwise, it will be
+          # / clamped down.
+          #
+          attr_accessor start_to_close_timeout(): ::Google::Protobuf::Duration?
+
+          # / Maximum time the local activity is allowed to execute after the task is dispatched. This
+          # / timeout is always retryable. Either or both of `schedule_to_close_timeout` and this must be
+          # / specified. If set, this must be <= `schedule_to_close_timeout`, otherwise, it will be
+          # / clamped down.
+          #
+          def start_to_close_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                     | ...
+
+          def start_to_close_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Specify a retry policy for the local activity. By default local activities will be retried
+          # / indefinitely.
+          #
+          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # / Specify a retry policy for the local activity. By default local activities will be retried
+          # / indefinitely.
+          #
+          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # / If the activity is retrying and backoff would exceed this value, lang will be told to
+          # / schedule a timer and retry the activity after. Otherwise, backoff will happen internally in
+          # / core. Defaults to 1 minute.
+          #
+          attr_accessor local_retry_threshold(): ::Google::Protobuf::Duration?
+
+          # / If the activity is retrying and backoff would exceed this value, lang will be told to
+          # / schedule a timer and retry the activity after. Otherwise, backoff will happen internally in
+          # / core. Defaults to 1 minute.
+          #
+          def local_retry_threshold=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                    | ...
+
+          def local_retry_threshold!: () -> ::Google::Protobuf::Duration?
+
+          # / Defines how the workflow will wait (or not) for cancellation of the activity to be
+          # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
+          # / will default to `TRY_CANCEL` automatically.
+          #
+          attr_accessor cancellation_type(): ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+
+          # / Defines how the workflow will wait (or not) for cancellation of the activity to be
+          # / confirmed. Lang should default this to `WAIT_CANCELLATION_COMPLETED`, even though proto
+          # / will default to `TRY_CANCEL` automatically.
+          #
+          def cancellation_type=: (::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values
+                                | ...
+
+          def cancellation_type!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType?
+
+          def initialize: (?seq: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?attempt: ::Integer, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?schedule_to_close_timeout: ::Google::Protobuf::Duration::init?, ?schedule_to_start_timeout: ::Google::Protobuf::Duration::init?, ?start_to_close_timeout: ::Google::Protobuf::Duration::init?, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?local_retry_threshold: ::Google::Protobuf::Duration::init?, ?cancellation_type: ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::init) -> void
+
+          def []: (:seq) -> ::Integer
+                | (:activity_id) -> ::String
+                | (:activity_type) -> ::String
+                | (:attempt) -> ::Integer
+                | (:original_schedule_time) -> ::Google::Protobuf::Timestamp?
+                | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:schedule_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:schedule_to_start_timeout) -> ::Google::Protobuf::Duration?
+                | (:start_to_close_timeout) -> ::Google::Protobuf::Duration?
+                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:local_retry_threshold) -> ::Google::Protobuf::Duration?
+                | (:cancellation_type) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:activity_id, ::String) -> ::String
+                 | (:activity_type, ::String) -> ::String
+                 | (:attempt, ::Integer) -> ::Integer
+                 | (:original_schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_schedule_time, M?) -> M?
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:schedule_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_close_timeout, M?) -> M?
+                 | (:schedule_to_start_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:schedule_to_start_timeout, M?) -> M?
+                 | (:start_to_close_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:start_to_close_timeout, M?) -> M?
+                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:local_retry_threshold, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:local_retry_threshold, M?) -> M?
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values) -> ::Temporalio::Bridge::Api::WorkflowCommands::ActivityCancellationType::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ScheduleLocalActivity
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ScheduleLocalActivity | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ScheduleLocalActivity, ScheduleLocalActivity | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ScheduleLocalActivity, ScheduleLocalActivity | _ToProto]
+
+          type array = ::Array[ScheduleLocalActivity | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ScheduleLocalActivity | _ToProto]
+        end
+
+        class RequestCancelActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RequestCancelActivity) -> String
+
+          # / Lang's incremental sequence number as passed to `ScheduleActivity`
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          def initialize: (?seq: ::Integer) -> void
+
+          def []: (:seq) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> RequestCancelActivity
+          end
+
+          # The type of `#initialize` parameter.
+          type init = RequestCancelActivity | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RequestCancelActivity, RequestCancelActivity | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelActivity, RequestCancelActivity | _ToProto]
+
+          type array = ::Array[RequestCancelActivity | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, RequestCancelActivity | _ToProto]
+        end
+
+        class RequestCancelLocalActivity < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RequestCancelLocalActivity) -> String
+
+          # / Lang's incremental sequence number as passed to `ScheduleLocalActivity`
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          def initialize: (?seq: ::Integer) -> void
+
+          def []: (:seq) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> RequestCancelLocalActivity
+          end
+
+          # The type of `#initialize` parameter.
+          type init = RequestCancelLocalActivity | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RequestCancelLocalActivity, RequestCancelLocalActivity | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelLocalActivity, RequestCancelLocalActivity | _ToProto]
+
+          type array = ::Array[RequestCancelLocalActivity | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, RequestCancelLocalActivity | _ToProto]
+        end
+
+        class QueryResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (QueryResult) -> String
+
+          # / Corresponds to the id provided in the activation job
+          #
+          attr_accessor query_id(): ::String
+
+          def query_id!: () -> ::String?
+
+          attr_accessor succeeded(): ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess?
+
+          def succeeded=: [M < ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess::_ToProto] (M?) -> M?
+                        | ...
+
+          def succeeded!: () -> ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess?
+
+          attr_accessor failed(): ::Temporalio::Api::Failure::V1::Failure?
+
+          def failed=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                     | ...
+
+          def failed!: () -> ::Temporalio::Api::Failure::V1::Failure?
+
+          def initialize: (?query_id: ::String, ?succeeded: ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess::init?, ?failed: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:query_id) -> ::String
+                | (:succeeded) -> ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess?
+                | (:failed) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:query_id, ::String) -> ::String
+                 | (:succeeded, ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess?) -> ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess?
+                 | [M < ::Temporalio::Bridge::Api::WorkflowCommands::QuerySuccess::_ToProto] (:succeeded, M?) -> M?
+                 | (:failed, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failed, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> QueryResult
+          end
+
+          # The type of `#initialize` parameter.
+          type init = QueryResult | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[QueryResult, QueryResult | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QueryResult, QueryResult | _ToProto]
+
+          type array = ::Array[QueryResult | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, QueryResult | _ToProto]
+        end
+
+        class QuerySuccess < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (QuerySuccess) -> String
+
+          attr_accessor response(): ::Temporalio::Api::Common::V1::Payload?
+
+          def response=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+                       | ...
+
+          def response!: () -> ::Temporalio::Api::Common::V1::Payload?
+
+          def initialize: (?response: ::Temporalio::Api::Common::V1::Payload::init?) -> void
+
+          def []: (:response) -> ::Temporalio::Api::Common::V1::Payload?
+                | (::Symbol) -> untyped
+
+          def []=: (:response, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
+                 | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:response, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> QuerySuccess
+          end
+
+          # The type of `#initialize` parameter.
+          type init = QuerySuccess | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[QuerySuccess, QuerySuccess | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, QuerySuccess, QuerySuccess | _ToProto]
+
+          type array = ::Array[QuerySuccess | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, QuerySuccess | _ToProto]
+        end
+
+        # / Issued when the workflow completes successfully
+        #
+        class CompleteWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CompleteWorkflowExecution) -> String
+
+          attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
+
+          def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+                     | ...
+
+          def result!: () -> ::Temporalio::Api::Common::V1::Payload?
+
+          def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
+
+          def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
+                | (::Symbol) -> untyped
+
+          def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
+                 | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CompleteWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CompleteWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CompleteWorkflowExecution, CompleteWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CompleteWorkflowExecution, CompleteWorkflowExecution | _ToProto]
+
+          type array = ::Array[CompleteWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CompleteWorkflowExecution | _ToProto]
+        end
+
+        # / Issued when the workflow errors out
+        #
+        class FailWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (FailWorkflowExecution) -> String
+
+          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+
+          def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> FailWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = FailWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[FailWorkflowExecution, FailWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, FailWorkflowExecution, FailWorkflowExecution | _ToProto]
+
+          type array = ::Array[FailWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, FailWorkflowExecution | _ToProto]
+        end
+
+        # Continue the workflow as a new execution
+        #
+        class ContinueAsNewWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ContinueAsNewWorkflowExecution) -> String
+
+          # The identifier the lang-specific sdk uses to execute workflow code
+          #
+          attr_accessor workflow_type(): ::String
+
+          def workflow_type!: () -> ::String?
+
+          # Task queue for the new workflow execution
+          #
+          attr_accessor task_queue(): ::String
+
+          def task_queue!: () -> ::String?
+
+          # Inputs to the workflow code. Should be specified. Will not re-use old arguments, as that
+          #  typically wouldn't make any sense.
+          #
+          attr_accessor arguments(): ::Temporalio::Api::Common::V1::Payload::field_array
+
+          # Inputs to the workflow code. Should be specified. Will not re-use old arguments, as that
+          #  typically wouldn't make any sense.
+          #
+          def arguments=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                        | ...
+
+          def arguments!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
+
+          # Timeout for a single run of the new workflow. Will not re-use current workflow's value.
+          #
+          attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout for a single run of the new workflow. Will not re-use current workflow's value.
+          #
+          def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                   | ...
+
+          def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow task. Will not re-use current workflow's value.
+          #
+          attr_accessor workflow_task_timeout(): ::Google::Protobuf::Duration?
+
+          # Timeout of a single workflow task. Will not re-use current workflow's value.
+          #
+          def workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                    | ...
+
+          def workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # If set, the new workflow will have this memo. If unset, re-uses the current workflow's memo
+          #
+          attr_accessor memo(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # If set, the new workflow will have this memo. If unset, re-uses the current workflow's memo
+          #
+          def memo=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                   | ...
+
+          def memo!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # If set, the new workflow will have these headers. Will *not* re-use current workflow's
+          #  headers otherwise.
+          #
+          attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # If set, the new workflow will have these headers. Will *not* re-use current workflow's
+          #  headers otherwise.
+          #
+          def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                      | ...
+
+          def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # If set, the new workflow will have these search attributes. If unset, re-uses the current
+          #  workflow's search attributes.
+          #
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # If set, the new workflow will have these search attributes. If unset, re-uses the current
+          #  workflow's search attributes.
+          #
+          def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                                | ...
+
+          def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # If set, the new workflow will have this retry policy. If unset, re-uses the current
+          #  workflow's retry policy.
+          #
+          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          # If set, the new workflow will have this retry policy. If unset, re-uses the current
+          #  workflow's retry policy.
+          #
+          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          def initialize: (?workflow_type: ::String, ?task_queue: ::String, ?arguments: ::Temporalio::Api::Common::V1::Payload::array, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?memo: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?) -> void
+
+          def []: (:workflow_type) -> ::String
+                | (:task_queue) -> ::String
+                | (:arguments) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
+                | (:memo) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (::Symbol) -> untyped
+
+          def []=: (:workflow_type, ::String) -> ::String
+                 | (:task_queue, ::String) -> ::String
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:arguments, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
+                 | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
+                 | (:memo, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:memo, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ContinueAsNewWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ContinueAsNewWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ContinueAsNewWorkflowExecution, ContinueAsNewWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ContinueAsNewWorkflowExecution, ContinueAsNewWorkflowExecution | _ToProto]
+
+          type array = ::Array[ContinueAsNewWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ContinueAsNewWorkflowExecution | _ToProto]
+        end
+
+        # / Indicate a workflow has completed as cancelled. Generally sent as a response to an activation
+        # / containing a cancellation job.
+        #
+        class CancelWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CancelWorkflowExecution) -> String
+
+          def initialize: () -> void
+
+          interface _ToProto
+            def to_proto: () -> CancelWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CancelWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CancelWorkflowExecution, CancelWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelWorkflowExecution, CancelWorkflowExecution | _ToProto]
+
+          type array = ::Array[CancelWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CancelWorkflowExecution | _ToProto]
+        end
+
+        # / A request to set/check if a certain patch is present or not
+        #
+        class SetPatchMarker < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (SetPatchMarker) -> String
+
+          # A user-chosen identifier for this patch. If the same identifier is used in multiple places in
+          #  the code, those places are considered to be versioned as one unit. IE: The check call will
+          #  return the same result for all of them
+          #
+          attr_accessor patch_id(): ::String
+
+          def patch_id!: () -> ::String?
+
+          # Can be set to true to indicate that branches using this change are being removed, and all
+          #  future worker deployments will only have the "with change" code in them.
+          #
+          attr_accessor deprecated(): bool
+
+          def deprecated!: () -> bool?
+
+          def initialize: (?patch_id: ::String, ?deprecated: bool) -> void
+
+          def []: (:patch_id) -> ::String
+                | (:deprecated) -> bool
+                | (::Symbol) -> untyped
+
+          def []=: (:patch_id, ::String) -> ::String
+                 | (:deprecated, bool) -> bool
+                 | (::Symbol, untyped) -> untyped
+
+          def deprecated?: () -> bool
+
+          interface _ToProto
+            def to_proto: () -> SetPatchMarker
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SetPatchMarker | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SetPatchMarker, SetPatchMarker | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SetPatchMarker, SetPatchMarker | _ToProto]
+
+          type array = ::Array[SetPatchMarker | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SetPatchMarker | _ToProto]
+        end
+
+        # / Start a child workflow execution
+        #
+        class StartChildWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StartChildWorkflowExecution) -> String
+
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          attr_accessor workflow_id(): ::String
+
+          def workflow_id!: () -> ::String?
+
+          attr_accessor workflow_type(): ::String
+
+          def workflow_type!: () -> ::String?
+
+          attr_accessor task_queue(): ::String
+
+          def task_queue!: () -> ::String?
+
+          attr_accessor input(): ::Temporalio::Api::Common::V1::Payload::field_array
+
+          def input=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                    | ...
+
+          def input!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
+
+          # / Total workflow execution timeout including retries and continue as new.
+          #
+          attr_accessor workflow_execution_timeout(): ::Google::Protobuf::Duration?
+
+          # / Total workflow execution timeout including retries and continue as new.
+          #
+          def workflow_execution_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                         | ...
+
+          def workflow_execution_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Timeout of a single workflow run.
+          #
+          attr_accessor workflow_run_timeout(): ::Google::Protobuf::Duration?
+
+          # / Timeout of a single workflow run.
+          #
+          def workflow_run_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                   | ...
+
+          def workflow_run_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Timeout of a single workflow task.
+          #
+          attr_accessor workflow_task_timeout(): ::Google::Protobuf::Duration?
+
+          # / Timeout of a single workflow task.
+          #
+          def workflow_task_timeout=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                                    | ...
+
+          def workflow_task_timeout!: () -> ::Google::Protobuf::Duration?
+
+          # / Default: PARENT_CLOSE_POLICY_TERMINATE.
+          #
+          attr_accessor parent_close_policy(): ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy
+
+          # / Default: PARENT_CLOSE_POLICY_TERMINATE.
+          #
+          def parent_close_policy=: (::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy::values) -> ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy::values
+                                  | ...
+
+          def parent_close_policy!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy?
+
+          # string control = 11; (unused from StartChildWorkflowExecutionCommandAttributes)
+          #  Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
+          #
+          attr_accessor workflow_id_reuse_policy(): ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
+
+          # string control = 11; (unused from StartChildWorkflowExecutionCommandAttributes)
+          #  Default: WORKFLOW_ID_REUSE_POLICY_ALLOW_DUPLICATE.
+          #
+          def workflow_id_reuse_policy=: (::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
+                                       | ...
+
+          def workflow_id_reuse_policy!: () -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy?
+
+          attr_accessor retry_policy(): ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          def retry_policy=: [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (M?) -> M?
+                           | ...
+
+          def retry_policy!: () -> ::Temporalio::Api::Common::V1::RetryPolicy?
+
+          attr_accessor cron_schedule(): ::String
+
+          def cron_schedule!: () -> ::String?
+
+          # / Header fields
+          #
+          attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # / Header fields
+          #
+          def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                      | ...
+
+          def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # / Memo fields
+          #
+          attr_accessor memo(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # / Memo fields
+          #
+          def memo=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                   | ...
+
+          def memo!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # / Search attributes
+          #
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # / Search attributes
+          #
+          def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                                | ...
+
+          def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          # / Defines behaviour of the underlying workflow when child workflow cancellation has been requested.
+          #
+          attr_accessor cancellation_type(): ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType
+
+          # / Defines behaviour of the underlying workflow when child workflow cancellation has been requested.
+          #
+          def cancellation_type=: (::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType::values) -> ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType::values
+                                | ...
+
+          def cancellation_type!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType?
+
+          def initialize: (?seq: ::Integer, ?namespace: ::String, ?workflow_id: ::String, ?workflow_type: ::String, ?task_queue: ::String, ?input: ::Temporalio::Api::Common::V1::Payload::array, ?workflow_execution_timeout: ::Google::Protobuf::Duration::init?, ?workflow_run_timeout: ::Google::Protobuf::Duration::init?, ?workflow_task_timeout: ::Google::Protobuf::Duration::init?, ?parent_close_policy: ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy::init, ?workflow_id_reuse_policy: ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::init, ?retry_policy: ::Temporalio::Api::Common::V1::RetryPolicy::init?, ?cron_schedule: ::String, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?memo: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String], ?cancellation_type: ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType::init) -> void
+
+          def []: (:seq) -> ::Integer
+                | (:namespace) -> ::String
+                | (:workflow_id) -> ::String
+                | (:workflow_type) -> ::String
+                | (:task_queue) -> ::String
+                | (:input) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:workflow_execution_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_run_timeout) -> ::Google::Protobuf::Duration?
+                | (:workflow_task_timeout) -> ::Google::Protobuf::Duration?
+                | (:parent_close_policy) -> ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy
+                | (:workflow_id_reuse_policy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
+                | (:retry_policy) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                | (:cron_schedule) -> ::String
+                | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:memo) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (:cancellation_type) -> ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:namespace, ::String) -> ::String
+                 | (:workflow_id, ::String) -> ::String
+                 | (:workflow_type, ::String) -> ::String
+                 | (:task_queue, ::String) -> ::String
+                 | (:input, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:input, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:workflow_execution_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_execution_timeout, M?) -> M?
+                 | (:workflow_run_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_run_timeout, M?) -> M?
+                 | (:workflow_task_timeout, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:workflow_task_timeout, M?) -> M?
+                 | (:parent_close_policy, ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy) -> ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy
+                 | (:parent_close_policy, ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy::values) -> ::Temporalio::Bridge::Api::ChildWorkflow::ParentClosePolicy::values
+                 | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy
+                 | (:workflow_id_reuse_policy, ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values) -> ::Temporalio::Api::Enums::V1::WorkflowIdReusePolicy::values
+                 | (:retry_policy, ::Temporalio::Api::Common::V1::RetryPolicy?) -> ::Temporalio::Api::Common::V1::RetryPolicy?
+                 | [M < ::Temporalio::Api::Common::V1::RetryPolicy::_ToProto] (:retry_policy, M?) -> M?
+                 | (:cron_schedule, ::String) -> ::String
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:memo, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:memo, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType) -> ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType
+                 | (:cancellation_type, ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType::values) -> ::Temporalio::Bridge::Api::ChildWorkflow::ChildWorkflowCancellationType::values
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> StartChildWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = StartChildWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartChildWorkflowExecution, StartChildWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartChildWorkflowExecution, StartChildWorkflowExecution | _ToProto]
+
+          type array = ::Array[StartChildWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, StartChildWorkflowExecution | _ToProto]
+        end
+
+        # / Cancel a child workflow
+        #
+        class CancelChildWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CancelChildWorkflowExecution) -> String
+
+          # Sequence number as given to the `StartChildWorkflowExecution` command
+          #
+          attr_accessor child_workflow_seq(): ::Integer
+
+          def child_workflow_seq!: () -> ::Integer?
+
+          def initialize: (?child_workflow_seq: ::Integer) -> void
+
+          def []: (:child_workflow_seq) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:child_workflow_seq, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CancelChildWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CancelChildWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CancelChildWorkflowExecution, CancelChildWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelChildWorkflowExecution, CancelChildWorkflowExecution | _ToProto]
+
+          type array = ::Array[CancelChildWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CancelChildWorkflowExecution | _ToProto]
+        end
+
+        # / Request cancellation of an external workflow execution (which may be a started child)
+        #
+        class RequestCancelExternalWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RequestCancelExternalWorkflowExecution) -> String
+
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          # A specific workflow instance
+          #
+          attr_accessor workflow_execution(): ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+
+          # A specific workflow instance
+          #
+          def workflow_execution=: [M < ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::_ToProto] (M?) -> M?
+                                 | ...
+
+          def workflow_execution!: () -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+
+          # The desired target must be a child of the issuing workflow, and this is its workflow id
+          #
+          attr_accessor child_workflow_id(): ::String
+
+          def child_workflow_id!: () -> ::String?
+
+          def initialize: (?seq: ::Integer, ?workflow_execution: ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::init?, ?child_workflow_id: ::String) -> void
+
+          def []: (:seq) -> ::Integer
+                | (:workflow_execution) -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+                | (:child_workflow_id) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:workflow_execution, ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?) -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:child_workflow_id, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> RequestCancelExternalWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = RequestCancelExternalWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[RequestCancelExternalWorkflowExecution, RequestCancelExternalWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, RequestCancelExternalWorkflowExecution, RequestCancelExternalWorkflowExecution | _ToProto]
+
+          type array = ::Array[RequestCancelExternalWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, RequestCancelExternalWorkflowExecution | _ToProto]
+        end
+
+        # / Send a signal to an external or child workflow
+        #
+        class SignalExternalWorkflowExecution < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (SignalExternalWorkflowExecution) -> String
+
+          # / Lang's incremental sequence number, used as the operation identifier
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          # A specific workflow instance
+          #
+          attr_accessor workflow_execution(): ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+
+          # A specific workflow instance
+          #
+          def workflow_execution=: [M < ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::_ToProto] (M?) -> M?
+                                 | ...
+
+          def workflow_execution!: () -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+
+          # The desired target must be a child of the issuing workflow, and this is its workflow id
+          #
+          attr_accessor child_workflow_id(): ::String
+
+          def child_workflow_id!: () -> ::String?
+
+          # / Name of the signal handler
+          #
+          attr_accessor signal_name(): ::String
+
+          def signal_name!: () -> ::String?
+
+          # / Arguments for the handler
+          #
+          attr_accessor args(): ::Temporalio::Api::Common::V1::Payload::field_array
+
+          # / Arguments for the handler
+          #
+          def args=: (::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                   | ...
+
+          def args!: () -> ::Temporalio::Api::Common::V1::Payload::field_array?
+
+          # / Headers to attach to the signal
+          #
+          attr_accessor headers(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # / Headers to attach to the signal
+          #
+          def headers=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                      | ...
+
+          def headers!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          def initialize: (?seq: ::Integer, ?workflow_execution: ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::init?, ?child_workflow_id: ::String, ?signal_name: ::String, ?args: ::Temporalio::Api::Common::V1::Payload::array, ?headers: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
+
+          def []: (:seq) -> ::Integer
+                | (:workflow_execution) -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+                | (:child_workflow_id) -> ::String
+                | (:signal_name) -> ::String
+                | (:args) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                | (:headers) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:workflow_execution, ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?) -> ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution?
+                 | [M < ::Temporalio::Bridge::Api::Common::NamespacedWorkflowExecution::_ToProto] (:workflow_execution, M?) -> M?
+                 | (:child_workflow_id, ::String) -> ::String
+                 | (:signal_name, ::String) -> ::String
+                 | (:args, ::Temporalio::Api::Common::V1::Payload::field_array) -> ::Temporalio::Api::Common::V1::Payload::field_array
+                 | (:args, ::Temporalio::Api::Common::V1::Payload::array) -> ::Temporalio::Api::Common::V1::Payload::array
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:headers, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> SignalExternalWorkflowExecution
+          end
+
+          # The type of `#initialize` parameter.
+          type init = SignalExternalWorkflowExecution | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[SignalExternalWorkflowExecution, SignalExternalWorkflowExecution | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, SignalExternalWorkflowExecution, SignalExternalWorkflowExecution | _ToProto]
+
+          type array = ::Array[SignalExternalWorkflowExecution | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, SignalExternalWorkflowExecution | _ToProto]
+        end
+
+        # / Can be used to cancel not-already-sent `SignalExternalWorkflowExecution` commands
+        #
+        class CancelSignalWorkflow < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CancelSignalWorkflow) -> String
+
+          # / Lang's incremental sequence number as passed to `SignalExternalWorkflowExecution`
+          #
+          attr_accessor seq(): ::Integer
+
+          def seq!: () -> ::Integer?
+
+          def initialize: (?seq: ::Integer) -> void
+
+          def []: (:seq) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> CancelSignalWorkflow
+          end
+
+          # The type of `#initialize` parameter.
+          type init = CancelSignalWorkflow | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[CancelSignalWorkflow, CancelSignalWorkflow | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, CancelSignalWorkflow, CancelSignalWorkflow | _ToProto]
+
+          type array = ::Array[CancelSignalWorkflow | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, CancelSignalWorkflow | _ToProto]
+        end
+
+        class UpsertWorkflowSearchAttributes < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (UpsertWorkflowSearchAttributes) -> String
+
+          # / SearchAttributes fields - equivalent to indexed_fields on api. Key = search index, Value =
+          # / value?
+          #
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+
+          # / SearchAttributes fields - equivalent to indexed_fields on api. Key = search index, Value =
+          # / value?
+          #
+          def search_attributes=: (::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                                | ...
+
+          def search_attributes!: () -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]?
+
+          def initialize: (?search_attributes: ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> void
+
+          def []: (:search_attributes) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                | (::Symbol) -> untyped
+
+          def []=: (:search_attributes, ::Temporalio::Api::Common::V1::Payload::field_hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::field_hash[::String]
+                 | (:search_attributes, ::Temporalio::Api::Common::V1::Payload::hash[::String]) -> ::Temporalio::Api::Common::V1::Payload::hash[::String]
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> UpsertWorkflowSearchAttributes
+          end
+
+          # The type of `#initialize` parameter.
+          type init = UpsertWorkflowSearchAttributes | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[UpsertWorkflowSearchAttributes, UpsertWorkflowSearchAttributes | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpsertWorkflowSearchAttributes, UpsertWorkflowSearchAttributes | _ToProto]
+
+          type array = ::Array[UpsertWorkflowSearchAttributes | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, UpsertWorkflowSearchAttributes | _ToProto]
+        end
+
+        class ModifyWorkflowProperties < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ModifyWorkflowProperties) -> String
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          attr_accessor upserted_memo(): ::Temporalio::Api::Common::V1::Memo?
+
+          # If set, update the workflow memo with the provided values. The values will be merged with
+          #  the existing memo. If the user wants to delete values, a default/empty Payload should be
+          #  used as the value for the key being deleted.
+          #
+          def upserted_memo=: [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (M?) -> M?
+                            | ...
+
+          def upserted_memo!: () -> ::Temporalio::Api::Common::V1::Memo?
+
+          def initialize: (?upserted_memo: ::Temporalio::Api::Common::V1::Memo::init?) -> void
+
+          def []: (:upserted_memo) -> ::Temporalio::Api::Common::V1::Memo?
+                | (::Symbol) -> untyped
+
+          def []=: (:upserted_memo, ::Temporalio::Api::Common::V1::Memo?) -> ::Temporalio::Api::Common::V1::Memo?
+                 | [M < ::Temporalio::Api::Common::V1::Memo::_ToProto] (:upserted_memo, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ModifyWorkflowProperties
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ModifyWorkflowProperties | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
+
+          type array = ::Array[ModifyWorkflowProperties | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ModifyWorkflowProperties | _ToProto]
+        end
       end
-
-      # The type of `#initialize` parameter.
-      type init = ModifyWorkflowProperties | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ModifyWorkflowProperties, ModifyWorkflowProperties | _ToProto]
-
-      type array = ::Array[ModifyWorkflowProperties | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, ModifyWorkflowProperties | _ToProto]
     end
   end
 end

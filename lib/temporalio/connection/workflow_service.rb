@@ -662,17 +662,17 @@ module Temporalio
         Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdOrderingResponse.decode(response)
       end
 
-      # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkflowRequest]
+      # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest]
       # @param metadata [Hash<String, String>] Headers used on the RPC call.
       #   Keys here override client-level RPC metadata keys.
       # @param timeout [Integer] Optional RPC deadline to set for each RPC call.
       #
-      # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkflowResponse]
-      def update_workflow(request, metadata: {}, timeout: nil)
-        encoded = Temporalio::Api::WorkflowService::V1::UpdateWorkflowRequest.encode(request)
-        response = call(:update_workflow, encoded, metadata, timeout)
+      # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse]
+      def update_workflow_execution(request, metadata: {}, timeout: nil)
+        encoded = Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest.encode(request)
+        response = call(:update_workflow_execution, encoded, metadata, timeout)
 
-        Temporalio::Api::WorkflowService::V1::UpdateWorkflowResponse.decode(response)
+        Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse.decode(response)
       end
 
       # @param request [Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest]

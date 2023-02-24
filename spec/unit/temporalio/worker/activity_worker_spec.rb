@@ -82,9 +82,9 @@ describe Temporalio::Worker::ActivityWorker do
 
     context 'when processing a start task' do
       let(:task) do
-        Coresdk::ActivityTask::ActivityTask.new(
+        Temporalio::Bridge::Api::ActivityTask::ActivityTask.new(
           task_token: token,
-          start: Coresdk::ActivityTask::Start.new(
+          start: Temporalio::Bridge::Api::ActivityTask::Start.new(
             activity_type: activity_name,
             input: [converter.to_payload('test')],
           )
@@ -98,7 +98,7 @@ describe Temporalio::Worker::ActivityWorker do
           Async { |task| subject.run(task) }
 
           expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
             expect(proto.task_token).to eq(token)
             expect(proto.result.failed.failure.message).to eq(
               'Activity unknown-activity is not registered on this worker, available activities: TestActivity'
@@ -115,7 +115,7 @@ describe Temporalio::Worker::ActivityWorker do
           Async { |task| subject.run(task) }
 
           expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
             expect(proto.task_token).to eq(token)
             expect(proto.result.completed.result.data).to eq('"test result"')
           end
@@ -133,7 +133,7 @@ describe Temporalio::Worker::ActivityWorker do
           Async { |task| subject.run(task) }
 
           expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-            proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+            proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
             expect(proto.task_token).to eq(token)
             expect(proto.result.failed.failure.message).to eq('test error')
           end
@@ -152,7 +152,7 @@ describe Temporalio::Worker::ActivityWorker do
             Async { |task| subject.run(task) }
 
             expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-              proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+              proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
               expect(proto.task_token).to eq(token)
               expect(proto.result.failed.failure.message).to eq('test cancellation')
             end
@@ -167,7 +167,7 @@ describe Temporalio::Worker::ActivityWorker do
             Async { |task| subject.run(task) }
 
             expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-              proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+              proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
               expect(proto.task_token).to eq(token)
               expect(proto.result.cancelled.failure.message).to eq('test cancellation')
             end
@@ -178,10 +178,10 @@ describe Temporalio::Worker::ActivityWorker do
 
     context 'when processing a cancel task' do
       let(:task) do
-        Coresdk::ActivityTask::ActivityTask.new(
+        Temporalio::Bridge::Api::ActivityTask::ActivityTask.new(
           task_token: token,
-          cancel: Coresdk::ActivityTask::Cancel.new(
-            reason: Coresdk::ActivityTask::ActivityCancelReason::CANCELLED,
+          cancel: Temporalio::Bridge::Api::ActivityTask::Cancel.new(
+            reason: Temporalio::Bridge::Api::ActivityTask::ActivityCancelReason::CANCELLED,
           )
         )
       end
@@ -214,9 +214,9 @@ describe Temporalio::Worker::ActivityWorker do
 
     context 'when handling a fatal error' do
       let(:task) do
-        Coresdk::ActivityTask::ActivityTask.new(
+        Temporalio::Bridge::Api::ActivityTask::ActivityTask.new(
           task_token: token,
-          start: Coresdk::ActivityTask::Start.new(
+          start: Temporalio::Bridge::Api::ActivityTask::Start.new(
             activity_type: activity_name,
             input: [converter.to_payload('test')],
           )

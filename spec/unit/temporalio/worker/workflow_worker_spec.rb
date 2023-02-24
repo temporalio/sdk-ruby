@@ -84,8 +84,8 @@ describe Temporalio::Worker::WorkflowWorker do
     let(:workflow_id) { SecureRandom.uuid }
     let(:workflow_name) { 'TestHelloWorldWorkflow' }
     let(:start_workflow) do
-      Coresdk::WorkflowActivation::WorkflowActivationJob.new(
-        start_workflow: Coresdk::WorkflowActivation::StartWorkflow.new(
+      Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
+        start_workflow: Temporalio::Bridge::Api::WorkflowActivation::StartWorkflow.new(
           workflow_type: workflow_name,
           workflow_id: workflow_id,
           arguments: [converter.to_payload(input)],
@@ -103,7 +103,7 @@ describe Temporalio::Worker::WorkflowWorker do
         )
       end
       let(:activation) do
-        Coresdk::WorkflowActivation::WorkflowActivation.new(
+        Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
           run_id: run_id,
           timestamp: Time.now,
           is_replaying: false,
@@ -118,7 +118,7 @@ describe Temporalio::Worker::WorkflowWorker do
           Async { |task| subject.run(task) }
 
           expect(core_worker).to have_received(:complete_workflow_activation) do |bytes, &_|
-            proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
+            proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
             expect(proto.run_id).to eq(run_id)
             expect(proto.failed.failure.message).to eq(
               'Workflow unknown-workflow is not registered on this worker, available workflows: ' \
@@ -134,7 +134,7 @@ describe Temporalio::Worker::WorkflowWorker do
           Async { |task| subject.run(task) }
 
           expect(core_worker).to have_received(:complete_workflow_activation) do |bytes, &_|
-            proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
+            proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
             expect(proto.run_id).to eq(run_id)
             expect(proto.successful.commands.length).to eq(1)
             command = proto.successful.commands.first
@@ -157,7 +157,7 @@ describe Temporalio::Worker::WorkflowWorker do
       let(:input) { 42 }
       let(:workflow_name) { 'TestTimerWorkflow' }
       let(:activation_1) do
-        Coresdk::WorkflowActivation::WorkflowActivation.new(
+        Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
           run_id: run_id,
           timestamp: Time.now,
           is_replaying: false,
@@ -165,13 +165,13 @@ describe Temporalio::Worker::WorkflowWorker do
         )
       end
       let(:activation_2) do
-        Coresdk::WorkflowActivation::WorkflowActivation.new(
+        Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
           run_id: run_id,
           timestamp: Time.now,
           is_replaying: false,
           jobs: [
-            Coresdk::WorkflowActivation::WorkflowActivationJob.new(
-              fire_timer: Coresdk::WorkflowActivation::FireTimer.new(seq: 1),
+            Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
+              fire_timer: Temporalio::Bridge::Api::WorkflowActivation::FireTimer.new(seq: 1),
             ),
           ]
         )
@@ -182,7 +182,7 @@ describe Temporalio::Worker::WorkflowWorker do
 
         call = 0
         expect(core_worker).to have_received(:complete_workflow_activation).twice do |bytes|
-          proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
+          proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.decode(bytes)
           expect(proto.run_id).to eq(run_id)
           expect(proto.successful.commands.length).to eq(1)
           command = proto.successful.commands.first
@@ -204,7 +204,7 @@ describe Temporalio::Worker::WorkflowWorker do
 
     context 'when handling a fatal error' do
       let(:activation) do
-        Coresdk::WorkflowActivation::WorkflowActivation.new(
+        Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
           run_id: run_id,
           timestamp: Time.now,
           is_replaying: false,

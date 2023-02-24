@@ -3,6 +3,10 @@ module Temporalio
     module Filter
       module V1
         class WorkflowExecutionFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionFilter) -> String
+
           attr_accessor workflow_id(): ::String
 
           def workflow_id!: () -> ::String?
@@ -40,6 +44,10 @@ module Temporalio
         end
 
         class WorkflowTypeFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowTypeFilter) -> String
+
           attr_accessor name(): ::String
 
           def name!: () -> ::String?
@@ -71,6 +79,10 @@ module Temporalio
         end
 
         class StartTimeFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StartTimeFilter) -> String
+
           attr_accessor earliest_time(): ::Google::Protobuf::Timestamp?
 
           def earliest_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
@@ -116,6 +128,10 @@ module Temporalio
         end
 
         class StatusFilter < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (StatusFilter) -> String
+
           attr_accessor status(): ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus
 
           def status=: (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values) -> ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::values

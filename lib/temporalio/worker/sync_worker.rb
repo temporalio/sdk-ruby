@@ -21,41 +21,41 @@ module Temporalio
       def poll_activity_task
         with_queue do |done|
           core_worker.poll_activity_task do |task, error|
-            done.call(task && Coresdk::ActivityTask::ActivityTask.decode(task), error)
+            done.call(task && Temporalio::Bridge::Api::ActivityTask::ActivityTask.decode(task), error)
           end
         end
       end
 
       def complete_activity_task_with_success(task_token, payload)
-        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
-          completed: Coresdk::ActivityResult::Success.new(result: payload),
+        result = Temporalio::Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+          completed: Temporalio::Bridge::Api::ActivityResult::Success.new(result: payload),
         )
 
         complete_activity_task(task_token, result)
       end
 
       def complete_activity_task_with_failure(task_token, failure)
-        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
-          failed: Coresdk::ActivityResult::Failure.new(failure: failure),
+        result = Temporalio::Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+          failed: Temporalio::Bridge::Api::ActivityResult::Failure.new(failure: failure),
         )
 
         complete_activity_task(task_token, result)
       end
 
       def complete_activity_task_with_cancellation(task_token, failure)
-        result = Coresdk::ActivityResult::ActivityExecutionResult.new(
-          cancelled: Coresdk::ActivityResult::Cancellation.new(failure: failure),
+        result = Temporalio::Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+          cancelled: Temporalio::Bridge::Api::ActivityResult::Cancellation.new(failure: failure),
         )
 
         complete_activity_task(task_token, result)
       end
 
       def record_activity_heartbeat(task_token, payloads)
-        proto = Coresdk::ActivityHeartbeat.new(
+        proto = Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat.new(
           task_token: task_token,
           details: payloads,
         )
-        encoded_proto = Coresdk::ActivityHeartbeat.encode(proto)
+        encoded_proto = Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat.encode(proto)
 
         core_worker.record_activity_heartbeat(encoded_proto)
       end
@@ -63,24 +63,24 @@ module Temporalio
       def poll_workflow_activation
         with_queue do |done|
           core_worker.poll_workflow_activation do |task, error|
-            done.call(task && Coresdk::WorkflowActivation::WorkflowActivation.decode(task), error)
+            done.call(task && Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.decode(task), error)
           end
         end
       end
 
       def complete_workflow_activation_with_success(run_id, commands)
-        proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.new(
+        proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
           run_id: run_id,
-          successful: Coresdk::WorkflowCompletion::Success.new(commands: commands),
+          successful: Temporalio::Bridge::Api::WorkflowCompletion::Success.new(commands: commands),
         )
 
         complete_workflow_activation(proto)
       end
 
       def complete_workflow_activation_with_failure(run_id, failure)
-        proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.new(
+        proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
           run_id: run_id,
-          failed: Coresdk::WorkflowCompletion::Failure.new(failure: failure),
+          failed: Temporalio::Bridge::Api::WorkflowCompletion::Failure.new(failure: failure),
         )
 
         complete_workflow_activation(proto)
@@ -101,11 +101,11 @@ module Temporalio
       end
 
       def complete_activity_task(task_token, result)
-        proto = Coresdk::ActivityTaskCompletion.new(
+        proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.new(
           task_token: task_token,
           result: result,
         )
-        encoded_proto = Coresdk::ActivityTaskCompletion.encode(proto)
+        encoded_proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.encode(proto)
 
         with_queue do |done|
           core_worker.complete_activity_task(encoded_proto, &done)
@@ -113,7 +113,7 @@ module Temporalio
       end
 
       def complete_workflow_activation(proto)
-        encoded_proto = Coresdk::WorkflowCompletion::WorkflowActivationCompletion.encode(proto)
+        encoded_proto = Temporalio::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.encode(proto)
 
         with_queue do |done|
           core_worker.complete_workflow_activation(encoded_proto, &done)

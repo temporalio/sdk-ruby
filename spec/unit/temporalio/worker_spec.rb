@@ -59,7 +59,7 @@ describe Temporalio::Worker do
 
       expect(Temporalio::Bridge::Worker)
         .to have_received(:create)
-        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue, 1_000)
+        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue, 1_000, false)
     end
 
     it 'uses a default executor with a default size' do

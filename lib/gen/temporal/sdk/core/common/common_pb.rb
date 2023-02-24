@@ -15,8 +15,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module Common
-    NamespacedWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.NamespacedWorkflowExecution").msgclass
+module Temporalio
+  module Bridge
+    module Api
+      module Common
+        NamespacedWorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.common.NamespacedWorkflowExecution").msgclass
+      end
+    end
   end
 end

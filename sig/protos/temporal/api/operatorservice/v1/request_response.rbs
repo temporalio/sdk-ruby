@@ -5,6 +5,10 @@ module Temporalio
         # (-- Search Attribute --)
         #
         class AddSearchAttributesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (AddSearchAttributesRequest) -> String
+
           # Mapping between search attribute name and its IndexedValueType.
           #
           attr_accessor search_attributes(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
@@ -16,13 +20,19 @@ module Temporalio
 
           def search_attributes!: () -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]?
 
-          def initialize: (?search_attributes: ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> void
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?search_attributes: ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String], ?namespace: ::String) -> void
 
           def []: (:search_attributes) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
+                | (:namespace) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:search_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
                  | (:search_attributes, ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]) -> ::Temporalio::Api::Enums::V1::IndexedValueType::hash[::String]
+                 | (:namespace, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -44,6 +54,10 @@ module Temporalio
         end
 
         class AddSearchAttributesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (AddSearchAttributesResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -65,6 +79,10 @@ module Temporalio
         end
 
         class RemoveSearchAttributesRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RemoveSearchAttributesRequest) -> String
+
           # Search attribute names to delete.
           #
           attr_accessor search_attributes(): ::Protobuf::field_array[::String]
@@ -76,13 +94,19 @@ module Temporalio
 
           def search_attributes!: () -> ::Protobuf::field_array[::String]?
 
-          def initialize: (?search_attributes: ::Array[::String]) -> void
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?search_attributes: ::Array[::String], ?namespace: ::String) -> void
 
           def []: (:search_attributes) -> ::Protobuf::field_array[::String]
+                | (:namespace) -> ::String
                 | (::Symbol) -> untyped
 
           def []=: (:search_attributes, ::Protobuf::field_array[::String]) -> ::Protobuf::field_array[::String]
                  | (:search_attributes, ::Array[::String]) -> ::Array[::String]
+                 | (:namespace, ::String) -> ::String
                  | (::Symbol, untyped) -> untyped
 
           interface _ToProto
@@ -104,6 +128,10 @@ module Temporalio
         end
 
         class RemoveSearchAttributesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RemoveSearchAttributesResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -125,7 +153,21 @@ module Temporalio
         end
 
         class ListSearchAttributesRequest < ::Protobuf::Message
-          def initialize: () -> void
+          # Encode the message to a binary string
+          #
+          def self.encode: (ListSearchAttributesRequest) -> String
+
+          attr_accessor namespace(): ::String
+
+          def namespace!: () -> ::String?
+
+          def initialize: (?namespace: ::String) -> void
+
+          def []: (:namespace) -> ::String
+                | (::Symbol) -> untyped
+
+          def []=: (:namespace, ::String) -> ::String
+                 | (::Symbol, untyped) -> untyped
 
           interface _ToProto
             def to_proto: () -> ListSearchAttributesRequest
@@ -146,6 +188,10 @@ module Temporalio
         end
 
         class ListSearchAttributesResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ListSearchAttributesResponse) -> String
+
           # Mapping between custom (user-registered) search attribute name to its IndexedValueType.
           #
           attr_accessor custom_attributes(): ::Temporalio::Api::Enums::V1::IndexedValueType::field_hash[::String]
@@ -218,6 +264,10 @@ module Temporalio
         #      aip.dev/not-precedent: DeleteNamespace RPC doesn't follow Google API format. --)
         #
         class DeleteNamespaceRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (DeleteNamespaceRequest) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -249,6 +299,10 @@ module Temporalio
         end
 
         class DeleteNamespaceResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (DeleteNamespaceResponse) -> String
+
           # Temporary namespace name that is used during reclaim resources step.
           #
           attr_accessor deleted_namespace(): ::String
@@ -282,6 +336,10 @@ module Temporalio
         end
 
         class AddOrUpdateRemoteClusterRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (AddOrUpdateRemoteClusterRequest) -> String
+
           # Frontend Address is a cross cluster accessible address.
           #
           attr_accessor frontend_address(): ::String
@@ -325,6 +383,10 @@ module Temporalio
         end
 
         class AddOrUpdateRemoteClusterResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (AddOrUpdateRemoteClusterResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -346,6 +408,10 @@ module Temporalio
         end
 
         class RemoveRemoteClusterRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RemoveRemoteClusterRequest) -> String
+
           # Remote cluster name to be removed.
           #
           attr_accessor cluster_name(): ::String
@@ -379,6 +445,10 @@ module Temporalio
         end
 
         class RemoveRemoteClusterResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (RemoveRemoteClusterResponse) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -400,6 +470,10 @@ module Temporalio
         end
 
         class ListClustersRequest < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ListClustersRequest) -> String
+
           attr_accessor page_size(): ::Integer
 
           def page_size!: () -> ::Integer?
@@ -437,6 +511,10 @@ module Temporalio
         end
 
         class ListClustersResponse < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ListClustersResponse) -> String
+
           # List of all cluster information
           #
           attr_accessor clusters(): ::Temporalio::Api::OperatorService::V1::ClusterMetadata::field_array
@@ -482,6 +560,10 @@ module Temporalio
         end
 
         class ClusterMetadata < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ClusterMetadata) -> String
+
           # Name of the cluster name.
           #
           attr_accessor cluster_name(): ::String

@@ -42,8 +42,8 @@ module Temporalio
           future.on_cancel do
             if runner.remove_completion(:timer, seq)
               runner.push_command(
-                Coresdk::WorkflowCommands::WorkflowCommand.new(
-                  cancel_timer: Coresdk::WorkflowCommands::CancelTimer.new(
+                Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                  cancel_timer: Temporalio::Bridge::Api::WorkflowCommands::CancelTimer.new(
                     seq: seq,
                   ),
                 ),
@@ -54,8 +54,8 @@ module Temporalio
 
           # TODO: Do we need our own struct interface for commands?
           runner.push_command(
-            Coresdk::WorkflowCommands::WorkflowCommand.new(
-              start_timer: Coresdk::WorkflowCommands::StartTimer.new(
+            Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+              start_timer: Temporalio::Bridge::Api::WorkflowCommands::StartTimer.new(
                 seq: seq,
                 start_to_fire_timeout: Google::Protobuf::Duration.new(seconds: duration),
               ),

@@ -79,16 +79,16 @@ describe Temporalio::Workflow::Context do
     let(:seq) { 1 }
     let(:duration) { 42 }
     let(:start_timer_command) do
-      Coresdk::WorkflowCommands::WorkflowCommand.new(
-        start_timer: Coresdk::WorkflowCommands::StartTimer.new(
+      Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+        start_timer: Temporalio::Bridge::Api::WorkflowCommands::StartTimer.new(
           seq: seq,
           start_to_fire_timeout: Google::Protobuf::Duration.new(seconds: duration),
         ),
       )
     end
     let(:cancel_timer_command) do
-      Coresdk::WorkflowCommands::WorkflowCommand.new(
-        cancel_timer: Coresdk::WorkflowCommands::CancelTimer.new(seq: seq),
+      Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+        cancel_timer: Temporalio::Bridge::Api::WorkflowCommands::CancelTimer.new(seq: seq),
       )
     end
 

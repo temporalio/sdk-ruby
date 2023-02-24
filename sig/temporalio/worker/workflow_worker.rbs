@@ -27,9 +27,9 @@ module Temporalio
       def prepare_workflows: (Array[singleton(Temporalio::Workflow)] workflows)
         -> Hash[String, singleton(Temporalio::Workflow)]
       def lookup_workflow: (String workflow_type) -> singleton(Temporalio::Workflow)
-      def get_or_create_workflow_runner: (Coresdk::WorkflowActivation::WorkflowActivation activation)
+      def get_or_create_workflow_runner: (Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation activation)
         -> Temporalio::Worker::WorkflowRunner
-      def handle_activation: (Coresdk::WorkflowActivation::WorkflowActivation activation) -> void
+      def handle_activation: (Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation activation) -> void
     end
   end
 end

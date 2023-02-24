@@ -2,12 +2,20 @@ module Temporalio
   module Api
     module Enums
       module V1
-        class WorkflowUpdateResultAccessStyle < ::Protobuf::Enum
-          type names = :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED | :WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE
+        # UpdateWorkflowExecutionLifecycleStage is specified by clients invoking
+        #  workflow execution updates and used to indicate to the server how long the
+        #  client wishes to wait for a return value from the RPC. If any value other
+        #  than UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_COMPLETED is sent by the
+        #  client then the RPC will complete before the update is finished and will
+        #  return a handle to the running update so that it can later be polled for
+        #  completion.
+        #
+        class UpdateWorkflowExecutionLifecycleStage < ::Protobuf::Enum
+          type names = :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED | :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ADMITTED | :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ACCEPTED | :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_COMPLETED
 
-          type strings = "WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED" | "WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE"
+          type strings = "UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED" | "UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ADMITTED" | "UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ACCEPTED" | "UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_COMPLETED"
 
-          type tags = 0 | 1
+          type tags = 0 | 1 | 2 | 3
 
           type values = names | strings | tags
 
@@ -15,25 +23,40 @@ module Temporalio
 
           attr_reader tag(): tags
 
-          WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_UNSPECIFIED: WorkflowUpdateResultAccessStyle
-
-          # Indicates that the update response _must_ be included as part of the gRPC
-          #  response body
+          # An unspecified vale for this enum.
           #
-          WORKFLOW_UPDATE_RESULT_ACCESS_STYLE_REQUIRE_INLINE: WorkflowUpdateResultAccessStyle
+          UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED: UpdateWorkflowExecutionLifecycleStage
+
+          # The gRPC call will not return until the update request has been admitted
+          #  by the server - it may be the case that due to a considerations like load
+          #  or resource limits that an update is made to wait before the server will
+          #  indicate that it has been received and will be processed. This value
+          #  does not wait for any sort of acknowledgement from a worker.
+          #
+          UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ADMITTED: UpdateWorkflowExecutionLifecycleStage
+
+          # The gRPC call will not return until the update has passed validation on
+          #  a worker.
+          #
+          UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_ACCEPTED: UpdateWorkflowExecutionLifecycleStage
+
+          # The gRPC call will not return until the update has executed to completion
+          #  on a worker and has either been rejected or returned a value or an error.
+          #
+          UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_COMPLETED: UpdateWorkflowExecutionLifecycleStage
 
           # The type of `#initialize` parameter.
-          type init = WorkflowUpdateResultAccessStyle | values
+          type init = UpdateWorkflowExecutionLifecycleStage | values
 
           # The type of `repeated` field.
-          type field_array = ::Protobuf::Field::FieldArray[WorkflowUpdateResultAccessStyle, WorkflowUpdateResultAccessStyle | values]
+          type field_array = ::Protobuf::Field::FieldArray[UpdateWorkflowExecutionLifecycleStage, UpdateWorkflowExecutionLifecycleStage | values]
 
           # The type of `map` field.
-          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, WorkflowUpdateResultAccessStyle, WorkflowUpdateResultAccessStyle | values]
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, UpdateWorkflowExecutionLifecycleStage, UpdateWorkflowExecutionLifecycleStage | values]
 
-          type array = ::Array[WorkflowUpdateResultAccessStyle | values]
+          type array = ::Array[UpdateWorkflowExecutionLifecycleStage | values]
 
-          type hash[KEY] = ::Hash[KEY, WorkflowUpdateResultAccessStyle | values]
+          type hash[KEY] = ::Hash[KEY, UpdateWorkflowExecutionLifecycleStage | values]
         end
       end
     end

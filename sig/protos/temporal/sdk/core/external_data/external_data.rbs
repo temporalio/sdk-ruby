@@ -1,111 +1,119 @@
-module Coresdk
-  module External_data
-    # This file defines data that Core might write externally. The first motivating case being
-    #  storing data in markers in event history. Defining such data as protos provides an easy way
-    #  for consumers which would like to just depend on the proto package to make sense of marker data.
-    #
-    class LocalActivityMarkerData < ::Protobuf::Message
-      attr_accessor seq(): ::Integer
+module Temporalio
+  module Bridge
+    module Api
+      module ExternalData
+        # This file defines data that Core might write externally. The first motivating case being
+        #  storing data in markers in event history. Defining such data as protos provides an easy way
+        #  for consumers which would like to just depend on the proto package to make sense of marker data.
+        #
+        class LocalActivityMarkerData < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (LocalActivityMarkerData) -> String
 
-      def seq!: () -> ::Integer?
+          attr_accessor seq(): ::Integer
 
-      # The number of attempts at execution before we recorded this result. Typically starts at 1,
-      #  but it is possible to start at a higher number when backing off using a timer.
-      #
-      attr_accessor attempt(): ::Integer
+          def seq!: () -> ::Integer?
 
-      def attempt!: () -> ::Integer?
+          # The number of attempts at execution before we recorded this result. Typically starts at 1,
+          #  but it is possible to start at a higher number when backing off using a timer.
+          #
+          attr_accessor attempt(): ::Integer
 
-      attr_accessor activity_id(): ::String
+          def attempt!: () -> ::Integer?
 
-      def activity_id!: () -> ::String?
+          attr_accessor activity_id(): ::String
 
-      attr_accessor activity_type(): ::String
+          def activity_id!: () -> ::String?
 
-      def activity_type!: () -> ::String?
+          attr_accessor activity_type(): ::String
 
-      # You can think of this as "perceived completion time". It is the time the local activity thought
-      #  it was when it completed. Which could be different from wall-clock time because of workflow
-      #  replay. It's the WFT start time + the LA's runtime
-      #
-      attr_accessor complete_time(): ::Google::Protobuf::Timestamp?
+          def activity_type!: () -> ::String?
 
-      # You can think of this as "perceived completion time". It is the time the local activity thought
-      #  it was when it completed. Which could be different from wall-clock time because of workflow
-      #  replay. It's the WFT start time + the LA's runtime
-      #
-      def complete_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                        | ...
+          # You can think of this as "perceived completion time". It is the time the local activity thought
+          #  it was when it completed. Which could be different from wall-clock time because of workflow
+          #  replay. It's the WFT start time + the LA's runtime
+          #
+          attr_accessor complete_time(): ::Google::Protobuf::Timestamp?
 
-      def complete_time!: () -> ::Google::Protobuf::Timestamp?
+          # You can think of this as "perceived completion time". It is the time the local activity thought
+          #  it was when it completed. Which could be different from wall-clock time because of workflow
+          #  replay. It's the WFT start time + the LA's runtime
+          #
+          def complete_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                            | ...
 
-      # If set, this local activity conceptually is retrying after the specified backoff.
-      #  Implementation wise, they are really two different LA machines, but with the same type & input.
-      #  The retry starts with an attempt number > 1.
-      #
-      attr_accessor backoff(): ::Google::Protobuf::Duration?
+          def complete_time!: () -> ::Google::Protobuf::Timestamp?
 
-      # If set, this local activity conceptually is retrying after the specified backoff.
-      #  Implementation wise, they are really two different LA machines, but with the same type & input.
-      #  The retry starts with an attempt number > 1.
-      #
-      def backoff=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
-                  | ...
+          # If set, this local activity conceptually is retrying after the specified backoff.
+          #  Implementation wise, they are really two different LA machines, but with the same type & input.
+          #  The retry starts with an attempt number > 1.
+          #
+          attr_accessor backoff(): ::Google::Protobuf::Duration?
 
-      def backoff!: () -> ::Google::Protobuf::Duration?
+          # If set, this local activity conceptually is retrying after the specified backoff.
+          #  Implementation wise, they are really two different LA machines, but with the same type & input.
+          #  The retry starts with an attempt number > 1.
+          #
+          def backoff=: [M < ::Google::Protobuf::Duration::_ToProto] (M?) -> M?
+                      | ...
 
-      # The time the LA was originally scheduled (wall clock time). This is used to track
-      #  schedule-to-close timeouts when timer-based backoffs are used
-      #
-      attr_accessor original_schedule_time(): ::Google::Protobuf::Timestamp?
+          def backoff!: () -> ::Google::Protobuf::Duration?
 
-      # The time the LA was originally scheduled (wall clock time). This is used to track
-      #  schedule-to-close timeouts when timer-based backoffs are used
-      #
-      def original_schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
-                                 | ...
+          # The time the LA was originally scheduled (wall clock time). This is used to track
+          #  schedule-to-close timeouts when timer-based backoffs are used
+          #
+          attr_accessor original_schedule_time(): ::Google::Protobuf::Timestamp?
 
-      def original_schedule_time!: () -> ::Google::Protobuf::Timestamp?
+          # The time the LA was originally scheduled (wall clock time). This is used to track
+          #  schedule-to-close timeouts when timer-based backoffs are used
+          #
+          def original_schedule_time=: [M < ::Google::Protobuf::Timestamp::_ToProto] (M?) -> M?
+                                     | ...
 
-      def initialize: (?seq: ::Integer, ?attempt: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?complete_time: ::Google::Protobuf::Timestamp::init?, ?backoff: ::Google::Protobuf::Duration::init?, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?) -> void
+          def original_schedule_time!: () -> ::Google::Protobuf::Timestamp?
 
-      def []: (:seq) -> ::Integer
-            | (:attempt) -> ::Integer
-            | (:activity_id) -> ::String
-            | (:activity_type) -> ::String
-            | (:complete_time) -> ::Google::Protobuf::Timestamp?
-            | (:backoff) -> ::Google::Protobuf::Duration?
-            | (:original_schedule_time) -> ::Google::Protobuf::Timestamp?
-            | (::Symbol) -> untyped
+          def initialize: (?seq: ::Integer, ?attempt: ::Integer, ?activity_id: ::String, ?activity_type: ::String, ?complete_time: ::Google::Protobuf::Timestamp::init?, ?backoff: ::Google::Protobuf::Duration::init?, ?original_schedule_time: ::Google::Protobuf::Timestamp::init?) -> void
 
-      def []=: (:seq, ::Integer) -> ::Integer
-             | (:attempt, ::Integer) -> ::Integer
-             | (:activity_id, ::String) -> ::String
-             | (:activity_type, ::String) -> ::String
-             | (:complete_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:complete_time, M?) -> M?
-             | (:backoff, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
-             | [M < ::Google::Protobuf::Duration::_ToProto] (:backoff, M?) -> M?
-             | (:original_schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
-             | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_schedule_time, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def []: (:seq) -> ::Integer
+                | (:attempt) -> ::Integer
+                | (:activity_id) -> ::String
+                | (:activity_type) -> ::String
+                | (:complete_time) -> ::Google::Protobuf::Timestamp?
+                | (:backoff) -> ::Google::Protobuf::Duration?
+                | (:original_schedule_time) -> ::Google::Protobuf::Timestamp?
+                | (::Symbol) -> untyped
 
-      interface _ToProto
-        def to_proto: () -> LocalActivityMarkerData
+          def []=: (:seq, ::Integer) -> ::Integer
+                 | (:attempt, ::Integer) -> ::Integer
+                 | (:activity_id, ::String) -> ::String
+                 | (:activity_type, ::String) -> ::String
+                 | (:complete_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:complete_time, M?) -> M?
+                 | (:backoff, ::Google::Protobuf::Duration?) -> ::Google::Protobuf::Duration?
+                 | [M < ::Google::Protobuf::Duration::_ToProto] (:backoff, M?) -> M?
+                 | (:original_schedule_time, ::Google::Protobuf::Timestamp?) -> ::Google::Protobuf::Timestamp?
+                 | [M < ::Google::Protobuf::Timestamp::_ToProto] (:original_schedule_time, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> LocalActivityMarkerData
+          end
+
+          # The type of `#initialize` parameter.
+          type init = LocalActivityMarkerData | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[LocalActivityMarkerData, LocalActivityMarkerData | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LocalActivityMarkerData, LocalActivityMarkerData | _ToProto]
+
+          type array = ::Array[LocalActivityMarkerData | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, LocalActivityMarkerData | _ToProto]
+        end
       end
-
-      # The type of `#initialize` parameter.
-      type init = LocalActivityMarkerData | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[LocalActivityMarkerData, LocalActivityMarkerData | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, LocalActivityMarkerData, LocalActivityMarkerData | _ToProto]
-
-      type array = ::Array[LocalActivityMarkerData | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, LocalActivityMarkerData | _ToProto]
     end
   end
 end

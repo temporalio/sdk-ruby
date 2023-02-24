@@ -3,6 +3,10 @@ module Temporalio
     module ErrorDetails
       module V1
         class NotFoundFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NotFoundFailure) -> String
+
           attr_accessor current_cluster(): ::String
 
           def current_cluster!: () -> ::String?
@@ -40,6 +44,10 @@ module Temporalio
         end
 
         class WorkflowExecutionAlreadyStartedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowExecutionAlreadyStartedFailure) -> String
+
           attr_accessor start_request_id(): ::String
 
           def start_request_id!: () -> ::String?
@@ -77,6 +85,10 @@ module Temporalio
         end
 
         class NamespaceNotActiveFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceNotActiveFailure) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -120,6 +132,10 @@ module Temporalio
         end
 
         class NamespaceInvalidStateFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceInvalidStateFailure) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -181,6 +197,10 @@ module Temporalio
         end
 
         class NamespaceNotFoundFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceNotFoundFailure) -> String
+
           attr_accessor namespace(): ::String
 
           def namespace!: () -> ::String?
@@ -212,6 +232,10 @@ module Temporalio
         end
 
         class NamespaceAlreadyExistsFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (NamespaceAlreadyExistsFailure) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -233,6 +257,10 @@ module Temporalio
         end
 
         class ClientVersionNotSupportedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ClientVersionNotSupportedFailure) -> String
+
           attr_accessor client_version(): ::String
 
           def client_version!: () -> ::String?
@@ -276,6 +304,10 @@ module Temporalio
         end
 
         class ServerVersionNotSupportedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ServerVersionNotSupportedFailure) -> String
+
           attr_accessor server_version(): ::String
 
           def server_version!: () -> ::String?
@@ -313,6 +345,10 @@ module Temporalio
         end
 
         class CancellationAlreadyRequestedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (CancellationAlreadyRequestedFailure) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -334,6 +370,10 @@ module Temporalio
         end
 
         class QueryFailedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (QueryFailedFailure) -> String
+
           def initialize: () -> void
 
           interface _ToProto
@@ -355,6 +395,10 @@ module Temporalio
         end
 
         class PermissionDeniedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (PermissionDeniedFailure) -> String
+
           attr_accessor reason(): ::String
 
           def reason!: () -> ::String?
@@ -386,6 +430,10 @@ module Temporalio
         end
 
         class ResourceExhaustedFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ResourceExhaustedFailure) -> String
+
           attr_accessor cause(): ::Temporalio::Api::Enums::V1::ResourceExhaustedCause
 
           def cause=: (::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values) -> ::Temporalio::Api::Enums::V1::ResourceExhaustedCause::values
@@ -421,6 +469,10 @@ module Temporalio
         end
 
         class SystemWorkflowFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (SystemWorkflowFailure) -> String
+
           # WorkflowId and RunId of the Temporal system workflow performing the underlying operation.
           #  Looking up the info of the system workflow run may help identify the issue causing the failure.
           #
@@ -470,6 +522,10 @@ module Temporalio
         end
 
         class WorkflowNotReadyFailure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (WorkflowNotReadyFailure) -> String
+
           def initialize: () -> void
 
           interface _ToProto

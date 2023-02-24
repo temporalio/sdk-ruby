@@ -5,6 +5,10 @@ module Temporalio
         # ReleaseInfo contains information about specific version of temporal.
         #
         class ReleaseInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ReleaseInfo) -> String
+
           attr_accessor version(): ::String
 
           def version!: () -> ::String?
@@ -54,6 +58,10 @@ module Temporalio
         # Alert contains notification and severity.
         #
         class Alert < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (Alert) -> String
+
           attr_accessor message(): ::String
 
           def message!: () -> ::String?
@@ -97,6 +105,10 @@ module Temporalio
         # VersionInfo contains details about current and recommended release versions as well as alerts and upgrade instructions.
         #
         class VersionInfo < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (VersionInfo) -> String
+
           attr_accessor current(): ::Temporalio::Api::Version::V1::ReleaseInfo?
 
           def current=: [M < ::Temporalio::Api::Version::V1::ReleaseInfo::_ToProto] (M?) -> M?

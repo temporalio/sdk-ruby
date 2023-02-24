@@ -1,303 +1,323 @@
-module Coresdk
-  module Child_workflow
-    # *
-    #  Used by the service to determine the fate of a child workflow
-    #  in case its parent is closed.
-    #
-    class ParentClosePolicy < ::Protobuf::Enum
-      type names = :PARENT_CLOSE_POLICY_UNSPECIFIED | :PARENT_CLOSE_POLICY_TERMINATE | :PARENT_CLOSE_POLICY_ABANDON | :PARENT_CLOSE_POLICY_REQUEST_CANCEL
+module Temporalio
+  module Bridge
+    module Api
+      module ChildWorkflow
+        # *
+        #  Used by the service to determine the fate of a child workflow
+        #  in case its parent is closed.
+        #
+        class ParentClosePolicy < ::Protobuf::Enum
+          type names = :PARENT_CLOSE_POLICY_UNSPECIFIED | :PARENT_CLOSE_POLICY_TERMINATE | :PARENT_CLOSE_POLICY_ABANDON | :PARENT_CLOSE_POLICY_REQUEST_CANCEL
 
-      type strings = "PARENT_CLOSE_POLICY_UNSPECIFIED" | "PARENT_CLOSE_POLICY_TERMINATE" | "PARENT_CLOSE_POLICY_ABANDON" | "PARENT_CLOSE_POLICY_REQUEST_CANCEL"
+          type strings = "PARENT_CLOSE_POLICY_UNSPECIFIED" | "PARENT_CLOSE_POLICY_TERMINATE" | "PARENT_CLOSE_POLICY_ABANDON" | "PARENT_CLOSE_POLICY_REQUEST_CANCEL"
 
-      type tags = 0 | 1 | 2 | 3
+          type tags = 0 | 1 | 2 | 3
 
-      type values = names | strings | tags
+          type values = names | strings | tags
 
-      attr_reader name(): names
+          attr_reader name(): names
 
-      attr_reader tag(): tags
+          attr_reader tag(): tags
 
-      # * Let's the server set the default.
-      #
-      PARENT_CLOSE_POLICY_UNSPECIFIED: ParentClosePolicy
+          # * Let's the server set the default.
+          #
+          PARENT_CLOSE_POLICY_UNSPECIFIED: ParentClosePolicy
 
-      # * Terminate means terminating the child workflow.
-      #
-      PARENT_CLOSE_POLICY_TERMINATE: ParentClosePolicy
+          # * Terminate means terminating the child workflow.
+          #
+          PARENT_CLOSE_POLICY_TERMINATE: ParentClosePolicy
 
-      # * Abandon means not doing anything on the child workflow.
-      #
-      PARENT_CLOSE_POLICY_ABANDON: ParentClosePolicy
+          # * Abandon means not doing anything on the child workflow.
+          #
+          PARENT_CLOSE_POLICY_ABANDON: ParentClosePolicy
 
-      # * Cancel means requesting cancellation on the child workflow.
-      #
-      PARENT_CLOSE_POLICY_REQUEST_CANCEL: ParentClosePolicy
+          # * Cancel means requesting cancellation on the child workflow.
+          #
+          PARENT_CLOSE_POLICY_REQUEST_CANCEL: ParentClosePolicy
 
-      # The type of `#initialize` parameter.
-      type init = ParentClosePolicy | values
+          # The type of `#initialize` parameter.
+          type init = ParentClosePolicy | values
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ParentClosePolicy, ParentClosePolicy | values]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ParentClosePolicy, ParentClosePolicy | values]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ParentClosePolicy, ParentClosePolicy | values]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ParentClosePolicy, ParentClosePolicy | values]
 
-      type array = ::Array[ParentClosePolicy | values]
+          type array = ::Array[ParentClosePolicy | values]
 
-      type hash[KEY] = ::Hash[KEY, ParentClosePolicy | values]
-    end
+          type hash[KEY] = ::Hash[KEY, ParentClosePolicy | values]
+        end
 
-    # * Possible causes of failure to start a child workflow
-    #
-    class StartChildWorkflowExecutionFailedCause < ::Protobuf::Enum
-      type names = :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED | :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS
+        # * Possible causes of failure to start a child workflow
+        #
+        class StartChildWorkflowExecutionFailedCause < ::Protobuf::Enum
+          type names = :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED | :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS
 
-      type strings = "START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED" | "START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS"
+          type strings = "START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED" | "START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS"
 
-      type tags = 0 | 1
+          type tags = 0 | 1
 
-      type values = names | strings | tags
+          type values = names | strings | tags
 
-      attr_reader name(): names
+          attr_reader name(): names
 
-      attr_reader tag(): tags
+          attr_reader tag(): tags
 
-      START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED: StartChildWorkflowExecutionFailedCause
+          START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED: StartChildWorkflowExecutionFailedCause
 
-      START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS: StartChildWorkflowExecutionFailedCause
+          START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS: StartChildWorkflowExecutionFailedCause
 
-      # The type of `#initialize` parameter.
-      type init = StartChildWorkflowExecutionFailedCause | values
+          # The type of `#initialize` parameter.
+          type init = StartChildWorkflowExecutionFailedCause | values
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[StartChildWorkflowExecutionFailedCause, StartChildWorkflowExecutionFailedCause | values]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[StartChildWorkflowExecutionFailedCause, StartChildWorkflowExecutionFailedCause | values]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartChildWorkflowExecutionFailedCause, StartChildWorkflowExecutionFailedCause | values]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, StartChildWorkflowExecutionFailedCause, StartChildWorkflowExecutionFailedCause | values]
 
-      type array = ::Array[StartChildWorkflowExecutionFailedCause | values]
+          type array = ::Array[StartChildWorkflowExecutionFailedCause | values]
 
-      type hash[KEY] = ::Hash[KEY, StartChildWorkflowExecutionFailedCause | values]
-    end
+          type hash[KEY] = ::Hash[KEY, StartChildWorkflowExecutionFailedCause | values]
+        end
 
-    # *
-    #  Controls at which point to report back to lang when a child workflow is cancelled
-    #
-    class ChildWorkflowCancellationType < ::Protobuf::Enum
-      type names = :ABANDON | :TRY_CANCEL | :WAIT_CANCELLATION_COMPLETED | :WAIT_CANCELLATION_REQUESTED
+        # *
+        #  Controls at which point to report back to lang when a child workflow is cancelled
+        #
+        class ChildWorkflowCancellationType < ::Protobuf::Enum
+          type names = :ABANDON | :TRY_CANCEL | :WAIT_CANCELLATION_COMPLETED | :WAIT_CANCELLATION_REQUESTED
 
-      type strings = "ABANDON" | "TRY_CANCEL" | "WAIT_CANCELLATION_COMPLETED" | "WAIT_CANCELLATION_REQUESTED"
+          type strings = "ABANDON" | "TRY_CANCEL" | "WAIT_CANCELLATION_COMPLETED" | "WAIT_CANCELLATION_REQUESTED"
 
-      type tags = 0 | 1 | 2 | 3
+          type tags = 0 | 1 | 2 | 3
 
-      type values = names | strings | tags
+          type values = names | strings | tags
 
-      attr_reader name(): names
+          attr_reader name(): names
 
-      attr_reader tag(): tags
+          attr_reader tag(): tags
 
-      # * Do not request cancellation of the child workflow if already scheduled
-      #
-      ABANDON: ChildWorkflowCancellationType
+          # * Do not request cancellation of the child workflow if already scheduled
+          #
+          ABANDON: ChildWorkflowCancellationType
 
-      # * Initiate a cancellation request and immediately report cancellation to the parent.
-      #
-      TRY_CANCEL: ChildWorkflowCancellationType
+          # * Initiate a cancellation request and immediately report cancellation to the parent.
+          #
+          TRY_CANCEL: ChildWorkflowCancellationType
 
-      # * Wait for child cancellation completion.
-      #
-      WAIT_CANCELLATION_COMPLETED: ChildWorkflowCancellationType
+          # * Wait for child cancellation completion.
+          #
+          WAIT_CANCELLATION_COMPLETED: ChildWorkflowCancellationType
 
-      # * Request cancellation of the child and wait for confirmation that the request was received.
-      #
-      WAIT_CANCELLATION_REQUESTED: ChildWorkflowCancellationType
+          # * Request cancellation of the child and wait for confirmation that the request was received.
+          #
+          WAIT_CANCELLATION_REQUESTED: ChildWorkflowCancellationType
 
-      # The type of `#initialize` parameter.
-      type init = ChildWorkflowCancellationType | values
+          # The type of `#initialize` parameter.
+          type init = ChildWorkflowCancellationType | values
 
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ChildWorkflowCancellationType, ChildWorkflowCancellationType | values]
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ChildWorkflowCancellationType, ChildWorkflowCancellationType | values]
 
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ChildWorkflowCancellationType, ChildWorkflowCancellationType | values]
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ChildWorkflowCancellationType, ChildWorkflowCancellationType | values]
 
-      type array = ::Array[ChildWorkflowCancellationType | values]
+          type array = ::Array[ChildWorkflowCancellationType | values]
 
-      type hash[KEY] = ::Hash[KEY, ChildWorkflowCancellationType | values]
-    end
+          type hash[KEY] = ::Hash[KEY, ChildWorkflowCancellationType | values]
+        end
 
-    # *
-    #  Used by core to resolve child workflow executions.
-    #
-    class ChildWorkflowResult < ::Protobuf::Message
-      attr_accessor completed(): ::Coresdk::Child_workflow::Success?
+        # *
+        #  Used by core to resolve child workflow executions.
+        #
+        class ChildWorkflowResult < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (ChildWorkflowResult) -> String
 
-      def completed=: [M < ::Coresdk::Child_workflow::Success::_ToProto] (M?) -> M?
-                    | ...
+          attr_accessor completed(): ::Temporalio::Bridge::Api::ChildWorkflow::Success?
 
-      def completed!: () -> ::Coresdk::Child_workflow::Success?
+          def completed=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Success::_ToProto] (M?) -> M?
+                        | ...
 
-      attr_accessor failed(): ::Coresdk::Child_workflow::Failure?
+          def completed!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
 
-      def failed=: [M < ::Coresdk::Child_workflow::Failure::_ToProto] (M?) -> M?
-                 | ...
+          attr_accessor failed(): ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
 
-      def failed!: () -> ::Coresdk::Child_workflow::Failure?
+          def failed=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Failure::_ToProto] (M?) -> M?
+                     | ...
 
-      attr_accessor cancelled(): ::Coresdk::Child_workflow::Cancellation?
+          def failed!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
 
-      def cancelled=: [M < ::Coresdk::Child_workflow::Cancellation::_ToProto] (M?) -> M?
-                    | ...
+          attr_accessor cancelled(): ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
 
-      def cancelled!: () -> ::Coresdk::Child_workflow::Cancellation?
+          def cancelled=: [M < ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::_ToProto] (M?) -> M?
+                        | ...
 
-      def initialize: (?completed: ::Coresdk::Child_workflow::Success::init?, ?failed: ::Coresdk::Child_workflow::Failure::init?, ?cancelled: ::Coresdk::Child_workflow::Cancellation::init?) -> void
+          def cancelled!: () -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
 
-      def []: (:completed) -> ::Coresdk::Child_workflow::Success?
-            | (:failed) -> ::Coresdk::Child_workflow::Failure?
-            | (:cancelled) -> ::Coresdk::Child_workflow::Cancellation?
-            | (::Symbol) -> untyped
+          def initialize: (?completed: ::Temporalio::Bridge::Api::ChildWorkflow::Success::init?, ?failed: ::Temporalio::Bridge::Api::ChildWorkflow::Failure::init?, ?cancelled: ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::init?) -> void
 
-      def []=: (:completed, ::Coresdk::Child_workflow::Success?) -> ::Coresdk::Child_workflow::Success?
-             | [M < ::Coresdk::Child_workflow::Success::_ToProto] (:completed, M?) -> M?
-             | (:failed, ::Coresdk::Child_workflow::Failure?) -> ::Coresdk::Child_workflow::Failure?
-             | [M < ::Coresdk::Child_workflow::Failure::_ToProto] (:failed, M?) -> M?
-             | (:cancelled, ::Coresdk::Child_workflow::Cancellation?) -> ::Coresdk::Child_workflow::Cancellation?
-             | [M < ::Coresdk::Child_workflow::Cancellation::_ToProto] (:cancelled, M?) -> M?
-             | (::Symbol, untyped) -> untyped
+          def []: (:completed) -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
+                | (:failed) -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
+                | (:cancelled) -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
+                | (::Symbol) -> untyped
 
-      interface _ToProto
-        def to_proto: () -> ChildWorkflowResult
+          def []=: (:completed, ::Temporalio::Bridge::Api::ChildWorkflow::Success?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Success?
+                 | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Success::_ToProto] (:completed, M?) -> M?
+                 | (:failed, ::Temporalio::Bridge::Api::ChildWorkflow::Failure?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Failure?
+                 | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Failure::_ToProto] (:failed, M?) -> M?
+                 | (:cancelled, ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?) -> ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation?
+                 | [M < ::Temporalio::Bridge::Api::ChildWorkflow::Cancellation::_ToProto] (:cancelled, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> ChildWorkflowResult
+          end
+
+          # The type of `#initialize` parameter.
+          type init = ChildWorkflowResult | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[ChildWorkflowResult, ChildWorkflowResult | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ChildWorkflowResult, ChildWorkflowResult | _ToProto]
+
+          type array = ::Array[ChildWorkflowResult | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, ChildWorkflowResult | _ToProto]
+        end
+
+        # *
+        #  Used in ChildWorkflowResult to report successful completion.
+        #
+        class Success < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (Success) -> String
+
+          attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
+
+          def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
+                     | ...
+
+          def result!: () -> ::Temporalio::Api::Common::V1::Payload?
+
+          def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
+
+          def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
+                | (::Symbol) -> untyped
+
+          def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
+                 | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Success
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Success | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Success, Success | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Success, Success | _ToProto]
+
+          type array = ::Array[Success | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Success | _ToProto]
+        end
+
+        # *
+        #  Used in ChildWorkflowResult to report non successful outcomes such as
+        #  application failures, timeouts, terminations, and cancellations.
+        #
+        class Failure < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (Failure) -> String
+
+          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+
+          def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Failure
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Failure | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Failure, Failure | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Failure, Failure | _ToProto]
+
+          type array = ::Array[Failure | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Failure | _ToProto]
+        end
+
+        # *
+        #  Used in ChildWorkflowResult to report cancellation.
+        #  Failure should be ChildWorkflowFailure with a CanceledFailure cause.
+        #
+        class Cancellation < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (Cancellation) -> String
+
+          attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
+
+          def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
+                      | ...
+
+          def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
+
+          def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
+
+          def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
+                | (::Symbol) -> untyped
+
+          def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
+                 | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> Cancellation
+          end
+
+          # The type of `#initialize` parameter.
+          type init = Cancellation | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[Cancellation, Cancellation | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancellation, Cancellation | _ToProto]
+
+          type array = ::Array[Cancellation | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, Cancellation | _ToProto]
+        end
       end
-
-      # The type of `#initialize` parameter.
-      type init = ChildWorkflowResult | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[ChildWorkflowResult, ChildWorkflowResult | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, ChildWorkflowResult, ChildWorkflowResult | _ToProto]
-
-      type array = ::Array[ChildWorkflowResult | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, ChildWorkflowResult | _ToProto]
-    end
-
-    # *
-    #  Used in ChildWorkflowResult to report successful completion.
-    #
-    class Success < ::Protobuf::Message
-      attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
-
-      def result=: [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (M?) -> M?
-                 | ...
-
-      def result!: () -> ::Temporalio::Api::Common::V1::Payload?
-
-      def initialize: (?result: ::Temporalio::Api::Common::V1::Payload::init?) -> void
-
-      def []: (:result) -> ::Temporalio::Api::Common::V1::Payload?
-            | (::Symbol) -> untyped
-
-      def []=: (:result, ::Temporalio::Api::Common::V1::Payload?) -> ::Temporalio::Api::Common::V1::Payload?
-             | [M < ::Temporalio::Api::Common::V1::Payload::_ToProto] (:result, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> Success
-      end
-
-      # The type of `#initialize` parameter.
-      type init = Success | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[Success, Success | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Success, Success | _ToProto]
-
-      type array = ::Array[Success | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, Success | _ToProto]
-    end
-
-    # *
-    #  Used in ChildWorkflowResult to report non successful outcomes such as
-    #  application failures, timeouts, terminations, and cancellations.
-    #
-    class Failure < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
-
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                  | ...
-
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
-
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
-
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-            | (::Symbol) -> untyped
-
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> Failure
-      end
-
-      # The type of `#initialize` parameter.
-      type init = Failure | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[Failure, Failure | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Failure, Failure | _ToProto]
-
-      type array = ::Array[Failure | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, Failure | _ToProto]
-    end
-
-    # *
-    #  Used in ChildWorkflowResult to report cancellation.
-    #  Failure should be ChildWorkflowFailure with a CanceledFailure cause.
-    #
-    class Cancellation < ::Protobuf::Message
-      attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
-
-      def failure=: [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (M?) -> M?
-                  | ...
-
-      def failure!: () -> ::Temporalio::Api::Failure::V1::Failure?
-
-      def initialize: (?failure: ::Temporalio::Api::Failure::V1::Failure::init?) -> void
-
-      def []: (:failure) -> ::Temporalio::Api::Failure::V1::Failure?
-            | (::Symbol) -> untyped
-
-      def []=: (:failure, ::Temporalio::Api::Failure::V1::Failure?) -> ::Temporalio::Api::Failure::V1::Failure?
-             | [M < ::Temporalio::Api::Failure::V1::Failure::_ToProto] (:failure, M?) -> M?
-             | (::Symbol, untyped) -> untyped
-
-      interface _ToProto
-        def to_proto: () -> Cancellation
-      end
-
-      # The type of `#initialize` parameter.
-      type init = Cancellation | _ToProto
-
-      # The type of `repeated` field.
-      type field_array = ::Protobuf::Field::FieldArray[Cancellation, Cancellation | _ToProto]
-
-      # The type of `map` field.
-      type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, Cancellation, Cancellation | _ToProto]
-
-      type array = ::Array[Cancellation | _ToProto]
-
-      type hash[KEY] = ::Hash[KEY, Cancellation | _ToProto]
     end
   end
 end

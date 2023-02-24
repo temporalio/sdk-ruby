@@ -12,7 +12,7 @@ describe Temporalio::Worker::SyncWorker do
     context 'when call succeeds' do
       before do
         allow(core_worker).to receive(:poll_activity_task) do |&block|
-          proto = Coresdk::ActivityTask::ActivityTask.new(task_token: token)
+          proto = Temporalio::Bridge::Api::ActivityTask::ActivityTask.new(task_token: token)
           block.call(proto.to_proto)
         end
       end
@@ -20,7 +20,7 @@ describe Temporalio::Worker::SyncWorker do
       it 'calls core worker and decodes the response' do
         task = subject.poll_activity_task
 
-        expect(task).to be_a(Coresdk::ActivityTask::ActivityTask)
+        expect(task).to be_a(Temporalio::Bridge::Api::ActivityTask::ActivityTask)
         expect(task.task_token).to eq(token)
         expect(core_worker).to have_received(:poll_activity_task)
       end
@@ -47,7 +47,7 @@ describe Temporalio::Worker::SyncWorker do
         subject.complete_activity_task_with_success(token, payload)
 
         expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
           expect(proto.task_token).to eq(token)
           expect(proto.result.completed.result).to eq(payload)
         end
@@ -80,7 +80,7 @@ describe Temporalio::Worker::SyncWorker do
         subject.complete_activity_task_with_failure(token, failure)
 
         expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
           expect(proto.task_token).to eq(token)
           expect(proto.result.failed.failure).to eq(failure)
         end
@@ -113,7 +113,7 @@ describe Temporalio::Worker::SyncWorker do
         subject.complete_activity_task_with_cancellation(token, failure)
 
         expect(core_worker).to have_received(:complete_activity_task) do |bytes|
-          proto = Coresdk::ActivityTaskCompletion.decode(bytes)
+          proto = Temporalio::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(bytes)
           expect(proto.task_token).to eq(token)
           expect(proto.result.cancelled.failure).to eq(failure)
         end
@@ -140,7 +140,7 @@ describe Temporalio::Worker::SyncWorker do
       subject.record_activity_heartbeat(token, [payload])
 
       expect(core_worker).to have_received(:record_activity_heartbeat) do |bytes|
-        proto = Coresdk::ActivityHeartbeat.decode(bytes)
+        proto = Temporalio::Bridge::Api::CoreInterface::ActivityHeartbeat.decode(bytes)
         expect(proto.task_token).to eq(token)
         expect(proto.details.size).to eq(1)
         expect(proto.details.first).to eq(payload)

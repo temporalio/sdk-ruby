@@ -85,6 +85,7 @@ module Temporalio
         namespace,
         task_queue,
         max_cached_workflows,
+        activities.empty?,
       )
       sync_worker = Worker::SyncWorker.new(@core_worker)
       @activity_worker =

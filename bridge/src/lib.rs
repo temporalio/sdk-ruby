@@ -165,15 +165,16 @@ methods!(
         NilClass::new()
     }
 
-    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString, max_cached_workflows: Integer) -> AnyObject {
+    fn create_worker(runtime: AnyObject, connection: AnyObject, namespace: RString, task_queue: RString, max_cached_workflows: Integer, no_remote_activity: Boolean) -> AnyObject {
         let namespace = namespace.map_err(VM::raise_ex).unwrap().to_string();
         let task_queue = task_queue.map_err(VM::raise_ex).unwrap().to_string();
         let max_cached_workflows = max_cached_workflows.map_err(VM::raise_ex).unwrap().to_u32();
+        let no_remote_activity = no_remote_activity.map_err(VM::raise_ex).unwrap().to_bool();
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
         let connection = connection.unwrap();
         let connection = connection.get_data(&*CONNECTION_WRAPPER);
-        let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue, max_cached_workflows);
+        let worker = Worker::new(runtime, &connection.client, &namespace, &task_queue, max_cached_workflows, no_remote_activity);
 
         Module::from_existing("Temporalio")
             .get_nested_module("Bridge")

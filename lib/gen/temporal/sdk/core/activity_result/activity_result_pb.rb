@@ -45,14 +45,18 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
 end
 
-module Coresdk
-  module ActivityResult
-    ActivityExecutionResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.ActivityExecutionResult").msgclass
-    ActivityResolution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.ActivityResolution").msgclass
-    Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Success").msgclass
-    Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Failure").msgclass
-    Cancellation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Cancellation").msgclass
-    WillCompleteAsync = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.WillCompleteAsync").msgclass
-    DoBackoff = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.DoBackoff").msgclass
+module Temporalio
+  module Bridge
+    module Api
+      module ActivityResult
+        ActivityExecutionResult = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.ActivityExecutionResult").msgclass
+        ActivityResolution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.ActivityResolution").msgclass
+        Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Success").msgclass
+        Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Failure").msgclass
+        Cancellation = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.Cancellation").msgclass
+        WillCompleteAsync = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.WillCompleteAsync").msgclass
+        DoBackoff = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.activity_result.DoBackoff").msgclass
+      end
+    end
   end
 end

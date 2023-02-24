@@ -61,13 +61,13 @@ describe Temporalio::Worker::WorkflowRunner do
     let(:workflow_id) { SecureRandom.uuid }
 
     let(:activation_1) do
-      Coresdk::WorkflowActivation::WorkflowActivation.new(
+      Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
         run_id: run_id,
         timestamp: time_1,
         is_replaying: true,
         jobs: [
-          Coresdk::WorkflowActivation::WorkflowActivationJob.new(
-            start_workflow: Coresdk::WorkflowActivation::StartWorkflow.new(
+          Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
+            start_workflow: Temporalio::Bridge::Api::WorkflowActivation::StartWorkflow.new(
               workflow_type: workflow_class._name,
               workflow_id: workflow_id,
               arguments: [converter.to_payload(input)],
@@ -78,13 +78,13 @@ describe Temporalio::Worker::WorkflowRunner do
       )
     end
     let(:activation_2) do
-      Coresdk::WorkflowActivation::WorkflowActivation.new(
+      Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
         run_id: run_id,
         timestamp: time_2,
         is_replaying: false,
         jobs: [
-          Coresdk::WorkflowActivation::WorkflowActivationJob.new(
-            fire_timer: Coresdk::WorkflowActivation::FireTimer.new(seq: 1),
+          Temporalio::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
+            fire_timer: Temporalio::Bridge::Api::WorkflowActivation::FireTimer.new(seq: 1),
           ),
         ]
       )
@@ -164,8 +164,8 @@ describe Temporalio::Worker::WorkflowRunner do
 
   describe '#push_commands' do
     let(:command) do
-      Coresdk::WorkflowCommands::WorkflowCommand.new(
-        start_timer: Coresdk::WorkflowCommands::StartTimer.new(
+      Temporalio::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+        start_timer: Temporalio::Bridge::Api::WorkflowCommands::StartTimer.new(
           seq: 1,
           start_to_fire_timeout: Google::Protobuf::Duration.new(seconds: 10),
         ),

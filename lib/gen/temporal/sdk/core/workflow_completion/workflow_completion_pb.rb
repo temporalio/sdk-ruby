@@ -4,6 +4,7 @@
 require 'google/protobuf'
 
 require 'temporal/api/failure/v1/message_pb'
+require 'temporal/api/enums/v1/failed_cause_pb'
 require 'temporal/sdk/core/common/common_pb'
 require 'temporal/sdk/core/workflow_commands/workflow_commands_pb'
 
@@ -18,17 +19,23 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     end
     add_message "coresdk.workflow_completion.Success" do
       repeated :commands, :message, 1, "coresdk.workflow_commands.WorkflowCommand"
+      repeated :used_internal_flags, :uint32, 6
     end
     add_message "coresdk.workflow_completion.Failure" do
       optional :failure, :message, 1, "temporal.api.failure.v1.Failure"
+      optional :force_cause, :enum, 2, "temporal.api.enums.v1.WorkflowTaskFailedCause"
     end
   end
 end
 
-module Coresdk
-  module WorkflowCompletion
-    WorkflowActivationCompletion = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.WorkflowActivationCompletion").msgclass
-    Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.Success").msgclass
-    Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.Failure").msgclass
+module Temporalio
+  module Bridge
+    module Api
+      module WorkflowCompletion
+        WorkflowActivationCompletion = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.WorkflowActivationCompletion").msgclass
+        Success = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.Success").msgclass
+        Failure = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("coresdk.workflow_completion.Failure").msgclass
+      end
+    end
   end
 end
