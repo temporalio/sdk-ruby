@@ -133,7 +133,7 @@ methods!(
                 service: service.clone(),
                 request: request.clone(),
                 metadata: metadata.clone(),
-            timeout_millis: timeout
+                timeout_millis: timeout
             };
             connection.call(params, token.clone())
         }, Some(|| { token.cancel() }));
