@@ -85,6 +85,7 @@ module Temporalio
         namespace,
         task_queue,
         max_cached_workflows,
+        # FIXME: expose enable_non_local_activities
         activities.empty?,
       )
       sync_worker = Worker::SyncWorker.new(@core_worker)
