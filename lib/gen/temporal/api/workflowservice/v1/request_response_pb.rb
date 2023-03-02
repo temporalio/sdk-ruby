@@ -180,6 +180,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :worker_versioning_id, :message, 10, "temporal.api.taskqueue.v1.VersionId"
       repeated :messages, :message, 11, "temporal.api.protocol.v1.Message"
       optional :sdk_metadata, :message, 12, "temporal.api.sdk.v1.WorkflowTaskCompletedMetadata"
+      optional :metering_metadata, :message, 13, "temporal.api.common.v1.MeteringMetadata"
     end
     add_message "temporal.api.workflowservice.v1.RespondWorkflowTaskCompletedResponse" do
       optional :workflow_task, :message, 1, "temporal.api.workflowservice.v1.PollWorkflowTaskQueueResponse"

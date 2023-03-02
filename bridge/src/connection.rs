@@ -4,14 +4,14 @@ use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
-    ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, WorkflowService, RetryClient,
-    ConfiguredClient, TemporalServiceClientWithMetrics, TestService
+    ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, ConfiguredClient,
+    RetryClient, TemporalServiceClientWithMetrics, TestService, WorkflowService,
 };
 use thiserror::Error;
-use tokio::{select};
-use tokio::runtime::{Runtime};
+use tokio::runtime::Runtime;
+use tokio::select;
 use tokio_util::sync::CancellationToken;
-use tonic::metadata::{MetadataKey,MetadataValue};
+use tonic::metadata::{MetadataKey, MetadataValue};
 use url::Url;
 
 pub type Client = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;

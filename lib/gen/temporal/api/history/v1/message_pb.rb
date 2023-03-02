@@ -97,6 +97,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
       optional :binary_checksum, :string, 4
       optional :worker_versioning_id, :message, 5, "temporal.api.taskqueue.v1.VersionId"
       optional :sdk_metadata, :message, 6, "temporal.api.sdk.v1.WorkflowTaskCompletedMetadata"
+      optional :metering_metadata, :message, 13, "temporal.api.common.v1.MeteringMetadata"
     end
     add_message "temporal.api.history.v1.WorkflowTaskTimedOutEventAttributes" do
       optional :scheduled_event_id, :int64, 1

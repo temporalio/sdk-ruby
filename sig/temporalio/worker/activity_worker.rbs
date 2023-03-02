@@ -1,6 +1,7 @@
 module Temporalio
   class Worker
     class ActivityWorker
+      @cancelation_task: Async::Task?
       @running: bool
 
       def initialize: (
@@ -14,6 +15,7 @@ module Temporalio
       ) -> void
       def run: (Async::Task reactor) -> void
       def drain: -> void
+      def setup_graceful_shutdown_timer: (Temporalio::Worker::Reactor reactor) -> void
 
       private
 

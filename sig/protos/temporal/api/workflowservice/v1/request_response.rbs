@@ -1610,7 +1610,18 @@ module Temporalio
 
           def sdk_metadata!: () -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
 
-          def initialize: (?task_token: ::String, ?commands: ::Temporalio::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporalio::Api::TaskQueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporalio::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String, ?worker_versioning_id: ::Temporalio::Api::TaskQueue::V1::VersionId::init?, ?messages: ::Temporalio::Api::Protocol::V1::Message::array, ?sdk_metadata: ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::init?) -> void
+          # Local usage data collected for metering
+          #
+          attr_accessor metering_metadata(): ::Temporalio::Api::Common::V1::MeteringMetadata?
+
+          # Local usage data collected for metering
+          #
+          def metering_metadata=: [M < ::Temporalio::Api::Common::V1::MeteringMetadata::_ToProto] (M?) -> M?
+                                | ...
+
+          def metering_metadata!: () -> ::Temporalio::Api::Common::V1::MeteringMetadata?
+
+          def initialize: (?task_token: ::String, ?commands: ::Temporalio::Api::Command::V1::Command::array, ?identity: ::String, ?sticky_attributes: ::Temporalio::Api::TaskQueue::V1::StickyExecutionAttributes::init?, ?return_new_workflow_task: bool, ?force_create_new_workflow_task: bool, ?binary_checksum: ::String, ?query_results: ::Temporalio::Api::Query::V1::WorkflowQueryResult::hash[::String], ?namespace: ::String, ?worker_versioning_id: ::Temporalio::Api::TaskQueue::V1::VersionId::init?, ?messages: ::Temporalio::Api::Protocol::V1::Message::array, ?sdk_metadata: ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::init?, ?metering_metadata: ::Temporalio::Api::Common::V1::MeteringMetadata::init?) -> void
 
           def []: (:task_token) -> ::String
                 | (:commands) -> ::Temporalio::Api::Command::V1::Command::field_array
@@ -1624,6 +1635,7 @@ module Temporalio
                 | (:worker_versioning_id) -> ::Temporalio::Api::TaskQueue::V1::VersionId?
                 | (:messages) -> ::Temporalio::Api::Protocol::V1::Message::field_array
                 | (:sdk_metadata) -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
+                | (:metering_metadata) -> ::Temporalio::Api::Common::V1::MeteringMetadata?
                 | (::Symbol) -> untyped
 
           def []=: (:task_token, ::String) -> ::String
@@ -1644,6 +1656,8 @@ module Temporalio
                  | (:messages, ::Temporalio::Api::Protocol::V1::Message::array) -> ::Temporalio::Api::Protocol::V1::Message::array
                  | (:sdk_metadata, ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?) -> ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata?
                  | [M < ::Temporalio::Api::Sdk::V1::WorkflowTaskCompletedMetadata::_ToProto] (:sdk_metadata, M?) -> M?
+                 | (:metering_metadata, ::Temporalio::Api::Common::V1::MeteringMetadata?) -> ::Temporalio::Api::Common::V1::MeteringMetadata?
+                 | [M < ::Temporalio::Api::Common::V1::MeteringMetadata::_ToProto] (:metering_metadata, M?) -> M?
                  | (::Symbol, untyped) -> untyped
 
           def return_new_workflow_task?: () -> bool
