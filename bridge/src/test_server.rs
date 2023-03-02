@@ -102,10 +102,10 @@ fn ephemeral_exe(
     } else {
         let version =
             if download_version == "default" {
-                ephemeral_server::EphemeralExeVersion::SDKDefault { sdk_name, sdk_version }
-        } else {
-            ephemeral_server::EphemeralExeVersion::Fixed(download_version)
-        };
+                    ephemeral_server::EphemeralExeVersion::SDKDefault { sdk_name, sdk_version }
+            } else {
+                ephemeral_server::EphemeralExeVersion::Fixed(download_version)
+            };
 
         ephemeral_server::EphemeralExe::CachedDownload { version, dest_dir: download_dir }
     }

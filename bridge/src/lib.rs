@@ -127,15 +127,15 @@ methods!(
         let token = CancellationToken::new();
 
         let result = Thread::call_without_gvl(|| {
-                let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
-                let params = RpcParams {
-                    rpc: rpc.clone(),
-                    service: service.clone(),
-                    request: request.clone(),
-                    metadata: metadata.clone(),
-                timeout_millis: timeout
-                };
-                connection.call(params, token.clone())
+            let connection = _rtself.get_data_mut(&*CONNECTION_WRAPPER);
+            let params = RpcParams {
+                rpc: rpc.clone(),
+                service: service.clone(),
+                request: request.clone(),
+                metadata: metadata.clone(),
+            timeout_millis: timeout
+            };
+            connection.call(params, token.clone())
         }, Some(|| { token.cancel() }));
 
         let response = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
