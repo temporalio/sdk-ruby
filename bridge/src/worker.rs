@@ -67,8 +67,8 @@ impl Worker {
             .build()?;
 
         let core_worker = runtime.tokio_runtime.block_on(async move {
-                temporal_sdk_core::init_worker(&runtime.core_runtime, config, client.clone())
-            }).expect("Failed to initialize Core Worker");
+            temporal_sdk_core::init_worker(&runtime.core_runtime, config, client.clone())
+        }).expect("Failed to initialize Core Worker");
 
         Ok(Worker {
             core_worker: Some(Arc::new(core_worker)),
