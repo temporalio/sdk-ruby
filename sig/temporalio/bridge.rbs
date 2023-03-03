@@ -33,7 +33,7 @@ module Temporalio
       def poll_workflow_activation: { (String?, Exception?) -> void } -> void
       def complete_workflow_activation: (String) { (nil, Exception?) -> void } -> void
       def initiate_shutdown: -> void
-      def shutdown: -> void
+      def finalize_shutdown: -> void
     end
 
     class TestServer

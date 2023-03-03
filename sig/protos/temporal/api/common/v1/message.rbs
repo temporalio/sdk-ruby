@@ -478,6 +478,50 @@ module Temporalio
 
           type hash[KEY] = ::Hash[KEY, RetryPolicy | _ToProto]
         end
+
+        # Metadata relevant for metering purposes
+        #
+        class MeteringMetadata < ::Protobuf::Message
+          # Encode the message to a binary string
+          #
+          def self.encode: (MeteringMetadata) -> String
+
+          # Count of local activities which have begun an execution attempt during this workflow task,
+          #  and whose first attempt occurred in some previous task. This is used for metering
+          #  purposes, and does not affect workflow state.
+          #
+          #  (-- api-linter: core::0141::forbidden-types=disabled
+          #      aip.dev/not-precedent: Negative values make no sense to represent. --)
+          #
+          attr_accessor nonfirst_local_activity_execution_attempts(): ::Integer
+
+          def nonfirst_local_activity_execution_attempts!: () -> ::Integer?
+
+          def initialize: (?nonfirst_local_activity_execution_attempts: ::Integer) -> void
+
+          def []: (:nonfirst_local_activity_execution_attempts) -> ::Integer
+                | (::Symbol) -> untyped
+
+          def []=: (:nonfirst_local_activity_execution_attempts, ::Integer) -> ::Integer
+                 | (::Symbol, untyped) -> untyped
+
+          interface _ToProto
+            def to_proto: () -> MeteringMetadata
+          end
+
+          # The type of `#initialize` parameter.
+          type init = MeteringMetadata | _ToProto
+
+          # The type of `repeated` field.
+          type field_array = ::Protobuf::Field::FieldArray[MeteringMetadata, MeteringMetadata | _ToProto]
+
+          # The type of `map` field.
+          type field_hash[KEY] = ::Protobuf::Field::FieldHash[KEY, MeteringMetadata, MeteringMetadata | _ToProto]
+
+          type array = ::Array[MeteringMetadata | _ToProto]
+
+          type hash[KEY] = ::Hash[KEY, MeteringMetadata | _ToProto]
+        end
       end
     end
   end

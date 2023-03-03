@@ -53,20 +53,21 @@ module Temporalio
       rescue Temporalio::Bridge::Error::WorkerShutdown
         # No need to re-raise this error, it's a part of a normal shutdown
       ensure
-        reactor.async do |async_task|
-          cancelation_task =
-            if graceful_timeout
-              async_task.async do
-                sleep graceful_timeout
-                running_activities.each_value do |activity_runner|
-                  activity_runner.cancel('Worker is shutting down', by_request: false)
-                end
+        outstanding_tasks.each(&:wait)
+        @cancelation_task&.wait
+        drain_queue.close
+      end
+
+      def setup_graceful_shutdown_timer(reactor)
+        if graceful_timeout
+          reactor.async do |async_task|
+            @cancelation_task = async_task.async do
+              sleep graceful_timeout
+              @running_activities.each_value do |activity_runner|
+                activity_runner.cancel('Worker is shutting down', by_request: false)
               end
             end
-
-          outstanding_tasks.each(&:wait)
-          cancelation_task&.stop # all tasks completed, stop cancellations
-          drain_queue.close
+          end
         end
       end
 

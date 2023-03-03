@@ -10,12 +10,12 @@ mod worker;
 use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
-    Module, Object, Symbol, RString, Encoding, AnyObject, AnyException, Exception, VM, Thread,
-    NilClass, Hash, Integer, Boolean, Array,
+    AnyException, AnyObject, Array, Boolean, Encoding, Exception, Hash, Integer, Module, NilClass,
+    Object, RString, Symbol, Thread, VM,
 };
 use std::collections::HashMap;
 use temporal_sdk_core_api::telemetry::{Logger, TelemetryOptionsBuilder};
-use test_server::{TestServer, TestServerConfig, TemporaliteConfig};
+use test_server::{TemporaliteConfig, TestServer, TestServerConfig};
 use tokio_util::sync::CancellationToken;
 use worker::{Worker, WorkerError, WorkerResult};
 
@@ -269,14 +269,14 @@ methods!(
 
     fn worker_initiate_shutdown() -> NilClass {
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
-        worker.initiate_shutdown();
+        worker.initiate_shutdown().map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
         NilClass::new()
     }
 
-    fn worker_shutdown() -> NilClass {
+    fn worker_finalize_shutdown() -> NilClass {
         let worker = _rtself.get_data_mut(&*WORKER_WRAPPER);
-        worker.shutdown();
+        worker.finalize_shutdown().map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
 
         NilClass::new()
     }
@@ -420,7 +420,7 @@ pub extern "C" fn init_bridge() {
             klass.def("poll_workflow_activation", worker_poll_workflow_activation);
             klass.def("complete_workflow_activation", worker_complete_workflow_activation);
             klass.def("initiate_shutdown", worker_initiate_shutdown);
-            klass.def("shutdown", worker_shutdown);
+            klass.def("finalize_shutdown", worker_finalize_shutdown);
         });
 
         module.define_nested_class("TestServer", None).define(|klass| {

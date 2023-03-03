@@ -116,7 +116,7 @@ describe Temporalio::Worker do
         .and_raise(Temporalio::Bridge::Error::WorkerShutdown)
 
       allow(core_worker).to receive(:initiate_shutdown)
-      allow(core_worker).to receive(:shutdown)
+      allow(core_worker).to receive(:finalize_shutdown)
 
       allow(reactor).to receive(:async).and_call_original
     end
@@ -145,8 +145,9 @@ describe Temporalio::Worker do
 
     before do
       allow(core_worker).to receive(:initiate_shutdown)
-      allow(core_worker).to receive(:shutdown)
+      allow(core_worker).to receive(:finalize_shutdown)
       allow(Temporalio::Worker::ActivityWorker).to receive(:new).and_return(activity_worker)
+      allow(activity_worker).to receive(:setup_graceful_shutdown_timer).and_return(nil)
       allow(activity_worker).to receive(:run).and_return(nil)
       allow(Temporalio::Worker::ThreadPoolExecutor).to receive(:new).and_return(activity_executor)
       allow(activity_executor).to receive(:shutdown).and_call_original
@@ -158,9 +159,10 @@ describe Temporalio::Worker do
       subject.shutdown
 
       expect(core_worker).to have_received(:initiate_shutdown).ordered
+      expect(activity_worker).to have_received(:setup_graceful_shutdown_timer).ordered
       expect(activity_worker).to have_received(:drain).ordered
       expect(activity_executor).to have_received(:shutdown).ordered
-      expect(core_worker).to have_received(:shutdown).ordered
+      expect(core_worker).to have_received(:finalize_shutdown).ordered
     end
   end
 

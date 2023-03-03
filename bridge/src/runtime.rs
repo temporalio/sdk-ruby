@@ -1,6 +1,6 @@
 use rutie::Thread;
+use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Arc;
-use std::sync::mpsc::{channel, Sender, Receiver};
 use temporal_sdk_core::CoreRuntime;
 use temporal_sdk_core_api::telemetry::TelemetryOptions;
 use tokio::runtime::{Builder, Runtime as TokioRuntime};

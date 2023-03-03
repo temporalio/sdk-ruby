@@ -1,8 +1,8 @@
-use crate::runtime::{Runtime};
+use crate::runtime::Runtime;
 use std::sync::Arc;
 use temporal_sdk_core::ephemeral_server;
 use thiserror::Error;
-use tokio::runtime::{Runtime as TokioRuntime};
+use tokio::runtime::Runtime as TokioRuntime;
 
 #[derive(Error, Debug)]
 pub enum TestServerError {

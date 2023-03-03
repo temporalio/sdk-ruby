@@ -85,6 +85,7 @@ module Temporalio
         namespace,
         task_queue,
         max_cached_workflows,
+        # FIXME: expose enable_non_local_activities
         activities.empty?,
       )
       sync_worker = Worker::SyncWorker.new(@core_worker)
@@ -178,17 +179,21 @@ module Temporalio
       mutex.synchronize do
         return unless running?
 
-        # First initiate Core shutdown, which will start dropping poll requests
-        core_worker.initiate_shutdown
-        # Then let the runner know we're shutting down, so it can stop other workers
+        # Let the runner know we're shutting down, so it can stop other workers.
+        # This will cause a reentrant call to this method, but the mutex above will block that call.
         runner&.shutdown(exception)
+
+        # Initiate Core shutdown, which will start dropping poll requests
+        core_worker.initiate_shutdown
+        # Start the graceful activity shutdown timer, which will cancel activities after the timeout
+        activity_worker&.setup_graceful_shutdown_timer(runtime.reactor)
         # Wait for workers to drain any outstanding tasks
         activity_worker&.drain
         workflow_worker&.drain
         # Stop the executor (at this point there should already be nothing in it)
         activity_executor.shutdown
         # Finalize the shutdown by stopping the Core
-        core_worker.shutdown
+        core_worker.finalize_shutdown
 
         @shutdown = true
       end
