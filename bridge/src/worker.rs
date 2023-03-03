@@ -180,10 +180,11 @@ impl Worker {
         // Take the worker out of the option and leave None
         let core_worker = self.core_worker.take().ok_or(WorkerError::WorkerHasBeenShutdown())?;
 
-        // This should be the only reference remaining to the worker so try_unwrap will work.
+        // By design, there should be no more task using the worker by the time the Ruby code calls finalize_shutdown.
+        // This should therefore be the very last reference remaining to the worker. This is a condition for try_unwrap to work.
         let core_worker = Arc::try_unwrap(core_worker).map_err(|arc| {
             WorkerError::UnexpectedError(format!(
-                "Cannot finalize, expected 1 reference, got {}",
+                "Can't finalize worker's shutdown because there are still active references to it (expected exactly 1 reference, but got {})",
                 Arc::strong_count(&arc)
             ))
         })?;
