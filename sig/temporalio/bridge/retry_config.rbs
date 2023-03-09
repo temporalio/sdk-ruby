@@ -1,0 +1,32 @@
+module Temporalio
+  module Bridge
+    class RetryConfig
+      # Initial backoff interval.
+      attr_reader initial_interval_millis: Integer
+
+      # Randomization jitter to add.
+      attr_reader randomization_factor: Float
+
+      # Backoff multiplier.
+      attr_reader multiplier: Float
+
+      # Maximum backoff interval.
+      attr_reader max_interval_millis: Integer
+
+      # Maximum total time.
+      attr_reader max_elapsed_time_millis: Integer?
+
+      # Maximum number of retries.
+      attr_reader max_retries: Integer
+
+      def initialize: (
+          initial_interval_millis: Integer,
+          randomization_factor: Float,
+          multiplier: Float,
+          max_interval_millis: Integer,
+          ?max_elapsed_time_millis: Integer?,
+          max_retries: Integer,
+      ) -> void
+    end
+  end
+end

@@ -1,0 +1,21 @@
+module Temporalio
+  module Bridge
+    class ConnectOptions
+      attr_reader url: String
+      attr_reader tls: TlsOptions?
+      attr_reader identity: String
+      attr_reader metadata: Hash[String, String]?
+      attr_reader retry_config: RetryConfig?
+      attr_reader client_version: String
+
+      def initialize: (
+        url: String,
+        tls: TlsOptions?,
+        identity: String,
+        metadata: Hash[String, String]?,
+        retry_config: RetryConfig?,
+        client_version: String,
+      ) -> void
+    end
+  end
+end

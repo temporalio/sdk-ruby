@@ -1,18 +1,18 @@
+use parking_lot::RwLock;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::str::FromStr;
 use std::sync::Arc;
 use std::time::Duration;
 use temporal_client::{
-    ClientInitError, ClientOptionsBuilder, ClientOptionsBuilderError, ConfiguredClient,
-    RetryClient, TemporalServiceClientWithMetrics, TestService, WorkflowService,
+    ClientInitError, ClientOptionsBuilderError, ConfiguredClient, RetryClient,
+    TemporalServiceClientWithMetrics, TestService, WorkflowService, ClientOptions,
 };
 use thiserror::Error;
 use tokio::runtime::Runtime;
 use tokio::select;
 use tokio_util::sync::CancellationToken;
 use tonic::metadata::{MetadataKey, MetadataValue};
-use url::Url;
 
 pub type Client = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;
 
@@ -177,22 +177,13 @@ pub struct RpcParams {
     pub timeout_millis: Option<u64>
 }
 
-async fn create_client(host: String) -> Result<Client, ConnectionError> {
-    let url = Url::try_from(&*host)?;
-    let options = ClientOptionsBuilder::default()
-        .identity("testtest".to_string())
-        .target_url(url)
-        .client_name("ruby-sdk".to_string())
-        .client_version("0.0.1".to_string())
-        .build()?;
-
-    Ok(options.connect_no_namespace(None, None).await?)
+async fn create_client(options: ClientOptions, headers: Option<HashMap<String, String>>) -> Result<Client, ConnectionError> {
+    Ok(options.connect_no_namespace(None, headers.map(|h| Arc::new(RwLock::new(h)))).await?)
 }
 
 impl Connection {
-    // TODO: Change the interface to accept a full configuration
-    pub fn connect(runtime: Arc<Runtime>, host: String) -> Result<Self, ConnectionError> {
-        let client = runtime.block_on(create_client(host))?;
+    pub fn connect(runtime: Arc<Runtime>, options: ClientOptions, headers: Option<HashMap<String, String>>) -> Result<Self, ConnectionError> {
+        let client = runtime.block_on(create_client(options, headers))?;
 
         Ok(Connection { client, runtime })
     }

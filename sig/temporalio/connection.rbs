@@ -2,7 +2,13 @@ module Temporalio
   class Connection
     attr_reader core_connection: Temporalio::Bridge::Connection
 
-    def initialize: (String) -> void
+    def initialize: (
+      ?String? address,
+      ?tls: TlsOptions?,
+      ?identity: String?,
+      ?metadata: Hash[String, String]?,
+      ?retry_config: RetryConfig?,
+    ) -> void
     def workflow_service: -> Temporalio::Connection::WorkflowService
     def test_service: -> Temporalio::Connection::TestService
 
@@ -11,6 +17,71 @@ module Temporalio
     @workflow_service: Temporalio::Connection::WorkflowService?
     @test_service: Temporalio::Connection::TestService?
 
-    def parse_url: (String) -> String
+    def parse_url: (String?) -> [String, Integer]
+
+    def self.default_identity: -> String
+
+    class TlsOptions
+      # Root CA certificate used by the server. If not set, and the server's cert is issued
+      # by someone the operating system trusts, verification will still work (ex: Cloud offering).
+      attr_reader server_root_ca_cert: String?
+
+      # Client certificate used to authenticate with the server.
+      attr_reader client_cert: String?
+
+      # Client private key used to authenticate with the server.
+      attr_reader client_cert_key: String?
+
+      # Overrides the target name used for SSL host name checking. If this attribute is not specified,
+      # the name used for SSL host name checking will be the host part of the connection target address.
+      # This _should_ be used for testing only.
+      attr_reader server_name_override: String?
+
+      # @param [String] server_root_ca_cert Root CA certificate used by the server. If not set, and the server's
+      #   cert is issued by someone the operating system trusts, verification will still work (ex: Cloud offering).
+      # @param [String] client_cert
+      # @param [String] client_cert_key
+      # @param [String] server_name_override
+      def initialize: (
+          ?server_root_ca_cert: String?,
+          ?client_cert: String?,
+          ?client_cert_key: String?,
+          ?server_name_override: String?,
+        ) -> void
+    end
+
+    class RetryConfig
+      # Initial backoff interval.
+      # @default 100
+      attr_reader initial_interval_millis: Integer
+
+      # Randomization jitter to add.
+      # @default 0.2
+      attr_reader randomization_factor: Float
+
+      # Backoff multiplier.
+      # @default 1.5
+      attr_reader multiplier: Float
+
+      # Maximum backoff interval.
+      # @default 5000
+      attr_reader max_interval_millis: Integer
+
+      # Maximum total time (optional).
+      attr_reader max_elapsed_time_millis: Integer?
+
+      # Maximum number of retries.
+      # @default 10
+      attr_reader max_retries: Integer
+
+      def initialize: (
+          ?initial_interval_millis: Integer?,
+          ?randomization_factor: Float?,
+          ?multiplier: Float?,
+          ?max_interval_millis: Integer?,
+          ?max_elapsed_time_millis: Integer?,
+          ?max_retries: Integer?,
+        ) -> void
+    end
   end
 end

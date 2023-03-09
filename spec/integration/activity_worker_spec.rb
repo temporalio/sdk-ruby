@@ -1,5 +1,3 @@
-require 'support/helpers/test_rpc'
-require 'support/helpers/test_capture_interceptor'
 require 'temporalio/activity'
 require 'temporalio/bridge'
 require 'temporalio/client'
