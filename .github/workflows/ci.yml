@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Print build information
-        run: 'echo head_ref: ${{ github.head_ref }}, ref: ${{ github.ref }}, os: ${{ matrix.os }}, ruby: ${{ matrix.ruby }}'
+        run: "echo head_ref: ${{ github.head_ref }}, ref: ${{ github.ref }}, os: ${{ matrix.os }}, ruby: ${{ matrix.ruby }}"
       - uses: actions/checkout@v2
         with:
           submodules: recursive
@@ -53,6 +53,7 @@ jobs:
           key: ${{ runner.os }}-golang-${{ hashFiles('spec/support/**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-golang-
+      - run: gem install bundler
       - run: bundle install
       - run: bundle exec rubocop
       - run: bundle exec steep check

@@ -16,7 +16,6 @@ module Temporalio
     # @api private
     attr_reader :core_connection
 
-    public
     # @param address [String | nil] `host[:port]` for the Temporal server. Host defaults to `localhost:7233`.
     # @param [TlsOptions | nil] tls
     # @param [String | nil] identity
@@ -83,10 +82,13 @@ module Temporalio
       [uri.host || 'localhost', uri.port || 7233]
     end
 
-    def self.default_identity
-      "#{Process.pid}@#{Socket.gethostname}"
-    end
+    class << self
+      private
 
+      def default_identity
+        "#{Process.pid}@#{Socket.gethostname}"
+      end
+    end
     class TlsOptions
       # Root CA certificate used by the server.
       # If not set, and the server's cert is issued by someone the operating system trusts,

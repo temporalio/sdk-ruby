@@ -10,7 +10,8 @@ describe Temporalio::Testing do
       .to receive(:connect)
       .with(
         an_instance_of(Temporalio::Bridge::Runtime),
-        an_instance_of(Temporalio::Bridge::ConnectOptions), # Temporalio::Bridge::ConnectOptions.new(url: 'http://localhost:12345', tls: nil),
+        # FIXME: Find a way to validate ConnectOptions values
+        an_instance_of(Temporalio::Bridge::ConnectOptions),
       )
       .and_return(core_connection)
   end

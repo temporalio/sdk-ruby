@@ -52,16 +52,15 @@ A client can be created and used to start a workflow like so:
 # Establish a gRPC connection to the server
 connection = Temporalio::Connection.new('localhost:7233')
 
-# To enable TLS, add the `tls:` argument
-# Temporalio::Connection.new(
-#    'localhost:7233',
-#    tls: Temporalio::Connection::TlsOptions.new(
-#        server_root_ca_cert,
-#        client_cert,
-#        client_cert_key,
-#        server_name_override,
-#    )
-# )
+# To enable TLS, simply add the `tls:` argument:
+#     Temporalio::Connection.new(
+#       'localhost:7233',
+#       tls: Temporalio::Connection::TlsOptions.new(
+#         server_root_ca_cert,
+#         client_cert,
+#         client_cert_key,
+#       )
+#     )
 
 # Initialize a Client with a namespace
 client = Temporalio::Client.new(connection, 'my-namespace')
