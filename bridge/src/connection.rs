@@ -178,7 +178,8 @@ pub struct RpcParams {
 }
 
 async fn create_client(options: ClientOptions, headers: Option<HashMap<String, String>>) -> Result<Client, ConnectionError> {
-    Ok(options.connect_no_namespace(None, headers.map(|h| Arc::new(RwLock::new(h)))).await?)
+    let headers = headers.map(|h| Arc::new(RwLock::new(h)));
+    Ok(options.connect_no_namespace(None, headers).await?)
 }
 
 impl Connection {

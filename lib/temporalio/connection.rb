@@ -8,10 +8,10 @@ require 'temporalio/runtime'
 require 'uri'
 
 module Temporalio
-  # A connection to the Temporal server.
+  # A connection to the Temporal server. It provides gRPC level communication to a Temporal server.
   #
-  # This is used to instantiate a {Temporalio::Client}. But it also can be used for a direct
-  # interaction with the API via one of the services (e.g. {#workflow_service}).
+  # Connections are usually used through either {Temporalio::Client} or a {Temporalio::Worker}.
+  # It may also be used to perform gRPC requests to the server (see {#workflow_service}).
   class Connection
     # @api private
     attr_reader :core_connection
@@ -38,7 +38,7 @@ module Temporalio
           tls: tls && Temporalio::Bridge::TlsOptions.new(
             server_root_ca_cert: tls.server_root_ca_cert,
             client_cert: tls.client_cert,
-            client_cert_key: tls.client_cert_key,
+            client_private_key: tls.client_private_key,
             server_name_override: tls.server_name_override,
           ),
           identity: identity || self.class.default_identity,
@@ -89,40 +89,8 @@ module Temporalio
         "#{Process.pid}@#{Socket.gethostname}"
       end
     end
-    class TlsOptions
-      # Root CA certificate used by the server.
-      # If not set, and the server's cert is issued by someone the operating system trusts,
-      # verification will still work (ex: Cloud offering).
-      attr_reader :server_root_ca_cert
 
-      # Client certificate used to authenticate with the server.
-      attr_reader :client_cert
 
-      # Client private key used to authenticate with the server.
-      attr_reader :client_cert_key
-
-      # Overrides the target name used for SSL host name checking. If this attribute is not specified, the name used for
-      # SSL host name checking will be the host part of the connection target address. This _should_ be used for testing
-      # only.
-      attr_reader :server_name_override
-
-      # @param [String] server_root_ca_cert Root CA certificate used by the server. If not set, and the server's
-      #   cert is issued by someone the operating system trusts, verification will still work (ex: Cloud offering).
-      # @param [String] client_cert
-      # @param [String] client_cert_key
-      # @param [String] server_name_override
-      def initialize(
-        server_root_ca_cert: nil,
-        client_cert: nil,
-        client_cert_key: nil,
-        server_name_override: nil
-      )
-        @server_root_ca_cert = server_root_ca_cert
-        @client_cert = client_cert
-        @client_cert_key = client_cert_key
-        @server_name_override = server_name_override
-      end
-    end
 
     class RetryConfig
       # Initial backoff interval.

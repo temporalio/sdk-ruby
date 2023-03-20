@@ -35,7 +35,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-          # bundler-cache: true
+          bundler-cache: true
       # Needed to compile go test server and worker
       - uses: actions/setup-go@v2
         with:
@@ -53,7 +53,6 @@ jobs:
           key: ${{ runner.os }}-golang-${{ hashFiles('spec/support/**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-golang-
-      - run: gem install bundler
       - run: bundle install
       - run: bundle exec rubocop
       - run: bundle exec steep check

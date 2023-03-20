@@ -116,7 +116,7 @@ methods!(
         let tls = tls.map(|tls| {
             let server_root_ca_cert = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@server_root_ca_cert"))).map(unwrap_bytes);
             let client_cert = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@client_cert"))).map(unwrap_bytes);
-            let client_private_key = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@client_cert_key"))).map(unwrap_bytes);
+            let client_private_key = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@client_private_key"))).map(unwrap_bytes);
             let server_name_override = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@server_name_override"))).map(|x| x.to_string());
 
             TlsConfig {

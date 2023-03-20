@@ -3,10 +3,15 @@ module Temporalio
     class TlsOptions
       attr_reader server_root_ca_cert: String?
       attr_reader client_cert: String?
-      attr_reader client_cert_key: String?
+      attr_reader client_private_key: String?
       attr_reader server_name_override: String?
 
-      def initialize: (server_root_ca_cert: String?, client_cert: String?, client_cert_key: String?, server_name_override: String?) -> void
+      def initialize: (
+        server_root_ca_cert: String?,
+        client_cert: String?,
+        client_private_key: String?,
+        server_name_override: String?
+      ) -> void
     end
   end
 end
