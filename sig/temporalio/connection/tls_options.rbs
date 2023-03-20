@@ -5,16 +5,18 @@ module Temporalio
       # validated against the operating system's root certificates.
       #
       # Leave unset for Temporal Cloud.
-      attr_reader :server_root_ca_cert
+      #
+      # @default Use the operating system's trust store.
+      attr_reader server_root_ca_cert: String?
 
       # Client certificate used to authenticate with the server. If set, a corresponding
       # `client_private_key` must be provided.
       #
       # @default do not use client side authentication.
-      attr_reader :client_cert
+      attr_reader client_cert: String?
 
       # Client private key used to authenticate with the server. Required if `client_cert` is set.
-      attr_reader :client_private_key
+      attr_reader client_private_key: String?
 
       # Overrides the target name used for validation of the server SSL certificate. If not
       # specified, the server certificate will be checked against the host part of the connection
@@ -23,24 +25,18 @@ module Temporalio
       # Leave unset for Temporal Cloud.
       #
       # @default Validate the server certificate against the host part of the connection target address.
-      attr_reader :server_name_override
+      attr_reader server_name_override: String?
 
       # @param [String?] server_root_ca_cert Root CA certificate used by the server.
       # @param [String?] client_cert Client certificate used to authenticate with the server.
       # @param [String?] client_private_key Client private key used to authenticate with the server.
-      # @param [String?] server_name_override Overrides the target name used for validation of the
-      #                  server SSL certificate.
-      def initialize(
-        server_root_ca_cert: nil,
-        client_cert: nil,
-        client_private_key: nil,
-        server_name_override: nil
-      )
-        @server_root_ca_cert = server_root_ca_cert
-        @client_cert = client_cert
-        @client_private_key = client_private_key
-        @server_name_override = server_name_override
-      end
+      # @param [String?] server_name_override Overrides the target name used for validation of the server SSL certificate.
+      def initialize: (
+          ?server_root_ca_cert: String?,
+          ?client_cert: String?,
+          ?client_private_key: String?,
+          ?server_name_override: String?,
+        ) -> void
     end
   end
 end
