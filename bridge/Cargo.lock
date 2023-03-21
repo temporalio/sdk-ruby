@@ -185,6 +185,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "lazy_static",
+ "parking_lot",
  "prost",
  "rutie",
  "temporal-client",

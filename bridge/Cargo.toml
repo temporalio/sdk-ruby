@@ -8,6 +8,7 @@ repository = "https://github.com/temporalio/sdk-ruby"
 [dependencies]
 anyhow = "1.0"
 lazy_static = "1.4.0"
+parking_lot = { version = "0.12", features = ["send_guard"] }
 prost = "0.11"
 rutie = { version = "0.8.4", features = ["no-link"] }
 temporal-client = { version = "0.1.0", path = "./sdk-core/client" }

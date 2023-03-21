@@ -14,7 +14,6 @@ jobs:
       fail-fast: true
       matrix:
         ruby:
-          # - 2.7.6
           - 3.0.4
           - 3.1.2
         os:
@@ -23,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Print build information
-        run: 'echo head_ref: ${{ github.head_ref }}, ref: ${{ github.ref }}, os: ${{ matrix.os }}, ruby: ${{ matrix.ruby }}'
+        run: "echo head_ref: ${{ github.head_ref }}, ref: ${{ github.ref }}, os: ${{ matrix.os }}, ruby: ${{ matrix.ruby }}"
       - uses: actions/checkout@v2
         with:
           submodules: recursive

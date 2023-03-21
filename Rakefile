@@ -36,6 +36,9 @@ namespace :bridge do
   #   try against a dynamically linked one causing errors in the build result
   desc 'Clean up previous build artefacts'
   task clean: ['thermite:clean']
+
+  desc 'Clean up and rebuild SDK Core Bridge'
+  task rebuild: ['bridge:clean', 'bridge:build']
 end
 
 namespace :test_server do

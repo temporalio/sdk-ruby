@@ -8,7 +8,11 @@ describe Temporalio::Testing do
   before do
     allow(Temporalio::Bridge::Connection)
       .to receive(:connect)
-      .with(an_instance_of(Temporalio::Bridge::Runtime), 'http://localhost:12345')
+      .with(
+        an_instance_of(Temporalio::Bridge::Runtime),
+        # FIXME: Find a way to validate ConnectOptions values
+        an_instance_of(Temporalio::Bridge::ConnectOptions),
+      )
       .and_return(core_connection)
   end
 

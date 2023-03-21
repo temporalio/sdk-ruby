@@ -11,9 +11,11 @@ use connection::{Connection, RpcParams};
 use runtime::Runtime;
 use rutie::{
     AnyException, AnyObject, Array, Boolean, Encoding, Exception, Hash, Integer, Module, NilClass,
-    Object, RString, Symbol, Thread, VM,
+    Object, RString, Symbol, Thread, VM, Float,
 };
-use std::collections::HashMap;
+use temporal_client::{ClientOptionsBuilder, TlsConfig, ClientTlsConfig, RetryConfig};
+use temporal_sdk_core::Url;
+use std::{collections::HashMap, time::Duration};
 use temporal_sdk_core_api::telemetry::{Logger, TelemetryOptionsBuilder};
 use test_server::{TemporaliteConfig, TestServer, TestServerConfig};
 use tokio_util::sync::CancellationToken;
@@ -101,13 +103,71 @@ methods!(
     TemporalBridge,
     _rtself, // somehow compiler is sure this is unused and insists on the "_"
 
-    fn create_connection(runtime: AnyObject, host: RString) -> AnyObject {
-        let host = host.map_err(VM::raise_ex).unwrap().to_string();
+    fn create_connection(runtime: AnyObject, options: AnyObject) -> AnyObject {
         let runtime = runtime.unwrap();
         let runtime = runtime.get_data(&*RUNTIME_WRAPPER);
 
+        let options = options.map_err(VM::raise_ex).unwrap();
+
+        let url = options.instance_variable_get("@url").try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string();
+        let url = Url::try_from(&*url).map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
+
+        let tls = unwrap_as_optional::<AnyObject>(Ok(options.instance_variable_get("@tls"))).map(|x| x.to_any_object());
+        let tls = tls.map(|tls| {
+            let server_root_ca_cert = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@server_root_ca_cert"))).map(unwrap_bytes);
+            let client_cert = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@client_cert"))).map(unwrap_bytes);
+            let client_private_key = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@client_private_key"))).map(unwrap_bytes);
+            let server_name_override = unwrap_as_optional::<RString>(Ok(tls.instance_variable_get("@server_name_override"))).map(|x| x.to_string());
+
+            TlsConfig {
+                server_root_ca_cert,
+                client_tls_config:
+                    if let (Some(client_cert), Some(client_private_key)) = (client_cert, client_private_key) {
+                        Some(ClientTlsConfig {
+                            client_cert,
+                            client_private_key,
+                        })
+                    } else {
+                        None
+                    },
+                domain: server_name_override,
+            }
+        });
+
+        let client_version = options.instance_variable_get("@client_version").try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string();
+        let headers = unwrap_as_optional::<Hash>(Ok(options.instance_variable_get("@metadata"))).map(to_hash_map);
+
+        let retry_config = unwrap_as_optional::<AnyObject>(Ok(options.instance_variable_get("@retry_config"))).map(|x| x.to_any_object());
+        let retry_config = retry_config.map(|config| {
+            let initial_interval = Duration::from_millis(config.instance_variable_get("@initial_interval_millis").try_convert_to::<Integer>().map_err(VM::raise_ex).unwrap().to_u64());
+            let randomization_factor = config.instance_variable_get("@randomization_factor").try_convert_to::<Float>().map_err(VM::raise_ex).unwrap().to_f64();
+            let multiplier = config.instance_variable_get("@multiplier").try_convert_to::<Float>().map_err(VM::raise_ex).unwrap().to_f64();
+            let max_interval = Duration::from_millis(config.instance_variable_get("@max_interval_millis").try_convert_to::<Integer>().map_err(VM::raise_ex).unwrap().to_u64());
+            let max_elapsed_time = unwrap_as_optional::<Integer>(Ok(options.instance_variable_get("@max_elapsed_time_millis"))).map(|x| Duration::from_millis(x.to_u64()));
+            let max_retries = config.instance_variable_get("@max_retries").try_convert_to::<Integer>().map_err(VM::raise_ex).unwrap().to_u64();
+
+            RetryConfig {
+                initial_interval,
+                randomization_factor,
+                multiplier,
+                max_interval,
+                max_elapsed_time,
+                max_retries: max_retries as usize,
+            }
+        });
+
+        let mut options = ClientOptionsBuilder::default();
+        options.target_url(url)
+            .client_name("temporal-ruby".to_string())
+            .client_version(client_version)
+            .retry_config(retry_config.unwrap_or(RetryConfig::default()));
+        if let Some(tls_cfg) = tls {
+            options.tls_cfg(tls_cfg);
+        }
+
+        let options = options.build().map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();
         let result = Thread::call_without_gvl(move || {
-            Connection::connect(runtime.tokio_runtime.clone(), host.clone())
+            Connection::connect(runtime.tokio_runtime.clone(), options.clone(), headers.clone())
         }, Some(|| {}));
 
         let connection = result.map_err(|e| raise_bridge_exception(&e.to_string())).unwrap();

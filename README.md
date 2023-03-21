@@ -21,7 +21,6 @@ At this point the SDK only supports the **Temporal Client** capabilities:
 - Interacting with a workflow (cancelling, querying, signalling, etc)
 - Interceptor and Data Conversion support
 - gRPC access to Temporal Server
-- Temporal Cloud is not yet supported due to the lack of TLS support, but it's coming soon
 
 As well as **Activity Worker** capabilities:
 
@@ -43,7 +42,6 @@ The SDK is now ready for use. To build from source, see [Dev Setup](#dev-setup).
 
 **NOTE: This README is for the current branch and not necessarily what's released on RubyGems.**
 
-
 ## Usage
 
 ### Client
@@ -53,6 +51,12 @@ A client can be created and used to start a workflow like so:
 ```ruby
 # Establish a gRPC connection to the server
 connection = Temporalio::Connection.new('localhost:7233')
+
+# To enable TLS, simply add the `tls:` argument:
+#     Temporalio::Connection.new(
+#       'localhost:7233',
+#       tls: Temporalio::Connection::TlsOptions.new(client_cert, client_private_key)
+#     )
 
 # Initialize a Client with a namespace
 client = Temporalio::Client.new(connection, 'my-namespace')
@@ -68,7 +72,6 @@ puts "Result: #{result}"
 Some things to note about the above code:
 
 - A `Client` does not have an explicit "close"
-- TLS is not yet supported
 - All positional arguments after the workflow name are treated as workflow arguments
 - The `handle` represents the workflow that was started and can be used for more than just getting
   the result
@@ -98,13 +101,13 @@ different SDKs. A custom payload converter can be implemented to support these.
 Workers host workflows (coming soon) and/or activities. Here's how to run a worker:
 
 ```ruby
-require 'temporal'
+require 'temporalio'
 
 # Establish a gRPC connection to the server
-connection = Temporal::Connection.new('localhost:7233')
+connection = Temporalio::Connection.new('localhost:7233')
 
 # Initialize a new worker with your activities
-worker = Temporal::Worker.new(connection, 'my-namespace', 'my-task-queue', activities: [MyActivity])
+worker = Temporalio::Worker.new(connection, 'my-namespace', 'my-task-queue', activities: [MyActivity])
 
 # Occupy the thread by running the worker
 worker.run
@@ -125,7 +128,7 @@ which the worker will shut itself down:
 worker_1.run { sleep 5 }
 
 # Or shut the worker down when a workflow completes (very useful for running specs):
-client = Temporal::Client.new(connection, 'my-namespace')
+client = Temporalio::Client.new(connection, 'my-namespace')
 handle = client.start_workflow('MyWorkflow', 'some input', id: 'my-id', task_queue: 'my-task-queue')
 worker_2.run { handle.result }
 
@@ -135,34 +138,34 @@ Signal.trap('USR1') { stop_queue.close }
 worker_3.run { stop_queue.pop }
 ```
 
-You can also shut down a running worker by calling `Temporal::Worker#shutdown` from a separate
+You can also shut down a running worker by calling `Temporalio::Worker#shutdown` from a separate
 thread at any time.
 
 #### Running multiple workers
 
-In order to run multiple workers in the same thread you can use the `Temporal::Worker.run` method:
+In order to run multiple workers in the same thread you can use the `Temporalio::Worker.run` method:
 
 ```ruby
 # Initialize workers
-worker_1 = Temporal::Worker.new(connection, 'my-namespace-1', 'my-task-queue-1', activities: [MyActivity1, MyActivity2])
-worker_2 = Temporal::Worker.new(connection, 'my-namespace-2', 'my-task-queue-1', activities: [MyActivity3])
-worker_3 = Temporal::Worker.new(connection, 'my-namespace-1', 'my-task-queue-2', activities: [MyActivity4])
+worker_1 = Temporalio::Worker.new(connection, 'my-namespace-1', 'my-task-queue-1', activities: [MyActivity1, MyActivity2])
+worker_2 = Temporalio::Worker.new(connection, 'my-namespace-2', 'my-task-queue-1', activities: [MyActivity3])
+worker_3 = Temporalio::Worker.new(connection, 'my-namespace-1', 'my-task-queue-2', activities: [MyActivity4])
 
-Temporal::Worker.run(worker_1, worker_2, worker_3)
+Temporalio::Worker.run(worker_1, worker_2, worker_3)
 ```
 
-Please note that similar to `Temporal::Worker#run`, `Temporal::Worker.run` accepts a block that
+Please note that similar to `Temporalio::Worker#run`, `Temporalio::Worker.run` accepts a block that
 behaves the same way — the workers will be shut down when the block finishes.
 
 You can also configure your worker to listen on process signals to initiate a shutdown:
 
 ```ruby
-Temporal::Worker.run(worker_1, worker_2, worker_3, shutdown_signals: %w[INT TERM])
+Temporalio::Worker.run(worker_1, worker_2, worker_3, shutdown_signals: %w[INT TERM])
 ```
 
 #### Worker Shutdown
 
-The `Temporal::Worker#run` (as well as `Temporal::Worker#shutdown`) invocation will wait on all
+The `Temporalio::Worker#run` (as well as `Temporalio::Worker#shutdown`) invocation will wait on all
 activities to complete, so if a long-running activity does not at least respect cancellation, the
 shutdown may never complete.
 
@@ -175,10 +178,10 @@ Cancellation](#heartbeating-and-cancellation).
 
 #### Definition
 
-Activities are defined by subclassing `Temporal::Activity` class:
+Activities are defined by subclassing `Temporalio::Activity` class:
 
 ```ruby
-class SayHelloActivity < Temporal::Activity
+class SayHelloActivity < Temporalio::Activity
   # Optionally specify a custom activity name:
   #   (The class name `SayHelloActivity` will be used by default)
   activity_name 'say-hello'
@@ -197,7 +200,7 @@ Some things to note about activity definitions:
 
 #### Activity Context
 
-Activity classes have access to `Temporal::Activity::Context` via the `activity` method. Which
+Activity classes have access to `Temporalio::Activity::Context` via the `activity` method. Which
 itself provides access to useful methods, specifically:
 
 - `info` - Returns the immutable info of the currently running activity
@@ -217,12 +220,12 @@ persisted on the server for retrieval during activity retry. If an activity call
 return an array containing `123` and `456` on the next run.
 
 A cancellation is implemented using the `Thread#raise` method, which will raise a
-`Temporal::Error::ActivityCancelled` during the execution of an activity. This means that your code
+`Temporalio::Error::ActivityCancelled` during the execution of an activity. This means that your code
 might get interrupted at any point and never complete. In order to protect critical parts of your
 activities wrap them in `activity.shield`:
 
 ```ruby
-class ActivityWithCriticalLogic < Temporal::Activity
+class ActivityWithCriticalLogic < Temporalio::Activity
   def execute
     activity.shield do
       run_business_critical_logic_1
@@ -244,7 +247,7 @@ In case the entire activity is considered critical, you can mark it as `shielded
 cancellation requests altogether:
 
 ```ruby
-class CriticalActivity < Temporal::Activity
+class CriticalActivity < Temporalio::Activity
   shielded!
 
   def execute
@@ -258,7 +261,6 @@ For any long-running activity using this approach it is recommended to periodica
 
 Please note that your activities can also get cancelled during a worker shutdown process ([if
 configured accordingly](#worker-shutdown)).
-
 
 ## Dev Setup
 

@@ -1,4 +1,7 @@
 require 'temporalio/bridge'
+require 'temporalio/bridge/connect_options'
+require 'temporalio/bridge/tls_options'
+require 'temporalio/connection/tls_options'
 require 'temporalio/connection/test_service'
 require 'temporalio/connection/workflow_service'
 require 'temporalio/errors'
@@ -6,20 +9,52 @@ require 'temporalio/runtime'
 require 'uri'
 
 module Temporalio
-  # A connection to the Temporal server.
+  # A connection to the Temporal server. It provides gRPC level communication to a Temporal server.
   #
-  # This is used to instantiate a {Temporalio::Client}. But it also can be used for a direct
-  # interaction with the API via one of the services (e.g. {#workflow_service}).
+  # Connections are usually used through either a {Temporalio::Client} or a {Temporalio::Worker}.
+  # It may also be used to perform gRPC requests to the server (see {#workflow_service}).
   class Connection
     # @api private
     attr_reader :core_connection
 
-    # @param host [String] `host:port` for the Temporal server. For local development, this is
-    #   often `"localhost:7233"`.
-    def initialize(host)
-      url = parse_url(host)
+    # @param address [String | nil] `host[:port]` for the Temporal server. Defaults to `localhost:7233`.
+    # @param tls [Temporalio::Connection::TlsOptions | nil] TLS/mTLS options for the connection.
+    #   By default, TLS is disabled.
+    # @param metadata [Hash | nil] gRPC metadata (ie. HTTP headers) to send with each request to the server. Optional.
+    # @param retry_config [Temporalio::Connection::RetryConfig | nil] gRPC retry configuration to use by default on this
+    #   connection.
+    def initialize(
+      address = nil,
+      tls: nil,
+      metadata: nil,
+      retry_config: nil
+    )
+      host, port = parse_url(address)
+
       runtime = Temporalio::Runtime.instance
-      @core_connection = Temporalio::Bridge::Connection.connect(runtime.core_runtime, url)
+
+      @core_connection = Temporalio::Bridge::Connection.connect(
+        runtime.core_runtime,
+        Temporalio::Bridge::ConnectOptions.new(
+          url: tls ? "https://#{host}:#{port}" : "http://#{host}:#{port}",
+          tls: tls && Temporalio::Bridge::TlsOptions.new(
+            server_root_ca_cert: tls.server_root_ca_cert,
+            client_cert: tls.client_cert,
+            client_private_key: tls.client_private_key,
+            server_name_override: tls.server_name_override,
+          ),
+          metadata: metadata,
+          retry_config: retry_config && Temporalio::Bridge::RetryConfig.new(
+            initial_interval_millis: retry_config.initial_interval_millis,
+            randomization_factor: retry_config.randomization_factor,
+            multiplier: retry_config.multiplier,
+            max_interval_millis: retry_config.max_interval_millis,
+            max_elapsed_time_millis: retry_config.max_elapsed_time_millis,
+            max_retries: retry_config.max_retries,
+          ),
+          client_version: Temporalio::VERSION,
+        ),
+      )
     end
 
     # Get an object for making WorkflowService RPCs.
@@ -39,13 +74,13 @@ module Temporalio
     private
 
     def parse_url(url)
+      url ||= 'localhost:7233'
+
       # Turn this into a valid URI before parsing
       uri = URI.parse(url.include?('://') ? url : "//#{url}")
       raise Temporalio::Error, 'Target host as URL with scheme are not supported' if uri.scheme
 
-      # TODO: Add support for mTLS
-      uri.scheme = 'http'
-      uri.to_s
+      [uri.host || 'localhost', uri.port || 7233]
     end
   end
 end
