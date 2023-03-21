@@ -122,6 +122,17 @@ describe Temporalio::Connection do
   end
 
   describe 'error handling' do
+    before(:all) do
+      @server, @address = MockServer.start_mock_server(MockWorkflowService.new)
+    end
+
+    after(:all) do
+      @server.stop
+    end
+
+    subject { described_class.new(@address) }
+    let(:service) { subject.workflow_service }
+
     it 'raises when given invalid url' do
       expect { described_class.new('not_a_real_url') }.to raise_error(Temporalio::Bridge::Error)
     end
@@ -139,11 +150,11 @@ describe Temporalio::Connection do
     it 'raises when incorrect request was provided' do
       request = Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest.new
 
-      expect { subject.workflow_service.describe_namespace(request) }.to raise_error(ArgumentError)
+      expect { service.describe_namespace(request) }.to raise_error(ArgumentError)
     end
 
     it 'raises when no request was provided' do
-      expect { subject.workflow_service.describe_namespace(nil) }.to raise_error(TypeError)
+      expect { service.describe_namespace(nil) }.to raise_error(TypeError)
     end
   end
 
