@@ -33,6 +33,23 @@ class MockServer
     server.handle(MockWorkflowService.new)
     server.run_till_terminated_or_interrupted([1, 'int', 'SIGQUIT'])
   end
+
+  # @param service [GRPC::GenericService]
+  def self.with_mock_server(service)
+    server = GRPC::RpcServer.new
+    port = server.add_http2_port('localhost:0', :this_port_is_insecure)
+    server.handle(service)
+
+    Thread.new do
+      server.run
+    end
+    server.wait_till_running
+
+    yield "localhost:#{port}"
+
+    server.stop
+    server.wait_till_stopped
+  end
 end
 
 if __FILE__ == $PROGRAM_NAME

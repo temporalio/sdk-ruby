@@ -19,12 +19,10 @@ module Temporalio
 
     # @param address [String | nil] `host[:port]` for the Temporal server. Host defaults to `localhost:7233`.
     # @param [Temporalio::Connection::TlsOptions | nil] tls
-    # @param [String | nil] identity
     # @param [Hash | nil] metadata
     def initialize(
       address = nil,
       tls: nil,
-      identity: nil,
       metadata: nil,
       retry_config: nil
     )
@@ -42,7 +40,6 @@ module Temporalio
             client_private_key: tls.client_private_key,
             server_name_override: tls.server_name_override,
           ),
-          identity: identity || default_identity,
           metadata: metadata,
           retry_config: retry_config && Temporalio::Bridge::RetryConfig.new(
             initial_interval_millis: retry_config.initial_interval_millis,
@@ -81,10 +78,6 @@ module Temporalio
       raise Temporalio::Error, 'Target host as URL with scheme are not supported' if uri.scheme
 
       [uri.host || 'localhost', uri.port || 7233]
-    end
-
-    def default_identity
-      "#{Process.pid}@#{Socket.gethostname}"
     end
   end
 end

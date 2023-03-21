@@ -2,6 +2,7 @@ require 'grpc'
 require 'temporalio/connection'
 require 'support/helpers/test_rpc'
 require 'support/mock_server'
+require 'support/grpc/temporal/api/workflowservice/v1/service_services_pb'
 
 describe Temporalio::Connection do
   mock_address = '0.0.0.0:4444'.freeze
@@ -119,6 +120,34 @@ describe Temporalio::Connection do
 
     it 'raises when no request was provided' do
       expect { subject.workflow_service.describe_namespace(nil) }.to raise_error(TypeError)
+    end
+  end
+end
+
+describe Temporalio::Connection do
+  describe 'xx' do
+    it 'reports the correct client-name and client-version by default' do
+      received_metadata = {}
+
+      mock_workflow_service = (Class.new(Temporalio::Api::WorkflowService::V1::WorkflowService::Service) do
+        # @param _request [Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest]
+        # @param call [GRPC::ActiveCall::SingleReqView]
+        define_method :start_workflow_execution do |_request, call|
+          call.metadata.each do |key, value|
+            received_metadata[key] = value
+          end
+          Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse.new # Return an empty response
+        end
+      end).new
+
+      MockServer.with_mock_server(mock_workflow_service) do |address|
+        Temporalio::Connection.new(address).workflow_service.start_workflow_execution(
+          Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest.new
+        )
+      end
+
+      expect(received_metadata['client-name']).to eq('temporal-ruby')
+      expect(received_metadata['client-version']).to eq(Temporalio::VERSION)
     end
   end
 end

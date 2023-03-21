@@ -135,7 +135,6 @@ methods!(
         });
 
         let client_version = options.instance_variable_get("@client_version").try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string();
-        let identity = options.instance_variable_get("@identity").try_convert_to::<RString>().map_err(VM::raise_ex).unwrap().to_string();
         let headers = unwrap_as_optional::<Hash>(Ok(options.instance_variable_get("@metadata"))).map(to_hash_map);
 
         let retry_config = unwrap_as_optional::<AnyObject>(Ok(options.instance_variable_get("@retry_config"))).map(|x| x.to_any_object());
@@ -158,8 +157,7 @@ methods!(
         });
 
         let mut options = ClientOptionsBuilder::default();
-        options.identity(identity)
-            .target_url(url)
+        options.target_url(url)
             .client_name("temporal-ruby".to_string())
             .client_version(client_version)
             .retry_config(retry_config.map_or(RetryConfig::default(), |c| c.into()));
