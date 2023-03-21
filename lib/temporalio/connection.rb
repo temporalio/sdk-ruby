@@ -17,9 +17,10 @@ module Temporalio
     # @api private
     attr_reader :core_connection
 
-    # @param address [String | nil] `host[:port]` for the Temporal server. Host defaults to `localhost:7233`.
-    # @param [Temporalio::Connection::TlsOptions | nil] tls
-    # @param [Hash | nil] metadata
+    # @param address [String | nil] `host[:port]` for the Temporal server. Defaults to `localhost:7233`.
+    # @param tls [Temporalio::Connection::TlsOptions | nil] TLS/mTLS options for the connection. By default, TLS is disabled.
+    # @param metadata [Hash | nil] gRPC metadata (ie. HTTP headers) to send with each request to the server. Optional.
+    # @param retry_config [Temporalio::Connection::RetryConfig | nil] gRPC retry configuration to use by default on this connection.
     def initialize(
       address = nil,
       tls: nil,
