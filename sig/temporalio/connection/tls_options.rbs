@@ -31,6 +31,7 @@ module Temporalio
       # @param [String?] client_cert Client certificate used to authenticate with the server.
       # @param [String?] client_private_key Client private key used to authenticate with the server.
       # @param [String?] server_name_override Overrides the target name used for validation of the server SSL certificate.
+      # @raise [ArgumentError] if `client_cert` and `client_private_key` are not both set or both unset
       def initialize: (
           ?server_root_ca_cert: String?,
           ?client_cert: String?,

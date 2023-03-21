@@ -55,11 +55,7 @@ connection = Temporalio::Connection.new('localhost:7233')
 # To enable TLS, simply add the `tls:` argument:
 #     Temporalio::Connection.new(
 #       'localhost:7233',
-#       tls: Temporalio::Connection::TlsOptions.new(
-#         server_root_ca_cert,
-#         client_cert,
-#         client_private_key,
-#       )
+#       tls: Temporalio::Connection::TlsOptions.new(client_cert, client_private_key)
 #     )
 
 # Initialize a Client with a namespace

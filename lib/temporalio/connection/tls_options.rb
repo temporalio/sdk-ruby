@@ -30,12 +30,17 @@ module Temporalio
       # @param [String?] client_private_key Client private key used to authenticate with the server.
       # @param [String?] server_name_override Overrides the target name used for validation of the
       #                  server SSL certificate.
+      # @raise [ArgumentError] if `client_cert` and `client_private_key` are not both set or both unset
       def initialize(
         server_root_ca_cert: nil,
         client_cert: nil,
         client_private_key: nil,
         server_name_override: nil
       )
+        if (client_cert && !client_private_key) || (!client_cert && client_private_key)
+          raise ArgumentError, 'client_cert and client_private_key must be either both set or both unset'
+        end
+
         @server_root_ca_cert = server_root_ca_cert
         @client_cert = client_cert
         @client_private_key = client_private_key

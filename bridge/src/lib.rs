@@ -151,7 +151,7 @@ methods!(
                 randomization_factor,
                 multiplier,
                 max_interval,
-                max_elapsed_time: max_elapsed_time,
+                max_elapsed_time,
                 max_retries: max_retries as usize,
             }
         });
@@ -160,7 +160,7 @@ methods!(
         options.target_url(url)
             .client_name("temporal-ruby".to_string())
             .client_version(client_version)
-            .retry_config(retry_config.map_or(RetryConfig::default(), |c| c.into()));
+            .retry_config(retry_config.unwrap_or(RetryConfig::default()));
         if let Some(tls_cfg) = tls {
             options.tls_cfg(tls_cfg);
         }
