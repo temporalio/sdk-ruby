@@ -1,6 +1,6 @@
 [package]
 name = "bridge"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Anthony D <anthony@temporal.io>"]
 edition = "2021"
 repository = "https://github.com/temporalio/sdk-ruby"
