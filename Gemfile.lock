@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    temporalio (0.0.2)
+    temporalio (0.1.0)
       async
       google-protobuf (~> 3.21.1)
       rexml (~> 3.2.5)

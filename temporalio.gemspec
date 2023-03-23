@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/temporalio/sdk-ruby'
   spec.licenses      = ['MIT']
 
-  spec.authors       = ['Anthony D']
-  spec.email         = ['anthony@temporal.io']
+  spec.authors       = ['Temporal Technologies Inc.']
+  spec.email         = ['sdk@temporal.io']
 
   spec.require_paths = ['lib']
   spec.extensions    = ['ext/Rakefile']
