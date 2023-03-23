@@ -27,10 +27,5 @@ describe Temporalio::Interceptor do
       expect(described_class.filter(interceptors, :activity_outbound))
         .to eq([activity_outbound_1, activity_outbound_2])
     end
-
-    it 'empty array if no interceptors match' do
-      expect(described_class.filter(interceptors, :workflow_inbound)).to eq([])
-      expect(described_class.filter(interceptors, :workflow_outbound)).to eq([])
-    end
   end
 end

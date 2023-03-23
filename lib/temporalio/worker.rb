@@ -6,10 +6,9 @@ require 'temporalio/worker/activity_worker'
 require 'temporalio/worker/runner'
 require 'temporalio/worker/sync_worker'
 require 'temporalio/worker/thread_pool_executor'
-require 'temporalio/worker/workflow_worker'
 
 module Temporalio
-  # Worker to process workflows and/or activities.
+  # Worker to process activities.
   #
   # Once created, workers can be run and shutdown explicitly via {#run} and {#shutdown}.
   class Worker
@@ -42,13 +41,12 @@ module Temporalio
       Runner.new(*workers).run(&block)
     end
 
-    # Create a worker to process workflows and/or activities.
+    # Create a worker to process activities.
     #
     # @param connection [Temporalio::Connection] A connection to be used for this worker.
     # @param namespace [String] A namespace.
     # @param task_queue [String] A task queue.
     # @param activities [Array<Class>] A list of activities (subclasses of {Temporalio::Activity}).
-    # @param workflows [Array<Class>] A list of workflows (subclasses of {Temporalio::Workflow}).
     # @param data_converter [Temporalio::DataConverter] Data converter to use for all data conversions
     #   to/from payloads.
     # @param activity_executor [ThreadPoolExecutor] Concurrent executor for all activities. Defaults
@@ -60,17 +58,15 @@ module Temporalio
     #   after a shutdown to complete before they are cancelled. A default value of `nil` means that
     #   activities are never cancelled when handling a shutdown.
     #
-    # @raise [ArgumentError] When no activities or workflows have been provided.
+    # @raise [ArgumentError] When no activities have been provided.
     def initialize(
       connection,
       namespace,
       task_queue,
       activities: [],
-      workflows: [],
       data_converter: Temporalio::DataConverter.new,
       activity_executor: nil,
       interceptors: [],
-      max_cached_workflows: 1_000,
       max_concurrent_activities: 100,
       graceful_shutdown_timeout: nil
     )
@@ -84,7 +80,7 @@ module Temporalio
         connection.core_connection,
         namespace,
         task_queue,
-        max_cached_workflows,
+        0, # maxCachedWorkflows disabled temporarily
         # FIXME: expose enable_non_local_activities
         activities.empty?,
       )
@@ -101,20 +97,9 @@ module Temporalio
             graceful_shutdown_timeout,
           )
         end
-      @workflow_worker =
-        unless workflows.empty?
-          Worker::WorkflowWorker.new(
-            namespace,
-            task_queue,
-            sync_worker,
-            workflows,
-            data_converter,
-            interceptors,
-          )
-        end
 
-      if !@activity_worker && !@workflow_worker
-        raise ArgumentError, 'At least one activity or workflow must be specified'
+      unless @activity_worker
+        raise ArgumentError, 'At least one activity must be specified'
       end
     end
 
@@ -127,9 +112,9 @@ module Temporalio
     #   run it again.
     #
     # @yield Optionally you can provide a block by the end of which the worker will shut itself
-    #   down. You can use this to stop a worker after some time has passed, your workflow has
-    #   finished or any other arbitrary implementation has completed. Any errors raised from this
-    #   block will be re-raised by this method.
+    #   down. You can use this to stop a worker after some time has passed or any other arbitrary
+    #   implementation has completed. Any errors raised from this block will be re-raised by this
+    #   method.
     def run(&block)
       Runner.new(self).run(&block)
     end
@@ -163,8 +148,6 @@ module Temporalio
             shutdown(e) # initiate shutdown because of a fatal error
           end
         end
-
-        task.async { |task| workflow_worker.run(task) } if workflow_worker
       end
     end
 
@@ -189,8 +172,6 @@ module Temporalio
         activity_worker&.setup_graceful_shutdown_timer(runtime.reactor)
         # Wait for workers to drain any outstanding tasks
         activity_worker&.drain
-        workflow_worker&.drain
-        # Stop the executor (at this point there should already be nothing in it)
         activity_executor.shutdown
         # Finalize the shutdown by stopping the Core
         core_worker.finalize_shutdown
@@ -218,6 +199,6 @@ module Temporalio
     private
 
     attr_reader :mutex, :runtime, :activity_executor, :core_worker, :activity_worker,
-                :workflow_worker, :runner
+                :runner
   end
 end

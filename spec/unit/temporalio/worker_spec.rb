@@ -59,7 +59,7 @@ describe Temporalio::Worker do
 
       expect(Temporalio::Bridge::Worker)
         .to have_received(:create)
-        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue, 1_000, false)
+        .with(an_instance_of(Temporalio::Bridge::Runtime), core_connection, namespace, task_queue, 0, false)
     end
 
     it 'uses a default executor with a default size' do
@@ -72,7 +72,7 @@ describe Temporalio::Worker do
       it 'raises an error' do
         expect do
           described_class.new(connection, namespace, task_queue)
-        end.to raise_error(ArgumentError, 'At least one activity or workflow must be specified')
+        end.to raise_error(ArgumentError, 'At least one activity must be specified')
       end
     end
 

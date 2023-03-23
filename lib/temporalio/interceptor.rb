@@ -1,7 +1,5 @@
 require 'temporalio/interceptor/activity_inbound'
 require 'temporalio/interceptor/activity_outbound'
-require 'temporalio/interceptor/workflow_inbound'
-require 'temporalio/interceptor/workflow_outbound'
 
 module Temporalio
   module Interceptor
@@ -14,10 +12,6 @@ module Temporalio
           Temporalio::Interceptor::ActivityInbound
         when :activity_outbound
           Temporalio::Interceptor::ActivityOutbound
-        when :workflow_inbound
-          Temporalio::Interceptor::WorkflowInbound
-        when :workflow_outbound
-          Temporalio::Interceptor::WorkflowOutbound
         end
 
       interceptors.each_with_object([]) do |i, result|
