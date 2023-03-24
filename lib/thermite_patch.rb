@@ -19,5 +19,15 @@ module Thermite
       target_base = ENV.fetch('CARGO_TARGET_DIR', File.join(rust_toplevel_dir, 'target'))
       File.join(target_base, ENV.fetch('CARGO_BUILD_TARGET', ''), profile, *path_components)
     end
+
+    def dynamic_linker_flags
+      @dynamic_linker_flags ||= begin
+        default_flags = RbConfig::CONFIG['DLDFLAGS'].strip
+        if target_os == 'darwin' && !default_flags.include?('-Wl,-undefined,dynamic_lookup')
+          default_flags += ' -Wl,-undefined,dynamic_lookup'
+        end
+        default_flags
+      end
+    end
   end
 end

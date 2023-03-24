@@ -4,10 +4,12 @@ module Thermite
     def target_os: -> String
     def cargo_target_path: (String, *String) -> String
     def rust_toplevel_dir: -> String
+    def dynamic_linker_flags: -> String
 
     private
 
     @target_arch: String?
     @target_os: String?
+    @dynamic_linker_flags: String?
   end
 end

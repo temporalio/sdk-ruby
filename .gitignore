@@ -13,7 +13,7 @@ _yardoc/
 
 # Thermite artefacts
 mkmf.log
-lib/bridge.so
+lib/temporal_sdk_ruby_bridge.*
 
 # rspec failure tracking
 .rspec_status
