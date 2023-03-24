@@ -9,6 +9,8 @@ _yardoc/
 /spec/reports/
 /tmp/
 
+*.gem
+
 # Thermite artefacts
 mkmf.log
 lib/bridge.so
