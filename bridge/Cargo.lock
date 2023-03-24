@@ -180,26 +180,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bridge"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "lazy_static",
- "parking_lot",
- "prost",
- "rutie",
- "temporal-client",
- "temporal-sdk-core",
- "temporal-sdk-core-api",
- "temporal-sdk-core-protos",
- "thiserror",
- "tokio",
- "tokio-util",
- "tonic",
- "url",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2241,6 +2221,26 @@ dependencies = [
  "tonic",
  "tonic-build",
  "uuid",
+]
+
+[[package]]
+name = "temporal-sdk-ruby-bridge"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "lazy_static",
+ "parking_lot",
+ "prost",
+ "rutie",
+ "temporal-client",
+ "temporal-sdk-core",
+ "temporal-sdk-core-api",
+ "temporal-sdk-core-protos",
+ "thiserror",
+ "tokio",
+ "tokio-util",
+ "tonic",
+ "url",
 ]
 
 [[package]]
