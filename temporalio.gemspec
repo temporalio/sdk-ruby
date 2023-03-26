@@ -15,7 +15,8 @@ Gem::Specification.new do |spec|
   spec.extensions    = ['ext/Rakefile']
 
   spec.files =
-    Dir['lib/**/*.*'] +
+    Dir['lib/**/*.rb'] +
+    Dir['sig/**/*.rbs'] +
     Dir['bridge/**/*.*'].reject { |x| x.include?('/target/') } +
     %w[ext/Rakefile temporalio.gemspec Gemfile LICENSE README.md]
 

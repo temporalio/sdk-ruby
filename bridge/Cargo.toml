@@ -1,6 +1,6 @@
 [package]
-name = "bridge"
-version = "0.1.0"
+name = "temporal-sdk-ruby-bridge"
+version = "0.1.1"
 authors = ["Anthony D <anthony@temporal.io>"]
 edition = "2021"
 repository = "https://github.com/temporalio/sdk-ruby"
@@ -22,7 +22,7 @@ tonic = "0.8"
 url = "2.2"
 
 [lib]
-name = "bridge"
+name = "temporal_sdk_ruby_bridge"
 crate-type = ["dylib"]
 
 [package.metadata.thermite]

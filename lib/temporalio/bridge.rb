@@ -8,7 +8,7 @@ module Temporalio
   # @api private
   module Bridge
     Rutie
-      .new(:bridge, lib_path: '', lib_suffix: 'so', lib_prefix: '')
+      .new(:temporal_sdk_ruby_bridge, lib_path: '', lib_suffix: 'so', lib_prefix: '')
       .init('init_bridge', BRIDGE_DIR)
   end
 end
