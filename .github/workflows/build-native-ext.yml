@@ -81,8 +81,8 @@ jobs:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
         run: |
           bundle exec rake thermite:tarball
-          echo bridge-*.tar.gz
-          echo "tarball=$(echo bridge-*.tar.gz)" >> $GITHUB_OUTPUT
+          echo temporal_sdk_ruby_bridge-*.tar.gz
+          echo "tarball=$(echo temporal_sdk_ruby_bridge-*.tar.gz)" >> $GITHUB_OUTPUT
 
       - name: Upload artifacts
         uses: actions/upload-release-asset@v1
