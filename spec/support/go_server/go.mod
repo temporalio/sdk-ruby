@@ -3,11 +3,16 @@ module github.com/temporalio/sdk-ruby/spec/support/go_server
 go 1.19
 
 require (
+	github.com/temporalio/temporalite v0.1.1
+	go.temporal.io/server v1.17.5
+)
+
+require (
 	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
 	cloud.google.com/go/storage v1.23.0 // indirect
-	github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7 // indirect
+	github.com/apache/thrift v0.13.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.41 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -62,7 +67,6 @@ require (
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect
 	github.com/temporalio/ringpop-go v0.0.0-20211012191444-6f91b5915e95 // indirect
-	github.com/temporalio/temporalite v0.1.1 // indirect
 	github.com/twmb/murmur3 v1.1.6 // indirect
 	github.com/uber-common/bark v1.3.0 // indirect
 	github.com/uber-go/tally/v4 v4.1.2 // indirect
@@ -77,7 +81,6 @@ require (
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
 	go.temporal.io/api v1.8.1-0.20220603192404-e65836719706 // indirect
 	go.temporal.io/sdk v1.15.0 // indirect
-	go.temporal.io/server v1.17.5 // indirect
 	go.temporal.io/version v0.3.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/dig v1.14.1 // indirect
