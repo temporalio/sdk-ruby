@@ -4,6 +4,13 @@
 [![Build](https://github.com/temporalio/sdk-ruby/actions/workflows/build-native-ext.yml/badge.svg)](https://github.com/temporalio/sdk-ruby/actions/workflows/build-native-ext.yml?query=branch%3Amain+event%3Arelease)
 [![Gem Version](https://badge.fury.io/rb/temporalio.svg)](https://rubygems.org/gems/temporalio)
 
+⚠️ INACTIVE ⚠️ 
+
+This repository is not under active development, is client only, and is not compatible with Ruby 3+.
+
+To see a list of Temporal's fully supported SDKs, check out the [Temporal documentation](https://docs.temporal.io/dev-guide/sdks#official-sdks).
+
+***
 [Temporal](https://temporal.io/) is a distributed, scalable, durable, and highly available
 orchestration engine used to execute asynchronous long-running business logic in a scalable and
 resilient way.
@@ -11,11 +18,7 @@ resilient way.
 "Temporal Ruby SDK" is the framework for authoring workflows and activities using the Ruby
 programming language.
 
-⚠️ UNDER DEVELOPMENT
-
-The Ruby SDK is under development. There are no compatibility guarantees at this time.
-
-At this point the SDK only supports the **Temporal Client** capabilities:
+At this point this experimental repository only implements the **Temporal Client** capabilities:
 
 - Starting a workflow (defined in any other SDK)
 - Interacting with a workflow (cancelling, querying, signalling, etc)
