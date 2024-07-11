@@ -1,5 +1,0 @@
-module Temporalio
-  module PayloadConverter
-    DEFAULT: _PayloadConverter
-  end
-end

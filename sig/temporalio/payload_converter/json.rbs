@@ -1,9 +1,0 @@
-module Temporalio
-  module PayloadConverter
-    class JSON
-      include _EncodingPayloadConverter
-
-      ENCODING: String
-    end
-  end
-end

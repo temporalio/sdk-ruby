@@ -1,6 +1,0 @@
-module Temporalio
-  module Interceptor
-    def self.filter: (Array[Temporalio::Worker::worker_interceptor], :activity_inbound) -> Array[Temporalio::Interceptor::ActivityInbound]
-                   | (Array[Temporalio::Worker::worker_interceptor], :activity_outbound) -> Array[Temporalio::Interceptor::ActivityOutbound]
-  end
-end

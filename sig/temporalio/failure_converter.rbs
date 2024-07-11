@@ -1,5 +1,0 @@
-module Temporalio
-  module FailureConverter
-    DEFAULT: _FailureConverter
-  end
-end
