@@ -12,8 +12,17 @@ jobs:
       fail-fast: true
       matrix:
         # TODO(cretz): Enable Windows (it's slow)
-        # os: [ubuntu-latest, ubuntu-arm, macos-intel, macos-arm, windows-latest]
-        os: [ubuntu-latest, ubuntu-arm, macos-intel, macos-arm]
+        #
+        # TODO(cretz): Enable Linux ARM. It's not natively supported with setup-ruby (see
+        # https://github.com/ruby/setup-ruby#supported-platforms). So we need to set ruby-version to 'none' per
+        # https://github.com/oxidize-rb/actions/tree/main/setup-ruby-and-rust and install Ruby ourselves maybe. See
+        # https://github.com/ruby/setup-ruby?tab=readme-ov-file#using-self-hosted-runners. The error states:
+        #     Error: The current runner (ubuntu-24.04-arm64) was detected as self-hosted because the platform does not match a GitHub-hosted runner image (or that image is deprecated and no longer supported).
+        #     In such a case, you should install Ruby in the $RUNNER_TOOL_CACHE yourself, for example using https://github.com/rbenv/ruby-build
+        #     You can take inspiration from this workflow for more details: https://github.com/ruby/ruby-builder/blob/master/.github/workflows/build.yml
+        #
+        #os: [ubuntu-latest, ubuntu-arm, macos-intel, macos-arm, windows-latest]
+        os: [ubuntu-latest, macos-intel, macos-arm]
         # Earliest and latest supported
         rubyVersion: ["3.1", "3.3"]
         
@@ -21,8 +30,6 @@ jobs:
           - os: ubuntu-latest
             rubyVersion: "3.3"
             checkTarget: true
-          - os: ubuntu-arm
-            runsOn: ubuntu-24.04-arm64-2-core
           - os: macos-intel
             runsOn: macos-12
           - os: macos-arm
