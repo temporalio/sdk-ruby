@@ -20,4 +20,5 @@ temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api" }
 temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
 tokio = "1.26"
 tonic = "0.11"
+tracing = "0.1"
 url = "2.2"

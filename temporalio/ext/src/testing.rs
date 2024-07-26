@@ -8,7 +8,7 @@ use temporal_sdk_core::ephemeral_server::{
 };
 
 use crate::{
-    error, new_error,
+    error, id, new_error,
     runtime::{Runtime, RuntimeHandle},
     util::Struct,
     ROOT_MOD,
@@ -53,31 +53,33 @@ impl EphemeralServer {
         let mut opts_build = TemporalDevServerConfigBuilder::default();
         opts_build
             .exe(
-                if let Some(existing_path) = options.aref::<Option<String>>("existing_path")? {
+                if let Some(existing_path) =
+                    options.member::<Option<String>>(id!("existing_path"))?
+                {
                     EphemeralExe::ExistingPath(existing_path)
                 } else {
                     EphemeralExe::CachedDownload {
-                        version: match options.aref::<String>("download_version")? {
+                        version: match options.member::<String>(id!("download_version"))? {
                             ref v if v == "default" => EphemeralExeVersion::SDKDefault {
-                                sdk_name: options.aref("sdk_name")?,
-                                sdk_version: options.aref("sdk_version")?,
+                                sdk_name: options.member(id!("sdk_name"))?,
+                                sdk_version: options.member(id!("sdk_version"))?,
                             },
                             download_version => EphemeralExeVersion::Fixed(download_version),
                         },
-                        dest_dir: options.aref("download_dest_dir")?,
+                        dest_dir: options.member(id!("download_dest_dir"))?,
                     }
                 },
             )
-            .namespace(options.aref::<String>("namespace")?)
-            .ip(options.aref::<String>("ip")?)
-            .port(options.aref::<Option<u16>>("port")?)
-            .db_filename(options.aref::<Option<String>>("database_filename")?)
-            .ui(options.aref("namespace")?)
+            .namespace(options.member::<String>(id!("namespace"))?)
+            .ip(options.member::<String>(id!("ip"))?)
+            .port(options.member::<Option<u16>>(id!("port"))?)
+            .db_filename(options.member::<Option<String>>(id!("database_filename"))?)
+            .ui(options.member(id!("namespace"))?)
             .log((
-                options.aref::<String>("log_format")?,
-                options.aref::<String>("log_level")?,
+                options.member::<String>(id!("log_format"))?,
+                options.member::<String>(id!("log_level"))?,
             ))
-            .extra_args(options.aref("extra_args")?);
+            .extra_args(options.member(id!("extra_args"))?);
         let opts = opts_build
             .build()
             .map_err(|err| error!("Invalid Temporalite config: {}", err))?;
@@ -89,22 +91,15 @@ impl EphemeralServer {
             async move { opts.start_server().await },
             move |ruby, result| {
                 let block = ruby.get_inner(block);
-                match result {
-                    Ok(core) => {
-                        let _: Value = block
-                            .call((EphemeralServer {
-                                target: core.target.clone(),
-                                core: Mutex::new(Some(core)),
-                                runtime_handle,
-                            },))
-                            .expect("Block call failed");
-                    }
-                    Err(err) => {
-                        let _: Value = block
-                            .call((new_error!("Failed starting server: {}", err),))
-                            .expect("Block call failed");
-                    }
-                }
+                let _: Value = match result {
+                    Ok(core) => block.call((EphemeralServer {
+                        target: core.target.clone(),
+                        core: Mutex::new(Some(core)),
+                        runtime_handle,
+                    },))?,
+                    Err(err) => block.call((new_error!("Failed starting server: {}", err),))?,
+                };
+                Ok(())
             },
         );
         Ok(())
@@ -121,16 +116,13 @@ impl EphemeralServer {
             self.runtime_handle
                 .spawn(async move { core.shutdown().await }, move |ruby, result| {
                     let block = ruby.get_inner(block);
-                    match result {
-                        Ok(_) => {
-                            let _: Value = block.call((ruby.qnil(),)).expect("Block call failed");
-                        }
+                    let _: Value = match result {
+                        Ok(_) => block.call((ruby.qnil(),))?,
                         Err(err) => {
-                            let _: Value = block
-                                .call((new_error!("Failed shutting down server: {}", err),))
-                                .expect("Block call failed");
+                            block.call((new_error!("Failed shutting down server: {}", err),))?
                         }
                     };
+                    Ok(())
                 })
         }
         Ok(())

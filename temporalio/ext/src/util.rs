@@ -1,12 +1,14 @@
 use std::ffi::c_void;
 
+use magnus::symbol::IntoSymbol;
+use magnus::value::OpaqueId;
 use magnus::Ruby;
 use magnus::{Error, RStruct, TryConvert, Value};
 
 use crate::error;
 
 pub(crate) struct Struct {
-    field_path: Vec<&'static str>,
+    field_path: Vec<OpaqueId>,
     inner: RStruct,
 }
 
@@ -20,26 +22,30 @@ impl TryConvert for Struct {
 }
 
 impl Struct {
-    pub(crate) fn aref<T>(&self, field: &'static str) -> Result<T, Error>
+    pub(crate) fn member<T>(&self, field: OpaqueId) -> Result<T, Error>
     where
         T: TryConvert,
     {
-        self.inner.aref::<_, T>(field).map_err(|err| {
+        self.inner.getmember::<_, T>(field).map_err(|err| {
             if self.field_path.is_empty() {
-                error!("Failed reading field '{}': {}", field, err)
+                error!("Failed reading field '{}': {}", field.into_symbol(), err)
             } else {
                 error!(
                     "Failed reading field '{}.{}': {}",
-                    self.field_path.join("."),
-                    field,
+                    self.field_path
+                        .iter()
+                        .map(|v| v.into_symbol().to_string())
+                        .collect::<Vec<String>>()
+                        .join("."),
+                    field.into_symbol(),
                     err
                 )
             }
         })
     }
 
-    pub(crate) fn child(&self, field: &'static str) -> Result<Option<Struct>, Error> {
-        self.aref::<Option<RStruct>>(field).map(|inner| {
+    pub(crate) fn child(&self, field: OpaqueId) -> Result<Option<Struct>, Error> {
+        self.member::<Option<RStruct>>(field).map(|inner| {
             inner.map(|inner| {
                 let mut field_path = self.field_path.clone();
                 field_path.push(field);
@@ -58,6 +64,11 @@ where
     F: FnMut() -> R,
     U: FnMut(),
 {
+    // These extern functions are unsafe because they are callbacks from Ruby C
+    // code that unbox data into Rust functions. This is only used within this
+    // function and we can trust the boxed-then-unboxed Rust functions live for
+    // the life of this function (and Ruby does not use them after that).
+
     unsafe extern "C" fn anon_func<F, R>(data: *mut c_void) -> *mut c_void
     where
         F: FnMut() -> R,

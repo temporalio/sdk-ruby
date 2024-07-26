@@ -1,4 +1,4 @@
-use std::{collections::HashMap, future::Future, time::Duration};
+use std::{collections::HashMap, future::Future, marker::PhantomData, time::Duration};
 
 use temporal_client::{
     ClientInitError, ClientKeepAliveConfig, ClientOptionsBuilder, ClientTlsConfig,
@@ -13,7 +13,7 @@ use magnus::{
 use tonic::{metadata::MetadataKey, Status};
 use url::Url;
 
-use super::{error, new_error, ROOT_MOD};
+use super::{error, id, new_error, ROOT_MOD};
 use crate::{
     runtime::{Runtime, RuntimeHandle},
     util::Struct,
@@ -82,19 +82,21 @@ impl Client {
         let mut opts_build = ClientOptionsBuilder::default();
         opts_build
             .target_url(
-                Url::parse(format!("http://{}", options.aref::<String>("target_host")?).as_str())
-                    .map_err(|err| error!("Failed parsing host: {}", err))?,
+                Url::parse(
+                    format!("http://{}", options.member::<String>(id!("target_host"))?).as_str(),
+                )
+                .map_err(|err| error!("Failed parsing host: {}", err))?,
             )
-            .client_name(options.aref::<String>("client_name")?)
-            .client_version(options.aref::<String>("client_version")?)
-            .headers(Some(options.aref("rpc_metadata")?))
-            .api_key(options.aref("api_key")?)
-            .identity(options.aref("identity")?);
-        if let Some(tls) = options.child("tls")? {
+            .client_name(options.member::<String>(id!("client_name"))?)
+            .client_version(options.member::<String>(id!("client_version"))?)
+            .headers(Some(options.member(id!("rpc_metadata"))?))
+            .api_key(options.member(id!("api_key"))?)
+            .identity(options.member(id!("identity"))?);
+        if let Some(tls) = options.child(id!("tls"))? {
             opts_build.tls_cfg(TlsConfig {
                 client_tls_config: match (
-                    tls.aref::<Option<RString>>("client_cert")?,
-                    tls.aref::<Option<RString>>("client_private_key")?,
+                    tls.member::<Option<RString>>(id!("client_cert"))?,
+                    tls.member::<Option<RString>>(id!("client_private_key"))?,
                 ) {
                     (None, None) => None,
                     (Some(client_cert), Some(client_private_key)) => Some(ClientTlsConfig {
@@ -109,38 +111,38 @@ impl Client {
                     }
                 },
                 server_root_ca_cert: tls
-                    .aref::<Option<RString>>("server_root_ca_cert")?
+                    .member::<Option<RString>>(id!("server_root_ca_cert"))?
                     .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
-                domain: tls.aref("domain")?,
+                domain: tls.member(id!("domain"))?,
             });
         }
         let rpc_retry = options
-            .child("rpc_retry")?
+            .child(id!("rpc_retry"))?
             .ok_or_else(|| error!("Missing rpc_retry"))?;
         opts_build.retry_config(RetryConfig {
-            initial_interval: Duration::from_millis(rpc_retry.aref("initial_interval_ms")?),
-            randomization_factor: rpc_retry.aref("randomization_factor")?,
-            multiplier: rpc_retry.aref("multiplier")?,
-            max_interval: Duration::from_millis(rpc_retry.aref("max_interval_ms")?),
-            max_elapsed_time: match rpc_retry.aref::<u64>("max_elapsed_time_ms")? {
+            initial_interval: Duration::from_millis(rpc_retry.member(id!("initial_interval_ms"))?),
+            randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
+            multiplier: rpc_retry.member(id!("multiplier"))?,
+            max_interval: Duration::from_millis(rpc_retry.member(id!("max_interval_ms"))?),
+            max_elapsed_time: match rpc_retry.member::<u64>(id!("max_elapsed_time_ms"))? {
                 // 0 means none
                 0 => None,
                 val => Some(Duration::from_millis(val)),
             },
-            max_retries: rpc_retry.aref("max_retries")?,
+            max_retries: rpc_retry.member(id!("max_retries"))?,
         });
-        if let Some(keep_alive) = options.child("keep_alive")? {
+        if let Some(keep_alive) = options.child(id!("keep_alive"))? {
             opts_build.keep_alive(Some(ClientKeepAliveConfig {
-                interval: Duration::from_millis(keep_alive.aref("interval_ms")?),
-                timeout: Duration::from_millis(keep_alive.aref("timeout_ms")?),
+                interval: Duration::from_millis(keep_alive.member(id!("interval_ms"))?),
+                timeout: Duration::from_millis(keep_alive.member(id!("timeout_ms"))?),
             }));
         }
-        if let Some(proxy) = options.child("http_connect_proxy")? {
+        if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
             opts_build.http_connect_proxy(Some(HttpConnectProxyOptions {
-                target_addr: proxy.aref("target_host")?,
+                target_addr: proxy.member(id!("target_host"))?,
                 basic_auth: match (
-                    proxy.aref::<Option<String>>("basic_auth_user")?,
-                    proxy.aref::<Option<String>>("basic_auth_user")?,
+                    proxy.member::<Option<String>>(id!("basic_auth_user"))?,
+                    proxy.member::<Option<String>>(id!("basic_auth_user"))?,
                 ) {
                     (None, None) => None,
                     (Some(user), Some(pass)) => Some((user, pass)),
@@ -165,21 +167,14 @@ impl Client {
             },
             move |ruby, result: Result<CoreClient, ClientInitError>| {
                 let block = ruby.get_inner(block);
-                match result {
-                    Ok(core) => {
-                        let _: Value = block
-                            .call((Client {
-                                core,
-                                runtime_handle,
-                            },))
-                            .expect("Block call failed");
-                    }
-                    Err(err) => {
-                        let _: Value = block
-                            .call((new_error!("Failed client connect: {}", err),))
-                            .expect("Block call failed");
-                    }
+                let _: Value = match result {
+                    Ok(core) => block.call((Client {
+                        core,
+                        runtime_handle,
+                    },))?,
+                    Err(err) => block.call((new_error!("Failed client connect: {}", err),))?,
                 };
+                Ok(())
             },
         );
         Ok(())
@@ -195,12 +190,12 @@ impl Client {
         >(
             args.keywords,
             &[
-                "service",
-                "rpc",
-                "request",
-                "rpc_retry",
-                "rpc_metadata",
-                "rpc_timeout_ms",
+                id!("service"),
+                id!("rpc"),
+                id!("request"),
+                id!("rpc_retry"),
+                id!("rpc_metadata"),
+                id!("rpc_timeout_ms"),
             ],
             &[],
         )?
@@ -211,6 +206,7 @@ impl Client {
             retry,
             metadata,
             timeout_ms,
+            _not_send_sync: PhantomData,
         };
         let block = Opaque::from(args.block);
         match service {
@@ -261,6 +257,11 @@ struct RpcCall<'a> {
     retry: bool,
     metadata: HashMap<String, String>,
     timeout_ms: u64,
+
+    // This RPC call contains an unsafe reference to Ruby bytes that does not
+    // outlive the call, so we prevent it from being sent to another thread.
+    // !Send/!Sync not yet stable: https://github.com/rust-lang/rust/issues/68318
+    _not_send_sync: PhantomData<*const ()>,
 }
 
 impl RpcCall<'_> {
@@ -295,19 +296,13 @@ where
         async move { fut.await.map(|msg| msg.get_ref().encode_to_vec()) },
         move |ruby, result| {
             let block = ruby.get_inner(block);
-            match result {
-                Ok(val) => {
-                    // TODO(cretz): Any reasonable way to prevent byte copy?
-                    let _: Value = block
-                        .call((RString::from_slice(&val),))
-                        .expect("Block call failed");
-                }
-                Err(status) => {
-                    let _: Value = block
-                        .call((RpcFailure { status },))
-                        .expect("Block call failed");
-                }
+            let _: Value = match result {
+                // TODO(cretz): Any reasonable way to prevent byte copy that is just going to get decoded into proto
+                // object?
+                Ok(val) => block.call((RString::from_slice(&val),))?,
+                Err(status) => block.call((RpcFailure { status },))?,
             };
+            Ok(())
         },
     );
     Ok(())

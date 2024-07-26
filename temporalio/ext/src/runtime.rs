@@ -1,4 +1,4 @@
-use super::{error, ROOT_MOD};
+use super::{error, id, ROOT_MOD};
 use crate::util::{without_gvl, Struct};
 use magnus::{
     class, function, method, prelude::*, DataTypeFunctions, Error, Ruby, TypedData, Value,
@@ -15,6 +15,7 @@ use temporal_sdk_core_api::telemetry::{
     Logger, MetricTemporality, OtelCollectorOptionsBuilder, PrometheusExporterOptionsBuilder,
     TelemetryOptionsBuilder,
 };
+use tracing::error as log_error;
 use url::Url;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -29,7 +30,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
 #[derive(DataTypeFunctions, TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Runtime", free_immediately)]
 pub struct Runtime {
-    /// Separate cloneable handle that can be reference in other Rust objects.
+    /// Separate cloneable handle that can be referenced in other Rust objects.
     pub(crate) handle: RuntimeHandle,
     async_command_rx: Receiver<AsyncCommand>,
 }
@@ -40,7 +41,7 @@ pub(crate) struct RuntimeHandle {
     async_command_tx: Sender<AsyncCommand>,
 }
 
-type Callback = Box<dyn FnOnce() + Send + 'static>;
+type Callback = Box<dyn FnOnce() -> Result<(), Error> + Send + 'static>;
 
 enum AsyncCommand {
     RunCallback(Callback),
@@ -52,25 +53,25 @@ impl Runtime {
         // Build options
         let mut opts_build = TelemetryOptionsBuilder::default();
         let telemetry = options
-            .child("telemetry")?
+            .child(id!("telemetry"))?
             .ok_or_else(|| error!("Missing telemetry options"))?;
-        if let Some(logging) = telemetry.child("logging")? {
+        if let Some(logging) = telemetry.child(id!("logging"))? {
             opts_build.logging(
-                if let Some(_forward_to) = logging.aref::<Option<Value>>("forward_to")? {
+                if let Some(_forward_to) = logging.member::<Option<Value>>(id!("forward_to"))? {
                     // TODO(cretz): This
                     return Err(error!("Forwarding not yet supported"));
                 } else {
                     Logger::Console {
-                        filter: logging.aref("log_filter")?,
+                        filter: logging.member(id!("log_filter"))?,
                     }
                 },
             );
         }
         // Set some metrics options now, but the metrics instance is late-bound
         // after CoreRuntime created since it needs Tokio runtime
-        if let Some(metrics) = telemetry.child("metrics")? {
-            opts_build.attach_service_name(metrics.aref("attach_service_name")?);
-            if let Some(prefix) = metrics.aref::<Option<String>>("metric_prefix")? {
+        if let Some(metrics) = telemetry.child(id!("metrics"))? {
+            opts_build.attach_service_name(metrics.member(id!("attach_service_name"))?);
+            if let Some(prefix) = metrics.member::<Option<String>>(id!("metric_prefix"))? {
                 opts_build.metric_prefix(prefix);
             }
         }
@@ -83,27 +84,27 @@ impl Runtime {
             .map_err(|err| error!("Failed initializing telemetry: {}", err))?;
 
         // Create metrics (created after Core runtime since it needs Tokio handle)
-        if let Some(metrics) = telemetry.child("metrics")? {
+        if let Some(metrics) = telemetry.child(id!("metrics"))? {
             let _guard = core.tokio_handle().enter();
-            match (metrics.child("opentelemetry")?, metrics.child("prometheus")?, metrics.child("buffered_with_size")?) {
+            match (metrics.child(id!("opentelemetry"))?, metrics.child(id!("prometheus"))?, metrics.child(id!("buffered_with_size"))?) {
                 // Build OTel
                 (Some(opentelemetry), None, None) => {
                     let mut opts_build = OtelCollectorOptionsBuilder::default();
                     opts_build.url(
-                            Url::parse(&opentelemetry.aref::<String>("url")?).map_err(|err| {
+                            Url::parse(&opentelemetry.member::<String>(id!("url"))?).map_err(|err| {
                                 error!("Invalid OTel URL: {}", err)
                             })?).
-                            use_seconds_for_durations(opentelemetry.aref("durations_as_seconds")?);
-                    if let Some(headers) = opentelemetry.aref::<Option<HashMap<String, String>>>("headers")? {
+                            use_seconds_for_durations(opentelemetry.member(id!("durations_as_seconds"))?);
+                    if let Some(headers) = opentelemetry.member::<Option<HashMap<String, String>>>(id!("headers"))? {
                         opts_build.headers(headers);
                     }
-                    if let Some(period) = opentelemetry.aref::<Option<u64>>("metric_periodicity_ms")? {
+                    if let Some(period) = opentelemetry.member::<Option<u64>>(id!("metric_periodicity_ms"))? {
                         opts_build.metric_periodicity(Duration::from_millis(period));
                     }
-                    if opentelemetry.aref::<bool>("metric_temporality_delta")? {
+                    if opentelemetry.member::<bool>(id!("metric_temporality_delta"))? {
                         opts_build.metric_temporality(MetricTemporality::Delta);
                     }
-                    if let Some(global_tags) = metrics.aref::<Option<HashMap<String, String>>>("global_tags")? {
+                    if let Some(global_tags) = metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))? {
                         opts_build.global_tags(global_tags);
                     }
                     let opts = opts_build
@@ -117,14 +118,14 @@ impl Runtime {
                     let mut opts_build = PrometheusExporterOptionsBuilder::default();
                     opts_build
                         .socket_addr(
-                            SocketAddr::from_str(&prom.aref::<String>("bind_address")?).map_err(|err| {
+                            SocketAddr::from_str(&prom.member::<String>(id!("bind_address"))?).map_err(|err| {
                                 error!("Invalid Prometheus address: {}", err)
                             })?,
                         )
-                        .counters_total_suffix(prom.aref("counters_total_suffix")?)
-                        .unit_suffix(prom.aref("unit_suffix")?)
-                        .use_seconds_for_durations(prom.aref("durations_as_seconds")?);
-                    if let Some(global_tags) = metrics.aref::<Option<HashMap<String, String>>>("global_tags")? {
+                        .counters_total_suffix(prom.member(id!("counters_total_suffix"))?)
+                        .unit_suffix(prom.member(id!("unit_suffix"))?)
+                        .use_seconds_for_durations(prom.member(id!("durations_as_seconds"))?);
+                    if let Some(global_tags) = metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))? {
                         opts_build.global_tags(global_tags);
                     }
                     let opts = opts_build
@@ -152,23 +153,29 @@ impl Runtime {
         })
     }
 
+    // See the ext/README.md for details on how this works
     pub fn run_command_loop(&self) {
         loop {
             let cmd = without_gvl(
                 || self.async_command_rx.recv(),
                 || {
-                    // Ignore fail since we don't properly catch panics in
-                    // without_gvl right now
-                    let _ = self.handle.async_command_tx.send(AsyncCommand::Shutdown);
+                    if let Err(err) = self.handle.async_command_tx.send(AsyncCommand::Shutdown) {
+                        log_error!("Unable to send shutdown command: {}", err)
+                    }
                 },
             );
-            if let Ok(AsyncCommand::RunCallback(callback)) = cmd {
-                // TODO(cretz): Can we trust that this call is cheap?
-                // TODO(cretz): Catch and unwind here?
-                callback();
-            } else {
-                // We break on all errors/shutdown
-                break;
+            match cmd {
+                Ok(AsyncCommand::RunCallback(callback)) => {
+                    if let Err(err) = callback() {
+                        log_error!("Unexpected error inside async Ruby callback: {}", err);
+                    }
+                }
+                Ok(AsyncCommand::Shutdown) => return,
+                Err(err) => {
+                    // Should never happen, but we exit the loop if it does
+                    log_error!("Unexpected error receiving runtime command: {}", err);
+                    return;
+                }
             }
         }
     }
@@ -178,13 +185,15 @@ impl RuntimeHandle {
     /// Spawn the given future in Tokio and then, upon complete, call the given
     /// function inside a Ruby thread. The callback inside the Ruby thread must
     /// be cheap because it is one shared Ruby thread for everything. Therefore
-    /// it should be something like a queue push or a fiber scheduling.
+    /// it should be something like a queue push or a fiber scheduling. It only
+    /// logs the error of the callback, so callers should consider dealing with
+    /// errors themselves
     pub(crate) fn spawn<T, F>(
         &self,
         without_gvl: impl Future<Output = T> + Send + 'static,
         with_gvl: F,
     ) where
-        F: FnOnce(Ruby, T) + Send + 'static,
+        F: FnOnce(Ruby, T) -> Result<(), Error> + Send + 'static,
         T: Send + 'static,
     {
         let async_command_tx = self.async_command_tx.clone();
@@ -194,11 +203,15 @@ impl RuntimeHandle {
             // dropped before this Tokio future runs
             let _ = async_command_tx
                 .clone()
-                .send(AsyncCommand::RunCallback(Box::new(move || {
-                    if let Ok(ruby) = Ruby::get() {
-                        with_gvl(ruby, val);
-                    }
-                })));
+                .send(AsyncCommand::RunCallback(Box::new(
+                    move || match Ruby::get() {
+                        Ok(ruby) => with_gvl(ruby, val),
+                        Err(err) => {
+                            log_error!("Unable to get Ruby instance in async callback: {}", err);
+                            Ok(())
+                        }
+                    },
+                )));
         });
     }
 }

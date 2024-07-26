@@ -1,3 +1,8 @@
+# Ruby and rb-sys seem to require a Cargo.toml here at the gem root (see https://github.com/oxidize-rb/rb-sys/issues/405),
+# and Rust is broken if one workspace is nested within another without the ability to exclude (see
+# https://github.com/rust-lang/cargo/issues/6745). So we basically must copy sdk-core's workspace for now.
+# TODO(cretz): Fix this situation if possible without moving sdk-core submodule.
+
 [workspace]
 members = ["./ext"]
 resolver = "2"

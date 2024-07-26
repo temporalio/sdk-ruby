@@ -30,8 +30,8 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         Internal::Bridge::Runtime::TelemetryOptions.new(
-          logging: @logging&._to_bridge,
-          metrics: @metrics&._to_bridge
+          logging: logging&._to_bridge,
+          metrics: metrics&._to_bridge
         )
       end
     end
@@ -55,10 +55,10 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         Internal::Bridge::Runtime::LoggingOptions.new(
-          log_filter: if @log_filter.is_a?(String)
-                        @log_filter
-                      elsif @log_filter.is_a?(LoggingFilterOptions)
-                        @log_filter._to_bridge
+          log_filter: if log_filter.is_a?(String)
+                        log_filter
+                      elsif log_filter.is_a?(LoggingFilterOptions)
+                        log_filter._to_bridge
                       else
                         raise 'Log filter must be string or LoggingFilterOptions'
                       end
@@ -86,7 +86,7 @@ module Temporalio
 
       # @!visibility private
       def _to_bridge
-        "#{@other_level},temporal_sdk_core=#{@core_level},temporal_client=#{@core_level},temporal_sdk=#{@core_level}"
+        "#{other_level},temporal_sdk_core=#{core_level},temporal_client=#{core_level},temporal_sdk=#{core_level}"
       end
     end
 
@@ -121,11 +121,11 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         Internal::Bridge::Runtime::MetricsOptions.new(
-          opentelemetry: @opentelemetry&._to_bridge,
-          prometheus: @prometheus&._to_bridge,
-          attach_service_name: @attach_service_name,
-          global_tags: @global_tags,
-          metric_prefix: @metric_prefix
+          opentelemetry: opentelemetry&._to_bridge,
+          prometheus: prometheus&._to_bridge,
+          attach_service_name:,
+          global_tags:,
+          metric_prefix:
         )
       end
     end
@@ -168,15 +168,15 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         Internal::Bridge::Runtime::OpenTelemetryMetricsOptions.new(
-          url: @url,
-          headers: @headers,
-          metric_periodicity_ms: @metric_periodicity_ms,
-          metric_temporality_delta: case @metric_temporality
+          url:,
+          headers:,
+          metric_periodicity_ms:,
+          metric_temporality_delta: case metric_temporality
                                     when MetricTemporality::CUMULATIVE then false
                                     when MetricTemporality::DELTA then true
                                     else raise 'Unrecognized metric temporality'
                                     end,
-          durations_as_seconds: @durations_as_seconds
+          durations_as_seconds:
         )
       end
     end
@@ -210,10 +210,10 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         Internal::Bridge::Runtime::PrometheusOptions.new(
-          bind_address: @bind_address,
-          counters_total_suffix: @counters_total_suffix,
-          unit_suffix: @unit_suffix,
-          durations_as_seconds: @durations_as_seconds
+          bind_address:,
+          counters_total_suffix:,
+          unit_suffix:,
+          durations_as_seconds:
         )
       end
     end
