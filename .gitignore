@@ -1,28 +1,9 @@
-.bundle/
-.yardoc
-_yardoc/
-
-/coverage/
-/doc/
-/examples/vendor/
-/pkg/
-/spec/reports/
-/tmp/
-
-*.gem
-
-# Thermite artefacts
-mkmf.log
-lib/temporal_sdk_ruby_bridge.*
-
-# rspec failure tracking
-.rspec_status
-
-.idea/*
-
-# Rust builds
-bridge/target
-
-# Go binaries
-spec/support/go_server/main
-spec/support/go_worker/main
+tmp/
+target/
+Gemfile.lock
+.gem_rbs_collection
+*.so
+temporalio/test/golangworker/golangworker
+temporalio/.yardoc
+temporalio/doc
+temporalio/pkg

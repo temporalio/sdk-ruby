@@ -1,0 +1,33 @@
+sources:
+  - type: git
+    name: ruby/gem_rbs_collection
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    revision: main
+    repo_dir: gems
+
+path: .gem_rbs_collection
+
+gems:
+  # Bad/unnecessary RBS
+  # - name: activesupport
+  #   ignore: true
+  - name: ast
+    ignore: true
+  # - name: concurrent-ruby
+  #   ignore: true
+  - name: connection_pool
+    ignore: true
+  - name: diff-lcs
+    ignore: true
+  - name: listen
+    ignore: true
+  - name: parser
+    ignore: true
+  - name: rainbow
+    ignore: true
+  - name: rake
+    ignore: true
+  - name: rubocop
+    ignore: true
+  - name: rubocop-ast
+    ignore: true

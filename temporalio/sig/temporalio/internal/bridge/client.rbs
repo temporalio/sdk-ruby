@@ -1,0 +1,10 @@
+module Temporalio
+  module Internal
+    module Bridge
+      class Client
+        # TODO(cretz): Improve
+        def self.new: (untyped, untyped) -> Client
+      end
+    end
+  end
+end
