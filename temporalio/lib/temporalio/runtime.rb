@@ -101,7 +101,7 @@ module Temporalio
     # @!attribute attach_service_name
     #   @return [Boolean] Whether to put the service_name on every metric, default +true+.
     # @!attribute global_tags
-    #   @return [Hash{String=>String}, nil] Resource tags to be applied to all metrics.
+    #   @return [Hash<String, String>, nil] Resource tags to be applied to all metrics.
     # @!attribute metric_prefix
     #   @return [String, nil] Prefix to put on every Temporal metric. If unset, defaults to +temporal_+.
     MetricsOptions = Struct.new(
@@ -135,9 +135,9 @@ module Temporalio
     # @!attribute url
     #   @return [String] URL for OpenTelemetry endpoint.
     # @!attribute headers
-    #   @return [Hash{String=>String}, nil] Headers for OpenTelemetry endpoint.
-    # @!attribute metric_periodicity_ms
-    #   @return [Integer, nil] How frequently metrics should be exported, unset uses internal default.
+    #   @return [Hash<String, String>, nil] Headers for OpenTelemetry endpoint.
+    # @!attribute metric_periodicity
+    #   @return [Float, nil] How frequently metrics should be exported, unset uses internal default.
     # @!attribute metric_temporality
     #   @return [MetricTemporality] How frequently metrics should be exported, default is
     #     {MetricTemporality::CUMULATIVE}.
@@ -147,7 +147,7 @@ module Temporalio
     OpenTelemetryMetricsOptions = Struct.new(
       :url,
       :headers,
-      :metric_periodicity_ms,
+      :metric_periodicity,
       :metric_temporality,
       :durations_as_seconds,
       keyword_init: true
@@ -170,7 +170,7 @@ module Temporalio
         Internal::Bridge::Runtime::OpenTelemetryMetricsOptions.new(
           url:,
           headers:,
-          metric_periodicity_ms:,
+          metric_periodicity:,
           metric_temporality_delta: case metric_temporality
                                     when MetricTemporality::CUMULATIVE then false
                                     when MetricTemporality::DELTA then true

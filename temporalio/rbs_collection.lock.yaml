@@ -113,6 +113,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: ripper
+  version: '0'
+  source:
+    type: stdlib
 - name: securerandom
   version: '0'
   source:
@@ -139,6 +143,14 @@ gems:
     type: git
     name: ruby/gem_rbs_collection
     revision: 0233af5f782a23991cc0b8bd2e5e0e0f882aadee
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: yard
+  version: '0.9'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 03121e6bbf2340e3b179edcc351deac45476f4d0
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 gemfile_lock_path: Gemfile.lock

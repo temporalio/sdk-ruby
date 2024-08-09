@@ -4,6 +4,9 @@ module Temporalio
   class Client
     # Mixin for intercepting clients. Classes that +include+ this should implement their own {intercept_client} that
     # returns their own instance of {Outbound}.
+    #
+    # @note Input classes herein may get new requeired fields added and therefore the constructors of the Input
+    # classes may change in backwards incompatible ways. Users should not try to construct Input classes themselves.
     module Interceptor
       # Method called when intercepting a client. This is called upon client creation.
       #
@@ -20,7 +23,20 @@ module Temporalio
         :args,
         :id,
         :task_queue,
-        # TODO(cretz): more
+        :execution_timeout,
+        :run_timeout,
+        :task_timeout,
+        :id_reuse_policy,
+        :id_conflict_policy,
+        :retry_policy,
+        :cron_schedule,
+        :memo,
+        :search_attributes,
+        :start_delay,
+        :request_eager_start,
+        :headers,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true
       )
 
@@ -33,7 +49,8 @@ module Temporalio
         :wait_new_event,
         :event_filter_type,
         :skip_archival,
-        # TODO(cretz): more
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true
       )
 

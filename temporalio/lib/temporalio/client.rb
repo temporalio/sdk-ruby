@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
+require 'google/protobuf/well_known_types'
 require 'temporalio/api'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/workflow_handle'
+require 'temporalio/common_enums'
 require 'temporalio/converters'
+require 'temporalio/error'
+require 'temporalio/internal/proto_utils'
 require 'temporalio/runtime'
+require 'temporalio/search_attributes'
 
 module Temporalio
   # Client for accessing Temporal.
@@ -16,7 +21,7 @@ module Temporalio
   # +Client.new(**my_options.to_h)+).
   #
   # Clients are thread-safe and are meant to be reused for the life of the application. They are built to work in both
-  # synchronous and asynchronous contexts. Internally they use callbacks based on {Queue} which means they are
+  # synchronous and asynchronous contexts. Internally they use callbacks based on {::Queue} which means they are
   # Fiber-compatible.
   class Client
     # Options as returned from {dup_options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
@@ -46,7 +51,7 @@ module Temporalio
     # @param default_workflow_query_reject_condition [Api::Enums::V1::QueryRejectCondition, nil] Default rejection
     #   condition for workflow queries if not set during query. See {WorkflowHandle.query} for details on the
     #   rejection condition.
-    # @param rpc_metadata [Hash{String=>String}] Headers to use for all calls to the server. Keys here can be overriden
+    # @param rpc_metadata [Hash<String, String>] Headers to use for all calls to the server. Keys here can be overriden
     #   by per-call RPC metadata keys.
     # @param rpc_retry [Connection::RPCRetryOptions] Retry options for direct service calls (when opted in) or all
     #   high-level calls made by this client (which all opt-in to retries by default).
@@ -154,6 +159,11 @@ module Temporalio
       connection.workflow_service
     end
 
+    # @return [Connection::OperatorService] Raw gRPC operator service.
+    def operator_service
+      connection.operator_service
+    end
+
     # @return [Options] Shallow duplication of options for potential use in {initialize}. Note, this is shallow, so
     #   attributes like {Options.interceptors} are not duplicated, but no mutations will apply.
     def dup_options
@@ -166,21 +176,66 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
+    # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
+    #   as new.
+    # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
+    # @param task_timeout [Float, nil] Timeout of a single workflow task in seconds.
+    # @param id_reuse_policy [WorkflowIDReusePolicy] How already-existing IDs are treated.
+    # @param id_conflict_policy [WorkflowIDConflictPolicy] How already-running workflows of the same ID are treated.
+    #   Default is unspecified which effectively means fail the start attempt. This cannot be set if `id_reuse_policy`
+    #   is set to terminate if running.
+    # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
+    # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
+    # @param memo [Hash<String, Object>, nil] Memo for the workflow.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
+    # @param start_delay [Float, nil] Amount of time in seconds to wait before starting the workflow. This does not work
+    #   with `cron_schedule`.
+    # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
+    #   server to start it on a local worker running with this same client. This is currently experimental.
+    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
+    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
     #
     # @return [WorkflowHandle] A workflow handle to the started workflow.
+    # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
     # @raise [Error::RPCError] RPC error from call.
     def start_workflow(
       workflow,
       *args,
       id:,
-      task_queue:
-      # TODO(cretz): More
+      task_queue:,
+      execution_timeout: nil,
+      run_timeout: nil,
+      task_timeout: nil,
+      id_reuse_policy: WorkflowIDReusePolicy::ALLOW_DUPLICATE,
+      id_conflict_policy: WorkflowIDConflictPolicy::UNSPECIFIED,
+      retry_policy: nil,
+      cron_schedule: nil,
+      memo: nil,
+      search_attributes: nil,
+      start_delay: nil,
+      request_eager_start: false,
+      rpc_metadata: nil,
+      rpc_timeout: nil
     )
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
                              workflow:,
                              args:,
                              id:,
-                             task_queue:
+                             task_queue:,
+                             execution_timeout:,
+                             run_timeout:,
+                             task_timeout:,
+                             id_reuse_policy:,
+                             id_conflict_policy:,
+                             retry_policy:,
+                             cron_schedule:,
+                             memo:,
+                             search_attributes:,
+                             start_delay:,
+                             request_eager_start:,
+                             headers: {},
+                             rpc_metadata:,
+                             rpc_timeout:
                            ))
     end
 
@@ -190,18 +245,67 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
+    # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
+    #   as new.
+    # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
+    # @param task_timeout [Float, nil] Timeout of a single workflow task in seconds.
+    # @param id_reuse_policy [WorkflowIDReusePolicy] How already-existing IDs are treated.
+    # @param id_conflict_policy [WorkflowIDConflictPolicy] How already-running workflows of the same ID are treated.
+    #   Default is unspecified which effectively means fail the start attempt. This cannot be set if `id_reuse_policy`
+    #   is set to terminate if running.
+    # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
+    # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
+    # @param memo [Hash<String, Object>, nil] Memo for the workflow.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
+    # @param start_delay [Float, nil] Amount of time in seconds to wait before starting the workflow. This does not work
+    #   with `cron_schedule`.
+    # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
+    #   server to start it on a local worker running with this same client. This is currently experimental.
+    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
+    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
     #
     # @return [Object] Successful result of the workflow.
+    # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
     # @raise [Error::WorkflowFailureError] Workflow failed with {Error::WorkflowFailureError.cause} as cause.
     # @raise [Error::RPCError] RPC error from call.
     def execute_workflow(
       workflow,
       *args,
       id:,
-      task_queue:
-      # TODO(cretz): More
+      task_queue:,
+      execution_timeout: nil,
+      run_timeout: nil,
+      task_timeout: nil,
+      id_reuse_policy: WorkflowIDReusePolicy::ALLOW_DUPLICATE,
+      id_conflict_policy: WorkflowIDConflictPolicy::UNSPECIFIED,
+      retry_policy: nil,
+      cron_schedule: nil,
+      memo: nil,
+      search_attributes: nil,
+      start_delay: nil,
+      request_eager_start: false,
+      rpc_metadata: nil,
+      rpc_timeout: nil
     )
-      start_workflow(workflow, *args, id:, task_queue:).result
+      start_workflow(
+        workflow,
+        *args,
+        id:,
+        task_queue:,
+        execution_timeout:,
+        run_timeout:,
+        task_timeout:,
+        id_reuse_policy:,
+        id_conflict_policy:,
+        retry_policy:,
+        cron_schedule:,
+        memo:,
+        search_attributes:,
+        start_delay:,
+        request_eager_start:,
+        rpc_metadata:,
+        rpc_timeout:
+      ).result
     end
 
     # Get a workflow handle to an existing workflow by its ID.
@@ -235,18 +339,53 @@ module Temporalio
 
       # @!visibility private
       def start_workflow(input)
-        # TODO(cretz): Signal with start
+        # TODO(cretz): Signal/update with start
         req = Api::WorkflowService::V1::StartWorkflowExecutionRequest.new(
           request_id: SecureRandom.uuid,
           namespace: @client.namespace,
           workflow_type: Api::Common::V1::WorkflowType.new(name: input.workflow.to_s),
           workflow_id: input.id,
           task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
-          input: @client.data_converter.to_payloads(input.args)
-          # TODO(cretz): More things
+          input: @client.data_converter.to_payloads(input.args),
+          workflow_execution_timeout: Internal::ProtoUtils.seconds_to_duration(input.execution_timeout),
+          workflow_run_timeout: Internal::ProtoUtils.seconds_to_duration(input.run_timeout),
+          workflow_task_timeout: Internal::ProtoUtils.seconds_to_duration(input.task_timeout),
+          identity: @client.connection.identity,
+          workflow_id_reuse_policy: input.id_reuse_policy,
+          workflow_id_conflict_policy: input.id_conflict_policy,
+          retry_policy: input.retry_policy&.to_proto,
+          cron_schedule: input.cron_schedule,
+          memo: Internal::ProtoUtils.memo_to_proto(input.memo, @client.data_converter),
+          search_attributes: input.search_attributes&.to_proto,
+          workflow_start_delay: Internal::ProtoUtils.seconds_to_duration(input.start_delay),
+          request_eager_execution: input.request_eager_start,
+          header: input.headers
         )
-        # TODO(cretz): RPC params, error handling, etc
-        resp = @client.workflow_service.start_workflow_execution(req)
+
+        # Send request
+        begin
+          resp = @client.workflow_service.start_workflow_execution(
+            req,
+            rpc_retry: true,
+            rpc_metadata: input.rpc_metadata,
+            rpc_timeout: input.rpc_timeout
+          )
+        rescue Error::RPCError => e
+          # Unpack and raise already started if that's the error, otherwise default raise
+          if e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+            details = e.grpc_status.details.first.unpack(Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure)
+            if details
+              raise Error::WorkflowAlreadyStartedError.new(
+                workflow_id: req.workflow_id,
+                workflow_type: req.workflow_type.name,
+                run_id: details.run_id
+              )
+            end
+          end
+          raise
+        end
+
+        # Return handle
         WorkflowHandle.new(
           @client,
           input.id,
@@ -268,10 +407,13 @@ module Temporalio
           wait_new_event: input.wait_new_event,
           history_event_filter_type: input.event_filter_type,
           skip_archival: input.skip_archival
-          # TODO(cretz): More things
         )
-        # TODO(cretz): RPC params
-        resp = @client.workflow_service.get_workflow_execution_history(req)
+        resp = @client.workflow_service.get_workflow_execution_history(
+          req,
+          rpc_retry: true,
+          rpc_metadata: input.rpc_metadata,
+          rpc_timeout: input.rpc_timeout
+        )
         Interceptor::FetchWorkflowHistoryEventPage.new(
           events: resp.history&.events || [],
           next_page_token: resp.next_page_token.empty? ? nil : resp.next_page_token

@@ -21,7 +21,10 @@ Prerequisites:
 
 To build shared library for development use:
 
-    bundle exec rake compile:dev
+    bundle exec rake compile
+
+Note, this is not `compile:dev` because debug-mode in Rust has
+[an issue](https://github.com/rust-lang/rust/issues/34283) that causes runtime stack size problems.
 
 To build and test release:
 

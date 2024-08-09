@@ -62,5 +62,29 @@ module TestHelper
         @kitchen_sink_exe = File.join(__dir__ || '', 'golangworker', 'golangworker')
       end
     end
+
+    def ensure_search_attribute_keys(*keys)
+      # Do a list and collect ones not present
+      list_resp = client.operator_service.list_search_attributes(
+        Temporalio::Api::OperatorService::V1::ListSearchAttributesRequest.new(namespace: client.namespace)
+      )
+
+      # Add every one not already present
+      to_add = keys.reject { |key| list_resp.custom_attributes.has_key?(key.name) } # rubocop:disable Style/PreferredHashMethods
+      return if to_add.empty?
+
+      client.operator_service.add_search_attributes(
+        Temporalio::Api::OperatorService::V1::AddSearchAttributesRequest.new(
+          namespace: client.namespace,
+          search_attributes: to_add.to_h { |key| [key.name, key.type] }
+        )
+      )
+
+      # List again, confirm all present
+      list_resp = client.operator_service.list_search_attributes(
+        Temporalio::Api::OperatorService::V1::ListSearchAttributesRequest.new(namespace: client.namespace)
+      )
+      raise 'Missing keys' unless keys.all? { |key| list_resp.custom_attributes.has_key?(key.name) } # rubocop:disable Style/PreferredHashMethods
+    end
   end
 end

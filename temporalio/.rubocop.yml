@@ -34,7 +34,7 @@ Metrics/BlockLength:
 
 # The default is too small
 Metrics/ClassLength:
-  Max: 400
+  Max: 1000
 
 # The default is too small
 Metrics/CyclomaticComplexity:

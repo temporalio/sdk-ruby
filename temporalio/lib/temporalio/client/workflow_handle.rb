@@ -60,13 +60,19 @@ module Temporalio
       #
       # @param follow_runs [Boolean] If +true+, workflow runs will be continually fetched across retries and continue as
       #   new until the latest one is found. If +false+, the first result is used.
+      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
+      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
       #
       # @return [Object] Result of the workflow after being converted by the data converter.
       #
-      # @raise [Error::WorkflowFailureError] Workflow failed with {Error::WorkflowFailureError.cause} as cause.
+      # @raise [Error::WorkflowFailureError] Workflow failed with {Error::WorkflowFailureError#cause} as cause.
       # @raise [Error::WorkflowContinuedAsNewError] Workflow continued as new and +follow_runs+ is +false+.
       # @raise [Error::RPCError] RPC error from call.
-      def result(follow_runs: true)
+      def result(
+        follow_runs: true,
+        rpc_metadata: nil,
+        rpc_timeout: nil
+      )
         # Wait on the close event, following as needed
         hist_run_id = result_run_id
         loop do
@@ -76,7 +82,9 @@ module Temporalio
             page_size: nil,
             wait_new_event: true,
             event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
-            skip_archival: true
+            skip_archival: true,
+            rpc_metadata:,
+            rpc_timeout:
           ).next
 
           # Check each close type'
@@ -143,20 +151,26 @@ module Temporalio
       #   history.
       # @param event_filter_type [Api::Enums::V1::HistoryEventFilterType] Types of events to fetch.
       # @param skip_archival [Boolean] Whether to skip archival.
+      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
+      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
       #
       # @return [Enumerable<Api::History::V1::HistoryEvent>] Enumerable events.
       def fetch_history_events(
         page_size: nil,
         wait_new_event: false,
         event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_ALL_EVENT,
-        skip_archival: false
+        skip_archival: false,
+        rpc_metadata: nil,
+        rpc_timeout: nil
       )
         fetch_history_events_for_run(
           run_id,
           page_size:,
           wait_new_event:,
           event_filter_type:,
-          skip_archival:
+          skip_archival:,
+          rpc_metadata:,
+          rpc_timeout:
         )
       end
 
@@ -167,8 +181,9 @@ module Temporalio
         page_size:,
         wait_new_event:,
         event_filter_type:,
-        skip_archival:
-        # TODO(cretz): RPC stuff
+        skip_archival:,
+        rpc_metadata: nil,
+        rpc_timeout: nil
       )
         Enumerator.new do |yielder|
           input = Interceptor::FetchWorkflowHistoryEventPageInput.new(
@@ -178,7 +193,9 @@ module Temporalio
             next_page_token: nil,
             wait_new_event:,
             event_filter_type:,
-            skip_archival:
+            skip_archival:,
+            rpc_metadata:,
+            rpc_timeout:
           )
           loop do
             page = @client._impl.fetch_workflow_history_event_page(input)

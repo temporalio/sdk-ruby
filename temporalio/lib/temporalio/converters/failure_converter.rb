@@ -19,8 +19,8 @@ module Temporalio
 
       # Convert a Ruby error to a Temporal failure.
       #
-      # @param error [Exception] Ruby error.
-      # @param payload_converter [PayloadConverter] Payload converter.
+      # @param _error [Exception] Ruby error.
+      # @param _payload_converter [PayloadConverter] Payload converter.
       # @return [Api::Failure::V1::Failure] Converted failure.
       def to_failure(_error, _payload_converter)
         raise 'TODO'
@@ -28,8 +28,8 @@ module Temporalio
 
       # Convert a Temporal failure to a Ruby error.
       #
-      # @param failure [Api::Failure::V1::Failure] Failure.
-      # @param payload_converter [PayloadConverter] Payload converter.
+      # @param _failure [Api::Failure::V1::Failure] Failure.
+      # @param _payload_converter [PayloadConverter] Payload converter.
       # @return [Exception] Converted Ruby error.
       def from_failure(_failure, _payload_converter)
         raise 'TODO'

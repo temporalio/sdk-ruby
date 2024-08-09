@@ -6,9 +6,9 @@ require 'temporalio/converters/payload_converter'
 module Temporalio
   module Converters
     class PayloadConverter
-      # Payload converter that is a collection of {EncodingConverter}s. When converting to a payload, it tries each
-      # encoding converter in order until one works. The encoding converter is expected to set the +encoding+ metadata
-      # which is then used to match to the proper encoding converter when converting back to a Ruby value.
+      # Payload converter that is a collection of {Encoding}s. When converting to a payload, it tries each encoding
+      # converter in order until one works. The encoding converter is expected to set the +encoding+ metadata which is
+      # then used to match to the proper encoding converter when converting back to a Ruby value.
       class Composite < PayloadConverter
         class ConverterNotFound < Error; end
         class EncodingNotSet < Error; end

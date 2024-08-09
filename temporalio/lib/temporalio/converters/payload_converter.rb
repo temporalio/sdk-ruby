@@ -18,8 +18,8 @@ module Temporalio
 
       # Create a new payload converter with the default set of encoding converters.
       #
-      # @param json_parse_options [Hash] Options for {JSON.parse}.
-      # @param json_generate_options [Hash] Options for {JSON.generate}.
+      # @param json_parse_options [Hash] Options for {::JSON.parse}.
+      # @param json_generate_options [Hash] Options for {::JSON.generate}.
       def self.new_with_defaults(json_parse_options: { create_additions: true }, json_generate_options: {})
         Ractor.make_shareable(
           PayloadConverter::Composite.new(
