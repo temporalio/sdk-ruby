@@ -1,0 +1,66 @@
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.1
+  SuggestExtensions: false
+  Exclude:
+    - ext/**/*
+    - lib/temporalio/api/**/*
+    - target/**/*
+    - tmp/**/*
+    - vendor/**/*
+
+# Keep cop rule settings in alphabetical order. For each rule setting, provide
+# justification for the change from default.
+
+# We want development dependencies in the gemspec
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
+# We want our classes in a certain order
+Layout/ClassStructure:
+  Enabled: true
+
+# The default is too small and triggers simply setting lots of values on a proto
+Metrics/AbcSize:
+  Max: 75
+
+# The default is too small
+Metrics/BlockLength:
+  Max: 100
+
+# The default is too small
+Metrics/ClassLength:
+  Max: 400
+
+# The default is too small
+Metrics/CyclomaticComplexity:
+  Max: 25
+
+# The default is too small
+Metrics/MethodLength:
+  Max: 100
+
+# The default is too small
+Metrics/PerceivedComplexity:
+  Max: 25
+
+# We want methods to be documented
+Style/DocumentationMethod:
+  Enabled: true
+
+# Ok to have global vars in tests
+Style/GlobalVars:
+  Exclude:
+    - test/**/*
+
+# We want our require lists to be in order
+Style/RequireOrder:
+  Enabled: true
+
+# We are ok with large amount of keyword args
+Metrics/ParameterLists:
+  CountKeywordArgs: false

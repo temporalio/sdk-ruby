@@ -1,0 +1,24 @@
+[package]
+name = "temporalio_bridge"
+version = "0.1.0"
+edition = "2021"
+authors = ["Chad Retz <chad@temporal.io>"]
+license = "MIT"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+magnus = "0.7"
+parking_lot = "0.12"
+prost = "0.12"
+rb-sys = "0.9"
+temporal-client = { version = "0.1.0", path = "./sdk-core/client" }
+temporal-sdk-core = { version = "0.1.0", path = "./sdk-core/core", features = ["ephemeral-server"] }
+temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api" }
+temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
+tokio = "1.26"
+tonic = "0.11"
+tracing = "0.1"
+url = "2.2"
