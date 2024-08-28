@@ -1,0 +1,12 @@
+module Temporalio
+  module Converters
+    class FailureConverter
+      def self.default: -> FailureConverter
+
+      def initialize: (?encode_common_attributes: bool) -> void
+
+      def to_failure: (Exception error, PayloadConverter payload_converter) -> untyped
+      def from_failure: (untyped failure, PayloadConverter payload_converter) -> Exception
+    end
+  end
+end

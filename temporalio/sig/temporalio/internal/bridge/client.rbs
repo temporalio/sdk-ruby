@@ -2,8 +2,112 @@ module Temporalio
   module Internal
     module Bridge
       class Client
-        # TODO(cretz): Improve
-        def self.new: (untyped, untyped) -> Client
+        class Options
+          attr_accessor target_host: String
+          attr_accessor client_name: String
+          attr_accessor client_version: String
+          attr_accessor rpc_metadata: Hash[String, String]
+          attr_accessor api_key: String?
+          attr_accessor identity: String
+          attr_accessor tls: TLSOptions?
+          attr_accessor rpc_retry: RPCRetryOptions
+          attr_accessor keep_alive: KeepAliveOptions?
+          attr_accessor http_connect_proxy: HTTPConnectProxyOptions?
+  
+          def initialize: (
+            target_host: String,
+            client_name: String,
+            client_version: String,
+            rpc_metadata: Hash[String, String],
+            api_key: String?,
+            identity: String,
+            ?tls: TLSOptions?,
+            rpc_retry: RPCRetryOptions,
+            ?keep_alive: KeepAliveOptions?,
+            ?http_connect_proxy: HTTPConnectProxyOptions?
+          ) -> void
+        end
+
+        class TLSOptions
+          attr_accessor client_cert: String?
+          attr_accessor client_private_key: String?
+          attr_accessor server_root_ca_cert: String?
+          attr_accessor domain: String?
+  
+          def initialize: (
+            ?client_cert: String?,
+            ?client_private_key: String?,
+            ?server_root_ca_cert: String?,
+            ?domain: String?
+          ) -> void
+        end
+
+        class RPCRetryOptions
+          attr_accessor initial_interval: Float
+          attr_accessor randomization_factor: Float
+          attr_accessor multiplier: Float
+          attr_accessor max_interval: Float
+          attr_accessor max_elapsed_time: Float
+          attr_accessor max_retries: Integer
+  
+          def initialize: (
+            initial_interval: Float,
+            randomization_factor: Float,
+            multiplier: Float,
+            max_interval: Float,
+            max_elapsed_time: Float,
+            max_retries: Integer
+          ) -> void
+        end
+
+        class KeepAliveOptions
+          attr_accessor interval: Float
+          attr_accessor timeout: Float
+  
+          def initialize: (
+            interval: Float,
+            timeout: Float
+          ) -> void
+        end
+  
+        class HTTPConnectProxyOptions
+          attr_accessor target_host: String
+          attr_accessor basic_auth_user: String?
+          attr_accessor basic_auth_pass: String?
+  
+          def initialize: (
+            target_host: String,
+            basic_auth_user: String?,
+            basic_auth_pass: String?
+          ) -> void
+        end
+
+        # Defined in Rust
+
+        SERVICE_WORKFLOW: Integer
+        SERVICE_OPERATOR: Integer
+        SERVICE_CLOUD: Integer
+        SERVICE_TEST: Integer
+        SERVICE_HEALTH: Integer
+
+        def self.new: (Runtime runtime, Options options) -> Client
+
+        def self.async_new: (Runtime runtime, Options options) { ([Client, Exception]) -> void } -> void
+
+        def async_invoke_rpc: (
+          service: Integer,
+          rpc: String,
+          request: String,
+          rpc_retry: bool,
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) { ([String, RPCFailure]) -> void } -> void
+
+        class RPCFailure < Error
+          def code: -> Temporalio::Error::RPCError::Code::enum
+          def message: -> String
+          def details: -> String
+        end
       end
     end
   end

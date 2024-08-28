@@ -1,0 +1,59 @@
+module Temporalio
+  class SearchAttributes
+    class Key
+      attr_reader name: String
+      attr_reader type: Integer
+
+      def initialize: (String name, Integer type) -> void
+
+      def validate_value: (Object value) -> void
+
+      def value_set: (Object value) -> Update
+      def value_unset: -> Update
+    end
+
+    class Update
+      attr_reader key: Key
+      attr_reader value: Object?
+
+      def initialize: (Key key, Object? value) -> void
+    end
+
+    def self.from_proto: (untyped proto) -> SearchAttributes
+
+    def initialize: (SearchAttributes existing) -> void
+                  | (Hash[Key, Object] existing) -> void
+                  | -> void
+
+    def []=: (Key key, Object? value) -> void
+    def []: (Key key) -> Object?
+
+    def delete: (Key key) -> void
+              | (String key) -> void
+
+    def each: { (Key key, Object value) -> void } -> self
+
+    def to_h: -> Hash[Key, Object]
+
+    def dup: -> SearchAttributes
+
+    def update: (*Update updates) -> SearchAttributes
+
+    def update!: (*Update updates) -> void
+
+    def to_proto: -> untyped
+
+    module IndexedValueType
+      TEXT: Integer
+      KEYWORD: Integer
+      INTEGER: Integer
+      FLOAT: Integer
+      BOOLEAN: Integer
+      TIME: Integer
+      KEYWORD_LIST: Integer
+
+      PROTO_NAMES: Hash[Integer, String]
+      PROTO_VALUES: Hash[String, Integer]
+    end
+  end
+end

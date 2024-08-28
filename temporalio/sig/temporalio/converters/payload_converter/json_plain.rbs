@@ -1,0 +1,12 @@
+module Temporalio
+  module Converters
+    class PayloadConverter
+      class JsonPlain < Encoding
+        def initialize: (
+          ?Hash[Symbol, untyped] parse_options,
+          ?Hash[Symbol, untyped] generate_options
+        ) -> void
+      end
+    end
+  end
+end

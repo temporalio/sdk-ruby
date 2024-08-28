@@ -1,0 +1,19 @@
+module Temporalio
+  module WorkflowIDReusePolicy
+    type enum = Integer
+
+    ALLOW_DUPLICATE: enum
+    ALLOW_DUPLICATE_FAILED_ONLY: enum
+    REJECT_DUPLICATE: enum
+    TERMINATE_IF_RUNNING: enum
+  end
+
+  module WorkflowIDConflictPolicy
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    FAIL: enum
+    USE_EXISTING: enum
+    TERMINATE_EXISTING: enum
+  end
+end

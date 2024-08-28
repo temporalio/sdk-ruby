@@ -1,0 +1,83 @@
+module Temporalio
+  module Internal
+    module Bridge
+      class Runtime
+        class Options
+          attr_accessor telemetry: TelemetryOptions
+
+          def initialize: (telemetry: TelemetryOptions) -> void
+        end
+
+        class TelemetryOptions
+          attr_accessor logging: LoggingOptions?
+          attr_accessor metrics: MetricsOptions?
+    
+          def initialize: (
+            logging: LoggingOptions?,
+            metrics: MetricsOptions?
+          ) -> void
+        end
+    
+        class LoggingOptions
+          attr_accessor log_filter: String?
+    
+          def initialize: (
+            log_filter: String?
+          ) -> void
+        end
+    
+        class MetricsOptions
+          attr_accessor opentelemetry: OpenTelemetryMetricsOptions?
+          attr_accessor prometheus: PrometheusMetricsOptions?
+          attr_accessor attach_service_name: bool
+          attr_accessor global_tags: Hash[String, String]?
+          attr_accessor metric_prefix: String?
+    
+          def initialize: (
+            opentelemetry: OpenTelemetryMetricsOptions?,
+            prometheus: PrometheusMetricsOptions?,
+            attach_service_name: bool,
+            global_tags: Hash[String, String]?,
+            metric_prefix: String?
+          ) -> void
+        end
+    
+        class OpenTelemetryMetricsOptions
+          attr_accessor url: String
+          attr_accessor headers: Hash[String, String]?
+          attr_accessor metric_periodicity: Float?
+          attr_accessor metric_temporality_delta: bool
+          attr_accessor durations_as_seconds: bool
+    
+          def initialize: (
+            url: String,
+            headers: Hash[String, String]?,
+            metric_periodicity: Float?,
+            metric_temporality_delta: bool,
+            durations_as_seconds: bool
+          ) -> void
+        end
+    
+        class PrometheusMetricsOptions
+          attr_accessor bind_address: String
+          attr_accessor counters_total_suffix: bool
+          attr_accessor unit_suffix: bool
+          attr_accessor durations_as_seconds: bool
+    
+          def initialize: (
+            bind_address: String,
+            counters_total_suffix: bool,
+            unit_suffix: bool,
+            durations_as_seconds: bool
+          ) -> void
+        end
+
+        # Defined in Rust
+
+        def self.new: (Options options) -> Runtime
+
+        def run_command_loop: -> void
+      end
+    end
+  end
+end

@@ -20,6 +20,7 @@ module Temporalio
         def to_payload(value)
           return nil unless value.is_a?(Google::Protobuf::MessageExts)
 
+          # @type var value: Google::Protobuf::MessageExts
           Api::Common::V1::Payload.new(
             metadata: { 'encoding' => ENCODING, 'messageType' => value.class.descriptor.name },
             data: value.to_proto
@@ -29,6 +30,7 @@ module Temporalio
         # (see Encoding.from_payload)
         def from_payload(payload)
           type = payload.metadata['messageType']
+          # @type var desc: untyped
           desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(type)
           raise "No protobuf message found in global pool for message type #{type}" unless desc
 

@@ -13,7 +13,7 @@ module Temporalio
     # Connection to Temporal server that is not namespace specific. Most users will use {Client.connect} instead of this
     # directly.
     class Connection
-      # Options as returned from {dup_options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
+      # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
       Options = Struct.new(
         :target_host,
         :api_key,
@@ -72,7 +72,8 @@ module Temporalio
         :max_retries,
         keyword_init: true
       ) do
-        def initialize(*, **kwargs)
+        def initialize(**kwargs)
+          # @type var kwargs: untyped
           kwargs[:initial_interval] = 0.1 unless kwargs.key?(:initial_interval)
           kwargs[:randomization_factor] = 0.2 unless kwargs.key?(:randomization_factor)
           kwargs[:multiplier] = 1.5 unless kwargs.key?(:multiplier)
@@ -95,7 +96,8 @@ module Temporalio
         :timeout,
         keyword_init: true
       ) do
-        def initialize(*, **kwargs)
+        def initialize(**kwargs)
+          # @type var kwargs: untyped
           kwargs[:interval] = 30.0 unless kwargs.key?(:interval)
           kwargs[:timeout] = 15.0 unless kwargs.key?(:timeout)
           super
@@ -117,8 +119,8 @@ module Temporalio
         keyword_init: true
       )
 
-      # @return [String] Client identity.
-      attr_reader :identity
+      # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
+      attr_reader :options
 
       # @return [WorkflowService] Raw gRPC workflow service.
       attr_reader :workflow_service
@@ -130,7 +132,7 @@ module Temporalio
       attr_reader :cloud_service
 
       # Connect to Temporal server. Most users will use {Client.connect} instead of this directly. Parameters here match
-      # {Options} returned from {dup_options} by intention so options can be altered and splatted to create a new
+      # {Options} returned from {options} by intention so options can be dup'd, altered, splatted to create a new
       # connection.
       #
       # @param target_host [String] +host:port+ for the Temporal server. For local development, this is often
@@ -146,7 +148,7 @@ module Temporalio
       # @param identity [String] Identity for this client.
       # @param keep_alive [KeepAliveOptions] Keep-alive options for the client connection. Can be set to +nil+ to
       #   disable.
-      # @param http_connect_proxy [HTTPConnectProxyOptions] Options for HTTP CONNECT proxy.
+      # @param http_connect_proxy [HTTPConnectProxyOptions, nil] Options for HTTP CONNECT proxy.
       # @param runtime [Runtime] Runtime for this client.
       # @param lazy_connect [Boolean] If true, there is no connection until the first call is attempted or a worker
       #   is created with it. Clients from lazy connections cannot be used for workers if they have not performed a
@@ -176,7 +178,7 @@ module Temporalio
           http_connect_proxy:,
           runtime:,
           lazy_connect:
-        )
+        ).freeze
         # Create core client now if not lazy
         _core_client unless lazy_connect
         # Create service instances
@@ -190,10 +192,9 @@ module Temporalio
         @options.target_host
       end
 
-      # @return [Options] Shallow duplication of options for potential use in {initialize}. Note, this is shallow, so
-      #   attributes like {Options.rpc_metadata} are not duplicated, but no mutations will apply.
-      def dup_options
-        @options.dup
+      # @return [String] Client identity.
+      def identity
+        @options.identity
       end
 
       # @return [Boolean] Whether this connection is connected. This is always `true` unless `lazy_connect` option was
@@ -237,10 +238,10 @@ module Temporalio
         if @options.tls
           options.tls = if @options.tls.is_a?(TLSOptions)
                           Internal::Bridge::Client::TLSOptions.new(
-                            client_cert: @options.tls.client_cert,
-                            client_private_key: @options.tls.client_private_key,
-                            server_root_ca_cert: @options.tls.server_root_ca_cert,
-                            domain: @options.tls.domain
+                            client_cert: @options.tls.client_cert, # steep:ignore
+                            client_private_key: @options.tls.client_private_key, # steep:ignore
+                            server_root_ca_cert: @options.tls.server_root_ca_cert, # steep:ignore
+                            domain: @options.tls.domain # steep:ignore
                           )
                         else
                           Internal::Bridge::Client::TLSOptions.new

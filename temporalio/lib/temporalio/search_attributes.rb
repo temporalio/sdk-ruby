@@ -10,20 +10,30 @@ module Temporalio
   # class is frozen.
   class SearchAttributes
     # Key for a search attribute.
-    #
-    # @!attribute name
-    #   @return [String] Name of the search attribute.
-    # @!attribute type
-    #   @return [IndexedValueType] Type of the search attribute.
-    Key = Struct.new(
-      :name,
-      :type
-    ) do
+    class Key
+      # @return [String] Name of the search attribute.
+      attr_reader :name
+
+      # @return [IndexedValueType] Type of the search attribute.
+      attr_reader :type
+
       def initialize(name, type)
         raise ArgumentError, 'Invalid type' unless Api::Enums::V1::IndexedValueType.lookup(type)
 
-        super
-        freeze
+        @name = name
+        @type = type
+      end
+
+      # @return [Boolean] Check equality.
+      def ==(other)
+        other.is_a?(Key) && other.name == @name && other.type == @type
+      end
+
+      alias eql? ==
+
+      # @return [Integer] Hash
+      def hash
+        [self.class, @name, @age].hash
       end
 
       # Validate that the given value matches the expected {#type}.
@@ -104,7 +114,7 @@ module Temporalio
         key = Key.new(key_name, IndexedValueType::PROTO_VALUES[payload.metadata['type']])
         value = Converters::PayloadConverter.default.from_payload(payload)
         # Time needs to be converted
-        value = Time.iso8601(value) if key.type == IndexedValueType::TIME
+        value = Time.iso8601(value) if key.type == IndexedValueType::TIME && value.is_a?(String)
         [key, value]
       end.to_h)
     end
@@ -197,7 +207,7 @@ module Temporalio
     # @return [SearchAttributes] New collection.
     def update(*updates)
       attrs = dup
-      attrs.with_updates!(*updates)
+      attrs.update!(*updates)
       attrs
     end
 

@@ -1,0 +1,12 @@
+module Temporalio
+  module Internal
+    module ProtoUtils
+      def self.seconds_to_duration: (Float? seconds_float) -> untyped?
+
+      def self.memo_to_proto: (
+        Hash[String, untyped?]? hash,
+        Converters::DataConverter data_converter
+      ) -> untyped?
+    end
+  end
+end

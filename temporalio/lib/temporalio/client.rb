@@ -16,15 +16,15 @@ module Temporalio
   # Client for accessing Temporal.
   #
   # Most users will use {connect} to connect a client. The {workflow_service} method provides access to a raw gRPC
-  # client. To create another client on the same connection, like for a different namespace, {dup_options} may be
-  # used to get the options as a struct which can then be altered and splatted as kwargs to the constructor (e.g.
+  # client. To create another client on the same connection, like for a different namespace, {options} may be used to
+  # get the options as a struct which can then be dup'd, altered, and splatted as kwargs to the constructor (e.g.
   # +Client.new(**my_options.to_h)+).
   #
   # Clients are thread-safe and are meant to be reused for the life of the application. They are built to work in both
   # synchronous and asynchronous contexts. Internally they use callbacks based on {::Queue} which means they are
   # Fiber-compatible.
   class Client
-    # Options as returned from {dup_options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
+    # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
     Options = Struct.new(
       :connection,
       :namespace,
@@ -58,7 +58,7 @@ module Temporalio
     # @param identity [String] Identity for this client.
     # @param keep_alive [Connection::KeepAliveOptions] Keep-alive options for the client connection. Can be set to +nil+
     #   to disable.
-    # @param http_connect_proxy [Connection::HTTPConnectProxyOptions] Options for HTTP CONNECT proxy.
+    # @param http_connect_proxy [Connection::HTTPConnectProxyOptions, nil] Options for HTTP CONNECT proxy.
     # @param runtime [Runtime] Runtime for this client.
     # @param lazy_connect [Boolean] If true, the client will not connect until the first call is attempted or a worker
     #   is created with it. Lazy clients cannot be used for workers if they have not performed a connection.
@@ -103,8 +103,12 @@ module Temporalio
       )
     end
 
+    # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
+    attr_reader :options
+
     # Create a client from an existing connection. Most users will prefer {connect} instead. Parameters here match
-    # {Options} returned from {dup_options} by intention so options can be altered and splatted to create a new client.
+    # {Options} returned from {options} by intention so options can be dup'd, altered, and splatted to create a new
+    # client.
     #
     # @param connection [Connection] Existing connection to create a client from.
     # @param namespace [String] Namespace to use for client calls.
@@ -132,7 +136,7 @@ module Temporalio
         data_converter:,
         interceptors:,
         default_workflow_query_reject_condition:
-      )
+      ).freeze
       # Initialize interceptors
       @impl = interceptors.reverse_each.reduce(Implementation.new(self)) do |acc, int|
         int.intercept_client(acc)
@@ -162,12 +166,6 @@ module Temporalio
     # @return [Connection::OperatorService] Raw gRPC operator service.
     def operator_service
       connection.operator_service
-    end
-
-    # @return [Options] Shallow duplication of options for potential use in {initialize}. Note, this is shallow, so
-    #   attributes like {Options.interceptors} are not duplicated, but no mutations will apply.
-    def dup_options
-      @options.dup
     end
 
     # Start a workflow and return its handle.

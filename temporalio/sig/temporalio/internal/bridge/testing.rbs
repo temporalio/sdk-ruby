@@ -1,0 +1,56 @@
+module Temporalio
+  module Internal
+    module Bridge
+      module Testing
+        class EphemeralServer
+          class StartDevServerOptions
+            attr_accessor existing_path: String?
+            attr_accessor sdk_name: String
+            attr_accessor sdk_version: String
+            attr_accessor download_version: String
+            attr_accessor download_dest_dir: String?
+            attr_accessor namespace: String
+            attr_accessor ip: String
+            attr_accessor port: Integer?
+            attr_accessor database_filename: String?
+            attr_accessor ui: bool
+            attr_accessor log_format: String
+            attr_accessor log_level: String
+            attr_accessor extra_args: Array[String]
+
+            def initialize: (
+              existing_path: String?,
+              sdk_name: String,
+              sdk_version: String,
+              download_version: String,
+              download_dest_dir: String?,
+              namespace: String,
+              ip: String,
+              port: Integer?,
+              database_filename: String?,
+              ui: bool,
+              log_format: String,
+              log_level: String,
+              extra_args: Array[String]
+            ) -> void
+          end
+
+          def self.start_dev_server: (Runtime runtime, StartDevServerOptions options) -> EphemeralServer
+
+          def shutdown: -> void
+
+          # Defined in Rust
+
+          def self.async_start_dev_server: (
+            Runtime runtime,
+            StartDevServerOptions options
+          ) { ([EphemeralServer, Error]) -> void } -> void
+
+          def target: -> String
+
+          def async_shutdown: { ([nil, Error]) -> void } -> void
+        end
+      end
+    end
+  end
+end

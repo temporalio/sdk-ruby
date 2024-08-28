@@ -1,0 +1,102 @@
+module Temporalio
+  class Client
+    class Options
+      attr_accessor connection: Connection
+      attr_accessor namespace: String
+      attr_accessor data_converter: Converters::DataConverter
+      attr_accessor interceptors: Array[Interceptor]
+      attr_accessor default_workflow_query_reject_condition: Integer
+
+      def initialize: (
+        connection: Connection,
+        namespace: String,
+        data_converter: Converters::DataConverter,
+        interceptors: Array[Interceptor],
+        default_workflow_query_reject_condition: Integer
+      ) -> void
+    end
+
+    def self.connect: (
+      String target_host,
+      String namespace,
+      ?api_key: String?,
+      ?tls: bool | Connection::TLSOptions,
+      ?data_converter: Converters::DataConverter,
+      ?interceptors: Array[Interceptor],
+      ?default_workflow_query_reject_condition: Integer,
+      ?rpc_metadata: Hash[String, String],
+      ?rpc_retry: Connection::RPCRetryOptions,
+      ?identity: String,
+      ?keep_alive: Connection::KeepAliveOptions,
+      ?http_connect_proxy: Connection::HTTPConnectProxyOptions?,
+      ?runtime: Runtime,
+      ?lazy_connect: bool
+    ) -> Client
+
+    attr_reader options: Options
+
+    def initialize: (
+      connection: Connection,
+      namespace: String,
+      ?data_converter: Converters::DataConverter,
+      ?interceptors: Array[Interceptor],
+      ?default_workflow_query_reject_condition: Integer
+    ) -> void
+
+    def connection: -> Connection
+    def namespace: -> String
+    def data_converter: -> Converters::DataConverter
+
+    # TODO(cretz): Update when generated
+    # def workflow_service: -> Connection::WorkflowService
+    # def operator_service: -> Connection::OperatorService
+    def workflow_service: -> untyped
+    def operator_service: -> untyped
+
+    def start_workflow: (
+      String workflow,
+      *Object args,
+      id: String,
+      task_queue: String,
+      ?execution_timeout: Float?,
+      ?run_timeout: Float?,
+      ?task_timeout: Float?,
+      ?id_reuse_policy: WorkflowIDReusePolicy::enum,
+      ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?cron_schedule: String?,
+      ?memo: Hash[String, Object]?,
+      ?search_attributes: SearchAttributes?,
+      ?start_delay: Float?,
+      ?request_eager_start: bool,
+      ?rpc_metadata: Hash[String, String]?,
+      ?rpc_timeout: Float?
+    ) -> WorkflowHandle
+
+    def execute_workflow: (
+      String workflow,
+      *Object args,
+      id: String,
+      task_queue: String,
+      ?execution_timeout: Float?,
+      ?run_timeout: Float?,
+      ?task_timeout: Float?,
+      ?id_reuse_policy: WorkflowIDReusePolicy::enum,
+      ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?cron_schedule: String?,
+      ?memo: Hash[String, Object]?,
+      ?search_attributes: SearchAttributes?,
+      ?start_delay: Float?,
+      ?request_eager_start: bool,
+      ?rpc_metadata: Hash[String, String]?,
+      ?rpc_timeout: Float?
+    ) -> Object
+
+    def workflow_handle: (
+      String workflow_id,
+      ?run_id: String?,
+      ?first_execution_run_id: String?
+    ) -> WorkflowHandle
+  end
+end

@@ -3,7 +3,7 @@
 require 'minitest/autorun'
 require 'singleton'
 
-module TestHelper
+class Test < Minitest::Test
   def env
     TestEnvironment.instance
   end
@@ -27,10 +27,10 @@ module TestHelper
     def with_kitchen_sink_worker(worker_client = client)
       # Run the golangworker
       task_queue = "tq-#{SecureRandom.uuid}"
-      pid = Process.spawn(
+      pid = spawn(
         kitchen_sink_exe,
         worker_client.connection.target_host, worker_client.namespace, task_queue,
-        { chdir: File.join(__dir__ || '', 'golangworker') }
+        chdir: File.join(__dir__ || '', 'golangworker')
       )
       begin
         yield task_queue
@@ -47,9 +47,9 @@ module TestHelper
 
         # Build the executable. We can't use "go run" because it can't forward kill
         # signal
-        pid = Process.spawn(
+        pid = spawn(
           'go', 'build', '-o', 'golangworker', '.',
-          { chdir: File.join(__dir__ || '', 'golangworker') }
+          chdir: File.join(__dir__ || '', 'golangworker')
         )
         begin
           Timeout.timeout(100) { Process.wait(pid) }
@@ -57,7 +57,7 @@ module TestHelper
           Process.kill('KILL', pid)
           raise
         end
-        raise "Go build failed with #{$?.exitstatus}" unless $?.exitstatus.zero? # rubocop:disable Style/SpecialGlobalVars
+        raise "Go build failed with #{$?&.exitstatus}" unless $?&.exitstatus&.zero? # rubocop:disable Style/SpecialGlobalVars
 
         @kitchen_sink_exe = File.join(__dir__ || '', 'golangworker', 'golangworker')
       end

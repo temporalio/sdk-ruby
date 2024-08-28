@@ -39,7 +39,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_singleton_method("async_new", function!(Client::async_new, 2))?;
     class.define_method("async_invoke_rpc", method!(Client::async_invoke_rpc, -1))?;
 
-    let inner_class = class.define_error("RpcFailure", ruby.get_inner(&ROOT_ERR))?;
+    let inner_class = class.define_error("RPCFailure", ruby.get_inner(&ROOT_ERR))?;
     inner_class.define_method("code", method!(RpcFailure::code, 0))?;
     inner_class.define_method("message", method!(RpcFailure::message, 0))?;
     inner_class.define_method("details", method!(RpcFailure::details, 0))?;
@@ -220,7 +220,7 @@ impl Client {
 
 #[derive(DataTypeFunctions, TypedData)]
 #[magnus(
-    class = "Temporalio::Internal::Bridge::Client::RpcFailure",
+    class = "Temporalio::Internal::Bridge::Client::RPCFailure",
     free_immediately
 )]
 pub struct RpcFailure {

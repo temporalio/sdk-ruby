@@ -1,0 +1,48 @@
+module Temporalio
+  module Testing
+    class WorkflowEnvironment
+      attr_reader client: Client
+
+      def self.start_local: (
+        ?namespace: String,
+        ?data_converter: Converters::DataConverter,
+        ?interceptors: Array[Client::Interceptor],
+        ?ip: String,
+        ?port: Integer?,
+        ?ui: bool,
+        ?runtime: Runtime,
+        ?dev_server_existing_path: String?,
+        ?dev_server_database_filename: String?,
+        ?dev_server_log_format: String,
+        ?dev_server_log_level: String,
+        ?dev_server_download_version: String,
+        ?dev_server_download_dest_dir: String?,
+        ?dev_server_extra_args: Array[String]
+      ) -> WorkflowEnvironment
+                          | [T] (
+        ?namespace: String,
+        ?data_converter: Converters::DataConverter,
+        ?interceptors: Array[Client::Interceptor],
+        ?ip: String,
+        ?port: Integer?,
+        ?ui: bool,
+        ?runtime: Runtime,
+        ?dev_server_existing_path: String?,
+        ?dev_server_database_filename: String?,
+        ?dev_server_log_format: String,
+        ?dev_server_log_level: String,
+        ?dev_server_download_version: String,
+        ?dev_server_download_dest_dir: String?,
+        ?dev_server_extra_args: Array[String]
+      ) { (WorkflowEnvironment) -> T } -> T
+
+      def initialize: (Client client) -> void
+
+      def shutdown: -> void
+
+      class Ephemeral < WorkflowEnvironment
+        def initialize: (Client client, untyped core_server) -> void
+      end
+    end
+  end
+end

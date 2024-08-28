@@ -1,0 +1,7 @@
+module Temporalio
+  module Converters
+    class PayloadCodec
+      # TODO
+    end
+  end
+end

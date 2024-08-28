@@ -31,7 +31,7 @@ module Temporalio
               rpc_metadata:,
               rpc_timeout:
             )
-          rescue Internal::Bridge::Client::RpcFailure => e
+          rescue Internal::Bridge::Client::RPCFailure => e
             raise Error::RPCError.new(e.message, code: e.code, raw_grpc_status: e.details)
           end
         end

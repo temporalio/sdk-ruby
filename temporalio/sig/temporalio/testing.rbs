@@ -1,0 +1,4 @@
+module Temporalio
+  module Testing
+  end
+end

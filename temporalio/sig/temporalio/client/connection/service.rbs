@@ -1,0 +1,19 @@
+module Temporalio
+  class Client
+    class Connection
+      class Service
+        def initialize: (Connection, untyped) -> void
+
+        def invoke_rpc: [REQ < Object, RESP < Object] (
+          rpc: String,
+          request_class: class REQ,
+          response_class: class RESP,
+          request: REQ,
+          rpc_retry: bool,
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> RESP
+      end
+    end
+  end
+end

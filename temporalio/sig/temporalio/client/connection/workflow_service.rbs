@@ -1,0 +1,74 @@
+# Generated code.  DO NOT EDIT!
+
+module Temporalio
+  class Client
+    class Connection
+      class WorkflowService < Service
+        def initialize: (Connection) -> void
+        def register_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def describe_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_namespaces: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def update_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def deprecate_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def start_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def execute_multi_operation: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_workflow_execution_history: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_workflow_execution_history_reverse: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def poll_workflow_task_queue: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_workflow_task_completed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_workflow_task_failed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def poll_activity_task_queue: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def record_activity_task_heartbeat: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def record_activity_task_heartbeat_by_id: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_completed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_completed_by_id: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_failed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_failed_by_id: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_canceled: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_activity_task_canceled_by_id: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def request_cancel_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def signal_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def signal_with_start_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def reset_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def terminate_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def delete_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_open_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_closed_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_archived_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def scan_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def count_workflow_executions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_search_attributes: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_query_task_completed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def reset_sticky_task_queue: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def query_workflow: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def describe_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def describe_task_queue: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_cluster_info: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_system_info: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_task_queue_partitions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def create_schedule: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def describe_schedule: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def update_schedule: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def patch_schedule: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_schedule_matching_times: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def delete_schedule: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_schedules: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def update_worker_build_id_compatibility: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_worker_build_id_compatibility: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def update_worker_versioning_rules: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_worker_versioning_rules: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_worker_task_reachability: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def update_workflow_execution: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def poll_workflow_execution_update: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def start_batch_operation: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def stop_batch_operation: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def describe_batch_operation: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def list_batch_operations: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def poll_nexus_task_queue: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_nexus_task_completed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def respond_nexus_task_failed: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+      end
+    end
+  end
+end

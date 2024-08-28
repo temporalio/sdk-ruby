@@ -1,0 +1,22 @@
+class Test < Minitest::Test
+  def env: -> TestEnvironment
+
+  class TestEnvironment
+    include Singleton
+
+    # Need manual instance method: https://github.com/ruby/rbs/issues/1498
+    def self.instance: -> TestEnvironment
+
+    attr_reader server: Temporalio::Testing::WorkflowEnvironment
+
+    def client: -> Temporalio::Client
+
+    def with_kitchen_sink_worker: [T] (
+      ?Temporalio::Client worker_client
+    ) { (String task_queue) -> T } -> T
+
+    def kitchen_sink_exe: -> String
+
+    def ensure_search_attribute_keys: (*Temporalio::SearchAttributes::Key keys) -> void
+  end
+end

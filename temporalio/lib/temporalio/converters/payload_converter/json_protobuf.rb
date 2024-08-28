@@ -29,6 +29,7 @@ module Temporalio
         # (see Encoding.from_payload)
         def from_payload(payload)
           type = payload.metadata['messageType']
+          # @type var desc: untyped
           desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(type)
           raise "No protobuf message found in global pool for message type #{type}" unless desc
 

@@ -92,13 +92,13 @@ module Temporalio
           when :EVENT_TYPE_WORKFLOW_EXECUTION_COMPLETED
             attrs = event.workflow_execution_completed_event_attributes
             hist_run_id = attrs.new_execution_run_id
-            next if follow_runs && !hist_run_id.empty?
+            next if follow_runs && hist_run_id && !hist_run_id.empty?
 
             return @client.data_converter.from_payloads(attrs.result).first
           when :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED
             attrs = event.workflow_execution_failed_event_attributes
             hist_run_id = attrs.new_execution_run_id
-            next if follow_runs && !hist_run_id.empty?
+            next if follow_runs && hist_run_id && !hist_run_id.empty?
 
             raise Error::WorkflowFailureError.new(cause: @client.data_converter.from_failure(attrs.failure))
           when :EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED
@@ -120,7 +120,7 @@ module Temporalio
           when :EVENT_TYPE_WORKFLOW_EXECUTION_TIMED_OUT
             attrs = event.workflow_execution_timed_out_event_attributes
             hist_run_id = attrs.new_execution_run_id
-            next if follow_runs && !hist_run_id.empty?
+            next if follow_runs && hist_run_id && !hist_run_id.empty?
 
             raise Error::WorkflowFailureError.new(
               cause: Error::TimeoutError.new(
@@ -131,7 +131,7 @@ module Temporalio
           when :EVENT_TYPE_WORKFLOW_EXECUTION_CONTINUED_AS_NEW
             attrs = event.workflow_execution_continued_as_new_event_attributes
             hist_run_id = attrs.new_execution_run_id
-            next if follow_runs && !hist_run_id.empty?
+            next if follow_runs && hist_run_id && !hist_run_id.empty?
 
             # TODO: Use more specific error and decode failure
             raise Error::WorkflowContinuedAsNewError.new(new_run_id: attrs.new_execution_run_id)
@@ -182,8 +182,8 @@ module Temporalio
         wait_new_event:,
         event_filter_type:,
         skip_archival:,
-        rpc_metadata: nil,
-        rpc_timeout: nil
+        rpc_metadata:,
+        rpc_timeout:
       )
         Enumerator.new do |yielder|
           input = Interceptor::FetchWorkflowHistoryEventPageInput.new(

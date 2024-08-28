@@ -47,7 +47,7 @@ module Temporalio
         )
 
         # @!visibility private
-        PrometheusOptions = Struct.new(
+        PrometheusMetricsOptions = Struct.new(
           :bind_address,
           :counters_total_suffix,
           :unit_suffix,

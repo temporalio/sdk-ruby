@@ -1,0 +1,16 @@
+module Temporalio
+  module Converters
+    class PayloadConverter
+      class Composite < PayloadConverter
+        class ConverterNotFound < Error
+        end
+        class EncodingNotSet < Error
+        end
+
+        attr_reader converters: Hash[String, Encoding]
+
+        def initialize: (*Encoding converters) -> void
+      end
+    end
+  end
+end

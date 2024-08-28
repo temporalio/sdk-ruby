@@ -13,7 +13,7 @@ module Temporalio
         class ConverterNotFound < Error; end
         class EncodingNotSet < Error; end
 
-        # @return [Array<Encoding>] Encoding converters processed in order.
+        # @return [Hash<String, Encoding>] Encoding converters processed in order.
         attr_reader :converters
 
         # Create a payload converter with the given encoding converters processed in order.
