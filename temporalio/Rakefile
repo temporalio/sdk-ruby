@@ -250,7 +250,6 @@ namespace :proto do
         #{service_enum} => match call.rpc.as_str() {
       TEXT
 
-      # desc.sort_by { |a, b| a.name <=> b.name }.each do |method|
       desc.to_a.sort_by(&:name).each do |method|
         # Camel case to snake case
         rpc = method.name.gsub(/([A-Z])/, '_\1').downcase.delete_prefix('_')

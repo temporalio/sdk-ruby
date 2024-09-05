@@ -80,7 +80,7 @@ jobs:
         working-directory: ./temporalio
         run: |
           bundle exec rake proto:generate
-          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed"; exit 1)
+          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio
