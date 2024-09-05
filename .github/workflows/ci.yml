@@ -71,10 +71,19 @@ jobs:
         working-directory: ./temporalio
         run: cargo clippy && cargo fmt --check
 
-      # TODO(cretz): For checkTarget, regen protos and ensure no diff
+      - name: Install bundle
+        working-directory: ./temporalio
+        run: bundle install
+
+      - name: Check generated protos
+        if: ${{ matrix.checkTarget }}
+        working-directory: ./temporalio
+        run: |
+          bundle exec rake proto:generate
+          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio
-        run: bundle install && bundle exec rake TESTOPTS="--verbose"
+        run: bundle exec rake TESTOPTS="--verbose"
 
       # TODO(cretz): Build gem and smoke test against separate dir

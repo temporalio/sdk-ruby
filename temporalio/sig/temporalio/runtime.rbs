@@ -1,0 +1,105 @@
+module Temporalio
+  class Runtime
+    class TelemetryOptions
+      attr_accessor logging: LoggingOptions?
+      attr_accessor metrics: MetricsOptions?
+
+      def initialize: (
+        ?logging: LoggingOptions?,
+        ?metrics: MetricsOptions?
+      ) -> void
+
+      def _to_bridge: -> Internal::Bridge::Runtime::TelemetryOptions
+    end
+
+    class LoggingOptions
+      attr_accessor log_filter: LoggingFilterOptions | String
+
+      def initialize: (
+        ?log_filter: LoggingFilterOptions | String
+      ) -> void
+
+      def _to_bridge: -> Internal::Bridge::Runtime::LoggingOptions
+    end
+
+    type logging_filter_level = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
+
+    class LoggingFilterOptions
+      attr_accessor core_level: logging_filter_level
+      attr_accessor other_level: logging_filter_level
+
+      def initialize: (
+        ?core_level: logging_filter_level,
+        ?other_level: logging_filter_level
+      ) -> void
+
+      def _to_bridge: -> String
+    end
+
+    class MetricsOptions
+      attr_accessor opentelemetry: OpenTelemetryMetricsOptions?
+      attr_accessor prometheus: PrometheusMetricsOptions?
+      attr_accessor attach_service_name: bool
+      attr_accessor global_tags: Hash[String, String]?
+      attr_accessor metric_prefix: String?
+
+      def initialize: (
+        ?opentelemetry: OpenTelemetryMetricsOptions?,
+        ?prometheus: PrometheusMetricsOptions?,
+        ?attach_service_name: bool,
+        ?global_tags: Hash[String, String]?,
+        ?metric_prefix: String?
+      ) -> void
+
+      def _to_bridge: -> Internal::Bridge::Runtime::MetricsOptions
+    end
+
+    class OpenTelemetryMetricsOptions
+      module MetricTemporality
+        CUMULATIVE: 1
+        DELTA: 2
+
+        type enum = 1 | 2
+      end
+
+      attr_accessor url: String
+      attr_accessor headers: Hash[String, String]?
+      attr_accessor metric_periodicity: Float?
+      attr_accessor metric_temporality: MetricTemporality
+      attr_accessor durations_as_seconds: bool
+
+      def initialize: (
+        url: String,
+        ?headers: Hash[String, String]?,
+        ?metric_periodicity: Float?,
+        ?metric_temporality: MetricTemporality,
+        ?durations_as_seconds: bool
+      ) -> void
+
+      def _to_bridge: -> Internal::Bridge::Runtime::OpenTelemetryMetricsOptions
+    end
+
+    class PrometheusMetricsOptions
+      attr_accessor bind_address: String
+      attr_accessor counters_total_suffix: bool
+      attr_accessor unit_suffix: bool
+      attr_accessor durations_as_seconds: bool
+
+      def initialize: (
+        bind_address: String,
+        ?counters_total_suffix: bool,
+        ?unit_suffix: bool,
+        ?durations_as_seconds: bool
+      ) -> void
+
+      def _to_bridge: -> Internal::Bridge::Runtime::PrometheusMetricsOptions
+    end
+
+    def self.default: -> Runtime
+    def self.default=: (Runtime runtime) -> void
+
+    def initialize: (?telemetry: TelemetryOptions) -> void
+
+    def _core_runtime: -> Internal::Bridge::Runtime
+  end
+end

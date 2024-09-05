@@ -34,7 +34,6 @@ module Temporalio
       #   Default of +nil+ means in-memory only.
       # @param dev_server_log_format [String] Log format for CLI dev server.
       # @param dev_server_log_level [String] Log level for CLI dev server.
-      # @param dev_server_log_format [String] Log format for CLI dev server.
       # @param dev_server_download_version [String] Version of dev server to download and cache.
       # @param dev_server_download_dest_dir [String, nil] Where to download. Defaults to tmp.
       # @param dev_server_extra_args [Array<String>] Any extra arguments for the CLI dev server.

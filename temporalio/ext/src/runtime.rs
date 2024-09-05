@@ -98,8 +98,8 @@ impl Runtime {
                     if let Some(headers) = opentelemetry.member::<Option<HashMap<String, String>>>(id!("headers"))? {
                         opts_build.headers(headers);
                     }
-                    if let Some(period) = opentelemetry.member::<Option<u64>>(id!("metric_periodicity_ms"))? {
-                        opts_build.metric_periodicity(Duration::from_millis(period));
+                    if let Some(period) = opentelemetry.member::<Option<f64>>(id!("metric_periodicity"))? {
+                        opts_build.metric_periodicity(Duration::from_secs_f64(period));
                     }
                     if opentelemetry.member::<bool>(id!("metric_temporality_delta"))? {
                         opts_build.metric_temporality(MetricTemporality::Delta);

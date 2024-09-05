@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rake-compiler'
-  spec.add_development_dependency 'rbs', '~> 3.5.2'
+  spec.add_development_dependency 'rbs', '~> 3.5.3'
   spec.add_development_dependency 'rb_sys', '~> 0.9.63'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'steep', '~> 1.7.1'

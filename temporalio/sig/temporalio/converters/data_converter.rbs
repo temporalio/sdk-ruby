@@ -1,0 +1,26 @@
+module Temporalio
+  module Converters
+    class DataConverter
+      attr_reader payload_converter: PayloadConverter
+      attr_reader failure_converter: FailureConverter
+      attr_reader payload_codec: PayloadCodec?
+
+      def self.default: -> DataConverter
+
+      def initialize: (
+        ?payload_converter: PayloadConverter,
+        ?failure_converter: FailureConverter,
+        ?payload_codec: PayloadCodec?
+      ) -> void
+
+      def to_payload: (Object? value) -> untyped
+      def to_payloads: (Array[Object?] values) -> untyped
+
+      def from_payload: (untyped payload) -> Object?
+      def from_payloads: (untyped payloads) -> Array[Object?]
+
+      def to_failure: (Exception error) -> untyped
+      def from_failure: (untyped failure) -> Exception
+    end
+  end
+end

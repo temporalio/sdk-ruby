@@ -1,0 +1,95 @@
+module Temporalio
+  class Client
+    module Interceptor
+      def intercept_client: (Outbound next_interceptor) -> Outbound
+
+      class StartWorkflowInput
+        attr_accessor workflow: String
+        attr_accessor args: Array[Object]
+        attr_accessor id: String
+        attr_accessor task_queue: String
+        attr_accessor execution_timeout: Float?
+        attr_accessor run_timeout: Float?
+        attr_accessor task_timeout: Float?
+        attr_accessor id_reuse_policy: WorkflowIDReusePolicy::enum
+        attr_accessor id_conflict_policy: WorkflowIDConflictPolicy::enum
+        attr_accessor retry_policy: RetryPolicy?
+        attr_accessor cron_schedule: String?
+        attr_accessor memo: Hash[String, Object]?
+        attr_accessor search_attributes: SearchAttributes?
+        attr_accessor start_delay: Float?
+        attr_accessor request_eager_start: bool
+        attr_accessor headers: Hash[String, String]
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          workflow: String,
+          args: Array[Object],
+          id: String,
+          task_queue: String,
+          execution_timeout: Float?,
+          run_timeout: Float?,
+          task_timeout: Float?,
+          id_reuse_policy: WorkflowIDReusePolicy::enum,
+          id_conflict_policy: WorkflowIDConflictPolicy::enum,
+          retry_policy: RetryPolicy?,
+          cron_schedule: String?,
+          memo: Hash[String, Object]?,
+          search_attributes: SearchAttributes?,
+          start_delay: Float?,
+          request_eager_start: bool,
+          headers: Hash[String, String],
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class FetchWorkflowHistoryEventPageInput
+        attr_accessor id: String
+        attr_accessor run_id: String?
+        attr_accessor page_size: Integer?
+        attr_accessor next_page_token: String?
+        attr_accessor wait_new_event: bool
+        attr_accessor event_filter_type: Integer
+        attr_accessor skip_archival: bool
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          id: String,
+          run_id: String?,
+          page_size: Integer?,
+          next_page_token: String?,
+          wait_new_event: bool,
+          event_filter_type: Integer,
+          skip_archival: bool,
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class FetchWorkflowHistoryEventPage
+        attr_accessor events: Enumerable[untyped]
+        attr_accessor next_page_token: String?
+
+        def initialize: (
+          events: Enumerable[untyped]?,
+          next_page_token: String?
+        ) -> void
+      end
+
+      class Outbound
+        attr_reader next_interceptor: Outbound
+
+        def initialize: (Outbound next_interceptor) -> void
+
+        def start_workflow: (StartWorkflowInput input) -> WorkflowHandle
+
+        def fetch_workflow_history_event_page: (
+          FetchWorkflowHistoryEventPageInput input
+        ) -> FetchWorkflowHistoryEventPage
+      end
+    end
+  end
+end

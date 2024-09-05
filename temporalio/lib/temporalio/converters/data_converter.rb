@@ -52,7 +52,7 @@ module Temporalio
 
       # Convert multiple Ruby values to a payload set and encode it.
       #
-      # @param value [Object] Ruby values, converted to array via {Kernel.Array}.
+      # @param values [Object] Ruby values, converted to array via {::Array}.
       # @return [Api::Common::V1::Payloads] Converted and encoded payload set.
       def to_payloads(values)
         payloads = Array(values).map { |value| payload_converter.to_payload(value) }

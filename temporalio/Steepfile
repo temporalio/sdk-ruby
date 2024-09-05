@@ -12,7 +12,7 @@ target :lib do
   library 'uri'
 
   configure_code_diagnostics do |hash|
+    # TODO(cretz): Fix as more protos are generated
     hash[D::Ruby::UnknownConstant] = :information
-    hash[D::Ruby::NoMethod] = :information
   end
 end

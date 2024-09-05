@@ -40,14 +40,14 @@ module Temporalio
         OpenTelemetryMetricsOptions = Struct.new(
           :url,
           :headers, # Optional
-          :metric_periodicity_ms, # Optional
+          :metric_periodicity, # Optional
           :metric_temporality_delta,
           :durations_as_seconds,
           keyword_init: true
         )
 
         # @!visibility private
-        PrometheusOptions = Struct.new(
+        PrometheusMetricsOptions = Struct.new(
           :bind_address,
           :counters_total_suffix,
           :unit_suffix,

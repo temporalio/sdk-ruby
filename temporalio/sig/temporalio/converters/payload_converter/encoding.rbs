@@ -1,0 +1,13 @@
+module Temporalio
+  module Converters
+    class PayloadConverter
+      class Encoding
+        def encoding: -> String
+
+        def to_payload: (Object? value) -> untyped?
+
+        def from_payload: (untyped payload) -> Object?
+      end
+    end
+  end
+end

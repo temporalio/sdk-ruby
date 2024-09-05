@@ -1,0 +1,8 @@
+module Temporalio
+  module Converters
+    class PayloadConverter
+      class BinaryProtobuf < Encoding
+      end
+    end
+  end
+end

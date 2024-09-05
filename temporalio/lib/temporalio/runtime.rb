@@ -22,13 +22,15 @@ module Temporalio
       keyword_init: true
     ) do
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:logging] = LoggingOptions.new unless kwargs.key?(:logging)
         super
       end
 
       # @!visibility private
       def _to_bridge
+        # @type self: TelemetryOptions
         Internal::Bridge::Runtime::TelemetryOptions.new(
           logging: logging&._to_bridge,
           metrics: metrics&._to_bridge
@@ -47,13 +49,15 @@ module Temporalio
       keyword_init: true
     ) do
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:log_filter] = LoggingFilterOptions.new unless kwargs.key?(:log_filter)
         super
       end
 
       # @!visibility private
       def _to_bridge
+        # @type self: LoggingOptions
         Internal::Bridge::Runtime::LoggingOptions.new(
           log_filter: if log_filter.is_a?(String)
                         log_filter
@@ -78,7 +82,8 @@ module Temporalio
       keyword_init: true
     ) do
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:core_level] = 'WARN' unless kwargs.key?(:core_level)
         kwargs[:other_level] = 'ERROR' unless kwargs.key?(:other_level)
         super
@@ -86,6 +91,7 @@ module Temporalio
 
       # @!visibility private
       def _to_bridge
+        # @type self: LoggingFilterOptions
         "#{other_level},temporal_sdk_core=#{core_level},temporal_client=#{core_level},temporal_sdk=#{core_level}"
       end
     end
@@ -101,7 +107,7 @@ module Temporalio
     # @!attribute attach_service_name
     #   @return [Boolean] Whether to put the service_name on every metric, default +true+.
     # @!attribute global_tags
-    #   @return [Hash{String=>String}, nil] Resource tags to be applied to all metrics.
+    #   @return [Hash<String, String>, nil] Resource tags to be applied to all metrics.
     # @!attribute metric_prefix
     #   @return [String, nil] Prefix to put on every Temporal metric. If unset, defaults to +temporal_+.
     MetricsOptions = Struct.new(
@@ -113,13 +119,15 @@ module Temporalio
       keyword_init: true
     ) do
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:attach_service_name] = true unless kwargs.key?(:attach_service_name)
         super
       end
 
       # @!visibility private
       def _to_bridge
+        # @type self: MetricsOptions
         Internal::Bridge::Runtime::MetricsOptions.new(
           opentelemetry: opentelemetry&._to_bridge,
           prometheus: prometheus&._to_bridge,
@@ -135,9 +143,9 @@ module Temporalio
     # @!attribute url
     #   @return [String] URL for OpenTelemetry endpoint.
     # @!attribute headers
-    #   @return [Hash{String=>String}, nil] Headers for OpenTelemetry endpoint.
-    # @!attribute metric_periodicity_ms
-    #   @return [Integer, nil] How frequently metrics should be exported, unset uses internal default.
+    #   @return [Hash<String, String>, nil] Headers for OpenTelemetry endpoint.
+    # @!attribute metric_periodicity
+    #   @return [Float, nil] How frequently metrics should be exported, unset uses internal default.
     # @!attribute metric_temporality
     #   @return [MetricTemporality] How frequently metrics should be exported, default is
     #     {MetricTemporality::CUMULATIVE}.
@@ -147,7 +155,7 @@ module Temporalio
     OpenTelemetryMetricsOptions = Struct.new(
       :url,
       :headers,
-      :metric_periodicity_ms,
+      :metric_periodicity,
       :metric_temporality,
       :durations_as_seconds,
       keyword_init: true
@@ -159,7 +167,8 @@ module Temporalio
       end
 
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:metric_temporality] = MetricTemporality::CUMULATIVE unless kwargs.key?(:metric_temporality)
         kwargs[:durations_as_seconds] = false unless kwargs.key?(:durations_as_seconds)
         super
@@ -167,10 +176,11 @@ module Temporalio
 
       # @!visibility private
       def _to_bridge
+        # @type self: OpenTelemetryMetricsOptions
         Internal::Bridge::Runtime::OpenTelemetryMetricsOptions.new(
           url:,
           headers:,
-          metric_periodicity_ms:,
+          metric_periodicity:,
           metric_temporality_delta: case metric_temporality
                                     when MetricTemporality::CUMULATIVE then false
                                     when MetricTemporality::DELTA then true
@@ -188,11 +198,11 @@ module Temporalio
     # @!attribute counters_total_suffix
     #   @return [Boolean] If +true+, all counters will include a +_total+ suffix, default is +false+.
     # @!attribute unit_suffix
-    #   @return [String] If +true+, all histograms will include the unit in their name as a suffix, default is +false+.
+    #   @return [Boolean] If +true+, all histograms will include the unit in their name as a suffix, default is +false+.
     # @!attribute durations_as_seconds
     #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations, default is
     #     +false+.
-    PrometheusOptions = Struct.new(
+    PrometheusMetricsOptions = Struct.new(
       :bind_address,
       :counters_total_suffix,
       :unit_suffix,
@@ -200,7 +210,8 @@ module Temporalio
       keyword_init: true
     ) do
       # @!visibility private
-      def initialize(*, **kwargs)
+      def initialize(**kwargs)
+        # @type var kwargs: untyped
         kwargs[:counters_total_suffix] = false unless kwargs.key?(:counters_total_suffix)
         kwargs[:unit_suffix] = false unless kwargs.key?(:unit_suffix)
         kwargs[:durations_as_seconds] = false unless kwargs.key?(:durations_as_seconds)
@@ -209,7 +220,8 @@ module Temporalio
 
       # @!visibility private
       def _to_bridge
-        Internal::Bridge::Runtime::PrometheusOptions.new(
+        # @type self: PrometheusMetricsOptions
+        Internal::Bridge::Runtime::PrometheusMetricsOptions.new(
           bind_address:,
           counters_total_suffix:,
           unit_suffix:,

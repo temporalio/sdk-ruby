@@ -33,19 +33,19 @@ module Temporalio
 
         # @!visibility private
         RPCRetryOptions = Struct.new(
-          :initial_interval_ms,
+          :initial_interval,
           :randomization_factor,
           :multiplier,
-          :max_interval_ms,
-          :max_elapsed_time_ms, # Can use 0 for none
+          :max_interval,
+          :max_elapsed_time, # Can use 0 for none
           :max_retries,
           keyword_init: true
         )
 
         # @!visibility private
         KeepAliveOptions = Struct.new(
-          :interval_ms,
-          :timeout_ms,
+          :interval,
+          :timeout,
           keyword_init: true
         )
 
@@ -74,7 +74,7 @@ module Temporalio
           response_class:,
           rpc_retry:,
           rpc_metadata:,
-          rpc_timeout_ms:
+          rpc_timeout:
         )
           response_bytes = Bridge.async_call do |queue|
             async_invoke_rpc(
@@ -83,7 +83,7 @@ module Temporalio
               request: request.to_proto,
               rpc_retry:,
               rpc_metadata:,
-              rpc_timeout_ms:
+              rpc_timeout:
             ) do |val|
               queue.push(val)
             end

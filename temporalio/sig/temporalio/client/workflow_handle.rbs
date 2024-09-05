@@ -1,0 +1,43 @@
+module Temporalio
+  class Client
+    class WorkflowHandle
+      attr_reader id: String
+      attr_reader run_id: String?
+      attr_reader result_run_id: String?
+      attr_reader first_execution_run_id: String?
+
+      def initialize: (
+        Client client,
+        String id,
+        ?run_id: String?,
+        ?result_run_id: String?,
+        ?first_execution_run_id: String?
+      ) -> void
+
+      def result: (
+        ?follow_runs: bool,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> Object
+
+      def fetch_history_events: (
+        ?page_size: Integer?,
+        ?wait_new_event: bool,
+        ?event_filter_type: Integer,
+        ?skip_archival: bool,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> Enumerable[untyped]
+
+      private def fetch_history_events_for_run: (
+        String? run_id,
+        page_size: Integer?,
+        wait_new_event: bool,
+        event_filter_type: Integer,
+        skip_archival: bool,
+        rpc_metadata: Hash[String, String]?,
+        rpc_timeout: Float?
+      ) -> Enumerator[untyped, untyped]
+    end
+  end
+end

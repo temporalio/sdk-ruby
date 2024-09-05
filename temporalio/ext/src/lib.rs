@@ -1,6 +1,7 @@
 use magnus::{prelude::*, value::Lazy, Error, ExceptionClass, RModule, Ruby};
 
 mod client;
+mod client_rpc_generated;
 mod runtime;
 mod testing;
 mod util;

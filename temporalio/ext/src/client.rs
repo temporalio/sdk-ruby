@@ -3,7 +3,7 @@ use std::{collections::HashMap, future::Future, marker::PhantomData, time::Durat
 use temporal_client::{
     ClientInitError, ClientKeepAliveConfig, ClientOptionsBuilder, ClientTlsConfig,
     ConfiguredClient, HttpConnectProxyOptions, RetryClient, RetryConfig,
-    TemporalServiceClientWithMetrics, TlsConfig, WorkflowService,
+    TemporalServiceClientWithMetrics, TlsConfig,
 };
 
 use magnus::{
@@ -17,14 +17,15 @@ use super::{error, id, new_error, ROOT_MOD};
 use crate::{
     runtime::{Runtime, RuntimeHandle},
     util::Struct,
+    ROOT_ERR,
 };
 use std::str::FromStr;
 
-const SERVICE_WORKFLOW: u8 = 1;
-const SERVICE_OPERATOR: u8 = 2;
-const SERVICE_CLOUD: u8 = 3;
-const SERVICE_TEST: u8 = 4;
-const SERVICE_HEALTH: u8 = 5;
+pub(crate) const SERVICE_WORKFLOW: u8 = 1;
+pub(crate) const SERVICE_OPERATOR: u8 = 2;
+pub(crate) const SERVICE_CLOUD: u8 = 3;
+pub(crate) const SERVICE_TEST: u8 = 4;
+pub(crate) const SERVICE_HEALTH: u8 = 5;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
@@ -38,7 +39,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_singleton_method("async_new", function!(Client::async_new, 2))?;
     class.define_method("async_invoke_rpc", method!(Client::async_invoke_rpc, -1))?;
 
-    let inner_class = class.define_class("RpcFailure", class::object())?;
+    let inner_class = class.define_error("RPCFailure", ruby.get_inner(&ROOT_ERR))?;
     inner_class.define_method("code", method!(RpcFailure::code, 0))?;
     inner_class.define_method("message", method!(RpcFailure::message, 0))?;
     inner_class.define_method("details", method!(RpcFailure::details, 0))?;
@@ -54,24 +55,21 @@ pub struct Client {
     runtime_handle: RuntimeHandle,
 }
 
+#[macro_export]
 macro_rules! rpc_call {
-    ($client:ident, $block:ident, $call:ident, $call_name:ident) => {{
+    ($client:ident, $block:ident, $call:ident, $trait:tt, $call_name:ident) => {{
         if $call.retry {
             let mut core_client = $client.core.clone();
             let req = $call.into_request()?;
-            rpc_resp(
-                $client,
-                $block,
-                async move { core_client.$call_name(req).await },
-            )
+            crate::client::rpc_resp($client, $block, async move {
+                $trait::$call_name(&mut core_client, req).await
+            })
         } else {
             let mut core_client = $client.core.clone().into_inner();
             let req = $call.into_request()?;
-            rpc_resp(
-                $client,
-                $block,
-                async move { core_client.$call_name(req).await },
-            )
+            crate::client::rpc_resp($client, $block, async move {
+                $trait::$call_name(&mut core_client, req).await
+            })
         }
     }};
 }
@@ -120,21 +118,21 @@ impl Client {
             .child(id!("rpc_retry"))?
             .ok_or_else(|| error!("Missing rpc_retry"))?;
         opts_build.retry_config(RetryConfig {
-            initial_interval: Duration::from_millis(rpc_retry.member(id!("initial_interval_ms"))?),
+            initial_interval: Duration::from_secs_f64(rpc_retry.member(id!("initial_interval"))?),
             randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
             multiplier: rpc_retry.member(id!("multiplier"))?,
-            max_interval: Duration::from_millis(rpc_retry.member(id!("max_interval_ms"))?),
-            max_elapsed_time: match rpc_retry.member::<u64>(id!("max_elapsed_time_ms"))? {
+            max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
+            max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
                 // 0 means none
-                0 => None,
-                val => Some(Duration::from_millis(val)),
+                0.0 => None,
+                val => Some(Duration::from_secs_f64(val)),
             },
             max_retries: rpc_retry.member(id!("max_retries"))?,
         });
         if let Some(keep_alive) = options.child(id!("keep_alive"))? {
             opts_build.keep_alive(Some(ClientKeepAliveConfig {
-                interval: Duration::from_millis(keep_alive.member(id!("interval_ms"))?),
-                timeout: Duration::from_millis(keep_alive.member(id!("timeout_ms"))?),
+                interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
+                timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
             }));
         }
         if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
@@ -182,9 +180,16 @@ impl Client {
 
     pub fn async_invoke_rpc(&self, args: &[Value]) -> Result<(), Error> {
         let args = scan_args::scan_args::<(), (), (), (), _, Proc>(args)?;
-        let (service, rpc, request, retry, metadata, timeout_ms) = scan_args::get_kwargs::<
+        let (service, rpc, request, retry, metadata, timeout) = scan_args::get_kwargs::<
             _,
-            (u8, String, RString, bool, HashMap<String, String>, u64),
+            (
+                u8,
+                String,
+                RString,
+                bool,
+                Option<HashMap<String, String>>,
+                Option<f64>,
+            ),
             (),
             (),
         >(
@@ -195,7 +200,7 @@ impl Client {
                 id!("request"),
                 id!("rpc_retry"),
                 id!("rpc_metadata"),
-                id!("rpc_timeout_ms"),
+                id!("rpc_timeout"),
             ],
             &[],
         )?
@@ -205,28 +210,17 @@ impl Client {
             request: unsafe { request.as_slice() },
             retry,
             metadata,
-            timeout_ms,
+            timeout,
             _not_send_sync: PhantomData,
         };
         let block = Opaque::from(args.block);
-        match service {
-            SERVICE_WORKFLOW => match call.rpc.as_str() {
-                "get_workflow_execution_history" => {
-                    rpc_call!(self, block, call, get_workflow_execution_history)
-                }
-                "start_workflow_execution" => {
-                    rpc_call!(self, block, call, start_workflow_execution)
-                }
-                _ => Err(error!("Unknown RPC call {}", call.rpc)),
-            },
-            _ => Err(error!("Unknown service")),
-        }
+        self.invoke_rpc(service, block, call)
     }
 }
 
 #[derive(DataTypeFunctions, TypedData)]
 #[magnus(
-    class = "Temporalio::Internal::Bridge::Client::RpcFailure",
+    class = "Temporalio::Internal::Bridge::Client::RPCFailure",
     free_immediately
 )]
 pub struct RpcFailure {
@@ -251,12 +245,12 @@ impl RpcFailure {
     }
 }
 
-struct RpcCall<'a> {
-    rpc: String,
-    request: &'a [u8],
-    retry: bool,
-    metadata: HashMap<String, String>,
-    timeout_ms: u64,
+pub(crate) struct RpcCall<'a> {
+    pub rpc: String,
+    pub request: &'a [u8],
+    pub retry: bool,
+    pub metadata: Option<HashMap<String, String>>,
+    pub timeout: Option<f64>,
 
     // This RPC call contains an unsafe reference to Ruby bytes that does not
     // outlive the call, so we prevent it from being sent to another thread.
@@ -265,25 +259,27 @@ struct RpcCall<'a> {
 }
 
 impl RpcCall<'_> {
-    fn into_request<P: prost::Message + Default>(self) -> Result<tonic::Request<P>, Error> {
+    pub fn into_request<P: prost::Message + Default>(self) -> Result<tonic::Request<P>, Error> {
         let proto = P::decode(self.request).map_err(|err| error!("Invalid proto: {}", err))?;
         let mut req = tonic::Request::new(proto);
-        for (k, v) in self.metadata {
-            req.metadata_mut().insert(
-                MetadataKey::from_str(k.as_str())
-                    .map_err(|err| error!("Invalid metadata key: {}", err))?,
-                v.parse()
-                    .map_err(|err| error!("Invalid metadata value: {}", err))?,
-            );
+        if let Some(metadata) = self.metadata {
+            for (k, v) in metadata {
+                req.metadata_mut().insert(
+                    MetadataKey::from_str(k.as_str())
+                        .map_err(|err| error!("Invalid metadata key: {}", err))?,
+                    v.parse()
+                        .map_err(|err| error!("Invalid metadata value: {}", err))?,
+                );
+            }
         }
-        if self.timeout_ms > 0 {
-            req.set_timeout(Duration::from_millis(self.timeout_ms));
+        if let Some(timeout) = self.timeout {
+            req.set_timeout(Duration::from_secs_f64(timeout));
         }
         Ok(req)
     }
 }
 
-fn rpc_resp<P>(
+pub(crate) fn rpc_resp<P>(
     client: &Client,
     block: Opaque<Proc>,
     fut: impl Future<Output = Result<tonic::Response<P>, tonic::Status>> + Send + 'static,

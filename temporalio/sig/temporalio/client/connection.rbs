@@ -1,0 +1,114 @@
+module Temporalio
+  class Client
+    class Connection
+      class Options
+        attr_accessor target_host: String
+        attr_accessor api_key: String?
+        attr_accessor tls: bool | Connection::TLSOptions
+        attr_accessor rpc_metadata: Hash[String, String]
+        attr_accessor rpc_retry: RPCRetryOptions
+        attr_accessor identity: String
+        attr_accessor keep_alive: KeepAliveOptions
+        attr_accessor http_connect_proxy: HTTPConnectProxyOptions
+        attr_accessor runtime: Runtime
+        attr_accessor lazy_connect: bool
+
+        def initialize: (
+          target_host: String,
+          api_key: String?,
+          tls: bool | Connection::TLSOptions,
+          rpc_metadata: Hash[String, String],
+          rpc_retry: RPCRetryOptions,
+          identity: String,
+          keep_alive: KeepAliveOptions,
+          http_connect_proxy: HTTPConnectProxyOptions?,
+          runtime: Runtime,
+          lazy_connect: bool
+        ) -> void
+      end
+
+      class TLSOptions
+        attr_accessor client_cert: String?
+        attr_accessor client_private_key: String?
+        attr_accessor server_root_ca_cert: String?
+        attr_accessor domain: String?
+
+        def initialize: (
+          ?client_cert: String?,
+          ?client_private_key: String?,
+          ?server_root_ca_cert: String?,
+          ?domain: String?
+        ) -> void
+      end
+
+      class RPCRetryOptions
+        attr_accessor initial_interval: Float
+        attr_accessor randomization_factor: Float
+        attr_accessor multiplier: Float
+        attr_accessor max_interval: Float
+        attr_accessor max_elapsed_time: Float
+        attr_accessor max_retries: Integer
+
+        def initialize: (
+          ?initial_interval: Float,
+          ?randomization_factor: Float,
+          ?multiplier: Float,
+          ?max_interval: Float,
+          ?max_elapsed_time: Float,
+          ?max_retries: Integer
+        ) -> void
+      end
+
+      class KeepAliveOptions
+        attr_accessor interval: Float
+        attr_accessor timeout: Float
+
+        def initialize: (
+          ?interval: Float,
+          ?timeout: Float
+        ) -> void
+      end
+
+      class HTTPConnectProxyOptions
+        attr_accessor target_host: String
+        attr_accessor basic_auth_user: String?
+        attr_accessor basic_auth_pass: String?
+
+        def initialize: (
+          target_host: String,
+          ?basic_auth_user: String?,
+          ?basic_auth_pass: String?
+        ) -> void
+      end
+
+      attr_reader options: Options
+
+      # TODO(cretz): Update when generated
+      # attr_reader workflow_service: WorkflowService
+      # attr_reader operator_service: OperatorService
+      # attr_reader cloud_service: CloudService
+      attr_reader workflow_service: untyped
+      attr_reader operator_service: untyped
+      attr_reader cloud_service: untyped
+
+      def initialize: (
+        target_host: String,
+        ?api_key: String?,
+        ?tls: bool | Connection::TLSOptions,
+        ?rpc_metadata: Hash[String, String],
+        ?rpc_retry: RPCRetryOptions,
+        ?identity: String,
+        ?keep_alive: KeepAliveOptions,
+        ?http_connect_proxy: HTTPConnectProxyOptions?,
+        ?runtime: Runtime,
+        ?lazy_connect: bool
+      ) -> void
+
+      def target_host: -> String
+      def identity: -> String
+      def connected?: -> bool
+      def _core_client: -> Internal::Bridge::Client
+      private def new_core_client: -> Internal::Bridge::Client
+    end
+  end
+end

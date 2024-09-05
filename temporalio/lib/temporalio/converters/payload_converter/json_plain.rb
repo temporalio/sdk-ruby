@@ -12,8 +12,8 @@ module Temporalio
 
         # Create JSONPlain converter.
         #
-        # @param parse_options [Hash] Options for {JSON.parse}.
-        # @param generate_options [Hash] Options for {JSON.generate}.
+        # @param parse_options [Hash] Options for {::JSON.parse}.
+        # @param generate_options [Hash] Options for {::JSON.generate}.
         def initialize(parse_options: { create_additions: true }, generate_options: {})
           super()
           @parse_options = parse_options
