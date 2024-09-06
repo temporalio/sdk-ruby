@@ -1,0 +1,17 @@
+module Temporalio
+  class Client
+    class WorkflowExecutionCount
+      attr_reader count: Integer
+      attr_reader groups: Array[AggregationGroup]
+
+      def initialize: (Integer count, Array[AggregationGroup] groups) -> void
+
+      class AggregationGroup
+        attr_reader count: Integer
+        attr_reader group_values: Array[Object]
+
+        def initialize: (Integer count, Array[Object] group_values) -> void
+      end
+    end
+  end
+end

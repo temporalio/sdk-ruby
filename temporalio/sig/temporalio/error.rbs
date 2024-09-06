@@ -1,9 +1,15 @@
 module Temporalio
   class Error < StandardError
-    class WorkflowFailureError < Error
-      attr_reader cause: Exception
+    def self.canceled?: (Exception error) -> bool
 
-      def initialize: (cause: Exception) -> void
+    def self._with_backtrace_and_cause: (
+      Exception err,
+      backtrace: Array[String],
+      cause: Exception?
+    ) -> Exception
+
+    class WorkflowFailureError < Error
+      def initialize: -> void
     end
 
     class WorkflowContinuedAsNewError < Error
@@ -12,16 +18,21 @@ module Temporalio
       def initialize: (new_run_id: String) -> void
     end
 
-    class WorkflowAlreadyStartedError < Error
-      attr_reader workflow_id: String
-      attr_reader workflow_type: String
-      attr_reader run_id: String
+    class WorkflowQueryFailedError < Error
+    end
 
-      def initialize: (
-        workflow_id: String,
-        workflow_type: String,
-        run_id: String
-      ) -> void
+    class WorkflowQueryRejectedError < Error
+      attr_reader status: Client::WorkflowExecutionStatus::enum
+
+      def initialize: (status: Client::WorkflowExecutionStatus::enum) -> void
+    end
+
+    class WorkflowUpdateFailedError < Error
+      def initialize: -> void
+    end
+
+    class WorkflowUpdateRPCTimeoutOrCanceledError < Error
+      def initialize: -> void
     end
 
     class RPCError < Error

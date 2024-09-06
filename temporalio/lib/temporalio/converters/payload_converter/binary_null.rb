@@ -25,7 +25,7 @@ module Temporalio
         end
 
         # (see Encoding.from_payload)
-        def from_payload(_payload)
+        def from_payload(payload) # rubocop:disable Lint/UnusedMethodArgument
           nil
         end
       end

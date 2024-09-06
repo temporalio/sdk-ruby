@@ -1,0 +1,16 @@
+
+module Temporalio
+  class Client
+    module WorkflowExecutionStatus
+      type enum = Integer
+
+      RUNNING: enum
+      COMPLETED: enum
+      FAILED: enum
+      CANCELED: enum
+      TERMINATED: enum
+      CONTINUED_AS_NEW: enum
+      TIMED_OUT: enum
+    end
+  end
+end

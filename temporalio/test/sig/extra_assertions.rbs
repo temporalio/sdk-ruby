@@ -1,0 +1,3 @@
+module ExtraAssertions
+  def assert_eventually: [T] (?timeout: Float, ?interval: Float) { -> T } -> T
+end

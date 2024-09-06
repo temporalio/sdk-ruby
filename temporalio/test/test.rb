@@ -1,9 +1,32 @@
 # frozen_string_literal: true
 
+require 'extra_assertions'
 require 'minitest/autorun'
+require 'securerandom'
 require 'singleton'
+require 'temporalio/testing'
+require 'timeout'
 
 class Test < Minitest::Test
+  include ExtraAssertions
+
+  ATTR_KEY_TEXT = Temporalio::SearchAttributes::Key.new('ruby-key-text',
+                                                        Temporalio::SearchAttributes::IndexedValueType::TEXT)
+  ATTR_KEY_KEYWORD = Temporalio::SearchAttributes::Key.new('ruby-key-keyword',
+                                                           Temporalio::SearchAttributes::IndexedValueType::KEYWORD)
+  ATTR_KEY_INTEGER = Temporalio::SearchAttributes::Key.new('ruby-key-integer',
+                                                           Temporalio::SearchAttributes::IndexedValueType::INTEGER)
+  ATTR_KEY_FLOAT = Temporalio::SearchAttributes::Key.new('ruby-key-float',
+                                                         Temporalio::SearchAttributes::IndexedValueType::FLOAT)
+  ATTR_KEY_BOOLEAN = Temporalio::SearchAttributes::Key.new('ruby-key-boolean',
+                                                           Temporalio::SearchAttributes::IndexedValueType::BOOLEAN)
+  ATTR_KEY_TIME = Temporalio::SearchAttributes::Key.new('ruby-key-time',
+                                                        Temporalio::SearchAttributes::IndexedValueType::TIME)
+  ATTR_KEY_KEYWORD_LIST = Temporalio::SearchAttributes::Key.new(
+    'ruby-key-keyword-list',
+    Temporalio::SearchAttributes::IndexedValueType::KEYWORD_LIST
+  )
+
   def env
     TestEnvironment.instance
   end
@@ -61,6 +84,11 @@ class Test < Minitest::Test
 
         @kitchen_sink_exe = File.join(__dir__ || '', 'golangworker', 'golangworker')
       end
+    end
+
+    def ensure_common_search_attribute_keys
+      ensure_search_attribute_keys(ATTR_KEY_TEXT, ATTR_KEY_KEYWORD, ATTR_KEY_INTEGER, ATTR_KEY_FLOAT, ATTR_KEY_BOOLEAN,
+                                   ATTR_KEY_TIME, ATTR_KEY_KEYWORD_LIST)
     end
 
     def ensure_search_attribute_keys(*keys)

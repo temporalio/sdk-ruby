@@ -108,15 +108,22 @@ module Temporalio
 
     # @!visibility private
     def self.from_proto(proto)
+      return nil unless proto
       raise ArgumentError, 'Expected proto search attribute' unless proto.is_a?(Api::Common::V1::SearchAttributes)
 
       SearchAttributes.new(proto.indexed_fields.map do |key_name, payload| # rubocop:disable Style/MapToHash
         key = Key.new(key_name, IndexedValueType::PROTO_VALUES[payload.metadata['type']])
-        value = Converters::PayloadConverter.default.from_payload(payload)
-        # Time needs to be converted
-        value = Time.iso8601(value) if key.type == IndexedValueType::TIME && value.is_a?(String)
+        value = value_from_payload(payload)
         [key, value]
       end.to_h)
+    end
+
+    # @!visibility private
+    def self.value_from_payload(payload)
+      value = Converters::PayloadConverter.default.from_payload(payload)
+      # Time needs to be converted
+      value = Time.iso8601(value) if payload.metadata['type'] == 'DateTime' && value.is_a?(String)
+      value
     end
 
     # Create a search attribute collection.
@@ -200,6 +207,18 @@ module Temporalio
     def dup
       SearchAttributes.new(self)
     end
+
+    # @return [Boolean] Whether the set of attributes is empty.
+    def empty?
+      length.zero?
+    end
+
+    # @return [Integer] Number of attributes.
+    def length
+      @raw_hash.length
+    end
+
+    alias size length
 
     # Return a new search attributes collection with updates applied.
     #

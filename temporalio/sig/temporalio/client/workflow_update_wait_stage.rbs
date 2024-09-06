@@ -1,0 +1,12 @@
+
+module Temporalio
+  class Client
+    module WorkflowUpdateWaitStage
+      type enum = Integer
+
+      ADMITTED: enum
+      ACCEPTED: enum
+      COMPLETED: enum
+    end
+  end
+end

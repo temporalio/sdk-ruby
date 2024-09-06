@@ -55,10 +55,9 @@ module Temporalio
       # @param values [Object] Ruby values, converted to array via {::Array}.
       # @return [Api::Common::V1::Payloads] Converted and encoded payload set.
       def to_payloads(values)
-        payloads = Array(values).map { |value| payload_converter.to_payload(value) }
+        payload_converter.to_payloads(values)
         # TODO(cretz):
         # payloads = payload_codec.encode_payloads(payloads) if payload_codec
-        Api::Common::V1::Payloads.new(payloads:)
       end
 
       # Decode and convert a payload to a Ruby value.
@@ -73,12 +72,14 @@ module Temporalio
 
       # Decode and convert a payload set to Ruby values.
       #
-      # @param payloads [Api::Common::V1::Payloads] Encoded payload set.
+      # @param payloads [Api::Common::V1::Payloads, nil] Encoded payload set.
       # @return [Array<Object>] Decoded and converted Ruby values.
       def from_payloads(payloads)
+        return [] unless payloads
+
         # TODO(cretz):
         # payloads = payload_codec.decode_payloads(payloads) if payload_codec
-        payloads.payloads.map { |payload| payload_converter.from_payload(payload) }
+        payload_converter.from_payloads(payloads)
       end
 
       # Convert a Ruby error to a Temporal failure and encode it.

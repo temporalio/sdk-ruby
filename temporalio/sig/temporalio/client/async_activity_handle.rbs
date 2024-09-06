@@ -1,0 +1,35 @@
+module Temporalio
+  class Client
+    class AsyncActivityHandle
+      attr_reader task_token: String?
+      attr_reader id_reference: ActivityIDReference?
+
+      def initialize: (String | ActivityIDReference task_token_or_id_reference) -> void
+
+      def heartbeat: (
+        *Object details,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+
+      def complete: (
+        ?Object? result,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+
+      def fail: (
+        Exception error,
+        ?last_heartbeat_details: Array[Object],
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+
+      def report_cancellation: (
+        *Object details,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+    end
+  end
+end

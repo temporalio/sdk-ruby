@@ -26,7 +26,7 @@ Layout/ClassStructure:
 
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:
-  Max: 75
+  Max: 200
 
 # The default is too small
 Metrics/BlockLength:
@@ -43,6 +43,10 @@ Metrics/CyclomaticComplexity:
 # The default is too small
 Metrics/MethodLength:
   Max: 100
+
+# The default is too small
+Metrics/ModuleLength:
+  Max: 1000
 
 # The default is too small
 Metrics/PerceivedComplexity:

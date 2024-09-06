@@ -19,7 +19,9 @@ module Temporalio
       def initialize: (Key key, Object? value) -> void
     end
 
-    def self.from_proto: (untyped proto) -> SearchAttributes
+    def self.from_proto: (untyped proto) -> SearchAttributes?
+
+    def self.value_from_payload: (untyped payload) -> Object?
 
     def initialize: (SearchAttributes existing) -> void
                   | (Hash[Key, Object] existing) -> void
@@ -36,6 +38,12 @@ module Temporalio
     def to_h: -> Hash[Key, Object]
 
     def dup: -> SearchAttributes
+
+    def empty?: -> bool
+
+    def length: -> Integer
+
+    alias size length
 
     def update: (*Update updates) -> SearchAttributes
 

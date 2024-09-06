@@ -63,7 +63,7 @@ module Temporalio
       )
         server_options = Internal::Bridge::Testing::EphemeralServer::StartDevServerOptions.new(
           existing_path: dev_server_existing_path,
-          sdk_name: 'sdk-python',
+          sdk_name: 'sdk-ruby',
           sdk_version: VERSION,
           download_version: dev_server_download_version,
           download_dest_dir: dev_server_download_dest_dir,

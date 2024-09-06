@@ -1,0 +1,12 @@
+
+module Temporalio
+  class Client
+    module WorkflowQueryRejectCondition
+      type enum = Integer
+
+      NONE: enum
+      NOT_OPEN: enum
+      NOT_COMPLETED_CLEANLY: enum
+    end
+  end
+end

@@ -7,11 +7,11 @@ module Temporalio
       attr_reader first_execution_run_id: String?
 
       def initialize: (
-        Client client,
-        String id,
-        ?run_id: String?,
-        ?result_run_id: String?,
-        ?first_execution_run_id: String?
+        client: Client,
+        id: String,
+        run_id: String?,
+        result_run_id: String?,
+        first_execution_run_id: String?
       ) -> void
 
       def result: (
@@ -20,24 +20,74 @@ module Temporalio
         ?rpc_timeout: Float?
       ) -> Object
 
+      def describe: (
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> WorkflowExecution::Description
+
+      def fetch_history: (
+        ?event_filter_type: Integer,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> WorkflowHistory
+
       def fetch_history_events: (
-        ?page_size: Integer?,
         ?wait_new_event: bool,
         ?event_filter_type: Integer,
         ?skip_archival: bool,
+        ?specific_run_id: String?,
         ?rpc_metadata: Hash[String, String]?,
         ?rpc_timeout: Float?
-      ) -> Enumerable[untyped]
-
-      private def fetch_history_events_for_run: (
-        String? run_id,
-        page_size: Integer?,
-        wait_new_event: bool,
-        event_filter_type: Integer,
-        skip_archival: bool,
-        rpc_metadata: Hash[String, String]?,
-        rpc_timeout: Float?
       ) -> Enumerator[untyped, untyped]
+
+      def signal: (
+        String signal,
+        *Object? args,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+
+      def query: (
+        String query,
+        *Object? args,
+        ?reject_condition: WorkflowQueryRejectCondition::enum?,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> Object?
+
+      def start_update: (
+        String update,
+        *Object? args,
+        wait_for_stage: WorkflowUpdateWaitStage::enum,
+        ?id: String,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> WorkflowUpdateHandle
+
+      def execute_update: (
+        String update,
+        *Object? args,
+        ?id: String,
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> Object?
+
+      def update_handle: (
+        String id,
+        ?specific_run_id: String?
+      ) -> WorkflowUpdateHandle
+
+      def cancel: (
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
+
+      def terminate: (
+        ?String? reason,
+        ?details: Array[Object?],
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> void
     end
   end
 end

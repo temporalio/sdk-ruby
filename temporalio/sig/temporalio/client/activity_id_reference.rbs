@@ -1,0 +1,11 @@
+module Temporalio
+  class Client
+    class ActivityIDReference
+      attr_reader workflow_id: String
+      attr_reader run_id: String?
+      attr_reader activity_id: String
+
+      def initialize: (workflow_id: String, run_id: String?, activity_id: String) -> void
+    end
+  end
+end

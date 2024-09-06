@@ -5,14 +5,14 @@ module Temporalio
       attr_accessor namespace: String
       attr_accessor data_converter: Converters::DataConverter
       attr_accessor interceptors: Array[Interceptor]
-      attr_accessor default_workflow_query_reject_condition: Integer
+      attr_accessor default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
 
       def initialize: (
         connection: Connection,
         namespace: String,
         data_converter: Converters::DataConverter,
         interceptors: Array[Interceptor],
-        default_workflow_query_reject_condition: Integer
+        default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
       ) -> void
     end
 
@@ -23,7 +23,7 @@ module Temporalio
       ?tls: bool | Connection::TLSOptions,
       ?data_converter: Converters::DataConverter,
       ?interceptors: Array[Interceptor],
-      ?default_workflow_query_reject_condition: Integer,
+      ?default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?,
       ?rpc_metadata: Hash[String, String],
       ?rpc_retry: Connection::RPCRetryOptions,
       ?identity: String,
@@ -40,22 +40,18 @@ module Temporalio
       namespace: String,
       ?data_converter: Converters::DataConverter,
       ?interceptors: Array[Interceptor],
-      ?default_workflow_query_reject_condition: Integer
+      ?default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
     ) -> void
 
     def connection: -> Connection
     def namespace: -> String
     def data_converter: -> Converters::DataConverter
-
-    # TODO(cretz): Update when generated
-    # def workflow_service: -> Connection::WorkflowService
-    # def operator_service: -> Connection::OperatorService
-    def workflow_service: -> untyped
-    def operator_service: -> untyped
+    def workflow_service: -> Connection::WorkflowService
+    def operator_service: -> Connection::OperatorService
 
     def start_workflow: (
       String workflow,
-      *Object args,
+      *Object? args,
       id: String,
       task_queue: String,
       ?execution_timeout: Float?,
@@ -75,7 +71,7 @@ module Temporalio
 
     def execute_workflow: (
       String workflow,
-      *Object args,
+      *Object? args,
       id: String,
       task_queue: String,
       ?execution_timeout: Float?,
@@ -98,5 +94,21 @@ module Temporalio
       ?run_id: String?,
       ?first_execution_run_id: String?
     ) -> WorkflowHandle
+
+    def list_workflows: (
+      ?String query,
+      ?rpc_metadata: Hash[String, String]?,
+      ?rpc_timeout: Float?
+    ) -> Enumerator[WorkflowExecution, WorkflowExecution]
+
+    def count_workflows: (
+      ?String query,
+      ?rpc_metadata: Hash[String, String]?,
+      ?rpc_timeout: Float?
+    ) -> WorkflowExecutionCount
+
+    def async_activity_handle: (
+      String | ActivityIDReference task_token_or_id_reference
+    ) -> AsyncActivityHandle
   end
 end

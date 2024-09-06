@@ -1,0 +1,119 @@
+module Temporalio
+  class Error
+    class Failure < Error
+    end
+
+    class WorkflowAlreadyStartedError < Failure
+      attr_reader workflow_id: String
+      attr_reader workflow_type: String
+      attr_reader run_id: String
+
+      def initialize: (workflow_id: String, workflow_type: String, run_id: String) -> void
+    end
+
+    class ApplicationError < Failure
+      attr_reader details: Array[Object?]
+      attr_reader type: String?
+      attr_reader non_retryable: bool
+      attr_reader next_retry_delay: Float?
+
+      def initialize: (
+        String message,
+        *Object? details,
+        ?type: String?,
+        ?non_retryable: bool,
+        ?next_retry_delay: Float?
+      ) -> void
+
+      def retryable?: -> bool
+    end
+
+    class CanceledError < Failure
+      attr_reader details: Array[Object?]
+
+      def initialize: (String message, details: Array[Object?]) -> void
+    end
+
+    class TerminatedError < Failure
+      attr_reader details: Array[Object?]
+
+      def initialize: (String message, details: Array[Object?]) -> void
+    end
+
+    class TimeoutError < Failure
+      attr_reader type: TimeoutType::enum
+      attr_reader last_heartbeat_details: Array[Object?]
+
+      def initialize: (String message, type: TimeoutType::enum, last_heartbeat_details: Array[Object?]) -> void
+
+      module TimeoutType
+        type enum = Integer
+  
+        START_TO_CLOSE: enum
+        SCHEDULE_TO_START: enum
+        SCHEDULE_TO_CLOSE: enum
+        HEARTBEAT: enum
+      end
+    end
+
+    class ServerError < Failure
+      attr_reader non_retryable: bool
+
+      def initialize: (String message, non_retryable: bool) -> void
+
+      def retryable?: -> bool
+    end
+
+    module RetryState
+      type enum = Integer
+
+      IN_PROGRESS: enum
+      NON_RETRYABLE_FAILURE: enum
+      TIMEOUT: enum
+      MAXIMUM_ATTEMPTS_REACHED: enum
+      RETRY_POLICY_NOT_SET: enum
+      INTERNAL_SERVER_ERROR: enum
+      CANCEL_REQUESTED: enum
+    end
+
+    class ActivityError < Failure
+      attr_reader scheduled_event_id: Integer
+      attr_reader started_event_id: Integer
+      attr_reader identity: String
+      attr_reader activity_type: String
+      attr_reader activity_id: String
+      attr_reader retry_state: RetryState::enum?
+
+      def initialize: (
+        String message,
+        scheduled_event_id: Integer,
+        started_event_id: Integer,
+        identity: String,
+        activity_type: String,
+        activity_id: String,
+        retry_state: RetryState::enum?
+      ) -> void
+    end
+
+    class ChildWorkflowError < Failure
+      attr_reader namespace: String
+      attr_reader workflow_id: String
+      attr_reader run_id: String
+      attr_reader workflow_type: String
+      attr_reader initiated_event_id: Integer
+      attr_reader started_event_id: Integer
+      attr_reader retry_state: RetryState::enum?
+
+      def initialize: (
+        String message,
+        namespace: String,
+        workflow_id: String,
+        run_id: String,
+        workflow_type: String,
+        initiated_event_id: Integer,
+        started_event_id: Integer,
+        retry_state: RetryState::enum?
+      ) -> void
+    end
+  end
+end
