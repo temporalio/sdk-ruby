@@ -95,7 +95,7 @@ module Temporalio
             { message: failure.message, stack_trace: failure.stack_trace }
           )
           failure.message = 'Encoded failure'
-          failure.stack_trace = nil
+          failure.stack_trace = ''
         end
 
         failure
@@ -109,7 +109,7 @@ module Temporalio
       def from_failure(failure, converter)
         # If encoded attributes have any of the fields we expect, try to decode
         # but ignore any error
-        if failure.encoded_attributes
+        unless failure.encoded_attributes.nil?
           begin
             attrs = converter.from_payload(failure.encoded_attributes)
             if attrs.is_a?(Hash)

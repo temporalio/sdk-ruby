@@ -28,7 +28,10 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'google-protobuf', '>= 3.27.0'
 
+  spec.add_development_dependency 'activemodel'
+  spec.add_development_dependency 'activerecord'
   spec.add_development_dependency 'async'
+  spec.add_development_dependency 'base64'
   spec.add_development_dependency 'grpc', '>= 1.65.0.pre2'
   spec.add_development_dependency 'grpc-tools'
   spec.add_development_dependency 'minitest'
@@ -37,6 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rbs', '~> 3.5.3'
   spec.add_development_dependency 'rb_sys', '~> 0.9.63'
   spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'sqlite3', '~> 1.4'
   spec.add_development_dependency 'steep', '~> 1.7.1'
   spec.add_development_dependency 'yard'
 end

@@ -45,7 +45,7 @@ class ClientWorkflowTest < Test
       )
 
       # Confirm next one fails as already started
-      err = assert_raises(Temporalio::Error::Failure::WorkflowAlreadyStartedError) do
+      err = assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         env.client.start_workflow(
           'kitchen_sink',
           { actions: [{ action_signal: 'complete' }] },
@@ -71,7 +71,7 @@ class ClientWorkflowTest < Test
 
       # Now confirm complete and another fails w/ on duplicate failed only
       assert_equal 'done', new_handle.result
-      assert_raises(Temporalio::Error::Failure::WorkflowAlreadyStartedError) do
+      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         env.client.start_workflow(
           'kitchen_sink',
           { actions: [{ result: { value: 'done' } }] },
@@ -185,7 +185,7 @@ class ClientWorkflowTest < Test
           task_queue:
         )
       end
-      assert_instance_of Temporalio::Error::Failure::ApplicationError, err.cause
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause
       assert_equal 'some error', err.cause.message
       assert_equal 'error-type', err.cause.type
       refute err.cause.non_retryable
@@ -200,8 +200,8 @@ class ClientWorkflowTest < Test
           task_queue:
         )
       end
-      assert_instance_of Temporalio::Error::Failure::ActivityError, err.cause
-      assert_instance_of Temporalio::Error::Failure::ApplicationError, err.cause.cause
+      assert_instance_of Temporalio::Error::ActivityError, err.cause
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause.cause
       assert_includes err.cause.cause.message, 'does-not-exist'
     end
   end
@@ -220,7 +220,7 @@ class ClientWorkflowTest < Test
           )
         )
       end
-      assert_instance_of Temporalio::Error::Failure::ApplicationError, err.cause
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause
       assert_equal 'attempt 2', err.cause.message
     end
   end
@@ -403,7 +403,7 @@ class ClientWorkflowTest < Test
       err = assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
         handle.execute_update('update-fail', 'update-result')
       end
-      assert_instance_of Temporalio::Error::Failure::ApplicationError, err.cause
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause
       assert_equal 'update failed', err.cause.message
 
       # Immediate complete update success via start+result
@@ -441,7 +441,7 @@ class ClientWorkflowTest < Test
       err = assert_raises(Temporalio::Error::WorkflowFailureError) do
         handle.result
       end
-      assert_instance_of Temporalio::Error::Failure::CanceledError, err.cause
+      assert_instance_of Temporalio::Error::CanceledError, err.cause
     end
   end
 
@@ -457,7 +457,7 @@ class ClientWorkflowTest < Test
       err = assert_raises(Temporalio::Error::WorkflowFailureError) do
         handle.result
       end
-      assert_instance_of Temporalio::Error::Failure::TerminatedError, err.cause
+      assert_instance_of Temporalio::Error::TerminatedError, err.cause
       assert_equal 'some reason', err.cause.message
       assert_equal ['some details'], err.cause.details
     end
