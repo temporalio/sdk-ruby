@@ -1,0 +1,3 @@
+class ClientWorkflowTest < Test
+  def start_simple: -> void
+end

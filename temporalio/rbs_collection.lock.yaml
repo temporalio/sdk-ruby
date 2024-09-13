@@ -1,6 +1,22 @@
 ---
 path: ".gem_rbs_collection"
 gems:
+- name: activemodel
+  version: '7.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 2275d263564ec90f749ea9ff8fce8160b9ed58e9
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: activerecord
+  version: '7.1'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 2275d263564ec90f749ea9ff8fce8160b9ed58e9
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
 - name: activesupport
   version: '7.0'
   source:
@@ -130,6 +146,10 @@ gems:
   source:
     type: stdlib
 - name: time
+  version: '0'
+  source:
+    type: stdlib
+- name: timeout
   version: '0'
   source:
     type: stdlib

@@ -5,8 +5,8 @@ module Temporalio
 
       def initialize: (?encode_common_attributes: bool) -> void
 
-      def to_failure: (Exception error, PayloadConverter payload_converter) -> untyped
-      def from_failure: (untyped failure, PayloadConverter payload_converter) -> Exception
+      def to_failure: (Exception error, DataConverter | PayloadConverter converter) -> untyped
+      def from_failure: (untyped failure, DataConverter | PayloadConverter converter) -> Exception
     end
   end
 end

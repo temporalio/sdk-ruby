@@ -5,16 +5,38 @@ require 'temporalio/api'
 module Temporalio
   # Superclass for all Temporal errors
   class Error < StandardError
+    # Whether the error represents some form of cancellation from an activity or workflow.
+    #
+    # @param error [Exception] Error to check.
+    # @return [Boolean] True if some form of canceled, false otherwise.
+    def self.canceled?(error)
+      error.is_a?(CanceledError) ||
+        (error.is_a?(ActivityError) && error.cause.is_a?(CanceledError)) ||
+        (error.is_a?(ChildWorkflowError) && error.cause.is_a?(CanceledError))
+    end
+
+    # @!visibility private
+    def self._with_backtrace_and_cause(err, backtrace:, cause:)
+      if cause
+        # The only way to set a _real_ cause in Ruby is to use `raise`. Even if
+        # you try to override `def cause`, it won't be outputted in situations
+        # where Ruby outputs cause.
+        begin
+          raise(err, err.message, backtrace, cause:)
+        rescue StandardError => e
+          e
+        end
+      else
+        err.set_backtrace(backtrace)
+        err
+      end
+    end
+
     # Error that is returned from  when a workflow is unsuccessful.
     class WorkflowFailureError < Error
-      # @return [Exception] Cause of the failure.
-      attr_reader :cause
-
-      # @param cause [Exception] Cause of the failure.
-      def initialize(cause:)
+      # @!visibility private
+      def initialize
         super('Workflow failed')
-
-        @cause = cause
       end
     end
 
@@ -23,29 +45,45 @@ module Temporalio
       # @return [String] New execution run ID the workflow continued to.
       attr_reader :new_run_id
 
-      # @param new_run_id [String] New execution run ID the workflow continued to.
+      # @!visibility private
       def initialize(new_run_id:)
         super('Workflow execution continued as new')
         @new_run_id = new_run_id
       end
     end
 
-    # Error raised by a client or workflow when a workflow execution has already started.
-    class WorkflowAlreadyStartedError < Error
-      # @return [String] ID of the already-started workflow.
-      attr_reader :workflow_id
+    # Error that occurs when a query fails.
+    class WorkflowQueryFailedError < Error
+    end
 
-      # @return [String] Workflow type name of the already-started workflow.
-      attr_reader :workflow_type
+    # Error that occurs when a query was rejected.
+    class WorkflowQueryRejectedError < Error
+      # @return [Client::WorkflowExecutionStatus] Workflow execution status causing rejection.
+      attr_reader :status
 
-      # @return [String] Run ID of the already-started workflow if this was raised by the client.
-      attr_reader :run_id
+      # @!visibility private
+      def initialize(status:)
+        super("Query rejected, #{status}")
+        @status = status
+      end
+    end
 
-      def initialize(workflow_id:, workflow_type:, run_id:)
-        super('Workflow execution already started')
-        @workflow_id = workflow_id
-        @workflow_type = workflow_type
-        @run_id = run_id
+    # Error that occurs when an update fails.
+    class WorkflowUpdateFailedError < Error
+      # @!visibility private
+      def initialize
+        super('Workflow update failed')
+      end
+    end
+
+    # Error that occurs when update RPC call times out or is cancelled.
+    #
+    # @note This is not related to any general concept of timing out or cancelling a running update, this is only
+    # related to the client call itself.
+    class WorkflowUpdateRPCTimeoutOrCanceledError < Error
+      # @!visibility private
+      def initialize
+        super('Timeout or cancellation waiting for update')
       end
     end
 
@@ -77,7 +115,7 @@ module Temporalio
       # Status code for RPC errors. These are gRPC status codes.
       module Code
         OK = 0
-        CANCELLED = 1
+        CANCELED = 1 # Intentionally one-L while gRPC is two-L
         UNKNOWN = 2
         INVALID_ARGUMENT = 3
         DEADLINE_EXCEEDED = 4

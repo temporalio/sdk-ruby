@@ -1,4 +1,14 @@
 class Test < Minitest::Test
+  include ExtraAssertions
+
+  ATTR_KEY_TEXT: Temporalio::SearchAttributes::Key
+  ATTR_KEY_KEYWORD: Temporalio::SearchAttributes::Key
+  ATTR_KEY_INTEGER: Temporalio::SearchAttributes::Key
+  ATTR_KEY_FLOAT: Temporalio::SearchAttributes::Key
+  ATTR_KEY_BOOLEAN: Temporalio::SearchAttributes::Key
+  ATTR_KEY_TIME: Temporalio::SearchAttributes::Key
+  ATTR_KEY_KEYWORD_LIST: Temporalio::SearchAttributes::Key
+
   def env: -> TestEnvironment
 
   class TestEnvironment
@@ -16,6 +26,8 @@ class Test < Minitest::Test
     ) { (String task_queue) -> T } -> T
 
     def kitchen_sink_exe: -> String
+
+    def ensure_common_search_attribute_keys: -> void
 
     def ensure_search_attribute_keys: (*Temporalio::SearchAttributes::Key keys) -> void
   end

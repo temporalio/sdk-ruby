@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'temporalio/api'
 require 'temporalio/converters/payload_converter/encoding'
 

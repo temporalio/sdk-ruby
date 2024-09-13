@@ -1,0 +1,24 @@
+module Temporalio
+  class Client
+    class WorkflowUpdateHandle
+      attr_reader id: String
+      attr_reader workflow_id: String
+      attr_reader workflow_run_id: String?
+
+      def initialize: (
+        client: Client,
+        id: String,
+        workflow_id: String,
+        workflow_run_id: String?,
+        known_outcome: untyped?
+      ) -> void
+
+      def result_obtained?: -> bool
+
+      def result: (
+        ?rpc_metadata: Hash[String, String]?,
+        ?rpc_timeout: Float?
+      ) -> Object?
+    end
+  end
+end

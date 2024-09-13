@@ -1,0 +1,7 @@
+module Temporalio
+  class WorkflowHistory
+    attr_reader events: Array[untyped]
+    
+    def initialize: (Array[untyped] events) -> void
+  end
+end

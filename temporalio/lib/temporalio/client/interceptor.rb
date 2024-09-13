@@ -5,8 +5,8 @@ module Temporalio
     # Mixin for intercepting clients. Classes that +include+ this should implement their own {intercept_client} that
     # returns their own instance of {Outbound}.
     #
-    # @note Input classes herein may get new requeired fields added and therefore the constructors of the Input
-    # classes may change in backwards incompatible ways. Users should not try to construct Input classes themselves.
+    # @note Input classes herein may get new required fields added and therefore the constructors of the Input classes
+    # may change in backwards incompatible ways. Users should not try to construct Input classes themselves.
     module Interceptor
       # Method called when intercepting a client. This is called upon client creation.
       #
@@ -21,7 +21,7 @@ module Temporalio
       StartWorkflowInput = Struct.new(
         :workflow,
         :args,
-        :id,
+        :workflow_id,
         :task_queue,
         :execution_timeout,
         :run_timeout,
@@ -40,12 +40,35 @@ module Temporalio
         keyword_init: true
       )
 
-      # Input for {Outbound.fetch_workflow_history_event_page}.
-      FetchWorkflowHistoryEventPageInput = Struct.new(
-        :id,
+      # Input for {Outbound.list_workflows}.
+      ListWorkflowsInput = Struct.new(
+        :query,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.count_workflows}.
+      CountWorkflowsInput = Struct.new(
+        :query,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.describe_workflow}.
+      DescribeWorkflowInput = Struct.new(
+        :workflow_id,
         :run_id,
-        :page_size,
-        :next_page_token,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.fetch_workflow_history_events}.
+      FetchWorkflowHistoryEventsInput = Struct.new(
+        :workflow_id,
+        :run_id,
         :wait_new_event,
         :event_filter_type,
         :skip_archival,
@@ -54,10 +77,74 @@ module Temporalio
         keyword_init: true
       )
 
-      # Output for {Outbound.fetch_workflow_history_event_page}.
-      FetchWorkflowHistoryEventPage = Struct.new(
-        :events,
-        :next_page_token,
+      # Input for {Outbound.signal_workflow}.
+      SignalWorkflowInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :signal,
+        :args,
+        :headers,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.query_workflow}.
+      QueryWorkflowInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :query,
+        :args,
+        :reject_condition,
+        :headers,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.start_workflow_update}.
+      StartWorkflowUpdateInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :update_id,
+        :update,
+        :args,
+        :wait_for_stage,
+        :headers,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.poll_workflow_update}.
+      PollWorkflowUpdateInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :update_id,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.cancel_workflow}.
+      CancelWorkflowInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :first_execution_run_id,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.terminate_workflow}.
+      TerminateWorkflowInput = Struct.new(
+        :workflow_id,
+        :run_id,
+        :first_execution_run_id,
+        :reason,
+        :details,
+        :rpc_metadata,
+        :rpc_timeout,
         keyword_init: true
       )
 
@@ -82,12 +169,81 @@ module Temporalio
           next_interceptor.start_workflow(input)
         end
 
-        # Called everytime the client needs a page of workflow history. This includes getting the result.
+        # Called for every {Client.list_workflows} call.
         #
-        # @param input [FetchWorkflowHistoryEventPageInput] Input.
-        # @return [FetchWorkflowHistoryEventPage] Event page.
-        def fetch_workflow_history_event_page(input)
-          next_interceptor.fetch_workflow_history_event_page(input)
+        # @param input [ListWorkflowsInput] Input.
+        # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
+        def list_workflows(input)
+          next_interceptor.list_workflows(input)
+        end
+
+        # Called for every {Client.count_workflows} call.
+        #
+        # @param input [CountWorkflowsInput] Input.
+        # @return [WorkflowExecutionCount] Workflow count.
+        def count_workflows(input)
+          next_interceptor.count_workflows(input)
+        end
+
+        # Called for every {WorkflowHandle.describe} call.
+        #
+        # @param input [DescribeWorkflowInput] Input.
+        # @return [WorkflowExecution::Description] Workflow description.
+        def describe_workflow(input)
+          next_interceptor.describe_workflow(input)
+        end
+
+        # Called everytime the client needs workflow history. This includes getting the result.
+        #
+        # @param input [FetchWorkflowHistoryEventsInput] Input.
+        # @return [Enumerator<Api::History::V1::HistoryEvent>] Event enumerator.
+        def fetch_workflow_history_events(input)
+          next_interceptor.fetch_workflow_history_events(input)
+        end
+
+        # Called for every {WorkflowHandle.signal} call.
+        #
+        # @param input [SignalWorkflowInput] Input.
+        def signal_workflow(input)
+          next_interceptor.signal_workflow(input)
+        end
+
+        # Called for every {WorkflowHandle.query} call.
+        #
+        # @param input [QueryWorkflowInput] Input.
+        # @return [Object, nil] Query result.
+        def query_workflow(input)
+          next_interceptor.query_workflow(input)
+        end
+
+        # Called for every {WorkflowHandle.start_update} call.
+        #
+        # @param input [StartWorkflowUpdateInput] Input.
+        # @return [WorkflowUpdateHandle] Update handle.
+        def start_workflow_update(input)
+          next_interceptor.start_workflow_update(input)
+        end
+
+        # Called when polling for update result.
+        #
+        # @param input [PollWorkflowUpdateInput] Input.
+        # @return [Api::Update::V1::Outcome] Update outcome.
+        def poll_workflow_update(input)
+          next_interceptor.poll_workflow_update(input)
+        end
+
+        # Called for every {WorkflowHandle.cancel} call.
+        #
+        # @param input [CancelWorkflowInput] Input.
+        def cancel_workflow(input)
+          next_interceptor.cancel_workflow(input)
+        end
+
+        # Called for every {WorkflowHandle.terminate} call.
+        #
+        # @param input [TerminateWorkflowInput] Input.
+        def terminate_workflow(input)
+          next_interceptor.terminate_workflow(input)
         end
       end
     end

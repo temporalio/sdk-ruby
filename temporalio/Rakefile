@@ -33,7 +33,18 @@ Steep::RakeTask.new
 
 require 'yard'
 
-YARD::Rake::YardocTask.new
+module CustomizeYardWarnings # rubocop:disable Style/Documentation
+  def process
+    super
+  rescue YARD::Parser::UndocumentableError
+    # We ignore if it's an API warning
+    raise unless statement.last.file.start_with?('lib/temporalio/api/')
+  end
+end
+
+YARD::Handlers::Ruby::ConstantHandler.prepend(CustomizeYardWarnings)
+
+YARD::Rake::YardocTask.new { |t| t.options = ['--fail-on-warning'] }
 
 require 'fileutils'
 require 'google/protobuf'
@@ -321,4 +332,4 @@ Rake::Task[:build].enhance([:copy_parent_files]) do
   rm ['LICENSE', 'README.md']
 end
 
-task default: ['rubocop', 'compile', 'rbs:install_collection', 'steep', 'test']
+task default: ['rubocop', 'yard', 'compile', 'rbs:install_collection', 'steep', 'test']

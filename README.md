@@ -26,7 +26,7 @@ To build shared library for development use:
 Note, this is not `compile:dev` because debug-mode in Rust has
 [an issue](https://github.com/rust-lang/rust/issues/34283) that causes runtime stack size problems.
 
-To build and test release:
+To lint, build, and test release:
 
     bundle exec rake
 

@@ -4,9 +4,19 @@ module Temporalio
       def self.seconds_to_duration: (Float? seconds_float) -> untyped?
 
       def self.memo_to_proto: (
-        Hash[String, untyped?]? hash,
-        Converters::DataConverter data_converter
+        Hash[String, Object?]? hash,
+        Converters::DataConverter | Converters::PayloadConverter converter
       ) -> untyped?
+
+      def self.memo_from_proto: (
+        untyped? memo,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, Object?]?
+
+      def self.string_or: (String? str, ?nil default) -> String?
+                        | (String? str, String default) -> String
+
+      def self.enum_to_int: (untyped enum_mod, untyped enum_val, ?zero_means_nil: bool) -> Integer
     end
   end
 end

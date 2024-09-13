@@ -1,3 +1,0 @@
-class ClientTest < Test
-  def start_simple_workflows: -> void
-end

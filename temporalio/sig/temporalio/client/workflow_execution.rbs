@@ -1,0 +1,29 @@
+module Temporalio
+  class Client
+    class WorkflowExecution
+      attr_reader raw_info: untyped
+
+      def initialize: (untyped raw_info, Converters::DataConverter data_converter) -> void
+
+      def close_time: -> Time?
+      def execution_time: -> Time?
+      def history_length: -> Integer
+      def id: -> String
+      def memo: -> Hash[String, Object]
+      def parent_id: -> String?
+      def parent_run_id: -> String?
+      def run_id: -> String
+      def search_attributes: -> SearchAttributes?
+      def start_time: -> Time
+      def status: -> WorkflowExecutionStatus::enum
+      def task_queue: -> String
+      def workflow_type: -> String
+
+      class Description < WorkflowExecution
+        attr_reader raw_description: untyped
+
+        def initialize: (untyped raw_description, Converters::DataConverter data_converter) -> void
+      end
+    end
+  end
+end

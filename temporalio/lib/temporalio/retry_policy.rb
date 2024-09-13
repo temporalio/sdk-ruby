@@ -32,18 +32,19 @@ module Temporalio
 
     # @!visibility private
     def to_proto
-      raise 'Initial interval cannot be negative' if @initial_interval.negative?
-      raise 'Backoff coefficient cannot be less than 1' if @backoff_coefficient < 1
-      raise 'Max interval cannot be negative' if @max_interval&.negative?
-      raise 'Max interval cannot be less than initial interval' if @max_interval && @max_interval < @initial_interval
-      raise 'Max attempts cannot be negative' if @max_attempts.negative?
+      # @type self: RetryPolicy
+      raise 'Initial interval cannot be negative' if initial_interval.negative?
+      raise 'Backoff coefficient cannot be less than 1' if backoff_coefficient < 1
+      raise 'Max interval cannot be negative' if max_interval&.negative?
+      raise 'Max interval cannot be less than initial interval' if max_interval && max_interval < initial_interval
+      raise 'Max attempts cannot be negative' if max_attempts.negative?
 
       Api::Common::V1::RetryPolicy.new(
-        initial_interval: Internal::ProtoUtils.seconds_to_duration(@initial_interval),
-        backoff_coefficient: @backoff_coefficient,
-        maximum_interval: Internal::ProtoUtils.seconds_to_duration(@max_interval),
-        maximum_attempts: @max_attempts,
-        non_retryable_error_types: @non_retryable_error_types
+        initial_interval: Internal::ProtoUtils.seconds_to_duration(initial_interval),
+        backoff_coefficient:,
+        maximum_interval: Internal::ProtoUtils.seconds_to_duration(max_interval),
+        maximum_attempts: max_attempts,
+        non_retryable_error_types:
       )
     end
   end

@@ -5,14 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"time"
 
 	"go.temporal.io/sdk/client"
+	sdklog "go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
 )
+
+func init() {
+	slog.SetLogLoggerLevel(slog.LevelWarn)
+}
 
 func main() {
 	if len(os.Args) != 4 {
@@ -24,17 +30,21 @@ func main() {
 }
 
 func run(endpoint, namespace, taskQueue string) error {
-	log.Printf("Creating client to %v", endpoint)
-	cl, err := client.NewClient(client.Options{HostPort: endpoint, Namespace: namespace})
+	slog.Info("Creating client")
+	cl, err := client.Dial(client.Options{
+		HostPort:  endpoint,
+		Namespace: namespace,
+		Logger:    sdklog.NewStructuredLogger(slog.Default()),
+	})
 	if err != nil {
 		return fmt.Errorf("failed to create client: %w", err)
 	}
 	defer cl.Close()
 
-	log.Printf("Creating worker")
+	slog.Info("Creating worker")
 	w := worker.New(cl, taskQueue, worker.Options{})
 	w.RegisterWorkflowWithOptions(KitchenSinkWorkflow, workflow.RegisterOptions{Name: "kitchen_sink"})
-	defer log.Printf("Stopping worker")
+	defer slog.Info("Stopping worker")
 	return w.Run(worker.InterruptCh())
 }
 
@@ -49,6 +59,7 @@ type KitchenSinkAction struct {
 	ContinueAsNew   *ContinueAsNewAction   `json:"continue_as_new"`
 	Sleep           *SleepAction           `json:"sleep"`
 	QueryHandler    *QueryHandlerAction    `json:"query_handler"`
+	UpdateHandler   *UpdateHandlerAction   `json:"update_handler"`
 	Signal          *SignalAction          `json:"signal"`
 	ExecuteActivity *ExecuteActivityAction `json:"execute_activity"`
 }
@@ -60,6 +71,7 @@ type ResultAction struct {
 
 type ErrorAction struct {
 	Message string      `json:"message"`
+	Type    string      `json:"type"`
 	Details interface{} `json:"details"`
 	Attempt bool        `json:"attempt"`
 }
@@ -76,6 +88,12 @@ type SleepAction struct {
 type QueryHandlerAction struct {
 	Name  string `json:"name"`
 	Error string `json:"error"`
+}
+
+type UpdateHandlerAction struct {
+	Name          string `json:"name"`
+	Error         string `json:"error"`
+	WaitForSignal string `json:"wait_for_signal"`
 }
 
 type SignalAction struct {
@@ -145,7 +163,7 @@ func handleAction(
 		if action.Error.Details != nil {
 			details = append(details, action.Error.Details)
 		}
-		return true, nil, temporal.NewApplicationError(action.Error.Message, "", details...)
+		return true, nil, temporal.NewApplicationError(action.Error.Message, action.Error.Type, details...)
 
 	case action.ContinueAsNew != nil:
 		if action.ContinueAsNew.WhileAboveZero > 0 {
@@ -167,6 +185,25 @@ func handleAction(
 			}
 			return arg, nil
 		})
+		if err != nil {
+			return true, nil, err
+		}
+
+	case action.UpdateHandler != nil:
+		err := workflow.SetUpdateHandler(
+			ctx,
+			action.UpdateHandler.Name,
+			func(ctx workflow.Context, arg string) (string, error) {
+				if action.UpdateHandler.Error != "" {
+					return "", errors.New(action.UpdateHandler.Error)
+				} else if action.UpdateHandler.WaitForSignal != "" {
+					var sigVal string
+					workflow.GetSignalChannel(ctx, action.UpdateHandler.WaitForSignal).Receive(ctx, &sigVal)
+					return sigVal, nil
+				} else {
+					return arg, nil
+				}
+			})
 		if err != nil {
 			return true, nil, err
 		}

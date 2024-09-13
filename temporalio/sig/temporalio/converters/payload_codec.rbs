@@ -1,7 +1,8 @@
 module Temporalio
   module Converters
     class PayloadCodec
-      # TODO
+      def encode: (Enumerable[untyped] payloads) -> Array[untyped]
+      def decode: (Enumerable[untyped] payloads) -> Array[untyped]
     end
   end
 end

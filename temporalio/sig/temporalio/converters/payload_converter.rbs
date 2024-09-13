@@ -9,7 +9,10 @@ module Temporalio
       ) -> PayloadConverter
 
       def to_payload: (Object? value) -> untyped
+      def to_payloads: (Array[Object?] values) -> untyped
+
       def from_payload: (untyped payload) -> Object?
+      def from_payloads: (untyped payloads) -> Array[Object?]
     end
   end
 end
