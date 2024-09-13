@@ -38,12 +38,12 @@ pub struct Runtime {
 #[derive(Clone)]
 pub(crate) struct RuntimeHandle {
     pub(crate) core: Arc<CoreRuntime>,
-    async_command_tx: Sender<AsyncCommand>,
+    pub(crate) async_command_tx: Sender<AsyncCommand>,
 }
 
-type Callback = Box<dyn FnOnce() -> Result<(), Error> + Send + 'static>;
+pub(crate) type Callback = Box<dyn FnOnce() -> Result<(), Error> + Send + 'static>;
 
-enum AsyncCommand {
+pub(crate) enum AsyncCommand {
     RunCallback(Callback),
     Shutdown,
 }

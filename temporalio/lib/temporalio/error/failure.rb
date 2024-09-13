@@ -72,7 +72,7 @@ module Temporalio
       attr_reader :details
 
       # @!visibility private
-      def initialize(message, details:)
+      def initialize(message, details: [])
         super(message)
         @details = details
       end

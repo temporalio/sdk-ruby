@@ -1,0 +1,22 @@
+module Temporalio
+  class Activity
+    class Context
+      def self.current: -> Context
+      def self.current_or_nil: -> Context?
+      def self.exist?: -> bool
+
+      def self._current_executor: -> Worker::ActivityExecutor?
+      def self._current_executor=: (Worker::ActivityExecutor? executor) -> void
+
+      def info: -> Info
+      def heartbeat: (*Object? details) -> void
+      def cancellation: -> Cancellation
+      def worker_shutdown_cancellation: -> Cancellation
+      def payload_converter: -> Converters::PayloadConverter
+      def logger: -> ScopedLogger
+      def definition: -> Definition
+
+      def _scoped_logger_info: -> Hash[Symbol, Object]
+    end
+  end
+end

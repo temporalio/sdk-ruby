@@ -1,0 +1,119 @@
+module Temporalio
+  module Internal
+    module Bridge
+      class Worker
+        class Options
+          attr_accessor activity: bool
+          attr_accessor workflow: bool
+          attr_accessor namespace: String
+          attr_accessor task_queue: String
+          attr_accessor tuner: TunerOptions
+          attr_accessor build_id: String
+          attr_accessor identity_override: String?
+          attr_accessor max_cached_workflows: Integer
+          attr_accessor max_concurrent_workflow_task_polls: Integer
+          attr_accessor nonsticky_to_sticky_poll_ratio: Float
+          attr_accessor max_concurrent_activity_task_polls: Integer
+          attr_accessor no_remote_activities: bool
+          attr_accessor sticky_queue_schedule_to_start_timeout: Float
+          attr_accessor max_heartbeat_throttle_interval: Float
+          attr_accessor default_heartbeat_throttle_interval: Float
+          attr_accessor max_worker_activities_per_second: Float?
+          attr_accessor max_task_queue_activities_per_second: Float?
+          attr_accessor graceful_shutdown_period: Float
+          attr_accessor use_worker_versioning: bool
+    
+          def initialize: (
+            activity: bool,
+            workflow: bool,
+            namespace: String,
+            task_queue: String,
+            tuner: TunerOptions,
+            build_id: String,
+            identity_override: String?,
+            max_cached_workflows: Integer,
+            max_concurrent_workflow_task_polls: Integer,
+            nonsticky_to_sticky_poll_ratio: Float,
+            max_concurrent_activity_task_polls: Integer,
+            no_remote_activities: bool,
+            sticky_queue_schedule_to_start_timeout: Float,
+            max_heartbeat_throttle_interval: Float,
+            default_heartbeat_throttle_interval: Float,
+            max_worker_activities_per_second: Float?,
+            max_task_queue_activities_per_second: Float?,
+            graceful_shutdown_period: Float,
+            use_worker_versioning: bool
+          ) -> void
+        end
+
+        class TunerOptions
+          attr_accessor workflow_slot_supplier: TunerSlotSupplierOptions
+          attr_accessor activity_slot_supplier: TunerSlotSupplierOptions
+          attr_accessor local_activity_slot_supplier: TunerSlotSupplierOptions
+
+          def initialize: (
+            workflow_slot_supplier: TunerSlotSupplierOptions,
+            activity_slot_supplier: TunerSlotSupplierOptions,
+            local_activity_slot_supplier: TunerSlotSupplierOptions
+          ) -> void
+        end
+
+        class TunerSlotSupplierOptions
+          attr_accessor fixed_size: Integer?
+          attr_accessor resource_based: TunerResourceBasedSlotSupplierOptions?
+
+          def initialize: (
+            fixed_size: Integer?,
+            resource_based: TunerResourceBasedSlotSupplierOptions?
+          ) -> void
+        end
+
+        class TunerResourceBasedSlotSupplierOptions
+          attr_accessor target_mem_usage: Float
+          attr_accessor target_cpu_usage: Float
+          attr_accessor min_slots: Integer?
+          attr_accessor max_slots: Integer?
+          attr_accessor ramp_throttle: Float?
+
+          def initialize: (
+            target_mem_usage: Float,
+            target_cpu_usage: Float,
+            min_slots: Integer?,
+            max_slots: Integer?,
+            ramp_throttle: Float?
+          ) -> void
+        end
+
+        def self.finalize_shutdown_all: (Array[Worker] workers) -> void
+
+        def validate: -> void
+
+        def complete_activity_task: (untyped proto) -> void
+
+        def complete_activity_task_in_background: (untyped proto) -> void
+
+        # Defined in Rust
+
+        def self.new: (Client client, Options options) -> Worker
+
+        def self.async_poll_all: (
+          Array[Worker] workers,
+        ) { (Integer?, Symbol?, String | Exception | nil) -> void } -> void
+
+        def self.async_finalize_all: (
+          Array[Worker] workers,
+        ) { (Error?) -> void } -> void
+
+        def async_validate: { (Error?) -> void } -> void
+
+        def async_complete_activity_task: (String proto) { (Error?) -> void } -> void
+
+        def record_activity_heartbeat: (String proto) -> void
+
+        def replace_client: (Client client) -> void
+
+        def initiate_shutdown: -> void
+      end
+    end
+  end
+end

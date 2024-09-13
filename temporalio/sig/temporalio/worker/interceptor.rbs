@@ -1,0 +1,43 @@
+module Temporalio
+  class Worker
+    module Interceptor
+      def intercept_activity: (ActivityInbound next_interceptor) -> ActivityInbound
+
+      class ExecuteActivityInput
+        attr_accessor proc: Proc
+        attr_accessor args: Array[Object?]
+        attr_accessor headers: Hash[String, String]
+
+        def initialize: (
+          proc: Proc,
+          args: Array[Object?],
+          headers: Hash[String, String]
+        ) -> void
+      end
+
+      class HeartbeatActivityInput
+        attr_accessor details: Array[Object?]
+
+        def initialize: (details: Array[Object?]) -> void
+      end
+
+      class ActivityInbound
+        attr_reader next_interceptor: ActivityInbound
+
+        def initialize: (ActivityInbound next_interceptor) -> void
+
+        def init: (ActivityOutbound outbound) -> ActivityOutbound
+
+        def execute: (ExecuteActivityInput input) -> Object?
+      end
+
+      class ActivityOutbound
+        attr_reader next_interceptor: ActivityOutbound
+
+        def initialize: (ActivityOutbound next_interceptor) -> void
+
+        def heartbeat: (HeartbeatActivityInput input) -> void
+      end
+    end
+  end
+end

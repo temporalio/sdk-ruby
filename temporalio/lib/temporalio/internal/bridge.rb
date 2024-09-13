@@ -2,9 +2,7 @@
 
 module Temporalio
   module Internal
-    # @!visibility private
     module Bridge
-      # @!visibility private
       def self.async_call
         queue = Queue.new
         yield queue

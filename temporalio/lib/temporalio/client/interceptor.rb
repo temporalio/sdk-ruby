@@ -148,6 +148,43 @@ module Temporalio
         keyword_init: true
       )
 
+      # Input for {Outbound.heartbeat_async_activity}.
+      HeartbeatAsyncActivityInput = Struct.new(
+        :task_token_or_id_reference,
+        :details,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.complete_async_activity}.
+      CompleteAsyncActivityInput = Struct.new(
+        :task_token_or_id_reference,
+        :result,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.fail_async_activity}.
+      FailAsyncActivityInput = Struct.new(
+        :task_token_or_id_reference,
+        :error,
+        :last_heartbeat_details,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.report_cancellation_async_activity}.
+      ReportCancellationAsyncActivityInput = Struct.new(
+        :task_token_or_id_reference,
+        :details,
+        :rpc_metadata,
+        :rpc_timeout,
+        keyword_init: true
+      )
+
       # Outbound interceptor for intercepting client calls. This should be extended by users needing to intercept client
       # actions.
       class Outbound
@@ -244,6 +281,34 @@ module Temporalio
         # @param input [TerminateWorkflowInput] Input.
         def terminate_workflow(input)
           next_interceptor.terminate_workflow(input)
+        end
+
+        # Called for every {AsyncActivityHandle.heartbeat} call.
+        #
+        # @param input [HeartbeatAsyncActivityInput] Input.
+        def heartbeat_async_activity(input)
+          next_interceptor.heartbeat_async_activity(input)
+        end
+
+        # Called for every {AsyncActivityHandle.complete} call.
+        #
+        # @param input [CompleteAsyncActivityInput] Input.
+        def complete_async_activity(input)
+          next_interceptor.complete_async_activity(input)
+        end
+
+        # Called for every {AsyncActivityHandle.fail} call.
+        #
+        # @param input [FailAsyncActivityInput] Input.
+        def fail_async_activity(input)
+          next_interceptor.fail_async_activity(input)
+        end
+
+        # Called for every {AsyncActivityHandle.report_cancellation} call.
+        #
+        # @param input [ReportCancellationAsyncActivityInput] Input.
+        def report_cancellation_async_activity(input)
+          next_interceptor.report_cancellation_async_activity(input)
         end
       end
     end

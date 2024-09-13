@@ -2,8 +2,8 @@ module Temporalio
   module Internal
     module Bridge
       interface _ResultQueue[T]
-        def push: ([T, Exception]) -> void
-        def pop: () -> [T, Exception]
+        def push: (T | Exception) -> void
+        def pop: -> T
       end
 
       def self.async_call: [T] { (_ResultQueue[T] queue) -> void } -> T

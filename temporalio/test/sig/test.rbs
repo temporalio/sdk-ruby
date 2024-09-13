@@ -9,7 +9,11 @@ class Test < Minitest::Test
   ATTR_KEY_TIME: Temporalio::SearchAttributes::Key
   ATTR_KEY_KEYWORD_LIST: Temporalio::SearchAttributes::Key
 
+  def self.also_run_all_tests_in_fiber: -> void
+
   def env: -> TestEnvironment
+
+  def run_in_background: { (?) -> untyped } -> (Thread | Fiber)
 
   class TestEnvironment
     include Singleton

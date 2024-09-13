@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'securerandom'
 require 'temporalio/api'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/workflow_update_handle'
@@ -302,7 +303,7 @@ module Temporalio
       # @return [WorkflowUpdateHandle] The update handle.
       #
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
-      #   mean the update itself was timed out or cancelled.
+      #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same
@@ -342,7 +343,7 @@ module Temporalio
       #
       # @raise [Error::WorkflowUpdateFailedError] If the update failed.
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
-      #   mean the update itself was timed out or cancelled.
+      #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same

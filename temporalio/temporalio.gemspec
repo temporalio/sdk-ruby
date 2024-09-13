@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'base64'
   spec.add_development_dependency 'grpc', '>= 1.65.0.pre2'
   spec.add_development_dependency 'grpc-tools'
+  spec.add_development_dependency 'memory_profiler'
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rake-compiler'

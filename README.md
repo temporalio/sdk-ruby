@@ -38,7 +38,19 @@ This project uses `minitest`. To test:
 
 Can add options via `TESTOPTS`. E.g. single test:
 
-    bundle exec rake test TESTOPTS="--name=test_start_workflows_async"
+    bundle exec rake test TESTOPTS="--name=test_some_method"
+
+E.g. all starting with prefix:
+
+    bundle exec rake test TESTOPTS="--name=/^test_some_method_prefix/"
+
+E.g. all for a class:
+
+    bundle exec rake test TESTOPTS="--name=/SomeClassName/"
+
+E.g. show all test names while executing:
+
+    bundle exec rake test TESTOPTS="--verbose"
 
 ### Code Formatting and Type Checking
 

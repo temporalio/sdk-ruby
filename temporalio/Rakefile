@@ -38,7 +38,8 @@ module CustomizeYardWarnings # rubocop:disable Style/Documentation
     super
   rescue YARD::Parser::UndocumentableError
     # We ignore if it's an API warning
-    raise unless statement.last.file.start_with?('lib/temporalio/api/')
+    raise unless statement.last.file.start_with?('lib/temporalio/api/') ||
+                 statement.last.file.start_with?('lib/temporalio/internal/bridge/api/')
   end
 end
 
@@ -313,6 +314,32 @@ namespace :proto do
       TEXT
     end
     sh 'cargo', 'fmt', '--', 'ext/src/client_rpc_generated.rs'
+
+    # Generate core protos
+    FileUtils.rm_rf('lib/temporalio/internal/bridge/api')
+    # Generate API to temp dir
+    FileUtils.rm_rf('tmp-proto')
+    FileUtils.mkdir_p('tmp-proto')
+    sh 'bundle exec grpc_tools_ruby_protoc ' \
+       '--proto_path=ext/sdk-core/sdk-core-protos/protos/api_upstream ' \
+       '--proto_path=ext/sdk-core/sdk-core-protos/protos/local ' \
+       '--ruby_out=tmp-proto ' \
+       "#{Dir.glob('ext/sdk-core/sdk-core-protos/protos/local/**/*.proto').join(' ')}"
+    # Walk all generated Ruby files and cleanup content and filename
+    Dir.glob('tmp-proto/temporal/sdk/**/*.rb') do |path|
+      # Fix up the imports
+      content = File.read(path)
+      content.gsub!(%r{^require 'temporal/(.*)_pb'$}, "require 'temporalio/\\1'")
+      content.gsub!(%r{^require 'temporalio/sdk/core/(.*)'$}, "require 'temporalio/internal/bridge/api/\\1'")
+      File.write(path, content)
+
+      # Remove _pb from the filename
+      FileUtils.mv(path, path.sub('_pb', ''))
+    end
+    # Move from temp dir and remove temp dir
+    FileUtils.mkdir_p('lib/temporalio/internal/bridge/api')
+    FileUtils.cp_r(Dir.glob('tmp-proto/temporal/sdk/core/*'), 'lib/temporalio/internal/bridge/api')
+    FileUtils.rm_rf('tmp-proto')
   end
 end
 

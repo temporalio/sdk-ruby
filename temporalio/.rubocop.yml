@@ -9,6 +9,7 @@ AllCops:
   Exclude:
     - ext/**/*
     - lib/temporalio/api/**/*
+    - lib/temporalio/internal/bridge/api/**/*
     - target/**/*
     - tmp/**/*
     - vendor/**/*
@@ -23,6 +24,11 @@ Gemspec/DevelopmentDependencies:
 # We want our classes in a certain order
 Layout/ClassStructure:
   Enabled: true
+
+# Don't need super for activities
+Lint/MissingSuper:
+  AllowedParentClasses:
+    - Temporalio::Activity
 
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:
@@ -52,9 +58,17 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 25
 
+# We want classes to be documented
+Style/Documentation:
+  Enabled: true
+  Exclude:
+    - lib/temporalio/internal/**/*
+
 # We want methods to be documented
 Style/DocumentationMethod:
   Enabled: true
+  Exclude:
+    - lib/temporalio/internal/**/*
 
 # Ok to have global vars in tests
 Style/GlobalVars:

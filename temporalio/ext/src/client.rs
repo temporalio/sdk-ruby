@@ -52,7 +52,7 @@ type CoreClient = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>
 #[magnus(class = "Temporalio::Internal::Bridge::Client", free_immediately)]
 pub struct Client {
     pub(crate) core: CoreClient,
-    runtime_handle: RuntimeHandle,
+    pub(crate) runtime_handle: RuntimeHandle,
 }
 
 #[macro_export]

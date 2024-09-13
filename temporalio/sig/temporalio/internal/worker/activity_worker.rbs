@@ -1,0 +1,52 @@
+module Temporalio
+  module Internal
+    module Worker
+      class ActivityWorker
+        attr_reader worker: Temporalio::Worker
+        attr_reader bridge_worker: Bridge::Worker
+
+        def initialize: (
+          Temporalio::Worker worker,
+          Bridge::Worker bridge_worker,
+        ) -> void
+
+        def set_running_activity: (String task_token, RunningActivity? activity) -> void
+        def get_running_activity: (String task_token) -> RunningActivity?
+        def remove_running_activity: (String task_token) -> void
+        def wait_all_complete: -> void
+
+        def handle_task: (untyped task) -> void
+        def handle_start_task: (String task_token, untyped start) -> void
+        def handle_cancel_task: (String task_token, untyped cancel) -> void
+
+        def execute_activity: (String task_token, Activity::Definition defn, untyped start) -> void
+        def run_activity: (
+          RunningActivity activity,
+          Temporalio::Worker::Interceptor::ExecuteActivityInput input
+        ) -> void
+
+        class RunningActivity < Activity::Context
+          attr_accessor _outbound_impl: Temporalio::Worker::Interceptor::ActivityOutbound?
+          attr_accessor _server_requested_cancel: bool
+
+          def initialize: (
+            info: Activity::Info,
+            cancellation: Cancellation,
+            worker_shutdown_cancellation: Cancellation,
+            payload_converter: Converters::PayloadConverter,
+            logger: ScopedLogger,
+            definition: Activity::Definition
+          ) -> void
+        end
+
+        class InboundImplementation < Temporalio::Worker::Interceptor::ActivityInbound
+          def initialize: (ActivityWorker worker) -> void
+        end
+
+        class OutboundImplementation < Temporalio::Worker::Interceptor::ActivityOutbound
+          def initialize: (ActivityWorker worker) -> void
+        end
+      end
+    end
+  end
+end

@@ -7,9 +7,7 @@ module Temporalio
   module Internal
     module Bridge
       module Testing
-        # @!visibility private
         class EphemeralServer
-          # @!visibility private
           StartDevServerOptions = Struct.new(
             :existing_path, # Optional
             :sdk_name,
@@ -27,7 +25,6 @@ module Temporalio
             keyword_init: true
           )
 
-          # @!visibility private
           def self.start_dev_server(runtime, options)
             Bridge.async_call do |queue|
               async_start_dev_server(runtime, options) do |val|
@@ -36,7 +33,6 @@ module Temporalio
             end
           end
 
-          # @!visibility private
           def shutdown
             Bridge.async_call do |queue|
               async_shutdown do |val|

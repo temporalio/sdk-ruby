@@ -8,9 +8,9 @@ module Temporalio
 
       class AggregationGroup
         attr_reader count: Integer
-        attr_reader group_values: Array[Object]
+        attr_reader group_values: Array[Object?]
 
-        def initialize: (Integer count, Array[Object] group_values) -> void
+        def initialize: (Integer count, Array[Object?] group_values) -> void
       end
     end
   end

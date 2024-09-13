@@ -1,11 +1,20 @@
 # frozen_string_literal: true
 
+require 'async'
 require 'extra_assertions'
+require 'logger'
 require 'minitest/autorun'
 require 'securerandom'
 require 'singleton'
 require 'temporalio/testing'
 require 'timeout'
+
+# require 'memory_profiler'
+# MemoryProfiler.start
+# Minitest.after_run do
+#   report = MemoryProfiler.stop
+#   report.pretty_print
+# end
 
 class Test < Minitest::Test
   include ExtraAssertions
@@ -27,8 +36,52 @@ class Test < Minitest::Test
     Temporalio::SearchAttributes::IndexedValueType::KEYWORD_LIST
   )
 
+  def self.also_run_all_tests_in_fiber
+    @also_run_all_tests_in_fiber = true
+  end
+
+  def self.method_added(method_name)
+    super
+    # If we are also running all tests in fiber, define `_in_fiber` equivalent
+    unless @also_run_all_tests_in_fiber && method_name.start_with?('test_') && !method_name.end_with?('_in_fiber')
+      return
+    end
+
+    original_method = instance_method(method_name)
+    define_method("#{method_name}_in_fiber") do
+      Async do |_task|
+        original_method.bind(self).call
+      end
+    end
+  end
+
   def env
     TestEnvironment.instance
+  end
+
+  def run_in_background(&)
+    if Fiber.current_scheduler
+      Fiber.schedule(&) # steep:ignore
+    else
+      Thread.new(&) # steep:ignore
+    end
+  end
+
+  def after_teardown
+    super
+    return if passed?
+
+    # Dump full cause chain on error
+    puts 'Full cause chain:'
+    current = failures.first&.error
+    while current
+      puts "Exception: #{current.class} - #{current.message}"
+      puts 'Backtrace:'
+      puts current.backtrace.join("\n")
+      puts '-' * 50
+
+      current = current.cause
+    end
   end
 
   class TestEnvironment
@@ -37,7 +90,7 @@ class Test < Minitest::Test
     attr_reader :server
 
     def initialize
-      @server = Temporalio::Testing::WorkflowEnvironment.start_local
+      @server = Temporalio::Testing::WorkflowEnvironment.start_local(logger: Logger.new($stdout))
       Minitest.after_run do
         @server.shutdown
       end

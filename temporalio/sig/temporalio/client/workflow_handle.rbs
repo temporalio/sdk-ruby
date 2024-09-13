@@ -18,7 +18,7 @@ module Temporalio
         ?follow_runs: bool,
         ?rpc_metadata: Hash[String, String]?,
         ?rpc_timeout: Float?
-      ) -> Object
+      ) -> Object?
 
       def describe: (
         ?rpc_metadata: Hash[String, String]?,

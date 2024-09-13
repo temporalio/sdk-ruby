@@ -1,0 +1,12 @@
+module Temporalio
+  class Worker
+    class ActivityExecutor
+      def self.defaults: -> Hash[Symbol, ActivityExecutor]
+
+      def initialize_activity: (Activity::Definition defn) -> void
+      def execute_activity: (Activity::Definition defn) { -> void } -> void
+      def activity_context: -> Activity::Context?
+      def activity_context=: (Activity::Context? context) -> void
+    end
+  end
+end

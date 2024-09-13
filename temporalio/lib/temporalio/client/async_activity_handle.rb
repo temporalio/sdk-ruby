@@ -34,7 +34,12 @@ module Temporalio
         rpc_metadata: nil,
         rpc_timeout: nil
       )
-        raise NotImplementedError
+        @client._impl.heartbeat_async_activity(Interceptor::HeartbeatAsyncActivityInput.new(
+                                                 task_token_or_id_reference:,
+                                                 details:,
+                                                 rpc_metadata:,
+                                                 rpc_timeout:
+                                               ))
       end
 
       # Complete the activity.
@@ -47,7 +52,12 @@ module Temporalio
         rpc_metadata: nil,
         rpc_timeout: nil
       )
-        raise NotImplementedError
+        @client._impl.complete_async_activity(Interceptor::CompleteAsyncActivityInput.new(
+                                                task_token_or_id_reference:,
+                                                result:,
+                                                rpc_metadata:,
+                                                rpc_timeout:
+                                              ))
       end
 
       # Fail the activity.
@@ -62,7 +72,13 @@ module Temporalio
         rpc_metadata: nil,
         rpc_timeout: nil
       )
-        raise NotImplementedError
+        @client._impl.fail_async_activity(Interceptor::FailAsyncActivityInput.new(
+                                            task_token_or_id_reference:,
+                                            error:,
+                                            last_heartbeat_details:,
+                                            rpc_metadata:,
+                                            rpc_timeout:
+                                          ))
       end
 
       # Report the activity as cancelled.
@@ -70,12 +86,24 @@ module Temporalio
       # @param details [Array<Object>] Cancellation details.
       # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
       # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @raise [AsyncActivityCanceledError] If the activity has been canceled.
       def report_cancellation(
         *details,
         rpc_metadata: nil,
         rpc_timeout: nil
       )
-        raise NotImplementedError
+        @client._impl.report_cancellation_async_activity(Interceptor::ReportCancellationAsyncActivityInput.new(
+                                                           task_token_or_id_reference:,
+                                                           details:,
+                                                           rpc_metadata:,
+                                                           rpc_timeout:
+                                                         ))
+      end
+
+      private
+
+      def task_token_or_id_reference
+        @task_token || @id_reference or raise
       end
     end
   end

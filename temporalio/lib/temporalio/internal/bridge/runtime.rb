@@ -3,29 +3,24 @@
 module Temporalio
   module Internal
     module Bridge
-      # @!visibility private
       class Runtime
-        # @!visibility private
         Options = Struct.new(
           :telemetry,
           keyword_init: true
         )
 
-        # @!visibility private
         TelemetryOptions = Struct.new(
           :logging, # Optional
           :metrics, # Optional
           keyword_init: true
         )
 
-        # @!visibility private
         LoggingOptions = Struct.new(
           :log_filter,
           :forward_to, # Optional
           keyword_init: true
         )
 
-        # @!visibility private
         MetricsOptions = Struct.new(
           :opentelemetry, # Optional
           :prometheus, # Optional
@@ -36,7 +31,6 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         OpenTelemetryMetricsOptions = Struct.new(
           :url,
           :headers, # Optional
@@ -46,7 +40,6 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         PrometheusMetricsOptions = Struct.new(
           :bind_address,
           :counters_total_suffix,

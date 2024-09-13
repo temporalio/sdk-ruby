@@ -1,0 +1,77 @@
+module Temporalio
+  module Internal
+    module Worker
+      class MultiRunner
+        def initialize: (workers: Array[Temporalio::Worker]) -> void
+
+        def apply_thread_or_fiber_block: ?{ (?) -> untyped } -> void
+
+        def raise_in_thread_or_fiber_block: (Exception error) -> void
+
+        def initiate_shutdown: -> void
+
+        def wait_complete_and_finalize_shutdown: -> void
+
+        def next_event: -> Event
+
+        class Event
+          class PollSuccess < Event
+            attr_reader worker: Temporalio::Worker
+            attr_reader worker_type: Symbol
+            attr_reader bytes: String
+
+            def initialize: (
+              worker: Temporalio::Worker,
+              worker_type: Symbol,
+              bytes: String
+            ) -> void
+          end
+
+          class PollFailure < Event
+            attr_reader worker: Temporalio::Worker
+            attr_reader worker_type: Symbol
+            attr_reader error: Exception
+
+            def initialize: (
+              worker: Temporalio::Worker,
+              worker_type: Symbol,
+              error: Exception
+            ) -> void
+          end
+
+          class PollerShutDown < Event
+            attr_reader worker: Temporalio::Worker
+            attr_reader worker_type: Symbol
+
+            def initialize: (
+              worker: Temporalio::Worker,
+              worker_type: Symbol
+            ) -> void
+          end
+
+          class AllPollersShutDown < Event
+            def self.instance: -> AllPollersShutDown
+          end
+
+          class BlockSuccess < Event
+            attr_reader result: Object?
+
+            def initialize: (result: Object?) -> void
+          end
+
+          class BlockFailure < Event
+            attr_reader error: Exception
+
+            def initialize: (error: Exception) -> void
+          end
+        end
+
+        class InjectEventForTesting < Temporalio::Error
+          attr_reader event: Event
+
+          def initialize: (Event event) -> void
+        end
+      end
+    end
+  end
+end
