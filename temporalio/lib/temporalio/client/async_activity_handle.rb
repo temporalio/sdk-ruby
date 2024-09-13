@@ -17,15 +17,11 @@ module Temporalio
       # {task_token}.
       attr_reader :id_reference
 
-      # Create an async activity handle. {Client.async_activity_handle} is preferred over instantiating this directly.
-      def initialize(task_token_or_id_reference)
-        if task_token_or_id_reference.is_a?(ActivityIDReference)
-          @id_reference = task_token_or_id_reference
-        elsif task_token_or_id_reference.is_a?(String)
-          @task_token = task_token_or_id_reference
-        else
-          raise ArgumentError, 'Must be a string task token or an ActivityIDReference'
-        end
+      # @!visibility private
+      def initialize(client:, task_token:, id_reference:)
+        @client = client
+        @task_token = task_token
+        @id_reference = id_reference
       end
 
       # Record a heartbeat for the activity.

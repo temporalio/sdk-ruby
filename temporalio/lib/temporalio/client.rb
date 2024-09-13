@@ -378,7 +378,13 @@ module Temporalio
     # @param task_token_or_id_reference [String, ActivityIDReference] Task token string or activity ID reference.
     # @return [AsyncActivityHandle]
     def async_activity_handle(task_token_or_id_reference)
-      AsyncActivityHandle.new(task_token_or_id_reference)
+      if task_token_or_id_reference.is_a?(ActivityIDReference)
+        AsyncActivityHandle.new(client: self, task_token: nil, id_reference: task_token_or_id_reference)
+      elsif task_token_or_id_reference.is_a?(String)
+        AsyncActivityHandle.new(client: self, task_token: task_token_or_id_reference, id_reference: nil)
+      else
+        raise ArgumentError, 'Must be a string task token or an ActivityIDReference'
+      end
     end
 
     # @!visibility private

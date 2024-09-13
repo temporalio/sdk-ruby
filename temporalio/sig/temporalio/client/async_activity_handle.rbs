@@ -4,7 +4,11 @@ module Temporalio
       attr_reader task_token: String?
       attr_reader id_reference: ActivityIDReference?
 
-      def initialize: (String | ActivityIDReference task_token_or_id_reference) -> void
+      def initialize: (
+        client: Client,
+        task_token: String?,
+        id_reference: ActivityIDReference?
+      ) -> void
 
       def heartbeat: (
         *Object details,
