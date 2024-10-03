@@ -26,19 +26,19 @@ module Temporalio
           )
 
           def self.start_dev_server(runtime, options)
-            Bridge.async_call do |queue|
-              async_start_dev_server(runtime, options) do |val|
-                queue.push(val)
-              end
-            end
+            queue = Queue.new
+            async_start_dev_server(runtime, options, queue)
+            result = queue.pop
+            raise result if result.is_a?(Exception)
+
+            result
           end
 
           def shutdown
-            Bridge.async_call do |queue|
-              async_shutdown do |val|
-                queue.push(val)
-              end
-            end
+            queue = Queue.new
+            async_shutdown(queue)
+            result = queue.pop
+            raise result if result.is_a?(Exception)
           end
         end
       end

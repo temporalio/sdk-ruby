@@ -53,36 +53,30 @@ module Temporalio
         )
 
         def self.finalize_shutdown_all(workers)
-          Bridge.async_call do |queue|
-            async_finalize_all(workers) do |val|
-              queue.push(val)
-            end
-          end
+          queue = Queue.new
+          async_finalize_all(workers, queue)
+          result = queue.pop
+          raise result if result.is_a?(Exception)
         end
 
         def validate
-          Bridge.async_call do |queue|
-            async_validate do |val|
-              queue.push(val)
-            end
-          end
+          queue = Queue.new
+          async_validate(queue)
+          result = queue.pop
+          raise result if result.is_a?(Exception)
         end
 
         def complete_activity_task(proto)
-          Bridge.async_call do |queue|
-            async_complete_activity_task(proto.to_proto) do |val|
-              queue.push(val)
-            end
-          end
+          queue = Queue.new
+          async_complete_activity_task(proto.to_proto, queue)
+          result = queue.pop
+          raise result if result.is_a?(Exception)
         end
 
         def complete_activity_task_in_background(proto)
-          async_complete_activity_task(proto.to_proto) do |val|
-            unless val.nil?
-              warn('Failed completing activity task in background')
-              warn(val)
-            end
-          end
+          queue = Queue.new
+          # TODO(cretz): Log error on this somehow?
+          async_complete_activity_task(proto.to_proto, queue)
         end
       end
     end

@@ -70,7 +70,11 @@ class WorkerActivityTest < Test
         # Wait for result
         handle.result
       end
+      flunk('Should have failed') unless Temporalio::Internal::Bridge.fibers_supported
       assert_equal 'Hello, Fiber!', result
+    rescue StandardError => e
+      raise if Temporalio::Internal::Bridge.fibers_supported
+      raise unless e.message.include?('Ruby 3.3 and newer')
     end
   end
 
@@ -180,7 +184,7 @@ class WorkerActivityTest < Test
 
   def test_failure
     # Check basic error
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) { execute_activity(FailureActivity, 'simple') }
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(FailureActivity, 'simple') }
     assert_kind_of Temporalio::Error::ActivityError, error.cause
     assert_equal 'FailureActivity', error.cause.activity_type
     assert_kind_of Temporalio::Error::ApplicationError, error.cause.cause
@@ -189,11 +193,11 @@ class WorkerActivityTest < Test
     assert_equal 'RuntimeError', error.cause.cause.type
 
     # Check that the error type is properly changed
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) { execute_activity(FailureActivity, 'argument') }
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(FailureActivity, 'argument') }
     assert_equal 'ArgumentError', error.cause.cause.type
 
     # Check that application error details are set
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) { execute_activity(FailureActivity, 'application') }
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(FailureActivity, 'application') }
     assert_equal 'application-error', error.cause.cause.message
     assert_equal [{ 'foo' => 'bar' }, 'detail2'], error.cause.cause.details
     assert_equal 'some-error-type', error.cause.cause.type
@@ -205,12 +209,12 @@ class WorkerActivityTest < Test
   end
 
   def test_unimplemented_execute
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) { execute_activity(UnimplementedExecuteActivity) }
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(UnimplementedExecuteActivity) }
     assert_equal 'Activity did not implement "execute"', error.cause.cause.message
   end
 
   def test_not_found
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) do
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) do
       execute_activity(UnimplementedExecuteActivity, override_name: 'not-found')
     end
     assert error.cause.cause.message.end_with?(
@@ -298,7 +302,7 @@ class WorkerActivityTest < Test
       # Send activity cancel
       handle.signal('cancel-activity')
       # Wait for completion
-      error = assert_raises(Temporalio::Error::WorkflowFailureError) { handle.result }
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       assert_kind_of Temporalio::Error::CanceledError, error.cause
       # Confirm thrown in activity
       assert act.canceled
@@ -389,7 +393,7 @@ class WorkerActivityTest < Test
       # Send activity cancel
       handle.signal('cancel-activity')
       # Wait for completion
-      error = assert_raises(Temporalio::Error::WorkflowFailureError) { handle.result }
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       assert_kind_of Temporalio::Error::CanceledError, error.cause
       # Confirm thrown in activity but the proper levels reached
       assert act.canceled
@@ -496,12 +500,12 @@ class WorkerActivityTest < Test
       act.wait_cancel_received
       act.reraise_cancel
       # Wait for workflow result
-      assert_raises(Temporalio::Error::WorkflowFailureError) { handle.result }
+      assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       handle
     end
 
     # Check that cancel was due to worker shutdown
-    error = assert_raises(Temporalio::Error::WorkflowFailureError) { workflow_handle.result }
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) { workflow_handle.result }
     assert_kind_of Temporalio::Error::ActivityError, error.cause
     assert_kind_of Temporalio::Error::ApplicationError, error.cause.cause
     assert_equal 'WorkerShutdown', error.cause.cause.type
@@ -549,7 +553,7 @@ class WorkerActivityTest < Test
 
       # Send failure and confirm accurate
       env.client.async_activity_handle(task_token).fail(RuntimeError.new('Oh no'))
-      error = assert_raises(Temporalio::Error::WorkflowFailureError) { handle.result }
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       assert_kind_of Temporalio::Error::ActivityError, error.cause
       assert_kind_of Temporalio::Error::ApplicationError, error.cause.cause
       assert_equal 'Oh no', error.cause.cause.message
@@ -572,7 +576,7 @@ class WorkerActivityTest < Test
 
       # Send cancel and confirm canceled
       env.client.async_activity_handle(task_token).report_cancellation
-      error = assert_raises(Temporalio::Error::WorkflowFailureError) { handle.result }
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       assert_kind_of Temporalio::Error::CanceledError, error.cause
     end
   end

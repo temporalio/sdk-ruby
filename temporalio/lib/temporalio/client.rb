@@ -277,7 +277,7 @@ module Temporalio
     #
     # @return [Object] Successful result of the workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
-    # @raise [Error::WorkflowFailureError] Workflow failed with +cause+ as the cause.
+    # @raise [Error::WorkflowFailedError] Workflow failed with +cause+ as the cause.
     # @raise [Error::RPCError] RPC error from call.
     def execute_workflow(
       workflow,

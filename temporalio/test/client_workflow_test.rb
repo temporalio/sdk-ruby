@@ -169,7 +169,7 @@ class ClientWorkflowTest < Test
   def test_failure
     env.with_kitchen_sink_worker do |task_queue|
       # Simple error
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ error: { message: 'some error', type: 'error-type', details: { foo: 'bar', baz: 123.45 } } }] },
@@ -184,7 +184,7 @@ class ClientWorkflowTest < Test
       assert_equal [{ 'foo' => 'bar', 'baz' => 123.45 }], err.cause.details
 
       # Activity does not exist, for checking causes
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ execute_activity: { name: 'does-not-exist' } }] },
@@ -200,7 +200,7 @@ class ClientWorkflowTest < Test
 
   def test_retry_policy
     env.with_kitchen_sink_worker do |task_queue|
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ error: { attempt: true } }] },
@@ -431,7 +431,7 @@ class ClientWorkflowTest < Test
         task_queue:
       )
       handle.cancel
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         handle.result
       end
       assert_instance_of Temporalio::Error::CanceledError, err.cause
@@ -447,7 +447,7 @@ class ClientWorkflowTest < Test
         task_queue:
       )
       handle.terminate('some reason', details: ['some details'])
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         handle.result
       end
       assert_instance_of Temporalio::Error::TerminatedError, err.cause

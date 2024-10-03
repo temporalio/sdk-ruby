@@ -8,7 +8,7 @@ module Temporalio
       cause: Exception?
     ) -> Exception
 
-    class WorkflowFailureError < Error
+    class WorkflowFailedError < Error
       def initialize: -> void
     end
 

@@ -266,7 +266,7 @@ namespace :proto do
         # Camel case to snake case
         rpc = method.name.gsub(/([A-Z])/, '_\1').downcase.delete_prefix('_')
         file.puts <<~TEXT
-          "#{rpc}" => rpc_call!(self, block, call, #{trait}, #{rpc}),
+          "#{rpc}" => rpc_call!(self, callback, call, #{trait}, #{rpc}),
         TEXT
       end
       file.puts <<~TEXT
@@ -278,14 +278,17 @@ namespace :proto do
       file.puts <<~TEXT
         // Generated code.  DO NOT EDIT!
 
-        use magnus::{block::Proc, value::Opaque, Error, Ruby};
+        use magnus::{Error, Ruby};
         use temporal_client::{CloudService, OperatorService, WorkflowService};
 
         use super::{error, rpc_call};
-        use crate::client::{Client, RpcCall, SERVICE_CLOUD, SERVICE_OPERATOR, SERVICE_WORKFLOW};
+        use crate::{
+            client::{Client, RpcCall, SERVICE_CLOUD, SERVICE_OPERATOR, SERVICE_WORKFLOW},
+            util::AsyncCallback,
+        };
 
         impl Client {
-            pub fn invoke_rpc(&self, service: u8, block: Opaque<Proc>, call: RpcCall) -> Result<(), Error> {
+            pub fn invoke_rpc(&self, service: u8, callback: AsyncCallback, call: RpcCall) -> Result<(), Error> {
                 match service {
       TEXT
       generate_rust_match_arm(

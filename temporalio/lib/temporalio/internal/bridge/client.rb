@@ -53,11 +53,12 @@ module Temporalio
         )
 
         def self.new(runtime, options)
-          Bridge.async_call do |queue|
-            async_new(runtime, options) do |val|
-              queue.push(val)
-            end
-          end
+          queue = Queue.new
+          async_new(runtime, options, queue)
+          result = queue.pop
+          raise result if result.is_a?(Exception)
+
+          result
         end
 
         def _invoke_rpc(
@@ -69,19 +70,20 @@ module Temporalio
           rpc_metadata:,
           rpc_timeout:
         )
-          response_bytes = Bridge.async_call do |queue|
-            async_invoke_rpc(
-              service:,
-              rpc:,
-              request: request.to_proto,
-              rpc_retry:,
-              rpc_metadata:,
-              rpc_timeout:
-            ) do |val|
-              queue.push(val)
-            end
-          end
-          response_class.decode(response_bytes)
+          queue = Queue.new
+          async_invoke_rpc(
+            service:,
+            rpc:,
+            request: request.to_proto,
+            rpc_retry:,
+            rpc_metadata:,
+            rpc_timeout:,
+            queue:
+          )
+          result = queue.pop
+          raise result if result.is_a?(Exception)
+
+          response_class.decode(result)
         end
       end
     end

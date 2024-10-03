@@ -92,7 +92,7 @@ module Temporalio
 
         def self.new: (Runtime runtime, Options options) -> Client
 
-        def self.async_new: (Runtime runtime, Options options) { (Client | Exception) -> void } -> void
+        def self.async_new: (Runtime runtime, Options options, Queue queue) -> void
 
         def async_invoke_rpc: (
           service: Integer,
@@ -100,8 +100,9 @@ module Temporalio
           request: String,
           rpc_retry: bool,
           rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
-        ) { (String | RPCFailure) -> void } -> void
+          rpc_timeout: Float?,
+          queue: Queue
+        ) -> void
 
         class RPCFailure < Error
           def code: -> Temporalio::Error::RPCError::Code::enum

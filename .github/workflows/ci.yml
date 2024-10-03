@@ -9,7 +9,7 @@ on:
 jobs:
   build-lint-test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         # TODO(cretz): Enable Windows (it's slow)
         #

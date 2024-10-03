@@ -14,26 +14,8 @@ module Temporalio
           @shutdown_initiated_mutex = Mutex.new
           @shutdown_initiated = false
 
-          # Handle worker polls. The block can be called with one these sets:
-          # * [worker index, :activity/:workflow, bytes] - poll success
-          # * [worker index, :activity/:workflow, error] - poll fail
-          # * [worker index, :activity/:workflow, nil] - worker shutdown
-          # * [nil, nil, nil] - all pollers done
-          Bridge::Worker.async_poll_all(workers.map(&:_bridge_worker)) do |worker_index, worker_type, result|
-            if worker_index.nil? || worker_type.nil?
-              @queue.push(Event::AllPollersShutDown.instance)
-              break
-            end
-            worker = workers[worker_index]
-            @queue.push(case result
-                        when nil
-                          Event::PollerShutDown.new(worker:, worker_type:)
-                        when Exception
-                          Event::PollFailure.new(worker:, worker_type:, error: result)
-                        else
-                          Event::PollSuccess.new(worker:, worker_type:, bytes: result)
-                        end)
-          end
+          # Start pollers
+          Bridge::Worker.async_poll_all(workers.map(&:_bridge_worker), @queue)
         end
 
         def apply_thread_or_fiber_block(&)
@@ -87,7 +69,31 @@ module Temporalio
         # Intentionally not an enumerable/enumerator since stop semantics are
         # caller determined
         def next_event
-          @queue.pop
+          # Queue value is one of the following:
+          # * Event - non-poller event
+          # * [worker index, :activity/:workflow, bytes] - poll success
+          # * [worker index, :activity/:workflow, error] - poll fail
+          # * [worker index, :activity/:workflow, nil] - worker shutdown
+          # * [nil, nil, nil] - all pollers done
+          result = @queue.pop
+          if result.is_a?(Event)
+            result
+          else
+            worker_index, worker_type, poll_result = result
+            if worker_index.nil? || worker_type.nil?
+              Event::AllPollersShutDown.instance
+            else
+              worker = @workers[worker_index]
+              case poll_result
+              when nil
+                Event::PollerShutDown.new(worker:, worker_type:)
+              when Exception
+                Event::PollFailure.new(worker:, worker_type:, error: poll_result)
+              else
+                Event::PollSuccess.new(worker:, worker_type:, bytes: poll_result)
+              end
+            end
+          end
         end
 
         class Event

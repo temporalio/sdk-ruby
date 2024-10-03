@@ -7,8 +7,8 @@ use temporal_client::{
 };
 
 use magnus::{
-    block::Proc, class, function, method, prelude::*, scan_args, value::Opaque, DataTypeFunctions,
-    Error, RString, Ruby, TypedData, Value,
+    class, function, method, prelude::*, scan_args, DataTypeFunctions, Error, RString, Ruby,
+    TypedData, Value,
 };
 use tonic::{metadata::MetadataKey, Status};
 use url::Url;
@@ -16,7 +16,7 @@ use url::Url;
 use super::{error, id, new_error, ROOT_MOD};
 use crate::{
     runtime::{Runtime, RuntimeHandle},
-    util::Struct,
+    util::{AsyncCallback, Struct},
     ROOT_ERR,
 };
 use std::str::FromStr;
@@ -36,7 +36,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.const_set("SERVICE_CLOUD", SERVICE_CLOUD)?;
     class.const_set("SERVICE_TEST", SERVICE_TEST)?;
     class.const_set("SERVICE_HEALTH", SERVICE_HEALTH)?;
-    class.define_singleton_method("async_new", function!(Client::async_new, 2))?;
+    class.define_singleton_method("async_new", function!(Client::async_new, 3))?;
     class.define_method("async_invoke_rpc", method!(Client::async_invoke_rpc, -1))?;
 
     let inner_class = class.define_error("RPCFailure", ruby.get_inner(&ROOT_ERR))?;
@@ -57,17 +57,17 @@ pub struct Client {
 
 #[macro_export]
 macro_rules! rpc_call {
-    ($client:ident, $block:ident, $call:ident, $trait:tt, $call_name:ident) => {{
+    ($client:ident, $callback:ident, $call:ident, $trait:tt, $call_name:ident) => {{
         if $call.retry {
             let mut core_client = $client.core.clone();
             let req = $call.into_request()?;
-            crate::client::rpc_resp($client, $block, async move {
+            $crate::client::rpc_resp($client, $callback, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         } else {
             let mut core_client = $client.core.clone().into_inner();
             let req = $call.into_request()?;
-            crate::client::rpc_resp($client, $block, async move {
+            $crate::client::rpc_resp($client, $callback, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         }
@@ -75,7 +75,7 @@ macro_rules! rpc_call {
 }
 
 impl Client {
-    pub fn async_new(ruby: &Ruby, runtime: &Runtime, options: Struct) -> Result<(), Error> {
+    pub fn async_new(runtime: &Runtime, options: Struct, queue: Value) -> Result<(), Error> {
         // Build options
         let mut opts_build = ClientOptionsBuilder::default();
         opts_build
@@ -153,7 +153,7 @@ impl Client {
             .map_err(|err| error!("Invalid client options: {}", err))?;
 
         // Create client
-        let block = Opaque::from(ruby.block_proc()?);
+        let callback = AsyncCallback::from_queue(queue);
         let core_runtime = runtime.handle.core.clone();
         let runtime_handle = runtime.handle.clone();
         runtime.handle.spawn(
@@ -163,24 +163,20 @@ impl Client {
                     .await?;
                 Ok(core)
             },
-            move |ruby, result: Result<CoreClient, ClientInitError>| {
-                let block = ruby.get_inner(block);
-                let _: Value = match result {
-                    Ok(core) => block.call((Client {
-                        core,
-                        runtime_handle,
-                    },))?,
-                    Err(err) => block.call((new_error!("Failed client connect: {}", err),))?,
-                };
-                Ok(())
+            move |_, result: Result<CoreClient, ClientInitError>| match result {
+                Ok(core) => callback.push(Client {
+                    core,
+                    runtime_handle,
+                }),
+                Err(err) => callback.push(new_error!("Failed client connect: {}", err)),
             },
         );
         Ok(())
     }
 
     pub fn async_invoke_rpc(&self, args: &[Value]) -> Result<(), Error> {
-        let args = scan_args::scan_args::<(), (), (), (), _, Proc>(args)?;
-        let (service, rpc, request, retry, metadata, timeout) = scan_args::get_kwargs::<
+        let args = scan_args::scan_args::<(), (), (), (), _, ()>(args)?;
+        let (service, rpc, request, retry, metadata, timeout, queue) = scan_args::get_kwargs::<
             _,
             (
                 u8,
@@ -189,6 +185,7 @@ impl Client {
                 bool,
                 Option<HashMap<String, String>>,
                 Option<f64>,
+                Value,
             ),
             (),
             (),
@@ -201,6 +198,7 @@ impl Client {
                 id!("rpc_retry"),
                 id!("rpc_metadata"),
                 id!("rpc_timeout"),
+                id!("queue"),
             ],
             &[],
         )?
@@ -213,8 +211,8 @@ impl Client {
             timeout,
             _not_send_sync: PhantomData,
         };
-        let block = Opaque::from(args.block);
-        self.invoke_rpc(service, block, call)
+        let callback = AsyncCallback::from_queue(queue);
+        self.invoke_rpc(service, callback, call)
     }
 }
 
@@ -237,7 +235,7 @@ impl RpcFailure {
     }
 
     pub fn details(&self) -> Option<RString> {
-        if self.status.details().len() == 0 {
+        if self.status.details().is_empty() {
             None
         } else {
             Some(RString::from_slice(self.status.details()))
@@ -281,7 +279,7 @@ impl RpcCall<'_> {
 
 pub(crate) fn rpc_resp<P>(
     client: &Client,
-    block: Opaque<Proc>,
+    callback: AsyncCallback,
     fut: impl Future<Output = Result<tonic::Response<P>, tonic::Status>> + Send + 'static,
 ) -> Result<(), Error>
 where
@@ -290,15 +288,13 @@ where
 {
     client.runtime_handle.spawn(
         async move { fut.await.map(|msg| msg.get_ref().encode_to_vec()) },
-        move |ruby, result| {
-            let block = ruby.get_inner(block);
-            let _: Value = match result {
+        move |_, result| {
+            match result {
                 // TODO(cretz): Any reasonable way to prevent byte copy that is just going to get decoded into proto
                 // object?
-                Ok(val) => block.call((RString::from_slice(&val),))?,
-                Err(status) => block.call((RpcFailure { status },))?,
-            };
-            Ok(())
+                Ok(val) => callback.push(RString::from_slice(&val)),
+                Err(status) => callback.push(RpcFailure { status }),
+            }
         },
     );
     Ok(())

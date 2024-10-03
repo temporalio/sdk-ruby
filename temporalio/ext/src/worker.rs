@@ -2,16 +2,16 @@ use std::{cell::RefCell, sync::Arc, time::Duration};
 
 use crate::{
     client::Client,
-    error, id, new_error,
+    enter_sync, error, id, new_error,
     runtime::{AsyncCommand, RuntimeHandle},
-    util::Struct,
+    util::{AsyncCallback, Struct},
     ROOT_MOD,
 };
 use futures::StreamExt;
 use futures::{future, stream};
 use magnus::{
-    class, function, method, prelude::*, typed_data, value::Opaque, DataTypeFunctions, Error,
-    RArray, RString, RTypedData, Ruby, TypedData, Value,
+    class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
+    RString, RTypedData, Ruby, TypedData, Value,
 };
 use prost::Message;
 use temporal_sdk_core::{
@@ -26,15 +26,15 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
         .get_inner(&ROOT_MOD)
         .define_class("Worker", class::object())?;
     class.define_singleton_method("new", function!(Worker::new, 2))?;
-    class.define_singleton_method("async_poll_all", function!(Worker::async_poll_all, 1))?;
+    class.define_singleton_method("async_poll_all", function!(Worker::async_poll_all, 2))?;
     class.define_singleton_method(
         "async_finalize_all",
-        function!(Worker::async_finalize_all, 1),
+        function!(Worker::async_finalize_all, 2),
     )?;
-    class.define_method("async_validate", method!(Worker::async_validate, 0))?;
+    class.define_method("async_validate", method!(Worker::async_validate, 1))?;
     class.define_method(
         "async_complete_activity_task",
-        method!(Worker::async_complete_activity_task, 1),
+        method!(Worker::async_complete_activity_task, 2),
     )?;
     class.define_method(
         "record_activity_heartbeat",
@@ -55,15 +55,6 @@ pub struct Worker {
     runtime_handle: RuntimeHandle,
     activity: bool,
     _workflow: bool,
-}
-
-macro_rules! enter_sync {
-    ($runtime:expr) => {
-        if let Some(subscriber) = $runtime.core.telemetry().trace_subscriber() {
-            temporal_sdk_core::telemetry::set_trace_subscriber_for_current_thread(subscriber);
-        }
-        let _guard = $runtime.core.tokio_handle().enter();
-    };
 }
 
 enum WorkerType {
@@ -135,7 +126,7 @@ impl Worker {
         })
     }
 
-    pub fn async_poll_all(ruby: &Ruby, workers: RArray) -> Result<(), Error> {
+    pub fn async_poll_all(workers: RArray, queue: Value) -> Result<(), Error> {
         // Get the first runtime handle
         let runtime = workers
             .entry::<typed_data::Obj<Worker>>(0)?
@@ -147,11 +138,10 @@ impl Worker {
         let worker_streams = workers
             .into_iter()
             .enumerate()
-            .map(|(index, worker_val)| {
+            .filter_map(|(index, worker_val)| {
                 let worker_typed_data = RTypedData::from_value(worker_val).expect("Not typed data");
                 let worker_ref = worker_typed_data.get::<Worker>().expect("Not worker");
                 if worker_ref.activity {
-                    let index = index;
                     let worker = Some(
                         worker_ref
                             .core
@@ -180,7 +170,6 @@ impl Worker {
                     None
                 }
             })
-            .filter_map(|v| v)
             .collect::<Vec<_>>();
         let mut worker_stream = stream::select_all(worker_streams);
 
@@ -189,7 +178,8 @@ impl Worker {
         // * [worker index, :activity/:workflow, error] - poll fail
         // * [worker index, :activity/:workflow, nil] - worker shutdown
         // * [nil, nil, nil] - all pollers done
-        let block = Opaque::from(ruby.block_proc()?);
+        let callback = Arc::new(AsyncCallback::from_queue(queue));
+        let complete_callback = callback.clone();
         let async_command_tx = runtime.async_command_tx.clone();
         runtime.spawn(
             async move {
@@ -197,42 +187,41 @@ impl Worker {
                 while let Some((worker, worker_type, result)) = worker_stream.next().await {
                     // Encode result and send callback to Ruby
                     let result = result.map(|v| v.encode_to_vec());
+                    let callback = callback.clone();
                     let _ = async_command_tx.send(AsyncCommand::RunCallback(Box::new(move || {
                         // Get Ruby in callback
                         let ruby = Ruby::get().expect("Ruby not available");
-                        let block = ruby.get_inner(block);
                         let worker_type = match worker_type {
                             WorkerType::Activity => id!("activity"),
                         };
                         // Call block
-                        let _: Value = match result {
-                            Ok(val) => {
-                                block.call((worker, worker_type, RString::from_slice(&val)))?
-                            }
-                            Err(PollActivityError::ShutDown) => {
-                                block.call((worker, worker_type, ruby.qnil()))?
-                            }
-                            Err(err) => block.call((
-                                worker,
-                                worker_type,
-                                new_error!("Poll failure: {}", err),
-                            ))?,
+                        let result: Value = match result {
+                            Ok(val) => RString::from_slice(&val).as_value(),
+                            Err(PollActivityError::ShutDown) => ruby.qnil().as_value(),
+                            Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
-                        Ok(())
+                        callback.push(ruby.ary_new_from_values(&[
+                            worker.into_value(),
+                            worker_type.into_value(),
+                            result,
+                        ]))
                     })));
                 }
-                ()
             },
             move |ruby, _| {
-                // Call with nil, nil, nil to say done
-                let _: Value = ruby.get_inner(block).call((ruby.qnil(), ruby.qnil(), ruby.qnil()))?;
-                Ok(())
+                // Take callback out of Arc and call with nil, nil, nil to say done
+                // let to_push = ruby.ary_new_from_values(&[ruby.qnil(), ruby.qnil(), ruby.qnil()]);
+                complete_callback.push(ruby.ary_new_from_values(&[
+                    ruby.qnil(),
+                    ruby.qnil(),
+                    ruby.qnil(),
+                ]))
             },
         );
         Ok(())
     }
 
-    pub fn async_finalize_all(ruby: &Ruby, workers: RArray) -> Result<(), Error> {
+    pub fn async_finalize_all(workers: RArray, queue: Value) -> Result<(), Error> {
         // Get the first runtime handle
         let runtime = workers
             .entry::<typed_data::Obj<Worker>>(0)?
@@ -267,7 +256,7 @@ impl Worker {
             .collect::<Vec<_>>();
 
         // Spawn the futures
-        let block = Opaque::from(ruby.block_proc()?);
+        let callback = AsyncCallback::from_queue(queue);
         runtime.spawn(
             async move {
                 // Run all futures and return errors
@@ -275,43 +264,35 @@ impl Worker {
                 errs
             },
             move |ruby, errs| {
-                let block = ruby.get_inner(block);
-                let _: Value = if errs.len() == 0 {
-                    block.call((ruby.qnil(),))?
+                if errs.is_empty() {
+                    callback.push(ruby.qnil())
                 } else {
-                    block.call((new_error!(
+                    callback.push(new_error!(
                         "{} worker(s) failed to finalize, reasons: {}",
                         errs.len(),
                         errs.join(", ")
-                    ),))?
-                };
-                Ok(())
+                    ))
+                }
             },
         );
         Ok(())
     }
 
-    pub fn async_validate(&self) -> Result<(), Error> {
-        let ruby = Ruby::get().expect("Not in Ruby thread");
-        let block = Opaque::from(ruby.block_proc()?);
+    pub fn async_validate(&self, queue: Value) -> Result<(), Error> {
+        let callback = AsyncCallback::from_queue(queue);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         self.runtime_handle.spawn(
             async move { temporal_sdk_core_api::Worker::validate(&*worker).await },
-            move |ruby, result| {
-                let block = ruby.get_inner(block);
-                let _: Value = match result {
-                    Ok(()) => block.call((ruby.qnil(),))?,
-                    Err(err) => block.call((new_error!("Failed validating worker: {}", err),))?,
-                };
-                Ok(())
+            move |ruby, result| match result {
+                Ok(()) => callback.push(ruby.qnil()),
+                Err(err) => callback.push(new_error!("Failed validating worker: {}", err)),
             },
         );
         Ok(())
     }
 
-    pub fn async_complete_activity_task(&self, proto: RString) -> Result<(), Error> {
-        let ruby = Ruby::get().expect("Not in Ruby thread");
-        let block = Opaque::from(ruby.block_proc()?);
+    pub fn async_complete_activity_task(&self, proto: RString, queue: Value) -> Result<(), Error> {
+        let callback = AsyncCallback::from_queue(queue);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         let completion = ActivityTaskCompletion::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
@@ -319,13 +300,9 @@ impl Worker {
             async move {
                 temporal_sdk_core_api::Worker::complete_activity_task(&*worker, completion).await
             },
-            move |ruby, result| {
-                let block = ruby.get_inner(block);
-                let _: Value = match result {
-                    Ok(()) => block.call((ruby.qnil(),))?,
-                    Err(err) => block.call((new_error!("Completion failure: {}", err),))?,
-                };
-                Ok(())
+            move |ruby, result| match result {
+                Ok(()) => callback.push((ruby.qnil(),)),
+                Err(err) => callback.push((new_error!("Completion failure: {}", err),)),
             },
         );
         Ok(())

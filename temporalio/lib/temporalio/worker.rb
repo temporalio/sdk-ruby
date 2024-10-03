@@ -4,6 +4,7 @@ require 'temporalio/activity'
 require 'temporalio/cancellation'
 require 'temporalio/client'
 require 'temporalio/error'
+require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/worker'
 require 'temporalio/internal/worker/activity_worker'
 require 'temporalio/internal/worker/multi_runner'
@@ -91,6 +92,8 @@ module Temporalio
       # Confirm there is at least one and they are all workers
       raise ArgumentError, 'At least one worker required' if workers.empty?
       raise ArgumentError, 'Not all parameters are workers' unless workers.all? { |w| w.is_a?(Worker) }
+
+      Internal::Bridge.assert_fiber_compatibility!
 
       # Start the multi runner
       runner = Internal::Worker::MultiRunner.new(workers:)

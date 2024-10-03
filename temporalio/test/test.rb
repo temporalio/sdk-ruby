@@ -6,6 +6,7 @@ require 'logger'
 require 'minitest/autorun'
 require 'securerandom'
 require 'singleton'
+require 'temporalio/internal/bridge'
 require 'temporalio/testing'
 require 'timeout'
 
@@ -42,8 +43,12 @@ class Test < Minitest::Test
 
   def self.method_added(method_name)
     super
-    # If we are also running all tests in fiber, define `_in_fiber` equivalent
-    unless @also_run_all_tests_in_fiber && method_name.start_with?('test_') && !method_name.end_with?('_in_fiber')
+    # If we are also running all tests in fiber, define `_in_fiber` equivalent,
+    # unless we are < 3.3
+    unless @also_run_all_tests_in_fiber &&
+           method_name.start_with?('test_') &&
+           !method_name.end_with?('_in_fiber') &&
+           Temporalio::Internal::Bridge.fibers_supported
       return
     end
 
@@ -53,6 +58,12 @@ class Test < Minitest::Test
         original_method.bind(self).call
       end
     end
+  end
+
+  def skip_if_fibers_not_supported!
+    return if Temporalio::Internal::Bridge.fibers_supported
+
+    skip('Fibers not supported in this Ruby version')
   end
 
   def env
