@@ -5,7 +5,7 @@ require 'temporalio/error'
 module Temporalio
   class Activity
     # Context accessible only within an activity. Use {current} to get the current context. Contexts are fiber or thread
-    # so may not be available in a newly started thread from an activity and may have to be propagated manually.
+    # local so may not be available in a newly started thread from an activity and may have to be propagated manually.
     class Context
       # @return [Context] The current context, or raises an error if not in activity fiber/thread.
       def self.current

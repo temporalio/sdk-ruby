@@ -6,7 +6,7 @@ module Temporalio
     # returns their own instance of {ActivityInbound}.
     #
     # @note Input classes herein may get new required fields added and therefore the constructors of the Input classes
-    # may change in backwards incompatible ways. Users should not try to construct Input classes themselves.
+    #   may change in backwards incompatible ways. Users should not try to construct Input classes themselves.
     module Interceptor
       # Method called when intercepting an activity. This is called when starting an activity attempt.
       #

@@ -6,7 +6,7 @@ require 'temporalio/worker/activity_executor/thread_pool'
 module Temporalio
   class Worker
     # Base class to be extended by activity executor implementations. Most users will not use this, but rather keep with
-    # thw two defaults of thread pool and fiber executors.
+    # the two defaults of thread pool and fiber executors.
     class ActivityExecutor
       # @return [Hash<Symbol, ActivityExecutor>] Default set of executors (immutable).
       def self.defaults

@@ -173,7 +173,7 @@ impl Worker {
             .collect::<Vec<_>>();
         let mut worker_stream = stream::select_all(worker_streams);
 
-        // Continually call the block with the worker and the result. The result can either be:
+        // Continually call the callback with the worker and the result. The result can either be:
         // * [worker index, :activity/:workflow, bytes] - poll success
         // * [worker index, :activity/:workflow, error] - poll fail
         // * [worker index, :activity/:workflow, nil] - worker shutdown
@@ -209,8 +209,7 @@ impl Worker {
                 }
             },
             move |ruby, _| {
-                // Take callback out of Arc and call with nil, nil, nil to say done
-                // let to_push = ruby.ary_new_from_values(&[ruby.qnil(), ruby.qnil(), ruby.qnil()]);
+                // Call with nil, nil, nil to say done
                 complete_callback.push(ruby.ary_new_from_values(&[
                     ruby.qnil(),
                     ruby.qnil(),

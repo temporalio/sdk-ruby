@@ -331,7 +331,7 @@ class WorkerActivityTest < Test
   class HeartbeatDetailsActivity < Temporalio::Activity
     def execute
       # First attempt sends a heartbeat with details and fails,
-      # next attempt jsut returns the first attempt's details
+      # next attempt just returns the first attempt's details
       if Temporalio::Activity::Context.current.info.attempt == 1
         Temporalio::Activity::Context.current.heartbeat('detail1', 'detail2')
         raise 'Intentional error'
@@ -356,7 +356,7 @@ class WorkerActivityTest < Test
     end
 
     def execute
-      # Do an outer shield and an inner shield and confirm not cancelled until
+      # Do an outer shield and an inner shield and confirm not canceled until
       # after
       Temporalio::Activity::Context.current.cancellation.shield do
         Temporalio::Activity::Context.current.cancellation.shield do
@@ -421,7 +421,7 @@ class WorkerActivityTest < Test
         sleep(0.05)
         Temporalio::Activity::Context.current.heartbeat
       end
-      'got cancelled'
+      'got canceled'
     end
 
     def wait_started
@@ -442,7 +442,7 @@ class WorkerActivityTest < Test
       # Send activity cancel
       handle.signal('cancel-activity')
       # Wait for completion
-      assert_equal 'got cancelled', handle.result
+      assert_equal 'got canceled', handle.result
     end
   end
 
@@ -463,7 +463,7 @@ class WorkerActivityTest < Test
         Temporalio::Activity::Context.current.heartbeat
       end
     rescue Temporalio::Error::CanceledError
-      raise 'Not cancelled' unless Temporalio::Activity::Context.current.worker_shutdown_cancellation.canceled?
+      raise 'Not canceled' unless Temporalio::Activity::Context.current.worker_shutdown_cancellation.canceled?
 
       @cancel_received.push(nil)
       @reraise_cancel.pop
