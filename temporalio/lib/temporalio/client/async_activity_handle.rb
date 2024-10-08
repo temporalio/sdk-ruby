@@ -81,7 +81,7 @@ module Temporalio
                                           ))
       end
 
-      # Report the activity as cancelled.
+      # Report the activity as canceled.
       #
       # @param details [Array<Object>] Cancellation details.
       # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.

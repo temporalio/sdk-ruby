@@ -34,8 +34,7 @@ module Temporalio
             cancellation: Cancellation,
             worker_shutdown_cancellation: Cancellation,
             payload_converter: Converters::PayloadConverter,
-            logger: ScopedLogger,
-            definition: Activity::Definition
+            logger: ScopedLogger
           ) -> void
         end
 

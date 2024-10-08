@@ -224,7 +224,7 @@ module Temporalio
     #   queue will dispatch, controlled server-side. Note that this only takes effect upon an activity poll request. If
     #   multiple workers on the same queue have different values set, they will thrash with the last poller winning.
     # @param graceful_shutdown_period [Float] Amount of time after shutdown is called that activities are given to
-    #   complete before their tasks are cancelled.
+    #   complete before their tasks are canceled.
     # @param use_worker_versioning [Boolean] If true, the `build_id` argument must be specified, and this worker opts
     #   into the worker versioning feature. This ensures it only receives workflow tasks for workflows which it claims
     #   to be compatible with. For more information, see https://docs.temporal.io/workers#worker-versioning.

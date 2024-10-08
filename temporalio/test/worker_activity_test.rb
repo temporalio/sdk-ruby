@@ -609,7 +609,7 @@ class WorkerActivityTest < Test
       Thread.current[:temporal_activity_context]
     end
 
-    def activity_context=(context)
+    def set_activity_context(_defn, context)
       Thread.current[:temporal_activity_context] = context
     end
   end

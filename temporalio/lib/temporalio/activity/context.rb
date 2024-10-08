@@ -82,11 +82,6 @@ module Temporalio
         raise NotImplementedError
       end
 
-      # @return [Definition] Definition for this activity.
-      def definition
-        raise NotImplementedError
-      end
-
       # @!visibility private
       def _scoped_logger_info
         return @scoped_logger_info unless @scoped_logger_info.nil?

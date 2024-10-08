@@ -421,7 +421,12 @@ customize this. If general code is needed to run around activities, users should
 
 #### Activity Testing
 
-TODO: https://github.com/temporalio/sdk-ruby/issues/167
+Unit testing an activity can is done via the `Temporalio::Testing::ActivityEnvironment` class. Simply instantiate the
+class, then invoke `run` with the activity to test and the arguments to give. The result will be the activity result or
+it will raise the error raised in the activity.
+
+The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
+activity.
 
 ## Development
 

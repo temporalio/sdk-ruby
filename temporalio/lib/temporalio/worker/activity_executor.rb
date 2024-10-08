@@ -45,8 +45,9 @@ module Temporalio
       # {execute_activity} with a context before user code is executed and with nil after user code is complete.
       # Implementers must implement this.
       #
+      # @param defn [Activity::Definition] Activity definition.
       # @param context [Activity::Context, nil] The value to set.
-      def activity_context=(context)
+      def set_activity_context(defn, context)
         raise NotImplementedError
       end
     end

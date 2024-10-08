@@ -193,10 +193,9 @@ module Temporalio
             cancellation: Cancellation.new,
             worker_shutdown_cancellation: @worker._worker_shutdown_cancellation,
             payload_converter: @worker.options.client.data_converter.payload_converter,
-            logger: @scoped_logger,
-            definition: defn
+            logger: @scoped_logger
           )
-          Activity::Context._current_executor&.activity_context = activity
+          Activity::Context._current_executor&.set_activity_context(defn, activity)
           set_running_activity(task_token, activity)
           run_activity(activity, input)
         rescue Exception => e # rubocop:disable Lint/RescueException We are intending to catch everything here
@@ -220,7 +219,7 @@ module Temporalio
             @scoped_logger.error(e_inner)
           end
         ensure
-          Activity::Context._current_executor&.activity_context = nil
+          Activity::Context._current_executor&.set_activity_context(defn, nil)
           remove_running_activity(task_token)
         end
 
@@ -280,7 +279,7 @@ module Temporalio
         end
 
         class RunningActivity < Activity::Context
-          attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger, :definition
+          attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
           attr_accessor :_outbound_impl, :_server_requested_cancel
 
           def initialize( # rubocop:disable Lint/MissingSuper
@@ -288,15 +287,13 @@ module Temporalio
             cancellation:,
             worker_shutdown_cancellation:,
             payload_converter:,
-            logger:,
-            definition:
+            logger:
           )
             @info = info
             @cancellation = cancellation
             @worker_shutdown_cancellation = worker_shutdown_cancellation
             @payload_converter = payload_converter
             @logger = logger
-            @definition = definition
             @_outbound_impl = nil
             @_server_requested_cancel = false
           end

@@ -56,14 +56,14 @@ module Temporalio
           Thread.current[:temporal_activity_context]
         end
 
-        # @see ActivityExecutor.activity_context=
-        def activity_context=(context)
+        # @see ActivityExecutor.set_activity_context
+        def set_activity_context(defn, context)
           Thread.current[:temporal_activity_context] = context
           # If they have opted in to raising on cancel, wire that up
-          return unless context&.definition&.cancel_raise
+          return unless defn.cancel_raise
 
           thread = Thread.current
-          context.cancellation.add_cancel_callback do
+          context&.cancellation&.add_cancel_callback do
             thread.raise(Error::CanceledError.new('Activity canceled')) if thread[:temporal_activity_context] == context
           end
         end

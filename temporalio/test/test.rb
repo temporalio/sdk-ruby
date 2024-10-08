@@ -80,7 +80,7 @@ class Test < Minitest::Test
 
   def after_teardown
     super
-    return if passed?
+    return if passed? || failures.first.is_a?(Minitest::Skip)
 
     # Dump full cause chain on error
     puts 'Full cause chain:'

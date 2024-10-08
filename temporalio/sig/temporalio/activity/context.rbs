@@ -14,7 +14,6 @@ module Temporalio
       def worker_shutdown_cancellation: -> Cancellation
       def payload_converter: -> Converters::PayloadConverter
       def logger: -> ScopedLogger
-      def definition: -> Definition
 
       def _scoped_logger_info: -> Hash[Symbol, Object]
     end
