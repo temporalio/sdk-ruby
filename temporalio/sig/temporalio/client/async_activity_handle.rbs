@@ -11,7 +11,7 @@ module Temporalio
       ) -> void
 
       def heartbeat: (
-        *Object details,
+        *Object? details,
         ?rpc_metadata: Hash[String, String]?,
         ?rpc_timeout: Float?
       ) -> void
@@ -24,16 +24,18 @@ module Temporalio
 
       def fail: (
         Exception error,
-        ?last_heartbeat_details: Array[Object],
+        ?last_heartbeat_details: Array[Object?],
         ?rpc_metadata: Hash[String, String]?,
         ?rpc_timeout: Float?
       ) -> void
 
       def report_cancellation: (
-        *Object details,
+        *Object? details,
         ?rpc_metadata: Hash[String, String]?,
         ?rpc_timeout: Float?
       ) -> void
+
+      private def task_token_or_id_reference: -> (String | ActivityIDReference)
     end
   end
 end

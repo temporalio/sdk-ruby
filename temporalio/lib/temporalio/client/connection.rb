@@ -4,6 +4,7 @@ require 'socket'
 require 'temporalio/client/connection/cloud_service'
 require 'temporalio/client/connection/operator_service'
 require 'temporalio/client/connection/workflow_service'
+require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/client'
 require 'temporalio/runtime'
 require 'temporalio/version'
@@ -219,6 +220,8 @@ module Temporalio
       private
 
       def new_core_client
+        Internal::Bridge.assert_fiber_compatibility!
+
         options = Internal::Bridge::Client::Options.new(
           target_host: @options.target_host,
           client_name: 'temporal-ruby',

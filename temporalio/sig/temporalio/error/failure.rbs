@@ -31,7 +31,7 @@ module Temporalio
     class CanceledError < Failure
       attr_reader details: Array[Object?]
 
-      def initialize: (String message, details: Array[Object?]) -> void
+      def initialize: (String message, ?details: Array[Object?]) -> void
     end
 
     class TerminatedError < Failure

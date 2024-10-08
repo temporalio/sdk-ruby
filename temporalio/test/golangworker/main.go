@@ -62,6 +62,7 @@ type KitchenSinkAction struct {
 	UpdateHandler   *UpdateHandlerAction   `json:"update_handler"`
 	Signal          *SignalAction          `json:"signal"`
 	ExecuteActivity *ExecuteActivityAction `json:"execute_activity"`
+	Concurrent      []*KitchenSinkAction   `json:"concurrent"`
 }
 
 type ResultAction struct {
@@ -110,6 +111,7 @@ type ExecuteActivityAction struct {
 	StartToCloseTimeoutMS    int64         `json:"start_to_close_timeout_ms"`
 	ScheduleToStartTimeoutMS int64         `json:"schedule_to_start_timeout_ms"`
 	CancelAfterMS            int64         `json:"cancel_after_ms"`
+	CancelOnSignal           string        `json:"cancel_on_signal"`
 	WaitForCancellation      bool          `json:"wait_for_cancellation"`
 	HeartbeatTimeoutMS       int64         `json:"heartbeat_timeout_ms"`
 	RetryMaxAttempts         int           `json:"retry_max_attempts"` // 0 same as 1
@@ -250,6 +252,14 @@ func handleAction(
 					cancel()
 				})
 			}
+			if action.ExecuteActivity.CancelOnSignal != "" {
+				var cancel workflow.CancelFunc
+				actCtx, cancel = workflow.WithCancel(actCtx)
+				workflow.Go(actCtx, func(actCtx workflow.Context) {
+					workflow.GetSignalChannel(actCtx, action.ExecuteActivity.CancelOnSignal).Receive(actCtx, nil)
+					cancel()
+				})
+			}
 			args := action.ExecuteActivity.Args
 			if action.ExecuteActivity.IndexAsArg {
 				args = []interface{}{i}
@@ -261,6 +271,29 @@ func handleAction(
 			sel.Select(ctx)
 		}
 		return true, lastResponse, lastErr
+
+	case len(action.Concurrent) > 0:
+		var futs []workflow.Future
+		for _, action := range action.Concurrent {
+			action := action
+			fut, set := workflow.NewFuture(ctx)
+			workflow.Go(ctx, func(ctx workflow.Context) {
+				_, ret, err := handleAction(ctx, params, action)
+				set.Set(ret, err)
+			})
+			futs = append(futs, fut)
+		}
+		var lastErr error
+		var vals []any
+		for _, fut := range futs {
+			var val any
+			if err := fut.Get(ctx, &val); err != nil {
+				lastErr = err
+			} else {
+				vals = append(vals, val)
+			}
+		}
+		return true, vals, lastErr
 
 	default:
 		return true, nil, fmt.Errorf("unrecognized action")

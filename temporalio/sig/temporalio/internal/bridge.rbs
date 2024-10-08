@@ -1,12 +1,8 @@
 module Temporalio
   module Internal
     module Bridge
-      interface _ResultQueue[T]
-        def push: ([T, Exception]) -> void
-        def pop: () -> [T, Exception]
-      end
-
-      def self.async_call: [T] { (_ResultQueue[T] queue) -> void } -> T
+      def self.assert_fiber_compatibility!: -> void
+      def self.fibers_supported: -> bool
 
       # Defined in Rust
 

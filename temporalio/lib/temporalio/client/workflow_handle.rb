@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'securerandom'
 require 'temporalio/api'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/workflow_update_handle'
@@ -68,7 +69,7 @@ module Temporalio
       #
       # @return [Object] Result of the workflow after being converted by the data converter.
       #
-      # @raise [Error::WorkflowFailureError] Workflow failed with +cause+ as the cause.
+      # @raise [Error::WorkflowFailedError] Workflow failed with +cause+ as the cause.
       # @raise [Error::WorkflowContinuedAsNewError] Workflow continued as new and +follow_runs+ is +false+.
       # @raise [Error::RPCError] RPC error from call.
       def result(
@@ -102,16 +103,16 @@ module Temporalio
             hist_run_id = attrs.new_execution_run_id
             next if follow_runs && hist_run_id && !hist_run_id.empty?
 
-            raise Error::WorkflowFailureError.new, cause: @client.data_converter.from_failure(attrs.failure)
+            raise Error::WorkflowFailedError.new, cause: @client.data_converter.from_failure(attrs.failure)
           when :EVENT_TYPE_WORKFLOW_EXECUTION_CANCELED
             attrs = event.workflow_execution_canceled_event_attributes
-            raise Error::WorkflowFailureError.new, cause: Error::CanceledError.new(
+            raise Error::WorkflowFailedError.new, cause: Error::CanceledError.new(
               'Workflow execution canceled',
               details: @client.data_converter.from_payloads(attrs&.details)
             )
           when :EVENT_TYPE_WORKFLOW_EXECUTION_TERMINATED
             attrs = event.workflow_execution_terminated_event_attributes
-            raise Error::WorkflowFailureError.new, cause: Error::TerminatedError.new(
+            raise Error::WorkflowFailedError.new, cause: Error::TerminatedError.new(
               Internal::ProtoUtils.string_or(attrs.reason, 'Workflow execution terminated'),
               details: @client.data_converter.from_payloads(attrs&.details)
             )
@@ -120,7 +121,7 @@ module Temporalio
             hist_run_id = attrs.new_execution_run_id
             next if follow_runs && hist_run_id && !hist_run_id.empty?
 
-            raise Error::WorkflowFailureError.new, cause: Error::TimeoutError.new(
+            raise Error::WorkflowFailedError.new, cause: Error::TimeoutError.new(
               'Workflow execution timed out',
               type: Api::Enums::V1::TimeoutType::TIMEOUT_TYPE_START_TO_CLOSE,
               last_heartbeat_details: []
@@ -302,7 +303,7 @@ module Temporalio
       # @return [WorkflowUpdateHandle] The update handle.
       #
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
-      #   mean the update itself was timed out or cancelled.
+      #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same
@@ -342,7 +343,7 @@ module Temporalio
       #
       # @raise [Error::WorkflowUpdateFailedError] If the update failed.
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
-      #   mean the update itself was timed out or cancelled.
+      #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same

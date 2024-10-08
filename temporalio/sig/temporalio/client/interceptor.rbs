@@ -15,7 +15,7 @@ module Temporalio
         attr_accessor id_conflict_policy: WorkflowIDConflictPolicy::enum
         attr_accessor retry_policy: RetryPolicy?
         attr_accessor cron_schedule: String?
-        attr_accessor memo: Hash[String, Object]?
+        attr_accessor memo: Hash[String, Object?]?
         attr_accessor search_attributes: SearchAttributes?
         attr_accessor start_delay: Float?
         attr_accessor request_eager_start: bool
@@ -35,7 +35,7 @@ module Temporalio
           id_conflict_policy: WorkflowIDConflictPolicy::enum,
           retry_policy: RetryPolicy?,
           cron_schedule: String?,
-          memo: Hash[String, Object]?,
+          memo: Hash[String, Object?]?,
           search_attributes: SearchAttributes?,
           start_delay: Float?,
           request_eager_start: bool,
@@ -206,7 +206,7 @@ module Temporalio
         attr_accessor run_id: String?
         attr_accessor first_execution_run_id: String?
         attr_accessor reason: String?
-        attr_accessor details: Array[Object]
+        attr_accessor details: Array[Object?]
         attr_accessor rpc_metadata: Hash[String, String]?
         attr_accessor rpc_timeout: Float?
 
@@ -215,6 +215,64 @@ module Temporalio
           run_id: String?,
           first_execution_run_id: String?,
           reason: String?,
+          details: Array[Object?],
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class HeartbeatAsyncActivityInput
+        attr_accessor task_token_or_id_reference: String | ActivityIDReference
+        attr_accessor details: Array[Object?]
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          task_token_or_id_reference: String | ActivityIDReference,
+          details: Array[Object?],
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class CompleteAsyncActivityInput
+        attr_accessor task_token_or_id_reference: String | ActivityIDReference
+        attr_accessor result: Object?
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          task_token_or_id_reference: String | ActivityIDReference,
+          result: Object?,
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class FailAsyncActivityInput
+        attr_accessor task_token_or_id_reference: String | ActivityIDReference
+        attr_accessor error: Exception
+        attr_accessor last_heartbeat_details: Array[Object?]
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          task_token_or_id_reference: String | ActivityIDReference,
+          error: Exception,
+          last_heartbeat_details: Array[Object?],
+          rpc_metadata: Hash[String, String]?,
+          rpc_timeout: Float?
+        ) -> void
+      end
+
+      class ReportCancellationAsyncActivityInput
+        attr_accessor task_token_or_id_reference: String | ActivityIDReference
+        attr_accessor details: Array[Object?]
+        attr_accessor rpc_metadata: Hash[String, String]?
+        attr_accessor rpc_timeout: Float?
+
+        def initialize: (
+          task_token_or_id_reference: String | ActivityIDReference,
           details: Array[Object?],
           rpc_metadata: Hash[String, String]?,
           rpc_timeout: Float?
@@ -247,6 +305,14 @@ module Temporalio
         def cancel_workflow: (CancelWorkflowInput input) -> void
 
         def terminate_workflow: (TerminateWorkflowInput input) -> void
+
+        def heartbeat_async_activity: (HeartbeatAsyncActivityInput input) -> void
+
+        def complete_async_activity: (CompleteAsyncActivityInput input) -> void
+
+        def fail_async_activity: (FailAsyncActivityInput input) -> void
+
+        def report_cancellation_async_activity: (ReportCancellationAsyncActivityInput input) -> void
       end
     end
   end

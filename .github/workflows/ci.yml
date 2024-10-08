@@ -9,7 +9,7 @@ on:
 jobs:
   build-lint-test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         # TODO(cretz): Enable Windows (it's slow)
         #
@@ -75,12 +75,12 @@ jobs:
         working-directory: ./temporalio
         run: bundle install
 
-      - name: Check generated protos
+      - name: Check generated code unchanged
         if: ${{ matrix.checkTarget }}
-        working-directory: ./temporalio
         run: |
-          bundle exec rake proto:generate
-          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
+          npx doctoc README.md
+          cd temporalio && bundle exec rake proto:generate
+          git diff --exit-code
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio

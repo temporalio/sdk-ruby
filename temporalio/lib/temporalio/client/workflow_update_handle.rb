@@ -43,7 +43,7 @@ module Temporalio
       #
       # @raise [Error::WorkflowUpdateFailedError] If the update failed.
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
-      #   mean the update itself was timed out or cancelled.
+      #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
       def result(rpc_metadata: nil, rpc_timeout: nil)
         @known_outcome ||= @client._impl.poll_workflow_update(Interceptor::PollWorkflowUpdateInput.new(

@@ -141,6 +141,14 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: sqlite3
+  version: '2.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: 7ae9e3cf731a9628e0cc39064ed6e2cf51d822da
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
 - name: strscan
   version: '0'
   source:

@@ -7,7 +7,7 @@ target :lib do
 
   check 'lib', 'test'
 
-  ignore 'lib/temporalio/api'
+  ignore 'lib/temporalio/api', 'lib/temporalio/internal/bridge/api'
 
   library 'uri'
 

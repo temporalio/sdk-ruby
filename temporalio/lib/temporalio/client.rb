@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'google/protobuf/well_known_types'
+require 'logger'
 require 'temporalio/api'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
-require 'temporalio/client/implementation'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/workflow_execution'
 require 'temporalio/client/workflow_execution_count'
@@ -13,6 +13,7 @@ require 'temporalio/client/workflow_query_reject_condition'
 require 'temporalio/common_enums'
 require 'temporalio/converters'
 require 'temporalio/error'
+require 'temporalio/internal/client/implementation'
 require 'temporalio/retry_policy'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
@@ -35,6 +36,7 @@ module Temporalio
       :namespace,
       :data_converter,
       :interceptors,
+      :logger,
       :default_workflow_query_reject_condition,
       keyword_init: true
     )
@@ -53,6 +55,8 @@ module Temporalio
     #   client calls. The earlier interceptors wrap the later ones. Any interceptors that also implement worker
     #   interceptor will be used as worker interceptors too so they should not be given separately when creating a
     #   worker.
+    # @param logger [Logger] Logger to use for this client and any workers made from this client. Defaults to stdout
+    #   with warn level. Callers setting this logger are responsible for closing it.
     # @param default_workflow_query_reject_condition [WorkflowQueryRejectCondition, nil] Default rejection
     #   condition for workflow queries if not set during query. See {WorkflowHandle.query} for details on the
     #   rejection condition.
@@ -79,6 +83,7 @@ module Temporalio
       tls: false,
       data_converter: Converters::DataConverter.default,
       interceptors: [],
+      logger: Logger.new($stdout, level: Logger::WARN),
       default_workflow_query_reject_condition: nil,
       rpc_metadata: {},
       rpc_retry: Connection::RPCRetryOptions.new,
@@ -104,6 +109,7 @@ module Temporalio
         namespace:,
         data_converter:,
         interceptors:,
+        logger:,
         default_workflow_query_reject_condition:
       )
     end
@@ -119,10 +125,11 @@ module Temporalio
     # @param namespace [String] Namespace to use for client calls.
     # @param data_converter [Converters::DataConverter] Data converter to use for all data conversions to/from payloads.
     # @param interceptors [Array<Interceptor>] Set of interceptors that are chained together to allow intercepting of
-    #   client calls. The earlier interceptors wrap the later ones.
-    #
-    #   Any interceptors that also implement worker interceptor will be used as worker interceptors too so they should
-    #   not be given separately when creating a worker.
+    #   client calls. The earlier interceptors wrap the later ones. Any interceptors that also implement worker
+    #   interceptor will be used as worker interceptors too so they should not be given separately when creating a
+    #   worker.
+    # @param logger [Logger] Logger to use for this client and any workers made from this client. Defaults to stdout
+    #   with warn level. Callers setting this logger are responsible for closing it.
     # @param default_workflow_query_reject_condition [WorkflowQueryRejectCondition, nil] Default rejection condition for
     #   workflow queries if not set during query. See {WorkflowHandle.query} for details on the rejection condition.
     #
@@ -132,6 +139,7 @@ module Temporalio
       namespace:,
       data_converter: DataConverter.default,
       interceptors: [],
+      logger: Logger.new($stdout, level: Logger::WARN),
       default_workflow_query_reject_condition: nil
     )
       @options = Options.new(
@@ -139,10 +147,11 @@ module Temporalio
         namespace:,
         data_converter:,
         interceptors:,
+        logger:,
         default_workflow_query_reject_condition:
       ).freeze
       # Initialize interceptors
-      @impl = interceptors.reverse_each.reduce(Implementation.new(self)) do |acc, int|
+      @impl = interceptors.reverse_each.reduce(Internal::Client::Implementation.new(self)) do |acc, int|
         int.intercept_client(acc)
       end
     end
@@ -268,7 +277,7 @@ module Temporalio
     #
     # @return [Object] Successful result of the workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
-    # @raise [Error::WorkflowFailureError] Workflow failed with +cause+ as the cause.
+    # @raise [Error::WorkflowFailedError] Workflow failed with +cause+ as the cause.
     # @raise [Error::RPCError] RPC error from call.
     def execute_workflow(
       workflow,

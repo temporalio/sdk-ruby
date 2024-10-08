@@ -1,0 +1,9 @@
+module Temporalio
+  class Worker
+    class ActivityExecutor
+      class Fiber < ActivityExecutor
+        def self.default: -> Fiber
+      end
+    end
+  end
+end

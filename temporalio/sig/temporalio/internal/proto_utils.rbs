@@ -17,6 +17,16 @@ module Temporalio
                         | (String? str, String default) -> String
 
       def self.enum_to_int: (untyped enum_mod, untyped enum_val, ?zero_means_nil: bool) -> Integer
+
+      def self.convert_from_payload_array: (
+        Converters::DataConverter | Converters::PayloadConverter converter,
+        Array[untyped] payloads
+      ) -> Array[Object?]
+
+      def self.convert_to_payload_array: (
+        Converters::DataConverter | Converters::PayloadConverter converter,
+        Array[Object?] values
+      ) -> Array[untyped]
     end
   end
 end

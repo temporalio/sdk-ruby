@@ -9,7 +9,7 @@ module Temporalio
       def execution_time: -> Time?
       def history_length: -> Integer
       def id: -> String
-      def memo: -> Hash[String, Object]
+      def memo: -> Hash[String, Object?]
       def parent_id: -> String?
       def parent_run_id: -> String?
       def run_id: -> String

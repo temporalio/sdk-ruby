@@ -5,6 +5,7 @@ mod client_rpc_generated;
 mod runtime;
 mod testing;
 mod util;
+mod worker;
 
 pub static ROOT_MOD: Lazy<RModule> = Lazy::new(|ruby| {
     ruby.define_module("Temporalio")
@@ -50,6 +51,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     client::init(ruby)?;
     runtime::init(ruby)?;
     testing::init(ruby)?;
+    worker::init(ruby)?;
 
     Ok(())
 }

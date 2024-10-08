@@ -1,0 +1,15 @@
+module Temporalio
+  class ScopedLogger < Logger
+    attr_accessor scoped_values_getter: Proc?
+    attr_accessor disable_scoped_values: bool
+
+    def initialize: (Logger) -> void
+
+    class LogMessage
+      attr_reader message: Object
+      attr_reader scoped_values: Object
+
+      def initialize: (Object message, Object scoped_values) -> void
+    end
+  end
+end

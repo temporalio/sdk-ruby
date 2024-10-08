@@ -1,0 +1,19 @@
+module Temporalio
+  class Activity
+    class Definition
+      attr_reader name: String | Symbol
+      attr_reader proc: Proc
+      attr_reader executor: Symbol
+      attr_reader cancel_raise: bool
+
+      def self.from_activity: (Activity | singleton(Activity) | Definition activity) -> Definition
+
+      def initialize: (
+        name: String | Symbol,
+        ?proc: Proc?,
+        ?executor: Symbol,
+        ?cancel_raise: bool
+      ) ?{ (?) -> untyped } -> void
+    end
+  end
+end

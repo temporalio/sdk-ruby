@@ -1,0 +1,36 @@
+class WorkerActivityTest < Test
+  def execute_activity: [T] (
+    untyped activity,
+    *untyped args,
+    ?retry_max_attempts: Integer,
+    ?logger: Logger?,
+    ?heartbeat_timeout: Float?,
+    ?start_to_close_timeout: Float?,
+    ?override_name: String?,
+    ?cancel_on_signal: String?,
+    ?wait_for_cancellation: bool,
+    ?cancellation: Temporalio::Cancellation,
+    ?raise_in_block_on_shutdown: bool,
+    ?activity_executors: Hash[Symbol, Temporalio::Worker::ActivityExecutor],
+    ?interceptors: Array[Temporalio::Worker::Interceptor],
+    ?client: Temporalio::Client
+  ) ?{ (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T | (
+    untyped activity,
+    *untyped args,
+    ?retry_max_attempts: Integer,
+    ?logger: Logger?,
+    ?heartbeat_timeout: Float?,
+    ?start_to_close_timeout: Float?,
+    ?override_name: String?,
+    ?cancel_on_signal: String?,
+    ?wait_for_cancellation: bool,
+    ?cancellation: Temporalio::Cancellation,
+    ?raise_in_block_on_shutdown: bool,
+    ?activity_executors: Hash[Symbol, Temporalio::Worker::ActivityExecutor],
+    ?interceptors: Array[Temporalio::Worker::Interceptor],
+    ?client: Temporalio::Client
+  ) -> Object?
+
+  def assert_multi_worker_activities: (?) -> untyped
+  def assert_single_worker_activities: (?) -> untyped
+end

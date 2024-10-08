@@ -6,7 +6,9 @@ require 'temporalio/testing'
 require 'test'
 
 class ClientWorkflowTest < Test
-  def start_simple
+  also_run_all_tests_in_fiber
+
+  def test_start_simple
     # Create ephemeral test server
     env.with_kitchen_sink_worker do |task_queue|
       # Start 5 workflows
@@ -21,16 +23,6 @@ class ClientWorkflowTest < Test
       # Check all results
       results = handles.map(&:result)
       assert_equal %w[result-0 result-1 result-2 result-3 result-4], results
-    end
-  end
-
-  def test_start_simple_threaded
-    start_simple
-  end
-
-  def test_start_simple_async
-    Sync do
-      start_simple
     end
   end
 
@@ -177,7 +169,7 @@ class ClientWorkflowTest < Test
   def test_failure
     env.with_kitchen_sink_worker do |task_queue|
       # Simple error
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ error: { message: 'some error', type: 'error-type', details: { foo: 'bar', baz: 123.45 } } }] },
@@ -192,7 +184,7 @@ class ClientWorkflowTest < Test
       assert_equal [{ 'foo' => 'bar', 'baz' => 123.45 }], err.cause.details
 
       # Activity does not exist, for checking causes
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ execute_activity: { name: 'does-not-exist' } }] },
@@ -208,7 +200,7 @@ class ClientWorkflowTest < Test
 
   def test_retry_policy
     env.with_kitchen_sink_worker do |task_queue|
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         env.client.execute_workflow(
           'kitchen_sink',
           { actions: [{ error: { attempt: true } }] },
@@ -231,6 +223,7 @@ class ClientWorkflowTest < Test
 
     # Start 5 workflows, 3 that complete and 2 that don't, and with different
     # SAs for odd ones vs even
+    text_val = "test-list-#{SecureRandom.uuid}"
     env.with_kitchen_sink_worker do |task_queue|
       handles = 5.times.map do |i|
         env.client.start_workflow(
@@ -244,7 +237,7 @@ class ClientWorkflowTest < Test
           task_queue:,
           search_attributes: Temporalio::SearchAttributes.new(
             {
-              ATTR_KEY_TEXT => 'test-list',
+              ATTR_KEY_TEXT => text_val,
               ATTR_KEY_KEYWORD => i.even? ? 'even' : 'odd'
             }
           )
@@ -253,31 +246,31 @@ class ClientWorkflowTest < Test
 
       # Make sure all 5 come back in list
       assert_eventually do
-        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = 'test-list'").to_a
+        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'").to_a
         assert_equal 5, wfs.size
         # Check each item is present too
         assert_equal handles.map(&:id).sort, wfs.map(&:id).sort
         # Check the first has search attr
-        assert_equal 'test-list', wfs.first&.search_attributes&.[](ATTR_KEY_TEXT)
+        assert_equal text_val, wfs.first&.search_attributes&.[](ATTR_KEY_TEXT)
       end
 
       # Query for just the odd ones and make sure it's two
       assert_eventually do
-        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = 'test-list' AND " \
+        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}' AND " \
                                         "`#{ATTR_KEY_KEYWORD.name}` = 'odd'").to_a
         assert_equal 2, wfs.size
       end
 
       # Normal count
       assert_eventually do
-        count = env.client.count_workflows("`#{ATTR_KEY_TEXT.name}` = 'test-list'")
+        count = env.client.count_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'")
         assert_equal 5, count.count
         assert_empty count.groups
       end
 
       # Count with group by making sure eventually first 3 are complete
       assert_eventually do
-        count = env.client.count_workflows("`#{ATTR_KEY_TEXT.name}` = 'test-list' GROUP BY ExecutionStatus")
+        count = env.client.count_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}' GROUP BY ExecutionStatus")
         assert_equal 5, count.count
         groups = count.groups.sort_by(&:count)
         # 2 running, 3 completed
@@ -438,7 +431,7 @@ class ClientWorkflowTest < Test
         task_queue:
       )
       handle.cancel
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         handle.result
       end
       assert_instance_of Temporalio::Error::CanceledError, err.cause
@@ -454,7 +447,7 @@ class ClientWorkflowTest < Test
         task_queue:
       )
       handle.terminate('some reason', details: ['some details'])
-      err = assert_raises(Temporalio::Error::WorkflowFailureError) do
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
         handle.result
       end
       assert_instance_of Temporalio::Error::TerminatedError, err.cause

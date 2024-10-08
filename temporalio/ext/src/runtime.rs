@@ -38,12 +38,22 @@ pub struct Runtime {
 #[derive(Clone)]
 pub(crate) struct RuntimeHandle {
     pub(crate) core: Arc<CoreRuntime>,
-    async_command_tx: Sender<AsyncCommand>,
+    pub(crate) async_command_tx: Sender<AsyncCommand>,
 }
 
-type Callback = Box<dyn FnOnce() -> Result<(), Error> + Send + 'static>;
+#[macro_export]
+macro_rules! enter_sync {
+    ($runtime:expr) => {
+        if let Some(subscriber) = $runtime.core.telemetry().trace_subscriber() {
+            temporal_sdk_core::telemetry::set_trace_subscriber_for_current_thread(subscriber);
+        }
+        let _guard = $runtime.core.tokio_handle().enter();
+    };
+}
 
-enum AsyncCommand {
+pub(crate) type Callback = Box<dyn FnOnce() -> Result<(), Error> + Send + 'static>;
+
+pub(crate) enum AsyncCommand {
     RunCallback(Callback),
     Shutdown,
 }
@@ -155,6 +165,7 @@ impl Runtime {
 
     // See the ext/README.md for details on how this works
     pub fn run_command_loop(&self) {
+        enter_sync!(self.handle);
         loop {
             let cmd = without_gvl(
                 || self.async_command_rx.recv(),
