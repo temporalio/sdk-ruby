@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'securerandom'
 require 'temporalio/api'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/workflow_update_handle'

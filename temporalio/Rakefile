@@ -11,7 +11,7 @@ task build: :compile
 GEMSPEC = Gem::Specification.load('temporalio.gemspec')
 
 RbSys::ExtensionTask.new('temporalio_bridge', GEMSPEC) do |ext|
-  ext.lib_dir = 'lib/temporalio'
+  ext.lib_dir = 'lib/temporalio/internal/bridge'
 end
 
 require 'rake/testtask'
@@ -22,6 +22,19 @@ Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.test_files = FileList['test/**/*_test.rb']
 end
+
+def add_protoc_to_path
+  tools_spec = Gem::Specification.find_by_name('grpc-tools')
+  cpu = RbConfig::CONFIG['host_cpu']
+  cpu = 'x86_64' if cpu == 'x64'
+  os = RbConfig::CONFIG['host_os']
+  os = 'windows' if os.start_with?('mingw')
+  protoc_path = "#{tools_spec.gem_dir}/bin/#{cpu}-#{os}"
+  separator = os == 'windows' ? ';' : ':'
+  ENV['PATH'] = "#{ENV.fetch('PATH', nil)}#{separator}#{protoc_path}"
+end
+
+add_protoc_to_path
 
 require 'rubocop/rake_task'
 
@@ -332,4 +345,9 @@ Rake::Task[:build].enhance([:copy_parent_files]) do
   rm ['LICENSE', 'README.md']
 end
 
-task default: ['rubocop', 'yard', 'compile', 'rbs:install_collection', 'steep', 'test']
+task :rust_lint do
+  sh 'cargo', 'clippy'
+  sh 'cargo', 'fmt', '--check'
+end
+
+task default: ['rubocop', 'yard', 'rbs:install_collection', 'steep', 'rust_lint', 'compile', 'test']
