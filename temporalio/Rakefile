@@ -11,7 +11,7 @@ task build: :compile
 GEMSPEC = Gem::Specification.load('temporalio.gemspec')
 
 RbSys::ExtensionTask.new('temporalio_bridge', GEMSPEC) do |ext|
-  ext.lib_dir = 'lib/temporalio'
+  ext.lib_dir = 'lib/temporalio/internal/bridge'
 end
 
 require 'rake/testtask'
@@ -22,6 +22,19 @@ Rake::TestTask.new(:test) do |t|
   t.libs << 'lib'
   t.test_files = FileList['test/**/*_test.rb']
 end
+
+def add_protoc_to_path
+  tools_spec = Gem::Specification.find_by_name('grpc-tools')
+  cpu = RbConfig::CONFIG['host_cpu']
+  cpu = 'x86_64' if cpu == 'x64'
+  os = RbConfig::CONFIG['host_os']
+  os = 'windows' if os.start_with?('mingw')
+  protoc_path = "#{tools_spec.gem_dir}/bin/#{cpu}-#{os}"
+  separator = os == 'windows' ? ';' : ':'
+  ENV['PATH'] = "#{ENV.fetch('PATH', nil)}#{separator}#{protoc_path}"
+end
+
+add_protoc_to_path
 
 require 'rubocop/rake_task'
 
@@ -332,4 +345,32 @@ Rake::Task[:build].enhance([:copy_parent_files]) do
   rm ['LICENSE', 'README.md']
 end
 
-task default: ['rubocop', 'yard', 'compile', 'rbs:install_collection', 'steep', 'test']
+task :rust_lint do
+  sh 'cargo', 'clippy'
+  sh 'cargo', 'fmt', '--check'
+end
+
+task :smoke_test_gem, [:gem_file_glob] do |_t, args|
+  # Install gem
+  gem_file_glob = args[:gem_file_glob]
+  raise 'Gem file glob not found' unless gem_file_glob
+
+  gem_files = Dir.glob(gem_file_glob)
+  raise "Unable to find single gem file, found #{gem_file.length}" unless gem_files.length == 1
+
+  sh 'gem', 'install', '--verbose', '--local', gem_files.first
+
+  # Move the installed gem to the front of the load path
+  $LOAD_PATH.unshift("#{Gem::Specification.find_by_name('temporalio').gem_dir}/lib")
+
+  # Create a local environment and start a workflow
+  require 'temporalio/client'
+  require 'temporalio/testing/workflow_environment'
+
+  Temporalio::Testing::WorkflowEnvironment.start_local do |env|
+    handle = env.client.start_workflow('MyWorkflow', id: 'my-workflow', task_queue: 'my-task-queue')
+    puts "Created workflow with run ID: #{handle.result_run_id}"
+  end
+end
+
+task default: ['rubocop', 'yard', 'rbs:install_collection', 'steep', 'rust_lint', 'compile', 'test']

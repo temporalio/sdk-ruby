@@ -61,13 +61,13 @@ macro_rules! rpc_call {
         if $call.retry {
             let mut core_client = $client.core.clone();
             let req = $call.into_request()?;
-            crate::client::rpc_resp($client, $block, async move {
+            $crate::client::rpc_resp($client, $block, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         } else {
             let mut core_client = $client.core.clone().into_inner();
             let req = $call.into_request()?;
-            crate::client::rpc_resp($client, $block, async move {
+            $crate::client::rpc_resp($client, $block, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         }
@@ -237,7 +237,7 @@ impl RpcFailure {
     }
 
     pub fn details(&self) -> Option<RString> {
-        if self.status.details().len() == 0 {
+        if self.status.details().is_empty() {
             None
         } else {
             Some(RString::from_slice(self.status.details()))
