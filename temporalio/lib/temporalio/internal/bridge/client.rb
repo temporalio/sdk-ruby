@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'temporalio/internal/bridge'
-require 'temporalio/temporalio_bridge'
 
 module Temporalio
   module Internal
