@@ -108,7 +108,8 @@ pub(crate) struct AsyncCallback {
 }
 
 // We trust our usage of this across threads. We would use Opaque but we can't
-// box that properly/safely.
+// box that properly/safely. The inner queue is always expected to be a Ruby
+// Queue.
 unsafe impl Send for AsyncCallback {}
 unsafe impl Sync for AsyncCallback {}
 
@@ -123,7 +124,6 @@ impl AsyncCallback {
     where
         V: IntoValue,
     {
-        // self.push_and_continue(value)
         self.queue.funcall(id!("push"), (value,)).map(|_: Value| ())
     }
 }

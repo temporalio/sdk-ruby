@@ -184,7 +184,7 @@ impl Worker {
         runtime.spawn(
             async move {
                 // Get next item from the stream
-                while let Some((worker, worker_type, result)) = worker_stream.next().await {
+                while let Some((worker_index, worker_type, result)) = worker_stream.next().await {
                     // Encode result and send callback to Ruby
                     let result = result.map(|v| v.encode_to_vec());
                     let callback = callback.clone();
@@ -201,7 +201,7 @@ impl Worker {
                             Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
                         callback.push(ruby.ary_new_from_values(&[
-                            worker.into_value(),
+                            worker_index.into_value(),
                             worker_type.into_value(),
                             result,
                         ]))

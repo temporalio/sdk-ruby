@@ -1,6 +1,8 @@
-# Temporal Ruby SDK
+![Temporal Ruby SDK](https://raw.githubusercontent.com/temporalio/assets/main/files/w/ruby.png)
 
+![Ruby 3.1 | 3.2 | 3.3](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
 [![MIT](https://img.shields.io/github/license/temporalio/sdk-ruby.svg?style=for-the-badge)](LICENSE)
+<!-- TODO: [![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio) -->
 
 [Temporal](https://temporal.io/) is a distributed, scalable, durable, and highly available orchestration engine used to
 execute asynchronous, long-running business logic in a scalable and resilient way.
@@ -410,7 +412,7 @@ this value is reached, the worker will stop asking for work from the server unti
 
 In addition to the thread pool executor, there is also a fiber executor in the default executor set. To use fibers, call
 `activity_executor :fiber` class method at the top of the activity class (the default of this value is `:default` which
-is the thread pool executor). Activities can only choose the fiber executor if they create and run the worker in a
+is the thread pool executor). Activities can only choose the fiber executor if the worker has been created and run in a
 fiber, but thread pool executor is always available. Currently due to
 [an issue](https://github.com/temporalio/sdk-ruby/issues/162), workers can only run in a fiber on Ruby versions 3.3 and
 newer.
@@ -421,7 +423,7 @@ customize this. If general code is needed to run around activities, users should
 
 #### Activity Testing
 
-Unit testing an activity can is done via the `Temporalio::Testing::ActivityEnvironment` class. Simply instantiate the
+Unit testing an activity can be done via the `Temporalio::Testing::ActivityEnvironment` class. Simply instantiate the
 class, then invoke `run` with the activity to test and the arguments to give. The result will be the activity result or
 it will raise the error raised in the activity.
 
@@ -439,6 +441,10 @@ Prerequisites:
 * [Protobuf Compiler](https://protobuf.dev/) (i.e. `protoc` on the `PATH`)
 * This repository, cloned recursively
 * Change to the `temporalio/` directory
+
+First, install dependencies:
+
+    bundle install
 
 To build shared library for development use:
 
