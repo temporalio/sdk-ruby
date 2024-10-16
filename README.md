@@ -96,9 +96,7 @@ worker = Temporalio::Worker.new(
 
 # Run the worker until SIGINT. This can be done in many ways, see specific
 # section for details.
-cancellation, cancel_proc = Temporalio::Cancellation.new
-Signal.trap('INT') { cancel_proc }
-worker.run(cancellation:)
+worker.run(shutdown_signals: ['SIGINT'])
 ```
 
 Running that will run the worker until Ctrl+C pressed.
@@ -291,6 +289,8 @@ Notes about the above code:
 * This just shows providing an activity class, but there are other forms, see the "Activities" section for details.
 * The worker `run` method accepts an optional `Temporalio::Cancellation` object that can be used to cancel instead or in
   addition to providing a block that waits for completion.
+* The worker `run` method accepts an `shutdown_signals` array which will trap the signal and start shutdown when
+  received.
 * Workers work with threads or fibers (but fiber compatibility only supported for Ruby 3.3+ at this time). Fiber-based
   activities (see "Activities" section) only work if the worker is created within a fiber.
 * The `run` method does not return until the worker is shut down. This means even if shutdown is triggered (e.g. via

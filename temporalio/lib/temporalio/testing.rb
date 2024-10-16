@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/testing/activity_environment'
 require 'temporalio/testing/workflow_environment'
 
 module Temporalio

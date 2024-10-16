@@ -7,12 +7,17 @@ module Temporalio
   module Internal
     module Worker
       class MultiRunner
-        def initialize(workers:)
+        def initialize(workers:, shutdown_signals:)
           @workers = workers
           @queue = Queue.new
 
           @shutdown_initiated_mutex = Mutex.new
           @shutdown_initiated = false
+
+          # Trap signals to push to queue
+          shutdown_signals.each do |signal|
+            Signal.trap(signal) { @queue.push(Event::ShutdownSignalReceived.new) }
+          end
 
           # Start pollers
           Bridge::Worker.async_poll_all(workers.map(&:_bridge_worker), @queue)
@@ -144,6 +149,9 @@ module Temporalio
             def initialize(error:) # rubocop:disable Lint/MissingSuper
               @error = error
             end
+          end
+
+          class ShutdownSignalReceived < Event
           end
         end
 

@@ -54,6 +54,7 @@ module Temporalio
     def self.run_all: [T] (
       *Worker workers,
       ?cancellation: Cancellation,
+      ?shutdown_signals: Array[String | Integer],
       ?raise_in_block_on_shutdown: Exception?,
       ?wait_block_complete: bool
     ) ?{ -> T } -> T
@@ -88,6 +89,7 @@ module Temporalio
 
     def run: [T] (
       ?cancellation: Cancellation,
+      ?shutdown_signals: Array[String | Integer],
       ?raise_in_block_on_shutdown: Exception?,
       ?wait_block_complete: bool
     ) ?{ -> T } -> T

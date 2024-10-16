@@ -2,7 +2,7 @@ module Temporalio
   module Internal
     module Worker
       class MultiRunner
-        def initialize: (workers: Array[Temporalio::Worker]) -> void
+        def initialize: (workers: Array[Temporalio::Worker], shutdown_signals: Array[String | Integer]) -> void
 
         def apply_thread_or_fiber_block: ?{ (?) -> untyped } -> void
 

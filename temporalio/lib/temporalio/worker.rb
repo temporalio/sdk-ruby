@@ -61,12 +61,16 @@ module Temporalio
       # tiniest code change will affect this, which is what we want since this
       # is meant to be a "binary checksum". We have chosen to use MD5 for speed,
       # similarity with other SDKs, and because security is not a factor.
-      # TODO(cretz): Ensure Temporal bridge library is imported or something is
-      # off
+      require 'digest'
 
-      $LOADED_FEATURES.each_with_object(Digest::MD5.new) do |file, digest|
+      saw_bridge = false
+      build_id = $LOADED_FEATURES.each_with_object(Digest::MD5.new) do |file, digest|
+        saw_bridge = true if file.include?('temporalio_bridge.')
         digest.update(File.read(file)) if File.file?(file)
       end.hexdigest
+      raise 'Temporal bridge library not in $LOADED_FEATURES, unable to calculate default build ID' unless saw_bridge
+
+      build_id
     end
 
     # Run all workers until cancellation or optional block completes. When the cancellation or block is complete, the
@@ -75,6 +79,7 @@ module Temporalio
     #
     # @param workers [Array<Worker>] Workers to run.
     # @param cancellation [Cancellation] Cancellation that can be canceled to shut down all workers.
+    # @param shutdown_signals [Array] Signals to trap and cause worker shutdown.
     # @param raise_in_block_on_shutdown [Exception, nil] Exception to {::Thread.raise} or {::Fiber.raise} if a block is
     #   present and still running on shutdown. If nil, `raise` is not used.
     # @param wait_block_complete [Boolean] If block given and shutdown caused by something else (e.g. cancellation
@@ -85,6 +90,7 @@ module Temporalio
     def self.run_all(
       *workers,
       cancellation: Cancellation.new,
+      shutdown_signals: [],
       raise_in_block_on_shutdown: Error::CanceledError.new('Workers finished'),
       wait_block_complete: true,
       &block
@@ -96,7 +102,7 @@ module Temporalio
       Internal::Bridge.assert_fiber_compatibility!
 
       # Start the multi runner
-      runner = Internal::Worker::MultiRunner.new(workers:)
+      runner = Internal::Worker::MultiRunner.new(workers:, shutdown_signals:)
 
       # Apply block
       runner.apply_thread_or_fiber_block(&block)
@@ -141,6 +147,9 @@ module Temporalio
           block_result = event
           first_error ||= event.error
           runner.initiate_shutdown
+        when Internal::Worker::MultiRunner::Event::ShutdownSignalReceived
+          logger.info('Signal received, beginning worker shutdown')
+          runner.initiate_shutdown
         else
           raise "Unexpected event: #{event}"
         end
@@ -169,6 +178,8 @@ module Temporalio
             logger.error(event.error)
             block_result = event
             first_error ||= event.error
+          when Internal::Worker::MultiRunner::Event::ShutdownSignalReceived
+            # Do nothing, waiting for block
           else
             raise "Unexpected event: #{event}"
           end
@@ -335,6 +346,7 @@ module Temporalio
     # every activity and workflow task to complete before returning.
     #
     # @param cancellation [Cancellation] Cancellation that can be canceled to shut down this worker.
+    # @param shutdown_signals [Array] Signals to trap and cause worker shutdown.
     # @param raise_in_block_on_shutdown [Exception, nil] Exception to {::Thread.raise} or {::Fiber.raise} if a block is
     #   present and still running on shutdown. If nil, `raise` is not used.
     # @param wait_block_complete [Boolean] If block given and shutdown caused by something else (e.g. cancellation
@@ -344,12 +356,12 @@ module Temporalio
     # @return [Object] Return value of the block or nil of no block given.
     def run(
       cancellation: Cancellation.new,
-      # TODO(cretz): Document that this can be set to nil
+      shutdown_signals: [],
       raise_in_block_on_shutdown: Error::CanceledError.new('Workers finished'),
       wait_block_complete: true,
       &block
     )
-      Worker.run_all(self, cancellation:, raise_in_block_on_shutdown:, wait_block_complete:, &block)
+      Worker.run_all(self, cancellation:, shutdown_signals:, raise_in_block_on_shutdown:, wait_block_complete:, &block)
     end
 
     # @!visibility private

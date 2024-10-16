@@ -44,7 +44,7 @@ Metrics/ClassLength:
 
 # The default is too small
 Metrics/CyclomaticComplexity:
-  Max: 25
+  Max: 100
 
 # The default is too small
 Metrics/MethodLength:
