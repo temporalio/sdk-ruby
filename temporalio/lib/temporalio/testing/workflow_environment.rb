@@ -24,6 +24,9 @@ module Temporalio
       # @param namespace [String] Namespace for the server.
       # @param data_converter [Converters::DataConverter] Data converter for the client.
       # @param interceptors [Array<Client::Interceptor>] Interceptors for the client.
+      # @param logger [Logger] Logger for the client.
+      # @param default_workflow_query_reject_condition [WorkflowQueryRejectCondition, nil] Default rejection condition
+      #   for the client.
       # @param ip [String] IP to bind to.
       # @param port [Integer, nil] Port to bind on, or +nil+ for random.
       # @param ui [Boolean] If +true+, also starts the UI.
@@ -48,7 +51,8 @@ module Temporalio
         namespace: 'default',
         data_converter: Converters::DataConverter.default,
         interceptors: [],
-        # TODO(cretz): More client connect options
+        logger: Logger.new($stdout, level: Logger::WARN),
+        default_workflow_query_reject_condition: nil,
         ip: '127.0.0.1',
         port: nil,
         ui: false, # rubocop:disable Naming/MethodParameterName
@@ -84,6 +88,8 @@ module Temporalio
             namespace,
             data_converter:,
             interceptors:,
+            logger:,
+            default_workflow_query_reject_condition:,
             runtime:
           )
           server = Ephemeral.new(client, core_server)

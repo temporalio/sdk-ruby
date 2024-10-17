@@ -1,0 +1,18 @@
+module Temporalio
+  class Cancellation
+    def initialize: (*Cancellation parents) -> void
+
+    def canceled?: -> bool
+    def canceled_reason: -> String?
+    def pending_canceled?: -> bool
+    def pending_canceled_reason: -> String?
+    def check!: (?Exception err) -> void
+    def to_ary: -> [Cancellation, Proc]
+    def wait: -> void
+    def shield: [T] { (?) -> untyped } -> T
+    def add_cancel_callback: (?Proc proc) ?{ -> untyped } -> void
+
+    private def on_cancel: (reason: Object?) -> void
+    private def prepare_cancel: (reason: Object?) -> Array[Proc]?
+  end
+end

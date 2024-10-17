@@ -33,7 +33,7 @@ module Temporalio
     end
 
     # Error that is returned from  when a workflow is unsuccessful.
-    class WorkflowFailureError < Error
+    class WorkflowFailedError < Error
       # @!visibility private
       def initialize
         super('Workflow failed')
@@ -76,7 +76,7 @@ module Temporalio
       end
     end
 
-    # Error that occurs when update RPC call times out or is cancelled.
+    # Error that occurs when update RPC call times out or is canceled.
     #
     # @note This is not related to any general concept of timing out or cancelling a running update, this is only
     # related to the client call itself.
@@ -84,6 +84,14 @@ module Temporalio
       # @!visibility private
       def initialize
         super('Timeout or cancellation waiting for update')
+      end
+    end
+
+    # Error that occurs when an async activity handle tries to heartbeat and the activity is marked as canceled.
+    class AsyncActivityCanceledError < Error
+      # @!visibility private
+      def initialize
+        super('Activity canceled')
       end
     end
 

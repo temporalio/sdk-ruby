@@ -7,6 +7,7 @@ module Temporalio
         ?namespace: String,
         ?data_converter: Converters::DataConverter,
         ?interceptors: Array[Client::Interceptor],
+        ?logger: Logger,
         ?ip: String,
         ?port: Integer?,
         ?ui: bool,

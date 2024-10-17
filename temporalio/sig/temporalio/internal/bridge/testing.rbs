@@ -43,12 +43,13 @@ module Temporalio
 
           def self.async_start_dev_server: (
             Runtime runtime,
-            StartDevServerOptions options
-          ) { ([EphemeralServer, Error]) -> void } -> void
+            StartDevServerOptions options,
+            Queue queue
+          ) -> void
 
           def target: -> String
 
-          def async_shutdown: { ([nil, Error]) -> void } -> void
+          def async_shutdown: (Queue queue) -> void
         end
       end
     end

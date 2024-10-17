@@ -25,19 +25,16 @@ So async calls usually looks like this:
 
     ```
     queue = Queue.new
-    some_bridge_thing.do_foo { |result| Queue.push(result) }
+    some_bridge_thing.do_foo(queue)
     queue.pop
     ```
 
 * In Rust, `do_foo` spawns some Tokio async thing and returns
 * Once Tokio async thing is completed, in the Ruby-thread callback, Rust side converts that thing to a Ruby thing and
-  invokes the block
+  pushes to the queue
 
 This allows Ruby to remain async if in a Fiber, because Ruby `queue.pop` does not block a thread when in a Fiber
-context.
-
-The invocation of a block with a value is quite cheap in Ruby (`rb_proc_call_kw` C call). There are no obvious
-performance savings by trying to push to a Ruby queue from inside Rust directly.
+context. The invocation of a queue push with a value is quite cheap in Ruby.
 
 ## Argument Passing
 

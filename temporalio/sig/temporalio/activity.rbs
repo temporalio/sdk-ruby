@@ -1,0 +1,15 @@
+module Temporalio
+  class Activity
+    def self.activity_name: (String | Symbol name) -> void
+    def self.activity_executor: (Symbol executor_name) -> void
+    def self.activity_cancel_raise: (bool cancel_raise) -> void
+
+    def self._activity_definition_details: -> {
+      activity_name: String | Symbol,
+      activity_executor: Symbol,
+      activity_cancel_raise: bool
+    }
+
+    def execute: (?) -> untyped
+  end
+end

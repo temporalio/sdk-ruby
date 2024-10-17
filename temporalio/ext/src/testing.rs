@@ -1,6 +1,5 @@
 use magnus::{
-    class, function, method, prelude::*, value::Opaque, DataTypeFunctions, Error, Ruby, TypedData,
-    Value,
+    class, function, method, prelude::*, DataTypeFunctions, Error, Ruby, TypedData, Value,
 };
 use parking_lot::Mutex;
 use temporal_sdk_core::ephemeral_server::{
@@ -10,7 +9,7 @@ use temporal_sdk_core::ephemeral_server::{
 use crate::{
     error, id, new_error,
     runtime::{Runtime, RuntimeHandle},
-    util::Struct,
+    util::{AsyncCallback, Struct},
     ROOT_MOD,
 };
 
@@ -22,12 +21,12 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let class = module.define_class("EphemeralServer", class::object())?;
     class.define_singleton_method(
         "async_start_dev_server",
-        function!(EphemeralServer::async_start_dev_server, 2),
+        function!(EphemeralServer::async_start_dev_server, 3),
     )?;
     class.define_method("target", method!(EphemeralServer::target, 0))?;
     class.define_method(
         "async_shutdown",
-        method!(EphemeralServer::async_shutdown, 0),
+        method!(EphemeralServer::async_shutdown, 1),
     )?;
     Ok(())
 }
@@ -45,9 +44,9 @@ pub struct EphemeralServer {
 
 impl EphemeralServer {
     pub fn async_start_dev_server(
-        ruby: &Ruby,
         runtime: &Runtime,
         options: Struct,
+        queue: Value,
     ) -> Result<(), Error> {
         // Build options
         let mut opts_build = TemporalDevServerConfigBuilder::default();
@@ -85,21 +84,17 @@ impl EphemeralServer {
             .map_err(|err| error!("Invalid Temporalite config: {}", err))?;
 
         // Start
-        let block = Opaque::from(ruby.block_proc()?);
+        let callback = AsyncCallback::from_queue(queue);
         let runtime_handle = runtime.handle.clone();
         runtime.handle.spawn(
             async move { opts.start_server().await },
-            move |ruby, result| {
-                let block = ruby.get_inner(block);
-                let _: Value = match result {
-                    Ok(core) => block.call((EphemeralServer {
-                        target: core.target.clone(),
-                        core: Mutex::new(Some(core)),
-                        runtime_handle,
-                    },))?,
-                    Err(err) => block.call((new_error!("Failed starting server: {}", err),))?,
-                };
-                Ok(())
+            move |_, result| match result {
+                Ok(core) => callback.push(EphemeralServer {
+                    target: core.target.clone(),
+                    core: Mutex::new(Some(core)),
+                    runtime_handle,
+                }),
+                Err(err) => callback.push(new_error!("Failed starting server: {}", err)),
             },
         );
         Ok(())
@@ -109,21 +104,19 @@ impl EphemeralServer {
         &self.target
     }
 
-    pub fn async_shutdown(&self) -> Result<(), Error> {
-        let ruby = Ruby::get().expect("Not in Ruby thread");
+    pub fn async_shutdown(&self, queue: Value) -> Result<(), Error> {
         if let Some(mut core) = self.core.lock().take() {
-            let block = Opaque::from(ruby.block_proc()?);
+            let callback = AsyncCallback::from_queue(queue);
             self.runtime_handle
-                .spawn(async move { core.shutdown().await }, move |ruby, result| {
-                    let block = ruby.get_inner(block);
-                    let _: Value = match result {
-                        Ok(_) => block.call((ruby.qnil(),))?,
+                .spawn(
+                    async move { core.shutdown().await },
+                    move |ruby, result| match result {
+                        Ok(_) => callback.push(ruby.qnil()),
                         Err(err) => {
-                            block.call((new_error!("Failed shutting down server: {}", err),))?
+                            callback.push(new_error!("Failed shutting down server: {}", err))
                         }
-                    };
-                    Ok(())
-                })
+                    },
+                )
         }
         Ok(())
     }

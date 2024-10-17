@@ -1,0 +1,22 @@
+module Temporalio
+  module Testing
+    class ActivityEnvironment
+      def self.default_info: -> Activity::Info
+
+      def initialize: (
+        ?info: Activity::Info,
+        ?on_heartbeat: Proc?,
+        ?cancellation: Cancellation,
+        ?worker_shutdown_cancellation: Cancellation,
+        ?payload_converter: Converters::PayloadConverter,
+        ?logger: Logger,
+        ?activity_executors: Hash[Symbol, Worker::ActivityExecutor]
+      ) -> void
+
+      def run: (
+        Activity | singleton(Activity) | Activity::Definition activity,
+        *Object? args
+      ) -> untyped
+    end
+  end
+end

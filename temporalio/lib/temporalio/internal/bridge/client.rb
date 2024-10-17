@@ -6,7 +6,6 @@ require 'temporalio/temporalio_bridge'
 module Temporalio
   module Internal
     module Bridge
-      # @!visibility private
       class Client
         Options = Struct.new(
           :target_host,
@@ -22,7 +21,6 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         TLSOptions = Struct.new(
           :client_cert, # Optional
           :client_private_key, # Optional
@@ -31,7 +29,6 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         RPCRetryOptions = Struct.new(
           :initial_interval,
           :randomization_factor,
@@ -42,14 +39,12 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         KeepAliveOptions = Struct.new(
           :interval,
           :timeout,
           keyword_init: true
         )
 
-        # @!visibility private
         HTTPConnectProxyOptions = Struct.new(
           :target_host,
           :basic_auth_user, # Optional
@@ -57,16 +52,15 @@ module Temporalio
           keyword_init: true
         )
 
-        # @!visibility private
         def self.new(runtime, options)
-          Bridge.async_call do |queue|
-            async_new(runtime, options) do |val|
-              queue.push(val)
-            end
-          end
+          queue = Queue.new
+          async_new(runtime, options, queue)
+          result = queue.pop
+          raise result if result.is_a?(Exception)
+
+          result
         end
 
-        # @!visibility private
         def _invoke_rpc(
           service:,
           rpc:,
@@ -76,19 +70,20 @@ module Temporalio
           rpc_metadata:,
           rpc_timeout:
         )
-          response_bytes = Bridge.async_call do |queue|
-            async_invoke_rpc(
-              service:,
-              rpc:,
-              request: request.to_proto,
-              rpc_retry:,
-              rpc_metadata:,
-              rpc_timeout:
-            ) do |val|
-              queue.push(val)
-            end
-          end
-          response_class.decode(response_bytes)
+          queue = Queue.new
+          async_invoke_rpc(
+            service:,
+            rpc:,
+            request: request.to_proto,
+            rpc_retry:,
+            rpc_metadata:,
+            rpc_timeout:,
+            queue:
+          )
+          result = queue.pop
+          raise result if result.is_a?(Exception)
+
+          response_class.decode(result)
         end
       end
     end

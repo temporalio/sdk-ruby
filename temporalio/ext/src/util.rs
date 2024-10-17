@@ -1,11 +1,11 @@
 use std::ffi::c_void;
 
 use magnus::symbol::IntoSymbol;
-use magnus::value::OpaqueId;
-use magnus::Ruby;
+use magnus::value::{BoxValue, OpaqueId, ReprValue};
 use magnus::{Error, RStruct, TryConvert, Value};
+use magnus::{IntoValue, Ruby};
 
-use crate::error;
+use crate::{error, id};
 
 pub(crate) struct Struct {
     field_path: Vec<OpaqueId>,
@@ -100,5 +100,30 @@ where
         );
 
         *Box::from_raw(result as _)
+    }
+}
+
+pub(crate) struct AsyncCallback {
+    queue: BoxValue<Value>,
+}
+
+// We trust our usage of this across threads. We would use Opaque but we can't
+// box that properly/safely. The inner queue is always expected to be a Ruby
+// Queue.
+unsafe impl Send for AsyncCallback {}
+unsafe impl Sync for AsyncCallback {}
+
+impl AsyncCallback {
+    pub(crate) fn from_queue(queue: Value) -> Self {
+        Self {
+            queue: BoxValue::new(queue),
+        }
+    }
+
+    pub(crate) fn push<V>(&self, value: V) -> Result<(), Error>
+    where
+        V: IntoValue,
+    {
+        self.queue.funcall(id!("push"), (value,)).map(|_: Value| ())
     }
 }

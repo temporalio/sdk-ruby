@@ -1,0 +1,69 @@
+module Temporalio
+  class Worker
+    class Tuner
+      class SlotSupplier
+        class Fixed < SlotSupplier
+          attr_reader slots: Integer
+
+          def initialize: (Integer slots) -> void
+        end
+
+        class ResourceBased < SlotSupplier
+          attr_reader tuner_options: ResourceBasedTunerOptions
+          attr_reader slot_options: ResourceBasedSlotOptions
+
+          def initialize: (
+            tuner_options: ResourceBasedTunerOptions,
+            slot_options: ResourceBasedSlotOptions
+          ) -> void
+        end
+      end
+
+      class ResourceBasedTunerOptions
+        attr_accessor target_memory_usage: Float
+        attr_accessor target_cpu_usage: Float
+
+        def initialize: (
+          target_memory_usage: Float,
+          target_cpu_usage: Float
+        ) -> void
+      end
+
+      class ResourceBasedSlotOptions
+        attr_accessor min_slots: Integer?
+        attr_accessor max_slots: Integer?
+        attr_accessor ramp_throttle: Float?
+
+        def initialize: (
+          min_slots: Integer?,
+          max_slots: Integer?,
+          ramp_throttle: Float?
+        ) -> void
+      end
+
+      def self.create_fixed: (
+        ?workflow_slots: Integer,
+        ?activity_slots: Integer,
+        ?local_activity_slots: Integer
+      ) -> Tuner
+
+      def self.create_resource_based: (
+        target_memory_usage: Float,
+        target_cpu_usage: Float,
+        ?workflow_options: ResourceBasedSlotOptions,
+        ?activity_options: ResourceBasedSlotOptions,
+        ?local_activity_options: ResourceBasedSlotOptions
+      ) -> Tuner
+
+      attr_reader workflow_slot_supplier: SlotSupplier
+      attr_reader activity_slot_supplier: SlotSupplier
+      attr_reader local_activity_slot_supplier: SlotSupplier
+
+      def initialize: (
+        workflow_slot_supplier: SlotSupplier,
+        activity_slot_supplier: SlotSupplier,
+        local_activity_slot_supplier: SlotSupplier
+      ) -> void
+    end
+  end
+end
