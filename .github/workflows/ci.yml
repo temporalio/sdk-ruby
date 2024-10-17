@@ -30,7 +30,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -69,5 +69,7 @@ jobs:
           [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
 
       - name: Lint, compile, test Ruby
+        # TODO(cretz): Tests currently segfault on Windows: https://github.com/temporalio/sdk-ruby/issues/172
+        if: ${{ matrix.os != 'windows-latest' }}
         working-directory: ./temporalio
         run: bundle exec rake TESTOPTS="--verbose"
