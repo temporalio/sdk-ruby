@@ -1,0 +1,85 @@
+name: Build Gems
+on:
+  push:
+    branches:
+      - main
+      - "releases/*"
+
+jobs:
+  build-gems:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rubyPlatform: ["aarch64-linux", "x86_64-linux", "arm64-darwin", "x86_64-darwin", "x64-mingw-ucrt"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup Ruby and Rust
+        uses: oxidize-rb/actions/setup-ruby-and-rust@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          cargo-cache: true
+          cargo-vendor: true
+          working-directory: ./temporalio
+          cache-version: v1-${{ matrix.rubyPlatform }}
+
+      - name: Cross compile gems
+        uses: oxidize-rb/actions/cross-gem@v1
+        id: cross-gem
+        with:
+          platform: ${{ matrix.rubyPlatform }}
+          ruby-versions: "3.1,3.2,3.3"
+          working-directory: ./temporalio
+
+      - name: Upload gems
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.rubyPlatform }}-gem
+          path: ${{ steps.cross-gem.outputs.gem-path }}
+
+  smoke-test-gems:
+    needs:
+      - build-gems
+    strategy:
+      fail-fast: false
+      matrix:
+        # TODO(cretz): Enable Linux ARM. See ci.yaml comment for why we can't right now.
+        os: [ubuntu-latest, macos-intel, macos-latest, windows-latest]
+        rubyVersion: ["3.1", "3.2", "3.3"]
+        include:
+          - os: ubuntu-latest
+            rubyPlatform: x86_64-linux
+          - os: macos-intel
+            runsOn: macos-12
+            rubyPlatform: x86_64-darwin
+          - os: macos-latest
+            rubyPlatform: arm64-darwin
+          - os: windows-latest
+            rubyPlatform: x64-mingw-ucrt
+    runs-on: ${{ matrix.runsOn || matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Download gem
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.rubyPlatform }}-gem
+          path: local-gem
+
+      - name: Setup Ruby
+        uses: oxidize-rb/actions/setup-ruby-and-rust@v1
+        with:
+          ruby-version: "${{ matrix.rubyVersion }}"
+          bundler-cache: true
+          cargo-cache: false
+
+      - name: Run smoke test
+        run: ruby ./temporalio/smoke_test/smoke_test_gem.rb 'local-gem/*-${{ matrix.rubyPlatform }}.gem'

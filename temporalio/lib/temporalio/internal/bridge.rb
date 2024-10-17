@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# Use Ruby-version-specific Rust library if present
+begin
+  RUBY_VERSION =~ /(\d+\.\d+)/
+  require "temporalio/internal/bridge/#{Regexp.last_match(1)}/temporalio_bridge"
+rescue LoadError
+  require 'temporalio/internal/bridge/temporalio_bridge'
+end
+
 module Temporalio
   module Internal
     module Bridge
