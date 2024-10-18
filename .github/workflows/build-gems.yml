@@ -6,7 +6,7 @@ on:
       - "releases/*"
 
 jobs:
-  build-gems:
+  build-platform-gems:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -30,7 +30,7 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
-      - name: Cross compile gems
+      - name: Cross compile gem
         uses: oxidize-rb/actions/cross-gem@v1
         id: cross-gem
         with:
@@ -38,15 +38,45 @@ jobs:
           ruby-versions: "3.1,3.2,3.3"
           working-directory: ./temporalio
 
-      - name: Upload gems
+      - name: Upload gem
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.rubyPlatform }}-gem
           path: ${{ steps.cross-gem.outputs.gem-path }}
 
+  build-source-gem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Ruby and Rust
+        uses: oxidize-rb/actions/setup-ruby-and-rust@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          cargo-cache: true
+          cache-version: v1-source
+
+      - name: Install bundle
+        working-directory: ./temporalio
+        run: bundle install
+
+      - name: Build
+        working-directory: ./temporalio
+        run: bundle exec rake build
+
+      - name: Upload gem
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-gem
+          path: temporalio/pkg/*.gem
+
   smoke-test-gems:
     needs:
-      - build-gems
+      - build-platform-gems
     strategy:
       fail-fast: false
       matrix:

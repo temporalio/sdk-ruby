@@ -10,8 +10,12 @@ task build: :compile
 
 GEMSPEC = Gem::Specification.load('temporalio.gemspec')
 
-RbSys::ExtensionTask.new('temporalio_bridge', GEMSPEC) do |ext|
-  ext.lib_dir = 'lib/temporalio/internal/bridge'
+begin
+  RbSys::ExtensionTask.new('temporalio_bridge', GEMSPEC) do |ext|
+    ext.lib_dir = 'lib/temporalio/internal/bridge'
+  end
+rescue RbSys::CargoMetadataError
+  raise 'Source gem cannot be installed directly, must be a supported platform'
 end
 
 require 'rake/testtask'

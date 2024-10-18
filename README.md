@@ -2,12 +2,17 @@
 
 ![Ruby 3.1 | 3.2 | 3.3](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
 [![MIT](https://img.shields.io/github/license/temporalio/sdk-ruby.svg?style=for-the-badge)](LICENSE)
-<!-- TODO: [![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio) -->
+[![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio)
 
 [Temporal](https://temporal.io/) is a distributed, scalable, durable, and highly available orchestration engine used to
 execute asynchronous, long-running business logic in a scalable and resilient way.
 
 **Temporal Ruby SDK** is the framework for authoring workflows and activities using the Ruby programming language.
+
+Also see:
+
+* [Ruby Samples](https://github.com/temporalio/samples-ruby)
+* [API Documentation](https://rubydoc.info/gems/temporalio/0.2.0)
 
 ⚠️ UNDER ACTIVE DEVELOPMENT
 
@@ -49,6 +54,7 @@ Notably missing from this SDK:
   - [Platform Support](#platform-support)
 - [Development](#development)
   - [Build](#build)
+    - [Build Platform-specific Gem](#build-platform-specific-gem)
   - [Testing](#testing)
   - [Code Formatting and Type Checking](#code-formatting-and-type-checking)
   - [Proto Generation](#proto-generation)
@@ -59,25 +65,25 @@ Notably missing from this SDK:
 
 ### Installation
 
-Install the gem to the desired version as mentioned at https://rubygems.org/gems/temporalio. Since the SDK is still in
-pre-release, the version should be specified explicitly. So either in a Gemfile like:
+Can require in a Gemfile like:
 
 ```
-gem 'temporalio', '<version>'
+gem 'temporalio'
 ```
 
 Or via `gem install` like:
 
 ```
-gem install temporalio -v '<version>'
+gem install temporalio
 ```
+
+**NOTE**: Only macOS ARM/x64 and Linux ARM/x64 are supported, and the platform-specific gem chosen is based on when the
+gem/bundle install is performed. A source gem is published but cannot be used directly and will fail to build if tried.
+MinGW-based Windows and Linux MUSL do not have gems. See the [Platform Support](#platform-support) section for more
+information.
 
 **NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
 supported on Ruby versions 3.3 and newer.
-
-**NOTE**: MinGW-based Windows is not currently supported natively, but is via WSL. Prebuilt gems for Linux MUSL are also
-not currently present. We also do not publish a gem for building from source at this time. See the
-[Platform Support](#platform-support) section later for more information.
 
 ### Implementing an Activity
 
@@ -462,9 +468,9 @@ This means Linux and macOS for ARM and x64 have published gems. Currently, a gem
 Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/172) with Windows and multi-threaded Rust, MinGW-based
 Windows (i.e. `x64-mingw-ucrt`) is not supported. But WSL is supported using the normal Linux gem.
 
-At this time a pure source gem is not published, which means that when trying to install the gem on an unsupported
-platform, you may get an error that it is not available. Building from source requires many files across submodules and
-requires Rust to be installed. See the [Build](#build) section for how to build a gem from the repository.
+At this time a pure source gem is published for documentation reasons, but it cannot be built and will fail if tried.
+Building from source requires many files across submodules and requires Rust to be installed. See the [Build](#build)
+section for how to build a the repository.
 
 The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
 `async` gem) are only supported on Ruby versions 3.3 and newer.
@@ -488,12 +494,31 @@ To build shared library for development use:
 
     bundle exec rake compile
 
-Note, this is not `compile:dev` because debug-mode in Rust has
+**NOTE**: This will make the current directory usable for the current Ruby version by putting the shared library
+`lib/temporalio/internal/bridge/temporalio_bridge.<ext>` in the proper place. But this development shared library may
+not work for other Ruby versions or other OS/arch combinations. For that, see "Build Platform-specific Gem" below.
+
+**NOTE**: This is not `compile:dev` because debug-mode in Rust has
 [an issue](https://github.com/rust-lang/rust/issues/34283) that causes runtime stack size problems.
 
-To lint, build, and test release:
+To lint, build, and test:
 
     bundle exec rake
+
+#### Build Platform-specific Gem
+
+The standard `bundle exec rake build` will produce a gem in the `pkg` directory, but that gem will not be usable because
+the shared library is not present (neither the Rust code nor the compiled form). To create a platform-specific gem that
+can be used, `rb-sys-dock` must be run. See the
+[Cross-Compilation documentation](https://oxidize-rb.github.io/rb-sys/tutorial/publishing/cross-compilation.html) in the
+`rb-sys` repository. For example, running:
+
+    bundle exec rb-sys-dock --platform x86_64-linux --ruby-versions 3.2,3.3 --build
+
+Will create a `pkg/temporalio-<version>-x86_64-linux.gem` file that can be used in x64 Linux environments on both Ruby
+3.2 and Ruby 3.3 because it contains the shared libraries. For this specific example, the shared libraries are inside
+the gem at `lib/temporalio/internal/bridge/3.2/temporalio_bridge.so` and
+`lib/temporalio/internal/bridge/3.3/temporalio_bridge.so`.
 
 ### Testing
 
