@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'google/protobuf/well_known_types'
+require 'securerandom'
 require 'temporalio/api'
 require 'temporalio/client/activity_id_reference'
 require 'temporalio/client/async_activity_handle'

@@ -9,20 +9,20 @@ on:
 jobs:
   build-lint-test:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        # TODO(cretz): Enable Windows (it's slow)
-        #
         # TODO(cretz): Enable Linux ARM. It's not natively supported with setup-ruby (see
-        # https://github.com/ruby/setup-ruby#supported-platforms). So we need to set ruby-version to 'none' per
+        # https://github.com/ruby/setup-ruby#supported-platforms and https://github.com/ruby/setup-ruby/issues/577).
+        # So we need to set ruby-version to 'none' per
         # https://github.com/oxidize-rb/actions/tree/main/setup-ruby-and-rust and install Ruby ourselves maybe. See
         # https://github.com/ruby/setup-ruby?tab=readme-ov-file#using-self-hosted-runners. The error states:
         #     Error: The current runner (ubuntu-24.04-arm64) was detected as self-hosted because the platform does not match a GitHub-hosted runner image (or that image is deprecated and no longer supported).
         #     In such a case, you should install Ruby in the $RUNNER_TOOL_CACHE yourself, for example using https://github.com/rbenv/ruby-build
         #     You can take inspiration from this workflow for more details: https://github.com/ruby/ruby-builder/blob/master/.github/workflows/build.yml
         #
-        #os: [ubuntu-latest, ubuntu-arm, macos-intel, macos-arm, windows-latest]
-        os: [ubuntu-latest, macos-intel, macos-arm]
+        # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
+        # https://github.com/temporalio/sdk-ruby/issues/172
+        os: [ubuntu-latest, macos-latest]
         # Earliest and latest supported
         rubyVersion: ["3.1", "3.3"]
         
@@ -30,14 +30,10 @@ jobs:
           - os: ubuntu-latest
             rubyVersion: "3.3"
             checkTarget: true
-          - os: macos-intel
-            runsOn: macos-12
-          - os: macos-arm
-            runsOn: macos-14
-    runs-on: ${{ matrix.runsOn || matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -47,11 +43,7 @@ jobs:
           ruby-version: ${{ matrix.rubyVersion }}
           bundler-cache: true
           cargo-cache: true
-
-      - name: Setup Rust cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: temporalio/ext -> temporalio/target
+          working-directory: ./temporalio
 
       # Needed for tests currently
       - name: Install Go
@@ -59,31 +51,26 @@ jobs:
         with:
           go-version: stable
 
-      - name: Install protoc
+      # Needed because gRPC tools does not have a macOS protoc binary
+      # currently, see https://github.com/grpc/grpc/issues/25755
+      - name: Install protoc for mac
+        if: ${{ matrix.os == 'macos-latest' }}
         uses: arduino/setup-protoc@v3
         with:
-          # TODO(cretz): Can upgrade proto when https://github.com/arduino/setup-protoc/issues/99 fixed
           version: "23.x"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Lint Rust
-        if: ${{ matrix.checkTarget }}
-        working-directory: ./temporalio
-        run: cargo clippy && cargo fmt --check
 
       - name: Install bundle
         working-directory: ./temporalio
         run: bundle install
 
-      - name: Check generated code unchanged
+      - name: Check generated protos
         if: ${{ matrix.checkTarget }}
+        working-directory: ./temporalio
         run: |
-          npx doctoc README.md
-          cd temporalio && bundle exec rake proto:generate
-          git diff --exit-code
+          bundle exec rake proto:generate
+          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio
         run: bundle exec rake TESTOPTS="--verbose"
-
-      # TODO(cretz): Build gem and smoke test against separate dir

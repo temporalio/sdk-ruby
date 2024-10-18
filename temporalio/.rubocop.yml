@@ -17,10 +17,6 @@ AllCops:
 # Keep cop rule settings in alphabetical order. For each rule setting, provide
 # justification for the change from default.
 
-# We want development dependencies in the gemspec
-Gemspec/DevelopmentDependencies:
-  EnforcedStyle: gemspec
-
 # We want our classes in a certain order
 Layout/ClassStructure:
   Enabled: true
