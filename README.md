@@ -75,9 +75,8 @@ gem install temporalio -v '<version>'
 **NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
 supported on Ruby versions 3.3 and newer.
 
-**NOTE**: MinGW-based Windows is not currently supported natively, but is via WSL. Prebuilt gems for Linux MUSL are also
-not currently present. We also do not publish a gem for building from source at this time. See the
-[Platform Support](#platform-support) section later for more information.
+**NOTE**: MinGW-based Windows, Linux MUSL, and pure source based gems are not currently published. See the
+[Platform Support](#platform-support) section for more information.
 
 ### Implementing an Activity
 
