@@ -2,12 +2,17 @@
 
 ![Ruby 3.1 | 3.2 | 3.3](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
 [![MIT](https://img.shields.io/github/license/temporalio/sdk-ruby.svg?style=for-the-badge)](LICENSE)
-<!-- TODO: [![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio) -->
+[![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio)
 
 [Temporal](https://temporal.io/) is a distributed, scalable, durable, and highly available orchestration engine used to
 execute asynchronous, long-running business logic in a scalable and resilient way.
 
 **Temporal Ruby SDK** is the framework for authoring workflows and activities using the Ruby programming language.
+
+Also see:
+
+* [Ruby Samples](https://github.com/temporalio/samples-ruby)
+* [API Documentation](https://rubydoc.info/gems/temporalio)
 
 ⚠️ UNDER ACTIVE DEVELOPMENT
 
@@ -59,17 +64,16 @@ Notably missing from this SDK:
 
 ### Installation
 
-Install the gem to the desired version as mentioned at https://rubygems.org/gems/temporalio. Since the SDK is still in
-pre-release, the version should be specified explicitly. So either in a Gemfile like:
+Can require in a Gemfile like:
 
 ```
-gem 'temporalio', '<version>'
+gem 'temporalio'
 ```
 
 Or via `gem install` like:
 
 ```
-gem install temporalio -v '<version>'
+gem install temporalio
 ```
 
 **NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
