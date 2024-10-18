@@ -19,7 +19,10 @@ jobs:
         #     Error: The current runner (ubuntu-24.04-arm64) was detected as self-hosted because the platform does not match a GitHub-hosted runner image (or that image is deprecated and no longer supported).
         #     In such a case, you should install Ruby in the $RUNNER_TOOL_CACHE yourself, for example using https://github.com/rbenv/ruby-build
         #     You can take inspiration from this workflow for more details: https://github.com/ruby/ruby-builder/blob/master/.github/workflows/build.yml
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        #
+        # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
+        # https://github.com/temporalio/sdk-ruby/issues/172
+        os: [ubuntu-latest, macos-latest]
         # Earliest and latest supported
         rubyVersion: ["3.1", "3.3"]
         
@@ -69,7 +72,5 @@ jobs:
           [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
 
       - name: Lint, compile, test Ruby
-        # TODO(cretz): Tests currently segfault on Windows: https://github.com/temporalio/sdk-ruby/issues/172
-        if: ${{ matrix.os != 'windows-latest' }}
         working-directory: ./temporalio
         run: bundle exec rake TESTOPTS="--verbose"

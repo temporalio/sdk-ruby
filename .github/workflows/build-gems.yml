@@ -11,7 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rubyPlatform: ["aarch64-linux", "x86_64-linux", "arm64-darwin", "x86_64-darwin", "x64-mingw-ucrt"]
+        # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
+        # https://github.com/temporalio/sdk-ruby/issues/172
+        rubyPlatform: ["aarch64-linux", "x86_64-linux", "arm64-darwin", "x86_64-darwin"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -49,7 +51,10 @@ jobs:
       fail-fast: false
       matrix:
         # TODO(cretz): Enable Linux ARM. See ci.yaml comment for why we can't right now.
-        os: [ubuntu-latest, macos-intel, macos-latest, windows-latest]
+        #
+        # TODO(cretz): Enable windows-latest if we can figure out Windows issue, see
+        #   https://github.com/temporalio/sdk-ruby/issues/172
+        os: [ubuntu-latest, macos-intel, macos-latest]
         rubyVersion: ["3.1", "3.2", "3.3"]
         include:
           - os: ubuntu-latest
@@ -59,8 +64,6 @@ jobs:
             rubyPlatform: x86_64-darwin
           - os: macos-latest
             rubyPlatform: arm64-darwin
-          - os: windows-latest
-            rubyPlatform: x64-mingw-ucrt
     runs-on: ${{ matrix.runsOn || matrix.os }}
     steps:
       - name: Checkout repository

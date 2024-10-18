@@ -7,7 +7,7 @@
 [Temporal](https://temporal.io/) is a distributed, scalable, durable, and highly available orchestration engine used to
 execute asynchronous, long-running business logic in a scalable and resilient way.
 
-"Temporal Ruby SDK" is the framework for authoring workflows and activities using the Ruby programming language.
+**Temporal Ruby SDK** is the framework for authoring workflows and activities using the Ruby programming language.
 
 ⚠️ UNDER ACTIVE DEVELOPMENT
 
@@ -46,6 +46,7 @@ Notably missing from this SDK:
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
     - [Activity Testing](#activity-testing)
+  - [Platform Support](#platform-support)
 - [Development](#development)
   - [Build](#build)
   - [Testing](#testing)
@@ -58,10 +59,25 @@ Notably missing from this SDK:
 
 ### Installation
 
-⚠️ PENDING GEM PUBLISH
+Install the gem to the desired version as mentioned at https://rubygems.org/gems/temporalio. Since the SDK is still in
+pre-release, the version should be specified explicitly. So either in a Gemfile like:
 
-**NOTE: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
+```
+gem 'temporalio', '<version>'
+```
+
+Or via `gem install` like:
+
+```
+gem install temporalio -v '<version>'
+```
+
+**NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
 supported on Ruby versions 3.3 and newer.
+
+**NOTE**: MinGW-based Windows is not currently supported natively, but is via WSL. Prebuilt gems for Linux MUSL are also
+not currently present. We also do not publish a gem for building from source at this time. See the
+[Platform Support](#platform-support) section later for more information.
 
 ### Implementing an Activity
 
@@ -430,6 +446,29 @@ it will raise the error raised in the activity.
 The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
 activity.
 
+### Platform Support
+
+This SDK is backed by a Ruby C extension written in Rust leveraging the
+[Temporal Rust Core](https://github.com/temporalio/sdk-core). Gems are currently published for the following platforms:
+
+* `aarch64-linux`
+* `x86_64-linux`
+* `arm64-darwin`
+* `x86_64-darwin`
+
+This means Linux and macOS for ARM and x64 have published gems. Currently, a gem is not published for
+`aarch64-linux-musl` so Alpine Linux users may need to build from scratch or use a libc-based distro.
+
+Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/172) with Windows and multi-threaded Rust, MinGW-based
+Windows (i.e. `x64-mingw-ucrt`) is not supported. But WSL is supported using the normal Linux gem.
+
+At this time a pure source gem is not published, which means that when trying to install the gem on an unsupported
+platform, you may get an error that it is not available. Building from source requires many files across submodules and
+requires Rust to be installed. See the [Build](#build) section for how to build a gem from the repository.
+
+The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
+`async` gem) are only supported on Ruby versions 3.3 and newer.
+
 ## Development
 
 ### Build
@@ -438,7 +477,6 @@ Prerequisites:
 
 * [Ruby](https://www.ruby-lang.org/) >= 3.1 (i.e. `ruby` and `bundle` on the `PATH`)
 * [Rust](https://www.rust-lang.org/) latest stable (i.e. `cargo` on the `PATH`)
-* [Protobuf Compiler](https://protobuf.dev/) (i.e. `protoc` on the `PATH`)
 * This repository, cloned recursively
 * Change to the `temporalio/` directory
 
