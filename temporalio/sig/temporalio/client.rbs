@@ -69,8 +69,7 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: Float?,
       ?request_eager_start: bool,
-      ?rpc_metadata: Hash[String, String]?,
-      ?rpc_timeout: Float?
+      ?rpc_options: RPCOptions?
     ) -> WorkflowHandle
 
     def execute_workflow: (
@@ -89,8 +88,7 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: Float?,
       ?request_eager_start: bool,
-      ?rpc_metadata: Hash[String, String]?,
-      ?rpc_timeout: Float?
+      ?rpc_options: RPCOptions?
     ) -> Object?
 
     def workflow_handle: (
@@ -101,18 +99,30 @@ module Temporalio
 
     def list_workflows: (
       ?String query,
-      ?rpc_metadata: Hash[String, String]?,
-      ?rpc_timeout: Float?
+      ?rpc_options: RPCOptions?
     ) -> Enumerator[WorkflowExecution, WorkflowExecution]
 
     def count_workflows: (
       ?String query,
-      ?rpc_metadata: Hash[String, String]?,
-      ?rpc_timeout: Float?
+      ?rpc_options: RPCOptions?
     ) -> WorkflowExecutionCount
 
     def async_activity_handle: (
       String | ActivityIDReference task_token_or_id_reference
     ) -> AsyncActivityHandle
+
+    class RPCOptions
+      attr_accessor metadata: Hash[String, String]?
+      attr_accessor timeout: Float?
+      attr_accessor cancellation: Cancellation?
+      attr_accessor override_retry: bool?
+
+      def initialize: (
+        ?metadata: Hash[String, String]?,
+        ?timeout: Float?,
+        ?cancellation: Cancellation?,
+        ?override_retry: bool?
+      ) -> void
+    end
   end
 end

@@ -16,19 +16,16 @@ module Temporalio
 
       def result: (
         ?follow_runs: bool,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> Object?
 
       def describe: (
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> WorkflowExecution::Description
 
       def fetch_history: (
         ?event_filter_type: Integer,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> WorkflowHistory
 
       def fetch_history_events: (
@@ -36,23 +33,20 @@ module Temporalio
         ?event_filter_type: Integer,
         ?skip_archival: bool,
         ?specific_run_id: String?,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> Enumerator[untyped, untyped]
 
       def signal: (
         String signal,
         *Object? args,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> void
 
       def query: (
         String query,
         *Object? args,
         ?reject_condition: WorkflowQueryRejectCondition::enum?,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> Object?
 
       def start_update: (
@@ -60,16 +54,14 @@ module Temporalio
         *Object? args,
         wait_for_stage: WorkflowUpdateWaitStage::enum,
         ?id: String,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> WorkflowUpdateHandle
 
       def execute_update: (
         String update,
         *Object? args,
         ?id: String,
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> Object?
 
       def update_handle: (
@@ -78,15 +70,13 @@ module Temporalio
       ) -> WorkflowUpdateHandle
 
       def cancel: (
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> void
 
       def terminate: (
         ?String? reason,
         ?details: Array[Object?],
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> void
     end
   end

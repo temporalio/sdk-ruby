@@ -65,18 +65,23 @@ module Temporalio
           rpc:,
           request:,
           response_class:,
-          rpc_retry:,
-          rpc_metadata:,
-          rpc_timeout:
+          rpc_options:
         )
+          # Build cancellation token if needed
+          if rpc_options&.cancellation
+            rpc_cancellation_token = CancellationToken.new
+            rpc_options&.cancellation&.add_cancel_callback { rpc_cancellation_token.cancel }
+          end
+
           queue = Queue.new
           async_invoke_rpc(
             service:,
             rpc:,
             request: request.to_proto,
-            rpc_retry:,
-            rpc_metadata:,
-            rpc_timeout:,
+            rpc_retry: rpc_options&.override_retry || false,
+            rpc_metadata: rpc_options&.metadata,
+            rpc_timeout: rpc_options&.timeout,
+            rpc_cancellation_token:,
             queue:
           )
           result = queue.pop

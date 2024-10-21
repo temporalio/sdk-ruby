@@ -17,8 +17,7 @@ module Temporalio
 
         protected
 
-        def invoke_rpc(rpc:, request_class:, response_class:, request:, rpc_retry:, rpc_metadata:,
-                       rpc_timeout:)
+        def invoke_rpc(rpc:, request_class:, response_class:, request:, rpc_options:)
           raise 'Invalid request type' unless request.is_a?(request_class)
 
           begin
@@ -27,11 +26,13 @@ module Temporalio
               rpc:,
               request:,
               response_class:,
-              rpc_retry:,
-              rpc_metadata:,
-              rpc_timeout:
+              rpc_options:
             )
           rescue Internal::Bridge::Client::RPCFailure => e
+            if e.code == Error::RPCError::Code::CANCELED && e.message == '<__user_canceled__>'
+              raise Error::CanceledError, 'User canceled'
+            end
+
             raise Error::RPCError.new(e.message, code: e.code, raw_grpc_status: e.details)
           end
         end

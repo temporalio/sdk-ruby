@@ -36,8 +36,7 @@ module Temporalio
       # Wait for and return the result of the update. The result may already be known in which case no network call is
       # made. Otherwise the result will be polled for until it is returned.
       #
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object, nil] Update result.
       #
@@ -45,13 +44,12 @@ module Temporalio
       # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
       #   mean the update itself was timed out or canceled.
       # @raise [Error::RPCError] RPC error from call.
-      def result(rpc_metadata: nil, rpc_timeout: nil)
+      def result(rpc_options: nil)
         @known_outcome ||= @client._impl.poll_workflow_update(Interceptor::PollWorkflowUpdateInput.new(
                                                                 workflow_id:,
                                                                 run_id: workflow_run_id,
                                                                 update_id: id,
-                                                                rpc_metadata:,
-                                                                rpc_timeout:
+                                                                rpc_options:
                                                               ))
 
         if @known_outcome.failure

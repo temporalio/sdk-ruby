@@ -22,6 +22,21 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
+        def self.with_default_rpc_options(user_rpc_options)
+          # If the user did not provide an override_retry, we need to make sure
+          # we use an option set that has it as "true"
+          if user_rpc_options.nil?
+            user_rpc_options = @always_retry_options ||= Temporalio::Client::RPCOptions.new(override_retry: true)
+          elsif !user_rpc_options.is_a?(Temporalio::Client::RPCOptions)
+            raise ArgumentError, 'rpc_options must be RPCOptions'
+          elsif user_rpc_options.override_retry.nil?
+            # Copy and set as true
+            user_rpc_options = user_rpc_options.dup
+            user_rpc_options.override_retry = true
+          end
+          user_rpc_options
+        end
+
         def initialize(client)
           super(nil)
           @client = client
@@ -55,9 +70,7 @@ module Temporalio
           begin
             resp = @client.workflow_service.start_workflow_execution(
               req,
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           rescue Error::RPCError => e
             # Unpack and raise already started if that's the error, otherwise default raise
@@ -95,9 +108,7 @@ module Temporalio
             loop do
               resp = @client.workflow_service.list_workflow_executions(
                 req,
-                rpc_retry: true,
-                rpc_metadata: input.rpc_metadata,
-                rpc_timeout: input.rpc_timeout
+                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
               )
               resp.executions.each do |raw_info|
                 yielder << Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
@@ -115,9 +126,7 @@ module Temporalio
               namespace: @client.namespace,
               query: input.query || ''
             ),
-            rpc_retry: true,
-            rpc_metadata: input.rpc_metadata,
-            rpc_timeout: input.rpc_timeout
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           Temporalio::Client::WorkflowExecutionCount.new(
             resp.count,
@@ -139,9 +148,7 @@ module Temporalio
                 run_id: input.run_id || ''
               )
             ),
-            rpc_retry: true,
-            rpc_metadata: input.rpc_metadata,
-            rpc_timeout: input.rpc_timeout
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           Temporalio::Client::WorkflowExecution::Description.new(resp, @client.data_converter)
         end
@@ -161,9 +168,7 @@ module Temporalio
             loop do
               resp = @client.workflow_service.get_workflow_execution_history(
                 req,
-                rpc_retry: true,
-                rpc_metadata: input.rpc_metadata,
-                rpc_timeout: input.rpc_timeout
+                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
               )
               resp.history&.events&.each { |event| yielder << event }
               break if resp.next_page_token.empty?
@@ -187,9 +192,7 @@ module Temporalio
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid
             ),
-            rpc_retry: true,
-            rpc_metadata: input.rpc_metadata,
-            rpc_timeout: input.rpc_timeout
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           nil
         end
@@ -210,9 +213,7 @@ module Temporalio
                 ),
                 query_reject_condition: input.reject_condition || 0
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           rescue Error::RPCError => e
             # If the status is INVALID_ARGUMENT, we can assume it's a query failed
@@ -267,9 +268,7 @@ module Temporalio
           loop do
             resp = @client.workflow_service.update_workflow_execution(
               req,
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
 
             # We're only done if the response stage is after the requested stage
@@ -295,8 +294,7 @@ module Temporalio
                 workflow_id: input.workflow_id,
                 run_id: input.run_id,
                 update_id: input.update_id,
-                rpc_metadata: input.rpc_metadata,
-                rpc_timeout: input.rpc_timeout
+                rpc_options: input.rpc_options
               )
             )
           end
@@ -330,9 +328,7 @@ module Temporalio
           loop do
             resp = @client.workflow_service.poll_workflow_execution_update(
               req,
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
             return resp.outcome if resp.outcome
           rescue Error::RPCError => e
@@ -357,9 +353,7 @@ module Temporalio
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid
             ),
-            rpc_retry: true,
-            rpc_metadata: input.rpc_metadata,
-            rpc_timeout: input.rpc_timeout
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           nil
         end
@@ -377,9 +371,7 @@ module Temporalio
               details: @client.data_converter.to_payloads(input.details),
               identity: @client.connection.identity
             ),
-            rpc_retry: true,
-            rpc_metadata: input.rpc_metadata,
-            rpc_timeout: input.rpc_timeout
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           nil
         end
@@ -395,9 +387,7 @@ module Temporalio
                        identity: @client.connection.identity,
                        details: @client.data_converter.to_payloads(input.details)
                      ),
-                     rpc_retry: true,
-                     rpc_metadata: input.rpc_metadata,
-                     rpc_timeout: input.rpc_timeout
+                     rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
                  else
                    @client.workflow_service.record_activity_task_heartbeat(
@@ -407,9 +397,7 @@ module Temporalio
                        identity: @client.connection.identity,
                        details: @client.data_converter.to_payloads(input.details)
                      ),
-                     rpc_retry: true,
-                     rpc_metadata: input.rpc_metadata,
-                     rpc_timeout: input.rpc_timeout
+                     rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
                  end
           raise Error::AsyncActivityCanceledError if resp.cancel_requested
@@ -428,9 +416,7 @@ module Temporalio
                 identity: @client.connection.identity,
                 result: @client.data_converter.to_payloads([input.result])
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_completed(
@@ -440,9 +426,7 @@ module Temporalio
                 identity: @client.connection.identity,
                 result: @client.data_converter.to_payloads([input.result])
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           end
           nil
@@ -464,9 +448,7 @@ module Temporalio
                                           @client.data_converter.to_payloads(input.last_heartbeat_details)
                                         end
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_failed(
@@ -481,9 +463,7 @@ module Temporalio
                                           @client.data_converter.to_payloads(input.last_heartbeat_details)
                                         end
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           end
           nil
@@ -500,9 +480,7 @@ module Temporalio
                 identity: @client.connection.identity,
                 details: @client.data_converter.to_payloads(input.details)
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_canceled(
@@ -512,9 +490,7 @@ module Temporalio
                 identity: @client.connection.identity,
                 details: @client.data_converter.to_payloads(input.details)
               ),
-              rpc_retry: true,
-              rpc_metadata: input.rpc_metadata,
-              rpc_timeout: input.rpc_timeout
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           end
           nil

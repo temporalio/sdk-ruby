@@ -27,36 +27,24 @@ module Temporalio
       # Record a heartbeat for the activity.
       #
       # @param details [Array<Object>] Details of the heartbeat.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
-      def heartbeat(
-        *details,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      def heartbeat(*details, rpc_options: nil)
         @client._impl.heartbeat_async_activity(Interceptor::HeartbeatAsyncActivityInput.new(
                                                  task_token_or_id_reference:,
                                                  details:,
-                                                 rpc_metadata:,
-                                                 rpc_timeout:
+                                                 rpc_options:
                                                ))
       end
 
       # Complete the activity.
       #
       # @param result [Object, nil] Result of the activity.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
-      def complete(
-        result = nil,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      def complete(result = nil, rpc_options: nil)
         @client._impl.complete_async_activity(Interceptor::CompleteAsyncActivityInput.new(
                                                 task_token_or_id_reference:,
                                                 result:,
-                                                rpc_metadata:,
-                                                rpc_timeout:
+                                                rpc_options:
                                               ))
       end
 
@@ -64,39 +52,26 @@ module Temporalio
       #
       # @param error [Exception] Error for the activity.
       # @param last_heartbeat_details [Array<Object>] Last heartbeat details for the activity.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
-      def fail(
-        error,
-        last_heartbeat_details: [],
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      def fail(error, last_heartbeat_details: [], rpc_options: nil)
         @client._impl.fail_async_activity(Interceptor::FailAsyncActivityInput.new(
                                             task_token_or_id_reference:,
                                             error:,
                                             last_heartbeat_details:,
-                                            rpc_metadata:,
-                                            rpc_timeout:
+                                            rpc_options:
                                           ))
       end
 
       # Report the activity as canceled.
       #
       # @param details [Array<Object>] Cancellation details.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [AsyncActivityCanceledError] If the activity has been canceled.
-      def report_cancellation(
-        *details,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def report_cancellation(*details, rpc_options: nil)
         @client._impl.report_cancellation_async_activity(Interceptor::ReportCancellationAsyncActivityInput.new(
                                                            task_token_or_id_reference:,
                                                            details:,
-                                                           rpc_metadata:,
-                                                           rpc_timeout:
+                                                           rpc_options:
                                                          ))
       end
 

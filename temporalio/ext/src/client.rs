@@ -43,6 +43,10 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     inner_class.define_method("code", method!(RpcFailure::code, 0))?;
     inner_class.define_method("message", method!(RpcFailure::message, 0))?;
     inner_class.define_method("details", method!(RpcFailure::details, 0))?;
+
+    let inner_class = class.define_class("CancellationToken", class::object())?;
+    inner_class.define_singleton_method("new", function!(CancellationToken::new, 0))?;
+    inner_class.define_method("cancel", method!(CancellationToken::cancel, 0))?;
     Ok(())
 }
 
@@ -58,16 +62,17 @@ pub struct Client {
 #[macro_export]
 macro_rules! rpc_call {
     ($client:ident, $callback:ident, $call:ident, $trait:tt, $call_name:ident) => {{
+        let cancel_token = $call.cancel_token.clone();
         if $call.retry {
             let mut core_client = $client.core.clone();
             let req = $call.into_request()?;
-            $crate::client::rpc_resp($client, $callback, async move {
+            $crate::client::rpc_resp($client, $callback, cancel_token, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         } else {
             let mut core_client = $client.core.clone().into_inner();
             let req = $call.into_request()?;
-            $crate::client::rpc_resp($client, $callback, async move {
+            $crate::client::rpc_resp($client, $callback, cancel_token, async move {
                 $trait::$call_name(&mut core_client, req).await
             })
         }
@@ -176,39 +181,43 @@ impl Client {
 
     pub fn async_invoke_rpc(&self, args: &[Value]) -> Result<(), Error> {
         let args = scan_args::scan_args::<(), (), (), (), _, ()>(args)?;
-        let (service, rpc, request, retry, metadata, timeout, queue) = scan_args::get_kwargs::<
-            _,
-            (
-                u8,
-                String,
-                RString,
-                bool,
-                Option<HashMap<String, String>>,
-                Option<f64>,
-                Value,
-            ),
-            (),
-            (),
-        >(
-            args.keywords,
-            &[
-                id!("service"),
-                id!("rpc"),
-                id!("request"),
-                id!("rpc_retry"),
-                id!("rpc_metadata"),
-                id!("rpc_timeout"),
-                id!("queue"),
-            ],
-            &[],
-        )?
-        .required;
+        let (service, rpc, request, retry, metadata, timeout, cancel_token, queue) =
+            scan_args::get_kwargs::<
+                _,
+                (
+                    u8,
+                    String,
+                    RString,
+                    bool,
+                    Option<HashMap<String, String>>,
+                    Option<f64>,
+                    Option<&CancellationToken>,
+                    Value,
+                ),
+                (),
+                (),
+            >(
+                args.keywords,
+                &[
+                    id!("service"),
+                    id!("rpc"),
+                    id!("request"),
+                    id!("rpc_retry"),
+                    id!("rpc_metadata"),
+                    id!("rpc_timeout"),
+                    id!("rpc_cancellation_token"),
+                    id!("queue"),
+                ],
+                &[],
+            )?
+            .required;
         let call = RpcCall {
             rpc,
             request: unsafe { request.as_slice() },
             retry,
             metadata,
             timeout,
+            cancel_token: cancel_token.map(|c| c.token.clone()),
             _not_send_sync: PhantomData,
         };
         let callback = AsyncCallback::from_queue(queue);
@@ -249,6 +258,7 @@ pub(crate) struct RpcCall<'a> {
     pub retry: bool,
     pub metadata: Option<HashMap<String, String>>,
     pub timeout: Option<f64>,
+    pub cancel_token: Option<tokio_util::sync::CancellationToken>,
 
     // This RPC call contains an unsafe reference to Ruby bytes that does not
     // outlive the call, so we prevent it from being sent to another thread.
@@ -280,6 +290,7 @@ impl RpcCall<'_> {
 pub(crate) fn rpc_resp<P>(
     client: &Client,
     callback: AsyncCallback,
+    cancel_token: Option<tokio_util::sync::CancellationToken>,
     fut: impl Future<Output = Result<tonic::Response<P>, tonic::Status>> + Send + 'static,
 ) -> Result<(), Error>
 where
@@ -287,7 +298,17 @@ where
     P: Default,
 {
     client.runtime_handle.spawn(
-        async move { fut.await.map(|msg| msg.get_ref().encode_to_vec()) },
+        async move {
+            let res = if let Some(cancel_token) = cancel_token {
+                tokio::select! {
+                    _ = cancel_token.cancelled() => Err(tonic::Status::new(tonic::Code::Cancelled, "<__user_canceled__>")),
+                    v = fut => v,
+                }
+            } else {
+                fut.await
+            };
+            res.map(|msg| msg.get_ref().encode_to_vec())
+        },
         move |_, result| {
             match result {
                 // TODO(cretz): Any reasonable way to prevent byte copy that is just going to get decoded into proto
@@ -298,4 +319,26 @@ where
         },
     );
     Ok(())
+}
+
+#[derive(DataTypeFunctions, TypedData)]
+#[magnus(
+    class = "Temporalio::Internal::Bridge::Client::CancellationToken",
+    free_immediately
+)]
+pub struct CancellationToken {
+    pub(crate) token: tokio_util::sync::CancellationToken,
+}
+
+impl CancellationToken {
+    pub fn new() -> Result<Self, Error> {
+        Ok(Self {
+            token: tokio_util::sync::CancellationToken::new(),
+        })
+    }
+
+    pub fn cancel(&self) -> Result<(), Error> {
+        self.token.cancel();
+        Ok(())
+    }
 }

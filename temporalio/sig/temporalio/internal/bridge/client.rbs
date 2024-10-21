@@ -101,6 +101,7 @@ module Temporalio
           rpc_retry: bool,
           rpc_metadata: Hash[String, String]?,
           rpc_timeout: Float?,
+          rpc_cancellation_token: CancellationToken?,
           queue: Queue
         ) -> void
 
@@ -108,6 +109,11 @@ module Temporalio
           def code: -> Temporalio::Error::RPCError::Code::enum
           def message: -> String
           def details: -> String
+        end
+
+        class CancellationToken
+          def self.new: -> CancellationToken
+          def cancel: -> void
         end
       end
     end
