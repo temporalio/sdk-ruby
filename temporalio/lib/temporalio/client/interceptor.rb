@@ -35,24 +35,21 @@ module Temporalio
         :start_delay,
         :request_eager_start,
         :headers,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
       # Input for {Outbound.list_workflows}.
       ListWorkflowsInput = Struct.new(
         :query,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
       # Input for {Outbound.count_workflows}.
       CountWorkflowsInput = Struct.new(
         :query,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -60,8 +57,7 @@ module Temporalio
       DescribeWorkflowInput = Struct.new(
         :workflow_id,
         :run_id,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -72,8 +68,7 @@ module Temporalio
         :wait_new_event,
         :event_filter_type,
         :skip_archival,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -84,8 +79,7 @@ module Temporalio
         :signal,
         :args,
         :headers,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -97,8 +91,7 @@ module Temporalio
         :args,
         :reject_condition,
         :headers,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -111,8 +104,7 @@ module Temporalio
         :args,
         :wait_for_stage,
         :headers,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -121,8 +113,7 @@ module Temporalio
         :workflow_id,
         :run_id,
         :update_id,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -131,8 +122,7 @@ module Temporalio
         :workflow_id,
         :run_id,
         :first_execution_run_id,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -143,8 +133,7 @@ module Temporalio
         :first_execution_run_id,
         :reason,
         :details,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -152,8 +141,7 @@ module Temporalio
       HeartbeatAsyncActivityInput = Struct.new(
         :task_token_or_id_reference,
         :details,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -161,8 +149,7 @@ module Temporalio
       CompleteAsyncActivityInput = Struct.new(
         :task_token_or_id_reference,
         :result,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -171,8 +158,7 @@ module Temporalio
         :task_token_or_id_reference,
         :error,
         :last_heartbeat_details,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 
@@ -180,8 +166,7 @@ module Temporalio
       ReportCancellationAsyncActivityInput = Struct.new(
         :task_token_or_id_reference,
         :details,
-        :rpc_metadata,
-        :rpc_timeout,
+        :rpc_options,
         keyword_init: true
       )
 

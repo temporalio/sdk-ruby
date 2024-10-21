@@ -5,39 +5,138 @@ module Temporalio
     class Connection
       class CloudService < Service
         def initialize: (Connection) -> void
-        def get_users: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_user: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def create_user: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def update_user: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def delete_user: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def set_user_namespace_access: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_async_operation: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def create_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_namespaces: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def update_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def rename_custom_search_attribute: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def delete_namespace: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def failover_namespace_region: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def add_namespace_region: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_regions: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_region: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_api_keys: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_api_key: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def create_api_key: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def update_api_key: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def delete_api_key: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_user_groups: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_user_group: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def create_user_group: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def update_user_group: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def delete_user_group: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def set_user_group_namespace_access: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def create_service_account: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_service_account: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def get_service_accounts: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def update_service_account: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
-        def delete_service_account: (untyped request, ?rpc_retry: bool, ?rpc_metadata: Hash[String, String]?, ?rpc_timeout: Float?) -> untyped
+        def get_users: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_user: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_user: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_user: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_user: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def set_user_namespace_access: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_async_operation: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_namespace: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_namespaces: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_namespace: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_namespace: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def rename_custom_search_attribute: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_namespace: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def failover_namespace_region: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def add_namespace_region: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_regions: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_region: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_api_keys: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_api_key: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_api_key: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_api_key: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_api_key: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_user_groups: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_user_group: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_user_group: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_user_group: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_user_group: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def set_user_group_namespace_access: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_service_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_service_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_service_accounts: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_service_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_service_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end

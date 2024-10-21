@@ -20,8 +20,7 @@ module Temporalio
         attr_accessor start_delay: Float?
         attr_accessor request_eager_start: bool
         attr_accessor headers: Hash[String, String]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow: String,
@@ -40,46 +39,39 @@ module Temporalio
           start_delay: Float?,
           request_eager_start: bool,
           headers: Hash[String, String],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class ListWorkflowsInput
         attr_accessor query: String?
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           query: String?,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class CountWorkflowsInput
         attr_accessor query: String?
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           query: String?,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class DescribeWorkflowInput
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
           run_id: String?,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -89,8 +81,7 @@ module Temporalio
         attr_accessor wait_new_event: bool
         attr_accessor event_filter_type: Integer
         attr_accessor skip_archival: bool
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -98,8 +89,7 @@ module Temporalio
           wait_new_event: bool,
           event_filter_type: Integer,
           skip_archival: bool,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -109,8 +99,7 @@ module Temporalio
         attr_accessor signal: String
         attr_accessor args: Array[Object?]
         attr_accessor headers: Hash[String, String]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -118,8 +107,7 @@ module Temporalio
           signal: String,
           args: Array[Object?],
           headers: Hash[String, String],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -130,8 +118,7 @@ module Temporalio
         attr_accessor args: Array[Object?]
         attr_accessor reject_condition: WorkflowQueryRejectCondition::enum?
         attr_accessor headers: Hash[String, String]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -140,8 +127,7 @@ module Temporalio
           args: Array[Object?],
           reject_condition: WorkflowQueryRejectCondition::enum?,
           headers: Hash[String, String],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -153,8 +139,7 @@ module Temporalio
         attr_accessor args: Array[Object?]
         attr_accessor wait_for_stage: WorkflowUpdateWaitStage::enum
         attr_accessor headers: Hash[String, String]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -164,8 +149,7 @@ module Temporalio
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
           headers: Hash[String, String],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -173,15 +157,13 @@ module Temporalio
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
         attr_accessor update_id: String
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
           run_id: String?,
           update_id: String,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -189,15 +171,13 @@ module Temporalio
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
         attr_accessor first_execution_run_id: String?
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
           run_id: String?,
           first_execution_run_id: String?,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -207,8 +187,7 @@ module Temporalio
         attr_accessor first_execution_run_id: String?
         attr_accessor reason: String?
         attr_accessor details: Array[Object?]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -216,36 +195,31 @@ module Temporalio
           first_execution_run_id: String?,
           reason: String?,
           details: Array[Object?],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class HeartbeatAsyncActivityInput
         attr_accessor task_token_or_id_reference: String | ActivityIDReference
         attr_accessor details: Array[Object?]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           details: Array[Object?],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class CompleteAsyncActivityInput
         attr_accessor task_token_or_id_reference: String | ActivityIDReference
         attr_accessor result: Object?
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           result: Object?,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
@@ -253,29 +227,25 @@ module Temporalio
         attr_accessor task_token_or_id_reference: String | ActivityIDReference
         attr_accessor error: Exception
         attr_accessor last_heartbeat_details: Array[Object?]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           error: Exception,
           last_heartbeat_details: Array[Object?],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 
       class ReportCancellationAsyncActivityInput
         attr_accessor task_token_or_id_reference: String | ActivityIDReference
         attr_accessor details: Array[Object?]
-        attr_accessor rpc_metadata: Hash[String, String]?
-        attr_accessor rpc_timeout: Float?
+        attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           details: Array[Object?],
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> void
       end
 

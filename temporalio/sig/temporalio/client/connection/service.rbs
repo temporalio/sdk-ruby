@@ -9,9 +9,7 @@ module Temporalio
           request_class: class REQ,
           response_class: class RESP,
           request: REQ,
-          rpc_retry: bool,
-          rpc_metadata: Hash[String, String]?,
-          rpc_timeout: Float?
+          rpc_options: RPCOptions?
         ) -> RESP
       end
     end

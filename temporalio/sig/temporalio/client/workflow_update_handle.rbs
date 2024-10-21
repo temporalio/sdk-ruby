@@ -16,8 +16,7 @@ module Temporalio
       def result_obtained?: -> bool
 
       def result: (
-        ?rpc_metadata: Hash[String, String]?,
-        ?rpc_timeout: Float?
+        ?rpc_options: RPCOptions?
       ) -> Object?
     end
   end

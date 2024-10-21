@@ -203,8 +203,7 @@ module Temporalio
     #   with `cron_schedule`.
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
-    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowHandle] A workflow handle to the started workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
@@ -225,8 +224,7 @@ module Temporalio
       search_attributes: nil,
       start_delay: nil,
       request_eager_start: false,
-      rpc_metadata: nil,
-      rpc_timeout: nil
+      rpc_options: nil
     )
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
                              workflow:,
@@ -245,8 +243,7 @@ module Temporalio
                              start_delay:,
                              request_eager_start:,
                              headers: {},
-                             rpc_metadata:,
-                             rpc_timeout:
+                             rpc_options:
                            ))
     end
 
@@ -272,8 +269,7 @@ module Temporalio
     #   with `cron_schedule`.
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
-    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Object] Successful result of the workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists.
@@ -295,8 +291,7 @@ module Temporalio
       search_attributes: nil,
       start_delay: nil,
       request_eager_start: false,
-      rpc_metadata: nil,
-      rpc_timeout: nil
+      rpc_options: nil
     )
       start_workflow(
         workflow,
@@ -314,8 +309,7 @@ module Temporalio
         search_attributes:,
         start_delay:,
         request_eager_start:,
-        rpc_metadata:,
-        rpc_timeout:
+        rpc_options:
       ).result
     end
 
@@ -339,47 +333,29 @@ module Temporalio
     # List workflows.
     #
     # @param query [String, nil] A Temporal visibility list filter.
-    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
     #
     # @raise [Error::RPCError] RPC error from call.
     #
     # @see https://docs.temporal.io/visibility
-    def list_workflows(
-      query = nil,
-      rpc_metadata: nil,
-      rpc_timeout: nil
-    )
-      @impl.list_workflows(Interceptor::ListWorkflowsInput.new(
-                             query:,
-                             rpc_metadata:,
-                             rpc_timeout:
-                           ))
+    def list_workflows(query = nil, rpc_options: nil)
+      @impl.list_workflows(Interceptor::ListWorkflowsInput.new(query:, rpc_options:))
     end
 
     # Count workflows.
     #
     # @param query [String, nil] A Temporal visibility list filter.
-    # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-    # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowExecutionCount] Count of workflows.
     #
     # @raise [Error::RPCError] RPC error from call.
     #
     # @see https://docs.temporal.io/visibility
-    def count_workflows(
-      query = nil,
-      rpc_metadata: nil,
-      rpc_timeout: nil
-    )
-      @impl.count_workflows(Interceptor::CountWorkflowsInput.new(
-                              query:,
-                              rpc_metadata:,
-                              rpc_timeout:
-                            ))
+    def count_workflows(query = nil, rpc_options: nil)
+      @impl.count_workflows(Interceptor::CountWorkflowsInput.new(query:, rpc_options:))
     end
 
     # Get an async activity handle.
@@ -399,6 +375,45 @@ module Temporalio
     # @!visibility private
     def _impl
       @impl
+    end
+
+    # Set of RPC options for RPC calls.
+    class RPCOptions
+      # @return [Hash<String, String>, nil] Headers to include on the RPC call.
+      attr_accessor :metadata
+
+      # @return [Float, nil] Number of seconds before timeout of the RPC call.
+      attr_accessor :timeout
+
+      # @return [Cancellation, nil] Cancellation to use to potentially cancel the call. If canceled, the RPC will return
+      #   {Error::CanceledError}.
+      attr_accessor :cancellation
+
+      # @return [Boolean, nil] Whether to override the default retry option which decides whether to retry calls
+      #   implicitly when known transient error codes are reached. By default when this is nil, high-level calls retry
+      #   known transient error codes and low-level/direct calls do not.
+      attr_accessor :override_retry
+
+      # Create RPC options.
+      #
+      # @param metadata [Hash<String, String>, nil] Headers to include on the RPC call.
+      # @param timeout [Float, nil] Number of seconds before timeout of the RPC call.
+      # @param cancellation [Cancellation, nil] Cancellation to use to potentially cancel the call. If canceled, the RPC
+      #   will return {Error::CanceledError}.
+      # @param override_retry [Boolean, nil] Whether to override the default retry option which decides whether to retry
+      #   calls implicitly when known transient error codes are reached. By default when this is nil, high-level calls
+      #   retry known transient error codes and low-level/direct calls do not.
+      def initialize(
+        metadata: nil,
+        timeout: nil,
+        cancellation: nil,
+        override_retry: nil
+      )
+        @metadata = metadata
+        @timeout = timeout
+        @cancellation = cancellation
+        @override_retry = override_retry
+      end
     end
   end
 end

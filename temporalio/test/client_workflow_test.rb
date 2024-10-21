@@ -456,10 +456,29 @@ class ClientWorkflowTest < Test
     end
   end
 
+  def test_rpc_cancellation
+    # Start a workflow, create cancellation, cancel after 500ms in background,
+    # wait on complete
+    env.with_kitchen_sink_worker do |task_queue|
+      handle = env.client.start_workflow(
+        'kitchen_sink',
+        { actions: [{ sleep: { millis: 50_000 } }] },
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      cancellation, cancel_proc = Temporalio::Cancellation.new
+      run_in_background do
+        sleep(0.5)
+        cancel_proc.call
+      end
+      err = assert_raises(Temporalio::Error::CanceledError) do
+        handle.result(rpc_options: Temporalio::Client::RPCOptions.new(cancellation:))
+      end
+      assert_equal 'User canceled', err.message
+    end
+  end
+
   # TODO(cretz): Tests to write:
-  # * Cancelling RPC of get result (and figuring out cancel token and Ruby async lib compat and thread/fiber raise, etc)
-  #   * Also cancelling waiting for update
   # * Workflow cloud test
   # * Signal/update with start
-  # * Async activity
 end

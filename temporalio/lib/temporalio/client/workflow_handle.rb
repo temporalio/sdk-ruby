@@ -64,19 +64,14 @@ module Temporalio
       #
       # @param follow_runs [Boolean] If +true+, workflow runs will be continually fetched across retries and continue as
       #   new until the latest one is found. If +false+, the first result is used.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object] Result of the workflow after being converted by the data converter.
       #
       # @raise [Error::WorkflowFailedError] Workflow failed with +cause+ as the cause.
       # @raise [Error::WorkflowContinuedAsNewError] Workflow continued as new and +follow_runs+ is +false+.
       # @raise [Error::RPCError] RPC error from call.
-      def result(
-        follow_runs: true,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def result(follow_runs: true, rpc_options: nil)
         # Wait on the close event, following as needed
         hist_run_id = result_run_id
         loop do
@@ -86,8 +81,7 @@ module Temporalio
             event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
             skip_archival: true,
             specific_run_id: hist_run_id,
-            rpc_metadata:,
-            rpc_timeout:
+            rpc_options:
           ).next
 
           # Check each close type'
@@ -142,8 +136,7 @@ module Temporalio
       # Get workflow details. This will get details for the {run_id} if present. To use a different run ID, create a new
       # handle via {Client.workflow_handle}.
       #
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [WorkflowExecution::Description] Workflow description.
       #
@@ -151,15 +144,11 @@ module Temporalio
       #
       # @note Handles created as a result of {Client.start_workflow} will describe the latest workflow with the same
       #   workflow ID even if it is unrelated to the started workflow.
-      def describe(
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def describe(rpc_options: nil)
         @client._impl.describe_workflow(Interceptor::DescribeWorkflowInput.new(
                                           workflow_id: id,
                                           run_id:,
-                                          rpc_metadata:,
-                                          rpc_timeout:
+                                          rpc_options:
                                         ))
       end
 
@@ -167,8 +156,7 @@ module Temporalio
       #
       # @param event_filter_type [Api::Enums::V1::HistoryEventFilterType] Types of events to fetch.
       # @param skip_archival [Boolean] Whether to skip archival.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [WorkflowHistory] Workflow history.
       #
@@ -176,15 +164,13 @@ module Temporalio
       def fetch_history(
         event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_ALL_EVENT,
         skip_archival: false,
-        rpc_metadata: nil,
-        rpc_timeout: nil
+        rpc_options: nil
       )
         WorkflowHistory.new(
           fetch_history_events(
             event_filter_type:,
             skip_archival:,
-            rpc_metadata:,
-            rpc_timeout:
+            rpc_options:
           ).to_a
         )
       end
@@ -199,8 +185,7 @@ module Temporalio
       # @param skip_archival [Boolean] Whether to skip archival.
       # @param specific_run_id [String, nil] Run ID to fetch events for. Default is the {run_id}. Most users will not
       #   need to set this and instead use the one on the class.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Enumerator<Api::History::V1::HistoryEvent>] Enumerable events.
       #
@@ -210,8 +195,7 @@ module Temporalio
         event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_ALL_EVENT,
         skip_archival: false,
         specific_run_id: run_id,
-        rpc_metadata: nil,
-        rpc_timeout: nil
+        rpc_options: nil
       )
         @client._impl.fetch_workflow_history_events(Interceptor::FetchWorkflowHistoryEventsInput.new(
                                                       workflow_id: id,
@@ -219,8 +203,7 @@ module Temporalio
                                                       wait_new_event:,
                                                       event_filter_type:,
                                                       skip_archival:,
-                                                      rpc_metadata:,
-                                                      rpc_timeout:
+                                                      rpc_options:
                                                     ))
       end
 
@@ -229,27 +212,20 @@ module Temporalio
       #
       # @param signal [String] Signal name.
       # @param args [Array<Object>] Signal arguments.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will signal the latest workflow with the same
       #   workflow ID even if it is unrelated to the started workflow.
-      def signal(
-        signal,
-        *args,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def signal(signal, *args, rpc_options: nil)
         @client._impl.signal_workflow(Interceptor::SignalWorkflowInput.new(
                                         workflow_id: id,
                                         run_id:,
                                         signal:,
                                         args:,
                                         headers: {},
-                                        rpc_metadata:,
-                                        rpc_timeout:
+                                        rpc_options:
                                       ))
       end
 
@@ -259,8 +235,7 @@ module Temporalio
       # @param query [String] Query name.
       # @param args [Array<Object>] Query arguments.
       # @param reject_condition [WorkflowQueryRejectCondition, nil] Condition for rejecting the query.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object, nil] Query result.
       #
@@ -274,8 +249,7 @@ module Temporalio
         query,
         *args,
         reject_condition: @client.options.default_workflow_query_reject_condition,
-        rpc_metadata: nil,
-        rpc_timeout: nil
+        rpc_options: nil
       )
         @client._impl.query_workflow(Interceptor::QueryWorkflowInput.new(
                                        workflow_id: id,
@@ -284,8 +258,7 @@ module Temporalio
                                        args:,
                                        reject_condition:,
                                        headers: {},
-                                       rpc_metadata:,
-                                       rpc_timeout:
+                                       rpc_options:
                                      ))
       end
 
@@ -297,8 +270,7 @@ module Temporalio
       # @param wait_for_stage [WorkflowUpdateWaitStage] Required stage to wait until returning. ADMITTED is not
       #   currently supported. See https://docs.temporal.io/workflows#update for more details.
       # @param id [String] ID of the update.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [WorkflowUpdateHandle] The update handle.
       #
@@ -314,8 +286,7 @@ module Temporalio
         *args,
         wait_for_stage:,
         id: SecureRandom.uuid,
-        rpc_metadata: nil,
-        rpc_timeout: nil
+        rpc_options: nil
       )
         @client._impl.start_workflow_update(Interceptor::StartWorkflowUpdateInput.new(
                                               workflow_id: self.id,
@@ -325,8 +296,7 @@ module Temporalio
                                               args:,
                                               wait_for_stage:,
                                               headers: {},
-                                              rpc_metadata:,
-                                              rpc_timeout:
+                                              rpc_options:
                                             ))
       end
 
@@ -336,8 +306,7 @@ module Temporalio
       # @param update [String] Update name.
       # @param args [Array<Object>] Update arguments.
       # @param id [String] ID of the update.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object, nil] Update result.
       #
@@ -349,20 +318,13 @@ module Temporalio
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same
       #   workflow ID even if it is unrelated to the started workflow.
       # @note WARNING: This API is experimental.
-      def execute_update(
-        update,
-        *args,
-        id: SecureRandom.uuid,
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def execute_update(update, *args, id: SecureRandom.uuid, rpc_options: nil)
         start_update(
           update,
           *args,
           wait_for_stage: WorkflowUpdateWaitStage::COMPLETED,
           id:,
-          rpc_metadata:,
-          rpc_timeout:
+          rpc_options:
         ).result
       end
 
@@ -375,10 +337,7 @@ module Temporalio
       # @return [WorkflowUpdateHandle] The update handle.
       #
       # @note WARNING: This API is experimental.
-      def update_handle(
-        id,
-        specific_run_id: run_id
-      )
+      def update_handle(id, specific_run_id: run_id)
         WorkflowUpdateHandle.new(
           client: @client,
           id:,
@@ -392,23 +351,18 @@ module Temporalio
       # run chain starting from {first_execution_run_id} if present. To create handles with these values, use
       # {Client.workflow_handle}.
       #
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of signal with start will cancel the latest workflow with the same workflow ID
       #   even if it is unrelated to the started workflow.
-      def cancel(
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def cancel(rpc_options: nil)
         @client._impl.cancel_workflow(Interceptor::CancelWorkflowInput.new(
                                         workflow_id: id,
                                         run_id:,
                                         first_execution_run_id:,
-                                        rpc_metadata:,
-                                        rpc_timeout:
+                                        rpc_options:
                                       ))
       end
 
@@ -418,27 +372,20 @@ module Temporalio
       #
       # @param reason [String, nil] Reason for the termination.
       # @param details [Array<Object>] Details to store on the termination.
-      # @param rpc_metadata [Hash<String, String>, nil] Headers to include on the RPC call.
-      # @param rpc_timeout [Float, nil] Number of seconds before timeout.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of signal with start will terminate the latest workflow with the same workflow
       #   ID even if it is unrelated to the started workflow.
-      def terminate(
-        reason = nil,
-        details: [],
-        rpc_metadata: nil,
-        rpc_timeout: nil
-      )
+      def terminate(reason = nil, details: [], rpc_options: nil)
         @client._impl.terminate_workflow(Interceptor::TerminateWorkflowInput.new(
                                            workflow_id: id,
                                            run_id:,
                                            first_execution_run_id:,
                                            reason:,
                                            details:,
-                                           rpc_metadata:,
-                                           rpc_timeout:
+                                           rpc_options:
                                          ))
       end
     end
