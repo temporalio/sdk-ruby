@@ -7,6 +7,8 @@ require 'temporalio/client/activity_id_reference'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
+require 'temporalio/client/schedule'
+require 'temporalio/client/schedule_handle'
 require 'temporalio/client/workflow_execution'
 require 'temporalio/client/workflow_execution_count'
 require 'temporalio/client/workflow_handle'
@@ -57,13 +59,13 @@ module Temporalio
             identity: @client.connection.identity,
             workflow_id_reuse_policy: input.id_reuse_policy,
             workflow_id_conflict_policy: input.id_conflict_policy,
-            retry_policy: input.retry_policy&.to_proto,
+            retry_policy: input.retry_policy&._to_proto,
             cron_schedule: input.cron_schedule,
             memo: ProtoUtils.memo_to_proto(input.memo, @client.data_converter),
-            search_attributes: input.search_attributes&.to_proto,
+            search_attributes: input.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(input.start_delay),
             request_eager_execution: input.request_eager_start,
-            header: input.headers
+            header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
           )
 
           # Send request
@@ -188,7 +190,7 @@ module Temporalio
               ),
               signal_name: input.signal,
               input: @client.data_converter.to_payloads(input.args),
-              header: input.headers,
+              header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid
             ),
@@ -209,7 +211,7 @@ module Temporalio
                 query: Api::Query::V1::WorkflowQuery.new(
                   query_type: input.query,
                   query_args: @client.data_converter.to_payloads(input.args),
-                  header: input.headers
+                  header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
                 ),
                 query_reject_condition: input.reject_condition || 0
               ),
@@ -252,7 +254,7 @@ module Temporalio
               input: Api::Update::V1::Input.new(
                 name: input.update,
                 args: @client.data_converter.to_payloads(input.args),
-                header: input.headers
+                header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
               )
             ),
             wait_policy: Api::Update::V1::WaitPolicy.new(
@@ -370,6 +372,197 @@ module Temporalio
               first_execution_run_id: input.first_execution_run_id,
               details: @client.data_converter.to_payloads(input.details),
               identity: @client.connection.identity
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def create_schedule(input)
+          if input.schedule.state.limited_actions && input.schedule.state.remaining_actions.zero?
+            raise 'Must set limited actions to false if there are no remaining actions set'
+          end
+          if !input.schedule.state.limited_actions && !input.schedule.state.remaining_actions.zero?
+            raise 'Must set limited actions to true if there are remaining actions set'
+          end
+
+          @client.workflow_service.create_schedule(
+            Api::WorkflowService::V1::CreateScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              schedule: input.schedule._to_proto(@client.data_converter),
+              initial_patch: if input.trigger_immediately || !input.backfills.empty?
+                               Api::Schedule::V1::SchedulePatch.new(
+                                 trigger_immediately: if input.trigger_immediately
+                                                        Api::Schedule::V1::TriggerImmediatelyRequest.new(
+                                                          overlap_policy: input.schedule.policy.overlap
+                                                        )
+                                                      end,
+                                 backfill_request: input.backfills.map(&:_to_proto)
+                               )
+                             end,
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              memo: ProtoUtils.memo_to_proto(input.memo, @client.data_converter),
+              search_attributes: input.search_attributes&._to_proto
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::ScheduleHandle.new(client: @client, id: input.id)
+        rescue Error::RPCError => e
+          # Unpack and raise already started if that's the error, otherwise default raise
+          details = if e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+                      e.grpc_status.details.first.unpack(Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure)
+                    end
+          raise Error::ScheduleAlreadyRunningError if details
+
+          raise
+        end
+
+        def list_schedules(input)
+          Enumerator.new do |yielder|
+            req = Api::WorkflowService::V1::ListSchedulesRequest.new(
+              namespace: @client.namespace,
+              query: input.query || ''
+            )
+            loop do
+              resp = @client.workflow_service.list_schedules(
+                req,
+                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+              )
+              resp.schedules.each do |raw_entry|
+                yielder << Temporalio::Client::Schedule::List::Description.new(raw_entry, @client.data_converter)
+              end
+              break if resp.next_page_token.empty?
+
+              req.next_page_token = resp.next_page_token
+            end
+          end
+        end
+
+        def backfill_schedule(input)
+          @client.workflow_service.patch_schedule(
+            Api::WorkflowService::V1::PatchScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              patch: Api::Schedule::V1::SchedulePatch.new(
+                backfill_request: input.backfills.map(&:_to_proto)
+              ),
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def delete_schedule(input)
+          @client.workflow_service.delete_schedule(
+            Api::WorkflowService::V1::DeleteScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              identity: @client.connection.identity
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def describe_schedule(input)
+          Temporalio::Client::Schedule::Description.new(
+            input.id,
+            @client.workflow_service.describe_schedule(
+              Api::WorkflowService::V1::DescribeScheduleRequest.new(
+                namespace: @client.namespace,
+                schedule_id: input.id
+              ),
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            ),
+            @client.data_converter
+          )
+        end
+
+        def pause_schedule(input)
+          @client.workflow_service.patch_schedule(
+            Api::WorkflowService::V1::PatchScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              patch: Api::Schedule::V1::SchedulePatch.new(pause: input.note),
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def trigger_schedule(input)
+          @client.workflow_service.patch_schedule(
+            Api::WorkflowService::V1::PatchScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              patch: Api::Schedule::V1::SchedulePatch.new(
+                trigger_immediately: Api::Schedule::V1::TriggerImmediatelyRequest.new(
+                  overlap_policy: input.overlap || 0
+                )
+              ),
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def unpause_schedule(input)
+          @client.workflow_service.patch_schedule(
+            Api::WorkflowService::V1::PatchScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              patch: Api::Schedule::V1::SchedulePatch.new(unpause: input.note),
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def update_schedule(input)
+          # TODO(cretz): This is supposed to be a retry-conflict loop, but we do
+          # not yet have a way to know update failure is due to conflict token
+          # mismatch
+          update = input.updater.call(
+            Temporalio::Client::Schedule::Update::Input.new(
+              description: Temporalio::Client::Schedule::Description.new(
+                input.id,
+                @client.workflow_service.describe_schedule(
+                  Api::WorkflowService::V1::DescribeScheduleRequest.new(
+                    namespace: @client.namespace,
+                    schedule_id: input.id
+                  ),
+                  rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+                ),
+                @client.data_converter
+              )
+            )
+          )
+          # Do nothing if update is nil, fail if not an expected update
+          return nil if update.nil?
+
+          unless update.is_a?(Temporalio::Client::Schedule::Update)
+            raise TypeError,
+                  'Expected result of update block to be a Schedule::Update'
+          end
+
+          @client.workflow_service.update_schedule(
+            Api::WorkflowService::V1::UpdateScheduleRequest.new(
+              namespace: @client.namespace,
+              schedule_id: input.id,
+              schedule: update.schedule._to_proto(@client.data_converter),
+              search_attributes: update.search_attributes&._to_proto,
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )

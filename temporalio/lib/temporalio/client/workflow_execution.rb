@@ -15,17 +15,18 @@ module Temporalio
       # @!visibility private
       def initialize(raw_info, data_converter)
         @raw_info = raw_info
-        @data_converter = data_converter
+        @memo = Internal::ProtoUtils::LazyMemo.new(raw_info.memo, data_converter)
+        @search_attributes = Internal::ProtoUtils::LazySearchAttributes.new(raw_info.search_attributes)
       end
 
       # @return [Time, nil] When the workflow was closed if closed.
       def close_time
-        @raw_info.close_time&.to_time
+        Internal::ProtoUtils.timestamp_to_time(@raw_info.close_time)
       end
 
       # @return [Time, nil] When this workflow run started or should start.
       def execution_time
-        @raw_info.execution_time&.to_time
+        Internal::ProtoUtils.timestamp_to_time(@raw_info.execution_time)
       end
 
       # @return [Integer] Number of events in the history.
@@ -40,8 +41,7 @@ module Temporalio
 
       # @return [Hash<String, Object>, nil] Memo for the workflow.
       def memo
-        @memo = Internal::ProtoUtils.memo_from_proto(@raw_info.memo, @data_converter) unless defined?(@memo)
-        @memo
+        @memo.get
       end
 
       # @return [String, nil] ID for the parent workflow if this was started as a child.
@@ -61,15 +61,12 @@ module Temporalio
 
       # @return [SearchAttributes, nil] Current set of search attributes if any.
       def search_attributes
-        unless defined?(@search_attributes)
-          @search_attributes = SearchAttributes.from_proto(@raw_info.search_attributes)
-        end
-        @search_attributes
+        @search_attributes.get
       end
 
       # @return [Time] When the workflow was created.
       def start_time
-        @raw_info.start_time.to_time
+        Internal::ProtoUtils.timestamp_to_time(@raw_info.start_time) || raise # Never nil
       end
 
       # @return [WorkflowExecutionStatus] Status for the workflow.

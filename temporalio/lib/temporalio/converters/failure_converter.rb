@@ -130,7 +130,9 @@ module Temporalio
                     *converter.from_payloads(failure.application_failure_info.details),
                     type: Internal::ProtoUtils.string_or(failure.application_failure_info.type),
                     non_retryable: failure.application_failure_info.non_retryable,
-                    next_retry_delay: failure.application_failure_info.next_retry_delay&.to_f
+                    next_retry_delay: Internal::ProtoUtils.duration_to_seconds(
+                      failure.application_failure_info.next_retry_delay
+                    )
                   )
                 elsif failure.timeout_failure_info
                   Error::TimeoutError.new(

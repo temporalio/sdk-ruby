@@ -95,6 +95,29 @@ class Test < Minitest::Test
     end
   end
 
+  def assert_no_schedules
+    assert_eventually do
+      assert_empty env.client.list_schedules.to_a
+    end
+  end
+
+  def delete_all_schedules
+    # 3 attempts
+    3.times do |attempt|
+      env.client.list_schedules.each do |schedule|
+        env.client.schedule_handle(schedule.id).delete
+      rescue Temporalio::Error::RPCError => e
+        # Ignore not found
+        raise unless e.code == Temporalio::Error::RPCError::Code::NOT_FOUND
+      end
+      begin
+        assert_no_schedules
+      rescue StandardError
+        raise unless attempt < 2
+      end
+    end
+  end
+
   class TestEnvironment
     include Singleton
 
@@ -111,9 +134,8 @@ class Test < Minitest::Test
       @server.client
     end
 
-    def with_kitchen_sink_worker(worker_client = client)
+    def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}")
       # Run the golangworker
-      task_queue = "tq-#{SecureRandom.uuid}"
       pid = spawn(
         kitchen_sink_exe,
         worker_client.connection.target_host, worker_client.namespace, task_queue,

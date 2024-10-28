@@ -6,6 +6,8 @@ module Temporalio
     attr_accessor max_attempts: Integer
     attr_accessor non_retryable_error_types: Array[String]?
 
+    def self._from_proto: (untyped raw_policy) -> RetryPolicy
+
     def initialize: (
       ?initial_interval: Float,
       ?backoff_coefficient: Float,
@@ -13,5 +15,7 @@ module Temporalio
       ?max_attempts: Integer,
       ?non_retryable_error_types: Array[String]?
     ) -> void
+
+    def _to_proto: -> untyped
   end
 end
