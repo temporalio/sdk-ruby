@@ -19,6 +19,7 @@ module Temporalio
         def initialize(worker, bridge_worker)
           @worker = worker
           @bridge_worker = bridge_worker
+          @runtime_metric_meter = worker.options.client.connection.options.runtime.metric_meter
 
           # Create shared logger that gives scoped activity details
           @scoped_logger = ScopedLogger.new(@worker.options.logger)
@@ -193,7 +194,8 @@ module Temporalio
             cancellation: Cancellation.new,
             worker_shutdown_cancellation: @worker._worker_shutdown_cancellation,
             payload_converter: @worker.options.client.data_converter.payload_converter,
-            logger: @scoped_logger
+            logger: @scoped_logger,
+            runtime_metric_meter: @runtime_metric_meter
           )
           Activity::Context._current_executor&.set_activity_context(defn, activity)
           set_running_activity(task_token, activity)
@@ -287,13 +289,15 @@ module Temporalio
             cancellation:,
             worker_shutdown_cancellation:,
             payload_converter:,
-            logger:
+            logger:,
+            runtime_metric_meter:
           )
             @info = info
             @cancellation = cancellation
             @worker_shutdown_cancellation = worker_shutdown_cancellation
             @payload_converter = payload_converter
             @logger = logger
+            @runtime_metric_meter = runtime_metric_meter
             @_outbound_impl = nil
             @_server_requested_cancel = false
           end
@@ -302,6 +306,16 @@ module Temporalio
             raise 'Implementation not set yet' if _outbound_impl.nil?
 
             _outbound_impl.heartbeat(Temporalio::Worker::Interceptor::HeartbeatActivityInput.new(details:))
+          end
+
+          def metric_meter
+            @metric_meter ||= @runtime_metric_meter.with_additional_attributes(
+              {
+                namespace: info.workflow_namespace,
+                task_queue: info.task_queue,
+                activity_type: info.activity_type
+              }
+            )
           end
         end
 

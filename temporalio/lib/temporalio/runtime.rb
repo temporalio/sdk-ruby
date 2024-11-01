@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/runtime'
+require 'temporalio/internal/metric'
+require 'temporalio/metric'
 
 module Temporalio
   # Runtime for Temporal Ruby SDK.
@@ -9,6 +12,12 @@ module Temporalio
   # before any clients are created, and set it via {default=}. Every time a new runtime is created, a new internal Rust
   # thread pool is created.
   class Runtime
+    TelemetryOptions = Struct.new(
+      :logging,
+      :metrics,
+      keyword_init: true
+    )
+
     # Telemetry options for the runtime.
     #
     # @!attribute logging
@@ -16,15 +25,13 @@ module Temporalio
     #     to nil to disable logging.
     # @!attribute metrics
     #   @return [MetricsOptions, nil] Metrics options.
-    TelemetryOptions = Struct.new(
-      :logging,
-      :metrics,
-      keyword_init: true
-    ) do
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:logging] = LoggingOptions.new unless kwargs.key?(:logging)
+    class TelemetryOptions
+      # Create telemetry options.
+      #
+      # @param logging [LoggingOptions, nil] Logging options, default is new {LoggingOptions} with no parameters. Can be
+      #   set to nil to disable logging.
+      # @param metrics [MetricsOptions, nil] Metrics options.
+      def initialize(logging: LoggingOptions.new, metrics: nil)
         super
       end
 
@@ -38,20 +45,22 @@ module Temporalio
       end
     end
 
+    LoggingOptions = Struct.new(
+      :log_filter,
+      # TODO(cretz): forward_to
+      keyword_init: true
+    )
+
     # Logging options for runtime telemetry.
     #
     # @!attribute log_filter
     #   @return [LoggingFilterOptions, String] Logging filter for Core, default is new {LoggingFilterOptions} with no
     #     parameters.
-    LoggingOptions = Struct.new(
-      :log_filter,
-      # TODO(cretz): forward_to
-      keyword_init: true
-    ) do
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:log_filter] = LoggingFilterOptions.new unless kwargs.key?(:log_filter)
+    class LoggingOptions
+      # Create logging options
+      #
+      # @param log_filter [LoggingFilterOptions, String] Logging filter for Core.
+      def initialize(log_filter: LoggingFilterOptions.new)
         super
       end
 
@@ -70,22 +79,24 @@ module Temporalio
       end
     end
 
-    # Logging filter options for Core.
-    #
-    # @!attribute core_level
-    #   @return ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for Core log messages, default is +'WARN'+.
-    # @!attribute other_level
-    #   @return ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for other Rust log messages, default is +'WARN'+.
     LoggingFilterOptions = Struct.new(
       :core_level,
       :other_level,
       keyword_init: true
-    ) do
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:core_level] = 'WARN' unless kwargs.key?(:core_level)
-        kwargs[:other_level] = 'ERROR' unless kwargs.key?(:other_level)
+    )
+
+    # Logging filter options for Core.
+    #
+    # @!attribute core_level
+    #   @return ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for Core log messages.
+    # @!attribute other_level
+    #   @return ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for other Rust log messages.
+    class LoggingFilterOptions
+      # Create logging filter options.
+      #
+      # @param core_level ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for Core log messages.
+      # @!attribute other_level ['TRACE', 'DEBUG', 'INFO', 'WARN', 'ERROR'] Log level for other Rust log messages.
+      def initialize(core_level: 'WARN', other_level: 'ERROR')
         super
       end
 
@@ -96,6 +107,15 @@ module Temporalio
       end
     end
 
+    MetricsOptions = Struct.new(
+      :opentelemetry,
+      :prometheus,
+      :attach_service_name,
+      :global_tags,
+      :metric_prefix,
+      keyword_init: true
+    )
+
     # Metrics options for runtime telemetry. Either {opentelemetry} or {prometheus} required, but not both.
     #
     # @!attribute opentelemetry
@@ -105,23 +125,28 @@ module Temporalio
     #   @return [PrometheusMetricsOptions, nil] Prometheus options if using Prometheus. This is mutually exclusive with
     #     +opentelemetry+.
     # @!attribute attach_service_name
-    #   @return [Boolean] Whether to put the service_name on every metric, default +true+.
+    #   @return [Boolean] Whether to put the service_name on every metric.
     # @!attribute global_tags
     #   @return [Hash<String, String>, nil] Resource tags to be applied to all metrics.
     # @!attribute metric_prefix
-    #   @return [String, nil] Prefix to put on every Temporal metric. If unset, defaults to +temporal_+.
-    MetricsOptions = Struct.new(
-      :opentelemetry,
-      :prometheus,
-      :attach_service_name,
-      :global_tags,
-      :metric_prefix,
-      keyword_init: true
-    ) do
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:attach_service_name] = true unless kwargs.key?(:attach_service_name)
+    #   @return [String, nil] Prefix to put on every Temporal metric. If unset, defaults to `temporal_`.
+    class MetricsOptions
+      # Create metrics options. Either `opentelemetry` or `prometheus` required, but not both.
+      #
+      # @param opentelemetry [OpenTelemetryMetricsOptions, nil] OpenTelemetry options if using OpenTelemetry. This is
+      #   mutually exclusive with `prometheus`.
+      # @param prometheus [PrometheusMetricsOptions, nil] Prometheus options if using Prometheus. This is mutually
+      #   exclusive with `opentelemetry`.
+      # @param attach_service_name [Boolean] Whether to put the service_name on every metric.
+      # @param global_tags [Hash<String, String>, nil] Resource tags to be applied to all metrics.
+      # @param metric_prefix [String, nil] Prefix to put on every Temporal metric. If unset, defaults to `temporal_`.
+      def initialize(
+        opentelemetry: nil,
+        prometheus: nil,
+        attach_service_name: true,
+        global_tags: nil,
+        metric_prefix: nil
+      )
         super
       end
 
@@ -138,6 +163,15 @@ module Temporalio
       end
     end
 
+    OpenTelemetryMetricsOptions = Struct.new(
+      :url,
+      :headers,
+      :metric_periodicity,
+      :metric_temporality,
+      :durations_as_seconds,
+      keyword_init: true
+    )
+
     # Options for exporting metrics to OpenTelemetry.
     #
     # @!attribute url
@@ -152,25 +186,28 @@ module Temporalio
     # @!attribute durations_as_seconds
     #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations, default is
     #     +false+.
-    OpenTelemetryMetricsOptions = Struct.new(
-      :url,
-      :headers,
-      :metric_periodicity,
-      :metric_temporality,
-      :durations_as_seconds,
-      keyword_init: true
-    ) do
+    class OpenTelemetryMetricsOptions
       # OpenTelemetry metric temporality.
-      module MetricTemporality # rubocop:disable Lint/ConstantDefinitionInBlock
+      module MetricTemporality
         CUMULATIVE = 1
         DELTA = 2
       end
 
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:metric_temporality] = MetricTemporality::CUMULATIVE unless kwargs.key?(:metric_temporality)
-        kwargs[:durations_as_seconds] = false unless kwargs.key?(:durations_as_seconds)
+      # Create OpenTelemetry options.
+      #
+      # @param url [String] URL for OpenTelemetry endpoint.
+      # @param headers [Hash<String, String>, nil] Headers for OpenTelemetry endpoint.
+      # @param metric_periodicity [Float, nil] How frequently metrics should be exported, unset uses internal default.
+      # @param metric_temporality [MetricTemporality] How frequently metrics should be exported.
+      # @param durations_as_seconds [Boolean] Whether to use float seconds instead of integer milliseconds for
+      #   durations.
+      def initialize(
+        url:,
+        headers: nil,
+        metric_periodicity: nil,
+        metric_temporality: MetricTemporality::CUMULATIVE,
+        durations_as_seconds: false
+      )
         super
       end
 
@@ -191,30 +228,38 @@ module Temporalio
       end
     end
 
-    # Options for exporting metrics to Prometheus.
-    #
-    # @!attribute bind_address
-    #   @return [String] Address to bind to for Prometheus endpoint.
-    # @!attribute counters_total_suffix
-    #   @return [Boolean] If +true+, all counters will include a +_total+ suffix, default is +false+.
-    # @!attribute unit_suffix
-    #   @return [Boolean] If +true+, all histograms will include the unit in their name as a suffix, default is +false+.
-    # @!attribute durations_as_seconds
-    #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations, default is
-    #     +false+.
     PrometheusMetricsOptions = Struct.new(
       :bind_address,
       :counters_total_suffix,
       :unit_suffix,
       :durations_as_seconds,
       keyword_init: true
-    ) do
-      # @!visibility private
-      def initialize(**kwargs)
-        # @type var kwargs: untyped
-        kwargs[:counters_total_suffix] = false unless kwargs.key?(:counters_total_suffix)
-        kwargs[:unit_suffix] = false unless kwargs.key?(:unit_suffix)
-        kwargs[:durations_as_seconds] = false unless kwargs.key?(:durations_as_seconds)
+    )
+
+    # Options for exporting metrics to Prometheus.
+    #
+    # @!attribute bind_address
+    #   @return [String] Address to bind to for Prometheus endpoint.
+    # @!attribute counters_total_suffix
+    #   @return [Boolean] If `true`, all counters will include a `_total` suffix.
+    # @!attribute unit_suffix
+    #   @return [Boolean] If `true`, all histograms will include the unit in their name as a suffix.
+    # @!attribute durations_as_seconds
+    #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations.
+    class PrometheusMetricsOptions
+      # Create Prometheus options.
+      #
+      # @param bind_address [String] Address to bind to for Prometheus endpoint.
+      # @param counters_total_suffix [Boolean] If `true`, all counters will include a `_total` suffix.
+      # @param unit_suffix [Boolean] If `true`, all histograms will include the unit in their name as a suffix.
+      # @param durations_as_seconds [Boolean] Whether to use float seconds instead of integer milliseconds for
+      #   durations.
+      def initialize(
+        bind_address:,
+        counters_total_suffix: false,
+        unit_suffix: false,
+        durations_as_seconds: false
+      )
         super
       end
 
@@ -248,6 +293,9 @@ module Temporalio
       @default = runtime
     end
 
+    # @return [Metric::Meter] Metric meter that can create and record metric values.
+    attr_reader :metric_meter
+
     # Create new Runtime. For most users, this should only be done once globally. In addition to creating a Rust thread
     # pool, this also consumes a Ruby thread for its lifetime.
     #
@@ -256,6 +304,7 @@ module Temporalio
       @core_runtime = Internal::Bridge::Runtime.new(
         Internal::Bridge::Runtime::Options.new(telemetry: telemetry._to_bridge)
       )
+      @metric_meter = Internal::Metric::Meter.create_from_runtime(self) || Metric::Meter.null
       # We need a thread to run the command loop
       # TODO(cretz): Is this something users should be concerned about or need control over?
       Thread.new do

@@ -2,6 +2,7 @@ use magnus::{prelude::*, value::Lazy, Error, ExceptionClass, RModule, Ruby};
 
 mod client;
 mod client_rpc_generated;
+mod metric;
 mod runtime;
 mod testing;
 mod util;
@@ -49,6 +50,7 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     Lazy::force(&ROOT_ERR, ruby);
 
     client::init(ruby)?;
+    metric::init(ruby)?;
     runtime::init(ruby)?;
     testing::init(ruby)?;
     worker::init(ruby)?;

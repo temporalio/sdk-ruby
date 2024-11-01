@@ -21,10 +21,19 @@ AllCops:
 Layout/ClassStructure:
   Enabled: true
 
+# RBS annotations allowed
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+
 # Don't need super for activities
 Lint/MissingSuper:
   AllowedParentClasses:
     - Temporalio::Activity
+
+# Allow tests to nest methods
+Lint/NestedMethodDefinition:
+  Exclude:
+    - test/**/*
 
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:

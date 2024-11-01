@@ -1,0 +1,55 @@
+module Temporalio
+  class Metric
+    def record: (
+      Numeric value,
+      ?additional_attributes: Hash[String | Symbol, String | Integer | Float | bool]?
+    ) -> void
+
+    def with_additional_attributes: (
+      Hash[String | Symbol, String | Integer | Float | bool] additional_attributes
+    ) -> Metric
+
+    def metric_type: -> (:counter | :histogram | :gauge)
+
+    def name: -> String
+
+    def description: -> String?
+
+    def unit: -> String?
+
+    def value_type: -> (:integer | :float | :duration)
+
+    class Meter
+      def self.null: -> Meter
+
+      def create_metric:
+        (
+          :counter metric_type,
+          String name,
+          ?description: String?,
+          ?unit: String?,
+          ?description: :integer
+        ) -> Metric
+        |
+        (
+          :histogram metric_type,
+          String name,
+          ?description: String?,
+          ?unit: String?,
+          ?description: (:integer | :float | :duration)
+        ) -> Metric
+        |
+        (
+          :gauge metric_type,
+          String name,
+          ?description: String?,
+          ?unit: String?,
+          ?description: (:integer | :float)
+        ) -> Metric
+
+        def with_additional_attributes: (
+          Hash[String | Symbol, String | Integer | Float | bool] additional_attributes
+        ) -> Meter
+    end
+  end
+end

@@ -1,0 +1,15 @@
+module Temporalio
+  module Internal
+    class Metric < Temporalio::Metric
+      class Meter < Temporalio::Metric::Meter
+        def initialize: (
+          metric_type: (:counter | :histogram | :gauge),
+          name: String,
+          description: String?,
+          unit: String?,
+          value_type: (:integer | :float | :duration)
+        ) -> void
+      end
+    end
+  end
+end
