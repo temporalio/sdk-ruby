@@ -39,6 +39,11 @@ class Test < Minitest::Test
 
   def self.also_run_all_tests_in_fiber
     @also_run_all_tests_in_fiber = true
+    # We have to tell Minitest the diff executable to use because "async" has an
+    # issue executing Kernel#system calls.
+    # See https://github.com/socketry/async/issues/351
+    # TODO(cretz): Remove when fixed in async
+    Minitest::Assertions.diff = 'diff'
   end
 
   def self.method_added(method_name)
