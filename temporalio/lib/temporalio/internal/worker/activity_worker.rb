@@ -159,17 +159,19 @@ module Temporalio
             activity_id: start.activity_id,
             activity_type: start.activity_type,
             attempt: start.attempt,
-            current_attempt_scheduled_time: start.current_attempt_scheduled_time.to_time,
+            current_attempt_scheduled_time: Internal::ProtoUtils.timestamp_to_time(
+              start.current_attempt_scheduled_time
+            ) || raise, # Never nil
             heartbeat_details: ProtoUtils.convert_from_payload_array(
               @worker.options.client.data_converter,
               start.heartbeat_details.to_ary
             ),
-            heartbeat_timeout: start.heartbeat_timeout&.to_f,
+            heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
-            schedule_to_close_timeout: start.schedule_to_close_timeout&.to_f,
-            scheduled_time: start.scheduled_time.to_time,
-            start_to_close_timeout: start.start_to_close_timeout&.to_f,
-            started_time: start.started_time.to_time,
+            schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.schedule_to_close_timeout),
+            scheduled_time: Internal::ProtoUtils.timestamp_to_time(start.scheduled_time) || raise, # Never nil
+            start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.start_to_close_timeout),
+            started_time: Internal::ProtoUtils.timestamp_to_time(start.started_time) || raise, # Never nil
             task_queue: @worker.options.task_queue,
             task_token:,
             workflow_id: start.workflow_execution.workflow_id,
@@ -185,7 +187,7 @@ module Temporalio
               @worker.options.client.data_converter,
               start.input.to_ary
             ),
-            headers: start.header_fields
+            headers: ProtoUtils.headers_from_proto_map(start.header_fields, @worker.options.client.data_converter) || {}
           )
 
           # Run

@@ -16,6 +16,8 @@ class Test < Minitest::Test
   def run_in_background: { (?) -> untyped } -> (Thread | Fiber)
 
   def find_free_port: -> String
+  def assert_no_schedules: -> void
+  def delete_schedules: (*String ids) -> void
 
   class TestEnvironment
     include Singleton
@@ -28,7 +30,8 @@ class Test < Minitest::Test
     def client: -> Temporalio::Client
 
     def with_kitchen_sink_worker: [T] (
-      ?Temporalio::Client worker_client
+      ?Temporalio::Client worker_client,
+      ?task_queue: String
     ) { (String task_queue) -> T } -> T
 
     def kitchen_sink_exe: -> String

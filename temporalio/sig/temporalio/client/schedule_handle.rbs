@@ -1,0 +1,44 @@
+module Temporalio
+  class Client
+    class ScheduleHandle
+      attr_reader id: String
+
+      def initialize: (
+        client: Client,
+        id: String
+      ) -> void
+
+      def backfill: (
+        *Schedule::Backfill backfills,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def delete: (
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def describe: (
+        ?rpc_options: RPCOptions?
+      ) -> Schedule::Description
+
+      def pause: (
+        ?note: String,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def trigger: (
+        ?overlap: Schedule::OverlapPolicy::enum?,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def unpause: (
+        ?note: String,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def update: (
+        ?rpc_options: RPCOptions?
+      ) { (Schedule::Update::Input) -> Schedule::Update? } -> void
+    end
+  end
+end

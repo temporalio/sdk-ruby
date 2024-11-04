@@ -87,6 +87,14 @@ module Temporalio
       end
     end
 
+    # Error when a schedule is already running.
+    class ScheduleAlreadyRunningError < Error
+      # @!visibility private
+      def initialize
+        super('Schedule already running')
+      end
+    end
+
     # Error that occurs when an async activity handle tries to heartbeat and the activity is marked as canceled.
     class AsyncActivityCanceledError < Error
       # @!visibility private

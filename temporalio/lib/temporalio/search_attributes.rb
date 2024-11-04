@@ -107,7 +107,7 @@ module Temporalio
     end
 
     # @!visibility private
-    def self.from_proto(proto)
+    def self._from_proto(proto)
       return nil unless proto
       raise ArgumentError, 'Expected proto search attribute' unless proto.is_a?(Api::Common::V1::SearchAttributes)
 
@@ -242,7 +242,7 @@ module Temporalio
     end
 
     # @!visibility private
-    def to_proto
+    def _to_proto
       Api::Common::V1::SearchAttributes.new(
         indexed_fields: @raw_hash.to_h do |key, value|
           # We use a default converter, but if type is a time, we need ISO format

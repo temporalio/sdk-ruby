@@ -3,6 +3,12 @@ module Temporalio
     module ProtoUtils
       def self.seconds_to_duration: (Float? seconds_float) -> untyped?
 
+      def self.duration_to_seconds: (untyped? duration) -> Float?
+
+      def self.time_to_timestamp: (Time? time) -> untyped?
+
+      def self.timestamp_to_time: (untyped? timestamp) -> Time?
+
       def self.memo_to_proto: (
         Hash[String, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
@@ -10,6 +16,21 @@ module Temporalio
 
       def self.memo_from_proto: (
         untyped? memo,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, Object?]?
+
+      def self.headers_to_proto: (
+        Hash[String, Object?]? hash,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> untyped?
+
+      def self.headers_from_proto: (
+        untyped? headers,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, Object?]?
+
+      def self.headers_from_proto_map: (
+        Hash[String, untyped]? headers,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> Hash[String, Object?]?
 
@@ -27,6 +48,21 @@ module Temporalio
         Converters::DataConverter | Converters::PayloadConverter converter,
         Array[Object?] values
       ) -> Array[untyped]
+
+      class LazyMemo
+        def initialize: (
+          untyped? raw_memo,
+          Converters::DataConverter | Converters::PayloadConverter converter,
+        ) -> void
+
+        def get: -> Hash[String, Object?]?
+      end
+
+      class LazySearchAttributes
+        def initialize: (untyped? raw_search_attributes) -> void
+
+        def get: -> SearchAttributes?
+      end
     end
   end
 end

@@ -65,7 +65,7 @@ module Temporalio
       ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
-      ?memo: Hash[String, Object]?,
+      ?memo: Hash[String, Object?]?,
       ?search_attributes: SearchAttributes?,
       ?start_delay: Float?,
       ?request_eager_start: bool,
@@ -84,7 +84,7 @@ module Temporalio
       ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
-      ?memo: Hash[String, Object]?,
+      ?memo: Hash[String, Object?]?,
       ?search_attributes: SearchAttributes?,
       ?start_delay: Float?,
       ?request_eager_start: bool,
@@ -106,6 +106,23 @@ module Temporalio
       ?String query,
       ?rpc_options: RPCOptions?
     ) -> WorkflowExecutionCount
+
+    def create_schedule: (
+      String id,
+      Schedule schedule,
+      ?trigger_immediately: bool,
+      ?backfills: Array[Schedule::Backfill],
+      ?memo: Hash[String, Object?]?,
+      ?search_attributes: SearchAttributes?,
+      ?rpc_options: RPCOptions?
+    ) -> ScheduleHandle
+
+    def schedule_handle: (String id) -> ScheduleHandle
+
+    def list_schedules: (
+      ?String query,
+      ?rpc_options: RPCOptions?
+    ) -> Enumerator[Schedule::List::Description, Schedule::List::Description]
 
     def async_activity_handle: (
       String | ActivityIDReference task_token_or_id_reference

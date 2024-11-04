@@ -108,7 +108,7 @@ module Temporalio
       runner.apply_thread_or_fiber_block(&block)
 
       # Reuse first worker logger
-      logger = workers.first&.options&.logger or raise # Help steep
+      logger = workers.first&.options&.logger or raise # Never nil
 
       # On cancel, initiate shutdown
       cancellation.add_cancel_callback do

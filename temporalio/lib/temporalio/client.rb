@@ -6,6 +6,8 @@ require 'temporalio/api'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
+require 'temporalio/client/schedule'
+require 'temporalio/client/schedule_handle'
 require 'temporalio/client/workflow_execution'
 require 'temporalio/client/workflow_execution_count'
 require 'temporalio/client/workflow_handle'
@@ -356,6 +358,67 @@ module Temporalio
     # @see https://docs.temporal.io/visibility
     def count_workflows(query = nil, rpc_options: nil)
       @impl.count_workflows(Interceptor::CountWorkflowsInput.new(query:, rpc_options:))
+    end
+
+    # Create a schedule and return its handle.
+    #
+    # @param id [String] Unique identifier of the schedule.
+    # @param schedule [Schedule] Schedule to create.
+    # @param trigger_immediately [Boolean]  If true, trigger one action immediately when creating the schedule.
+    # @param backfills [Array<Schedule::Backfill>] Set of time periods to take actions on as if that time passed right
+    #   now.
+    # @param memo [Hash<String, Object>, nil] Memo for the schedule. Memo for a scheduled workflow is part of the
+    #   schedule action.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the schedule. Search attributes for a
+    #   scheduled workflow are part of the scheduled action.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [ScheduleHandle] A handle to the created schedule.
+    # @raise [Error::ScheduleAlreadyRunningError] If a schedule with this ID is already running.
+    # @raise [Error::RPCError] RPC error from call.
+    def create_schedule(
+      id,
+      schedule,
+      trigger_immediately: false,
+      backfills: [],
+      memo: nil,
+      search_attributes: nil,
+      rpc_options: nil
+    )
+      @impl.create_schedule(Interceptor::CreateScheduleInput.new(
+                              id:,
+                              schedule:,
+                              trigger_immediately:,
+                              backfills:,
+                              memo:,
+                              search_attributes:,
+                              rpc_options:
+                            ))
+    end
+
+    # Get a schedule handle to an existing schedule for the given ID.
+    #
+    # @param id [String] Schedule ID to get a handle to.
+    # @return [ScheduleHandle] The schedule handle.
+    def schedule_handle(id)
+      ScheduleHandle.new(client: self, id:)
+    end
+
+    # List schedules.
+    #
+    # Note, this list is eventually consistent. Therefore if a schedule is added or deleted, it may not be available in
+    # the list immediately.
+    #
+    # @param query [String] A Temporal visibility list filter.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Enumerator<Schedule::List::Description>] Enumerable schedules.
+    #
+    # @raise [Error::RPCError] RPC error from call.
+    #
+    # @see https://docs.temporal.io/visibility
+    def list_schedules(query = nil, rpc_options: nil)
+      @impl.list_schedules(Interceptor::ListSchedulesInput.new(query:, rpc_options:))
     end
 
     # Get an async activity handle.

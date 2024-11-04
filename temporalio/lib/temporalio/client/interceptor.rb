@@ -137,6 +137,79 @@ module Temporalio
         keyword_init: true
       )
 
+      # Input for {Outbound.create_schedule}.
+      CreateScheduleInput = Struct.new(
+        :id,
+        :schedule,
+        :trigger_immediately,
+        :backfills,
+        :memo,
+        :search_attributes,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.list_schedules}.
+      ListSchedulesInput = Struct.new(
+        :query,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.backfill_schedule}.
+      BackfillScheduleInput = Struct.new(
+        :id,
+        :backfills,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.delete_schedule}.
+      DeleteScheduleInput = Struct.new(
+        :id,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.describe_schedule}.
+      DescribeScheduleInput = Struct.new(
+        :id,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.pause_schedule}.
+      PauseScheduleInput = Struct.new(
+        :id,
+        :note,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.trigger_schedule}.
+      TriggerScheduleInput = Struct.new(
+        :id,
+        :overlap,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.unpause_schedule}.
+      UnpauseScheduleInput = Struct.new(
+        :id,
+        :note,
+        :rpc_options,
+        keyword_init: true
+      )
+
+      # Input for {Outbound.update_schedule}.
+      UpdateScheduleInput = Struct.new(
+        :id,
+        :updater,
+        :rpc_options,
+        keyword_init: true
+      )
+
       # Input for {Outbound.heartbeat_async_activity}.
       HeartbeatAsyncActivityInput = Struct.new(
         :task_token_or_id_reference,
@@ -266,6 +339,72 @@ module Temporalio
         # @param input [TerminateWorkflowInput] Input.
         def terminate_workflow(input)
           next_interceptor.terminate_workflow(input)
+        end
+
+        # Called for every {Client.create_schedule} call.
+        #
+        # @param input [CreateScheduleInput] Input.
+        # @return [ScheduleHandle] Schedule handle.
+        def create_schedule(input)
+          next_interceptor.create_schedule(input)
+        end
+
+        # Called for every {Client.list_schedules} call.
+        #
+        # @param input [ListSchedulesInput] Input.
+        # @return [Enumerator<Schedule::List::Description>] Enumerable schedules.
+        def list_schedules(input)
+          next_interceptor.list_schedules(input)
+        end
+
+        # Called for every {ScheduleHandle.backfill} call.
+        #
+        # @param input [BackfillScheduleInput] Input.
+        def backfill_schedule(input)
+          next_interceptor.backfill_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.delete} call.
+        #
+        # @param input [DeleteScheduleInput] Input.
+        def delete_schedule(input)
+          next_interceptor.delete_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.describe} call.
+        #
+        # @param input [DescribeScheduleInput] Input.
+        # @return [Schedule::Description] Schedule description.
+        def describe_schedule(input)
+          next_interceptor.describe_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.pause} call.
+        #
+        # @param input [PauseScheduleInput] Input.
+        def pause_schedule(input)
+          next_interceptor.pause_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.trigger} call.
+        #
+        # @param input [TriggerScheduleInput] Input.
+        def trigger_schedule(input)
+          next_interceptor.trigger_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.unpause} call.
+        #
+        # @param input [UnpauseScheduleInput] Input.
+        def unpause_schedule(input)
+          next_interceptor.unpause_schedule(input)
+        end
+
+        # Called for every {ScheduleHandle.update} call.
+        #
+        # @param input [UpdateScheduleInput] Input.
+        def update_schedule(input)
+          next_interceptor.update_schedule(input)
         end
 
         # Called for every {AsyncActivityHandle.heartbeat} call.
