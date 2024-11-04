@@ -3,7 +3,7 @@
 require 'temporalio/error'
 
 module Temporalio
-  class Activity
+  module Activity
     # Error raised inside an activity to mark that the activity will be completed asynchronously.
     class CompleteAsyncError < Error
     end

@@ -6,7 +6,7 @@ require 'test'
 module Worker
   module ActivityExecutor
     class ThreadPoolTest < Test
-      DO_NOTHING_ACTIVITY = Temporalio::Activity::Definition.new(name: 'ignore') do
+      DO_NOTHING_ACTIVITY = Temporalio::Activity::Definition::Info.new(name: 'ignore') do
         # Empty
       end
 

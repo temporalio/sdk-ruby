@@ -12,7 +12,7 @@ require 'test'
 class WorkerActivityTest < Test
   also_run_all_tests_in_fiber
 
-  class ClassActivity < Temporalio::Activity
+  class ClassActivity < Temporalio::Activity::Definition
     def execute(name)
       "Hello, #{name}!"
     end
@@ -22,7 +22,7 @@ class WorkerActivityTest < Test
     assert_equal 'Hello, Class!', execute_activity(ClassActivity, 'Class')
   end
 
-  class InstanceActivity < Temporalio::Activity
+  class InstanceActivity < Temporalio::Activity::Definition
     def initialize(greeting)
       @greeting = greeting
     end
@@ -37,11 +37,11 @@ class WorkerActivityTest < Test
   end
 
   def test_block
-    activity = Temporalio::Activity::Definition.new(name: 'BlockActivity') { |name| "Greetings, #{name}!" }
+    activity = Temporalio::Activity::Definition::Info.new(name: 'BlockActivity') { |name| "Greetings, #{name}!" }
     assert_equal 'Greetings, Block!', execute_activity(activity, 'Block')
   end
 
-  class FiberActivity < Temporalio::Activity
+  class FiberActivity < Temporalio::Activity::Definition
     attr_reader :waiting_notification, :result_notification
 
     activity_executor :fiber
@@ -78,7 +78,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class LoggingActivity < Temporalio::Activity
+  class LoggingActivity < Temporalio::Activity::Definition
     def execute
       # Log and then raise only on first attempt
       Temporalio::Activity::Context.current.logger.info('Test log')
@@ -98,7 +98,7 @@ class WorkerActivityTest < Test
     assert(lines.one? { |l| l.include?('Test log') && l.include?(':attempt=>2') })
   end
 
-  class CustomNameActivity < Temporalio::Activity
+  class CustomNameActivity < Temporalio::Activity::Definition
     activity_name 'my-activity'
 
     def execute
@@ -115,10 +115,10 @@ class WorkerActivityTest < Test
     end
   end
 
-  class DuplicateNameActivity1 < Temporalio::Activity
+  class DuplicateNameActivity1 < Temporalio::Activity::Definition
   end
 
-  class DuplicateNameActivity2 < Temporalio::Activity
+  class DuplicateNameActivity2 < Temporalio::Activity::Definition
     activity_name :DuplicateNameActivity1
   end
 
@@ -133,7 +133,7 @@ class WorkerActivityTest < Test
     assert_equal 'Multiple activities named DuplicateNameActivity1', error.message
   end
 
-  class UnknownExecutorActivity < Temporalio::Activity
+  class UnknownExecutorActivity < Temporalio::Activity::Definition
     activity_executor :some_unknown
   end
 
@@ -159,10 +159,10 @@ class WorkerActivityTest < Test
         activities: [NotAnActivity]
       )
     end
-    assert error.message.end_with?('does not extend Activity')
+    assert error.message.end_with?('does not extend Temporalio::Activity::Definition')
   end
 
-  class FailureActivity < Temporalio::Activity
+  class FailureActivity < Temporalio::Activity::Definition
     def execute(form)
       case form
       when 'simple'
@@ -205,7 +205,7 @@ class WorkerActivityTest < Test
     assert_equal 1.23, error.cause.cause.next_retry_delay
   end
 
-  class UnimplementedExecuteActivity < Temporalio::Activity
+  class UnimplementedExecuteActivity < Temporalio::Activity::Definition
   end
 
   def test_unimplemented_execute
@@ -222,7 +222,7 @@ class WorkerActivityTest < Test
     )
   end
 
-  class MultiParamActivity < Temporalio::Activity
+  class MultiParamActivity < Temporalio::Activity::Definition
     def execute(arg1, arg2, arg3)
       "Args: #{arg1}, #{arg2}, #{arg3}"
     end
@@ -232,7 +232,7 @@ class WorkerActivityTest < Test
     assert_equal 'Args: {"foo"=>"bar"}, 123, baz', execute_activity(MultiParamActivity, { foo: 'bar' }, 123, 'baz')
   end
 
-  class InfoActivity < Temporalio::Activity
+  class InfoActivity < Temporalio::Activity::Definition
     def execute
       # Task token is non-utf8 safe string, so we need to base64 it
       info_hash = Temporalio::Activity::Context.current.info.to_h # steep:ignore
@@ -262,7 +262,7 @@ class WorkerActivityTest < Test
     assert_equal 'kitchen_sink', info.workflow_type
   end
 
-  class CancellationActivity < Temporalio::Activity
+  class CancellationActivity < Temporalio::Activity::Definition
     attr_reader :canceled
 
     def initialize(swallow: false)
@@ -328,7 +328,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class HeartbeatDetailsActivity < Temporalio::Activity
+  class HeartbeatDetailsActivity < Temporalio::Activity::Definition
     def execute
       # First attempt sends a heartbeat with details and fails,
       # next attempt just returns the first attempt's details
@@ -346,7 +346,7 @@ class WorkerActivityTest < Test
                  execute_activity(HeartbeatDetailsActivity, retry_max_attempts: 2, heartbeat_timeout: 0.8)
   end
 
-  class ShieldingActivity < Temporalio::Activity
+  class ShieldingActivity < Temporalio::Activity::Definition
     attr_reader :canceled, :levels_reached
 
     def initialize
@@ -401,7 +401,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class NoRaiseCancellationActivity < Temporalio::Activity
+  class NoRaiseCancellationActivity < Temporalio::Activity::Definition
     activity_cancel_raise false
     attr_reader :canceled
 
@@ -446,7 +446,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class WorkerShutdownActivity < Temporalio::Activity
+  class WorkerShutdownActivity < Temporalio::Activity::Definition
     attr_reader :canceled
 
     def initialize
@@ -511,7 +511,7 @@ class WorkerActivityTest < Test
     assert_equal 'WorkerShutdown', error.cause.cause.type
   end
 
-  class AsyncCompletionActivity < Temporalio::Activity
+  class AsyncCompletionActivity < Temporalio::Activity::Definition
     def initialize
       @task_token = Queue.new
     end
@@ -614,7 +614,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class CustomExecutorActivity < Temporalio::Activity
+  class CustomExecutorActivity < Temporalio::Activity::Definition
     activity_executor :my_executor
 
     def execute
@@ -627,7 +627,7 @@ class WorkerActivityTest < Test
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
   end
 
-  class ConcurrentActivity < Temporalio::Activity
+  class ConcurrentActivity < Temporalio::Activity::Definition
     def initialize
       @started = Queue.new
       @continue = Queue.new
@@ -789,7 +789,7 @@ class WorkerActivityTest < Test
     end
   end
 
-  class InterceptorActivity < Temporalio::Activity
+  class InterceptorActivity < Temporalio::Activity::Definition
     def execute(name)
       Temporalio::Activity::Context.current.heartbeat('heartbeat-val')
       "Hello, #{name}!"
@@ -839,7 +839,7 @@ class WorkerActivityTest < Test
     interceptors: [],
     client: env.client
   )
-    activity_defn = Temporalio::Activity::Definition.from_activity(activity)
+    activity_defn = Temporalio::Activity::Definition::Info.from_activity(activity)
     extra_worker_args = {}
     extra_worker_args[:activity_executors] = activity_executors if activity_executors
     worker = Temporalio::Worker.new(

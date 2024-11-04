@@ -201,7 +201,8 @@ module Temporalio
     #
     # @param client [Client] Client for this worker.
     # @param task_queue [String] Task queue for this worker.
-    # @param activities [Array<Activity, Class<Activity>, Activity::Definition>] Activities for this worker.
+    # @param activities [Array<Activity::Definition, Class<Activity::Definition>, Activity::Definition::Info>]
+    #   Activities for this worker.
     # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
     # @param tuner [Tuner] Tuner that controls the amount of concurrent activities/workflows that run at a time.
     # @param interceptors [Array<Interceptor>] Interceptors specific to this worker. Note, interceptors set on the

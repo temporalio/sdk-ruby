@@ -8,7 +8,7 @@ module Testing
   class ActivityEnvironmentTest < Test
     also_run_all_tests_in_fiber
 
-    class SimpleActivity < Temporalio::Activity
+    class SimpleActivity < Temporalio::Activity::Definition
       def initialize(init_arg = 'init-arg')
         @init_arg = init_arg
       end
@@ -28,7 +28,7 @@ module Testing
                    env.run(SimpleActivity.new('init-arg2'), 'arg2')
       assert_equal 'exec arg: arg3, id: test',
                    env.run(
-                     Temporalio::Activity::Definition.new(name: 'SimpleActivity') do |arg|
+                     Temporalio::Activity::Definition::Info.new(name: 'SimpleActivity') do |arg|
                        "exec arg: #{arg}, id: #{Temporalio::Activity::Context.current.info.activity_id}"
                      end,
                      'arg3'
@@ -37,7 +37,7 @@ module Testing
       assert_equal 'Intentional error', err.message
     end
 
-    class WaitCancelActivity < Temporalio::Activity
+    class WaitCancelActivity < Temporalio::Activity::Definition
       def execute
         Temporalio::Activity::Context.current.cancellation.wait
       end
@@ -56,7 +56,7 @@ module Testing
       assert_instance_of Temporalio::Error::CanceledError, err_queue.pop
     end
 
-    class WaitFiberCancelActivity < Temporalio::Activity
+    class WaitFiberCancelActivity < Temporalio::Activity::Definition
       activity_executor :fiber
 
       def execute
@@ -78,7 +78,7 @@ module Testing
       assert_instance_of Temporalio::Error::CanceledError, err_queue.pop
     end
 
-    class HeartbeatingActivity < Temporalio::Activity
+    class HeartbeatingActivity < Temporalio::Activity::Definition
       def execute
         Temporalio::Activity::Context.current.heartbeat(123, '456')
         Temporalio::Activity::Context.current.heartbeat(Temporalio::Activity::Context.current.info.activity_id)

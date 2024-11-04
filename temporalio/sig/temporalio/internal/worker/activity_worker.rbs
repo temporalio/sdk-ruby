@@ -19,7 +19,7 @@ module Temporalio
         def handle_start_task: (String task_token, untyped start) -> void
         def handle_cancel_task: (String task_token, untyped cancel) -> void
 
-        def execute_activity: (String task_token, Activity::Definition defn, untyped start) -> void
+        def execute_activity: (String task_token, Activity::Definition::Info defn, untyped start) -> void
         def run_activity: (
           RunningActivity activity,
           Temporalio::Worker::Interceptor::ExecuteActivityInput input

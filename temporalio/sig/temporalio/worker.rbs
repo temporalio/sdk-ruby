@@ -3,7 +3,7 @@ module Temporalio
     class Options
       attr_accessor client: Client
       attr_accessor task_queue: String
-      attr_accessor activities: Array[Activity | singleton(Activity) | Activity::Definition]
+      attr_accessor activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]
       attr_accessor activity_executors: Hash[Symbol, Worker::ActivityExecutor]
       attr_accessor tuner: Tuner
       attr_accessor interceptors: Array[Interceptor]
@@ -26,7 +26,7 @@ module Temporalio
       def initialize: (
         client: Client,
         task_queue: String,
-        activities: Array[Activity | singleton(Activity) | Activity::Definition],
+        activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info],
         activity_executors: Hash[Symbol, Worker::ActivityExecutor],
         tuner: Tuner,
         interceptors: Array[Interceptor],
@@ -64,7 +64,7 @@ module Temporalio
     def initialize: (
       client: Client,
       task_queue: String,
-      ?activities: Array[Activity | singleton(Activity) | Activity::Definition],
+      ?activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info],
       ?activity_executors: Hash[Symbol, Worker::ActivityExecutor],
       ?tuner: Tuner,
       ?interceptors: Array[Interceptor],

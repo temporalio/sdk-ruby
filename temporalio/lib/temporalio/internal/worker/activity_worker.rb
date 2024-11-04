@@ -30,7 +30,7 @@ module Temporalio
           @activities = worker.options.activities.each_with_object({}) do |act, hash|
             # Class means create each time, instance means just call, definition
             # does nothing special
-            defn = Activity::Definition.from_activity(act)
+            defn = Activity::Definition::Info.from_activity(act)
             # Confirm name not in use
             raise ArgumentError, "Multiple activities named #{defn.name}" if hash.key?(defn.name)
 

@@ -1,5 +1,5 @@
 module Temporalio
-  class Activity
+  module Activity
     class Context
       def self.current: -> Context
       def self.current_or_nil: -> Context?

@@ -28,7 +28,7 @@ Layout/LeadingCommentSpace:
 # Don't need super for activities
 Lint/MissingSuper:
   AllowedParentClasses:
-    - Temporalio::Activity
+    - Temporalio::Activity::Definition
 
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:

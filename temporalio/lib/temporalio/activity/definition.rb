@@ -1,76 +1,130 @@
 # frozen_string_literal: true
 
 module Temporalio
-  class Activity
-    # Definition of an activity. Activities are usually classes/instances that extend {Activity}, but definitions can
-    # also be manually created with a proc/block.
+  module Activity
+    # Base class for all activities.
+    #
+    # Activities can be given to a worker as instances of this class, which will call execute on the same instance for
+    # each execution, or given to the worker as the class itself which instantiates the activity for each execution.
+    #
+    # All activities must implement {execute}. Inside execute, {Activity::Context.current} can be used to access the
+    # current context to get information, issue heartbeats, etc.
+    #
+    # By default, the activity is named as its unqualified class name. This can be customized with {activity_name}.
+    #
+    # By default, the activity uses the `:default` executor which is usually the thread-pool based executor. This can be
+    # customized with {activity_executor}.
+    #
+    # By default, upon cancellation {::Thread.raise} or {::Fiber.raise} is called with a {Error::CanceledError}. This
+    # can be disabled by passing `false` to {activity_cancel_raise}.
+    #
+    # See documentation for more detail on activities.
     class Definition
-      # @return [String, Symbol] Name of the activity.
-      attr_reader :name
-
-      # @return [Proc] Proc for the activity.
-      attr_reader :proc
-
-      # @return [Symbol] Name of the executor. Default is `:default`.
-      attr_reader :executor
-
-      # @return [Boolean] Whether to raise in thread/fiber on cancellation. Default is `true`.
-      attr_reader :cancel_raise
-
-      # Obtain a definition representing the given activity, which can be a class, instance, or definition.
+      # Override the activity name which is defaulted to the unqualified class name.
       #
-      # @param activity [Activity, Class<Activity>, Definition] Activity to get definition for.
-      # @return Definition Obtained definition.
-      def self.from_activity(activity)
-        # Class means create each time, instance means just call, definition
-        # does nothing special
-        case activity
-        when Class
-          raise ArgumentError, "Class '#{activity}' does not extend Activity" unless activity < Activity
+      # @param name [String, Symbol] Name to use.
+      def self.activity_name(name)
+        raise ArgumentError, 'Activity name must be a symbol or string' if !name.is_a?(Symbol) && !name.is_a?(String)
 
-          details = activity._activity_definition_details
-          new(
-            name: details[:activity_name],
-            executor: details[:activity_executor],
-            cancel_raise: details[:activity_cancel_raise],
-            # Instantiate and call
-            proc: proc { |*args| activity.new.execute(*args) }
-          )
-        when Activity
-          details = activity.class._activity_definition_details
-          new(
-            name: details[:activity_name],
-            executor: details[:activity_executor],
-            cancel_raise: details[:activity_cancel_raise],
-            # Just call
-            proc: proc { |*args| activity.execute(*args) }
-          )
-        when Activity::Definition
-          activity
-        else
-          raise ArgumentError, "#{activity} is not an activity class, instance, or definition"
-        end
+        @activity_name = name.to_s
       end
 
-      # Manually create activity definition. Most users will use an instance/class of {Activity}.
+      # Override the activity executor which is defaulted to `:default`.
       #
-      # @param name [String, Symbol] Name of the activity.
-      # @param proc [Proc, nil] Proc for the activity, or can give block.
-      # @param executor [Symbol] Name of the executor.
-      # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
-      # @yield Use this block as the activity. Cannot be present with `proc`.
-      def initialize(name:, proc: nil, executor: :default, cancel_raise: true, &block)
-        @name = name
-        if proc.nil?
-          raise ArgumentError, 'Must give proc or block' unless block_given?
+      # @param executor_name [Symbol] Executor to use.
+      def self.activity_executor(executor_name)
+        raise ArgumentError, 'Executor name must be a symbol' unless executor_name.is_a?(Symbol)
 
-          proc = block
-        elsif block_given?
-          raise ArgumentError, 'Cannot give proc and block'
+        @activity_executor = executor_name
+      end
+
+      # Override whether the activity uses Thread/Fiber raise for cancellation which is defaulted to true.
+      #
+      # @param cancel_raise [Boolean] Whether to raise.
+      def self.activity_cancel_raise(cancel_raise)
+        raise ArgumentError, 'Must be a boolean' unless cancel_raise.is_a?(TrueClass) || cancel_raise.is_a?(FalseClass)
+
+        @activity_cancel_raise = cancel_raise
+      end
+
+      # @!visibility private
+      def self._activity_definition_details
+        {
+          activity_name: @activity_name || name.to_s.split('::').last,
+          activity_executor: @activity_executor || :default,
+          activity_cancel_raise: @activity_cancel_raise.nil? ? true : @activity_cancel_raise
+        }
+      end
+
+      # Implementation of the activity. The arguments should be positional and this should return the value on success
+      # or raise an error on failure.
+      def execute(*args)
+        raise NotImplementedError, 'Activity did not implement "execute"'
+      end
+
+      # Definition info of an activity. Activities are usually classes/instances that extend {Definition}, but
+      # definitions can also be manually created with a block via {initialize} here.
+      class Info
+        # @return [String, Symbol] Name of the activity.
+        attr_reader :name
+
+        # @return [Proc] Proc for the activity.
+        attr_reader :proc
+
+        # @return [Symbol] Name of the executor. Default is `:default`.
+        attr_reader :executor
+
+        # @return [Boolean] Whether to raise in thread/fiber on cancellation. Default is `true`.
+        attr_reader :cancel_raise
+
+        # Obtain definition info representing the given activity, which can be a class, instance, or definition info.
+        #
+        # @param activity [Definition, Class<Definition>, Info] Activity to get info for.
+        # @return Info Obtained definition info.
+        def self.from_activity(activity)
+          # Class means create each time, instance means just call, definition
+          # does nothing special
+          case activity
+          when Class
+            unless activity < Definition
+              raise ArgumentError,
+                    "Class '#{activity}' does not extend Temporalio::Activity::Definition"
+            end
+
+            details = activity._activity_definition_details
+            new(
+              name: details[:activity_name],
+              executor: details[:activity_executor],
+              cancel_raise: details[:activity_cancel_raise]
+            ) { |*args| activity.new.execute(*args) } # Instantiate and call
+          when Definition
+            details = activity.class._activity_definition_details
+            new(
+              name: details[:activity_name],
+              executor: details[:activity_executor],
+              cancel_raise: details[:activity_cancel_raise]
+            ) { |*args| activity.execute(*args) } # Just and call
+          when Info
+            activity
+          else
+            raise ArgumentError, "#{activity} is not an activity class, instance, or definition info"
+          end
         end
-        @proc = proc
-        @executor = executor
-        @cancel_raise = cancel_raise
+
+        # Manually create activity definition info. Most users will use an instance/class of {Definition}.
+        #
+        # @param name [String, Symbol] Name of the activity.
+        # @param executor [Symbol] Name of the executor.
+        # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
+        # @yield Use this block as the activity.
+        def initialize(name:, executor: :default, cancel_raise: true, &block)
+          @name = name
+          raise ArgumentError, 'Must give block' unless block_given?
+
+          @proc = block
+          @executor = executor
+          @cancel_raise = cancel_raise
+        end
       end
     end
   end

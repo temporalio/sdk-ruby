@@ -21,7 +21,7 @@ module Temporalio
       # allows executor implementations to do eager validation based on the definition. This does not have to be
       # implemented and the default is a no-op.
       #
-      # @param defn [Activity::Definition] Activity definition.
+      # @param defn [Activity::Definition::Info] Activity definition info.
       def initialize_activity(defn)
         # Default no-op
       end
@@ -29,7 +29,7 @@ module Temporalio
       # Execute the given block in the executor. The block is built to never raise and need no arguments. Implementers
       # must implement this.
       #
-      # @param defn [Activity::Definition] Activity definition.
+      # @param defn [Activity::Definition::Info] Activity definition info.
       # @yield Block to execute.
       def execute_activity(defn, &)
         raise NotImplementedError
@@ -45,7 +45,7 @@ module Temporalio
       # {execute_activity} with a context before user code is executed and with nil after user code is complete.
       # Implementers must implement this.
       #
-      # @param defn [Activity::Definition] Activity definition.
+      # @param defn [Activity::Definition::Info] Activity definition info.
       # @param context [Activity::Context, nil] The value to set.
       def set_activity_context(defn, context)
         raise NotImplementedError
