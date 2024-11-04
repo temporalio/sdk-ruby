@@ -16,6 +16,8 @@ module Temporalio
       def logger: -> ScopedLogger
 
       def _scoped_logger_info: -> Hash[Symbol, Object]
+
+      def metric_meter: -> Metric::Meter
     end
   end
 end

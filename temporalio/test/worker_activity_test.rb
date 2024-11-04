@@ -845,10 +845,10 @@ class WorkerActivityTest < Test
       )
     )
     conn_opts = env.client.connection.options.dup
-    conn_opts[:runtime] = runtime
+    conn_opts.runtime = runtime
     client_opts = env.client.options.dup
-    client_opts[:connection] = Temporalio::Client::Connection.new(**conn_opts.to_h)
-    client = Temporalio::Client.new(**client_opts.to_h)
+    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
 
     assert_equal 'done', execute_activity(CustomMetricActivity, client:)
 

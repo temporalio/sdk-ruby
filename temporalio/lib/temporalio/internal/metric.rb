@@ -81,9 +81,9 @@ module Temporalio
         def create_metric(
           metric_type,
           name,
-          description:,
-          unit:,
-          value_type:
+          description: nil,
+          unit: nil,
+          value_type: :integer
         )
           NullMetric.new(
             metric_type:,

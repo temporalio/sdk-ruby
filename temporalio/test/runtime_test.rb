@@ -7,6 +7,19 @@ require 'test'
 require 'uri'
 
 class RuntimeTest < Test
+  def assert_metric_line(dump, metric, **required_attrs)
+    lines = dump.split("\n").select do |l|
+      l.start_with?("#{metric}{") && required_attrs.all? { |k, v| l.include?("#{k}=\"#{v}\"") }
+    end
+    assert_equal 1, lines.size
+    lines.first&.split&.last
+  end
+
+  def assert_bad_call(message_includes = nil, &)
+    err = assert_raises(&)
+    assert_includes err.message, message_includes if message_includes
+  end
+
   def test_metric_basics
     # In this test, we'll use Prometheus and confirm existing metrics and custom
     # ones
@@ -22,23 +35,15 @@ class RuntimeTest < Test
     )
 
     # Create a client on this runtime and start a non-existent workflow
-    conn_opts = env.client.connection.options.dup #: Hash
-    conn_opts[:runtime] = runtime
+    conn_opts = env.client.connection.options.dup
+    conn_opts.runtime = runtime
     client_opts = env.client.options.dup
-    client_opts[:connection] = Temporalio::Client::Connection.new(**conn_opts.to_h)
-    client = Temporalio::Client.new(**client_opts.to_h)
+    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
     client.start_workflow('bad-workflow', id: "bad-wf-#{SecureRandom.uuid}", task_queue: 'bad-task-queue')
 
     # Check Prometheus metrics for a count of our request
     dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
-
-    def assert_metric_line(dump, metric, **required_attrs)
-      lines = dump.split("\n").select do |l|
-        l.start_with?("#{metric}{") && required_attrs.all? { |k, v| l.include?("#{k}=\"#{v}\"") }
-      end
-      assert_equal 1, lines.size
-      lines.first.split.last
-    end
 
     assert_equal '1', assert_metric_line(dump, 'temporal_request', operation: 'StartWorkflowExecution')
 
@@ -89,11 +94,7 @@ class RuntimeTest < Test
 
     # Confirm proper failure of bad types to calls
 
-    def assert_bad_call(message_includes = nil, &)
-      err = assert_raises(&)
-      assert_includes err.message, message_includes if message_includes
-    end
-
+    # steep:ignore:start
     assert_bad_call('Unrecognized instrument type') { meter.create_metric(:invalid_metric_type, 'bad-metric') }
     assert_bad_call('Unrecognized value type') { meter.create_metric(:counter, 'bad-metric', value_type: :float) }
     assert_bad_call('Unrecognized value type') { meter.create_metric(:counter, 'bad-metric', value_type: :duration) }
@@ -115,5 +116,6 @@ class RuntimeTest < Test
     assert_bad_call { counter_int.record(1, additional_attributes: { foo: :bad }) }
     assert_bad_call { counter_int.record(1, additional_attributes: { foo: nil }) }
     assert_bad_call { counter_int.record(1, additional_attributes: { 123 => 'foo' }) }
+    # steep:ignore:end
   end
 end

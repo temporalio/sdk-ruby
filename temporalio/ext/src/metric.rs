@@ -1,7 +1,12 @@
 use std::{sync::Arc, time::Duration};
 
 use magnus::{
-    class, function, method, prelude::*, r_hash::ForEach, value::{IntoId, Qfalse, Qtrue}, DataTypeFunctions, Error, Float, Integer, RHash, RString, Ruby, Symbol, TryConvert, TypedData, Value
+    class, function, method,
+    prelude::*,
+    r_hash::ForEach,
+    value::{IntoId, Qfalse, Qtrue},
+    DataTypeFunctions, Error, Float, Integer, RHash, RString, Ruby, Symbol, TryConvert, TypedData,
+    Value,
 };
 use temporal_sdk_core_api::telemetry::metrics;
 
@@ -58,7 +63,9 @@ impl Metric {
         let value_type = value_type.into_id_with(&ruby);
         let instrument: Arc<dyn Instrument> = if metric_type == counter {
             if value_type != integer {
-                return Err(error!("Unrecognized value type for counter, must be :integer"));
+                return Err(error!(
+                    "Unrecognized value type for counter, must be :integer"
+                ));
             }
             Arc::new(meter.core.inner.counter(params))
         } else if metric_type == histogram {
@@ -69,7 +76,9 @@ impl Metric {
             } else if value_type == duration {
                 Arc::new(meter.core.inner.histogram_duration(params))
             } else {
-                return Err(error!("Unrecognized value type for histogram, must be :integer, :float, or :duration"));
+                return Err(error!(
+                    "Unrecognized value type for histogram, must be :integer, :float, or :duration"
+                ));
             }
         } else if metric_type == gauge {
             if value_type == integer {
@@ -77,10 +86,14 @@ impl Metric {
             } else if value_type == float {
                 Arc::new(meter.core.inner.gauge_f64(params))
             } else {
-                return Err(error!("Unrecognized value type for gauge, must be :integer or :float"));
+                return Err(error!(
+                    "Unrecognized value type for gauge, must be :integer or :float"
+                ));
             }
         } else {
-            return Err(error!("Unrecognized instrument type, must be :counter, :histogram, or :gauge"));
+            return Err(error!(
+                "Unrecognized instrument type, must be :counter, :histogram, or :gauge"
+            ));
         };
         Ok(Metric { instrument })
     }
@@ -177,7 +190,7 @@ impl Instrument for Arc<dyn metrics::HistogramDuration> {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         let secs = f64::try_convert(value)?;
         if secs < 0.0 {
-            return Err(error!("Duration cannot be negative"))
+            return Err(error!("Duration cannot be negative"));
         }
         self.record(Duration::from_secs_f64(secs), attrs);
         Ok(())
@@ -240,9 +253,9 @@ fn metric_key_value(k: Value, v: Value) -> Result<metrics::MetricKeyValue, Error
     // Value can be string, bool, int, or float
     let val = if let Some(v) = RString::from_value(v) {
         metrics::MetricValue::String(v.to_string()?)
-    } else if let Some(_) = Qtrue::from_value(v) {
+    } else if Qtrue::from_value(v).is_some() {
         metrics::MetricValue::Bool(true)
-    } else if let Some(_) = Qfalse::from_value(v) {
+    } else if Qfalse::from_value(v).is_some() {
         metrics::MetricValue::Bool(false)
     } else if let Some(v) = Integer::from_value(v) {
         metrics::MetricValue::Int(v.to_i64()?)

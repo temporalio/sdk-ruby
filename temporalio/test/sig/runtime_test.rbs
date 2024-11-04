@@ -1,0 +1,9 @@
+class RuntimeTest < Test
+  def assert_metric_line: (
+    String dump,
+    String metric,
+    **untyped required_attrs
+  ) -> String?
+
+  def assert_bad_call: (?String? message_includes) { (?) -> untyped } -> void
+end
