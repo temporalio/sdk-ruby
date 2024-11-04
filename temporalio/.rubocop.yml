@@ -21,6 +21,10 @@ AllCops:
 Layout/ClassStructure:
   Enabled: true
 
+# RBS annotations allowed
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+
 # Don't need super for activities
 Lint/MissingSuper:
   AllowedParentClasses:

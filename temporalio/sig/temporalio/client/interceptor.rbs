@@ -19,7 +19,7 @@ module Temporalio
         attr_accessor search_attributes: SearchAttributes?
         attr_accessor start_delay: Float?
         attr_accessor request_eager_start: bool
-        attr_accessor headers: Hash[String, String]
+        attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
@@ -38,7 +38,7 @@ module Temporalio
           search_attributes: SearchAttributes?,
           start_delay: Float?,
           request_eager_start: bool,
-          headers: Hash[String, String],
+          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -98,7 +98,7 @@ module Temporalio
         attr_accessor run_id: String?
         attr_accessor signal: String
         attr_accessor args: Array[Object?]
-        attr_accessor headers: Hash[String, String]
+        attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
@@ -106,7 +106,7 @@ module Temporalio
           run_id: String?,
           signal: String,
           args: Array[Object?],
-          headers: Hash[String, String],
+          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -117,7 +117,7 @@ module Temporalio
         attr_accessor query: String
         attr_accessor args: Array[Object?]
         attr_accessor reject_condition: WorkflowQueryRejectCondition::enum?
-        attr_accessor headers: Hash[String, String]
+        attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
@@ -126,7 +126,7 @@ module Temporalio
           query: String,
           args: Array[Object?],
           reject_condition: WorkflowQueryRejectCondition::enum?,
-          headers: Hash[String, String],
+          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -138,7 +138,7 @@ module Temporalio
         attr_accessor update: String
         attr_accessor args: Array[Object?]
         attr_accessor wait_for_stage: WorkflowUpdateWaitStage::enum
-        attr_accessor headers: Hash[String, String]
+        attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
@@ -148,7 +148,7 @@ module Temporalio
           update: String,
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
-          headers: Hash[String, String],
+          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -195,6 +195,116 @@ module Temporalio
           first_execution_run_id: String?,
           reason: String?,
           details: Array[Object?],
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class CreateScheduleInput
+        attr_accessor id: String
+        attr_accessor schedule: Schedule
+        attr_accessor trigger_immediately: bool
+        attr_accessor backfills: Array[Schedule::Backfill]
+        attr_accessor memo: Hash[String, Object?]?
+        attr_accessor search_attributes: SearchAttributes?
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          schedule: Schedule,
+          trigger_immediately: bool,
+          backfills: Array[Schedule::Backfill],
+          memo: Hash[String, Object?]?,
+          search_attributes: SearchAttributes?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class ListSchedulesInput
+        attr_accessor query: String?
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          query: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class BackfillScheduleInput
+        attr_accessor id: String
+        attr_accessor backfills: Array[Schedule::Backfill]
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          backfills: Array[Schedule::Backfill],
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class DeleteScheduleInput
+        attr_accessor id: String
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class DescribeScheduleInput
+        attr_accessor id: String
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class PauseScheduleInput
+        attr_accessor id: String
+        attr_accessor note: String
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          note: String,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class TriggerScheduleInput
+        attr_accessor id: String
+        attr_accessor overlap: Schedule::OverlapPolicy::enum?
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          overlap: Schedule::OverlapPolicy::enum?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class UnpauseScheduleInput
+        attr_accessor id: String
+        attr_accessor note: String
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          note: String,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class UpdateScheduleInput
+        attr_accessor id: String
+        attr_accessor updater: ^(Schedule::Update::Input) -> Schedule::Update?
+        attr_accessor rpc_options: RPCOptions?
+
+        def initialize: (
+          id: String,
+          updater: ^(Schedule::Update::Input) -> Schedule::Update?,
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -275,6 +385,24 @@ module Temporalio
         def cancel_workflow: (CancelWorkflowInput input) -> void
 
         def terminate_workflow: (TerminateWorkflowInput input) -> void
+
+        def create_schedule: (CreateScheduleInput input) -> ScheduleHandle
+
+        def list_schedules: (ListSchedulesInput input) -> Enumerator[WorkflowExecution, WorkflowExecution]
+
+        def backfill_schedule: (BackfillScheduleInput input) -> void
+
+        def delete_schedule: (DeleteScheduleInput input) -> void
+
+        def describe_schedule: (DescribeScheduleInput input) -> Schedule::Description
+
+        def pause_schedule: (PauseScheduleInput input) -> void
+
+        def trigger_schedule: (TriggerScheduleInput input) -> void
+
+        def unpause_schedule: (UnpauseScheduleInput input) -> void
+
+        def update_schedule: (UpdateScheduleInput input) -> void
 
         def heartbeat_async_activity: (HeartbeatAsyncActivityInput input) -> void
 

@@ -39,6 +39,11 @@ class Test < Minitest::Test
 
   def self.also_run_all_tests_in_fiber
     @also_run_all_tests_in_fiber = true
+    # We have to tell Minitest the diff executable to use because "async" has an
+    # issue executing Kernel#system calls.
+    # See https://github.com/socketry/async/issues/351
+    # TODO(cretz): Remove when fixed in async
+    Minitest::Assertions.diff = 'diff'
   end
 
   def self.method_added(method_name)
@@ -95,6 +100,18 @@ class Test < Minitest::Test
     end
   end
 
+  def assert_no_schedules
+    assert_eventually do
+      assert_empty env.client.list_schedules.to_a
+    end
+  end
+
+  def delete_schedules(*ids)
+    ids.each do |id|
+      env.client.schedule_handle(id).delete
+    end
+  end
+
   class TestEnvironment
     include Singleton
 
@@ -111,9 +128,8 @@ class Test < Minitest::Test
       @server.client
     end
 
-    def with_kitchen_sink_worker(worker_client = client)
+    def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}")
       # Run the golangworker
-      task_queue = "tq-#{SecureRandom.uuid}"
       pid = spawn(
         kitchen_sink_exe,
         worker_client.connection.target_host, worker_client.namespace, task_queue,

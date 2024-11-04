@@ -3,6 +3,15 @@
 require 'temporalio/internal/proto_utils'
 
 module Temporalio
+  RetryPolicy = Struct.new(
+    :initial_interval,
+    :backoff_coefficient,
+    :max_interval,
+    :max_attempts,
+    :non_retryable_error_types,
+    keyword_init: true
+  )
+
   # Options for retrying workflows and activities.
   #
   # @!attribute initial_interval
@@ -15,24 +24,39 @@ module Temporalio
   #   @return [Integer] Maximum number of attempts. If `0`, the default, there is no maximum.
   # @!attribute non_retryable_error_types
   #   @return [Array<String>, nil] List of error types that are not retryable.
-  RetryPolicy = Struct.new(
-    :initial_interval,
-    :backoff_coefficient,
-    :max_interval,
-    :max_attempts,
-    :non_retryable_error_types,
-    keyword_init: true
-  ) do
-    def initialize(*, **kwargs)
-      kwargs[:initial_interval] = 1.0 unless kwargs.key?(:initial_interval)
-      kwargs[:backoff_coefficient] = 2.0 unless kwargs.key?(:backoff_coefficient)
-      kwargs[:max_attempts] = 0 unless kwargs.key?(:max_attempts)
+  class RetryPolicy
+    # @!visibility private
+    def self._from_proto(raw_policy)
+      RetryPolicy.new(
+        initial_interval: Internal::ProtoUtils.duration_to_seconds(raw_policy.initial_interval) || raise, # Never nil
+        backoff_coefficient: raw_policy.backoff_coefficient,
+        max_interval: Internal::ProtoUtils.duration_to_seconds(raw_policy.maximum_interval),
+        max_attempts: raw_policy.maximum_attempts,
+        non_retryable_error_types: raw_policy.non_retryable_error_types&.to_a
+      )
+    end
+
+    # Create retry policy.
+    #
+    # @param initial_interval [Float] Backoff interval in seconds for the first retry. Default 1.0.
+    # @param backoff_coefficient [Float] Coefficient to multiply previous backoff interval by to get new interval.
+    #   Default 2.0.
+    # @param max_interval [Float, nil] Maximum backoff interval in seconds between retries. Default 100x
+    #   `initial_interval`.
+    # @param max_attempts [Integer] Maximum number of attempts. If `0`, the default, there is no maximum.
+    # @param non_retryable_error_types [Array<String>, nil] List of error types that are not retryable.
+    def initialize(
+      initial_interval: 1.0,
+      backoff_coefficient: 2.0,
+      max_interval: nil,
+      max_attempts: 0,
+      non_retryable_error_types: nil
+    )
       super
     end
 
     # @!visibility private
-    def to_proto
-      # @type self: RetryPolicy
+    def _to_proto
       raise 'Initial interval cannot be negative' if initial_interval.negative?
       raise 'Backoff coefficient cannot be less than 1' if backoff_coefficient < 1
       raise 'Max interval cannot be negative' if max_interval&.negative?
