@@ -215,7 +215,7 @@ class ClientScheduleTest < Test
       assert_equal [handle3.id], env.client.list_schedules("`#{ATTR_KEY_INTEGER.name}` = 1234").map(&:id)
     end
   ensure
-    delete_all_schedules
+    delete_schedules(*expected_ids) if defined?(expected_ids)
   end
 
   def test_calendar_spec_defaults
@@ -250,28 +250,29 @@ class ClientScheduleTest < Test
       assert_equal desc.info.next_action_times[i - 1] + (24 * 60 * 60), next_action_time unless i.zero?
     end
   ensure
-    delete_all_schedules
+    delete_schedules(handle.id) if defined?(handle)
   end
 
   def test_trigger_immediately
     assert_no_schedules
 
-    env.with_kitchen_sink_worker do |task_queue|
-      handle = env.client.create_schedule(
-        "sched-#{SecureRandom.uuid}",
-        Temporalio::Client::Schedule.new(
-          action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
-            'kitchen_sink',
-            { actions: [{ result: { value: 'some-result' } }] },
-            id: "wf-#{SecureRandom.uuid}",
-            task_queue:
-          ),
-          spec: Temporalio::Client::Schedule::Spec.new,
-          state: Temporalio::Client::Schedule::State.new(paused: true)
+    task_queue = "tq-#{SecureRandom.uuid}"
+    handle = env.client.create_schedule(
+      "sched-#{SecureRandom.uuid}",
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          'kitchen_sink',
+          { actions: [{ result: { value: 'some-result' } }] },
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue:
         ),
-        trigger_immediately: true
-      )
+        spec: Temporalio::Client::Schedule::Spec.new,
+        state: Temporalio::Client::Schedule::State.new(paused: true)
+      ),
+      trigger_immediately: true
+    )
 
+    env.with_kitchen_sink_worker(task_queue:) do
       # Confirm result
       desc = handle.describe
       assert_equal 1, desc.info.num_actions
@@ -280,7 +281,7 @@ class ClientScheduleTest < Test
       assert_equal 'some-result', env.client.workflow_handle(exec.workflow_id).result
     end
   ensure
-    delete_all_schedules
+    delete_schedules(handle.id) if defined?(handle)
   end
 
   def test_backfill
@@ -331,6 +332,6 @@ class ClientScheduleTest < Test
     # tests are always on 1.24+
     assert_equal 7, handle.describe.info.num_actions
   ensure
-    delete_all_schedules
+    delete_schedules(handle.id) if defined?(handle)
   end
 end

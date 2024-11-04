@@ -106,20 +106,9 @@ class Test < Minitest::Test
     end
   end
 
-  def delete_all_schedules
-    # 3 attempts
-    3.times do |attempt|
-      env.client.list_schedules.each do |schedule|
-        env.client.schedule_handle(schedule.id).delete
-      rescue Temporalio::Error::RPCError => e
-        # Ignore not found
-        raise unless e.code == Temporalio::Error::RPCError::Code::NOT_FOUND
-      end
-      begin
-        assert_no_schedules
-      rescue StandardError
-        raise unless attempt < 2
-      end
+  def delete_schedules(*ids)
+    ids.each do |id|
+      env.client.schedule_handle(id).delete
     end
   end
 
