@@ -1,0 +1,35 @@
+module Temporalio
+  module Internal
+    class Metric < Temporalio::Metric
+      def initialize: (
+        metric_type: (:counter | :histogram | :gauge),
+        name: String,
+        description: String?,
+        unit: String?,
+        value_type: (:integer | :float | :duration),
+        bridge: Bridge::Metric,
+        bridge_attrs: Bridge::Metric::Attributes
+      ) -> void
+
+      class Meter < Temporalio::Metric::Meter
+        def self.create_from_runtime: (Runtime runtime) -> Meter?
+
+        def initialize: (Bridge::Metric::Meter bridge, Bridge::Metric::Attributes bridge_attrs) -> void
+      end
+
+      class NullMeter < Temporalio::Metric::Meter
+        def self.instance: -> NullMeter
+      end
+
+      class NullMetric < Temporalio::Metric
+        def initialize: (
+          metric_type: (:counter | :histogram | :gauge),
+          name: String,
+          description: String?,
+          unit: String?,
+          value_type: (:integer | :float | :duration)
+        ) -> void
+      end
+    end
+  end
+end

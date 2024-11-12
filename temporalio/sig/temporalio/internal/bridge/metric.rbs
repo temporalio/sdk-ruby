@@ -1,0 +1,28 @@
+module Temporalio
+  module Internal
+    module Bridge
+      class Metric
+        def initialize: (
+          Meter meter,
+          Symbol metric_type,
+          String name,
+          String? description,
+          String? unit,
+          Symbol value_type
+        ) -> void
+
+        def record_value: (untyped value, Attributes attrs) -> void
+
+        class Meter
+          def initialize: (Runtime runtime) -> void
+
+          def default_attributes: -> Attributes
+        end
+
+        class Attributes
+          def with_additional: (Hash[untyped, untyped] attrs) -> Attributes
+        end
+      end
+    end
+  end
+end

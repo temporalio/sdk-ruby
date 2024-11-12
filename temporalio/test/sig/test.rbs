@@ -15,6 +15,7 @@ class Test < Minitest::Test
 
   def run_in_background: { (?) -> untyped } -> (Thread | Fiber)
 
+  def find_free_port: -> String
   def assert_no_schedules: -> void
   def delete_schedules: (*String ids) -> void
 

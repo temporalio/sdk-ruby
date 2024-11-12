@@ -98,6 +98,8 @@ module Temporalio
     def self.default: -> Runtime
     def self.default=: (Runtime runtime) -> void
 
+    attr_reader metric_meter: Metric::Meter
+
     def initialize: (?telemetry: TelemetryOptions) -> void
 
     def _core_runtime: -> Internal::Bridge::Runtime
