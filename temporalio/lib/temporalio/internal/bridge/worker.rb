@@ -26,6 +26,8 @@ module Temporalio
           :max_task_queue_activities_per_second,
           :graceful_shutdown_period,
           :use_worker_versioning,
+          :nondeterminism_as_workflow_fail,
+          :nondeterminism_as_workflow_fail_for_types,
           keyword_init: true
         )
 

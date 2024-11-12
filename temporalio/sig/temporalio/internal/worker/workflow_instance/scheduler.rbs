@@ -1,0 +1,26 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class Scheduler
+          def initialize: (WorkflowInstance instance) -> void
+
+          def context: -> Context
+
+          def run_until_all_yielded: -> void
+
+          def wait_condition: [T] (cancellation: Cancellation?) { -> T } -> T
+
+          def stack_trace: -> String
+
+          # Only needed to say block is required
+          def timeout_after: [T] (
+            duration? duration,
+            singleton(Exception) exception_class,
+            *Object? exception_args
+          ) { -> T } -> T
+        end
+      end
+    end
+  end
+end

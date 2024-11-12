@@ -37,20 +37,20 @@ module Temporalio
       ) -> Enumerator[untyped, untyped]
 
       def signal: (
-        String signal,
+        Workflow::Definition::Signal | Symbol | String signal,
         *Object? args,
         ?rpc_options: RPCOptions?
       ) -> void
 
       def query: (
-        String query,
+        Workflow::Definition::Query | Symbol | String query,
         *Object? args,
         ?reject_condition: WorkflowQueryRejectCondition::enum?,
         ?rpc_options: RPCOptions?
       ) -> Object?
 
       def start_update: (
-        String update,
+        Workflow::Definition::Update | Symbol | String update,
         *Object? args,
         wait_for_stage: WorkflowUpdateWaitStage::enum,
         ?id: String,
@@ -58,7 +58,7 @@ module Temporalio
       ) -> WorkflowUpdateHandle
 
       def execute_update: (
-        String update,
+        Workflow::Definition::Update | Symbol | String update,
         *Object? args,
         ?id: String,
         ?rpc_options: RPCOptions?

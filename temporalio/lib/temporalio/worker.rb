@@ -8,9 +8,13 @@ require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/worker'
 require 'temporalio/internal/worker/activity_worker'
 require 'temporalio/internal/worker/multi_runner'
+require 'temporalio/internal/worker/workflow_instance'
+require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/activity_executor'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
+require 'temporalio/worker/workflow_executor'
 
 module Temporalio
   # Worker for processing activities and workflows on a task queue.
@@ -24,8 +28,10 @@ module Temporalio
       :client,
       :task_queue,
       :activities,
-      :activity_executors,
+      :workflows,
       :tuner,
+      :activity_executors,
+      :workflow_executor,
       :interceptors,
       :build_id,
       :identity,
@@ -42,6 +48,11 @@ module Temporalio
       :max_task_queue_activities_per_second,
       :graceful_shutdown_period,
       :use_worker_versioning,
+      :disable_eager_activity_execution,
+      :illegal_workflow_calls,
+      :workflow_failure_exception_types,
+      :workflow_payload_codec_thread_pool,
+      :debug_mode,
       keyword_init: true
     )
 
@@ -121,16 +132,34 @@ module Temporalio
       block_result = nil
       loop do
         event = runner.next_event
+        # TODO(cretz): Consider improving performance instead of this case statement
         case event
         when Internal::Worker::MultiRunner::Event::PollSuccess
           # Successful poll
-          event.worker._on_poll_bytes(event.worker_type, event.bytes)
+          event.worker._on_poll_bytes(runner, event.worker_type, event.bytes)
         when Internal::Worker::MultiRunner::Event::PollFailure
           # Poll failure, this causes shutdown of all workers
-          logger.error('Poll failure (beginning worker shutdown if not alaredy occurring)')
+          logger.error('Poll failure (beginning worker shutdown if not already occurring)')
           logger.error(event.error)
           first_error ||= event.error
           runner.initiate_shutdown
+        when Internal::Worker::MultiRunner::Event::WorkflowActivationDecoded
+          # Came back from a codec as decoded
+          event.workflow_worker.handle_activation(runner:, activation: event.activation, decoded: true)
+        when Internal::Worker::MultiRunner::Event::WorkflowActivationComplete
+          # An activation is complete
+          event.workflow_worker.handle_activation_complete(
+            runner:,
+            activation_completion: event.activation_completion,
+            encoded: event.encoded,
+            completion_complete_queue: event.completion_complete_queue
+          )
+        when Internal::Worker::MultiRunner::Event::WorkflowActivationCompletionComplete
+          # Completion complete, only need to log error if it occurs here
+          if event.error
+            logger.error("Activation completion failed to record on run ID #{event.run_id}")
+            logger.error(event.error)
+          end
         when Internal::Worker::MultiRunner::Event::PollerShutDown
           # Individual poller shut down. Nothing to do here until we support
           # worker status or something.
@@ -194,6 +223,53 @@ module Temporalio
       end
     end
 
+    # @return [Hash<String, [:all, Array<Symbol>]>] Default, immutable set illegal calls used for the
+    #   `illegal_workflow_calls` worker option. See the documentation of that option for more details.
+    def self.default_illegal_workflow_calls
+      @default_illegal_workflow_calls ||= begin
+        hash = {
+          'BasicSocket' => :all,
+          'Date' => %i[initialize today],
+          'DateTime' => %i[initialize now],
+          'Dir' => :all,
+          'Fiber' => [:set_scheduler],
+          'File' => :all,
+          'FileTest' => :all,
+          'FileUtils' => :all,
+          'Find' => :all,
+          'GC' => :all,
+          'IO' => [
+            :read
+            # Intentionally leaving out write so puts will work. We don't want to add heavy logic replacing stdout or
+            # trying to derive whether it's file vs stdout write.
+            #:write
+          ],
+          'Kernel' => %i[abort at_exit autoload autoload? eval exec exit fork gets load open rand readline readlines
+                         spawn srand system test trap],
+          'Net::HTTP' => :all,
+          'Pathname' => :all,
+          # TODO(cretz): Investigate why clock_gettime called from Timeout thread affects this code at all. Stack trace
+          # test executing activities inside a timeout will fail if clock_gettime is blocked.
+          'Process' => %i[abort argv0 daemon detach exec exit exit! fork kill setpriority setproctitle setrlimit setsid
+                          spawn times wait wait2 waitall warmup],
+          # TODO(cretz): Allow Ractor.current since exception formatting in error_highlight references it
+          # 'Ractor' => :all,
+          'Random::Base' => [:initialize],
+          'Resolv' => :all,
+          'SecureRandom' => :all,
+          'Signal' => :all,
+          'Socket' => :all,
+          'Tempfile' => :all,
+          'Thread' => %i[abort_on_exception= exit fork handle_interrupt ignore_deadlock= kill new pass
+                         pending_interrupt? report_on_exception= start stop initialize join name= priority= raise run
+                         terminate thread_variable_set wakeup],
+          'Time' => %i[initialize now]
+        } #: Hash[String, :all | Array[Symbol]]
+        hash.each_value(&:freeze)
+        hash.freeze
+      end
+    end
+
     # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
     attr_reader :options
 
@@ -203,19 +279,23 @@ module Temporalio
     # @param task_queue [String] Task queue for this worker.
     # @param activities [Array<Activity::Definition, Class<Activity::Definition>, Activity::Definition::Info>]
     #   Activities for this worker.
-    # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
+    # @param workflows [Array<Class<Workflow::Definition>>] Workflows for this worker.
     # @param tuner [Tuner] Tuner that controls the amount of concurrent activities/workflows that run at a time.
-    # @param interceptors [Array<Interceptor>] Interceptors specific to this worker. Note, interceptors set on the
-    #   client that include the {Interceptor} module are automatically included here, so no need to specify them again.
+    # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
+    # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within.
+    # @param interceptors [Array<Interceptor::Activity, Interceptor::Workflow>] Interceptors specific to this worker.
+    #   Note, interceptors set on the client that include the {Interceptor::Activity} or {Interceptor::Workflow} module
+    #   are automatically included here, so no need to specify them again.
     # @param build_id [String] Unique identifier for the current runtime. This is best set as a unique value
     #   representing all code and should change only when code does. This can be something like a git commit hash. If
     #   unset, default is hash of known Ruby code.
     # @param identity [String, nil] Override the identity for this worker. If unset, client identity is used.
+    # @param logger [Logger] Logger to override client logger with. Default is the client logger.
     # @param max_cached_workflows [Integer] Number of workflows held in cache for use by sticky task queue. If set to 0,
     #   workflow caching and sticky queuing are disabled.
     # @param max_concurrent_workflow_task_polls [Integer] Maximum number of concurrent poll workflow task requests we
     #   will perform at a time on this worker's task queue.
-    # @param nonsticky_to_sticky_poll_ratio [Float] `max_concurrent_workflow_task_polls`` * this number = the number of
+    # @param nonsticky_to_sticky_poll_ratio [Float] `max_concurrent_workflow_task_polls` * this number = the number of
     #   max pollers that will be allowed for the nonsticky queue when sticky tasks are enabled. If both defaults are
     #   used, the sticky queue will allow 4 max pollers while the nonsticky queue will allow one. The minimum for either
     #   poller is 1, so if `max_concurrent_workflow_task_polls` is 1 and sticky queues are enabled, there will be 2
@@ -240,12 +320,35 @@ module Temporalio
     # @param use_worker_versioning [Boolean] If true, the `build_id` argument must be specified, and this worker opts
     #   into the worker versioning feature. This ensures it only receives workflow tasks for workflows which it claims
     #   to be compatible with. For more information, see https://docs.temporal.io/workers#worker-versioning.
+    # @param disable_eager_activity_execution [Boolean] If true, disables eager activity execution. Eager activity
+    #   execution is an optimization on some servers that sends activities back to the same worker as the calling
+    #   workflow if they can run there. This should be set to true for `max_task_queue_activities_per_second` to work
+    #   and in a future version of this API may be implied as such (i.e. this setting will be ignored if that setting is
+    #   set).
+    # @param illegal_workflow_calls [Hash<String, [:all, Array<Symbol>]>] Set of illegal workflow calls that are
+    #   considered unsafe/non-deterministic and will raise if seen. The key of the hash is the fully qualified string
+    #   class name (no leading `::`). The value is either `:all` which means any use of the class, or an array of
+    #   symbols for methods on the class that cannot be used. The methods refer to either instance or class methods,
+    #   there is no way to differentiate at this time.
+    # @param workflow_failure_exception_types [Array<Class<Exception>>] Workflow failure exception types. This is the
+    #   set of exception types that, if a workflow-thrown exception extends, will cause the workflow/update to fail
+    #   instead of suspending the workflow via task failure. These are applied in addition to the
+    #   `workflow_failure_exception_type` on the workflow definition class itself. If {::Exception} is set, it
+    #   effectively will fail a workflow/update in all user exception cases.
+    # @param workflow_payload_codec_thread_pool [ThreadPool, nil] Thread pool to run payload codec encode/decode within.
+    #   This is required if a payload codec exists and the worker is not fiber based. Codecs can potentially block
+    #   execution which is why they need to be run in the background.
+    # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
+    #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
+    #   `true` or `1`.
     def initialize(
       client:,
       task_queue:,
       activities: [],
-      activity_executors: ActivityExecutor.defaults,
+      workflows: [],
       tuner: Tuner.create_fixed,
+      activity_executors: ActivityExecutor.defaults,
+      workflow_executor: WorkflowExecutor::Ractor.instance,
       interceptors: [],
       build_id: Worker.default_build_id,
       identity: nil,
@@ -261,17 +364,23 @@ module Temporalio
       max_activities_per_second: nil,
       max_task_queue_activities_per_second: nil,
       graceful_shutdown_period: 0,
-      use_worker_versioning: false
+      use_worker_versioning: false,
+      disable_eager_activity_execution: false,
+      illegal_workflow_calls: Worker.default_illegal_workflow_calls,
+      workflow_failure_exception_types: [],
+      workflow_payload_codec_thread_pool: nil,
+      debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
-      # TODO(cretz): Remove when workflows come about
-      raise ArgumentError, 'Must have at least one activity' if activities.empty?
+      raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
 
       @options = Options.new(
         client:,
         task_queue:,
         activities:,
-        activity_executors:,
+        workflows:,
         tuner:,
+        activity_executors:,
+        workflow_executor:,
         interceptors:,
         build_id:,
         identity:,
@@ -287,15 +396,36 @@ module Temporalio
         max_activities_per_second:,
         max_task_queue_activities_per_second:,
         graceful_shutdown_period:,
-        use_worker_versioning:
+        use_worker_versioning:,
+        disable_eager_activity_execution:,
+        illegal_workflow_calls:,
+        workflow_failure_exception_types:,
+        workflow_payload_codec_thread_pool:,
+        debug_mode:
       ).freeze
+
+      # Preload workflow definitions and some workflow settings for the bridge
+      workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
+      nondeterminism_as_workflow_fail = workflow_failure_exception_types.any? do |t|
+        t.is_a?(Class) && t >= Workflow::NondeterminismError
+      end
+      nondeterminism_as_workflow_fail_for_types = workflow_definitions.values.map do |defn|
+        next unless defn.failure_exception_types.any? { |t| t.is_a?(Class) && t >= Workflow::NondeterminismError }
+
+        # If they tried to do this on a dynamic workflow and haven't already set worker-level option, warn
+        unless defn.name || nondeterminism_as_workflow_fail
+          warn('Note, dynamic workflows cannot trap non-determinism errors, so worker-level ' \
+               'workflow_failure_exception_types should be set to capture that if that is the intention')
+        end
+        defn.name
+      end.compact
 
       # Create the bridge worker
       @bridge_worker = Internal::Bridge::Worker.new(
         client.connection._core_client,
         Internal::Bridge::Worker::Options.new(
           activity: !activities.empty?,
-          workflow: false,
+          workflow: !workflows.empty?,
           namespace: client.namespace,
           task_queue:,
           tuner: Internal::Bridge::Worker::TunerOptions.new(
@@ -309,26 +439,42 @@ module Temporalio
           max_concurrent_workflow_task_polls:,
           nonsticky_to_sticky_poll_ratio:,
           max_concurrent_activity_task_polls:,
-          no_remote_activities:,
+          # For shutdown to work properly, we must disable remote activities
+          # ourselves if there are no activities
+          no_remote_activities: no_remote_activities || activities.empty?,
           sticky_queue_schedule_to_start_timeout:,
           max_heartbeat_throttle_interval:,
           default_heartbeat_throttle_interval:,
           max_worker_activities_per_second: max_activities_per_second,
           max_task_queue_activities_per_second:,
           graceful_shutdown_period:,
-          use_worker_versioning:
+          use_worker_versioning:,
+          nondeterminism_as_workflow_fail:,
+          nondeterminism_as_workflow_fail_for_types:
         )
       )
 
       # Collect interceptors from client and params
-      @all_interceptors = client.options.interceptors.select { |i| i.is_a?(Interceptor) } + interceptors
+      @activity_interceptors = (client.options.interceptors + interceptors).select do |i|
+        i.is_a?(Interceptor::Activity)
+      end
+      @workflow_interceptors = (client.options.interceptors + interceptors).select do |i|
+        i.is_a?(Interceptor::Workflow)
+      end
 
       # Cancellation for the whole worker
       @worker_shutdown_cancellation = Cancellation.new
 
       # Create workers
-      # TODO(cretz): Make conditional when workflows appear
-      @activity_worker = Internal::Worker::ActivityWorker.new(self, @bridge_worker)
+      unless activities.empty?
+        @activity_worker = Internal::Worker::ActivityWorker.new(worker: self,
+                                                                bridge_worker: @bridge_worker)
+      end
+      unless workflows.empty?
+        @workflow_worker = Internal::Worker::WorkflowWorker.new(worker: self,
+                                                                bridge_worker: @bridge_worker,
+                                                                workflow_definitions:)
+      end
 
       # Validate worker
       @bridge_worker.validate
@@ -388,16 +534,29 @@ module Temporalio
     end
 
     # @!visibility private
-    def _all_interceptors
-      @all_interceptors
+    def _activity_interceptors
+      @activity_interceptors
     end
 
     # @!visibility private
-    def _on_poll_bytes(worker_type, bytes)
-      # TODO(cretz): Workflow workers
-      raise "Unrecognized worker type #{worker_type}" unless worker_type == :activity
+    def _workflow_interceptors
+      @workflow_interceptors
+    end
 
-      @activity_worker.handle_task(Internal::Bridge::Api::ActivityTask::ActivityTask.decode(bytes))
+    # @!visibility private
+    def _on_poll_bytes(runner, worker_type, bytes)
+      case worker_type
+      when :activity
+        @activity_worker.handle_task(Internal::Bridge::Api::ActivityTask::ActivityTask.decode(bytes))
+      when :workflow
+        @workflow_worker.handle_activation(
+          runner:,
+          activation: Internal::Bridge::Api::WorkflowActivation::WorkflowActivation.decode(bytes),
+          decoded: false
+        )
+      else
+        raise "Unrecognized worker type #{worker_type}"
+      end
     end
 
     private

@@ -11,7 +11,7 @@ module Temporalio
         activity_cancel_raise: bool
       }
   
-      def execute: (?) -> untyped
+      def execute: (*untyped) -> untyped
 
       class Info
         attr_reader name: String | Symbol

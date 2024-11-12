@@ -1,0 +1,16 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class ReplaySafeLogger < ScopedLogger
+          def initialize: (
+            logger: Logger,
+            instance: WorkflowInstance
+          ) -> void
+
+          def replay_safety_disabled: [T] { -> T } -> T
+        end
+      end
+    end
+  end
+end

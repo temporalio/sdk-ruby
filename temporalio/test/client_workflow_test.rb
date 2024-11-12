@@ -132,8 +132,7 @@ class ClientWorkflowTest < Test
       assert_equal handle.result_run_id, desc.run_id
       assert_instance_of Time, desc.start_time
       assert_equal Temporalio::Client::WorkflowExecutionStatus::COMPLETED, desc.status
-      # @type var attrs: Temporalio::SearchAttributes
-      attrs = desc.search_attributes
+      attrs = desc.search_attributes #: Temporalio::SearchAttributes
       assert_equal 'some text', attrs[ATTR_KEY_TEXT]
       assert_equal 'some keyword', attrs[ATTR_KEY_KEYWORD]
       assert_equal 123, attrs[ATTR_KEY_INTEGER]

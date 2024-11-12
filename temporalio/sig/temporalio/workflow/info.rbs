@@ -1,0 +1,57 @@
+module Temporalio
+  module Workflow
+    class Info
+      attr_reader attempt: Integer
+      attr_reader continued_run_id: String?
+      attr_reader cron_schedule: String?
+      attr_reader execution_timeout: Float?
+      attr_reader last_failure: Exception?
+      attr_reader last_result: Object?
+      attr_reader namespace: String
+      attr_reader parent: ParentInfo?
+      attr_reader retry_policy: RetryPolicy?
+      attr_reader run_id: String
+      attr_reader run_timeout: Float?
+      attr_reader start_time: Time
+      attr_reader task_queue: String
+      attr_reader task_timeout: Float
+      attr_reader workflow_id: String
+      attr_reader workflow_type: String
+
+      def initialize: (
+        attempt: Integer,
+        continued_run_id: String?,
+        cron_schedule: String?,
+        execution_timeout: Float?,
+        last_failure: Exception?,
+        last_result: Object?,
+        namespace: String,
+        parent: ParentInfo?,
+        retry_policy: RetryPolicy?,
+        run_id: String,
+        run_timeout: Float?,
+        start_time: Time,
+        task_queue: String,
+        task_timeout: Float,
+        workflow_id: String,
+        workflow_type: String
+      ) -> void
+
+      def to_h: -> Hash[Symbol, untyped]
+
+      class ParentInfo
+        attr_reader namespace: String
+        attr_reader run_id: String
+        attr_reader workflow_id: String
+
+        def initialize: (
+          namespace: String,
+          run_id: String,
+          workflow_id: String
+        ) -> void
+
+        def to_h: -> Hash[Symbol, untyped]
+      end
+    end
+  end
+end

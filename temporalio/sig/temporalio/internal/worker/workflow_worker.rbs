@@ -1,0 +1,65 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowWorker
+        def self.workflow_definitions: (
+          Array[singleton(Workflow::Definition) | Workflow::Definition::Info] workflows
+        ) -> Hash[String?, Workflow::Definition::Info]
+
+        def initialize: (
+          worker: Temporalio::Worker,
+          bridge_worker: Bridge::Worker,
+          workflow_definitions: Hash[String?, Workflow::Definition::Info]
+        ) -> void
+
+        def handle_activation: (
+          runner: MultiRunner,
+          activation: untyped,
+          decoded: bool
+        ) -> void
+
+        def handle_activation_complete: (
+          runner: MultiRunner,
+          activation_completion: untyped,
+          encoded: bool,
+          completion_complete_queue: Queue
+        ) -> void
+
+        def decode_activation: (MultiRunner runner, untyped activation) -> void
+        def encode_activation_completion: (MultiRunner runner, untyped activation_completion) -> void
+        def apply_codec_on_payload_visit: (untyped payload_or_payloads) { (untyped) -> Enumerable[untyped] } -> void
+
+        class State
+          attr_reader workflow_definitions: Hash[String?, Workflow::Definition::Info]
+          attr_reader bridge_worker: Bridge::Worker
+          attr_reader logger: Logger
+          attr_reader data_converter: Converters::DataConverter
+          attr_reader deadlock_timeout: Float?
+          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, bool]]
+          attr_reader namespace: String
+          attr_reader task_queue: String
+          attr_reader disable_eager_activity_execution: bool
+          attr_reader workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
+          attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
+
+          def initialize: (
+            workflow_definitions: Hash[String?, Workflow::Definition::Info],
+            bridge_worker: Bridge::Worker,
+            logger: Logger,
+            data_converter: Converters::DataConverter,
+            deadlock_timeout: Float?,
+            illegal_calls: Hash[String, :all | Hash[Symbol, bool]],
+            namespace: String,
+            task_queue: String,
+            disable_eager_activity_execution: bool,
+            workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
+            workflow_failure_exception_types: Array[singleton(Exception)]
+          ) -> void
+
+          def get_or_create_running_workflow: [T] (String run_id) { -> T } -> T
+          def evict_running_workflow: (String run_id) -> void
+        end
+      end
+    end
+  end
+end

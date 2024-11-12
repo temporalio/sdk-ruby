@@ -89,7 +89,7 @@ class WorkerActivityTest < Test
   end
 
   def test_logging
-    out, = capture_io do
+    out, = safe_capture_io do
       # New logger each time since stdout is replaced
       execute_activity(LoggingActivity, retry_max_attempts: 2, logger: Logger.new($stdout))
     end
@@ -744,7 +744,7 @@ class WorkerActivityTest < Test
   end
 
   class TrackCallsInterceptor
-    include Temporalio::Worker::Interceptor
+    include Temporalio::Worker::Interceptor::Activity
     # Also include client interceptor so we can test worker interceptors at a
     # client level
     include Temporalio::Client::Interceptor
@@ -759,7 +759,7 @@ class WorkerActivityTest < Test
       Inbound.new(self, next_interceptor)
     end
 
-    class Inbound < Temporalio::Worker::Interceptor::ActivityInbound
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
       def initialize(root, next_interceptor)
         super(next_interceptor)
         @root = root
@@ -776,7 +776,7 @@ class WorkerActivityTest < Test
       end
     end
 
-    class Outbound < Temporalio::Worker::Interceptor::ActivityOutbound
+    class Outbound < Temporalio::Worker::Interceptor::Activity::Outbound
       def initialize(root, next_interceptor)
         super(next_interceptor)
         @root = root

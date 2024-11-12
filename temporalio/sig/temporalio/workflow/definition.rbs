@@ -1,0 +1,126 @@
+module Temporalio
+  module Workflow
+    class Definition
+      def self.workflow_name: (String | Symbol workflow_name) -> void
+      def self.workflow_dynamic: (?bool value) -> void
+      def self.workflow_raw_args: (?bool value) -> void
+      def self.workflow_failure_exception_type: (*singleton(Exception) types) -> void
+      def self.workflow_query_attr_reader: (*Symbol attr_names) -> void
+
+      def self.workflow_init: (?bool value) -> void
+
+      def self.workflow_signal: (
+        ?name: String | Symbol | nil,
+        ?dynamic: bool,
+        ?raw_args: bool,
+        ?unfinished_policy: HandlerUnfinishedPolicy::enum
+      ) -> void
+
+      def self.workflow_query: (
+        ?name: String | Symbol | nil,
+        ?dynamic: bool,
+        ?raw_args: bool
+      ) -> void
+
+      def self.workflow_update: (
+        ?name: String | Symbol | nil,
+        ?dynamic: bool,
+        ?raw_args: bool,
+        ?unfinished_policy: HandlerUnfinishedPolicy::enum
+      ) -> void
+
+      def self.workflow_update_validator: (Symbol update_method) -> void
+
+      def self.pending_handler_details: -> Hash[Symbol, untyped]?
+      def self.pending_handler_details=: (Hash[Symbol, untyped]? value) -> void
+
+      def self._workflow_definition: -> Info
+
+      def self._workflow_type_from_workflow_parameter: (
+        singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow
+      ) -> String
+
+      def self._build_workflow_definition: -> Info
+
+      def execute: (*Object? args) -> Object?
+
+      class Info
+        attr_reader workflow_class: singleton(Workflow::Definition)
+        attr_reader override_name: String?
+        attr_reader dynamic: bool
+        attr_reader init: bool
+        attr_reader raw_args: bool
+        attr_reader failure_exception_types: Array[singleton(Exception)]
+        attr_reader signals: Hash[String?, Signal]
+        attr_reader queries: Hash[String?, Query]
+        attr_reader updates: Hash[String?, Update]
+
+        def self.from_class: (singleton(Definition) workflow_class) -> Info
+
+        def initialize: (
+          workflow_class: singleton(Workflow::Definition),
+          ?override_name: String?,
+          ?dynamic: bool,
+          ?init: bool,
+          ?raw_args: bool,
+          ?failure_exception_types: Array[singleton(Exception)],
+          ?signals: Hash[String, Signal],
+          ?queries: Hash[String, Query],
+          ?updates: Hash[String, Update]
+        ) -> void
+
+        def name: -> String?
+      end
+
+      class Signal
+        attr_reader name: String?
+        attr_reader to_invoke: Symbol | Proc
+        attr_reader raw_args: bool
+        attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
+
+        def self._name_from_parameter: (Workflow::Definition::Signal | String | Symbol) -> String
+
+        def initialize: (
+          name: String?,
+          to_invoke: Symbol | Proc,
+          ?raw_args: bool,
+          ?unfinished_policy: HandlerUnfinishedPolicy::enum
+        ) -> void
+      end
+
+      class Query
+        attr_reader name: String?
+        attr_reader to_invoke: Symbol | Proc
+        attr_reader raw_args: bool
+
+        def self._name_from_parameter: (Workflow::Definition::Query | String | Symbol) -> String
+
+        def initialize: (
+          name: String?,
+          to_invoke: Symbol | Proc,
+          ?raw_args: bool
+        ) -> void
+      end
+
+      class Update
+        attr_reader name: String?
+        attr_reader to_invoke: Symbol | Proc
+        attr_reader raw_args: bool
+        attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
+        attr_reader validator_to_invoke: Symbol | Proc | nil
+
+        def self._name_from_parameter: (Workflow::Definition::Update | String | Symbol) -> String
+
+        def initialize: (
+          name: String?,
+          to_invoke: Symbol | Proc,
+          ?raw_args: bool,
+          ?unfinished_policy: HandlerUnfinishedPolicy::enum,
+          ?validator_to_invoke: Symbol | Proc | nil
+        ) -> void
+
+        def _with_validator_to_invoke: (Symbol | Proc | nil validator_to_invoke) -> Update
+      end
+    end
+  end
+end

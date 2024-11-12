@@ -1,0 +1,19 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class HandlerExecution
+          attr_reader name: String
+          attr_reader update_id: String?
+          attr_reader unfinished_policy: Workflow::HandlerUnfinishedPolicy::enum
+
+          def initialize: (
+            name: String,
+            update_id: String?,
+            unfinished_policy: Workflow::HandlerUnfinishedPolicy::enum
+          ) -> void
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,19 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class ChildWorkflowHandle < Workflow::ChildWorkflowHandle
+          def initialize: (
+            id: String,
+            first_execution_run_id: String,
+            instance: WorkflowInstance,
+            cancellation: Cancellation,
+            cancel_callback_key: Object
+          ) -> void
+
+          def _resolve: (untyped resolution) -> void
+        end
+      end
+    end
+  end
+end

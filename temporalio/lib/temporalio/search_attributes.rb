@@ -7,7 +7,7 @@ module Temporalio
   #
   # This is represented as a mapping of {SearchAttributes::Key} to object values. This is not a hash though it does have
   # a few hash-like methods and can be converted to a hash via {#to_h}. In some situations, such as in workflows, this
-  # class is frozen.
+  # class is immutable for outside use.
   class SearchAttributes
     # Key for a search attribute.
     class Key
@@ -20,7 +20,7 @@ module Temporalio
       def initialize(name, type)
         raise ArgumentError, 'Invalid type' unless Api::Enums::V1::IndexedValueType.lookup(type)
 
-        @name = name
+        @name = name.to_s
         @type = type
       end
 
@@ -104,26 +104,52 @@ module Temporalio
         @key = key
         @value = value
       end
+
+      # @!visibility private
+      def _to_proto_pair
+        SearchAttributes._to_proto_pair(key, value)
+      end
     end
 
     # @!visibility private
-    def self._from_proto(proto)
-      return nil unless proto
-      raise ArgumentError, 'Expected proto search attribute' unless proto.is_a?(Api::Common::V1::SearchAttributes)
+    def self._from_proto(proto, disable_mutations: false, never_nil: false)
+      return nil unless proto || never_nil
 
-      SearchAttributes.new(proto.indexed_fields.map do |key_name, payload| # rubocop:disable Style/MapToHash
-        key = Key.new(key_name, IndexedValueType::PROTO_VALUES[payload.metadata['type']])
-        value = value_from_payload(payload)
-        [key, value]
-      end.to_h)
+      attrs = if proto
+                unless proto.is_a?(Api::Common::V1::SearchAttributes)
+                  raise ArgumentError, 'Expected proto search attribute'
+                end
+
+                SearchAttributes.new(proto.indexed_fields.map do |key_name, payload| # rubocop:disable Style/MapToHash
+                  key = Key.new(key_name, IndexedValueType::PROTO_VALUES[payload.metadata['type']])
+                  value = _value_from_payload(payload)
+                  [key, value]
+                end.to_h)
+              else
+                SearchAttributes.new
+              end
+      attrs._disable_mutations = disable_mutations
+      attrs
     end
 
     # @!visibility private
-    def self.value_from_payload(payload)
+    def self._value_from_payload(payload)
       value = Converters::PayloadConverter.default.from_payload(payload)
       # Time needs to be converted
       value = Time.iso8601(value) if payload.metadata['type'] == 'DateTime' && value.is_a?(String)
       value
+    end
+
+    # @!visibility private
+    def self._to_proto_pair(key, value)
+      # We use a default converter, but if type is a time, we need ISO format
+      value = value.iso8601 if key.type == IndexedValueType::TIME && value.is_a?(Time)
+
+      # Convert to payload
+      payload = Converters::PayloadConverter.default.to_payload(value)
+      payload.metadata['type'] = IndexedValueType::PROTO_NAMES[key.type]
+
+      [key.name, payload]
     end
 
     # Create a search attribute collection.
@@ -149,6 +175,7 @@ module Temporalio
     # @param key [Key] A key to set. This must be a {Key} and the value must be proper for the {Key#type}.
     # @param value [Object, nil] The value to set. If `nil`, the key is removed. The value must be proper for the `key`.
     def []=(key, value)
+      _assert_mutations_enabled
       # Key must be a Key
       raise ArgumentError, 'Key must be a key' unless key.is_a?(Key)
 
@@ -162,33 +189,37 @@ module Temporalio
 
     # Get a search attribute value for a key.
     #
-    # @param key [Key, String] The key to find. If this is a {Key}, it will use key equality (i.e. name and type) to
-    #   search. If this is a {::String}, the type is not checked when finding the proper key.
+    # @param key [Key, String, Symbol] The key to find. If this is a {Key}, it will use key equality (i.e. name and
+    #   type) to search. If this is a {::String}, the type is not checked when finding the proper key.
     # @return [Object, nil] Value if found or `nil` if not.
     def [](key)
       # Key must be a Key or a string
-      if key.is_a?(Key)
+      case key
+      when Key
         @raw_hash[key]
-      elsif key.is_a?(String)
-        @raw_hash.find { |hash_key, _| hash_key.name == key }&.last
+      when String, Symbol
+        @raw_hash.find { |hash_key, _| hash_key.name == key.to_s }&.last
       else
-        raise ArgumentError, 'Key must be a key or string'
+        raise ArgumentError, 'Key must be a key or string/symbol'
       end
     end
 
     # Delete a search attribute key
     #
-    # @param key [Key, String] The key to delete. Regardless of whether this is a {Key} or a {::String}, the key with
-    #   the matching name will be deleted. This means a {Key} with a matching name but different type may be deleted.
+    # @param key [Key, String, Symbol] The key to delete. Regardless of whether this is a {Key} or a {::String}, the key
+    #   with the matching name will be deleted. This means a {Key} with a matching name but different type may be
+    #   deleted.
     def delete(key)
+      _assert_mutations_enabled
       # Key must be a Key or a string, but we delete all values for the
       # name no matter what
-      name = if key.is_a?(Key)
+      name = case key
+             when Key
                key.name
-             elsif key.is_a?(String)
-               key
+             when String, Symbol
+               key.to_s
              else
-               raise ArgumentError, 'Key must be a key or string'
+               raise ArgumentError, 'Key must be a key or string/symbol'
              end
       @raw_hash.delete_if { |hash_key, _| hash_key.name == name }
     end
@@ -205,7 +236,9 @@ module Temporalio
 
     # @return [SearchAttributes] Copy of the search attributes.
     def dup
-      SearchAttributes.new(self)
+      attrs = SearchAttributes.new(self)
+      attrs._disable_mutations = false
+      attrs
     end
 
     # @return [Boolean] Whether the set of attributes is empty.
@@ -225,6 +258,7 @@ module Temporalio
     # @param updates [Update] Updates created via {Key#value_set} or {Key#value_unset}.
     # @return [SearchAttributes] New collection.
     def update(*updates)
+      _assert_mutations_enabled
       attrs = dup
       attrs.update!(*updates)
       attrs
@@ -234,27 +268,36 @@ module Temporalio
     #
     # @param updates [Update] Updates created via {Key#value_set} or {Key#value_unset}.
     def update!(*updates)
+      _assert_mutations_enabled
       updates.each do |update|
         raise ArgumentError, 'Update must be an update' unless update.is_a?(Update)
 
-        self[update.key] = update.value
+        if update.value.nil?
+          delete(update.key)
+        else
+          self[update.key] = update.value
+        end
       end
     end
 
     # @!visibility private
     def _to_proto
-      Api::Common::V1::SearchAttributes.new(
-        indexed_fields: @raw_hash.to_h do |key, value|
-          # We use a default converter, but if type is a time, we need ISO format
-          value = value.iso8601 if key.type == IndexedValueType::TIME
+      Api::Common::V1::SearchAttributes.new(indexed_fields: _to_proto_hash)
+    end
 
-          # Convert to payload
-          payload = Converters::PayloadConverter.default.to_payload(value)
-          payload.metadata['type'] = IndexedValueType::PROTO_NAMES[key.type]
+    # @!visibility private
+    def _to_proto_hash
+      @raw_hash.to_h { |key, value| SearchAttributes._to_proto_pair(key, value) }
+    end
 
-          [key.name, payload]
-        end
-      )
+    # @!visibility private
+    def _assert_mutations_enabled
+      raise 'Search attribute mutations disabled' if @disable_mutations
+    end
+
+    # @!visibility private
+    def _disable_mutations=(value)
+      @disable_mutations = value
     end
 
     # Type for a search attribute key/value.

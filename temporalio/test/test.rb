@@ -9,6 +9,7 @@ require 'singleton'
 require 'temporalio/internal/bridge'
 require 'temporalio/testing'
 require 'timeout'
+require 'workflow_utils'
 
 # require 'memory_profiler'
 # MemoryProfiler.start
@@ -19,6 +20,7 @@ require 'timeout'
 
 class Test < Minitest::Test
   include ExtraAssertions
+  include WorkflowUtils
 
   ATTR_KEY_TEXT = Temporalio::SearchAttributes::Key.new('ruby-key-text',
                                                         Temporalio::SearchAttributes::IndexedValueType::TEXT)
@@ -71,6 +73,10 @@ class Test < Minitest::Test
     skip('Fibers not supported in this Ruby version')
   end
 
+  def skip_if_not_x86!
+    skip('Test only supported on x86') unless RbConfig::CONFIG['host_cpu'] == 'x86_64'
+  end
+
   def env
     TestEnvironment.instance
   end
@@ -112,13 +118,26 @@ class Test < Minitest::Test
     end
   end
 
+  def safe_capture_io(&)
+    out, err = capture_io(&)
+    out.encode!('UTF-8', invalid: :replace)
+    err.encode!('UTF-8', invalid: :replace)
+    [out, err]
+  end
+
   class TestEnvironment
     include Singleton
 
     attr_reader :server
 
     def initialize
-      @server = Temporalio::Testing::WorkflowEnvironment.start_local(logger: Logger.new($stdout))
+      @server = Temporalio::Testing::WorkflowEnvironment.start_local(
+        logger: Logger.new($stdout),
+        dev_server_extra_args: [
+          # Allow continue as new to be immediate
+          '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"'
+        ]
+      )
       Minitest.after_run do
         @server.shutdown
       end

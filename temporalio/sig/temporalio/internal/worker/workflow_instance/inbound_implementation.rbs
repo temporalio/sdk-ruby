@@ -1,0 +1,19 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class InboundImplementation < Temporalio::Worker::Interceptor::Workflow::Inbound
+          def initialize: (WorkflowInstance instance) -> void
+
+          def invoke_handler: (
+            String name,
+            Temporalio::Worker::Interceptor::Workflow::HandleSignalInput | 
+              Temporalio::Worker::Interceptor::Workflow::HandleQueryInput |
+              Temporalio::Worker::Interceptor::Workflow::HandleUpdateInput input,
+            ?to_invoke: Symbol | Proc | nil
+          ) -> Object?
+        end
+      end
+    end
+  end
+end

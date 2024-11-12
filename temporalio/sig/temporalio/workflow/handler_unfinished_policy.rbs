@@ -1,0 +1,10 @@
+module Temporalio
+  module Workflow
+    module HandlerUnfinishedPolicy
+      type enum = Integer
+
+      WARN_AND_ABANDON: enum
+      ABANDON: enum
+    end
+  end
+end

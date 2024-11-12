@@ -1,0 +1,15 @@
+module Temporalio
+  class Worker
+    class WorkflowExecutor
+      def _validate_worker: (
+        Internal::Worker::WorkflowWorker worker,
+        Internal::Worker::WorkflowWorker::State worker_state
+      ) -> void
+
+      def _activate: (
+        untyped activation,
+        Internal::Worker::WorkflowWorker::State worker_state
+      ) { (untyped completion) -> void } -> void
+    end
+  end
+end

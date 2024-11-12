@@ -1,0 +1,16 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class ExternallyImmutableHash[K, V] < Hash[K, V]
+          def initialize: (Hash[K, V] initial_hash) -> void
+
+          def _update: { (Hash[K, V]) -> void } -> void
+
+          def __getobj__: -> Hash[K, V]
+          def __setobj__: (Hash[K, V] value) -> void
+        end
+      end
+    end
+  end
+end

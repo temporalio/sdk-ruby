@@ -5,11 +5,11 @@ require 'temporalio/api'
 module Temporalio
   module Internal
     module ProtoUtils
-      def self.seconds_to_duration(seconds_float)
-        return nil if seconds_float.nil?
+      def self.seconds_to_duration(seconds_numeric)
+        return nil if seconds_numeric.nil?
 
-        seconds = seconds_float.to_i
-        nanos = ((seconds_float - seconds) * 1_000_000_000).round
+        seconds = seconds_numeric.to_i
+        nanos = ((seconds_numeric - seconds) * 1_000_000_000).round
         Google::Protobuf::Duration.new(seconds:, nanos:)
       end
 
@@ -41,7 +41,13 @@ module Temporalio
       def self.memo_to_proto(hash, converter)
         return nil if hash.nil? || hash.empty?
 
-        Api::Common::V1::Memo.new(fields: hash.transform_values { |val| converter.to_payload(val) })
+        Api::Common::V1::Memo.new(fields: memo_to_proto_hash(hash, converter))
+      end
+
+      def self.memo_to_proto_hash(hash, converter)
+        return nil if hash.nil? || hash.empty?
+
+        hash.transform_keys(&:to_s).transform_values { |val| converter.to_payload(val) }
       end
 
       def self.memo_from_proto(memo, converter)

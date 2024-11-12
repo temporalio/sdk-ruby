@@ -6,6 +6,17 @@ module Temporalio
 
         def apply_thread_or_fiber_block: ?{ (?) -> untyped } -> void
 
+        def apply_workflow_activation_decoded: (
+          workflow_worker: WorkflowWorker,
+          activation: untyped
+        ) -> void
+
+        def apply_workflow_activation_complete: (
+          workflow_worker: WorkflowWorker,
+          activation_completion: untyped,
+          encoded: bool
+        ) -> void
+
         def raise_in_thread_or_fiber_block: (Exception error) -> void
 
         def initiate_shutdown: -> void
@@ -24,6 +35,40 @@ module Temporalio
               worker: Temporalio::Worker,
               worker_type: Symbol,
               bytes: String
+            ) -> void
+          end
+
+          class WorkflowActivationDecoded < Event
+            attr_reader workflow_worker: WorkflowWorker
+            attr_reader activation: untyped
+
+            def initialize: (
+              workflow_worker: WorkflowWorker,
+              activation: untyped
+            ) -> void
+          end
+
+          class WorkflowActivationComplete < Event
+            attr_reader workflow_worker: WorkflowWorker
+            attr_reader activation_completion: untyped
+            attr_reader encoded: bool
+            attr_reader completion_complete_queue: Queue
+
+            def initialize: (
+              workflow_worker: WorkflowWorker,
+              activation_completion: untyped,
+              encoded: bool,
+              completion_complete_queue: Queue
+            ) -> void
+          end
+
+          class WorkflowActivationCompletionComplete < Event
+            attr_reader run_id: String
+            attr_reader error: Exception
+
+            def initialize: (
+              run_id: String,
+              error: Exception
             ) -> void
           end
 

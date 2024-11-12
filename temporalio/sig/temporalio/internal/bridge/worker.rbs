@@ -22,6 +22,8 @@ module Temporalio
           attr_accessor max_task_queue_activities_per_second: Float?
           attr_accessor graceful_shutdown_period: Float
           attr_accessor use_worker_versioning: bool
+          attr_accessor nondeterminism_as_workflow_fail: bool
+          attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
     
           def initialize: (
             activity: bool,
@@ -42,7 +44,9 @@ module Temporalio
             max_worker_activities_per_second: Float?,
             max_task_queue_activities_per_second: Float?,
             graceful_shutdown_period: Float,
-            use_worker_versioning: bool
+            use_worker_versioning: bool,
+            nondeterminism_as_workflow_fail: bool,
+            nondeterminism_as_workflow_fail_for_types: Array[String]
           ) -> void
         end
 
@@ -109,6 +113,8 @@ module Temporalio
         def async_validate: (Queue queue) -> void
 
         def async_complete_activity_task: (String proto, Queue queue) -> void
+
+        def async_complete_workflow_activation: (String run_id, String proto, Queue queue) -> void
 
         def record_activity_heartbeat: (String proto) -> void
 

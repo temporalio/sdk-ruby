@@ -1,0 +1,45 @@
+module WorkflowUtils
+  def execute_workflow: (
+    singleton(Temporalio::Workflow::Definition) workflow,
+    *Object? args,
+    ?activities: Array[Temporalio::Activity::Definition | singleton(Temporalio::Activity::Definition)],
+    ?more_workflows: Array[singleton(Temporalio::Workflow::Definition)],
+    ?task_queue: String,
+    ?id: String,
+    ?search_attributes: Temporalio::SearchAttributes?,
+    ?memo: Hash[String | Symbol, Object?]?,
+    ?retry_policy: Temporalio::RetryPolicy?,
+    ?workflow_failure_exception_types: Array[singleton(Exception)],
+    ?max_cached_workflows: Integer,
+    ?logger: Logger?,
+    ?client: Temporalio::Client,
+    ?workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
+    ?id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::enum,
+    ?max_heartbeat_throttle_interval: Float,
+    ?task_timeout: duration?
+  ) -> Object? |
+  [T] (
+    singleton(Temporalio::Workflow::Definition) workflow,
+    *Object? args,
+    ?activities: Array[Temporalio::Activity::Definition | singleton(Temporalio::Activity::Definition)],
+    ?more_workflows: Array[singleton(Temporalio::Workflow::Definition)],
+    ?task_queue: String,
+    ?id: String,
+    ?search_attributes: Temporalio::SearchAttributes?,
+    ?memo: Hash[String | Symbol, Object?]?,
+    ?retry_policy: Temporalio::RetryPolicy?,
+    ?workflow_failure_exception_types: Array[singleton(Exception)],
+    ?max_cached_workflows: Integer,
+    ?logger: Logger?,
+    ?client: Temporalio::Client,
+    ?workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
+    ?id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::enum,
+    ?max_heartbeat_throttle_interval: Float,
+    ?task_timeout: duration?
+  ) { (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T
+
+  def assert_eventually_task_fail: (
+    handle: Temporalio::Client::WorkflowHandle,
+    ?message_contains: String?
+  ) -> void
+end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'temporalio/error'
+require 'temporalio/workflow'
 
 module Temporalio
   # Cancellation representation, often known as a "cancellation token". This is used by clients, activities, and
@@ -19,7 +20,7 @@ module Temporalio
       @canceled_reason = nil
       @canceled_mutex = Mutex.new
       @canceled_cond_var = nil
-      @cancel_callbacks = []
+      @cancel_callbacks = {} # Keyed by sentinel value, but value iteration still is deterministic
       @shield_depth = 0
       @shield_pending_cancel = nil # When pending, set as single-reason array
       parents.each { |p| p.add_cancel_callback { on_cancel(reason: p.canceled_reason) } }
@@ -59,15 +60,24 @@ module Temporalio
       [self, proc { |reason: nil| on_cancel(reason:) }]
     end
 
-    # Wait on this to be canceled. This is backed by a {::ConditionVariable}.
+    # Wait on this to be canceled. This is backed by a {::ConditionVariable} outside of workflows or
+    # {Workflow.wait_condition} inside of workflows.
     def wait
+      # If this is in a workflow, just wait for the canceled. This is because ConditionVariable does a no-duration
+      # kernel_sleep to the fiber scheduler which ends up recursing back into this because the workflow implementation
+      # of kernel_sleep by default relies on cancellation.
+      if Workflow.in_workflow?
+        Workflow.wait_condition(cancellation: nil) { @canceled }
+        return
+      end
+
       @canceled_mutex.synchronize do
         break if @canceled
 
         # Add cond var if not present
         if @canceled_cond_var.nil?
           @canceled_cond_var = ConditionVariable.new
-          @cancel_callbacks.push(proc { @canceled_mutex.synchronize { @canceled_cond_var.broadcast } })
+          @cancel_callbacks[Object.new] = proc { @canceled_mutex.synchronize { @canceled_cond_var.broadcast } }
         end
 
         # Wait on it
@@ -105,21 +115,29 @@ module Temporalio
     #
     # @note WARNING: This is advanced API, users should use {wait} or similar.
     #
-    # @param proc [Proc, nil] Proc to invoke, or nil to use block.
     # @yield Accepts block if not using `proc`.
-    def add_cancel_callback(proc = nil, &block)
-      raise ArgumentError, 'Must provide proc or block' unless proc || block
-      raise ArgumentError, 'Cannot provide both proc and block' if proc && block
-      raise ArgumentError, 'Parameter not a proc' if proc && !proc.is_a?(Proc)
+    # @return [Object] Key that can be used with {remove_cancel_callback} or `nil`` if run immediately.
+    def add_cancel_callback(&block)
+      raise ArgumentError, 'Must provide block' unless block_given?
 
-      callback_to_run_immediately = @canceled_mutex.synchronize do
-        callback = proc || block
-        @cancel_callbacks.push(proc || block)
-        break nil unless @canceled
+      callback_to_run_immediately, key = @canceled_mutex.synchronize do
+        break [block, nil] if @canceled
 
-        callback
+        key = Object.new
+        @cancel_callbacks[key] = block
+        [nil, key]
       end
       callback_to_run_immediately&.call
+      key
+    end
+
+    # Remove a cancel callback using the key returned from {add_cancel_callback}.
+    #
+    # @param key [Object] Key returned from {add_cancel_callback}.
+    def remove_cancel_callback(key)
+      @canceled_mutex.synchronize do
+        @cancel_callbacks.delete(key)
+      end
       nil
     end
 
@@ -144,7 +162,9 @@ module Temporalio
 
       @canceled = true
       @canceled_reason = reason
-      @cancel_callbacks.dup
+      to_return = @cancel_callbacks.dup
+      @cancel_callbacks.clear
+      to_return.values
     end
   end
 end

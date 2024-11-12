@@ -6,23 +6,23 @@ module Temporalio
     class WorkflowAlreadyStartedError < Failure
       attr_reader workflow_id: String
       attr_reader workflow_type: String
-      attr_reader run_id: String
+      attr_reader run_id: String?
 
-      def initialize: (workflow_id: String, workflow_type: String, run_id: String) -> void
+      def initialize: (workflow_id: String, workflow_type: String, run_id: String?) -> void
     end
 
     class ApplicationError < Failure
       attr_reader details: Array[Object?]
       attr_reader type: String?
       attr_reader non_retryable: bool
-      attr_reader next_retry_delay: Float?
+      attr_reader next_retry_delay: duration?
 
       def initialize: (
         String message,
         *Object? details,
         ?type: String?,
         ?non_retryable: bool,
-        ?next_retry_delay: Float?
+        ?next_retry_delay: duration?
       ) -> void
 
       def retryable?: -> bool

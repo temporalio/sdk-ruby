@@ -1,17 +1,17 @@
 module Temporalio
   class RetryPolicy
-    attr_accessor initial_interval: Float
-    attr_accessor backoff_coefficient: Float
-    attr_accessor max_interval: Float?
+    attr_accessor initial_interval: duration
+    attr_accessor backoff_coefficient: duration
+    attr_accessor max_interval: duration?
     attr_accessor max_attempts: Integer
     attr_accessor non_retryable_error_types: Array[String]?
 
     def self._from_proto: (untyped raw_policy) -> RetryPolicy
 
     def initialize: (
-      ?initial_interval: Float,
-      ?backoff_coefficient: Float,
-      ?max_interval: Float?,
+      ?initial_interval: duration,
+      ?backoff_coefficient: duration,
+      ?max_interval: duration?,
       ?max_attempts: Integer,
       ?non_retryable_error_types: Array[String]?
     ) -> void

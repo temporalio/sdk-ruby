@@ -10,7 +10,8 @@ module Temporalio
     def to_ary: -> [Cancellation, Proc]
     def wait: -> void
     def shield: [T] { (?) -> untyped } -> T
-    def add_cancel_callback: (?Proc proc) ?{ -> untyped } -> void
+    def add_cancel_callback: { -> untyped } -> Object
+    def remove_cancel_callback: (Object key) -> void
 
     private def on_cancel: (reason: Object?) -> void
     private def prepare_cancel: (reason: Object?) -> Array[Proc]?

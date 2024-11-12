@@ -202,9 +202,9 @@ module Temporalio
                     my_pool._ready_worker(self, ThreadPool._monotonic_time)
                   rescue StandardError => e
                     # Ignore
-                    warn("Unexpected execute block error: #{e}")
+                    warn("Unexpected execute block error: #{e.full_message}")
                   rescue Exception => e # rubocop:disable Lint/RescueException
-                    warn("Unexpected execute block exception: #{e}")
+                    warn("Unexpected execute block exception: #{e.full_message}")
                     my_pool._worker_died(self)
                     throw :stop
                   end

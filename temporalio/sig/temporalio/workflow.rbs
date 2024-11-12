@@ -1,0 +1,158 @@
+module Temporalio
+  module Workflow
+    def self.all_handlers_finished?: -> bool
+
+    def self.cancellation: -> Cancellation
+
+    def self.continue_as_new_suggested: -> bool
+
+    def self.current_history_length: -> Integer
+
+    def self.current_history_size: -> Integer
+
+    def self.current_update_info: -> UpdateInfo?
+
+    def self.execute_activity: (
+      singleton(Activity::Definition) | Symbol | String activity,
+      *Object? args,
+      ?task_queue: String,
+      ?schedule_to_close_timeout: duration?,
+      ?schedule_to_start_timeout: duration?,
+      ?start_to_close_timeout: duration?,
+      ?heartbeat_timeout: duration?,
+      ?retry_policy: RetryPolicy?,
+      ?cancellation: Cancellation,
+      ?cancellation_type: ActivityCancellationType::enum,
+      ?activity_id: String?,
+      ?disable_eager_execution: bool
+    ) -> Object?
+
+    def self.execute_child_workflow: (
+      singleton(Definition) | Definition::Info | Symbol | String workflow,
+      *Object? args,
+      ?id: String,
+      ?task_queue: String,
+      ?cancellation: Cancellation,
+      ?cancellation_type: ChildWorkflowCancellationType::enum,
+      ?parent_close_policy: ParentClosePolicy::enum,
+      ?execution_timeout: duration?,
+      ?run_timeout: duration?,
+      ?task_timeout: duration?,
+      ?id_reuse_policy: WorkflowIDReusePolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?cron_schedule: String?,
+      ?memo: Hash[String | Symbol, Object?]?,
+      ?search_attributes: SearchAttributes?
+    ) -> Object?
+
+    def self.execute_local_activity: (
+      singleton(Activity::Definition) | Symbol | String activity,
+      *Object? args,
+      ?schedule_to_close_timeout: duration?,
+      ?schedule_to_start_timeout: duration?,
+      ?start_to_close_timeout: duration?,
+      ?retry_policy: RetryPolicy?,
+      ?local_retry_threshold: duration?,
+      ?cancellation: Cancellation,
+      ?cancellation_type: ActivityCancellationType::enum,
+      ?activity_id: String?
+    ) -> Object?
+
+    def self.external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
+
+    def self.in_workflow?: -> bool
+
+    def self.info: -> Info
+
+    def self.logger: -> ScopedLogger
+
+    def self.memo: -> Hash[String, Object?]
+
+    def self.now: -> Time
+
+    def self.patched: (String patch_id) -> bool
+
+    def self.payload_converter: -> Converters::PayloadConverter
+
+    def self.query_handlers: -> Hash[String?, Workflow::Definition::Query]
+
+    def self.random: -> Random
+
+    def self.search_attributes: -> SearchAttributes
+
+    def self.signal_handlers: -> Hash[String?, Workflow::Definition::Signal]
+
+    def self.sleep: (duration? duration, ?summary: String?, ?cancellation: Cancellation) -> void
+
+    def self.start_child_workflow: (
+      singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
+      *Object? args,
+      ?id: String,
+      ?task_queue: String,
+      ?cancellation: Cancellation,
+      ?cancellation_type: Workflow::ChildWorkflowCancellationType::enum,
+      ?parent_close_policy: Workflow::ParentClosePolicy::enum,
+      ?execution_timeout: duration?,
+      ?run_timeout: duration?,
+      ?task_timeout: duration?,
+      ?id_reuse_policy: WorkflowIDReusePolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?cron_schedule: String?,
+      ?memo: Hash[String | Symbol, Object?]?,
+      ?search_attributes: SearchAttributes?
+    ) -> ChildWorkflowHandle
+
+    def self.timeout: [T] (
+      duration? duration,
+      ?singleton(Exception) exception_class,
+      ?String message,
+      ?summary: String?
+    ) { -> T } -> T
+
+    def self.update_handlers: -> Hash[String?, Workflow::Definition::Update]
+
+    def self.upsert_memo: (Hash[Symbol | String, Object?] hash) -> void
+
+    def self.upsert_search_attributes: (*SearchAttributes::Update updates) -> void
+
+    def self.wait_condition: [T] (?cancellation: Cancellation?) { -> T } -> T
+
+    def self._current: -> Internal::Worker::WorkflowInstance::Context
+    def self._current_or_nil: -> Internal::Worker::WorkflowInstance::Context?
+
+    module Unsafe
+      def self.replaying?: -> bool
+
+      def self.illegal_call_tracing_disabled: [T] { -> T } -> T
+    end
+
+    class ContinueAsNewError < Error
+      attr_accessor args: Array[Object?]
+      attr_accessor workflow: singleton(Workflow::Definition) | String | Symbol | nil
+      attr_accessor task_queue: String?
+      attr_accessor run_timeout: duration?
+      attr_accessor task_timeout: duration?
+      attr_accessor retry_policy: RetryPolicy?
+      attr_accessor memo: Hash[String | Symbol, Object?]?
+      attr_accessor search_attributes: SearchAttributes?
+      attr_accessor headers: Hash[String, Object?]
+
+      def initialize: (
+        *Object? args,
+        ?workflow: singleton(Workflow::Definition) | String | Symbol | nil,
+        ?task_queue: String?,
+        ?run_timeout: duration?,
+        ?task_timeout: duration?,
+        ?retry_policy: RetryPolicy?,
+        ?memo: Hash[String | Symbol, Object?]?,
+        ?search_attributes: SearchAttributes?,
+        ?headers: Hash[String, Object?]
+      ) -> void
+    end
+
+    class InvalidWorkflowStateError < Error
+    end
+    class NondeterminismError < Error
+    end
+  end
+end

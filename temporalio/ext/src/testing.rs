@@ -4,6 +4,7 @@ use magnus::{
 use parking_lot::Mutex;
 use temporal_sdk_core::ephemeral_server::{
     self, EphemeralExe, EphemeralExeVersion, TemporalDevServerConfigBuilder,
+    TestServerConfigBuilder,
 };
 
 use crate::{
@@ -22,6 +23,10 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_singleton_method(
         "async_start_dev_server",
         function!(EphemeralServer::async_start_dev_server, 3),
+    )?;
+    class.define_singleton_method(
+        "async_start_test_server",
+        function!(EphemeralServer::async_start_test_server, 3),
     )?;
     class.define_method("target", method!(EphemeralServer::target, 0))?;
     class.define_method(
@@ -51,24 +56,7 @@ impl EphemeralServer {
         // Build options
         let mut opts_build = TemporalDevServerConfigBuilder::default();
         opts_build
-            .exe(
-                if let Some(existing_path) =
-                    options.member::<Option<String>>(id!("existing_path"))?
-                {
-                    EphemeralExe::ExistingPath(existing_path)
-                } else {
-                    EphemeralExe::CachedDownload {
-                        version: match options.member::<String>(id!("download_version"))? {
-                            ref v if v == "default" => EphemeralExeVersion::SDKDefault {
-                                sdk_name: options.member(id!("sdk_name"))?,
-                                sdk_version: options.member(id!("sdk_version"))?,
-                            },
-                            download_version => EphemeralExeVersion::Fixed(download_version),
-                        },
-                        dest_dir: options.member(id!("download_dest_dir"))?,
-                    }
-                },
-            )
+            .exe(EphemeralServer::exe_from_options(&options)?)
             .namespace(options.member::<String>(id!("namespace"))?)
             .ip(options.member::<String>(id!("ip"))?)
             .port(options.member::<Option<u16>>(id!("port"))?)
@@ -81,7 +69,7 @@ impl EphemeralServer {
             .extra_args(options.member(id!("extra_args"))?);
         let opts = opts_build
             .build()
-            .map_err(|err| error!("Invalid Temporalite config: {}", err))?;
+            .map_err(|err| error!("Invalid dev server config: {}", err))?;
 
         // Start
         let callback = AsyncCallback::from_queue(queue);
@@ -98,6 +86,55 @@ impl EphemeralServer {
             },
         );
         Ok(())
+    }
+
+    pub fn async_start_test_server(
+        runtime: &Runtime,
+        options: Struct,
+        queue: Value,
+    ) -> Result<(), Error> {
+        // Build options
+        let mut opts_build = TestServerConfigBuilder::default();
+        opts_build
+            .exe(EphemeralServer::exe_from_options(&options)?)
+            .port(options.member::<Option<u16>>(id!("port"))?)
+            .extra_args(options.member(id!("extra_args"))?);
+        let opts = opts_build
+            .build()
+            .map_err(|err| error!("Invalid test server config: {}", err))?;
+
+        // Start
+        let callback = AsyncCallback::from_queue(queue);
+        let runtime_handle = runtime.handle.clone();
+        runtime.handle.spawn(
+            async move { opts.start_server().await },
+            move |_, result| match result {
+                Ok(core) => callback.push(EphemeralServer {
+                    target: core.target.clone(),
+                    core: Mutex::new(Some(core)),
+                    runtime_handle,
+                }),
+                Err(err) => callback.push(new_error!("Failed starting server: {}", err)),
+            },
+        );
+        Ok(())
+    }
+
+    fn exe_from_options(options: &Struct) -> Result<EphemeralExe, Error> {
+        if let Some(existing_path) = options.member::<Option<String>>(id!("existing_path"))? {
+            Ok(EphemeralExe::ExistingPath(existing_path))
+        } else {
+            Ok(EphemeralExe::CachedDownload {
+                version: match options.member::<String>(id!("download_version"))? {
+                    ref v if v == "default" => EphemeralExeVersion::SDKDefault {
+                        sdk_name: options.member(id!("sdk_name"))?,
+                        sdk_version: options.member(id!("sdk_version"))?,
+                    },
+                    download_version => EphemeralExeVersion::Fixed(download_version),
+                },
+                dest_dir: options.member(id!("download_dest_dir"))?,
+            })
+        }
     }
 
     pub fn target(&self) -> &str {

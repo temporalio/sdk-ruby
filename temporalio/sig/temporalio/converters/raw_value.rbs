@@ -1,0 +1,9 @@
+module Temporalio
+  module Converters
+    class RawValue
+      attr_reader payload: untyped
+
+      def initialize: (untyped payload) -> void
+    end
+  end
+end

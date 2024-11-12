@@ -8,6 +8,7 @@ module Temporalio
         ?data_converter: Converters::DataConverter,
         ?interceptors: Array[Client::Interceptor],
         ?logger: Logger,
+        ?default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
         ?ip: String,
         ?port: Integer?,
         ?ui: bool,
@@ -20,10 +21,12 @@ module Temporalio
         ?dev_server_download_dest_dir: String?,
         ?dev_server_extra_args: Array[String]
       ) -> WorkflowEnvironment
-                          | [T] (
+      | [T] (
         ?namespace: String,
         ?data_converter: Converters::DataConverter,
         ?interceptors: Array[Client::Interceptor],
+        ?logger: Logger,
+        ?default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
         ?ip: String,
         ?port: Integer?,
         ?ui: bool,
@@ -37,12 +40,89 @@ module Temporalio
         ?dev_server_extra_args: Array[String]
       ) { (WorkflowEnvironment) -> T } -> T
 
+      def self.start_time_skipping: (
+        ?data_converter: Converters::DataConverter,
+        ?interceptors: Array[Client::Interceptor],
+        ?logger: Logger,
+        ?default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
+        ?port: Integer?,
+        ?runtime: Runtime,
+        ?test_server_existing_path: String?,
+        ?test_server_download_version: String,
+        ?test_server_download_dest_dir: String?,
+        ?test_server_extra_args: Array[String]
+      ) -> WorkflowEnvironment
+      | [T] (
+        ?data_converter: Converters::DataConverter,
+        ?interceptors: Array[Client::Interceptor],
+        ?logger: Logger,
+        ?default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
+        ?port: Integer?,
+        ?runtime: Runtime,
+        ?test_server_existing_path: String?,
+        ?test_server_download_version: String,
+        ?test_server_download_dest_dir: String?,
+        ?test_server_extra_args: Array[String]
+      ) { (WorkflowEnvironment) -> T } -> T
+
+      def self._with_core_server: (
+        core_server: Internal::Bridge::Testing::EphemeralServer,
+        namespace: String,
+        data_converter: Converters::DataConverter,
+        interceptors: Array[Client::Interceptor],
+        logger: Logger,
+        default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
+        runtime: Runtime,
+        supports_time_skipping: bool
+      ) -> WorkflowEnvironment
+      | [T] (
+        core_server: Internal::Bridge::Testing::EphemeralServer,
+        namespace: String,
+        data_converter: Converters::DataConverter,
+        interceptors: Array[Client::Interceptor],
+        logger: Logger,
+        default_workflow_query_reject_condition: Client::WorkflowQueryRejectCondition::enum?,
+        runtime: Runtime,
+        supports_time_skipping: bool
+      ) { (WorkflowEnvironment) -> T } -> T
+
       def initialize: (Client client) -> void
 
       def shutdown: -> void
 
+      def supports_time_skipping?: -> bool
+
+      def sleep: (duration duration) -> void
+
+      def current_time: -> Time
+
+      def auto_time_skipping_disabled: [T] { -> T } -> T
+
       class Ephemeral < WorkflowEnvironment
-        def initialize: (Client client, untyped core_server) -> void
+        def initialize: (
+          Client client,
+          Internal::Bridge::Testing::EphemeralServer core_server,
+          supports_time_skipping: bool
+        ) -> void
+
+        def time_skipping_unlocked: [T] { -> T } -> T
+      end
+
+      class TimeSkippingClientInterceptor
+        include Client::Interceptor
+
+        def initialize: (WorkflowEnvironment env) -> void
+
+        class Outbound < Client::Interceptor::Outbound
+          def initialize: (
+            Client::Interceptor::Outbound next_interceptor,
+            WorkflowEnvironment env
+          ) -> void
+        end
+
+        class TimeSkippingWorkflowHandle < Client::WorkflowHandle
+          def initialize: (Client::WorkflowHandle handle, WorkflowEnvironment env) -> void
+        end
       end
     end
   end

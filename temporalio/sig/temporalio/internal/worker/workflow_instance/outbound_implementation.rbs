@@ -1,0 +1,32 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class OutboundImplementation < Temporalio::Worker::Interceptor::Workflow::Outbound
+          def initialize: (WorkflowInstance instance) -> void
+
+          def execute_activity_with_local_backoffs: (
+            local: bool,
+            cancellation: Cancellation
+          ) { (untyped?) -> Integer } -> Object?
+
+          def execute_activity_once: (
+            local: bool,
+            cancellation: Cancellation,
+            last_local_backoff: untyped?
+          ) { (untyped?) -> Integer } -> Object?
+
+          def _signal_external_workflow: (
+            id: String,
+            run_id: String?,
+            child: bool,
+            signal: Workflow::Definition::Signal | Symbol | String,
+            args: Array[Object?],
+            cancellation: Cancellation,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+      end
+    end
+  end
+end

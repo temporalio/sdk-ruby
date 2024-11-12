@@ -1,5 +1,6 @@
 class Test < Minitest::Test
   include ExtraAssertions
+  include WorkflowUtils
 
   ATTR_KEY_TEXT: Temporalio::SearchAttributes::Key
   ATTR_KEY_KEYWORD: Temporalio::SearchAttributes::Key
@@ -11,12 +12,17 @@ class Test < Minitest::Test
 
   def self.also_run_all_tests_in_fiber: -> void
 
+  def skip_if_fibers_not_supported!: -> void
+  def skip_if_not_x86!: -> void
+
   def env: -> TestEnvironment
 
   def run_in_background: { (?) -> untyped } -> (Thread | Fiber)
 
   def assert_no_schedules: -> void
   def delete_schedules: (*String ids) -> void
+
+  def safe_capture_io: { (?) -> untyped } -> [String, String]
 
   class TestEnvironment
     include Singleton

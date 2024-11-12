@@ -1,11 +1,11 @@
 // Generated code.  DO NOT EDIT!
 
 use magnus::{Error, Ruby};
-use temporal_client::{CloudService, OperatorService, WorkflowService};
+use temporal_client::{CloudService, OperatorService, TestService, WorkflowService};
 
 use super::{error, rpc_call};
 use crate::{
-    client::{Client, RpcCall, SERVICE_CLOUD, SERVICE_OPERATOR, SERVICE_WORKFLOW},
+    client::{Client, RpcCall, SERVICE_CLOUD, SERVICE_OPERATOR, SERVICE_TEST, SERVICE_WORKFLOW},
     util::AsyncCallback,
 };
 
@@ -514,6 +514,27 @@ impl Client {
                 "update_user_group" => {
                     rpc_call!(self, callback, call, CloudService, update_user_group)
                 }
+                _ => Err(error!("Unknown RPC call {}", call.rpc)),
+            },
+            SERVICE_TEST => match call.rpc.as_str() {
+                "get_current_time" => {
+                    rpc_call!(self, callback, call, TestService, get_current_time)
+                }
+                "lock_time_skipping" => {
+                    rpc_call!(self, callback, call, TestService, lock_time_skipping)
+                }
+                "sleep" => rpc_call!(self, callback, call, TestService, sleep),
+                "sleep_until" => rpc_call!(self, callback, call, TestService, sleep_until),
+                "unlock_time_skipping" => {
+                    rpc_call!(self, callback, call, TestService, unlock_time_skipping)
+                }
+                "unlock_time_skipping_with_sleep" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    TestService,
+                    unlock_time_skipping_with_sleep
+                ),
                 _ => Err(error!("Unknown RPC call {}", call.rpc)),
             },
             _ => Err(error!("Unknown service")),

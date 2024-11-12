@@ -1,0 +1,12 @@
+module Temporalio
+  module Workflow
+    module ChildWorkflowCancellationType
+      type enum = Integer
+
+      ABANDON: enum
+      TRY_CANCEL: enum
+      WAIT_CANCELLATION_COMPLETED: enum
+      WAIT_CANCELLATION_REQUESTED: enum
+    end
+  end
+end

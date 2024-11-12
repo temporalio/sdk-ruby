@@ -1,0 +1,12 @@
+module Temporalio
+  module Workflow
+    module ParentClosePolicy
+      type enum = Integer
+
+      UNSPECIFIED: enum
+      TERMINATE: enum
+      ABANDON: enum
+      REQUEST_CANCEL: enum
+    end
+  end
+end

@@ -19,6 +19,7 @@ require 'temporalio/error/failure'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
+require 'temporalio/workflow/definition'
 
 module Temporalio
   module Internal
@@ -49,7 +50,9 @@ module Temporalio
           req = Api::WorkflowService::V1::StartWorkflowExecutionRequest.new(
             request_id: SecureRandom.uuid,
             namespace: @client.namespace,
-            workflow_type: Api::Common::V1::WorkflowType.new(name: input.workflow.to_s),
+            workflow_type: Api::Common::V1::WorkflowType.new(
+              name: Workflow::Definition._workflow_type_from_workflow_parameter(input.workflow)
+            ),
             workflow_id: input.workflow_id,
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
             input: @client.data_converter.to_payloads(input.args),
@@ -65,7 +68,7 @@ module Temporalio
             search_attributes: input.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(input.start_delay),
             request_eager_execution: input.request_eager_start,
-            header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
           )
 
           # Send request
@@ -135,7 +138,7 @@ module Temporalio
             resp.groups.map do |group|
               Temporalio::Client::WorkflowExecutionCount::AggregationGroup.new(
                 group.count,
-                group.group_values.map { |payload| SearchAttributes.value_from_payload(payload) }
+                group.group_values.map { |payload| SearchAttributes._value_from_payload(payload) }
               )
             end
           )
@@ -188,7 +191,7 @@ module Temporalio
                 workflow_id: input.workflow_id,
                 run_id: input.run_id || ''
               ),
-              signal_name: input.signal,
+              signal_name: Workflow::Definition::Signal._name_from_parameter(input.signal),
               input: @client.data_converter.to_payloads(input.args),
               header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
               identity: @client.connection.identity,
@@ -209,7 +212,7 @@ module Temporalio
                   run_id: input.run_id || ''
                 ),
                 query: Api::Query::V1::WorkflowQuery.new(
-                  query_type: input.query,
+                  query_type: Workflow::Definition::Query._name_from_parameter(input.query),
                   query_args: @client.data_converter.to_payloads(input.args),
                   header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
                 ),
@@ -252,7 +255,7 @@ module Temporalio
                 identity: @client.connection.identity
               ),
               input: Api::Update::V1::Input.new(
-                name: input.update,
+                name: Workflow::Definition::Update._name_from_parameter(input.update),
                 args: @client.data_converter.to_payloads(input.args),
                 header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
               )

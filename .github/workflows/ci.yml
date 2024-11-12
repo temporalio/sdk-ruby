@@ -9,7 +9,7 @@ on:
 jobs:
   build-lint-test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         # TODO(cretz): Enable Linux ARM. It's not natively supported with setup-ruby (see
         # https://github.com/ruby/setup-ruby#supported-platforms and https://github.com/ruby/setup-ruby/issues/577).

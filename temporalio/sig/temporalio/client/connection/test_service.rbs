@@ -1,0 +1,35 @@
+# Generated code.  DO NOT EDIT!
+
+module Temporalio
+  class Client
+    class Connection
+      class TestService < Service
+        def initialize: (Connection) -> void
+        def lock_time_skipping: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def unlock_time_skipping: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def sleep: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def sleep_until: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def unlock_time_skipping_with_sleep: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_current_time: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+      end
+    end
+  end
+end

@@ -29,6 +29,7 @@ Layout/LeadingCommentSpace:
 Lint/MissingSuper:
   AllowedParentClasses:
     - Temporalio::Activity::Definition
+    - Temporalio::Workflow::Definition
 
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:
@@ -56,7 +57,7 @@ Metrics/ModuleLength:
 
 # The default is too small
 Metrics/PerceivedComplexity:
-  Max: 25
+  Max: 40
 
 # We want classes to be documented
 Style/Documentation:

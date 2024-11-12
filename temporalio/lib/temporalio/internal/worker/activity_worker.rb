@@ -11,12 +11,14 @@ require 'temporalio/worker/interceptor'
 module Temporalio
   module Internal
     module Worker
+      # Worker for handling activity tasks. Upon overarching worker shutdown, {wait_all_complete} should be used to wait
+      # for the activities to complete.
       class ActivityWorker
         LOG_TASKS = false
 
         attr_reader :worker, :bridge_worker
 
-        def initialize(worker, bridge_worker)
+        def initialize(worker:, bridge_worker:)
           @worker = worker
           @bridge_worker = bridge_worker
 
@@ -180,7 +182,7 @@ module Temporalio
           ).freeze
 
           # Build input
-          input = Temporalio::Worker::Interceptor::ExecuteActivityInput.new(
+          input = Temporalio::Worker::Interceptor::Activity::ExecuteInput.new(
             proc: defn.proc,
             args: ProtoUtils.convert_from_payload_array(
               @worker.options.client.data_converter,
@@ -228,9 +230,9 @@ module Temporalio
         def run_activity(activity, input)
           result = begin
             # Build impl with interceptors
-            # @type var impl: Temporalio::Worker::Interceptor::ActivityInbound
+            # @type var impl: Temporalio::Worker::Interceptor::Activity::Inbound
             impl = InboundImplementation.new(self)
-            impl = @worker._all_interceptors.reverse_each.reduce(impl) do |acc, int|
+            impl = @worker._activity_interceptors.reverse_each.reduce(impl) do |acc, int|
               int.intercept_activity(acc)
             end
             impl.init(OutboundImplementation.new(self))
@@ -303,11 +305,14 @@ module Temporalio
           def heartbeat(*details)
             raise 'Implementation not set yet' if _outbound_impl.nil?
 
-            _outbound_impl.heartbeat(Temporalio::Worker::Interceptor::HeartbeatActivityInput.new(details:))
+            # No-op if local
+            return if info.local?
+
+            _outbound_impl.heartbeat(Temporalio::Worker::Interceptor::Activity::HeartbeatInput.new(details:))
           end
         end
 
-        class InboundImplementation < Temporalio::Worker::Interceptor::ActivityInbound
+        class InboundImplementation < Temporalio::Worker::Interceptor::Activity::Inbound
           def initialize(worker)
             super(nil) # steep:ignore
             @worker = worker
@@ -325,7 +330,7 @@ module Temporalio
           end
         end
 
-        class OutboundImplementation < Temporalio::Worker::Interceptor::ActivityOutbound
+        class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
           def initialize(worker)
             super(nil) # steep:ignore
             @worker = worker

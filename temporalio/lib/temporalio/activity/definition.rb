@@ -20,31 +20,41 @@ module Temporalio
     #
     # See documentation for more detail on activities.
     class Definition
-      # Override the activity name which is defaulted to the unqualified class name.
-      #
-      # @param name [String, Symbol] Name to use.
-      def self.activity_name(name)
-        raise ArgumentError, 'Activity name must be a symbol or string' if !name.is_a?(Symbol) && !name.is_a?(String)
+      class << self
+        protected
 
-        @activity_name = name.to_s
-      end
+        # Override the activity name which is defaulted to the unqualified class name.
+        #
+        # @param name [String, Symbol] Name to use.
+        def activity_name(name)
+          if !name.is_a?(Symbol) && !name.is_a?(String)
+            raise ArgumentError,
+                  'Activity name must be a symbol or string'
+          end
 
-      # Override the activity executor which is defaulted to `:default`.
-      #
-      # @param executor_name [Symbol] Executor to use.
-      def self.activity_executor(executor_name)
-        raise ArgumentError, 'Executor name must be a symbol' unless executor_name.is_a?(Symbol)
+          @activity_name = name.to_s
+        end
 
-        @activity_executor = executor_name
-      end
+        # Override the activity executor which is defaulted to `:default`.
+        #
+        # @param executor_name [Symbol] Executor to use.
+        def activity_executor(executor_name)
+          raise ArgumentError, 'Executor name must be a symbol' unless executor_name.is_a?(Symbol)
 
-      # Override whether the activity uses Thread/Fiber raise for cancellation which is defaulted to true.
-      #
-      # @param cancel_raise [Boolean] Whether to raise.
-      def self.activity_cancel_raise(cancel_raise)
-        raise ArgumentError, 'Must be a boolean' unless cancel_raise.is_a?(TrueClass) || cancel_raise.is_a?(FalseClass)
+          @activity_executor = executor_name
+        end
 
-        @activity_cancel_raise = cancel_raise
+        # Override whether the activity uses Thread/Fiber raise for cancellation which is defaulted to true.
+        #
+        # @param cancel_raise [Boolean] Whether to raise.
+        def activity_cancel_raise(cancel_raise)
+          unless cancel_raise.is_a?(TrueClass) || cancel_raise.is_a?(FalseClass)
+            raise ArgumentError,
+                  'Must be a boolean'
+          end
+
+          @activity_cancel_raise = cancel_raise
+        end
       end
 
       # @!visibility private

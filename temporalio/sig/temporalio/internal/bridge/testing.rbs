@@ -35,7 +35,29 @@ module Temporalio
             ) -> void
           end
 
+          class StartTestServerOptions
+            attr_accessor existing_path: String?
+            attr_accessor sdk_name: String
+            attr_accessor sdk_version: String
+            attr_accessor download_version: String
+            attr_accessor download_dest_dir: String?
+            attr_accessor port: Integer?
+            attr_accessor extra_args: Array[String]
+
+            def initialize: (
+              existing_path: String?,
+              sdk_name: String,
+              sdk_version: String,
+              download_version: String,
+              download_dest_dir: String?,
+              port: Integer?,
+              extra_args: Array[String]
+            ) -> void
+          end
+
           def self.start_dev_server: (Runtime runtime, StartDevServerOptions options) -> EphemeralServer
+
+          def self.start_test_server: (Runtime runtime, StartTestServerOptions options) -> EphemeralServer
 
           def shutdown: -> void
 
@@ -44,6 +66,12 @@ module Temporalio
           def self.async_start_dev_server: (
             Runtime runtime,
             StartDevServerOptions options,
+            Queue queue
+          ) -> void
+
+          def self.async_start_test_server: (
+            Runtime runtime,
+            StartTestServerOptions options,
             Queue queue
           ) -> void
 
