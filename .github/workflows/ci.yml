@@ -73,4 +73,6 @@ jobs:
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio
+        # Timeout just in case there's a hanging part in rake
+        timeout-minutes: 20
         run: bundle exec rake TESTOPTS="--verbose"

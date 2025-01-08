@@ -3,9 +3,9 @@
 require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
-require 'test_base'
+require 'test'
 
-class WorkerTest < TestBase
+class WorkerTest < Test
   also_run_all_tests_in_fiber
 
   class SimpleActivity < Temporalio::Activity::Definition

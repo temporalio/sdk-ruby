@@ -33,31 +33,45 @@ module Temporalio
             end.freeze
           end
 
-          # Illegal calls are Hash[String, Hash[Symbol, Bool]]
+          # Illegal calls are Hash[String, :all | Hash[Symbol, Bool]]
           def initialize(illegal_calls)
             @tracepoint = TracePoint.new(:call, :c_call) do |tp|
               cls = tp.defined_class
               next unless cls.is_a?(Module)
 
-              # We need this to be quick so we don't do extra validations to satisfy type checker
-              # steep:ignore:start
-              if cls.singleton_class?
-                cls = cls.attached_object
-                next unless cls.is_a?(Module)
-              end
-              vals = illegal_calls[cls.name]
-              if vals == :all || vals&.[](tp.callee_id)
+              # Extract the class name from the defined class. This is more difficult than it seems because you have to
+              # resolve the attached object of the singleton class. But in older Ruby (at least <= 3.1), the singleton
+              # class of things like `Date` does not have `attached_object` so you have to fall back in these rare cases
+              # to parsing the string output. Reaching the string parsing component is rare, so this should not have
+              # significant performance impact.
+              cls_name = if cls.singleton_class?
+                           if cls.respond_to?(:attached_object)
+                             cls = cls.attached_object # steep:ignore
+                             next unless cls.is_a?(Module)
+
+                             cls.name.to_s
+                           else
+                             cls.to_s.delete_prefix('#<Class:').delete_suffix('>')
+                           end
+                         else
+                           cls.name.to_s
+                         end
+
+              # Check if the call is considered illegal
+              vals = illegal_calls[cls_name]
+              if vals == :all || vals&.[](tp.callee_id) # steep:ignore
                 raise Workflow::NondeterminismError,
-                      "Cannot access #{cls.name} #{tp.callee_id} from inside a " \
+                      "Cannot access #{cls_name} #{tp.callee_id} from inside a " \
                       'workflow. If this is known to be safe, the code can be run in ' \
                       'a Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled block.'
               end
-              # steep:ignore:end
             end
           end
 
           def enable(&)
-            @tracepoint.enable(&)
+            # Setting current thread explicitly because it wasn't until Ruby 3.2 that this
+            # was done automatically, ref https://github.com/ruby/ruby/pull/5359
+            @tracepoint.enable(target_thread: Thread.current, &)
           end
 
           def disable(&)

@@ -4,9 +4,9 @@ require 'async'
 require 'temporalio/client'
 require 'temporalio/client/schedule'
 require 'temporalio/testing'
-require 'test_base'
+require 'test'
 
-class ClientScheduleTest < TestBase
+class ClientScheduleTest < Test
   also_run_all_tests_in_fiber
 
   def test_basics # rubocop:disable Metrics/AbcSize,Metrics/MethodLength

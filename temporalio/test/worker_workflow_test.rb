@@ -6,10 +6,10 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test_base'
+require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < TestBase
+class WorkerWorkflowTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -435,8 +435,8 @@ class WorkerWorkflowTest < TestBase
         # Collect original, upsert (update one, delete another), collect updated
         orig = Temporalio::Workflow.search_attributes.to_h.transform_keys(&:name)
         Temporalio::Workflow.upsert_search_attributes(
-          TestBase::ATTR_KEY_TEXT.value_set('another-text'),
-          TestBase::ATTR_KEY_KEYWORD.value_unset
+          Test::ATTR_KEY_TEXT.value_set('another-text'),
+          Test::ATTR_KEY_KEYWORD.value_unset
         )
         updated = Temporalio::Workflow.search_attributes.to_h.transform_keys(&:name)
         { orig:, updated: }
@@ -997,9 +997,9 @@ class WorkerWorkflowTest < TestBase
       raise 'Bad act result' if act_res != 'some activity output'
 
       # SA
-      raise 'Bad SA' if Temporalio::Workflow.search_attributes[TestBase::ATTR_KEY_TEXT] != 'some-sa'
+      raise 'Bad SA' if Temporalio::Workflow.search_attributes[Test::ATTR_KEY_TEXT] != 'some-sa'
 
-      Temporalio::Workflow.upsert_search_attributes(TestBase::ATTR_KEY_TEXT.value_set('new-sa'))
+      Temporalio::Workflow.upsert_search_attributes(Test::ATTR_KEY_TEXT.value_set('new-sa'))
 
       # Memo
       raise 'Bad memo' if Temporalio::Workflow.memo['some-memo-key'] != 'some-memo'
@@ -1316,7 +1316,12 @@ class WorkerWorkflowTest < TestBase
     end
 
     def execute(timeout = nil)
-      @queue.pop(timeout:)
+      # Timeout only works on 3.2+
+      if timeout
+        @queue.pop(timeout:)
+      else
+        @queue.pop
+      end
     end
 
     workflow_signal
@@ -1332,6 +1337,10 @@ class WorkerWorkflowTest < TestBase
       handle.signal(QueueWorkflow.enqueue, 'some-value')
       assert_equal 'some-value', handle.result
     end
+
+    # Timeout not added until 3.2, so can stop test here before then
+    major, minor = RUBY_VERSION.split('.').take(2).map(&:to_i)
+    return if major.nil? || major != 3 || minor.nil? || minor < 2
 
     # High timeout not reached
     execute_workflow(QueueWorkflow, 20) do |handle|

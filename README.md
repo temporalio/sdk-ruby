@@ -1,6 +1,6 @@
 <div style="overflow: hidden"><img src="https://raw.githubusercontent.com/temporalio/assets/main/files/w/ruby.png" alt="Temporal Ruby SDK" /></div>
 
-![Ruby 3.1 | 3.2 | 3.3 | 3.4](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
+![Ruby 3.1 | 3.2 | 3.3](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
 [![MIT](https://img.shields.io/github/license/temporalio/sdk-ruby.svg?style=for-the-badge)](LICENSE)
 [![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio)
 
@@ -29,15 +29,32 @@ until the SDK is marked stable.
 
 - [Quick Start](#quick-start)
   - [Installation](#installation)
-  - [Implementing an Activity](#implementing-an-activity)
-  - [Running a Workflow](#running-a-workflow)
+  - [Implementing a Workflow and Activity](#implementing-a-workflow-and-activity)
+  - [Running a Worker](#running-a-worker)
+  - [Executing a Workflow](#executing-a-workflow)
 - [Usage](#usage)
   - [Client](#client)
     - [Cloud Client Using mTLS](#cloud-client-using-mtls)
+    - [Cloud Client Using API Key](#cloud-client-using-api-key)
     - [Data Conversion](#data-conversion)
       - [ActiveRecord and ActiveModel](#activerecord-and-activemodel)
   - [Workers](#workers)
   - [Workflows](#workflows)
+    - [Workflow Definition](#workflow-definition)
+    - [Running Workflows](#running-workflows)
+    - [Invoking Activities](#invoking-activities)
+    - [Invoking Child Workflows](#invoking-child-workflows)
+    - [Timers and Conditions](#timers-and-conditions)
+    - [Workflow Task Scheduling and Cancellation](#workflow-task-scheduling-and-cancellation)
+    - [Workflow Futures](#workflow-futures)
+    - [Workflow Utilities](#workflow-utilities)
+    - [Workflow Exceptions](#workflow-exceptions)
+    - [Workflow Logic Constraints](#workflow-logic-constraints)
+    - [Workflow Testing](#workflow-testing)
+      - [Automatic Time Skipping](#automatic-time-skipping)
+      - [Manual Time Skipping](#manual-time-skipping)
+      - [Mocking Activities](#mocking-activities)
+    - [Workflow Replay](#workflow-replay)
   - [Activities](#activities)
     - [Activity Definition](#activity-definition)
     - [Activity Context](#activity-context)
@@ -58,6 +75,8 @@ until the SDK is marked stable.
 ## Quick Start
 
 ### Installation
+
+The Ruby SDK works with Ruby 3.1, 3.2, and 3.3. 3.4 support will be added soon, and 3.1 support will be dropped soon.
 
 Can require in a Gemfile like:
 

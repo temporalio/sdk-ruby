@@ -5,9 +5,9 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test_base'
+require 'test'
 
-class WorkerWorkflowActivityTest < TestBase
+class WorkerWorkflowActivityTest < Test
   class SimpleActivity < Temporalio::Activity::Definition
     def execute(value)
       "from activity: #{value}"
@@ -93,7 +93,9 @@ class WorkerWorkflowActivityTest < TestBase
     attr_reader :started, :done
 
     def initialize
-      @queue = Queue.new
+      # Can't use queue because we need to heartbeat during pop and timeout is not in Ruby 3.1
+      @force_complete = false
+      @force_complete_mutex = Mutex.new
     end
 
     def execute
@@ -101,11 +103,13 @@ class WorkerWorkflowActivityTest < TestBase
       # Heartbeat every 100ms
       loop do
         Temporalio::Activity::Context.current.heartbeat
-        val = @queue.pop(timeout: 0.1)
+        # Check or sleep-then-loop
+        val = @force_complete_mutex.synchronize { @force_complete }
         if val
           @done = :success
           return val
         end
+        sleep(0.1)
       end
     rescue Temporalio::Error::CanceledError
       @done ||= :canceled
@@ -116,7 +120,7 @@ class WorkerWorkflowActivityTest < TestBase
     end
 
     def force_complete(value)
-      @queue << value
+      @force_complete_mutex.synchronize { @force_complete = value }
     end
   end
 

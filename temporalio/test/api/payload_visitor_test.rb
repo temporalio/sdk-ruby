@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'temporalio/api/payload_visitor'
-require 'test_base'
+require 'test'
 
 module Api
-  class PayloadVisitorTest < TestBase
+  class PayloadVisitorTest < Test
     def test_basics
       # Make protos that have:
       # * single payload

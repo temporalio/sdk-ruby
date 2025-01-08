@@ -5,10 +5,10 @@ require 'temporalio/api'
 require 'temporalio/converters/data_converter'
 require 'temporalio/converters/payload_codec'
 require 'temporalio/testing'
-require 'test_base'
+require 'test'
 
 module Converters
-  class DataConverterTest < TestBase
+  class DataConverterTest < Test
     def test_with_codec
       converter = Temporalio::Converters::DataConverter.new(
         failure_converter: Ractor.make_shareable(

@@ -6,11 +6,11 @@ require 'temporalio/client'
 require 'temporalio/testing/workflow_environment'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test_base'
+require 'test'
 require 'workflow_utils'
 
 module Testing
-  class WorkflowEnvironmentTest < TestBase
+  class WorkflowEnvironmentTest < Test
     include WorkflowUtils
 
     class SlowWorkflow < Temporalio::Workflow::Definition

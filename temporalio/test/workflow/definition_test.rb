@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'temporalio/workflow/definition'
-require 'test_base'
+require 'test'
 
 module Workflow
-  class DefinitionTest < TestBase
+  class DefinitionTest < Test
     class ValidWorkflowSimple < Temporalio::Workflow::Definition
       workflow_signal
       def my_signal(some_arg); end

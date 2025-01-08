@@ -7,9 +7,9 @@ require 'securerandom'
 require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
-require 'test_base'
+require 'test'
 
-class WorkerActivityTest < TestBase
+class WorkerActivityTest < Test
   also_run_all_tests_in_fiber
 
   class ClassActivity < Temporalio::Activity::Definition
@@ -822,7 +822,7 @@ class WorkerActivityTest < TestBase
     assert_equal ['heartbeat-val'], interceptor.calls[2][1].details
   end
 
-  class CustomMetricActivity < Temporalio::Activity
+  class CustomMetricActivity < Temporalio::Activity::Definition
     def execute
       counter = Temporalio::Activity::Context.current.metric_meter.create_metric(
         :counter, 'my-counter'

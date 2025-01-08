@@ -5,9 +5,9 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test_base'
+require 'test'
 
-class WorkerWorkflowExternalTest < TestBase
+class WorkerWorkflowExternalTest < Test
   class ExternalWaitingWorkflow < Temporalio::Workflow::Definition
     workflow_query_attr_reader :signals
 

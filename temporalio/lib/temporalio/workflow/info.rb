@@ -74,7 +74,8 @@ module Temporalio
       ParentInfo = Struct.new(
         :namespace,
         :run_id,
-        :workflow_id
+        :workflow_id,
+        keyword_init: true
       )
     end
   end

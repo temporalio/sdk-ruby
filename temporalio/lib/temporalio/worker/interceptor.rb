@@ -273,7 +273,8 @@ module Temporalio
         SleepInput = Struct.new(
           :duration,
           :summary,
-          :cancellation
+          :cancellation,
+          keyword_init: true
         )
 
         # Input for {Outbound.start_child_workflow}.

@@ -958,7 +958,8 @@ module Temporalio
 
         State = Struct.new(
           :note,
-          :paused
+          :paused,
+          keyword_init: true
         )
 
         # State of a listed schedule.
