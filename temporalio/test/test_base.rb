@@ -18,7 +18,7 @@ require 'workflow_utils'
 #   report.pretty_print
 # end
 
-class Test < Minitest::Test
+class TestBase < Minitest::Test
   include ExtraAssertions
   include WorkflowUtils
 

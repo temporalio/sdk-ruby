@@ -7,9 +7,9 @@ require 'securerandom'
 require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
-require 'test'
+require 'test_base'
 
-class WorkerActivityTest < Test
+class WorkerActivityTest < TestBase
   also_run_all_tests_in_fiber
 
   class ClassActivity < Temporalio::Activity::Definition

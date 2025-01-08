@@ -1,4 +1,4 @@
-class WorkerActivityTest < Test
+class WorkerActivityTest < TestBase
   def execute_activity: [T] (
     untyped activity,
     *untyped args,

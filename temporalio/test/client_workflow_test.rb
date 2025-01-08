@@ -3,9 +3,9 @@
 require 'async'
 require 'temporalio/client'
 require 'temporalio/testing'
-require 'test'
+require 'test_base'
 
-class ClientWorkflowTest < Test
+class ClientWorkflowTest < TestBase
   also_run_all_tests_in_fiber
 
   def test_start_simple

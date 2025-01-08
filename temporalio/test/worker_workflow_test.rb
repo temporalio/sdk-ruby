@@ -6,10 +6,10 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test'
+require 'test_base'
 require 'timeout'
 
-class WorkerWorkflowTest < Test
+class WorkerWorkflowTest < TestBase
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -435,8 +435,8 @@ class WorkerWorkflowTest < Test
         # Collect original, upsert (update one, delete another), collect updated
         orig = Temporalio::Workflow.search_attributes.to_h.transform_keys(&:name)
         Temporalio::Workflow.upsert_search_attributes(
-          Test::ATTR_KEY_TEXT.value_set('another-text'),
-          Test::ATTR_KEY_KEYWORD.value_unset
+          TestBase::ATTR_KEY_TEXT.value_set('another-text'),
+          TestBase::ATTR_KEY_KEYWORD.value_unset
         )
         updated = Temporalio::Workflow.search_attributes.to_h.transform_keys(&:name)
         { orig:, updated: }
@@ -997,9 +997,9 @@ class WorkerWorkflowTest < Test
       raise 'Bad act result' if act_res != 'some activity output'
 
       # SA
-      raise 'Bad SA' if Temporalio::Workflow.search_attributes[Test::ATTR_KEY_TEXT] != 'some-sa'
+      raise 'Bad SA' if Temporalio::Workflow.search_attributes[TestBase::ATTR_KEY_TEXT] != 'some-sa'
 
-      Temporalio::Workflow.upsert_search_attributes(Test::ATTR_KEY_TEXT.value_set('new-sa'))
+      Temporalio::Workflow.upsert_search_attributes(TestBase::ATTR_KEY_TEXT.value_set('new-sa'))
 
       # Memo
       raise 'Bad memo' if Temporalio::Workflow.memo['some-memo-key'] != 'some-memo'

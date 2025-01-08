@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'temporalio/cancellation'
-require 'test'
+require 'test_base'
 
-class CancellationTest < Test
+class CancellationTest < TestBase
   also_run_all_tests_in_fiber
 
   def test_simple_cancellation

@@ -5,9 +5,9 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test'
+require 'test_base'
 
-class WorkerWorkflowChildTest < Test
+class WorkerWorkflowChildTest < TestBase
   class SimpleChildWorkflow < Temporalio::Workflow::Definition
     def execute(scenario, arg = nil)
       case scenario.to_sym
@@ -258,7 +258,7 @@ class WorkerWorkflowChildTest < Test
   class SearchAttributesParentWorkflow < Temporalio::Workflow::Definition
     def execute
       search_attributes = Temporalio::Workflow.search_attributes.dup
-      search_attributes[Test::ATTR_KEY_TEXT] = 'changed-text'
+      search_attributes[TestBase::ATTR_KEY_TEXT] = 'changed-text'
       Temporalio::Workflow.execute_child_workflow(SearchAttributesChildWorkflow, search_attributes:)
     end
   end

@@ -5,10 +5,10 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test'
+require 'test_base'
 
 module WorkflowUtils
-  # @type instance: Test
+  # @type instance: TestBase
 
   def execute_workflow(
     workflow,

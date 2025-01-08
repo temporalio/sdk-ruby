@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'temporalio/worker/thread_pool'
-require 'test'
+require 'test_base'
 
 module Worker
-  class ThreadPoolTest < Test
+  class ThreadPoolTest < TestBase
     def test_unlimited_max_with_idle
       pool = Temporalio::Worker::ThreadPool.new(idle_timeout: 0.3)
 

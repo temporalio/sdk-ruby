@@ -1,5 +1,5 @@
 module Workflow
-  class DefinitionTest < Test
+  class DefinitionTest < TestBase
     class ValidWorkflowAdvancedBase < Temporalio::Workflow::Definition
     end
 

@@ -3,9 +3,9 @@
 require 'async'
 require 'temporalio/client'
 require 'temporalio/testing'
-require 'test'
+require 'test_base'
 
-class ClientTest < Test
+class ClientTest < TestBase
   def test_version_number
     assert !Temporalio::VERSION.nil?
   end

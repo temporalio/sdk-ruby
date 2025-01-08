@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'temporalio/scoped_logger'
-require 'test'
+require 'test_base'
 
-class ScopedLoggerTest < Test
+class ScopedLoggerTest < TestBase
   def test_logger_with_values
     # Default doesn't change anything
     out, = safe_capture_io do

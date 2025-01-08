@@ -4,9 +4,9 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test'
+require 'test_base'
 
-class WorkerWorkflowHandlerTest < Test
+class WorkerWorkflowHandlerTest < TestBase
   class SimpleWorkflow < Temporalio::Workflow::Definition
     workflow_query_attr_reader :my_signal_result
 

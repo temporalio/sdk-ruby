@@ -2,10 +2,10 @@
 
 require 'temporalio/activity'
 require 'temporalio/testing/activity_environment'
-require 'test'
+require 'test_base'
 
 module Testing
-  class ActivityEnvironmentTest < Test
+  class ActivityEnvironmentTest < TestBase
     also_run_all_tests_in_fiber
 
     class SimpleActivity < Temporalio::Activity::Definition

@@ -5,9 +5,9 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
-require 'test'
+require 'test_base'
 
-class WorkerWorkflowActivityTest < Test
+class WorkerWorkflowActivityTest < TestBase
   class SimpleActivity < Temporalio::Activity::Definition
     def execute(value)
       "from activity: #{value}"

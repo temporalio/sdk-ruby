@@ -3,10 +3,10 @@
 require 'temporalio/api'
 require 'temporalio/converters/failure_converter'
 require 'temporalio/testing'
-require 'test'
+require 'test_base'
 
 module Converters
-  class FailureConverterTest < Test
+  class FailureConverterTest < TestBase
     def test_failure_with_causes
       # Make multiple nested errors
       orig_err = assert_raises do

@@ -1,4 +1,4 @@
-class Test < Minitest::Test
+class TestBase < Minitest::Test
   include ExtraAssertions
   include WorkflowUtils
 

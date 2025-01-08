@@ -4,10 +4,10 @@ require 'active_model'
 require 'active_record'
 require 'temporalio/api'
 require 'temporalio/converters/payload_converter'
-require 'test'
+require 'test_base'
 
 module Converters
-  class PayloadConverterTest < Test
+  class PayloadConverterTest < TestBase
     # @type method assert_payload: (
     #   untyped input,
     #   String expected_encoding,
