@@ -31,6 +31,11 @@ Lint/MissingSuper:
     - Temporalio::Activity::Definition
     - Temporalio::Workflow::Definition
 
+# Allow tests to nest methods
+Lint/NestedMethodDefinition:
+  Exclude:
+    - test/**/*
+
 # The default is too small and triggers simply setting lots of values on a proto
 Metrics/AbcSize:
   Max: 200

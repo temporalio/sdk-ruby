@@ -101,7 +101,10 @@ module Temporalio
         }.freeze
       end
 
-      # TODO(cretz): metric meter
+      # @return [Metric::Meter] Metric meter to create metrics on, with some activity-specific attributes already set.
+      def metric_meter
+        raise NotImplementedError
+      end
     end
   end
 end

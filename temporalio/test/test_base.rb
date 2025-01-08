@@ -6,6 +6,7 @@ require 'logger'
 require 'minitest/autorun'
 require 'securerandom'
 require 'singleton'
+require 'socket'
 require 'temporalio/internal/bridge'
 require 'temporalio/testing'
 require 'timeout'
@@ -104,6 +105,13 @@ class TestBase < Minitest::Test
 
       current = current.cause
     end
+  end
+
+  def find_free_port
+    socket = TCPServer.new('127.0.0.1', 0)
+    port = socket.addr[1]
+    socket.close
+    port
   end
 
   def assert_no_schedules
