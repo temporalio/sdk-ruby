@@ -45,7 +45,7 @@ until the SDK is marked stable.
     - [Invoking Activities](#invoking-activities)
     - [Invoking Child Workflows](#invoking-child-workflows)
     - [Timers and Conditions](#timers-and-conditions)
-    - [Workflow Task Scheduling and Cancellation](#workflow-task-scheduling-and-cancellation)
+    - [Workflow Fiber Scheduling and Cancellation](#workflow-fiber-scheduling-and-cancellation)
     - [Workflow Futures](#workflow-futures)
     - [Workflow Utilities](#workflow-utilities)
     - [Workflow Exceptions](#workflow-exceptions)
@@ -146,23 +146,22 @@ require_relative 'say_hello_workflow'
 # Create a client
 client = Temporalio::Client.connect('localhost:7233', 'my-namespace')
 
-# Create a worker with the client and activities
+# Create a worker with the client, activities, and workflows
 worker = Temporalio::Worker.new(
   client:,
   task_queue: 'my-task-queue',
   workflows: [SayHelloWorkflow],
-  # There are various forms an activity can take, see "Activities" section for details.
+  # There are various forms an activity can take, see "Activities" section for details
   activities: [SayHelloActivity],
-  # During the beta period, this must be provided explicitly, see "Workers" section for details.
+  # During the beta period, this must be provided explicitly, see "Workers" section for details
   workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
 )
 
-# Run the worker until SIGINT. This can be done in many ways, see specific
-# section for details.
+# Run the worker until SIGINT. This can be done in many ways, see "Workers" section for details.
 worker.run(shutdown_signals: ['SIGINT'])
 ```
 
-Running that will run the worker until Ctrl+C pressed.
+Running that will run the worker until Ctrl+C is pressed.
 
 ### Executing a Workflow
 
@@ -179,7 +178,7 @@ client = Temporalio::Client.connect('localhost:7233', 'my-namespace')
 # Run workflow
 result = client.execute_workflow(
   SayHelloWorkflow,
-  Temporal,
+  'Temporal',
   id: 'my-workflow-id',
   task_queue: 'my-task-queue'
 )
@@ -352,14 +351,14 @@ require 'my_module'
 # Create a client
 client = Temporalio::Client.connect('localhost:7233', 'my-namespace')
 
-# Create a worker with the client and activities
+# Create a worker with the client, activities, and workflows
 worker = Temporalio::Worker.new(
   client:,
   task_queue: 'my-task-queue',
   workflows: [MyModule::MyWorkflow],
-  # There are various forms an activity can take, see "Activities" section for details.
+  # There are various forms an activity can take, see "Activities" section for details
   activities: [MyModule::MyActivity],
-  # During the beta period, this must be provided explicitly, see below for details.
+  # During the beta period, this must be provided explicitly, see below for details
   workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
 )
 
@@ -378,14 +377,14 @@ Notes about the above code:
   `Temporalio::Worker::WorkflowExecutor::ThreadPool.default` is required explicitly.
 * The worker `run` method accepts an optional `Temporalio::Cancellation` object that can be used to cancel instead or in
   addition to providing a block that waits for completion.
-* The worker `run` method accepts an `shutdown_signals` array which will trap the signal and start shutdown when
+* The worker `run` method accepts a `shutdown_signals` array which will trap the signal and start shutdown when
   received.
 * Workers work with threads or fibers (but fiber compatibility only supported for Ruby 3.3+ at this time). Fiber-based
   activities (see "Activities" section) only work if the worker is created within a fiber.
 * The `run` method does not return until the worker is shut down. This means even if shutdown is triggered (e.g. via
   `Cancellation` or block completion), it may not return immediately. Activities not completing may hang worker
   shutdown, see the "Activities" section.
-* Workers can have many more options not shown here (e.g. data converters and interceptors).
+* Workers can have many more options not shown here (e.g. tuners and interceptors).
 * The `Temporalio::Worker.run_all` class method is available for running multiple workers concurrently.
 
 ### Workflows
@@ -466,7 +465,7 @@ workflow definition/behavior:
   _and_ `workflow_query`. This means it is a superset of `attr_reader` and will not work if also using `attr_reader` or
   `attr_accessor`. If a writer is needed alongside this, use `attr_writer`.
 
-The following protected class methods that can be called just before defining instance methods to customize the
+The following protected class methods can be called just before defining instance methods to customize the
 definition/behavior of the method:
 
 * `workflow_init` - Mark an `initialize` method as needing the workflow start arguments. Otherwise, `initialize` must
@@ -531,7 +530,7 @@ Some things to note about the above code:
 
 #### Invoking Activities
 
-* Activities are executed with `Temporalio::Workflow.execute_activity` which accepts the activity class or a
+* Activities are executed with `Temporalio::Workflow.execute_activity`, which accepts the activity class or a
   string/symbol activity name.
 * Activity options are kwargs on the `execute_activity` method. Either `schedule_to_close_timeout` or
   `start_to_close_timeout` must be set.
@@ -543,7 +542,7 @@ Some things to note about the above code:
 
 #### Invoking Child Workflows
 
-* Child workflows are started with `Temporalio::Workflow.start_child_workflow` which accepts the workflow class or
+* Child workflows are started with `Temporalio::Workflow.start_child_workflow`, which accepts the workflow class or
   string/symbol name, arguments, and other options.
 * Result for `start_child_workflow` is a `Temporalio::Workflow::ChildWorkflowHandle` which has the `id`, the ability to
   wait on the `result`, and the ability to `signal` the child.
@@ -557,15 +556,16 @@ Some things to note about the above code:
   * _Technically_ `Kernel.sleep` and `Timeout.timeout` also delegate to the above calls, but the more explicit workflow
     forms are encouraged because they accept more options and are not subject to Ruby standard library implementation
     changes.
-  * Timers accept a `Cancellation`, but if none given, it defaults to `Temporalio::Workflow.cancellation`.
+  * Each timer accepts a `Cancellation`, but if none is given, it defaults to `Temporalio::Workflow.cancellation`.
 * `Temporalio::Workflow.wait_condition` accepts a block that waits until the evaluated block result is truthy, then
   returns the value.
   * This function is invoked on each iteration of the internal event loop. This means it cannot have any side effects.
   * This is commonly used for checking if a variable is changed from some other part of a workflow (e.g. a signal
     handler).
-  * Wait conditions accept a `Cancellation`, but if none given, it defaults to `Temporalio::Workflow.cancellation`.
+  * Each wait conditions accepts a `Cancellation`, but if none is given, it defaults to
+    `Temporalio::Workflow.cancellation`.
 
-#### Workflow Task Scheduling and Cancellation
+#### Workflow Fiber Scheduling and Cancellation
 
 Workflows are backed by a custom, deterministic `Fiber::Scheduler`. All fiber calls inside a workflow use this scheduler
 to ensure coroutines run deterministically.
@@ -588,7 +588,7 @@ before it even started.
 `Temporalio::Workflow::Future` can be used for running things in the background or concurrently. This is basically a
 safe wrapper around `Fiber.schedule` for starting and `Workflow.wait_condition` for waiting.
 
-Nothing uses futures by default but they work with all workflow code/constructs. For instance, to run 3 activities and
+Nothing uses futures by default, but they work with all workflow code/constructs. For instance, to run 3 activities and
 wait for them all to complete, something like this can be written:
 
 ```ruby
@@ -629,7 +629,7 @@ raise Temporalio::Error::ApplicationError, 'Timer expired' if sleep_fut.done?
 puts "Act result: #{act_result}"
 ```
 
-There are several other details not covered here about futures such as how exceptions are handled, how to use a setter
+There are several other details not covered here about futures, such as how exceptions are handled, how to use a setter
 proc instead of a block, etc. See the API documentation for details.
 
 #### Workflow Utilities
@@ -689,7 +689,7 @@ entire-workflow-failure situation.
 
 #### Workflow Logic Constraints
 
-Temporal Workflows [must be deterministic](https://docs.temporal.io/workflows#deterministic-constraints) which includes
+Temporal Workflows [must be deterministic](https://docs.temporal.io/workflows#deterministic-constraints), which includes
 Ruby workflows. This means there are several things workflows cannot do such as:
 
 * Perform IO (network, disk, stdio, etc)
@@ -701,7 +701,7 @@ Ruby workflows. This means there are several things workflows cannot do such as:
 
 #### Workflow Testing
 
-Workflow testing can be done in an integration-test fashion against a real server, however it is hard to simulate
+Workflow testing can be done in an integration-test fashion against a real server. However, it is hard to simulate
 timeouts and other long time-based code. Using the time-skipping workflow test environment can help there.
 
 A non-time-skipping `Temporalio::Testing::WorkflowEnvironment` can be started via `start_local` which supports all
@@ -717,7 +717,7 @@ built-in x64 translation in macOS.
 
 ##### Automatic Time Skipping
 
-Anytime a workflow result is waiting on, the time-skipping server automatically advances to the next event it can. To
+Anytime a workflow result is waited on, the time-skipping server automatically advances to the next event it can. To
 manually advance time before waiting on the result of the workflow, the `WorkflowEnvironment.sleep` method can be used
 on the environment itself. If an activity is running, time-skipping is disabled.
 
@@ -845,6 +845,9 @@ class MyTest < Minitest::Test
   end
 end
 ```
+
+This test will run almost instantly. The `env.sleep(50)` manually skips 50 seconds of time, allowing the timeout to be
+triggered without actually waiting the full 45 seconds to time out.
 
 ##### Mocking Activities
 
