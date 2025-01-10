@@ -52,6 +52,8 @@ module Temporalio
 
         def patch: (patch_id: Symbol | String, deprecated: bool) -> bool
 
+        def metric_meter: -> Temporalio::Metric::Meter
+
         def run_in_scheduler: [T] { -> T } -> T
 
         def activate_internal: (untyped activation) -> untyped

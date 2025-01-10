@@ -81,6 +81,10 @@ Style/GlobalVars:
   Exclude:
     - test/**/*
 
+# We're ok with two compound comparisons before doing Array.include?
+Style/MultipleComparison:
+  ComparisonsThreshold: 3
+
 # We want our require lists to be in order
 Style/RequireOrder:
   Enabled: true

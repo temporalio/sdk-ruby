@@ -33,6 +33,7 @@ module Temporalio
           attr_reader workflow_definitions: Hash[String?, Workflow::Definition::Info]
           attr_reader bridge_worker: Bridge::Worker
           attr_reader logger: Logger
+          attr_reader metric_meter: Temporalio::Metric::Meter
           attr_reader data_converter: Converters::DataConverter
           attr_reader deadlock_timeout: Float?
           attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, bool]]
@@ -46,6 +47,7 @@ module Temporalio
             workflow_definitions: Hash[String?, Workflow::Definition::Info],
             bridge_worker: Bridge::Worker,
             logger: Logger,
+            metric_meter: Temporalio::Metric::Meter,
             data_converter: Converters::DataConverter,
             deadlock_timeout: Float?,
             illegal_calls: Hash[String, :all | Hash[Symbol, bool]],

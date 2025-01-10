@@ -6,9 +6,9 @@ module Temporalio
       class WorkflowInstance
         # Details needed to instantiate a {WorkflowInstance}.
         class Details
-          attr_reader :namespace, :task_queue, :definition, :initial_activation, :logger, :payload_converter,
-                      :failure_converter, :interceptors, :disable_eager_activity_execution, :illegal_calls,
-                      :workflow_failure_exception_types
+          attr_reader :namespace, :task_queue, :definition, :initial_activation, :logger, :metric_meter,
+                      :payload_converter, :failure_converter, :interceptors, :disable_eager_activity_execution,
+                      :illegal_calls, :workflow_failure_exception_types
 
           def initialize(
             namespace:,
@@ -16,6 +16,7 @@ module Temporalio
             definition:,
             initial_activation:,
             logger:,
+            metric_meter:,
             payload_converter:,
             failure_converter:,
             interceptors:,
@@ -28,6 +29,7 @@ module Temporalio
             @definition = definition
             @initial_activation = initial_activation
             @logger = logger
+            @metric_meter = metric_meter
             @payload_converter = payload_converter
             @failure_converter = failure_converter
             @interceptors = interceptors

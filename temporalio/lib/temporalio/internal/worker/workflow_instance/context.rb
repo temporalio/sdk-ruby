@@ -136,6 +136,10 @@ module Temporalio
             @instance.memo
           end
 
+          def metric_meter
+            @instance.metric_meter
+          end
+
           def now
             @instance.now
           end

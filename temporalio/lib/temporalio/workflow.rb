@@ -232,6 +232,12 @@ module Temporalio
       _current.memo
     end
 
+    # @return [Metric::Meter] Metric meter to create metrics on. This metric meter already contains some
+    #   workflow-specific attributes and takes care not to apply metrics during replay.
+    def self.metric_meter
+      _current.metric_meter
+    end
+
     # @return [Time] Current UTC time for this workflow. This creates and returns a new {::Time} instance every time it
     #   is invoked, it is not the same instance continually mutated.
     def self.now

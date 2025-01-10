@@ -203,6 +203,7 @@ module Temporalio
                 definition:,
                 initial_activation:,
                 logger: worker_state.logger,
+                metric_meter: worker_state.metric_meter,
                 payload_converter: worker_state.data_converter.payload_converter,
                 failure_converter: worker_state.data_converter.failure_converter,
                 interceptors: worker_state.workflow_interceptors,

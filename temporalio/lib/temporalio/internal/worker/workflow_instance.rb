@@ -18,6 +18,7 @@ require 'temporalio/internal/worker/workflow_instance/illegal_call_tracer'
 require 'temporalio/internal/worker/workflow_instance/inbound_implementation'
 require 'temporalio/internal/worker/workflow_instance/outbound_implementation'
 require 'temporalio/internal/worker/workflow_instance/replay_safe_logger'
+require 'temporalio/internal/worker/workflow_instance/replay_safe_metric'
 require 'temporalio/internal/worker/workflow_instance/scheduler'
 require 'temporalio/retry_policy'
 require 'temporalio/scoped_logger'
@@ -64,6 +65,7 @@ module Temporalio
           end
           @logger = ReplaySafeLogger.new(logger: details.logger, instance: self)
           @logger.scoped_values_getter = proc { scoped_logger_info }
+          @runtime_metric_meter = details.metric_meter
           @scheduler = Scheduler.new(self)
           @payload_converter = details.payload_converter
           @failure_converter = details.failure_converter
@@ -187,6 +189,18 @@ module Temporalio
             end
             patched
           end
+        end
+
+        def metric_meter
+          @metric_meter ||= ReplaySafeMetric::Meter.new(
+            @runtime_metric_meter.with_additional_attributes(
+              {
+                namespace: info.namespace,
+                task_queue: info.task_queue,
+                workflow_type: info.workflow_type
+              }
+            )
+          )
         end
 
         private

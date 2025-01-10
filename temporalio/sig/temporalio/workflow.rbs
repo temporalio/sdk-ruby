@@ -68,6 +68,8 @@ module Temporalio
 
     def self.memo: -> Hash[String, Object?]
 
+    def self.metric_meter: -> Metric::Meter
+
     def self.now: -> Time
 
     def self.patched: (String patch_id) -> bool

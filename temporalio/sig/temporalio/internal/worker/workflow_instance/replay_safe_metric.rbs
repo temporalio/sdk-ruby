@@ -1,0 +1,15 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class ReplaySafeMetric < Temporalio::Metric
+          def initialize: (Temporalio::Metric) -> void
+
+          class Meter < Temporalio::Metric::Meter
+            def initialize: (Temporalio::Metric::Meter) -> void
+          end
+        end
+      end
+    end
+  end
+end

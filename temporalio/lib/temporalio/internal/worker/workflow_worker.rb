@@ -56,6 +56,7 @@ module Temporalio
             workflow_definitions:,
             bridge_worker:,
             logger: worker.options.logger,
+            metric_meter: worker.options.client.connection.options.runtime.metric_meter,
             data_converter: worker.options.client.data_converter,
             deadlock_timeout: worker.options.debug_mode ? nil : 2.0,
             # TODO(cretz): Make this more performant for the default set?
@@ -140,18 +141,19 @@ module Temporalio
         end
 
         class State
-          attr_reader :workflow_definitions, :bridge_worker, :logger, :data_converter, :deadlock_timeout,
+          attr_reader :workflow_definitions, :bridge_worker, :logger, :metric_meter, :data_converter, :deadlock_timeout,
                       :illegal_calls, :namespace, :task_queue, :disable_eager_activity_execution,
                       :workflow_interceptors, :workflow_failure_exception_types
 
           def initialize(
-            workflow_definitions:, bridge_worker:, logger:, data_converter:, deadlock_timeout:,
+            workflow_definitions:, bridge_worker:, logger:, metric_meter:, data_converter:, deadlock_timeout:,
             illegal_calls:, namespace:, task_queue:, disable_eager_activity_execution:,
             workflow_interceptors:, workflow_failure_exception_types:
           )
             @workflow_definitions = workflow_definitions
             @bridge_worker = bridge_worker
             @logger = logger
+            @metric_meter = metric_meter
             @data_converter = data_converter
             @deadlock_timeout = deadlock_timeout
             @illegal_calls = illegal_calls

@@ -1551,6 +1551,86 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class CustomMetricsActivity < Temporalio::Activity::Definition
+    def execute
+      counter = Temporalio::Activity::Context.current.metric_meter.create_metric(
+        :counter, 'my-activity-counter'
+      ).with_additional_attributes({ someattr: 'someval1' })
+      counter.record(123, additional_attributes: { anotherattr: 'anotherval1' })
+      'done'
+    end
+  end
+
+  class CustomMetricsWorkflow < Temporalio::Workflow::Definition
+    def execute
+      histogram = Temporalio::Workflow.metric_meter.create_metric(
+        :histogram, 'my-workflow-histogram', value_type: :duration
+      ).with_additional_attributes({ someattr: 'someval2' })
+      histogram.record(4.56, additional_attributes: { anotherattr: 'anotherval2' })
+      Temporalio::Workflow.execute_activity(CustomMetricsActivity, schedule_to_close_timeout: 10)
+    end
+  end
+
+  def test_custom_metrics
+    # Create a client w/ a Prometheus-enabled runtime
+    prom_addr = "127.0.0.1:#{find_free_port}"
+    runtime = Temporalio::Runtime.new(
+      telemetry: Temporalio::Runtime::TelemetryOptions.new(
+        metrics: Temporalio::Runtime::MetricsOptions.new(
+          prometheus: Temporalio::Runtime::PrometheusMetricsOptions.new(
+            bind_address: prom_addr
+          )
+        )
+      )
+    )
+    conn_opts = env.client.connection.options.dup
+    conn_opts.runtime = runtime
+    client_opts = env.client.options.dup
+    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
+
+    assert_equal 'done', execute_workflow(
+      CustomMetricsWorkflow,
+      activities: [CustomMetricsActivity],
+      client:
+    )
+
+    dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
+    lines = dump.split("\n")
+
+    # Confirm we have the regular activity metrics
+    line = lines.find { |l| l.start_with?('temporal_activity_task_received{') }
+    assert_includes line, 'activity_type="CustomMetricsActivity"'
+    assert_includes line, 'task_queue="'
+    assert_includes line, 'namespace="default"'
+    assert line.end_with?(' 1')
+
+    # Confirm we have the regular workflow metrics
+    line = lines.find { |l| l.start_with?('temporal_workflow_completed{') }
+    assert_includes line, 'workflow_type="CustomMetricsWorkflow"'
+    assert_includes line, 'task_queue="'
+    assert_includes line, 'namespace="default"'
+    assert line.end_with?(' 1')
+
+    # Confirm custom activity metric has the tags we expect
+    line = lines.find { |l| l.start_with?('my_activity_counter{') }
+    assert_includes line, 'activity_type="CustomMetricsActivity"'
+    assert_includes line, 'task_queue="'
+    assert_includes line, 'namespace="default"'
+    assert_includes line, 'someattr="someval1"'
+    assert_includes line, 'anotherattr="anotherval1"'
+    assert line.end_with?(' 123')
+
+    # Confirm custom workflow metric has the tags we expect
+    line = lines.find { |l| l.start_with?('my_workflow_histogram_sum{') }
+    assert_includes line, 'workflow_type="CustomMetricsWorkflow"'
+    assert_includes line, 'task_queue="'
+    assert_includes line, 'namespace="default"'
+    assert_includes line, 'someattr="someval2"'
+    assert_includes line, 'anotherattr="anotherval2"'
+    assert line.end_with?(' 4560')
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Ractor with global state
@@ -1561,7 +1641,6 @@ class WorkerWorkflowTest < Test
   #   * Failure in payload converter can fail workflow if proper error
   #   * Failure in failure converter (of activation error and workflow error)
   #   * Confirm GC post eviction
-  #   * Custom metrics
   #   * Replace worker client
   #   * Reset update randomness seed
   #   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow

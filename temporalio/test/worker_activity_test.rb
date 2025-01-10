@@ -822,56 +822,6 @@ class WorkerActivityTest < Test
     assert_equal ['heartbeat-val'], interceptor.calls[2][1].details
   end
 
-  class CustomMetricActivity < Temporalio::Activity::Definition
-    def execute
-      counter = Temporalio::Activity::Context.current.metric_meter.create_metric(
-        :counter, 'my-counter'
-      ).with_additional_attributes({ someattr: 'someval' })
-      counter.record(123, additional_attributes: { anotherattr: 'anotherval' })
-      'done'
-    end
-  end
-
-  def test_activity_metric
-    # Create a client w/ a Prometheus-enabled runtime
-    prom_addr = "127.0.0.1:#{find_free_port}"
-    runtime = Temporalio::Runtime.new(
-      telemetry: Temporalio::Runtime::TelemetryOptions.new(
-        metrics: Temporalio::Runtime::MetricsOptions.new(
-          prometheus: Temporalio::Runtime::PrometheusMetricsOptions.new(
-            bind_address: prom_addr
-          )
-        )
-      )
-    )
-    conn_opts = env.client.connection.options.dup
-    conn_opts.runtime = runtime
-    client_opts = env.client.options.dup
-    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
-    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
-
-    assert_equal 'done', execute_activity(CustomMetricActivity, client:)
-
-    dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
-    lines = dump.split("\n")
-
-    # Confirm we have the regular activity metrics
-    line = lines.find { |l| l.start_with?('temporal_activity_task_received{') }
-    assert_includes line, 'activity_type="CustomMetricActivity"'
-    assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
-    assert line.end_with?(' 1')
-
-    # Confirm custom metric has the tags we expect
-    line = lines.find { |l| l.start_with?('my_counter{') }
-    assert_includes line, 'activity_type="CustomMetricActivity"'
-    assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
-    assert_includes line, 'someattr="someval"'
-    assert_includes line, 'anotherattr="anotherval"'
-    assert line.end_with?(' 123')
-  end
-
   # steep:ignore
   def execute_activity(
     activity,

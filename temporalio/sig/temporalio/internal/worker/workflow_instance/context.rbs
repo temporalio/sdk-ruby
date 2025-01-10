@@ -59,6 +59,8 @@ module Temporalio
 
           def memo: -> ExternallyImmutableHash[String, Object?]
 
+          def metric_meter: -> Temporalio::Metric::Meter
+
           def now: -> Time
 
           def patched: (String patch_id) -> bool

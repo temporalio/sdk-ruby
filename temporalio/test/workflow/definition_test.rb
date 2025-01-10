@@ -66,7 +66,7 @@ module Workflow
       workflow_raw_args
 
       workflow_init
-      def initialize(arg1, arg2); end # rubocop:disable Style/RedundantInitialize,Lint/MissingSuper
+      def initialize(arg1, arg2); end # rubocop:disable Lint/MissingSuper
 
       def execute(arg1, arg2); end
 
