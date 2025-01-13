@@ -604,7 +604,7 @@ fut3 = Temporalio::Workflow::Future.new do
 end
 
 # Wait for them all to complete
-Temporalio::Workflow.Future.all_of(fut1, fut2, fut3).wait
+Temporalio::Workflow::Future.all_of(fut1, fut2, fut3).wait
 
 Temporalio::Workflow.logger.debug("Got: #{fut1.result}, #{fut2.result}, #{fut3.result}")
 ```
