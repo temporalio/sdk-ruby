@@ -25,6 +25,8 @@ module Temporalio
           completion_complete_queue: Queue
         ) -> void
 
+        def on_shutdown_complete: -> void
+
         def decode_activation: (MultiRunner runner, untyped activation) -> void
         def encode_activation_completion: (MultiRunner runner, untyped activation_completion) -> void
         def apply_codec_on_payload_visit: (untyped payload_or_payloads) { (untyped) -> Enumerable[untyped] } -> void
@@ -60,6 +62,7 @@ module Temporalio
 
           def get_or_create_running_workflow: [T] (String run_id) { -> T } -> T
           def evict_running_workflow: (String run_id) -> void
+          def evict_all: -> void
         end
       end
     end

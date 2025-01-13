@@ -1631,6 +1631,113 @@ class WorkerWorkflowTest < Test
     assert line.end_with?(' 4560')
   end
 
+  class FailWorkflowPayloadConverter < Temporalio::Converters::PayloadConverter
+    def to_payload(value)
+      if value == 'fail-on-this-result'
+        raise Temporalio::Error::ApplicationError.new('Intentional error', type: 'IntentionalError')
+      end
+
+      Temporalio::Converters::PayloadConverter.default.to_payload(value)
+    end
+
+    def from_payload(payload)
+      value = Temporalio::Converters::PayloadConverter.default.from_payload(payload)
+      if value == 'fail-on-this'
+        raise Temporalio::Error::ApplicationError.new('Intentional error', type: 'IntentionalError')
+      end
+
+      value
+    end
+  end
+
+  class FailWorkflowPayloadConverterWorkflow < Temporalio::Workflow::Definition
+    def execute(arg)
+      if arg == 'fail'
+        "#{arg}-on-this-result"
+      else
+        Temporalio::Workflow.wait_condition { false }
+      end
+    end
+
+    workflow_update
+    def do_update(arg)
+      "#{arg}-on-this-result"
+    end
+  end
+
+  def test_fail_workflow_payload_converter
+    new_options = env.client.options.dup
+    new_options.data_converter = Temporalio::Converters::DataConverter.new(
+      payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
+    )
+    client = Temporalio::Client.new(**new_options.to_h)
+
+    # As workflow argument
+    err = assert_raises(Temporalio::Error::WorkflowFailedError) do
+      execute_workflow(FailWorkflowPayloadConverterWorkflow, 'fail-on-this', client:)
+    end
+    assert_equal 'IntentionalError', err.cause.type
+
+    # As workflow result
+    err = assert_raises(Temporalio::Error::WorkflowFailedError) do
+      execute_workflow(FailWorkflowPayloadConverterWorkflow, 'fail', client:)
+    end
+    assert_equal 'IntentionalError', err.cause.type
+
+    # As an update argument
+    err = assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
+      execute_workflow(FailWorkflowPayloadConverterWorkflow, 'do-nothing', client:) do |handle|
+        handle.execute_update(FailWorkflowPayloadConverterWorkflow.do_update, 'fail-on-this')
+      end
+    end
+    # We do an extra `.cause` because this is wrapped in a RuntimeError that the update arg parsing failed
+    assert_equal 'IntentionalError', err.cause.cause.type
+
+    # As an update result
+    err = assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
+      execute_workflow(FailWorkflowPayloadConverterWorkflow, 'do-nothing', client:) do |handle|
+        handle.execute_update(FailWorkflowPayloadConverterWorkflow.do_update, 'fail')
+      end
+    end
+    assert_equal 'IntentionalError', err.cause.type
+  end
+
+  class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
+    @initialized_count = 0
+    @finalized_count = 0
+
+    class << self
+      attr_accessor :initialized_count, :finalized_count
+
+      def create_finalizer
+        proc { @finalized_count += 1 }
+      end
+    end
+
+    def initialize
+      self.class.initialized_count += 1
+      ObjectSpace.define_finalizer(self, self.class.create_finalizer)
+    end
+
+    def execute
+      Temporalio::Workflow.wait_condition { false }
+    end
+  end
+
+  def test_confirm_garbage_collect
+    execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
+      # Wait until it is started
+      assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+      # Confirm initialized but not finalized
+      assert_equal 1, ConfirmGarbageCollectWorkflow.initialized_count
+      assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
+    end
+
+    # Now with worker shutdown, GC and confirm finalized
+    GC.start
+    assert_equal 1, ConfirmGarbageCollectWorkflow.finalized_count
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Ractor with global state
@@ -1638,9 +1745,6 @@ class WorkerWorkflowTest < Test
   #   * Unawaited futures that have exceptions, need to log warning like Java does
   #   * Enhanced stack trace?
   #   * Separate abstract/interface demonstration
-  #   * Failure in payload converter can fail workflow if proper error
-  #   * Failure in failure converter (of activation error and workflow error)
-  #   * Confirm GC post eviction
   #   * Replace worker client
   #   * Reset update randomness seed
   #   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow
@@ -1649,7 +1753,6 @@ class WorkerWorkflowTest < Test
   #   * Interceptors
   # * Handler
   #   * Signal/update with start
-  #   * Adding dynamic signal handler drains all signals into the handler
   # * Activity
   #   * Local activity cancel (currently broken)
 end

@@ -124,6 +124,7 @@ module Temporalio
     def _activity_interceptors: -> Array[Interceptor::Activity]
     def _workflow_interceptors: -> Array[Interceptor::Workflow]
     def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
+    def _on_shutdown_complete: -> void
 
     private def to_bridge_slot_supplier_options: (
       Tuner::SlotSupplier slot_supplier

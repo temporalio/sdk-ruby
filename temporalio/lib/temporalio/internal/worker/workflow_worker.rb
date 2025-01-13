@@ -115,6 +115,10 @@ module Temporalio
           end
         end
 
+        def on_shutdown_complete
+          @state.evict_all
+        end
+
         private
 
         def decode_activation(runner, activation)
@@ -180,6 +184,10 @@ module Temporalio
 
           def evict_running_workflow(run_id)
             @running_workflows_mutex.synchronize { @running_workflows.delete(run_id) }
+          end
+
+          def evict_all
+            @running_workflows_mutex.synchronize { @running_workflows.clear }
           end
         end
       end

@@ -215,6 +215,9 @@ module Temporalio
         end
       end
 
+      # Notify each worker we're done with it
+      workers.each(&:_on_shutdown_complete)
+
       # If there was an shutdown-causing error, we raise that
       if !first_error.nil?
         raise first_error
@@ -557,6 +560,12 @@ module Temporalio
       else
         raise "Unrecognized worker type #{worker_type}"
       end
+    end
+
+    # @!visibility private
+    def _on_shutdown_complete
+      @workflow_worker&.on_shutdown_complete
+      @workflow_worker = nil
     end
 
     private
