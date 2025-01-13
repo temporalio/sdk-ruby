@@ -178,7 +178,7 @@ client = Temporalio::Client.connect('localhost:7233', 'my-namespace')
 # Run workflow
 result = client.execute_workflow(
   SayHelloWorkflow,
-  'Temporal', # This is the workflow argument
+  'Temporal', # This is the input to the workflow
   id: 'my-workflow-id',
   task_queue: 'my-task-queue'
 )
@@ -641,8 +641,8 @@ from workflows including:
   be called outside of a workflow without raising an exception.
 * `info` - Immutable workflow information.
 * `logger` - A Ruby logger that adds contextual information and takes care not to log on replay.
-* `metric_meter` - A metric meter for making custom metrics that adds contextual information and takes care not to log
-  on replay.
+* `metric_meter` - A metric meter for making custom metrics that adds contextual information and takes care not to
+  record on replay.
 * `random` - A deterministic `Random` instance.
 * `memo` - A read-only hash of the memo (updated via `upsert_memo`).
 * `search_attributes` - A read-only `SearchAttributes` collection (updated via `upsert_search_attributes`).

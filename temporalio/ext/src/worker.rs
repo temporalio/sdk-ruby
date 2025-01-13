@@ -73,6 +73,12 @@ enum WorkerType {
     Workflow,
 }
 
+struct PollResult {
+    worker_index: usize,
+    worker_type: WorkerType,
+    result: Result<Option<Vec<u8>>, String>,
+}
+
 impl Worker {
     pub fn new(client: &Client, options: Struct) -> Result<Self, Error> {
         enter_sync!(client.runtime_handle);
@@ -157,12 +163,12 @@ impl Worker {
         worker: Arc<temporal_sdk_core::Worker>,
         worker_index: usize,
         worker_type: WorkerType,
-    ) -> BoxStream<'a, (usize, WorkerType, Result<Option<Vec<u8>>, String>)> {
+    ) -> BoxStream<'a, PollResult> {
         stream::unfold(Some(worker.clone()), move |worker| async move {
             // We return no worker so the next streamed item closes
             // the stream with a None
             if let Some(worker) = worker {
-                let res = match worker_type {
+                let result = match worker_type {
                     WorkerType::Activity => {
                         match temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
@@ -180,9 +186,13 @@ impl Worker {
                         }
                     }
                 };
-                let shutdown_next = matches!(res, Ok(None));
+                let shutdown_next = matches!(result, Ok(None));
                 Some((
-                    (worker_index, worker_type, res),
+                    PollResult {
+                        worker_index,
+                        worker_type,
+                        result,
+                    },
                     // No more work if shutdown
                     if shutdown_next { None } else { Some(worker) },
                 ))
@@ -244,24 +254,24 @@ impl Worker {
         runtime.spawn(
             async move {
                 // Get next item from the stream
-                while let Some((worker_index, worker_type, result)) = worker_stream.next().await {
+                while let Some(poll_result) = worker_stream.next().await {
                     // Send callback to Ruby
                     let callback = callback.clone();
                     let _ = async_command_tx.send(AsyncCommand::RunCallback(Box::new(move || {
                         // Get Ruby in callback
                         let ruby = Ruby::get().expect("Ruby not available");
-                        let worker_type = match worker_type {
+                        let worker_type = match poll_result.worker_type {
                             WorkerType::Activity => id!("activity"),
                             WorkerType::Workflow => id!("workflow"),
                         };
                         // Call block
-                        let result: Value = match result {
+                        let result: Value = match poll_result.result {
                             Ok(Some(val)) => RString::from_slice(&val).as_value(),
                             Ok(None) => ruby.qnil().as_value(),
                             Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
                         callback.push(ruby.ary_new_from_values(&[
-                            worker_index.into_value(),
+                            poll_result.worker_index.into_value(),
                             worker_type.into_value(),
                             result,
                         ]))

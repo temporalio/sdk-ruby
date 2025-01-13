@@ -76,6 +76,7 @@ module Temporalio
           @pending_child_workflows = {} # Keyed by sequence, value is ChildWorkflowHandle to resolve with proto result
           @pending_external_signals = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_external_cancels = {} # Keyed by sequence, value is fiber to resume with proto result
+          @buffered_signals = {} # Keyed by signal name, value is signal job
           # TODO(cretz): Should these be sets instead? Both should be fairly low counts.
           @in_progress_handlers = [] # Value is HandlerExecution
           @patches_notified = []
@@ -93,7 +94,7 @@ module Temporalio
           ) do |defn|
             # New definition, drain buffer
             # TODO(cretz): Dynamic
-            @buffered_signals&.delete(defn.name)&.each { |job| apply_signal(job) }
+            @buffered_signals.delete(defn.name)&.each { |job| apply_signal(job) }
           end
           @query_handlers = HandlerHash.new(details.definition.queries, Workflow::Definition::Query)
           @update_handlers = HandlerHash.new(details.definition.updates, Workflow::Definition::Update)
@@ -341,12 +342,12 @@ module Temporalio
         end
 
         def apply_signal(job)
-          # Process as a top level handler so that errors are treated as if in primary workflow method
           defn = signal_handlers[job.signal_name] || signal_handlers[nil]
           handler_exec =
             if defn
               HandlerExecution.new(name: job.signal_name, update_id: nil, unfinished_policy: defn.unfinished_policy)
             end
+          # Process as a top level handler so that errors are treated as if in primary workflow method
           schedule(top_level: true, handler_exec:) do
             # Send to interceptor if there is a definition, buffer otherwise
             if defn
@@ -366,7 +367,7 @@ module Temporalio
                 )
               )
             else
-              buffered = (@buffered_signals ||= {})[job.signal_name]
+              buffered = @buffered_signals[job.signal_name]
               buffered = @buffered_signals[job.signal_name] = [] if buffered.nil?
               buffered << job
             end

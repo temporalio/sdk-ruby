@@ -103,7 +103,7 @@ module Temporalio
           def block(_blocker, timeout = nil)
             # TODO(cretz): Make the blocker visible in the stack trace?
 
-            # We just yield because unblock will resume this. We will just wropa
+            # We just yield because unblock will resume this. We will just wrap in timeout if needed.
             if timeout
               begin
                 Timeout.timeout(timeout) { Fiber.yield }
