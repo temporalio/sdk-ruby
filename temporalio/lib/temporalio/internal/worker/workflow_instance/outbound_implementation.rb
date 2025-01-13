@@ -73,7 +73,7 @@ module Temporalio
                     activity_id: input.activity_id || seq.to_s,
                     activity_type:,
                     task_queue: input.task_queue,
-                    headers: ProtoUtils.headers_to_proto(input.headers, @instance.payload_converter),
+                    headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
                     arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
                     schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
                     schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
@@ -110,7 +110,7 @@ module Temporalio
                     seq:,
                     activity_id: input.activity_id || seq.to_s,
                     activity_type:,
-                    headers: ProtoUtils.headers_to_proto(input.headers, @instance.payload_converter),
+                    headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
                     arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
                     schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
                     schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
@@ -230,7 +230,7 @@ module Temporalio
               seq:,
               signal_name: Workflow::Definition::Signal._name_from_parameter(signal),
               args: ProtoUtils.convert_to_payload_array(@instance.payload_converter, args),
-              headers: ProtoUtils.headers_to_proto(headers, @instance.payload_converter)
+              headers: ProtoUtils.headers_to_proto_hash(headers, @instance.payload_converter)
             )
             if child
               cmd.child_workflow_id = id
@@ -346,8 +346,8 @@ module Temporalio
                   workflow_id_reuse_policy: input.id_reuse_policy,
                   retry_policy: input.retry_policy&._to_proto,
                   cron_schedule: input.cron_schedule,
-                  headers: ProtoUtils.headers_to_proto(input.headers, @instance.payload_converter),
-                  memo: ProtoUtils.memo_to_proto(input.memo, @instance.payload_converter),
+                  headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
+                  memo: ProtoUtils.memo_to_proto_hash(input.memo, @instance.payload_converter),
                   search_attributes: input.search_attributes&._to_proto_hash,
                   cancellation_type: input.cancellation_type
                 )

@@ -59,7 +59,13 @@ module Temporalio
       def self.headers_to_proto(headers, converter)
         return nil if headers.nil? || headers.empty?
 
-        Api::Common::V1::Header.new(fields: headers.transform_values { |val| converter.to_payload(val) })
+        Api::Common::V1::Header.new(fields: headers_to_proto_hash(headers, converter))
+      end
+
+      def self.headers_to_proto_hash(headers, converter)
+        return nil if headers.nil? || headers.empty?
+
+        headers.transform_values { |val| converter.to_payload(val) }
       end
 
       def self.headers_from_proto(headers, converter)

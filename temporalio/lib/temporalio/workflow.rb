@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'random/formatter'
+require 'temporalio/error'
 require 'temporalio/workflow/activity_cancellation_type'
 require 'temporalio/workflow/child_workflow_cancellation_type'
 require 'temporalio/workflow/child_workflow_handle'

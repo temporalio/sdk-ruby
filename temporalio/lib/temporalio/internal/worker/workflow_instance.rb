@@ -572,7 +572,7 @@ module Temporalio
                   workflow_run_timeout: ProtoUtils.seconds_to_duration(err.run_timeout),
                   workflow_task_timeout: ProtoUtils.seconds_to_duration(err.task_timeout),
                   memo: ProtoUtils.memo_to_proto_hash(err.memo, payload_converter),
-                  headers: ProtoUtils.headers_to_proto(err.headers, payload_converter),
+                  headers: ProtoUtils.headers_to_proto_hash(err.headers, payload_converter),
                   search_attributes: err.search_attributes&._to_proto,
                   retry_policy: err.retry_policy&._to_proto
                 )

@@ -29,6 +29,11 @@ module Temporalio
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> untyped?
 
+      def self.headers_to_proto_hash: (
+        Hash[String, Object?]? hash,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, untyped]?
+
       def self.headers_from_proto: (
         untyped? headers,
         Converters::DataConverter | Converters::PayloadConverter converter
