@@ -40,7 +40,7 @@ class WorkerWorkflowHandlerTest < Test
   end
 
   class ManualDefinitionWorkflow < Temporalio::Workflow::Definition
-    workflow_query_attr_reader :signal_values
+    workflow_query_attr_reader :signal_values, :dynamic_signal_values
 
     def execute
       Temporalio::Workflow.query_handlers['my_query'] = Temporalio::Workflow::Definition::Query.new(
@@ -62,9 +62,18 @@ class WorkerWorkflowHandlerTest < Test
         to_invoke: proc { |arg1, arg2| (@signal_values ||= []) << [arg1, arg2] }
       )
     end
+
+    workflow_signal
+    def define_dynamic_signal_handler
+      Temporalio::Workflow.signal_handlers[nil] = Temporalio::Workflow::Definition::Signal.new(
+        name: nil,
+        to_invoke: proc { |arg1, *arg2| (@dynamic_signal_values ||= []) << [arg1, arg2] }
+      )
+    end
   end
 
   def test_manual_definition
+    # Test regular
     execute_workflow(ManualDefinitionWorkflow) do |handle|
       # Send 3 signals, then send a signal to define handler
       handle.signal(:my_signal, 'sig1-arg1', 'sig1-arg2')
@@ -73,12 +82,27 @@ class WorkerWorkflowHandlerTest < Test
 
       # Confirm buffer processed
       expected = [%w[sig1-arg1 sig1-arg2], %w[sig2-arg1 sig2-arg2]]
-      assert_eventually { assert_equal expected, handle.query(ManualDefinitionWorkflow.signal_values) }
+      assert_equal expected, handle.query(ManualDefinitionWorkflow.signal_values)
 
       # Send a another and confirm
       handle.signal(:my_signal, 'sig3-arg1', 'sig3-arg2')
       expected << %w[sig3-arg1 sig3-arg2]
-      assert_eventually { assert_equal expected, handle.query(ManualDefinitionWorkflow.signal_values) }
+      assert_equal expected, handle.query(ManualDefinitionWorkflow.signal_values)
+
+      # Send a couple for unknown signals and define dynamic
+      assert_nil handle.query(ManualDefinitionWorkflow.dynamic_signal_values)
+      handle.signal(:my_other_signal1, 'sig4-arg1', 'sig4-arg2')
+      handle.signal(:my_other_signal2, 'sig5-arg1', 'sig5-arg2')
+      handle.signal(ManualDefinitionWorkflow.define_dynamic_signal_handler)
+
+      # Confirm buffer processed
+      expected = [['my_other_signal1', %w[sig4-arg1 sig4-arg2]], ['my_other_signal2', %w[sig5-arg1 sig5-arg2]]]
+      assert_equal expected, handle.query(ManualDefinitionWorkflow.dynamic_signal_values)
+
+      # Send another and confirm
+      handle.signal(:my_other_signal3, 'sig6-arg1', 'sig6-arg2')
+      expected << ['my_other_signal3', %w[sig6-arg1 sig6-arg2]]
+      assert_equal expected, handle.query(ManualDefinitionWorkflow.dynamic_signal_values)
 
       # Query and update
       assert_equal %w[q1 q2], handle.query('my_query', 'q1', 'q2')

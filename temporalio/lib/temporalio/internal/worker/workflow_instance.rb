@@ -76,7 +76,7 @@ module Temporalio
           @pending_child_workflows = {} # Keyed by sequence, value is ChildWorkflowHandle to resolve with proto result
           @pending_external_signals = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_external_cancels = {} # Keyed by sequence, value is fiber to resume with proto result
-          @buffered_signals = {} # Keyed by signal name, value is signal job
+          @buffered_signals = {} # Keyed by signal name, value is array of signal jobs
           # TODO(cretz): Should these be sets instead? Both should be fairly low counts.
           @in_progress_handlers = [] # Value is HandlerExecution
           @patches_notified = []
@@ -92,9 +92,15 @@ module Temporalio
             details.definition.signals,
             Workflow::Definition::Signal
           ) do |defn|
-            # New definition, drain buffer
-            # TODO(cretz): Dynamic
-            @buffered_signals.delete(defn.name)&.each { |job| apply_signal(job) }
+            # New definition, drain buffer. If it's dynamic (i.e. no name) drain them all.
+            to_drain = if defn.name.nil?
+                         all_signals = @buffered_signals.values.flatten
+                         @buffered_signals.clear
+                         all_signals
+                       else
+                         @buffered_signals.delete(defn.name)
+                       end
+            to_drain&.each { |job| apply_signal(job) }
           end
           @query_handlers = HandlerHash.new(details.definition.queries, Workflow::Definition::Query)
           @update_handlers = HandlerHash.new(details.definition.updates, Workflow::Definition::Update)
