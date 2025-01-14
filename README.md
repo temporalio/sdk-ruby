@@ -1,6 +1,6 @@
 <div style="overflow: hidden"><img src="https://raw.githubusercontent.com/temporalio/assets/main/files/w/ruby.png" alt="Temporal Ruby SDK" /></div>
 
-![Ruby 3.1 | 3.2 | 3.3](https://img.shields.io/badge/ruby-3.1%20%7C%203.2%20%7C%203.3-blue.svg?style=for-the-badge)
+![Ruby 3.2 | 3.3 | 3.4](https://img.shields.io/badge/ruby-3.2%20|%203.3%20|%203.4-blue.svg?style=for-the-badge)
 [![MIT](https://img.shields.io/github/license/temporalio/sdk-ruby.svg?style=for-the-badge)](LICENSE)
 [![Gem](https://img.shields.io/gem/v/temporalio?style=for-the-badge)](https://rubygems.org/gems/temporalio)
 
@@ -76,7 +76,7 @@ until the SDK is marked stable.
 
 ### Installation
 
-The Ruby SDK works with Ruby 3.1, 3.2, and 3.3. 3.4 support will be added soon, and 3.1 support will be dropped soon.
+The Ruby SDK works with Ruby 3.2, 3.3, and 3.4.
 
 Can require in a Gemfile like:
 

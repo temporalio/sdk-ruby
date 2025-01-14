@@ -64,6 +64,10 @@ Metrics/ModuleLength:
 Metrics/PerceivedComplexity:
   Max: 40
 
+# We want the `*args` syntax instead of `*` so we can document clearly in YARD
+Style/ArgumentsForwarding:
+  UseAnonymousForwarding: false
+
 # We want classes to be documented
 Style/Documentation:
   Enabled: true

@@ -3,9 +3,9 @@
 # Use Ruby-version-specific Rust library if present. When the gem is compiled
 # via the cross-gem action, it is placed in a version specific directory. E.g.
 # for the Linux gem as of this writing, there will be files at:
-#   * temporalio/internal/bridge/3.1/temporalio_bridge.so
 #   * temporalio/internal/bridge/3.2/temporalio_bridge.so
 #   * temporalio/internal/bridge/3.3/temporalio_bridge.so
+#   * temporalio/internal/bridge/3.4/temporalio_bridge.so
 # We fallback to just temporalio/internal/bridge/temporalio_bridge.so because
 # rake compile puts it there during manual build/development.
 begin

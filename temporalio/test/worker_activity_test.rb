@@ -94,8 +94,8 @@ class WorkerActivityTest < Test
       execute_activity(LoggingActivity, retry_max_attempts: 2, logger: Logger.new($stdout))
     end
     lines = out.split("\n")
-    assert(lines.one? { |l| l.include?('Test log') && l.include?(':attempt=>1') })
-    assert(lines.one? { |l| l.include?('Test log') && l.include?(':attempt=>2') })
+    assert(lines.one? { |l| l.include?('Test log') && (l.include?(':attempt=>1') || l.include?('attempt: 1')) })
+    assert(lines.one? { |l| l.include?('Test log') && (l.include?(':attempt=>1') || l.include?('attempt: 2')) })
   end
 
   class CustomNameActivity < Temporalio::Activity::Definition
@@ -229,7 +229,8 @@ class WorkerActivityTest < Test
   end
 
   def test_multi_param
-    assert_equal 'Args: {"foo"=>"bar"}, 123, baz', execute_activity(MultiParamActivity, { foo: 'bar' }, 123, 'baz')
+    assert_equal "Args: #{{ 'foo' => 'bar' }}, 123, baz", # rubocop:disable Lint/LiteralInInterpolation
+                 execute_activity(MultiParamActivity, { foo: 'bar' }, 123, 'baz')
   end
 
   class InfoActivity < Temporalio::Activity::Definition

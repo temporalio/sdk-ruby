@@ -606,15 +606,16 @@ class WorkerWorkflowHandlerTest < Test
     # Confirm logs for workflow and updates
     lines = out.split("\n")
     assert(lines.any? do |l|
-      l.include?('In workflow') && l.include?(':workflow_type=>"UpdateInfoWorkflow"') && !l.include?('update_id')
+      l.include?('In workflow') && l.include?('workflow_type') &&
+        l.include?('"UpdateInfoWorkflow"') && !l.include?('update_id')
     end)
     assert(lines.any? do |l|
-      l.include?('In update') && l.include?(':workflow_type=>"UpdateInfoWorkflow"') &&
-        l.include?(':update_id=>"update-1"')
+      l.include?('In update') && l.include?('workflow_type') &&
+        l.include?('"UpdateInfoWorkflow"') && l.include?('update_id') && l.include?('"update-1"')
     end)
     assert(lines.any? do |l|
-      l.include?('In update') && l.include?(':workflow_type=>"UpdateInfoWorkflow"') &&
-        l.include?(':update_id=>"update-2"')
+      l.include?('In update') && l.include?('workflow_type') &&
+      l.include?('"UpdateInfoWorkflow"') && l.include?('update_id') && l.include?('"update-2"')
     end)
   end
 end

@@ -800,12 +800,13 @@ class WorkerWorkflowTest < Test
     # Confirm there is only one good line and it has contextual info
     good_lines = lines.select { |l| l.include?('some-log-1') }
     assert_equal 1, good_lines.size
-    assert_includes good_lines.first, ':workflow_type=>"LoggerWorkflow"'
+    assert_includes good_lines.first, 'workflow_type'
+    assert_includes good_lines.first, '"LoggerWorkflow"'
 
     # Confirm there are two bad lines, and they don't have contextual info
     bad_lines = lines.select { |l| l.include?('some-log-2') }
     assert bad_lines.size >= 2
-    refute_includes bad_lines.first, ':workflow_type=>"LoggerWorkflow"'
+    refute_includes bad_lines.first, '"LoggerWorkflow"'
 
     # Confirm task failure logs
     out, = safe_capture_io do
@@ -814,9 +815,9 @@ class WorkerWorkflowTest < Test
         assert_eventually_task_fail(handle:)
       end
     end
-    lines = out.split("\n").select { |l| l.include?(':workflow_type=>"LoggerWorkflow"') }
-    assert(lines.any? { |l| l.include?('Failed activation') && l.include?(':workflow_type=>"LoggerWorkflow"') })
-    assert(lines.any? { |l| l.include?('Some failure') && l.include?(':workflow_type=>"LoggerWorkflow"') })
+    lines = out.split("\n").select { |l| l.include?('workflow_type') && l.include?('"LoggerWorkflow"') }
+    assert(lines.any? { |l| l.include?('Failed activation') })
+    assert(lines.any? { |l| l.include?('Some failure') })
   end
 
   class CancelWorkflow < Temporalio::Workflow::Definition
