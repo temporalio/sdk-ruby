@@ -3,7 +3,7 @@
 require 'temporalio/error'
 
 module Temporalio
-  class Activity
+  module Activity
     # Context accessible only within an activity. Use {current} to get the current context. Contexts are fiber or thread
     # local so may not be available in a newly started thread from an activity and may have to be propagated manually.
     class Context

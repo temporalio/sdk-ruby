@@ -17,7 +17,7 @@ module Temporalio
       # @return [String] Workflow type name of the already-started workflow.
       attr_reader :workflow_type
 
-      # @return [String] Run ID of the already-started workflow if this was raised by the client.
+      # @return [String, nil] Run ID of the already-started workflow if this was raised by the client.
       attr_reader :run_id
 
       # @!visibility private

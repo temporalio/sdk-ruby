@@ -1,7 +1,7 @@
 module Temporalio
   module Internal
     module ProtoUtils
-      def self.seconds_to_duration: (Float? seconds_float) -> untyped?
+      def self.seconds_to_duration: (duration? seconds_numeric) -> untyped?
 
       def self.duration_to_seconds: (untyped? duration) -> Float?
 
@@ -10,9 +10,14 @@ module Temporalio
       def self.timestamp_to_time: (untyped? timestamp) -> Time?
 
       def self.memo_to_proto: (
-        Hash[String, Object?]? hash,
+        Hash[String | Symbol, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> untyped?
+
+      def self.memo_to_proto_hash: (
+        Hash[String | Symbol, Object?]? hash,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, untyped]?
 
       def self.memo_from_proto: (
         untyped? memo,
@@ -23,6 +28,11 @@ module Temporalio
         Hash[String, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> untyped?
+
+      def self.headers_to_proto_hash: (
+        Hash[String, Object?]? hash,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> Hash[String, untyped]?
 
       def self.headers_from_proto: (
         untyped? headers,

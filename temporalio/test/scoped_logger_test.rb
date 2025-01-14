@@ -6,7 +6,7 @@ require 'test'
 class ScopedLoggerTest < Test
   def test_logger_with_values
     # Default doesn't change anything
-    out, = capture_io do
+    out, = safe_capture_io do
       logger = Temporalio::ScopedLogger.new(Logger.new($stdout, level: Logger::INFO))
       logger.info('info1')
       logger.error('error1')
@@ -23,7 +23,7 @@ class ScopedLoggerTest < Test
 
     # With a getter that returns some values
     extra_vals = { some_key: { foo: 'bar', 'baz' => 123 } }
-    out, = capture_io do
+    out, = safe_capture_io do
       logger = Temporalio::ScopedLogger.new(Logger.new($stdout, level: Logger::INFO))
       logger.scoped_values_getter = proc { extra_vals }
       logger.add(Logger::WARN, 'warn1')

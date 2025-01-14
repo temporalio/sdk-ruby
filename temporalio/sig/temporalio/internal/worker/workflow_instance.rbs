@@ -1,0 +1,99 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        def self.new_completion_with_failure: (
+          run_id: String,
+          error: Exception,
+          failure_converter: Converters::FailureConverter,
+          payload_converter: Converters::PayloadConverter
+        ) -> untyped
+
+        attr_reader context: Context
+        attr_reader logger: ReplaySafeLogger
+        attr_reader info: Workflow::Info
+        attr_reader scheduler: Scheduler
+        attr_reader disable_eager_activity_execution: bool
+        attr_reader pending_activities: Hash[Integer, Fiber]
+        attr_reader pending_timers: Hash[Integer, Fiber]
+        attr_reader pending_child_workflow_starts: Hash[Integer, Fiber]
+        attr_reader pending_child_workflows: Hash[Integer, ChildWorkflowHandle]
+        attr_reader pending_external_signals: Hash[Integer, Fiber]
+        attr_reader pending_external_cancels: Hash[Integer, Fiber]
+        attr_reader in_progress_handlers: Array[HandlerExecution]
+        attr_reader payload_converter: Converters::PayloadConverter
+        attr_reader failure_converter: Converters::FailureConverter
+        attr_reader cancellation: Cancellation
+        attr_reader continue_as_new_suggested: bool
+        attr_reader current_history_length: Integer
+        attr_reader current_history_size: Integer
+        attr_reader replaying: bool
+        attr_reader random: Random
+        attr_reader signal_handlers: Hash[String?, Workflow::Definition::Signal]
+        attr_reader query_handlers: Hash[String?, Workflow::Definition::Query]
+        attr_reader update_handlers: Hash[String?, Workflow::Definition::Update]
+        attr_reader context_frozen: bool
+
+        def initialize: (Details details) -> void
+
+        def activate: (untyped activation) -> untyped
+
+        def add_command: (untyped command) -> void
+
+        def instance: -> Object
+
+        def search_attributes: -> SearchAttributes
+
+        def memo: -> ExternallyImmutableHash[String, Object?]
+
+        def now: -> Time
+
+        def illegal_call_tracing_disabled: [T] { -> T } -> T
+
+        def patch: (patch_id: Symbol | String, deprecated: bool) -> bool
+
+        def metric_meter: -> Temporalio::Metric::Meter
+
+        def run_in_scheduler: [T] { -> T } -> T
+
+        def activate_internal: (untyped activation) -> untyped
+
+        def create_instance: -> Object
+
+        def apply: (untyped job) -> void
+
+        def apply_signal: (untyped job) -> void
+
+        def apply_query: (untyped job) -> void
+
+        def apply_update: (untyped job) -> void
+
+        def run_workflow: -> void
+
+        def schedule: (?top_level: bool, ?handler_exec: HandlerExecution?) { -> untyped } -> Fiber
+
+        def on_top_level_exception: (Exception err) -> void
+
+        def failure_exception?: (Exception err) -> bool
+
+        def with_context_frozen: [T] { -> T } -> T
+
+        def convert_handler_args: (
+          payload_array: Array[untyped],
+          defn: Workflow::Definition::Signal | Workflow::Definition::Query | Workflow::Definition::Update
+        ) -> Array[Object?]
+
+        def convert_args: (
+          payload_array: Array[untyped],
+          method_name: Symbol?,
+          raw_args: bool,
+          ?ignore_first_param: bool
+        ) -> Array[Object?]
+
+        def scoped_logger_info: -> Hash[Symbol, Object?]
+
+        def warn_on_any_unfinished_handlers: -> void
+      end
+    end
+  end
+end

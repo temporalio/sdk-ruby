@@ -6,6 +6,8 @@ require 'temporalio/internal/bridge/worker'
 module Temporalio
   module Internal
     module Worker
+      # Primary worker (re)actor-style event handler. This handles multiple workers, receiving events from the bridge,
+      # and handling a user block.
       class MultiRunner
         def initialize(workers:, shutdown_signals:)
           @workers = workers
@@ -47,6 +49,16 @@ module Temporalio
                              end
         end
 
+        def apply_workflow_activation_decoded(workflow_worker:, activation:)
+          @queue.push(Event::WorkflowActivationDecoded.new(workflow_worker:, activation:))
+        end
+
+        def apply_workflow_activation_complete(workflow_worker:, activation_completion:, encoded:)
+          @queue.push(Event::WorkflowActivationComplete.new(
+                        workflow_worker:, activation_completion:, encoded:, completion_complete_queue: @queue
+                      ))
+        end
+
         def raise_in_thread_or_fiber_block(error)
           @thread_or_fiber&.raise(error)
         end
@@ -80,22 +92,25 @@ module Temporalio
           # * [worker index, :activity/:workflow, error] - poll fail
           # * [worker index, :activity/:workflow, nil] - worker shutdown
           # * [nil, nil, nil] - all pollers done
+          # * [-1, run_id_string, error_or_nil] - workflow activation completion complete
           result = @queue.pop
           if result.is_a?(Event)
             result
           else
-            worker_index, worker_type, poll_result = result
-            if worker_index.nil? || worker_type.nil?
+            first, second, third = result
+            if first.nil? || second.nil?
               Event::AllPollersShutDown.instance
+            elsif first == -1
+              Event::WorkflowActivationCompletionComplete.new(run_id: second, error: third)
             else
-              worker = @workers[worker_index]
-              case poll_result
+              worker = @workers[first]
+              case third
               when nil
-                Event::PollerShutDown.new(worker:, worker_type:)
+                Event::PollerShutDown.new(worker:, worker_type: second)
               when Exception
-                Event::PollFailure.new(worker:, worker_type:, error: poll_result)
+                Event::PollFailure.new(worker:, worker_type: second, error: third)
               else
-                Event::PollSuccess.new(worker:, worker_type:, bytes: poll_result)
+                Event::PollSuccess.new(worker:, worker_type: second, bytes: third)
               end
             end
           end
@@ -118,6 +133,35 @@ module Temporalio
             def initialize(worker:, worker_type:, error:) # rubocop:disable Lint/MissingSuper
               @worker = worker
               @worker_type = worker_type
+              @error = error
+            end
+          end
+
+          class WorkflowActivationDecoded < Event
+            attr_reader :workflow_worker, :activation
+
+            def initialize(workflow_worker:, activation:) # rubocop:disable Lint/MissingSuper
+              @workflow_worker = workflow_worker
+              @activation = activation
+            end
+          end
+
+          class WorkflowActivationComplete < Event
+            attr_reader :workflow_worker, :activation_completion, :encoded, :completion_complete_queue
+
+            def initialize(workflow_worker:, activation_completion:, encoded:, completion_complete_queue:) # rubocop:disable Lint/MissingSuper
+              @workflow_worker = workflow_worker
+              @activation_completion = activation_completion
+              @encoded = encoded
+              @completion_complete_queue = completion_complete_queue
+            end
+          end
+
+          class WorkflowActivationCompletionComplete < Event
+            attr_reader :run_id, :error
+
+            def initialize(run_id:, error:) # rubocop:disable Lint/MissingSuper
+              @run_id = run_id
               @error = error
             end
           end

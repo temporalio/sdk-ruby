@@ -1,0 +1,24 @@
+module Temporalio
+  module Workflow
+    class Future[unchecked out T]
+      def self.any_of: [T] (*Future[T] futures) -> Future[T]
+      def self.all_of: (*Future[untyped] futures) -> Future[nil]
+      def self.try_any_of: [T] (*Future[T] futures) -> Future[Future[T]]
+      def self.try_all_of: (*Future[untyped] futures) -> Future[nil]
+
+      attr_reader result: T?
+      attr_reader failure: Exception?
+
+      def initialize: ?{ -> T } -> void
+
+      def done?: -> bool
+      def result?: -> bool
+      def result=: (T result) -> void
+      def failure?: -> bool
+      def failure=: (Exception failure) -> void
+
+      def wait: -> T
+      def wait_no_raise: -> T?
+    end
+  end
+end

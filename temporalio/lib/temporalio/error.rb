@@ -35,8 +35,8 @@ module Temporalio
     # Error that is returned from  when a workflow is unsuccessful.
     class WorkflowFailedError < Error
       # @!visibility private
-      def initialize
-        super('Workflow failed')
+      def initialize(message = 'Workflow execution failed')
+        super
       end
     end
 

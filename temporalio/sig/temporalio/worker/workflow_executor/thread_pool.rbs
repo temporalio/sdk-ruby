@@ -1,0 +1,56 @@
+module Temporalio
+  class Worker
+    class WorkflowExecutor
+      class ThreadPool < WorkflowExecutor
+        def self.default: -> ThreadPool
+
+        def initialize: (
+          ?max_threads: Integer,
+          ?thread_pool: Temporalio::Worker::ThreadPool
+        ) -> void
+
+        def _thread_pool: -> Temporalio::Worker::ThreadPool
+
+        def _remove_workflow: (
+          Internal::Worker::WorkflowWorker::State worker_state,
+          String run_id
+        ) -> void
+
+        class Worker
+          LOG_ACTIVATIONS: bool
+
+          attr_accessor workflow_count: Integer
+
+          def initialize: (ThreadPool executor) -> void
+
+          def enqueue_activation: (
+            untyped activation,
+            Internal::Worker::WorkflowWorker::State worker_state
+          ) { (untyped completion) -> void } -> void
+
+          def shutdown: -> void
+
+          def run: -> void
+
+          def activate: (
+            untyped activation,
+            Internal::Worker::WorkflowWorker::State worker_state
+          ) { (untyped completion) -> void } -> void
+
+          def create_instance: (
+            untyped initial_activation,
+            Internal::Worker::WorkflowWorker::State worker_state
+          ) -> Internal::Worker::WorkflowInstance
+
+          def evict: (
+            Internal::Worker::WorkflowWorker::State worker_state,
+            String run_id
+          ) -> void
+        end
+
+        class DeadlockError < Exception
+        end
+      end
+    end
+  end
+end

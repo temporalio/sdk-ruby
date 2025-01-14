@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/converters/payload_converter'
+require 'temporalio/converters/raw_value'
 
 module Temporalio
   module Converters
@@ -34,6 +35,9 @@ module Temporalio
         # @return [Api::Common::V1::Payload] Converted payload.
         # @raise [ConverterNotFound] If no converters can process the value.
         def to_payload(value)
+          # As a special case, raw values just return the payload within
+          return value.payload if value.is_a?(RawValue)
+
           converters.each_value do |converter|
             payload = converter.to_payload(value)
             return payload unless payload.nil?

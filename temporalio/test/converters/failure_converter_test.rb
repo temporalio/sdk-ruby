@@ -67,8 +67,7 @@ module Converters
       assert_equal 'RuntimeError', failure.cause.cause.cause.application_failure_info.type
 
       # Confirm deserialized as expected
-      # @type var new_err: untyped
-      new_err = Temporalio::Converters::DataConverter.default.from_failure(failure)
+      new_err = Temporalio::Converters::DataConverter.default.from_failure(failure) #: untyped
       assert_instance_of Temporalio::Error::ChildWorkflowError, new_err
       assert_equal orig_err.backtrace, new_err.backtrace
       assert_equal 'Child error', new_err.message

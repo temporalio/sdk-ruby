@@ -4,39 +4,39 @@ module Temporalio
       def intercept_client: (Outbound next_interceptor) -> Outbound
 
       class StartWorkflowInput
-        attr_accessor workflow: String
+        attr_accessor workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
         attr_accessor args: Array[Object?]
         attr_accessor workflow_id: String
         attr_accessor task_queue: String
-        attr_accessor execution_timeout: Float?
-        attr_accessor run_timeout: Float?
-        attr_accessor task_timeout: Float?
+        attr_accessor execution_timeout: duration?
+        attr_accessor run_timeout: duration?
+        attr_accessor task_timeout: duration?
         attr_accessor id_reuse_policy: WorkflowIDReusePolicy::enum
         attr_accessor id_conflict_policy: WorkflowIDConflictPolicy::enum
         attr_accessor retry_policy: RetryPolicy?
         attr_accessor cron_schedule: String?
-        attr_accessor memo: Hash[String, Object?]?
+        attr_accessor memo: Hash[String | Symbol, Object?]?
         attr_accessor search_attributes: SearchAttributes?
-        attr_accessor start_delay: Float?
+        attr_accessor start_delay: duration?
         attr_accessor request_eager_start: bool
         attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
 
         def initialize: (
-          workflow: String,
+          workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String,
           args: Array[Object?],
           workflow_id: String,
           task_queue: String,
-          execution_timeout: Float?,
-          run_timeout: Float?,
-          task_timeout: Float?,
+          execution_timeout: duration?,
+          run_timeout: duration?,
+          task_timeout: duration?,
           id_reuse_policy: WorkflowIDReusePolicy::enum,
           id_conflict_policy: WorkflowIDConflictPolicy::enum,
           retry_policy: RetryPolicy?,
           cron_schedule: String?,
-          memo: Hash[String, Object?]?,
+          memo: Hash[String | Symbol, Object?]?,
           search_attributes: SearchAttributes?,
-          start_delay: Float?,
+          start_delay: duration?,
           request_eager_start: bool,
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
@@ -96,7 +96,7 @@ module Temporalio
       class SignalWorkflowInput
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
-        attr_accessor signal: String
+        attr_accessor signal: Workflow::Definition::Signal | Symbol | String
         attr_accessor args: Array[Object?]
         attr_accessor headers: Hash[String, Object?]
         attr_accessor rpc_options: RPCOptions?
@@ -104,7 +104,7 @@ module Temporalio
         def initialize: (
           workflow_id: String,
           run_id: String?,
-          signal: String,
+          signal: Workflow::Definition::Signal | Symbol | String,
           args: Array[Object?],
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
@@ -114,7 +114,7 @@ module Temporalio
       class QueryWorkflowInput
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
-        attr_accessor query: String
+        attr_accessor query: Workflow::Definition::Query | Symbol | String
         attr_accessor args: Array[Object?]
         attr_accessor reject_condition: WorkflowQueryRejectCondition::enum?
         attr_accessor headers: Hash[String, Object?]
@@ -123,7 +123,7 @@ module Temporalio
         def initialize: (
           workflow_id: String,
           run_id: String?,
-          query: String,
+          query: Workflow::Definition::Query | Symbol | String,
           args: Array[Object?],
           reject_condition: WorkflowQueryRejectCondition::enum?,
           headers: Hash[String, Object?],
@@ -135,7 +135,7 @@ module Temporalio
         attr_accessor workflow_id: String
         attr_accessor run_id: String?
         attr_accessor update_id: String
-        attr_accessor update: String
+        attr_accessor update: Workflow::Definition::Update | Symbol | String
         attr_accessor args: Array[Object?]
         attr_accessor wait_for_stage: WorkflowUpdateWaitStage::enum
         attr_accessor headers: Hash[String, Object?]
@@ -145,7 +145,7 @@ module Temporalio
           workflow_id: String,
           run_id: String?,
           update_id: String,
-          update: String,
+          update: Workflow::Definition::Update | Symbol | String,
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
           headers: Hash[String, Object?],
@@ -204,7 +204,7 @@ module Temporalio
         attr_accessor schedule: Schedule
         attr_accessor trigger_immediately: bool
         attr_accessor backfills: Array[Schedule::Backfill]
-        attr_accessor memo: Hash[String, Object?]?
+        attr_accessor memo: Hash[String | Symbol, Object?]?
         attr_accessor search_attributes: SearchAttributes?
         attr_accessor rpc_options: RPCOptions?
 
@@ -213,7 +213,7 @@ module Temporalio
           schedule: Schedule,
           trigger_immediately: bool,
           backfills: Array[Schedule::Backfill],
-          memo: Hash[String, Object?]?,
+          memo: Hash[String | Symbol, Object?]?,
           search_attributes: SearchAttributes?,
           rpc_options: RPCOptions?
         ) -> void

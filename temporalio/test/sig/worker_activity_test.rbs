@@ -12,7 +12,7 @@ class WorkerActivityTest < Test
     ?cancellation: Temporalio::Cancellation,
     ?raise_in_block_on_shutdown: bool,
     ?activity_executors: Hash[Symbol, Temporalio::Worker::ActivityExecutor],
-    ?interceptors: Array[Temporalio::Worker::Interceptor],
+    ?interceptors: Array[Temporalio::Worker::Interceptor::Activity],
     ?client: Temporalio::Client
   ) ?{ (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T | (
     untyped activity,
@@ -27,7 +27,7 @@ class WorkerActivityTest < Test
     ?cancellation: Temporalio::Cancellation,
     ?raise_in_block_on_shutdown: bool,
     ?activity_executors: Hash[Symbol, Temporalio::Worker::ActivityExecutor],
-    ?interceptors: Array[Temporalio::Worker::Interceptor],
+    ?interceptors: Array[Temporalio::Worker::Interceptor::Activity],
     ?client: Temporalio::Client
   ) -> Object?
 

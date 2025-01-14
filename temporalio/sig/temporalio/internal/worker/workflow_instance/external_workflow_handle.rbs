@@ -1,0 +1,15 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class ExternalWorkflowHandle < Workflow::ExternalWorkflowHandle
+          def initialize: (
+            id: String,
+            run_id: String?,
+            instance: Object
+          ) -> void
+        end
+      end
+    end
+  end
+end

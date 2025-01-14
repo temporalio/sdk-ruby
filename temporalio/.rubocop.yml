@@ -28,7 +28,8 @@ Layout/LeadingCommentSpace:
 # Don't need super for activities
 Lint/MissingSuper:
   AllowedParentClasses:
-    - Temporalio::Activity
+    - Temporalio::Activity::Definition
+    - Temporalio::Workflow::Definition
 
 # Allow tests to nest methods
 Lint/NestedMethodDefinition:
@@ -61,7 +62,7 @@ Metrics/ModuleLength:
 
 # The default is too small
 Metrics/PerceivedComplexity:
-  Max: 25
+  Max: 40
 
 # We want classes to be documented
 Style/Documentation:
@@ -79,6 +80,10 @@ Style/DocumentationMethod:
 Style/GlobalVars:
   Exclude:
     - test/**/*
+
+# We're ok with two compound comparisons before doing Array.include?
+Style/MultipleComparison:
+  ComparisonsThreshold: 3
 
 # We want our require lists to be in order
 Style/RequireOrder:

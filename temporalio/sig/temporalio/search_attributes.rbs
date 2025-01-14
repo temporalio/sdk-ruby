@@ -17,21 +17,28 @@ module Temporalio
       attr_reader value: Object?
 
       def initialize: (Key key, Object? value) -> void
+
+      def _to_proto_pair: -> [String, untyped]
     end
 
-    def self._from_proto: (untyped proto) -> SearchAttributes?
+    def self._from_proto: (
+      untyped proto,
+      ?disable_mutations: bool,
+      ?never_nil: bool
+    ) -> SearchAttributes?
 
-    def self.value_from_payload: (untyped payload) -> Object?
+    def self._value_from_payload: (untyped payload) -> Object?
+
+    def self._to_proto_pair: (Key key, Object? value) -> [String, untyped]
 
     def initialize: (SearchAttributes existing) -> void
                   | (Hash[Key, Object] existing) -> void
                   | -> void
 
-    def []=: (Key key, Object? value) -> void
+    def []=: (Key | String | Symbol key, Object? value) -> void
     def []: (Key key) -> Object?
 
-    def delete: (Key key) -> void
-              | (String key) -> void
+    def delete: (Key | String | Symbol key) -> void
 
     def each: { (Key key, Object value) -> void } -> self
 
@@ -50,6 +57,12 @@ module Temporalio
     def update!: (*Update updates) -> void
 
     def _to_proto: -> untyped
+
+    def _to_proto_hash: -> Hash[String, untyped]
+
+    def _assert_mutations_enabled: -> void
+
+    def _disable_mutations=: (bool value) -> void
 
     module IndexedValueType
       TEXT: Integer

@@ -1,0 +1,16 @@
+module Temporalio
+  module Workflow
+    class ExternalWorkflowHandle
+      def id: -> String
+      def run_id: -> String?
+
+      def signal: (
+        Workflow::Definition::Signal | Symbol | String signal,
+        *Object? args,
+        ?cancellation: Cancellation
+      ) -> void
+
+      def cancel: -> void
+    end
+  end
+end

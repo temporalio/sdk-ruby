@@ -1,42 +1,306 @@
 module Temporalio
   class Worker
     module Interceptor
-      def intercept_activity: (ActivityInbound next_interceptor) -> ActivityInbound
+      module Activity
+        def intercept_activity: (Inbound next_interceptor) -> Inbound
 
-      class ExecuteActivityInput
-        attr_accessor proc: Proc
-        attr_accessor args: Array[Object?]
-        attr_accessor headers: Hash[String, Object?]
+        class ExecuteInput
+          attr_accessor proc: Proc
+          attr_accessor args: Array[Object?]
+          attr_accessor headers: Hash[String, Object?]
 
-        def initialize: (
-          proc: Proc,
-          args: Array[Object?],
-          headers: Hash[String, Object?]
-        ) -> void
+          def initialize: (
+            proc: Proc,
+            args: Array[Object?],
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class Inbound
+          attr_reader next_interceptor: Inbound
+
+          def initialize: (Inbound next_interceptor) -> void
+
+          def init: (Outbound outbound) -> Outbound
+
+          def execute: (ExecuteInput input) -> Object?
+        end
+
+        class HeartbeatInput
+          attr_accessor details: Array[Object?]
+
+          def initialize: (details: Array[Object?]) -> void
+        end
+
+        class Outbound
+          attr_reader next_interceptor: Outbound
+
+          def initialize: (Outbound next_interceptor) -> void
+
+          def heartbeat: (HeartbeatInput input) -> void
+        end
       end
 
-      class HeartbeatActivityInput
-        attr_accessor details: Array[Object?]
+      module Workflow
+        def intercept_workflow: (Inbound next_interceptor) -> Inbound
 
-        def initialize: (details: Array[Object?]) -> void
-      end
+        class ExecuteInput
+          attr_accessor args: Array[Object?]
+          attr_accessor headers: Hash[String, Object?]
 
-      class ActivityInbound
-        attr_reader next_interceptor: ActivityInbound
+          def initialize: (
+            args: Array[Object?],
+            headers: Hash[String, Object?]
+          ) -> void
+        end
 
-        def initialize: (ActivityInbound next_interceptor) -> void
+        class HandleSignalInput
+          attr_accessor signal: String
+          attr_accessor args: Array[Object?]
+          attr_accessor definition: Temporalio::Workflow::Definition::Signal
+          attr_accessor headers: Hash[String, Object?]
 
-        def init: (ActivityOutbound outbound) -> ActivityOutbound
+          def initialize: (
+            signal: String,
+            args: Array[Object?],
+            definition: Temporalio::Workflow::Definition::Signal,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
 
-        def execute: (ExecuteActivityInput input) -> Object?
-      end
+        class HandleQueryInput
+          attr_accessor id: String
+          attr_accessor query: String
+          attr_accessor args: Array[Object?]
+          attr_accessor definition: Temporalio::Workflow::Definition::Query
+          attr_accessor headers: Hash[String, Object?]
 
-      class ActivityOutbound
-        attr_reader next_interceptor: ActivityOutbound
+          def initialize: (
+            id: String,
+            query: String,
+            args: Array[Object?],
+            definition: Temporalio::Workflow::Definition::Query,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
 
-        def initialize: (ActivityOutbound next_interceptor) -> void
+        class HandleUpdateInput
+          attr_accessor id: String
+          attr_accessor update: String
+          attr_accessor args: Array[Object?]
+          attr_accessor definition: Temporalio::Workflow::Definition::Update
+          attr_accessor headers: Hash[String, Object?]
 
-        def heartbeat: (HeartbeatActivityInput input) -> void
+          def initialize: (
+            id: String,
+            update: String,
+            args: Array[Object?],
+            definition: Temporalio::Workflow::Definition::Update,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class Inbound
+          attr_reader next_interceptor: Inbound
+
+          def initialize: (Inbound next_interceptor) -> void
+
+          def init: (Outbound outbound) -> Outbound
+
+          def execute: (ExecuteInput input) -> Object?
+
+          def handle_signal: (HandleSignalInput input) -> void
+
+          def handle_query: (HandleQueryInput input) -> Object?
+
+          def validate_update: (HandleUpdateInput input) -> void
+
+          def handle_update: (HandleUpdateInput input) -> Object?
+        end
+
+        class CancelExternalWorkflowInput
+          attr_accessor id: String
+          attr_accessor run_id: String?
+
+          def initialize: (
+            id: String,
+            run_id: String?
+          ) -> void
+        end
+
+        class ExecuteActivityInput
+          attr_accessor activity: singleton(Temporalio::Activity::Definition) | Symbol | String
+          attr_accessor args: Array[Object?]
+          attr_accessor task_queue: String
+          attr_accessor schedule_to_close_timeout: duration?
+          attr_accessor schedule_to_start_timeout: duration?
+          attr_accessor start_to_close_timeout: duration?
+          attr_accessor heartbeat_timeout: duration?
+          attr_accessor retry_policy: RetryPolicy?
+          attr_accessor cancellation: Cancellation
+          attr_accessor cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
+          attr_accessor activity_id: String?
+          attr_accessor disable_eager_execution: bool
+          attr_accessor headers: Hash[String, Object?]
+
+          def initialize: (
+            activity: singleton(Temporalio::Activity::Definition) | Symbol | String,
+            args: Array[Object?],
+            task_queue: String,
+            schedule_to_close_timeout: duration?,
+            schedule_to_start_timeout: duration?,
+            start_to_close_timeout: duration?,
+            heartbeat_timeout: duration?,
+            retry_policy: RetryPolicy?,
+            cancellation: Cancellation,
+            cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum,
+            activity_id: String?,
+            disable_eager_execution: bool,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class ExecuteLocalActivityInput
+          attr_accessor activity: singleton(Temporalio::Activity::Definition) | Symbol | String
+          attr_accessor args: Array[Object?]
+          attr_accessor schedule_to_close_timeout: duration?
+          attr_accessor schedule_to_start_timeout: duration?
+          attr_accessor start_to_close_timeout: duration?
+          attr_accessor retry_policy: RetryPolicy?
+          attr_accessor local_retry_threshold: duration?
+          attr_accessor cancellation: Cancellation
+          attr_accessor cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
+          attr_accessor activity_id: String?
+          attr_accessor headers: Hash[String, Object?]
+
+          def initialize: (
+            activity: singleton(Temporalio::Activity::Definition) | Symbol | String,
+            args: Array[Object?],
+            schedule_to_close_timeout: duration?,
+            schedule_to_start_timeout: duration?,
+            start_to_close_timeout: duration?,
+            retry_policy: RetryPolicy?,
+            local_retry_threshold: duration?,
+            cancellation: Cancellation,
+            cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum,
+            activity_id: String?,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class InitializeContinueAsNewErrorInput
+          attr_accessor error: Temporalio::Workflow::ContinueAsNewError
+
+          def initialize: (
+            error: Temporalio::Workflow::ContinueAsNewError
+          ) -> void
+        end
+
+        class SignalChildWorkflowInput
+          attr_accessor id: String
+          attr_accessor signal: Temporalio::Workflow::Definition::Signal | Symbol | String
+          attr_accessor args: Array[Object?]
+          attr_accessor cancellation: Cancellation
+          attr_accessor headers: Hash[String, Object?]
+
+          def initialize: (
+            id: String,
+            signal: Temporalio::Workflow::Definition::Signal | Symbol | String,
+            args: Array[Object?],
+            cancellation: Cancellation,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class SignalExternalWorkflowInput
+          attr_accessor id: String
+          attr_accessor run_id: String?
+          attr_accessor signal: Temporalio::Workflow::Definition::Signal | Symbol | String
+          attr_accessor args: Array[Object?]
+          attr_accessor cancellation: Cancellation
+          attr_accessor headers: Hash[String, Object?]
+
+          def initialize: (
+            id: String,
+            run_id: String?,
+            signal: Temporalio::Workflow::Definition::Signal | Symbol | String,
+            args: Array[Object?],
+            cancellation: Cancellation,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class SleepInput
+          attr_accessor duration: duration?
+          attr_accessor summary: String?
+          attr_accessor cancellation: Cancellation
+
+          def initialize: (
+            duration: duration?,
+            summary: String?,
+            cancellation: Cancellation
+          ) -> void
+        end
+
+        class StartChildWorkflowInput
+          attr_accessor workflow: singleton(Temporalio::Workflow::Definition) | Temporalio::Workflow::Definition::Info | Symbol | String
+          attr_accessor args: Array[Object?]
+          attr_accessor id: String
+          attr_accessor task_queue: String
+          attr_accessor cancellation: Cancellation
+          attr_accessor cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum
+          attr_accessor parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum
+          attr_accessor execution_timeout: duration?
+          attr_accessor run_timeout: duration?
+          attr_accessor task_timeout: duration?
+          attr_accessor id_reuse_policy: WorkflowIDReusePolicy::enum
+          attr_accessor retry_policy: RetryPolicy?
+          attr_accessor cron_schedule: String?
+          attr_accessor memo: Hash[String | Symbol, Object?]?
+          attr_accessor search_attributes: SearchAttributes?
+          attr_accessor headers: Hash[String, Object?]
+
+          def initialize: (
+            workflow: singleton(Temporalio::Workflow::Definition) | Temporalio::Workflow::Definition::Info | Symbol | String,
+            args: Array[Object?],
+            id: String,
+            task_queue: String,
+            cancellation: Cancellation,
+            cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum,
+            parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum,
+            execution_timeout: duration?,
+            run_timeout: duration?,
+            task_timeout: duration?,
+            id_reuse_policy: WorkflowIDReusePolicy::enum,
+            retry_policy: RetryPolicy?,
+            cron_schedule: String?,
+            memo: Hash[String | Symbol, Object?]?,
+            search_attributes: SearchAttributes?,
+            headers: Hash[String, Object?]
+          ) -> void
+        end
+
+        class Outbound
+          attr_reader next_interceptor: Outbound
+
+          def initialize: (Outbound next_interceptor) -> void
+
+          def cancel_external_workflow: (CancelExternalWorkflowInput input) -> void
+
+          def execute_activity: (ExecuteActivityInput input) -> Object?
+
+          def execute_local_activity: (ExecuteLocalActivityInput input) -> Object?
+
+          def initialize_continue_as_new_error: (InitializeContinueAsNewErrorInput input) -> void
+
+          def signal_child_workflow: (SignalChildWorkflowInput input) -> void
+
+          def signal_external_workflow: (SignalExternalWorkflowInput input) -> void
+
+          def sleep: (SleepInput input) -> void
+
+          def start_child_workflow: (StartChildWorkflowInput input) -> Temporalio::Workflow::ChildWorkflowHandle
+        end
       end
     end
   end

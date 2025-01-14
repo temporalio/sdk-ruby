@@ -1,5 +1,5 @@
 module Temporalio
-  class Activity
+  module Activity
     class Info
       attr_reader activity_id: String
       attr_reader activity_type: String

@@ -1,0 +1,11 @@
+module Workflow
+  class DefinitionTest < Test
+    class ValidWorkflowAdvancedBase < Temporalio::Workflow::Definition
+    end
+
+    def assert_invalid_workflow_code: (
+      String message_contains,
+      String code_to_eval
+    ) -> void
+  end
+end

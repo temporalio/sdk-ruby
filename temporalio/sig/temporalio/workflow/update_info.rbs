@@ -1,0 +1,15 @@
+module Temporalio
+  module Workflow
+    class UpdateInfo
+      attr_reader id: String
+      attr_reader name: String
+
+      def initialize: (
+        id: String,
+        name: String
+      ) -> void
+
+      def to_h: -> Hash[Symbol, untyped]
+    end
+  end
+end

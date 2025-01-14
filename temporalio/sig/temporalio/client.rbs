@@ -16,6 +16,8 @@ module Temporalio
         logger: Logger,
         default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
       ) -> void
+
+      def to_h: -> Hash[Symbol, untyped]
     end
 
     def self.connect: (
@@ -54,39 +56,39 @@ module Temporalio
     def operator_service: -> Connection::OperatorService
 
     def start_workflow: (
-      String workflow,
+      singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
       *Object? args,
       id: String,
       task_queue: String,
-      ?execution_timeout: Float?,
-      ?run_timeout: Float?,
-      ?task_timeout: Float?,
+      ?execution_timeout: duration?,
+      ?run_timeout: duration?,
+      ?task_timeout: duration?,
       ?id_reuse_policy: WorkflowIDReusePolicy::enum,
       ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
-      ?memo: Hash[String, Object?]?,
+      ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
-      ?start_delay: Float?,
+      ?start_delay: duration?,
       ?request_eager_start: bool,
       ?rpc_options: RPCOptions?
     ) -> WorkflowHandle
 
     def execute_workflow: (
-      String workflow,
+      singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
       *Object? args,
       id: String,
       task_queue: String,
-      ?execution_timeout: Float?,
-      ?run_timeout: Float?,
-      ?task_timeout: Float?,
+      ?execution_timeout: duration?,
+      ?run_timeout: duration?,
+      ?task_timeout: duration?,
       ?id_reuse_policy: WorkflowIDReusePolicy::enum,
       ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
-      ?memo: Hash[String, Object?]?,
+      ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
-      ?start_delay: Float?,
+      ?start_delay: duration?,
       ?request_eager_start: bool,
       ?rpc_options: RPCOptions?
     ) -> Object?

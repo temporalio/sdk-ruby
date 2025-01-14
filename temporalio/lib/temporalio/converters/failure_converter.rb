@@ -85,7 +85,7 @@ module Temporalio
           )
         else
           failure.application_failure_info = Api::Failure::V1::ApplicationFailureInfo.new(
-            type: error.class.name.split('::').last
+            type: error.class.name
           )
         end
 

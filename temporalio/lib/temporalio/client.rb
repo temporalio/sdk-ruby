@@ -19,6 +19,7 @@ require 'temporalio/internal/client/implementation'
 require 'temporalio/retry_policy'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
+require 'temporalio/workflow/definition'
 
 module Temporalio
   # Client for accessing Temporal.
@@ -185,7 +186,7 @@ module Temporalio
 
     # Start a workflow and return its handle.
     #
-    # @param workflow [Workflow, String] Name of the workflow
+    # @param workflow [Class<Workflow::Definition>, String, Symbol] Workflow definition class or workflow name.
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
@@ -199,7 +200,7 @@ module Temporalio
     #   is set to terminate if running.
     # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
     # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
-    # @param memo [Hash<String, Object>, nil] Memo for the workflow.
+    # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
     # @param start_delay [Float, nil] Amount of time in seconds to wait before starting the workflow. This does not work
     #   with `cron_schedule`.
@@ -251,7 +252,7 @@ module Temporalio
 
     # Start a workflow and wait for its result. This is a shortcut for {start_workflow} + {WorkflowHandle.result}.
     #
-    # @param workflow [Workflow, String] Name of the workflow
+    # @param workflow [Class<Workflow::Definition>, Symbol, String] Workflow definition class or workflow name.
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
@@ -265,7 +266,7 @@ module Temporalio
     #   is set to terminate if running.
     # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
     # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
-    # @param memo [Hash<String, Object>, nil] Memo for the workflow.
+    # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
     # @param start_delay [Float, nil] Amount of time in seconds to wait before starting the workflow. This does not work
     #   with `cron_schedule`.

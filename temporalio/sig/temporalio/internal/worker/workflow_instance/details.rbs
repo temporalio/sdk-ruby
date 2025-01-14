@@ -1,0 +1,37 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class Details
+          attr_reader namespace: String
+          attr_reader task_queue: String
+          attr_reader definition: Workflow::Definition::Info
+          attr_reader initial_activation: untyped
+          attr_reader logger: Logger
+          attr_reader metric_meter: Temporalio::Metric::Meter
+          attr_reader payload_converter: Converters::PayloadConverter
+          attr_reader failure_converter: Converters::FailureConverter
+          attr_reader interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
+          attr_reader disable_eager_activity_execution: bool
+          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, bool]]
+          attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
+
+          def initialize: (
+            namespace: String,
+            task_queue: String,
+            definition: Workflow::Definition::Info,
+            initial_activation: untyped,
+            logger: Logger,
+            metric_meter: Temporalio::Metric::Meter,
+            payload_converter: Converters::PayloadConverter,
+            failure_converter: Converters::FailureConverter,
+            interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
+            disable_eager_activity_execution: bool,
+            illegal_calls: Hash[String, :all | Hash[Symbol, bool]],
+            workflow_failure_exception_types: Array[singleton(Exception)]
+          ) -> void
+        end
+      end
+    end
+  end
+end

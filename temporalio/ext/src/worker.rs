@@ -1,4 +1,9 @@
-use std::{cell::RefCell, sync::Arc, time::Duration};
+use std::{
+    cell::RefCell,
+    collections::{HashMap, HashSet},
+    sync::Arc,
+    time::Duration,
+};
 
 use crate::{
     client::Client,
@@ -7,8 +12,8 @@ use crate::{
     util::{AsyncCallback, Struct},
     ROOT_MOD,
 };
-use futures::StreamExt;
 use futures::{future, stream};
+use futures::{stream::BoxStream, StreamExt};
 use magnus::{
     class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
     RString, RTypedData, Ruby, TypedData, Value,
@@ -18,7 +23,8 @@ use temporal_sdk_core::{
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfigBuilder,
 };
-use temporal_sdk_core_api::errors::PollActivityError;
+use temporal_sdk_core_api::errors::{PollActivityError, PollWfError, WorkflowErrorType};
+use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -40,6 +46,10 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
         "record_activity_heartbeat",
         method!(Worker::record_activity_heartbeat, 1),
     )?;
+    class.define_method(
+        "async_complete_workflow_activation",
+        method!(Worker::async_complete_workflow_activation, 3),
+    )?;
     class.define_method("replace_client", method!(Worker::replace_client, 1))?;
     class.define_method("initiate_shutdown", method!(Worker::initiate_shutdown, 0))?;
     Ok(())
@@ -54,18 +64,28 @@ pub struct Worker {
     core: RefCell<Option<Arc<temporal_sdk_core::Worker>>>,
     runtime_handle: RuntimeHandle,
     activity: bool,
-    _workflow: bool,
+    workflow: bool,
 }
 
+#[derive(Copy, Clone)]
 enum WorkerType {
     Activity,
+    Workflow,
+}
+
+struct PollResult {
+    worker_index: usize,
+    worker_type: WorkerType,
+    result: Result<Option<Vec<u8>>, String>,
 }
 
 impl Worker {
     pub fn new(client: &Client, options: Struct) -> Result<Self, Error> {
         enter_sync!(client.runtime_handle);
+
         let activity = options.member::<bool>(id!("activity"))?;
-        let _workflow = options.member::<bool>(id!("workflow"))?;
+        let workflow = options.member::<bool>(id!("workflow"))?;
+
         // Build config
         let config = WorkerConfigBuilder::default()
             .namespace(options.member::<String>(id!("namespace"))?)
@@ -107,8 +127,20 @@ impl Worker {
                     .child(id!("tuner"))?
                     .ok_or_else(|| error!("Missing tuner"))?,
             )?))
-            // TODO(cretz): workflow_failure_errors
-            // TODO(cretz): workflow_types_to_failure_errors
+            .workflow_failure_errors(
+                if options.member::<bool>(id!("nondeterminism_as_workflow_fail"))? {
+                    HashSet::from([WorkflowErrorType::Nondeterminism])
+                } else {
+                    HashSet::new()
+                },
+            )
+            .workflow_types_to_failure_errors(
+                options
+                    .member::<Vec<String>>(id!("nondeterminism_as_workflow_fail_for_types"))?
+                    .into_iter()
+                    .map(|s| (s, HashSet::from([WorkflowErrorType::Nondeterminism])))
+                    .collect::<HashMap<String, HashSet<WorkflowErrorType>>>(),
+            )
             .build()
             .map_err(|err| error!("Invalid worker options: {}", err))?;
 
@@ -122,8 +154,53 @@ impl Worker {
             core: RefCell::new(Some(Arc::new(worker))),
             runtime_handle: client.runtime_handle.clone(),
             activity,
-            _workflow,
+            workflow,
         })
+    }
+
+    // Helper that turns a worker + type into a poll stream
+    fn stream_poll<'a>(
+        worker: Arc<temporal_sdk_core::Worker>,
+        worker_index: usize,
+        worker_type: WorkerType,
+    ) -> BoxStream<'a, PollResult> {
+        stream::unfold(Some(worker.clone()), move |worker| async move {
+            // We return no worker so the next streamed item closes
+            // the stream with a None
+            if let Some(worker) = worker {
+                let result = match worker_type {
+                    WorkerType::Activity => {
+                        match temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await {
+                            Ok(res) => Ok(Some(res.encode_to_vec())),
+                            Err(PollActivityError::ShutDown) => Ok(None),
+                            Err(err) => Err(format!("Poll error: {}", err)),
+                        }
+                    }
+                    WorkerType::Workflow => {
+                        match temporal_sdk_core_api::Worker::poll_workflow_activation(&*worker)
+                            .await
+                        {
+                            Ok(res) => Ok(Some(res.encode_to_vec())),
+                            Err(PollWfError::ShutDown) => Ok(None),
+                            Err(err) => Err(format!("Poll error: {}", err)),
+                        }
+                    }
+                };
+                let shutdown_next = matches!(result, Ok(None));
+                Some((
+                    PollResult {
+                        worker_index,
+                        worker_type,
+                        result,
+                    },
+                    // No more work if shutdown
+                    if shutdown_next { None } else { Some(worker) },
+                ))
+            } else {
+                None
+            }
+        })
+        .boxed()
     }
 
     pub fn async_poll_all(workers: RArray, queue: Value) -> Result<(), Error> {
@@ -133,42 +210,35 @@ impl Worker {
             .runtime_handle
             .clone();
 
-        // Create stream of poll calls
-        // TODO(cretz): Map for workflow pollers too
+        // Create streams of poll calls
         let worker_streams = workers
             .into_iter()
             .enumerate()
-            .filter_map(|(index, worker_val)| {
+            .flat_map(|(index, worker_val)| {
                 let worker_typed_data = RTypedData::from_value(worker_val).expect("Not typed data");
                 let worker_ref = worker_typed_data.get::<Worker>().expect("Not worker");
+                let worker = worker_ref
+                    .core
+                    .borrow()
+                    .as_ref()
+                    .expect("Unable to borrow")
+                    .clone();
+                let mut streams = Vec::with_capacity(2);
                 if worker_ref.activity {
-                    let worker = Some(
-                        worker_ref
-                            .core
-                            .borrow()
-                            .as_ref()
-                            .expect("Unable to borrow")
-                            .clone(),
-                    );
-                    Some(Box::pin(stream::unfold(worker, move |worker| async move {
-                        // We return no worker so the next streamed item closes
-                        // the stream with a None
-                        if let Some(worker) = worker {
-                            let res =
-                                temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await;
-                            let shutdown_next = matches!(res, Err(PollActivityError::ShutDown));
-                            Some((
-                                (index, WorkerType::Activity, res),
-                                // No more worker if shutdown
-                                if shutdown_next { None } else { Some(worker) },
-                            ))
-                        } else {
-                            None
-                        }
-                    })))
-                } else {
-                    None
+                    streams.push(Self::stream_poll(
+                        worker.clone(),
+                        index,
+                        WorkerType::Activity,
+                    ));
                 }
+                if worker_ref.workflow {
+                    streams.push(Self::stream_poll(
+                        worker.clone(),
+                        index,
+                        WorkerType::Workflow,
+                    ));
+                }
+                streams
             })
             .collect::<Vec<_>>();
         let mut worker_stream = stream::select_all(worker_streams);
@@ -184,24 +254,24 @@ impl Worker {
         runtime.spawn(
             async move {
                 // Get next item from the stream
-                while let Some((worker_index, worker_type, result)) = worker_stream.next().await {
-                    // Encode result and send callback to Ruby
-                    let result = result.map(|v| v.encode_to_vec());
+                while let Some(poll_result) = worker_stream.next().await {
+                    // Send callback to Ruby
                     let callback = callback.clone();
                     let _ = async_command_tx.send(AsyncCommand::RunCallback(Box::new(move || {
                         // Get Ruby in callback
                         let ruby = Ruby::get().expect("Ruby not available");
-                        let worker_type = match worker_type {
+                        let worker_type = match poll_result.worker_type {
                             WorkerType::Activity => id!("activity"),
+                            WorkerType::Workflow => id!("workflow"),
                         };
                         // Call block
-                        let result: Value = match result {
-                            Ok(val) => RString::from_slice(&val).as_value(),
-                            Err(PollActivityError::ShutDown) => ruby.qnil().as_value(),
+                        let result: Value = match poll_result.result {
+                            Ok(Some(val)) => RString::from_slice(&val).as_value(),
+                            Ok(None) => ruby.qnil().as_value(),
                             Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
                         callback.push(ruby.ary_new_from_values(&[
-                            worker_index.into_value(),
+                            poll_result.worker_index.into_value(),
                             worker_type.into_value(),
                             result,
                         ]))
@@ -313,6 +383,37 @@ impl Worker {
             .map_err(|err| error!("Invalid proto: {}", err))?;
         let worker = self.core.borrow().as_ref().unwrap().clone();
         temporal_sdk_core_api::Worker::record_activity_heartbeat(&*worker, heartbeat);
+        Ok(())
+    }
+
+    pub fn async_complete_workflow_activation(
+        &self,
+        run_id: String,
+        proto: RString,
+        queue: Value,
+    ) -> Result<(), Error> {
+        let callback = AsyncCallback::from_queue(queue);
+        let worker = self.core.borrow().as_ref().unwrap().clone();
+        let completion = WorkflowActivationCompletion::decode(unsafe { proto.as_slice() })
+            .map_err(|err| error!("Invalid proto: {}", err))?;
+        self.runtime_handle.spawn(
+            async move {
+                temporal_sdk_core_api::Worker::complete_workflow_activation(&*worker, completion)
+                    .await
+            },
+            move |ruby, result| {
+                callback.push(ruby.ary_new_from_values(&[
+                    (-1).into_value_with(&ruby),
+                    run_id.into_value_with(&ruby),
+                    match result {
+                        Ok(()) => ruby.qnil().into_value_with(&ruby),
+                        Err(err) => {
+                            new_error!("Completion failure: {}", err).into_value_with(&ruby)
+                        }
+                    },
+                ]))
+            },
+        );
         Ok(())
     }
 

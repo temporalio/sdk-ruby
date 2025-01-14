@@ -1,0 +1,11 @@
+module Temporalio
+  module Workflow
+    module ActivityCancellationType
+      type enum = Integer
+
+      TRY_CANCEL: enum
+      WAIT_CANCELLATION_COMPLETED: enum
+      ABANDON: enum
+    end
+  end
+end

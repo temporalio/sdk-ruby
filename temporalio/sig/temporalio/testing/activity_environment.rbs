@@ -14,7 +14,7 @@ module Temporalio
       ) -> void
 
       def run: (
-        Activity | singleton(Activity) | Activity::Definition activity,
+        Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info activity,
         *Object? args
       ) -> untyped
     end

@@ -1,2 +1,3 @@
 module Temporalio
+  def self._root_file_path: -> String
 end

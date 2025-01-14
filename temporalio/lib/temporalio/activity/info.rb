@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Temporalio
-  class Activity
+  module Activity
     # Information about an activity.
     #
     # @!attribute activity_id

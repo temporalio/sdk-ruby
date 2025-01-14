@@ -1,5 +1,5 @@
 module Temporalio
-  class Activity
+  module Activity
     class CompleteAsyncError < Error
     end
   end

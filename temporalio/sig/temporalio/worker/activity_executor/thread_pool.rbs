@@ -4,40 +4,7 @@ module Temporalio
       class ThreadPool < ActivityExecutor
         def self.default: -> ThreadPool
 
-        def self._monotonic_time: -> Float
-
-        def initialize: (
-          ?max_threads: Integer?,
-          ?idle_timeout: Float
-        ) -> void
-
-        def largest_length: -> Integer
-        def scheduled_task_count: -> Integer
-        def completed_task_count: -> Integer
-        def active_count: -> Integer
-        def length: -> Integer
-        def queue_length: -> Integer
-        def shutdown: -> void
-        def kill: -> void
-
-        def _remove_busy_worker: (Worker worker) -> void
-        def _ready_worker: (Worker worker, Float last_message) -> void
-        def _worker_died: (Worker worker) -> void
-        def _worker_task_completed: -> void
-        private def locked_assign_worker: { (?) -> untyped } -> void
-        private def locked_enqueue: { (?) -> untyped } -> void
-        private def locked_add_busy_worker: -> Worker?
-        private def locked_prune_pool: -> void
-        private def locked_remove_busy_worker: (Worker worker) -> void
-        private def locked_ready_worker: (Worker worker, Float last_message) -> void
-        private def locked_worker_died: (Worker worker) -> void
-
-        class Worker
-          def initialize: (ThreadPool pool, Integer id) -> void
-          def <<: (Proc block) -> void
-          def stop: -> void
-          def kill: -> void
-        end
+        def initialize: (?ThreadPool thread_poll) -> void
       end
     end
   end

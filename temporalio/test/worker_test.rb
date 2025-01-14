@@ -8,7 +8,7 @@ require 'test'
 class WorkerTest < Test
   also_run_all_tests_in_fiber
 
-  class SimpleActivity < Temporalio::Activity
+  class SimpleActivity < Temporalio::Activity::Definition
     def execute(name)
       "Hello, #{name}!"
     end

@@ -1,0 +1,14 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class HandlerHash[D] < Hash[String?, D]
+          def initialize: (
+            Hash[String?, D] initial_frozen_hash,
+            singleton(Workflow::Definition::Signal) | singleton(Workflow::Definition::Query) | singleton(Workflow::Definition::Update) definition_class,
+          ) ?{ (D) -> void } -> void
+        end
+      end
+    end
+  end
+end

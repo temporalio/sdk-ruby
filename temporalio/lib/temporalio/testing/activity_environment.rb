@@ -67,11 +67,11 @@ module Temporalio
 
       # Run an activity and returns its result or raises its exception.
       #
-      # @param activity [Activity, Class<Activity>, Activity::Definition] Activity to run.
+      # @param activity [Activity::Definition, Class<Activity::Definition>, Activity::Definition::Info] Activity to run.
       # @param args [Array<Object>] Arguments to the activity.
       # @return Activity result.
       def run(activity, *args)
-        defn = Activity::Definition.from_activity(activity)
+        defn = Activity::Definition::Info.from_activity(activity)
         executor = @activity_executors[defn.executor]
         raise ArgumentError, "Unknown executor: #{defn.executor}" if executor.nil?
 

@@ -1,0 +1,137 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class Context
+          def initialize: (WorkflowInstance `instance`) -> void
+
+          def all_handlers_finished?: -> bool
+
+          def cancellation: -> Cancellation
+
+          def continue_as_new_suggested: -> bool
+
+          def current_history_length: -> Integer
+
+          def current_history_size: -> Integer
+
+          def current_update_info: -> Workflow::UpdateInfo?
+
+          def deprecate_patch: (Symbol | String patch_id) -> void
+
+          def execute_activity: (
+            singleton(Activity::Definition) | Symbol | String activity,
+            *Object? args,
+            task_queue: String,
+            schedule_to_close_timeout: duration?,
+            schedule_to_start_timeout: duration?,
+            start_to_close_timeout: duration?,
+            heartbeat_timeout: duration?,
+            retry_policy: RetryPolicy?,
+            cancellation: Cancellation,
+            cancellation_type: Workflow::ActivityCancellationType::enum,
+            activity_id: String?,
+            disable_eager_execution: bool
+          ) -> Object?
+
+          def execute_local_activity: (
+            singleton(Activity::Definition) | Symbol | String activity,
+            *Object? args,
+            schedule_to_close_timeout: duration?,
+            schedule_to_start_timeout: duration?,
+            start_to_close_timeout: duration?,
+            retry_policy: RetryPolicy?,
+            local_retry_threshold: duration?,
+            cancellation: Cancellation,
+            cancellation_type: Workflow::ActivityCancellationType::enum,
+            activity_id: String?
+          ) -> Object?
+
+          def external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
+
+          def illegal_call_tracing_disabled: [T] { -> T } -> T
+
+          def info: -> Workflow::Info
+
+          def initialize_continue_as_new_error: (Workflow::ContinueAsNewError error) -> void
+
+          def logger: -> ReplaySafeLogger
+
+          def memo: -> ExternallyImmutableHash[String, Object?]
+
+          def metric_meter: -> Temporalio::Metric::Meter
+
+          def now: -> Time
+
+          def patched: (String patch_id) -> bool
+
+          def payload_converter: -> Converters::PayloadConverter
+
+          def query_handlers: -> HandlerHash[Workflow::Definition::Query]
+
+          def random: -> Random
+
+          def replaying?: -> bool
+
+          def search_attributes: -> SearchAttributes
+
+          def signal_handlers: -> HandlerHash[Workflow::Definition::Signal]
+
+          def sleep: (duration? duration, summary: String?, cancellation: Cancellation) -> void
+
+          def start_child_workflow: (
+            singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
+            *Object? args,
+            id: String,
+            task_queue: String,
+            cancellation: Cancellation,
+            cancellation_type: Workflow::ChildWorkflowCancellationType::enum,
+            parent_close_policy: Workflow::ParentClosePolicy::enum,
+            execution_timeout: duration?,
+            run_timeout: duration?,
+            task_timeout: duration?,
+            id_reuse_policy: WorkflowIDReusePolicy::enum,
+            retry_policy: RetryPolicy?,
+            cron_schedule: String?,
+            memo: Hash[String | Symbol, Object?]?,
+            search_attributes: SearchAttributes?
+          ) -> ChildWorkflowHandle
+
+          def timeout: [T] (
+            duration? duration,
+            singleton(Exception) exception_class,
+            *Object? exception_args,
+            summary: String?
+          ) { -> T } -> T
+
+          def update_handlers: -> HandlerHash[Workflow::Definition::Update]
+
+          def upsert_memo: (Hash[Symbol | String, Object?] hash) -> void
+
+          def upsert_search_attributes: (*SearchAttributes::Update updates) -> void
+
+          def wait_condition: [T] (cancellation: Cancellation?) { -> T } -> T
+
+          def _cancel_external_workflow: (id: String, run_id: String?) -> void
+
+          def _outbound=: (Temporalio::Worker::Interceptor::Workflow::Outbound outbound) -> void
+
+          def _signal_child_workflow: (
+            id: String,
+            signal: Workflow::Definition::Signal | Symbol | String,
+            args: Array[Object?],
+            cancellation: Cancellation
+          ) -> void
+
+          def _signal_external_workflow: (
+            id: String,
+            run_id: String?,
+            signal: Workflow::Definition::Signal | Symbol | String,
+            args: Array[Object?],
+            cancellation: Cancellation
+          ) -> void
+        end
+      end
+    end
+  end
+end

@@ -3,10 +3,10 @@ module Temporalio
     class ActivityExecutor
       def self.defaults: -> Hash[Symbol, ActivityExecutor]
 
-      def initialize_activity: (Activity::Definition defn) -> void
-      def execute_activity: (Activity::Definition defn) { -> void } -> void
+      def initialize_activity: (Activity::Definition::Info defn) -> void
+      def execute_activity: (Activity::Definition::Info defn) { -> void } -> void
       def activity_context: -> Activity::Context?
-      def set_activity_context: (Activity::Definition defn, Activity::Context? context) -> void
+      def set_activity_context: (Activity::Definition::Info defn, Activity::Context? context) -> void
     end
   end
 end

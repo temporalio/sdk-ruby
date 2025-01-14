@@ -3,10 +3,12 @@ module Temporalio
     class Options
       attr_accessor client: Client
       attr_accessor task_queue: String
-      attr_accessor activities: Array[Activity | singleton(Activity) | Activity::Definition]
-      attr_accessor activity_executors: Hash[Symbol, Worker::ActivityExecutor]
+      attr_accessor activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]
+      attr_accessor workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
       attr_accessor tuner: Tuner
-      attr_accessor interceptors: Array[Interceptor]
+      attr_accessor activity_executors: Hash[Symbol, Worker::ActivityExecutor]
+      attr_accessor workflow_executor: Worker::WorkflowExecutor
+      attr_accessor interceptors: Array[Interceptor::Activity | Interceptor::Workflow]
       attr_accessor build_id: String
       attr_accessor identity: String
       attr_accessor logger: Logger
@@ -22,14 +24,21 @@ module Temporalio
       attr_accessor max_task_queue_activities_per_second: Float?
       attr_accessor graceful_shutdown_period: Float
       attr_accessor use_worker_versioning: bool
+      attr_accessor disable_eager_activity_execution: bool
+      attr_accessor illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
+      attr_accessor workflow_failure_exception_types: Array[singleton(Exception)]
+      attr_accessor workflow_payload_codec_thread_pool: ThreadPool?
+      attr_accessor debug_mode: bool
 
       def initialize: (
         client: Client,
         task_queue: String,
-        activities: Array[Activity | singleton(Activity) | Activity::Definition],
-        activity_executors: Hash[Symbol, Worker::ActivityExecutor],
+        activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info],
+        workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
         tuner: Tuner,
-        interceptors: Array[Interceptor],
+        activity_executors: Hash[Symbol, Worker::ActivityExecutor],
+        workflow_executor: Worker::WorkflowExecutor,
+        interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
         build_id: String,
         identity: String?,
         logger: Logger,
@@ -44,7 +53,12 @@ module Temporalio
         max_activities_per_second: Float?,
         max_task_queue_activities_per_second: Float?,
         graceful_shutdown_period: Float,
-        use_worker_versioning: bool
+        use_worker_versioning: bool,
+        disable_eager_activity_execution: bool,
+        illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+        workflow_failure_exception_types: Array[singleton(Exception)],
+        workflow_payload_codec_thread_pool: ThreadPool?,
+        debug_mode: bool
       ) -> void
     end
 
@@ -59,15 +73,19 @@ module Temporalio
       ?wait_block_complete: bool
     ) ?{ -> T } -> T
 
+    def self.default_illegal_workflow_calls: -> Hash[String, :all | Array[Symbol]]
+
     attr_reader options: Options
 
     def initialize: (
       client: Client,
       task_queue: String,
-      ?activities: Array[Activity | singleton(Activity) | Activity::Definition],
-      ?activity_executors: Hash[Symbol, Worker::ActivityExecutor],
+      ?activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info],
+      ?workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
       ?tuner: Tuner,
-      ?interceptors: Array[Interceptor],
+      ?activity_executors: Hash[Symbol, Worker::ActivityExecutor],
+      ?workflow_executor: Worker::WorkflowExecutor,
+      ?interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
       ?build_id: String,
       ?identity: String?,
       ?logger: Logger,
@@ -82,7 +100,12 @@ module Temporalio
       ?max_activities_per_second: Float?,
       ?max_task_queue_activities_per_second: Float?,
       ?graceful_shutdown_period: Float,
-      ?use_worker_versioning: bool
+      ?use_worker_versioning: bool,
+      ?disable_eager_activity_execution: bool,
+      ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+      ?workflow_failure_exception_types: Array[singleton(Exception)],
+      ?workflow_payload_codec_thread_pool: ThreadPool?,
+      ?debug_mode: bool
     ) -> void
 
     def task_queue: -> String
@@ -98,8 +121,10 @@ module Temporalio
     def _initiate_shutdown: -> void
     def _wait_all_complete: -> void
     def _bridge_worker: -> Internal::Bridge::Worker
-    def _all_interceptors: -> Array[Interceptor]
-    def _on_poll_bytes: (Symbol worker_type, String bytes) -> void
+    def _activity_interceptors: -> Array[Interceptor::Activity]
+    def _workflow_interceptors: -> Array[Interceptor::Workflow]
+    def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
+    def _on_shutdown_complete: -> void
 
     private def to_bridge_slot_supplier_options: (
       Tuner::SlotSupplier slot_supplier

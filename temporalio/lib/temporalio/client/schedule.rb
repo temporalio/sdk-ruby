@@ -224,7 +224,7 @@ module Temporalio
 
           # Create start-workflow schedule action.
           #
-          # @param workflow [String] Workflow.
+          # @param workflow [Class<Workflow::Definition>, Symbol, String] Workflow.
           # @param args [Array<Object>] Arguments to the workflow.
           # @param id [String] Unique identifier for the workflow execution.
           # @param task_queue [String] Task queue to run the workflow on.
@@ -251,7 +251,7 @@ module Temporalio
           )
             # steep:ignore:start
             super(
-              workflow:,
+              workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
               args:,
               id:,
               task_queue:,
@@ -958,7 +958,8 @@ module Temporalio
 
         State = Struct.new(
           :note,
-          :paused
+          :paused,
+          keyword_init: true
         )
 
         # State of a listed schedule.

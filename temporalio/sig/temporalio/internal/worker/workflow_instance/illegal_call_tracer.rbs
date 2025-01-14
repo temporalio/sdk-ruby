@@ -1,0 +1,18 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class IllegalCallTracer
+          def self.frozen_validated_illegal_calls: (
+            Hash[String, :all | Array[Symbol]] illegal_calls
+          ) -> Hash[String, :all | Hash[Symbol, bool]]
+
+          def initialize: (Hash[String, :all | Hash[Symbol, bool]] illegal_calls) -> void
+
+          def enable: [T] { -> T } -> T
+          def disable: [T] { -> T } -> T
+        end
+      end
+    end
+  end
+end
