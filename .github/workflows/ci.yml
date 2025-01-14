@@ -24,7 +24,7 @@ jobs:
         # https://github.com/temporalio/sdk-ruby/issues/172
         os: [ubuntu-latest, macos-latest]
         # Earliest and latest supported
-        rubyVersion: ["3.1", "3.3"]
+        rubyVersion: ["3.2", "3.3"]
         
         include:
           - os: ubuntu-latest
