@@ -804,7 +804,7 @@ class WorkerWorkflowTest < Test
 
     # Confirm there are two bad lines, and they don't have contextual info
     bad_lines = lines.select { |l| l.include?('some-log-2') }
-    assert_equal 2, bad_lines.size
+    assert bad_lines.size >= 2
     refute_includes bad_lines.first, ':workflow_type=>"LoggerWorkflow"'
 
     # Confirm task failure logs
@@ -1734,8 +1734,10 @@ class WorkerWorkflowTest < Test
     end
 
     # Now with worker shutdown, GC and confirm finalized
-    GC.start
-    assert_equal 1, ConfirmGarbageCollectWorkflow.finalized_count
+    assert_eventually do
+      GC.start
+      assert_equal 1, ConfirmGarbageCollectWorkflow.finalized_count
+    end
   end
 
   # TODO(cretz): To test

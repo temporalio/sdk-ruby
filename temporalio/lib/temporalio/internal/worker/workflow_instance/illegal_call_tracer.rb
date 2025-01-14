@@ -36,6 +36,9 @@ module Temporalio
           # Illegal calls are Hash[String, :all | Hash[Symbol, Bool]]
           def initialize(illegal_calls)
             @tracepoint = TracePoint.new(:call, :c_call) do |tp|
+              # Manual check for proper thread since we have seen issues in Ruby 3.2 where it leaks
+              next unless Thread.current == @enabled_thread
+
               cls = tp.defined_class
               next unless cls.is_a?(Module)
 
@@ -68,14 +71,24 @@ module Temporalio
             end
           end
 
-          def enable(&)
-            # Setting current thread explicitly because it wasn't until Ruby 3.2 that this
-            # was done automatically, ref https://github.com/ruby/ruby/pull/5359
-            @tracepoint.enable(target_thread: Thread.current, &)
+          def enable(&block)
+            # We've seen leaking issues in Ruby 3.2 where the TracePoint inadvertently remains enabled even for threads
+            # that it was not started on. So we will check the thread ourselves.
+            @enabled_thread = Thread.current
+            @tracepoint.enable do
+              block.call
+            ensure
+              @enabled_thread = nil
+            end
           end
 
-          def disable(&)
-            @tracepoint.disable(&)
+          def disable(&block)
+            previous_thread = @enabled_thread
+            @tracepoint.disable do
+              block.call
+            ensure
+              @enabled_thread = previous_thread
+            end
           end
         end
       end
