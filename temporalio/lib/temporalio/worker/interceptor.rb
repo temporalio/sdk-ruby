@@ -19,11 +19,10 @@ module Temporalio
         end
 
         # Input for {Inbound.execute}.
-        ExecuteInput = Struct.new(
+        ExecuteInput = Data.define(
           :proc,
           :args,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Inbound interceptor for intercepting inbound activity calls. This should be extended by users needing to
@@ -59,9 +58,8 @@ module Temporalio
         end
 
         # Input for {Outbound.heartbeat}.
-        HeartbeatInput = Struct.new(
-          :details,
-          keyword_init: true
+        HeartbeatInput = Data.define(
+          :details
         )
 
         # Outbound interceptor for intercepting outbound activity calls. This should be extended by users needing to
@@ -102,39 +100,35 @@ module Temporalio
         end
 
         # Input for {Inbound.execute}.
-        ExecuteInput = Struct.new(
+        ExecuteInput = Data.define(
           :args,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Inbound.handle_signal}.
-        HandleSignalInput = Struct.new(
+        HandleSignalInput = Data.define(
           :signal,
           :args,
           :definition,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Inbound.handle_query}.
-        HandleQueryInput = Struct.new(
+        HandleQueryInput = Data.define(
           :id,
           :query,
           :args,
           :definition,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Inbound.validate_update} and {Inbound.handle_update}.
-        HandleUpdateInput = Struct.new(
+        HandleUpdateInput = Data.define(
           :id,
           :update,
           :args,
           :definition,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Inbound interceptor for intercepting inbound workflow calls. This should be extended by users needing to
@@ -202,14 +196,13 @@ module Temporalio
         end
 
         # Input for {Outbound.cancel_external_workflow}.
-        CancelExternalWorkflowInput = Struct.new(
+        CancelExternalWorkflowInput = Data.define(
           :id,
-          :run_id,
-          keyword_init: true
+          :run_id
         )
 
         # Input for {Outbound.execute_activity}.
-        ExecuteActivityInput = Struct.new(
+        ExecuteActivityInput = Data.define(
           :activity,
           :args,
           :task_queue,
@@ -222,12 +215,11 @@ module Temporalio
           :cancellation_type,
           :activity_id,
           :disable_eager_execution,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Outbound.execute_local_activity}.
-        ExecuteLocalActivityInput = Struct.new(
+        ExecuteLocalActivityInput = Data.define(
           :activity,
           :args,
           :schedule_to_close_timeout,
@@ -238,47 +230,42 @@ module Temporalio
           :cancellation,
           :cancellation_type,
           :activity_id,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Outbound.initialize_continue_as_new_error}.
-        InitializeContinueAsNewErrorInput = Struct.new(
-          :error,
-          keyword_init: true
+        InitializeContinueAsNewErrorInput = Data.define(
+          :error
         )
 
         # Input for {Outbound.signal_child_workflow}.
-        SignalChildWorkflowInput = Struct.new(
+        SignalChildWorkflowInput = Data.define(
           :id,
           :signal,
           :args,
           :cancellation,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Outbound.signal_external_workflow}.
-        SignalExternalWorkflowInput = Struct.new(
+        SignalExternalWorkflowInput = Data.define(
           :id,
           :run_id,
           :signal,
           :args,
           :cancellation,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Input for {Outbound.sleep}.
-        SleepInput = Struct.new(
+        SleepInput = Data.define(
           :duration,
           :summary,
-          :cancellation,
-          keyword_init: true
+          :cancellation
         )
 
         # Input for {Outbound.start_child_workflow}.
-        StartChildWorkflowInput = Struct.new(
+        StartChildWorkflowInput = Data.define(
           :workflow,
           :args,
           :id,
@@ -294,8 +281,7 @@ module Temporalio
           :cron_schedule,
           :memo,
           :search_attributes,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Outbound interceptor for intercepting outbound workflow calls. This should be extended by users needing to

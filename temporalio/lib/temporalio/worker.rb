@@ -23,8 +23,7 @@ module Temporalio
   # {run_all} is used for a collection of workers. These can wait until a block is complete or a {Cancellation} is
   # canceled.
   class Worker
-    # Options as returned from {options} for `**to_h`` splat use in {initialize}. See {initialize} for details.
-    Options = Struct.new(
+    Options = Data.define(
       :client,
       :task_queue,
       :activities,
@@ -52,9 +51,11 @@ module Temporalio
       :illegal_workflow_calls,
       :workflow_failure_exception_types,
       :workflow_payload_codec_thread_pool,
-      :debug_mode,
-      keyword_init: true
+      :debug_mode
     )
+
+    # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
+    class Options; end # rubocop:disable Lint/EmptyClass
 
     # @return [String] Memoized default build ID. This default value is built as a checksum of all of the loaded Ruby
     #   source files in `$LOADED_FEATURES`. Users may prefer to set the build ID to a better representation of the

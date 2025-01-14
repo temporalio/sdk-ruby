@@ -3,13 +3,12 @@
 require 'temporalio/internal/proto_utils'
 
 module Temporalio
-  RetryPolicy = Struct.new(
+  RetryPolicy = Data.define(
     :initial_interval,
     :backoff_coefficient,
     :max_interval,
     :max_attempts,
-    :non_retryable_error_types,
-    keyword_init: true
+    :non_retryable_error_types
   )
 
   # Options for retrying workflows and activities.

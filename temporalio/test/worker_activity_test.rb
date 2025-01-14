@@ -811,8 +811,7 @@ class WorkerActivityTest < Test
   def test_interceptor_from_client
     interceptor = TrackCallsInterceptor.new
     # Create new client with the interceptor set
-    new_options = env.client.options.dup
-    new_options.interceptors = [interceptor]
+    new_options = env.client.options.with(interceptors: [interceptor])
     new_client = Temporalio::Client.new(**new_options.to_h) # steep:ignore
     assert_equal 'Hello, Temporal!', execute_activity(InterceptorActivity, 'Temporal', client: new_client)
     assert_equal 'activity_init', interceptor.calls[0].first

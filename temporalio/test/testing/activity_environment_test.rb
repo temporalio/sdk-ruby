@@ -87,8 +87,7 @@ module Testing
 
     def test_heartbeating
       queue = Queue.new
-      info = Temporalio::Testing::ActivityEnvironment.default_info.dup
-      info.activity_id = 'other-id' # steep:ignore
+      info = Temporalio::Testing::ActivityEnvironment.default_info.with(activity_id: 'other-id')
       env = Temporalio::Testing::ActivityEnvironment.new(
         info:,
         on_heartbeat: proc { |args| queue.push(args) }

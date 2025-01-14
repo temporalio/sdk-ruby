@@ -4,23 +4,23 @@ module Temporalio
       def intercept_client: (Outbound next_interceptor) -> Outbound
 
       class StartWorkflowInput
-        attr_accessor workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
-        attr_accessor args: Array[Object?]
-        attr_accessor workflow_id: String
-        attr_accessor task_queue: String
-        attr_accessor execution_timeout: duration?
-        attr_accessor run_timeout: duration?
-        attr_accessor task_timeout: duration?
-        attr_accessor id_reuse_policy: WorkflowIDReusePolicy::enum
-        attr_accessor id_conflict_policy: WorkflowIDConflictPolicy::enum
-        attr_accessor retry_policy: RetryPolicy?
-        attr_accessor cron_schedule: String?
-        attr_accessor memo: Hash[String | Symbol, Object?]?
-        attr_accessor search_attributes: SearchAttributes?
-        attr_accessor start_delay: duration?
-        attr_accessor request_eager_start: bool
-        attr_accessor headers: Hash[String, Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader workflow_id: String
+        attr_reader task_queue: String
+        attr_reader execution_timeout: duration?
+        attr_reader run_timeout: duration?
+        attr_reader task_timeout: duration?
+        attr_reader id_reuse_policy: WorkflowIDReusePolicy::enum
+        attr_reader id_conflict_policy: WorkflowIDConflictPolicy::enum
+        attr_reader retry_policy: RetryPolicy?
+        attr_reader cron_schedule: String?
+        attr_reader memo: Hash[String | Symbol, Object?]?
+        attr_reader search_attributes: SearchAttributes?
+        attr_reader start_delay: duration?
+        attr_reader request_eager_start: bool
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String,
@@ -44,8 +44,8 @@ module Temporalio
       end
 
       class ListWorkflowsInput
-        attr_accessor query: String?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader query: String?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           query: String?,
@@ -54,8 +54,8 @@ module Temporalio
       end
 
       class CountWorkflowsInput
-        attr_accessor query: String?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader query: String?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           query: String?,
@@ -64,9 +64,9 @@ module Temporalio
       end
 
       class DescribeWorkflowInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -76,12 +76,12 @@ module Temporalio
       end
 
       class FetchWorkflowHistoryEventsInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor wait_new_event: bool
-        attr_accessor event_filter_type: Integer
-        attr_accessor skip_archival: bool
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader wait_new_event: bool
+        attr_reader event_filter_type: Integer
+        attr_reader skip_archival: bool
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -94,12 +94,12 @@ module Temporalio
       end
 
       class SignalWorkflowInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor signal: Workflow::Definition::Signal | Symbol | String
-        attr_accessor args: Array[Object?]
-        attr_accessor headers: Hash[String, Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader signal: Workflow::Definition::Signal | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -112,13 +112,13 @@ module Temporalio
       end
 
       class QueryWorkflowInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor query: Workflow::Definition::Query | Symbol | String
-        attr_accessor args: Array[Object?]
-        attr_accessor reject_condition: WorkflowQueryRejectCondition::enum?
-        attr_accessor headers: Hash[String, Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader query: Workflow::Definition::Query | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader reject_condition: WorkflowQueryRejectCondition::enum?
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -132,14 +132,14 @@ module Temporalio
       end
 
       class StartWorkflowUpdateInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor update_id: String
-        attr_accessor update: Workflow::Definition::Update | Symbol | String
-        attr_accessor args: Array[Object?]
-        attr_accessor wait_for_stage: WorkflowUpdateWaitStage::enum
-        attr_accessor headers: Hash[String, Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader update_id: String
+        attr_reader update: Workflow::Definition::Update | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -154,10 +154,10 @@ module Temporalio
       end
 
       class PollWorkflowUpdateInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor update_id: String
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader update_id: String
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -168,10 +168,10 @@ module Temporalio
       end
 
       class CancelWorkflowInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor first_execution_run_id: String?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader first_execution_run_id: String?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -182,12 +182,12 @@ module Temporalio
       end
 
       class TerminateWorkflowInput
-        attr_accessor workflow_id: String
-        attr_accessor run_id: String?
-        attr_accessor first_execution_run_id: String?
-        attr_accessor reason: String?
-        attr_accessor details: Array[Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader workflow_id: String
+        attr_reader run_id: String?
+        attr_reader first_execution_run_id: String?
+        attr_reader reason: String?
+        attr_reader details: Array[Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           workflow_id: String,
@@ -200,13 +200,13 @@ module Temporalio
       end
 
       class CreateScheduleInput
-        attr_accessor id: String
-        attr_accessor schedule: Schedule
-        attr_accessor trigger_immediately: bool
-        attr_accessor backfills: Array[Schedule::Backfill]
-        attr_accessor memo: Hash[String | Symbol, Object?]?
-        attr_accessor search_attributes: SearchAttributes?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader schedule: Schedule
+        attr_reader trigger_immediately: bool
+        attr_reader backfills: Array[Schedule::Backfill]
+        attr_reader memo: Hash[String | Symbol, Object?]?
+        attr_reader search_attributes: SearchAttributes?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -220,8 +220,8 @@ module Temporalio
       end
 
       class ListSchedulesInput
-        attr_accessor query: String?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader query: String?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           query: String?,
@@ -230,9 +230,9 @@ module Temporalio
       end
 
       class BackfillScheduleInput
-        attr_accessor id: String
-        attr_accessor backfills: Array[Schedule::Backfill]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader backfills: Array[Schedule::Backfill]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -242,8 +242,8 @@ module Temporalio
       end
 
       class DeleteScheduleInput
-        attr_accessor id: String
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -252,8 +252,8 @@ module Temporalio
       end
 
       class DescribeScheduleInput
-        attr_accessor id: String
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -262,9 +262,9 @@ module Temporalio
       end
 
       class PauseScheduleInput
-        attr_accessor id: String
-        attr_accessor note: String
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader note: String
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -274,9 +274,9 @@ module Temporalio
       end
 
       class TriggerScheduleInput
-        attr_accessor id: String
-        attr_accessor overlap: Schedule::OverlapPolicy::enum?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader overlap: Schedule::OverlapPolicy::enum?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -286,9 +286,9 @@ module Temporalio
       end
 
       class UnpauseScheduleInput
-        attr_accessor id: String
-        attr_accessor note: String
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader note: String
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -298,9 +298,9 @@ module Temporalio
       end
 
       class UpdateScheduleInput
-        attr_accessor id: String
-        attr_accessor updater: ^(Schedule::Update::Input) -> Schedule::Update?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader id: String
+        attr_reader updater: ^(Schedule::Update::Input) -> Schedule::Update?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           id: String,
@@ -310,9 +310,9 @@ module Temporalio
       end
 
       class HeartbeatAsyncActivityInput
-        attr_accessor task_token_or_id_reference: String | ActivityIDReference
-        attr_accessor details: Array[Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader task_token_or_id_reference: String | ActivityIDReference
+        attr_reader details: Array[Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
@@ -322,9 +322,9 @@ module Temporalio
       end
 
       class CompleteAsyncActivityInput
-        attr_accessor task_token_or_id_reference: String | ActivityIDReference
-        attr_accessor result: Object?
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader task_token_or_id_reference: String | ActivityIDReference
+        attr_reader result: Object?
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
@@ -334,10 +334,10 @@ module Temporalio
       end
 
       class FailAsyncActivityInput
-        attr_accessor task_token_or_id_reference: String | ActivityIDReference
-        attr_accessor error: Exception
-        attr_accessor last_heartbeat_details: Array[Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader task_token_or_id_reference: String | ActivityIDReference
+        attr_reader error: Exception
+        attr_reader last_heartbeat_details: Array[Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
@@ -348,9 +348,9 @@ module Temporalio
       end
 
       class ReportCancellationAsyncActivityInput
-        attr_accessor task_token_or_id_reference: String | ActivityIDReference
-        attr_accessor details: Array[Object?]
-        attr_accessor rpc_options: RPCOptions?
+        attr_reader task_token_or_id_reference: String | ActivityIDReference
+        attr_reader details: Array[Object?]
+        attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,

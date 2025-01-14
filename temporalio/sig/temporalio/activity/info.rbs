@@ -38,6 +38,8 @@ module Temporalio
         workflow_run_id: String,
         workflow_type: String
       ) -> void
+
+      def with: (**untyped) -> Info
     end
   end
 end

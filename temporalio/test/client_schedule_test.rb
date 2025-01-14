@@ -79,17 +79,18 @@ class ClientScheduleTest < Test
     # We want to test the entire returned spec, policy, and state. But server
     # side spec turns the cron into a calendar, so we will replicate in our
     # expected spec.
-    expected_spec = schedule.spec.dup
-    expected_spec.cron_expressions = []
-    expected_spec.calendars.push(
-      Temporalio::Client::Schedule::Spec::Calendar.new(
-        second: [Temporalio::Client::Schedule::Range.new(0)],
-        minute: [Temporalio::Client::Schedule::Range.new(0)],
-        hour: [Temporalio::Client::Schedule::Range.new(12)],
-        day_of_month: [Temporalio::Client::Schedule::Range.new(1, 31)],
-        month: [Temporalio::Client::Schedule::Range.new(1, 12)],
-        day_of_week: [Temporalio::Client::Schedule::Range.new(1)]
-      )
+    expected_spec = schedule.spec.with(
+      cron_expressions: [],
+      calendars: schedule.spec.calendars + [
+        Temporalio::Client::Schedule::Spec::Calendar.new(
+          second: [Temporalio::Client::Schedule::Range.new(0)],
+          minute: [Temporalio::Client::Schedule::Range.new(0)],
+          hour: [Temporalio::Client::Schedule::Range.new(12)],
+          day_of_month: [Temporalio::Client::Schedule::Range.new(1, 31)],
+          month: [Temporalio::Client::Schedule::Range.new(1, 12)],
+          day_of_week: [Temporalio::Client::Schedule::Range.new(1)]
+        )
+      ]
     )
     assert_equal expected_spec, desc.schedule.spec
     assert_equal schedule.policy, desc.schedule.policy
@@ -98,9 +99,12 @@ class ClientScheduleTest < Test
     # Update to just change schedule workflow's task timeout
     assert_nil desc_action.task_timeout
     handle.update do |input|
-      to_update = input.description.schedule.dup
+      to_update = input.description.schedule.with(
+        action: input.description.schedule.action.with( # steep:ignore
+          task_timeout: 4.56
+        )
+      )
       assert_instance_of Temporalio::Client::Schedule::Action::StartWorkflow, to_update.action
-      to_update.action.task_timeout = 4.56 # steep:ignore
       Temporalio::Client::Schedule::Update.new(schedule: to_update)
     end
     desc = handle.describe

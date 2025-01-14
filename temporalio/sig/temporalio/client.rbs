@@ -1,12 +1,12 @@
 module Temporalio
   class Client
     class Options
-      attr_accessor connection: Connection
-      attr_accessor namespace: String
-      attr_accessor data_converter: Converters::DataConverter
-      attr_accessor interceptors: Array[Interceptor]
-      attr_accessor logger: Logger
-      attr_accessor default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
+      attr_reader connection: Connection
+      attr_reader namespace: String
+      attr_reader data_converter: Converters::DataConverter
+      attr_reader interceptors: Array[Interceptor]
+      attr_reader logger: Logger
+      attr_reader default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
 
       def initialize: (
         connection: Connection,
@@ -18,6 +18,8 @@ module Temporalio
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
+              
+      def with: (**untyped) -> Options
     end
 
     def self.connect: (

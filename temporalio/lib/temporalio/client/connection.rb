@@ -14,8 +14,7 @@ module Temporalio
     # Connection to Temporal server that is not namespace specific. Most users will use {Client.connect} instead of this
     # directly.
     class Connection
-      # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
-      Options = Struct.new(
+      Options = Data.define(
         :target_host,
         :api_key,
         :tls,
@@ -25,8 +24,17 @@ module Temporalio
         :keep_alive,
         :http_connect_proxy,
         :runtime,
-        :lazy_connect,
-        keyword_init: true
+        :lazy_connect
+      )
+
+      # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
+      class Options; end # rubocop:disable Lint/EmptyClass
+
+      TLSOptions = Data.define(
+        :client_cert,
+        :client_private_key,
+        :server_root_ca_cert,
+        :domain
       )
 
       # TLS options. All attributes are optional, and an empty options set just enables default TLS.
@@ -41,12 +49,15 @@ module Temporalio
       # @!attribute domain
       #   @return [String, nil] SNI override. This is only needed for self-hosted servers with certificates that do not
       #     match the hostname being connected to.
-      TLSOptions = Struct.new(
-        :client_cert,
-        :client_private_key,
-        :server_root_ca_cert,
-        :domain,
-        keyword_init: true
+      class TLSOptions; end # rubocop:disable Lint/EmptyClass
+
+      RPCRetryOptions = Data.define(
+        :initial_interval,
+        :randomization_factor,
+        :multiplier,
+        :max_interval,
+        :max_elapsed_time,
+        :max_retries
       )
 
       # Retry options for server calls when retry is enabled (which it is by default on all high-level {Client} calls).
@@ -64,26 +75,23 @@ module Temporalio
       #   @return [Float] Maximum total time, default 10.0. Can use 0 for no max.
       # @!attribute max_retries
       #   @return [Integer] Maximum number of retries, default 10.
-      RPCRetryOptions = Struct.new(
-        :initial_interval,
-        :randomization_factor,
-        :multiplier,
-        :max_interval,
-        :max_elapsed_time,
-        :max_retries,
-        keyword_init: true
-      ) do
-        def initialize(**kwargs)
-          # @type var kwargs: untyped
-          kwargs[:initial_interval] = 0.1 unless kwargs.key?(:initial_interval)
-          kwargs[:randomization_factor] = 0.2 unless kwargs.key?(:randomization_factor)
-          kwargs[:multiplier] = 1.5 unless kwargs.key?(:multiplier)
-          kwargs[:max_interval] = 5.0 unless kwargs.key?(:max_interval)
-          kwargs[:max_elapsed_time] = 10.0 unless kwargs.key?(:max_elapsed_time)
-          kwargs[:max_retries] = 10 unless kwargs.key?(:max_retries)
+      class RPCRetryOptions
+        def initialize(
+          initial_interval: 0.1,
+          randomization_factor: 0.2,
+          multiplier: 1.5,
+          max_interval: 5.0,
+          max_elapsed_time: 10.0,
+          max_retries: 10
+        )
           super
         end
       end
+
+      KeepAliveOptions = Data.define(
+        :interval,
+        :timeout
+      )
 
       # Keep-alive options for client connections. For most users, the default is preferred.
       #
@@ -92,18 +100,17 @@ module Temporalio
       # @!attribute timeout
       #   @return [Float] Timeout that the keep alive must be responded to within or the connection will be closed,
       #     default 15.0.
-      KeepAliveOptions = Struct.new(
-        :interval,
-        :timeout,
-        keyword_init: true
-      ) do
-        def initialize(**kwargs)
-          # @type var kwargs: untyped
-          kwargs[:interval] = 30.0 unless kwargs.key?(:interval)
-          kwargs[:timeout] = 15.0 unless kwargs.key?(:timeout)
+      class KeepAliveOptions
+        def initialize(interval: 30.0, timeout: 15.0)
           super
         end
       end
+
+      HTTPConnectProxyOptions = Data.define(
+        :target_host,
+        :basic_auth_user,
+        :basic_auth_pass
+      )
 
       # Options for HTTP CONNECT proxy for client connections.
       #
@@ -113,12 +120,7 @@ module Temporalio
       #   @return [String, nil] User for HTTP basic auth for the proxy, must be combined with {basic_auth_pass}.
       # @!attribute basic_auth_pass
       #   @return [String, nil] Pass for HTTP basic auth for the proxy, must be combined with {basic_auth_user}.
-      HTTPConnectProxyOptions = Struct.new(
-        :target_host,
-        :basic_auth_user, # Optional
-        :basic_auth_pass, # Optional,
-        keyword_init: true
-      )
+      class HTTPConnectProxyOptions; end # rubocop:disable Lint/EmptyClass
 
       # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
       attr_reader :options

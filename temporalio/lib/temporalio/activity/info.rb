@@ -2,6 +2,26 @@
 
 module Temporalio
   module Activity
+    Info = Data.define(
+      :activity_id,
+      :activity_type,
+      :attempt,
+      :current_attempt_scheduled_time,
+      :heartbeat_details,
+      :heartbeat_timeout,
+      :local?,
+      :schedule_to_close_timeout,
+      :scheduled_time,
+      :start_to_close_timeout,
+      :started_time,
+      :task_queue,
+      :task_token,
+      :workflow_id,
+      :workflow_namespace,
+      :workflow_run_id,
+      :workflow_type
+    )
+
     # Information about an activity.
     #
     # @!attribute activity_id
@@ -39,25 +59,6 @@ module Temporalio
     #   @return [String] Workflow run ID that started this activity.
     # @!attribute workflow_type
     #   @return [String] Workflow type name that started this activity.
-    Info = Struct.new(
-      :activity_id,
-      :activity_type,
-      :attempt,
-      :current_attempt_scheduled_time,
-      :heartbeat_details,
-      :heartbeat_timeout,
-      :local?,
-      :schedule_to_close_timeout,
-      :scheduled_time,
-      :start_to_close_timeout,
-      :started_time,
-      :task_queue,
-      :task_token,
-      :workflow_id,
-      :workflow_namespace,
-      :workflow_run_id,
-      :workflow_type,
-      keyword_init: true
-    )
+    class Info; end # rubocop:disable Lint/EmptyClass
   end
 end

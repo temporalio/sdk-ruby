@@ -434,7 +434,10 @@ module Temporalio
                 rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
               )
               resp.schedules.each do |raw_entry|
-                yielder << Temporalio::Client::Schedule::List::Description.new(raw_entry, @client.data_converter)
+                yielder << Temporalio::Client::Schedule::List::Description.new(
+                  raw_entry:,
+                  data_converter: @client.data_converter
+                )
               end
               break if resp.next_page_token.empty?
 
@@ -473,15 +476,15 @@ module Temporalio
 
         def describe_schedule(input)
           Temporalio::Client::Schedule::Description.new(
-            input.id,
-            @client.workflow_service.describe_schedule(
+            id: input.id,
+            raw_description: @client.workflow_service.describe_schedule(
               Api::WorkflowService::V1::DescribeScheduleRequest.new(
                 namespace: @client.namespace,
                 schedule_id: input.id
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             ),
-            @client.data_converter
+            data_converter: @client.data_converter
           )
         end
 
@@ -538,15 +541,15 @@ module Temporalio
           update = input.updater.call(
             Temporalio::Client::Schedule::Update::Input.new(
               description: Temporalio::Client::Schedule::Description.new(
-                input.id,
-                @client.workflow_service.describe_schedule(
+                id: input.id,
+                raw_description: @client.workflow_service.describe_schedule(
                   Api::WorkflowService::V1::DescribeScheduleRequest.new(
                     namespace: @client.namespace,
                     schedule_id: input.id
                   ),
                   rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                 ),
-                @client.data_converter
+                data_converter: @client.data_converter
               )
             )
           )

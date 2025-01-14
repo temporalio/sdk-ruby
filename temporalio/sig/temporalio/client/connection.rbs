@@ -2,16 +2,16 @@ module Temporalio
   class Client
     class Connection
       class Options
-        attr_accessor target_host: String
-        attr_accessor api_key: String?
-        attr_accessor tls: bool | Connection::TLSOptions
-        attr_accessor rpc_metadata: Hash[String, String]
-        attr_accessor rpc_retry: RPCRetryOptions
-        attr_accessor identity: String
-        attr_accessor keep_alive: KeepAliveOptions
-        attr_accessor http_connect_proxy: HTTPConnectProxyOptions
-        attr_accessor runtime: Runtime
-        attr_accessor lazy_connect: bool
+        attr_reader target_host: String
+        attr_reader api_key: String?
+        attr_reader tls: bool | Connection::TLSOptions
+        attr_reader rpc_metadata: Hash[String, String]
+        attr_reader rpc_retry: RPCRetryOptions
+        attr_reader identity: String
+        attr_reader keep_alive: KeepAliveOptions
+        attr_reader http_connect_proxy: HTTPConnectProxyOptions
+        attr_reader runtime: Runtime
+        attr_reader lazy_connect: bool
 
         def initialize: (
           target_host: String,
@@ -25,13 +25,17 @@ module Temporalio
           runtime: Runtime,
           lazy_connect: bool
         ) -> void
+
+        def to_h: -> Hash[Symbol, untyped]
+
+        def with: (**untyped) -> Options
       end
 
       class TLSOptions
-        attr_accessor client_cert: String?
-        attr_accessor client_private_key: String?
-        attr_accessor server_root_ca_cert: String?
-        attr_accessor domain: String?
+        attr_reader client_cert: String?
+        attr_reader client_private_key: String?
+        attr_reader server_root_ca_cert: String?
+        attr_reader domain: String?
 
         def initialize: (
           ?client_cert: String?,
@@ -42,12 +46,12 @@ module Temporalio
       end
 
       class RPCRetryOptions
-        attr_accessor initial_interval: Float
-        attr_accessor randomization_factor: Float
-        attr_accessor multiplier: Float
-        attr_accessor max_interval: Float
-        attr_accessor max_elapsed_time: Float
-        attr_accessor max_retries: Integer
+        attr_reader initial_interval: Float
+        attr_reader randomization_factor: Float
+        attr_reader multiplier: Float
+        attr_reader max_interval: Float
+        attr_reader max_elapsed_time: Float
+        attr_reader max_retries: Integer
 
         def initialize: (
           ?initial_interval: Float,
@@ -60,8 +64,8 @@ module Temporalio
       end
 
       class KeepAliveOptions
-        attr_accessor interval: Float
-        attr_accessor timeout: Float
+        attr_reader interval: Float
+        attr_reader timeout: Float
 
         def initialize: (
           ?interval: Float,
@@ -70,9 +74,9 @@ module Temporalio
       end
 
       class HTTPConnectProxyOptions
-        attr_accessor target_host: String
-        attr_accessor basic_auth_user: String?
-        attr_accessor basic_auth_pass: String?
+        attr_reader target_host: String
+        attr_reader basic_auth_user: String?
+        attr_reader basic_auth_pass: String?
 
         def initialize: (
           target_host: String,

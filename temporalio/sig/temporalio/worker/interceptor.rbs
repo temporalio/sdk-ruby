@@ -5,9 +5,9 @@ module Temporalio
         def intercept_activity: (Inbound next_interceptor) -> Inbound
 
         class ExecuteInput
-          attr_accessor proc: Proc
-          attr_accessor args: Array[Object?]
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader proc: Proc
+          attr_reader args: Array[Object?]
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             proc: Proc,
@@ -27,7 +27,7 @@ module Temporalio
         end
 
         class HeartbeatInput
-          attr_accessor details: Array[Object?]
+          attr_reader details: Array[Object?]
 
           def initialize: (details: Array[Object?]) -> void
         end
@@ -45,8 +45,8 @@ module Temporalio
         def intercept_workflow: (Inbound next_interceptor) -> Inbound
 
         class ExecuteInput
-          attr_accessor args: Array[Object?]
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader args: Array[Object?]
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             args: Array[Object?],
@@ -55,10 +55,10 @@ module Temporalio
         end
 
         class HandleSignalInput
-          attr_accessor signal: String
-          attr_accessor args: Array[Object?]
-          attr_accessor definition: Temporalio::Workflow::Definition::Signal
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader signal: String
+          attr_reader args: Array[Object?]
+          attr_reader definition: Temporalio::Workflow::Definition::Signal
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             signal: String,
@@ -69,11 +69,11 @@ module Temporalio
         end
 
         class HandleQueryInput
-          attr_accessor id: String
-          attr_accessor query: String
-          attr_accessor args: Array[Object?]
-          attr_accessor definition: Temporalio::Workflow::Definition::Query
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader id: String
+          attr_reader query: String
+          attr_reader args: Array[Object?]
+          attr_reader definition: Temporalio::Workflow::Definition::Query
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             id: String,
@@ -85,11 +85,11 @@ module Temporalio
         end
 
         class HandleUpdateInput
-          attr_accessor id: String
-          attr_accessor update: String
-          attr_accessor args: Array[Object?]
-          attr_accessor definition: Temporalio::Workflow::Definition::Update
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader id: String
+          attr_reader update: String
+          attr_reader args: Array[Object?]
+          attr_reader definition: Temporalio::Workflow::Definition::Update
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             id: String,
@@ -119,8 +119,8 @@ module Temporalio
         end
 
         class CancelExternalWorkflowInput
-          attr_accessor id: String
-          attr_accessor run_id: String?
+          attr_reader id: String
+          attr_reader run_id: String?
 
           def initialize: (
             id: String,
@@ -129,19 +129,19 @@ module Temporalio
         end
 
         class ExecuteActivityInput
-          attr_accessor activity: singleton(Temporalio::Activity::Definition) | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor task_queue: String
-          attr_accessor schedule_to_close_timeout: duration?
-          attr_accessor schedule_to_start_timeout: duration?
-          attr_accessor start_to_close_timeout: duration?
-          attr_accessor heartbeat_timeout: duration?
-          attr_accessor retry_policy: RetryPolicy?
-          attr_accessor cancellation: Cancellation
-          attr_accessor cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
-          attr_accessor activity_id: String?
-          attr_accessor disable_eager_execution: bool
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader activity: singleton(Temporalio::Activity::Definition) | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader task_queue: String
+          attr_reader schedule_to_close_timeout: duration?
+          attr_reader schedule_to_start_timeout: duration?
+          attr_reader start_to_close_timeout: duration?
+          attr_reader heartbeat_timeout: duration?
+          attr_reader retry_policy: RetryPolicy?
+          attr_reader cancellation: Cancellation
+          attr_reader cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
+          attr_reader activity_id: String?
+          attr_reader disable_eager_execution: bool
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             activity: singleton(Temporalio::Activity::Definition) | Symbol | String,
@@ -161,17 +161,17 @@ module Temporalio
         end
 
         class ExecuteLocalActivityInput
-          attr_accessor activity: singleton(Temporalio::Activity::Definition) | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor schedule_to_close_timeout: duration?
-          attr_accessor schedule_to_start_timeout: duration?
-          attr_accessor start_to_close_timeout: duration?
-          attr_accessor retry_policy: RetryPolicy?
-          attr_accessor local_retry_threshold: duration?
-          attr_accessor cancellation: Cancellation
-          attr_accessor cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
-          attr_accessor activity_id: String?
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader activity: singleton(Temporalio::Activity::Definition) | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader schedule_to_close_timeout: duration?
+          attr_reader schedule_to_start_timeout: duration?
+          attr_reader start_to_close_timeout: duration?
+          attr_reader retry_policy: RetryPolicy?
+          attr_reader local_retry_threshold: duration?
+          attr_reader cancellation: Cancellation
+          attr_reader cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
+          attr_reader activity_id: String?
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             activity: singleton(Temporalio::Activity::Definition) | Symbol | String,
@@ -189,7 +189,7 @@ module Temporalio
         end
 
         class InitializeContinueAsNewErrorInput
-          attr_accessor error: Temporalio::Workflow::ContinueAsNewError
+          attr_reader error: Temporalio::Workflow::ContinueAsNewError
 
           def initialize: (
             error: Temporalio::Workflow::ContinueAsNewError
@@ -197,11 +197,11 @@ module Temporalio
         end
 
         class SignalChildWorkflowInput
-          attr_accessor id: String
-          attr_accessor signal: Temporalio::Workflow::Definition::Signal | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor cancellation: Cancellation
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader id: String
+          attr_reader signal: Temporalio::Workflow::Definition::Signal | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader cancellation: Cancellation
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             id: String,
@@ -213,12 +213,12 @@ module Temporalio
         end
 
         class SignalExternalWorkflowInput
-          attr_accessor id: String
-          attr_accessor run_id: String?
-          attr_accessor signal: Temporalio::Workflow::Definition::Signal | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor cancellation: Cancellation
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader id: String
+          attr_reader run_id: String?
+          attr_reader signal: Temporalio::Workflow::Definition::Signal | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader cancellation: Cancellation
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             id: String,
@@ -231,9 +231,9 @@ module Temporalio
         end
 
         class SleepInput
-          attr_accessor duration: duration?
-          attr_accessor summary: String?
-          attr_accessor cancellation: Cancellation
+          attr_reader duration: duration?
+          attr_reader summary: String?
+          attr_reader cancellation: Cancellation
 
           def initialize: (
             duration: duration?,
@@ -243,22 +243,22 @@ module Temporalio
         end
 
         class StartChildWorkflowInput
-          attr_accessor workflow: singleton(Temporalio::Workflow::Definition) | Temporalio::Workflow::Definition::Info | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor id: String
-          attr_accessor task_queue: String
-          attr_accessor cancellation: Cancellation
-          attr_accessor cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum
-          attr_accessor parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum
-          attr_accessor execution_timeout: duration?
-          attr_accessor run_timeout: duration?
-          attr_accessor task_timeout: duration?
-          attr_accessor id_reuse_policy: WorkflowIDReusePolicy::enum
-          attr_accessor retry_policy: RetryPolicy?
-          attr_accessor cron_schedule: String?
-          attr_accessor memo: Hash[String | Symbol, Object?]?
-          attr_accessor search_attributes: SearchAttributes?
-          attr_accessor headers: Hash[String, Object?]
+          attr_reader workflow: singleton(Temporalio::Workflow::Definition) | Temporalio::Workflow::Definition::Info | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader id: String
+          attr_reader task_queue: String
+          attr_reader cancellation: Cancellation
+          attr_reader cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum
+          attr_reader parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum
+          attr_reader execution_timeout: duration?
+          attr_reader run_timeout: duration?
+          attr_reader task_timeout: duration?
+          attr_reader id_reuse_policy: WorkflowIDReusePolicy::enum
+          attr_reader retry_policy: RetryPolicy?
+          attr_reader cron_schedule: String?
+          attr_reader memo: Hash[String | Symbol, Object?]?
+          attr_reader search_attributes: SearchAttributes?
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             workflow: singleton(Temporalio::Workflow::Definition) | Temporalio::Workflow::Definition::Info | Symbol | String,

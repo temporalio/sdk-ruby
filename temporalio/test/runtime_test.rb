@@ -35,10 +35,10 @@ class RuntimeTest < Test
     )
 
     # Create a client on this runtime and start a non-existent workflow
-    conn_opts = env.client.connection.options.dup
-    conn_opts.runtime = runtime
-    client_opts = env.client.options.dup
-    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    )
     client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
     client.start_workflow('bad-workflow', id: "bad-wf-#{SecureRandom.uuid}", task_queue: 'bad-task-queue')
 

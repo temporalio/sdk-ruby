@@ -18,7 +18,7 @@ module Temporalio
       end
 
       # Input for {Outbound.start_workflow}.
-      StartWorkflowInput = Struct.new(
+      StartWorkflowInput = Data.define(
         :workflow,
         :args,
         :workflow_id,
@@ -35,68 +35,61 @@ module Temporalio
         :start_delay,
         :request_eager_start,
         :headers,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.list_workflows}.
-      ListWorkflowsInput = Struct.new(
+      ListWorkflowsInput = Data.define(
         :query,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.count_workflows}.
-      CountWorkflowsInput = Struct.new(
+      CountWorkflowsInput = Data.define(
         :query,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.describe_workflow}.
-      DescribeWorkflowInput = Struct.new(
+      DescribeWorkflowInput = Data.define(
         :workflow_id,
         :run_id,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.fetch_workflow_history_events}.
-      FetchWorkflowHistoryEventsInput = Struct.new(
+      FetchWorkflowHistoryEventsInput = Data.define(
         :workflow_id,
         :run_id,
         :wait_new_event,
         :event_filter_type,
         :skip_archival,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.signal_workflow}.
-      SignalWorkflowInput = Struct.new(
+      SignalWorkflowInput = Data.define(
         :workflow_id,
         :run_id,
         :signal,
         :args,
         :headers,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.query_workflow}.
-      QueryWorkflowInput = Struct.new(
+      QueryWorkflowInput = Data.define(
         :workflow_id,
         :run_id,
         :query,
         :args,
         :reject_condition,
         :headers,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.start_workflow_update}.
-      StartWorkflowUpdateInput = Struct.new(
+      StartWorkflowUpdateInput = Data.define(
         :workflow_id,
         :run_id,
         :update_id,
@@ -104,143 +97,126 @@ module Temporalio
         :args,
         :wait_for_stage,
         :headers,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.poll_workflow_update}.
-      PollWorkflowUpdateInput = Struct.new(
+      PollWorkflowUpdateInput = Data.define(
         :workflow_id,
         :run_id,
         :update_id,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.cancel_workflow}.
-      CancelWorkflowInput = Struct.new(
+      CancelWorkflowInput = Data.define(
         :workflow_id,
         :run_id,
         :first_execution_run_id,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.terminate_workflow}.
-      TerminateWorkflowInput = Struct.new(
+      TerminateWorkflowInput = Data.define(
         :workflow_id,
         :run_id,
         :first_execution_run_id,
         :reason,
         :details,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.create_schedule}.
-      CreateScheduleInput = Struct.new(
+      CreateScheduleInput = Data.define(
         :id,
         :schedule,
         :trigger_immediately,
         :backfills,
         :memo,
         :search_attributes,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.list_schedules}.
-      ListSchedulesInput = Struct.new(
+      ListSchedulesInput = Data.define(
         :query,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.backfill_schedule}.
-      BackfillScheduleInput = Struct.new(
+      BackfillScheduleInput = Data.define(
         :id,
         :backfills,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.delete_schedule}.
-      DeleteScheduleInput = Struct.new(
+      DeleteScheduleInput = Data.define(
         :id,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.describe_schedule}.
-      DescribeScheduleInput = Struct.new(
+      DescribeScheduleInput = Data.define(
         :id,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.pause_schedule}.
-      PauseScheduleInput = Struct.new(
+      PauseScheduleInput = Data.define(
         :id,
         :note,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.trigger_schedule}.
-      TriggerScheduleInput = Struct.new(
+      TriggerScheduleInput = Data.define(
         :id,
         :overlap,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.unpause_schedule}.
-      UnpauseScheduleInput = Struct.new(
+      UnpauseScheduleInput = Data.define(
         :id,
         :note,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.update_schedule}.
-      UpdateScheduleInput = Struct.new(
+      UpdateScheduleInput = Data.define(
         :id,
         :updater,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.heartbeat_async_activity}.
-      HeartbeatAsyncActivityInput = Struct.new(
+      HeartbeatAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :details,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.complete_async_activity}.
-      CompleteAsyncActivityInput = Struct.new(
+      CompleteAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :result,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.fail_async_activity}.
-      FailAsyncActivityInput = Struct.new(
+      FailAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :error,
         :last_heartbeat_details,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Input for {Outbound.report_cancellation_async_activity}.
-      ReportCancellationAsyncActivityInput = Struct.new(
+      ReportCancellationAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :details,
-        :rpc_options,
-        keyword_init: true
+        :rpc_options
       )
 
       # Outbound interceptor for intercepting client calls. This should be extended by users needing to intercept client

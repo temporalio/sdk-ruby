@@ -105,8 +105,7 @@ class ClientTest < Test
   def test_interceptor
     # Create client with interceptor
     track = TrackCallsInterceptor.new
-    new_options = env.client.options.dup
-    new_options.interceptors = [track]
+    new_options = env.client.options.with(interceptors: [track])
     client = Temporalio::Client.new(**new_options.to_h) # steep:ignore
 
     # Run a bunch of calls

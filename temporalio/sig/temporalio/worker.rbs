@@ -1,34 +1,34 @@
 module Temporalio
   class Worker
     class Options
-      attr_accessor client: Client
-      attr_accessor task_queue: String
-      attr_accessor activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]
-      attr_accessor workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
-      attr_accessor tuner: Tuner
-      attr_accessor activity_executors: Hash[Symbol, Worker::ActivityExecutor]
-      attr_accessor workflow_executor: Worker::WorkflowExecutor
-      attr_accessor interceptors: Array[Interceptor::Activity | Interceptor::Workflow]
-      attr_accessor build_id: String
-      attr_accessor identity: String
-      attr_accessor logger: Logger
-      attr_accessor max_cached_workflows: Integer
-      attr_accessor max_concurrent_workflow_task_polls: Integer
-      attr_accessor nonsticky_to_sticky_poll_ratio: Float
-      attr_accessor max_concurrent_activity_task_polls: Integer
-      attr_accessor no_remote_activities: bool
-      attr_accessor sticky_queue_schedule_to_start_timeout: Float
-      attr_accessor max_heartbeat_throttle_interval: Float
-      attr_accessor default_heartbeat_throttle_interval: Float
-      attr_accessor max_activities_per_second: Float?
-      attr_accessor max_task_queue_activities_per_second: Float?
-      attr_accessor graceful_shutdown_period: Float
-      attr_accessor use_worker_versioning: bool
-      attr_accessor disable_eager_activity_execution: bool
-      attr_accessor illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
-      attr_accessor workflow_failure_exception_types: Array[singleton(Exception)]
-      attr_accessor workflow_payload_codec_thread_pool: ThreadPool?
-      attr_accessor debug_mode: bool
+      attr_reader client: Client
+      attr_reader task_queue: String
+      attr_reader activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]
+      attr_reader workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
+      attr_reader tuner: Tuner
+      attr_reader activity_executors: Hash[Symbol, Worker::ActivityExecutor]
+      attr_reader workflow_executor: Worker::WorkflowExecutor
+      attr_reader interceptors: Array[Interceptor::Activity | Interceptor::Workflow]
+      attr_reader build_id: String
+      attr_reader identity: String
+      attr_reader logger: Logger
+      attr_reader max_cached_workflows: Integer
+      attr_reader max_concurrent_workflow_task_polls: Integer
+      attr_reader nonsticky_to_sticky_poll_ratio: Float
+      attr_reader max_concurrent_activity_task_polls: Integer
+      attr_reader no_remote_activities: bool
+      attr_reader sticky_queue_schedule_to_start_timeout: Float
+      attr_reader max_heartbeat_throttle_interval: Float
+      attr_reader default_heartbeat_throttle_interval: Float
+      attr_reader max_activities_per_second: Float?
+      attr_reader max_task_queue_activities_per_second: Float?
+      attr_reader graceful_shutdown_period: Float
+      attr_reader use_worker_versioning: bool
+      attr_reader disable_eager_activity_execution: bool
+      attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
+      attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
+      attr_reader workflow_payload_codec_thread_pool: ThreadPool?
+      attr_reader debug_mode: bool
 
       def initialize: (
         client: Client,

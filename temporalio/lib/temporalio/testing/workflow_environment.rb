@@ -256,8 +256,9 @@ module Temporalio
       class Ephemeral < WorkflowEnvironment
         def initialize(client, core_server, supports_time_skipping:)
           # Add our interceptor at the end of the existing interceptors that skips time
-          client_options = client.options.dup
-          client_options.interceptors += [TimeSkippingClientInterceptor.new(self)]
+          client_options = client.options.with(
+            interceptors: client.options.interceptors + [TimeSkippingClientInterceptor.new(self)]
+          )
           client = Client.new(**client_options.to_h) # steep:ignore
           super(client)
 

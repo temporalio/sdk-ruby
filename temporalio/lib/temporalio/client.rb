@@ -33,16 +33,17 @@ module Temporalio
   # synchronous and asynchronous contexts. Internally they use callbacks based on {::Queue} which means they are
   # Fiber-compatible.
   class Client
-    # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
-    Options = Struct.new(
+    Options = Data.define(
       :connection,
       :namespace,
       :data_converter,
       :interceptors,
       :logger,
-      :default_workflow_query_reject_condition,
-      keyword_init: true
+      :default_workflow_query_reject_condition
     )
+
+    # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
+    class Options; end # rubocop:disable Lint/EmptyClass
 
     # Connect to Temporal server. This is a shortcut for +Connection.new+ followed by +Client.new+.
     #

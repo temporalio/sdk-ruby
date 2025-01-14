@@ -8,12 +8,11 @@ require 'temporalio/search_attributes'
 
 module Temporalio
   class Client
-    Schedule = Struct.new(
+    Schedule = Data.define(
       :action,
       :spec,
       :policy,
-      :state,
-      keyword_init: true
+      :state
     )
 
     # A schedule for periodically running an action.
@@ -57,12 +56,11 @@ module Temporalio
         )
       end
 
-      Description = Struct.new( # rubocop:disable Layout/ClassStructure
+      Description = Data.define( # rubocop:disable Layout/ClassStructure
         :id,
         :schedule,
         :info,
-        :raw_description,
-        keyword_init: true
+        :raw_description
       )
 
       # Description of a schedule.
@@ -77,17 +75,17 @@ module Temporalio
       #   @return [Api::WorkflowService::V1::DescribeScheduleResponse] Raw description of the schedule.
       class Description
         # @!visibility private
-        def initialize(id, raw_description, data_converter)
+        def initialize(id:, raw_description:, data_converter:)
+          @memo = Internal::ProtoUtils::LazyMemo.new(raw_description.memo, data_converter)
+          @search_attributes = Internal::ProtoUtils::LazySearchAttributes.new(raw_description.search_attributes)
           # steep:ignore:start
           super(
             id:,
             schedule: Schedule._from_proto(raw_description.schedule, data_converter),
-            info: Info.new(raw_description.info),
+            info: Info.new(raw_info: raw_description.info),
             raw_description:
           )
           # steep:ignore:end
-          @memo = Internal::ProtoUtils::LazyMemo.new(raw_description.memo, data_converter)
-          @search_attributes = Internal::ProtoUtils::LazySearchAttributes.new(raw_description.search_attributes)
         end
 
         # @return [Hash<String, Object>, nil] Memo for the schedule, converted lazily on first call.
@@ -101,7 +99,7 @@ module Temporalio
         end
       end
 
-      Info = Struct.new(
+      Info = Data.define(
         :num_actions,
         :num_actions_missed_catchup_window,
         :num_actions_skipped_overlap,
@@ -109,8 +107,7 @@ module Temporalio
         :recent_actions,
         :next_action_times,
         :created_at,
-        :last_updated_at,
-        keyword_init: true
+        :last_updated_at
       )
 
       # Information about a schedule.
@@ -133,14 +130,16 @@ module Temporalio
       #   @return [Time, nil] When the schedule was last updated.
       class Info
         # @!visibility private
-        def initialize(raw_info)
+        def initialize(raw_info:)
           # steep:ignore:start
           super(
             num_actions: raw_info.action_count,
             num_actions_missed_catchup_window: raw_info.missed_catchup_window,
             num_actions_skipped_overlap: raw_info.overlap_skipped,
-            running_actions: raw_info.running_workflows.map { |w| ActionExecution::StartWorkflow.new(w) },
-            recent_actions: raw_info.recent_actions.map { |a| ActionResult.new(a) },
+            running_actions: raw_info.running_workflows.map do |w|
+              ActionExecution::StartWorkflow.new(raw_execution: w)
+            end,
+            recent_actions: raw_info.recent_actions.map { |a| ActionResult.new(raw_result: a) },
             next_action_times: raw_info.future_action_times.map { |t| Internal::ProtoUtils.timestamp_to_time(t) },
             created_at: Internal::ProtoUtils.timestamp_to_time(raw_info.create_time),
             last_updated_at: Internal::ProtoUtils.timestamp_to_time(raw_info.update_time)
@@ -163,7 +162,7 @@ module Temporalio
           raise NotImplementedError
         end
 
-        StartWorkflow = Struct.new(
+        StartWorkflow = Data.define(
           :workflow,
           :args,
           :id,
@@ -174,8 +173,7 @@ module Temporalio
           :retry_policy,
           :memo,
           :search_attributes,
-          :headers,
-          keyword_init: true
+          :headers
         )
 
         # Schedule action to start a workflow.
@@ -205,6 +203,52 @@ module Temporalio
         class StartWorkflow
           include Action
 
+          class << self
+            alias _original_new new
+
+            # Create start-workflow schedule action.
+            #
+            # @param workflow [Class<Workflow::Definition>, Symbol, String] Workflow.
+            # @param args [Array<Object>] Arguments to the workflow.
+            # @param id [String] Unique identifier for the workflow execution.
+            # @param task_queue [String] Task queue to run the workflow on.
+            # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and
+            #   continue as new.
+            # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
+            # @param task_timeout [Float, nil] Timeout of a single workflow task in seconds.
+            # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
+            # @param memo [Hash<String, Object>, nil] Memo for the workflow.
+            # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
+            # @param headers [Hash<String, Object>, nil] Headers for the workflow.
+            def new(
+              workflow,
+              *args,
+              id:,
+              task_queue:,
+              execution_timeout: nil,
+              run_timeout: nil,
+              task_timeout: nil,
+              retry_policy: nil,
+              memo: nil,
+              search_attributes: nil,
+              headers: nil
+            )
+              _original_new( # steep:ignore
+                workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
+                args:,
+                id:,
+                task_queue:,
+                execution_timeout:,
+                run_timeout:,
+                task_timeout:,
+                retry_policy:,
+                memo:,
+                search_attributes:,
+                headers:
+              )
+            end
+          end
+
           # @!visibility private
           def self._from_proto(raw_info, data_converter)
             StartWorkflow.new(
@@ -220,50 +264,6 @@ module Temporalio
               search_attributes: SearchAttributes._from_proto(raw_info.search_attributes),
               headers: Internal::ProtoUtils.headers_from_proto(raw_info.header, data_converter)
             )
-          end
-
-          # Create start-workflow schedule action.
-          #
-          # @param workflow [Class<Workflow::Definition>, Symbol, String] Workflow.
-          # @param args [Array<Object>] Arguments to the workflow.
-          # @param id [String] Unique identifier for the workflow execution.
-          # @param task_queue [String] Task queue to run the workflow on.
-          # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and
-          #   continue as new.
-          # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
-          # @param task_timeout [Float, nil] Timeout of a single workflow task in seconds.
-          # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
-          # @param memo [Hash<String, Object>, nil] Memo for the workflow.
-          # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
-          # @param headers [Hash<String, Object>, nil] Headers for the workflow.
-          def initialize(
-            workflow,
-            *args,
-            id:,
-            task_queue:,
-            execution_timeout: nil,
-            run_timeout: nil,
-            task_timeout: nil,
-            retry_policy: nil,
-            memo: nil,
-            search_attributes: nil,
-            headers: nil
-          )
-            # steep:ignore:start
-            super(
-              workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
-              args:,
-              id:,
-              task_queue:,
-              execution_timeout:,
-              run_timeout:,
-              task_timeout:,
-              retry_policy:,
-              memo:,
-              search_attributes:,
-              headers:,
-            )
-            # steep:ignore:end
           end
 
           # @!visibility private
@@ -313,11 +313,10 @@ module Temporalio
         ALLOW_ALL = Api::Enums::V1::ScheduleOverlapPolicy::SCHEDULE_OVERLAP_POLICY_ALLOW_ALL
       end
 
-      Backfill = Struct.new(
+      Backfill = Data.define(
         :start_at,
         :end_at,
-        :overlap,
-        keyword_init: true
+        :overlap
       )
 
       # Time period and policy for actions taken as if the time passed right now.
@@ -354,10 +353,9 @@ module Temporalio
 
       # Base module mixed in by specific action executions.
       module ActionExecution
-        StartWorkflow = Struct.new(
+        StartWorkflow = Data.define(
           :workflow_id,
-          :first_execution_run_id,
-          keyword_init: true
+          :first_execution_run_id
         )
 
         # Execution of a scheduled workflow start.
@@ -370,7 +368,7 @@ module Temporalio
           include ActionExecution
 
           # @!visibility private
-          def initialize(raw_execution)
+          def initialize(raw_execution:)
             # steep:ignore:start
             super(
               workflow_id: raw_execution.workflow_id,
@@ -381,11 +379,10 @@ module Temporalio
         end
       end
 
-      ActionResult = Struct.new(
+      ActionResult = Data.define(
         :scheduled_at,
         :started_at,
-        :action,
-        keyword_init: true
+        :action
       )
 
       # Information about when an action took place.
@@ -398,18 +395,18 @@ module Temporalio
       #   @return [ActionExecution] Action that took place.
       class ActionResult
         # @!visibility private
-        def initialize(raw_result)
+        def initialize(raw_result:)
           # steep:ignore:start
           super(
             scheduled_at: Internal::ProtoUtils.timestamp_to_time(raw_result.schedule_time),
             started_at: Internal::ProtoUtils.timestamp_to_time(raw_result.actual_time),
-            action: ActionExecution::StartWorkflow.new(raw_result.start_workflow_result)
+            action: ActionExecution::StartWorkflow.new(raw_execution: raw_result.start_workflow_result)
           )
           # steep:ignore:end
         end
       end
 
-      Spec = Struct.new(
+      Spec = Data.define(
         :calendars,
         :intervals,
         :cron_expressions,
@@ -417,8 +414,7 @@ module Temporalio
         :start_at,
         :end_at,
         :jitter,
-        :time_zone_name,
-        keyword_init: true
+        :time_zone_name
       )
 
       # Specification of the times scheduled actions may occur.
@@ -499,7 +495,7 @@ module Temporalio
           )
         end
 
-        Calendar = Struct.new( # rubocop:disable Layout/ClassStructure
+        Calendar = Data.define( # rubocop:disable Layout/ClassStructure
           :second,
           :minute,
           :hour,
@@ -507,8 +503,7 @@ module Temporalio
           :month,
           :year,
           :day_of_week,
-          :comment,
-          keyword_init: true
+          :comment
         )
 
         # Specification relative to calendar time when to run an action.
@@ -585,10 +580,9 @@ module Temporalio
           end
         end
 
-        Interval = Struct.new(
+        Interval = Data.define(
           :every,
-          :offset,
-          keyword_init: true
+          :offset
         )
 
         # Specification for scheduling on an interval.
@@ -626,11 +620,10 @@ module Temporalio
         end
       end
 
-      Range = Struct.new(
+      Range = Data.define(
         :start,
         :finish,
-        :step,
-        keyword_init: true
+        :step
       )
 
       # Inclusive range for a schedule match value.
@@ -642,6 +635,23 @@ module Temporalio
       # @!attribute step
       #   @return [Integer] Step to take between each value. Defaults as 1.
       class Range
+        class << self
+          alias _original_new new
+
+          # Create inclusive range.
+          #
+          # @param start [Integer] Inclusive start of the range.
+          # @param finish [Integer] Inclusive end of the range. If unset or less than start, defaults to start.
+          # @param step [Integer] Step to take between each value. Defaults as 1.
+          def new(start, finish = [0, start].max, step = 1)
+            _original_new( # steep:ignore
+              start:,
+              finish:,
+              step:
+            )
+          end
+        end
+
         # @!visibility private
         def self._from_proto(raw_range)
           Schedule::Range.new(
@@ -661,21 +671,6 @@ module Temporalio
           ranges.map(&:_to_proto)
         end
 
-        # Create inclusive range.
-        #
-        # @param start [Integer] Inclusive start of the range.
-        # @param finish [Integer] Inclusive end of the range. If unset or less than start, defaults to start.
-        # @param step [Integer] Step to take between each value. Defaults as 1.
-        def initialize(start, finish = [0, start].max, step = 1)
-          # steep:ignore:start
-          super(
-            start:,
-            finish:,
-            step:
-          )
-          # steep:ignore:end
-        end
-
         # @!visibility private
         def _to_proto
           Api::Schedule::V1::Range.new(
@@ -686,11 +681,10 @@ module Temporalio
         end
       end
 
-      Policy = Struct.new(
+      Policy = Data.define(
         :overlap,
         :catchup_window,
-        :pause_on_failure,
-        keyword_init: true
+        :pause_on_failure
       )
 
       # Policies of a schedule.
@@ -739,12 +733,11 @@ module Temporalio
         end
       end
 
-      State = Struct.new(
+      State = Data.define(
         :note,
         :paused,
         :limited_actions,
-        :remaining_actions,
-        keyword_init: true
+        :remaining_actions
       )
 
       # State of a schedule.
@@ -801,10 +794,9 @@ module Temporalio
         end
       end
 
-      Update = Struct.new(
+      Update = Data.define(
         :schedule,
-        :search_attributes,
-        keyword_init: true
+        :search_attributes
       )
 
       # Result of an update callback for {ScheduleHandle.update}.
@@ -826,19 +818,17 @@ module Temporalio
         #
         # @!attribute description
         #   @return [Description] Current description of the schedule.
-        Input = Struct.new( # rubocop:disable Layout/ClassStructure
-          :description,
-          keyword_init: true
+        Input = Data.define( # rubocop:disable Layout/ClassStructure
+          :description
         )
       end
 
       module List
-        Description = Struct.new(
+        Description = Data.define(
           :id,
           :schedule,
           :info,
-          :raw_entry,
-          keyword_init: true
+          :raw_entry
         )
 
         # Description of a listed schedule.
@@ -855,17 +845,17 @@ module Temporalio
         #   @return [Api::Schedule::V1::ScheduleListEntry] Raw description of the schedule.
         class Description
           # @!visibility private
-          def initialize(raw_entry, data_converter)
+          def initialize(raw_entry:, data_converter:)
+            @memo = Internal::ProtoUtils::LazyMemo.new(raw_entry.memo, data_converter)
+            @search_attributes = Internal::ProtoUtils::LazySearchAttributes.new(raw_entry.search_attributes)
             # steep:ignore:start
             super(
               id: raw_entry.schedule_id,
-              schedule: (Schedule.new(raw_entry.info) if raw_entry.info),
-              info: (Info.new(raw_entry.info) if raw_entry.info),
+              schedule: (Schedule.new(raw_info: raw_entry.info) if raw_entry.info),
+              info: (Info.new(raw_info: raw_entry.info) if raw_entry.info),
               raw_entry:
             )
             # steep:ignore:end
-            @memo = Internal::ProtoUtils::LazyMemo.new(raw_entry.memo, data_converter)
-            @search_attributes = Internal::ProtoUtils::LazySearchAttributes.new(raw_entry.search_attributes)
           end
 
           # @return [Hash<String, Object>, nil] Memo for the schedule, converted lazily on first call.
@@ -879,11 +869,10 @@ module Temporalio
           end
         end
 
-        Schedule = Struct.new(
+        Schedule = Data.define(
           :action,
           :spec,
-          :state,
-          keyword_init: true
+          :state
         )
 
         # Details for a listed schedule.
@@ -896,14 +885,14 @@ module Temporalio
         #   @return [State] State of the schedule.
         class Schedule
           # @!visibility private
-          def initialize(raw_info)
+          def initialize(raw_info:)
             raise 'Unknown action on schedule' unless raw_info.workflow_type
 
             # steep:ignore:start
             super(
-              action: Action::StartWorkflow.new(raw_info.workflow_type.name),
+              action: Action::StartWorkflow.new(workflow: raw_info.workflow_type.name),
               spec: Spec._from_proto(raw_info.spec),
-              state: State.new(raw_info)
+              state: State.new(raw_info:)
             )
             # steep:ignore:end
           end
@@ -911,9 +900,8 @@ module Temporalio
 
         # Base module mixed in by specific actions a listed schedule can take.
         module Action
-          StartWorkflow = Struct.new(
-            :workflow,
-            keyword_init: true
+          StartWorkflow = Data.define(
+            :workflow
           )
 
           # Action to start a workflow on a listed schedule.
@@ -922,18 +910,12 @@ module Temporalio
           #   @return [String] Workflow type name.
           class StartWorkflow
             include Action
-
-            # @!visibility private
-            def initialize(workflow)
-              super(workflow:) # steep:ignore
-            end
           end
         end
 
-        Info = Struct.new(
+        Info = Data.define(
           :recent_actions,
-          :next_action_times,
-          keyword_init: true
+          :next_action_times
         )
 
         # Information about a listed schedule.
@@ -946,20 +928,19 @@ module Temporalio
         #     {Temporalio::Client::Schedule::Info.next_action_times}.
         class Info
           # @!visibility private
-          def initialize(raw_info)
+          def initialize(raw_info:)
             # steep:ignore:start
             super(
-              recent_actions: raw_info.recent_actions.map { |a| ActionResult.new(a) },
+              recent_actions: raw_info.recent_actions.map { |a| ActionResult.new(raw_result: a) },
               next_action_times: raw_info.future_action_times.map { |t| Internal::ProtoUtils.timestamp_to_time(t) }
             )
             # steep:ignore:end
           end
         end
 
-        State = Struct.new(
+        State = Data.define(
           :note,
-          :paused,
-          keyword_init: true
+          :paused
         )
 
         # State of a listed schedule.
@@ -971,7 +952,7 @@ module Temporalio
         #   @return [Boolean] Whether the schedule is paused.
         class State
           # @!visibility private
-          def initialize(raw_info)
+          def initialize(raw_info:)
             # steep:ignore:start
             super(
               note: Internal::ProtoUtils.string_or(raw_info.notes),

@@ -1030,8 +1030,9 @@ class WorkerWorkflowTest < Test
     env.ensure_common_search_attribute_keys
 
     # Create a new client with the base64 codec
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    )
     client = Temporalio::Client.new(**new_options.to_h)
     assert_encoded = lambda do |payload|
       assert_equal 'test/base64', payload.metadata['encoding']
@@ -1111,12 +1112,13 @@ class WorkerWorkflowTest < Test
     end
 
     # Workflow failure with failure encoding
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(
-      failure_converter: Ractor.make_shareable(
-        Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
-      ),
-      payload_codec: Base64Codec.new
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(
+        failure_converter: Ractor.make_shareable(
+          Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
+        ),
+        payload_codec: Base64Codec.new
+      )
     )
     client = Temporalio::Client.new(**new_options.to_h)
     execute_workflow(
@@ -1584,10 +1586,10 @@ class WorkerWorkflowTest < Test
         )
       )
     )
-    conn_opts = env.client.connection.options.dup
-    conn_opts.runtime = runtime
-    client_opts = env.client.options.dup
-    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h)
+    )
     client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
 
     assert_equal 'done', execute_workflow(
@@ -1667,9 +1669,10 @@ class WorkerWorkflowTest < Test
   end
 
   def test_fail_workflow_payload_converter
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(
-      payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(
+        payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
+      )
     )
     client = Temporalio::Client.new(**new_options.to_h)
 

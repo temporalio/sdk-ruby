@@ -1,10 +1,10 @@
 module Temporalio
   class Client
     class Schedule
-      attr_accessor action: Action
-      attr_accessor spec: Spec
-      attr_accessor policy: Policy
-      attr_accessor state: State
+      attr_reader action: Action
+      attr_reader spec: Spec
+      attr_reader policy: Policy
+      attr_reader state: State
 
       def self._from_proto: (
         untyped raw_schedule,
@@ -20,16 +20,18 @@ module Temporalio
 
       def _to_proto: (Converters::DataConverter data_converter) -> untyped
 
+      def with: (**untyped) -> Schedule
+
       class Description
-        attr_accessor id: String
-        attr_accessor schedule: Schedule
-        attr_accessor info: Schedule::Info
-        attr_accessor raw_description: untyped
+        attr_reader id: String
+        attr_reader schedule: Schedule
+        attr_reader info: Schedule::Info
+        attr_reader raw_description: untyped
 
         def initialize: (
-          String id,
-          untyped raw_description,
-          Converters::DataConverter data_converter
+          id: String,
+          raw_description: untyped,
+          data_converter: Converters::DataConverter
         ) -> void
 
         def memo: -> Hash[String, Object?]?
@@ -37,16 +39,16 @@ module Temporalio
       end
 
       class Info
-        attr_accessor num_actions: Integer
-        attr_accessor num_actions_missed_catchup_window: Integer
-        attr_accessor num_actions_skipped_overlap: Integer
-        attr_accessor running_actions: Array[ActionExecution]
-        attr_accessor recent_actions: Array[ActionResult]
-        attr_accessor next_action_times: Array[Time]
-        attr_accessor created_at: Time
-        attr_accessor last_updated_at: Time?
+        attr_reader num_actions: Integer
+        attr_reader num_actions_missed_catchup_window: Integer
+        attr_reader num_actions_skipped_overlap: Integer
+        attr_reader running_actions: Array[ActionExecution]
+        attr_reader recent_actions: Array[ActionResult]
+        attr_reader next_action_times: Array[Time]
+        attr_reader created_at: Time
+        attr_reader last_updated_at: Time?
 
-        def initialize: (untyped raw_info) -> void
+        def initialize: (raw_info: untyped) -> void
       end
 
       module Action
@@ -60,24 +62,19 @@ module Temporalio
         class StartWorkflow
           include Action
 
-          attr_accessor workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
-          attr_accessor args: Array[Object?]
-          attr_accessor id: String
-          attr_accessor task_queue: String
-          attr_accessor execution_timeout: duration?
-          attr_accessor run_timeout: duration?
-          attr_accessor task_timeout: duration?
-          attr_accessor retry_policy: RetryPolicy?
-          attr_accessor memo: Hash[String, Object?]?
-          attr_accessor search_attributes: SearchAttributes?
-          attr_accessor headers: Hash[String, Object?]?
+          attr_reader workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
+          attr_reader args: Array[Object?]
+          attr_reader id: String
+          attr_reader task_queue: String
+          attr_reader execution_timeout: duration?
+          attr_reader run_timeout: duration?
+          attr_reader task_timeout: duration?
+          attr_reader retry_policy: RetryPolicy?
+          attr_reader memo: Hash[String, Object?]?
+          attr_reader search_attributes: SearchAttributes?
+          attr_reader headers: Hash[String, Object?]?
 
-          def self._from_proto: (
-            untyped raw_info,
-            Converters::DataConverter data_converter
-          ) -> StartWorkflow
-
-          def initialize: (
+          def self.new: (
             singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
             *Object? args,
             id: String,
@@ -89,7 +86,14 @@ module Temporalio
             ?memo: Hash[String, Object?]?,
             ?search_attributes: SearchAttributes?,
             ?headers: Hash[String, Object?]?
-          ) -> void
+          ) -> StartWorkflow
+
+          def self._from_proto: (
+            untyped raw_info,
+            Converters::DataConverter data_converter
+          ) -> StartWorkflow
+
+          def with: (**untyped) -> StartWorkflow
 
           def _to_proto: (Converters::DataConverter data_converter) -> untyped
         end
@@ -107,9 +111,9 @@ module Temporalio
       end
 
       class Backfill
-        attr_accessor start_at: Time
-        attr_accessor end_at: Time
-        attr_accessor overlap: OverlapPolicy::enum?
+        attr_reader start_at: Time
+        attr_reader end_at: Time
+        attr_reader overlap: OverlapPolicy::enum?
 
         def initialize: (
           start_at: Time,
@@ -124,30 +128,30 @@ module Temporalio
         class StartWorkflow
           include ActionExecution
 
-          attr_accessor workflow_id: String
-          attr_accessor first_execution_run_id: String
+          attr_reader workflow_id: String
+          attr_reader first_execution_run_id: String
 
-          def initialize: (untyped raw_execution) -> void
+          def initialize: (raw_execution: untyped) -> void
         end
       end
 
       class ActionResult
-        attr_accessor schedule_at: Time
-        attr_accessor started_at: Time
-        attr_accessor action: ActionExecution
+        attr_reader schedule_at: Time
+        attr_reader started_at: Time
+        attr_reader action: ActionExecution
 
-        def initialize: (untyped raw_result) -> void
+        def initialize: (raw_result: untyped) -> void
       end
 
       class Spec
-        attr_accessor calendars: Array[Calendar]
-        attr_accessor intervals: Array[Interval]
-        attr_accessor cron_expressions: Array[String]
-        attr_accessor skip: Array[Calendar]
-        attr_accessor start_at: Time?
-        attr_accessor end_at: Time?
-        attr_accessor jitter: Float?
-        attr_accessor time_zone_name: String?
+        attr_reader calendars: Array[Calendar]
+        attr_reader intervals: Array[Interval]
+        attr_reader cron_expressions: Array[String]
+        attr_reader skip: Array[Calendar]
+        attr_reader start_at: Time?
+        attr_reader end_at: Time?
+        attr_reader jitter: Float?
+        attr_reader time_zone_name: String?
 
         def self._from_proto: (untyped raw_spec) -> Spec
 
@@ -164,15 +168,17 @@ module Temporalio
 
         def _to_proto: -> untyped
 
+        def with: (**untyped) -> Spec
+
         class Calendar
-          attr_accessor second: Array[Schedule::Range]
-          attr_accessor minute: Array[Schedule::Range]
-          attr_accessor hour: Array[Schedule::Range]
-          attr_accessor day_of_month: Array[Schedule::Range]
-          attr_accessor month: Array[Schedule::Range]
-          attr_accessor year: Array[Schedule::Range]
-          attr_accessor day_of_week: Array[Schedule::Range]
-          attr_accessor comment: String?
+          attr_reader second: Array[Schedule::Range]
+          attr_reader minute: Array[Schedule::Range]
+          attr_reader hour: Array[Schedule::Range]
+          attr_reader day_of_month: Array[Schedule::Range]
+          attr_reader month: Array[Schedule::Range]
+          attr_reader year: Array[Schedule::Range]
+          attr_reader day_of_week: Array[Schedule::Range]
+          attr_reader comment: String?
 
           def self._from_proto: (untyped raw_cal) -> Calendar
 
@@ -191,8 +197,8 @@ module Temporalio
         end
 
         class Interval
-          attr_accessor every: duration
-          attr_accessor offset: duration?
+          attr_reader every: duration
+          attr_reader offset: duration?
 
           def self._from_proto: (untyped raw_int) -> Interval
 
@@ -206,27 +212,27 @@ module Temporalio
       end
 
       class Range
-        attr_accessor start: Integer
-        attr_accessor finish: Integer
-        attr_accessor step: Integer
+        attr_reader start: Integer
+        attr_reader finish: Integer
+        attr_reader step: Integer
+
+        def self.new: (
+          Integer start,
+          ?Integer finish,
+          ?Integer step
+        ) -> Range
 
         def self._from_proto: (untyped raw_range) -> Range
         def self._from_protos: (Array[untyped] raw_ranges) -> Array[Range]
         def self._to_protos: (Array[Range] ranges) -> Array[untyped]
 
-        def initialize: (
-          Integer start,
-          ?Integer finish,
-          ?Integer step
-        ) -> void
-
         def _to_proto: -> untyped
       end
 
       class Policy
-        attr_accessor overlap: OverlapPolicy::enum
-        attr_accessor catchup_window: duration
-        attr_accessor pause_on_failure: bool
+        attr_reader overlap: OverlapPolicy::enum
+        attr_reader catchup_window: duration
+        attr_reader pause_on_failure: bool
 
         def self._from_proto: (untyped raw_policies) -> Policy
 
@@ -240,10 +246,10 @@ module Temporalio
       end
 
       class State
-        attr_accessor note: String?
-        attr_accessor paused: bool
-        attr_accessor limited_actions: bool
-        attr_accessor remaining_actions: Integer
+        attr_reader note: String?
+        attr_reader paused: bool
+        attr_reader limited_actions: bool
+        attr_reader remaining_actions: Integer
 
         def self._from_proto: (untyped raw_state) -> State
 
@@ -258,8 +264,8 @@ module Temporalio
       end
 
       class Update
-        attr_accessor schedule: Schedule
-        attr_accessor search_attributes: SearchAttributes?
+        attr_reader schedule: Schedule
+        attr_reader search_attributes: SearchAttributes?
 
         def initialize: (
           schedule: Schedule,
@@ -267,7 +273,7 @@ module Temporalio
         ) -> void
 
         class Input
-          attr_accessor description: Description
+          attr_reader description: Description
 
           def initialize: (description: Description) -> void
         end
@@ -275,47 +281,47 @@ module Temporalio
 
       module List
         class Description
-          attr_accessor id: String
-          attr_accessor schedule: Schedule
-          attr_accessor info: Info
-          attr_accessor raw_entry: untyped
+          attr_reader id: String
+          attr_reader schedule: Schedule
+          attr_reader info: Info
+          attr_reader raw_entry: untyped
 
           def initialize: (
-            untyped raw_entry,
-            Converters::DataConverter data_converter
+            raw_entry: untyped,
+            data_converter: Converters::DataConverter
           ) -> void
         end
 
         class Schedule
-          attr_accessor action: Action
-          attr_accessor spec: Spec
-          attr_accessor state: State
+          attr_reader action: Action
+          attr_reader spec: Spec
+          attr_reader state: State
 
-          def initialize: (untyped raw_info) -> void
+          def initialize: (raw_info: untyped) -> void
         end
 
         module Action
           class StartWorkflow
             include Action
 
-            attr_accessor workflow: String
+            attr_reader workflow: String
 
-            def initialize: (String workflow) -> void
+            def initialize: (workflow: String) -> void
           end
         end
 
         class Info
-          attr_accessor recent_actions: Array[ActionResult]
-          attr_accessor next_action_times: Array[Time]
+          attr_reader recent_actions: Array[ActionResult]
+          attr_reader next_action_times: Array[Time]
 
-          def initialize: (untyped raw_info) -> void
+          def initialize: (raw_info: untyped) -> void
         end
 
         class State
-          attr_accessor note: String?
-          attr_accessor paused: bool
+          attr_reader note: String?
+          attr_reader paused: bool
 
-          def initialize: (untyped raw_info) -> void
+          def initialize: (raw_info: untyped) -> void
         end
       end
     end

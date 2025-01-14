@@ -12,10 +12,9 @@ module Temporalio
   # before any clients are created, and set it via {default=}. Every time a new runtime is created, a new internal Rust
   # thread pool is created.
   class Runtime
-    TelemetryOptions = Struct.new(
+    TelemetryOptions = Data.define(
       :logging,
-      :metrics,
-      keyword_init: true
+      :metrics
     )
 
     # Telemetry options for the runtime.
@@ -45,10 +44,9 @@ module Temporalio
       end
     end
 
-    LoggingOptions = Struct.new(
-      :log_filter,
+    LoggingOptions = Data.define(
+      :log_filter
       # TODO(cretz): forward_to
-      keyword_init: true
     )
 
     # Logging options for runtime telemetry.
@@ -79,10 +77,9 @@ module Temporalio
       end
     end
 
-    LoggingFilterOptions = Struct.new(
+    LoggingFilterOptions = Data.define(
       :core_level,
-      :other_level,
-      keyword_init: true
+      :other_level
     )
 
     # Logging filter options for Core.
@@ -107,13 +104,12 @@ module Temporalio
       end
     end
 
-    MetricsOptions = Struct.new(
+    MetricsOptions = Data.define(
       :opentelemetry,
       :prometheus,
       :attach_service_name,
       :global_tags,
-      :metric_prefix,
-      keyword_init: true
+      :metric_prefix
     )
 
     # Metrics options for runtime telemetry. Either {opentelemetry} or {prometheus} required, but not both.
@@ -163,13 +159,12 @@ module Temporalio
       end
     end
 
-    OpenTelemetryMetricsOptions = Struct.new(
+    OpenTelemetryMetricsOptions = Data.define(
       :url,
       :headers,
       :metric_periodicity,
       :metric_temporality,
-      :durations_as_seconds,
-      keyword_init: true
+      :durations_as_seconds
     )
 
     # Options for exporting metrics to OpenTelemetry.
@@ -228,12 +223,11 @@ module Temporalio
       end
     end
 
-    PrometheusMetricsOptions = Struct.new(
+    PrometheusMetricsOptions = Data.define(
       :bind_address,
       :counters_total_suffix,
       :unit_suffix,
-      :durations_as_seconds,
-      keyword_init: true
+      :durations_as_seconds
     )
 
     # Options for exporting metrics to Prometheus.
