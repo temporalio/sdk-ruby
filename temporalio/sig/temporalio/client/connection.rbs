@@ -111,6 +111,10 @@ module Temporalio
       def target_host: -> String
       def identity: -> String
       def connected?: -> bool
+      def api_key: -> String?
+      def api_key=: (String? new_key) -> void
+      def rpc_metadata: -> Hash[String, String]
+      def rpc_metadata=: (Hash[String, String] rpc_metadata) -> void
       def _core_client: -> Internal::Bridge::Client
       private def new_core_client: -> Internal::Bridge::Client
     end
