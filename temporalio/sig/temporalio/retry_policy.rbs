@@ -1,10 +1,10 @@
 module Temporalio
   class RetryPolicy
-    attr_accessor initial_interval: duration
-    attr_accessor backoff_coefficient: duration
-    attr_accessor max_interval: duration?
-    attr_accessor max_attempts: Integer
-    attr_accessor non_retryable_error_types: Array[String]?
+    attr_reader initial_interval: duration
+    attr_reader backoff_coefficient: duration
+    attr_reader max_interval: duration?
+    attr_reader max_attempts: Integer
+    attr_reader non_retryable_error_types: Array[String]?
 
     def self._from_proto: (untyped raw_policy) -> RetryPolicy
 

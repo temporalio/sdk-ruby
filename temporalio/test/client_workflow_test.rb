@@ -323,8 +323,9 @@ class ClientWorkflowTest < Test
       assert_equal 'some query arg', handle.query('some query', 'some query arg')
 
       # Now demonstrate simple configuration change w/ default reject condition
-      new_options = env.client.options.dup
-      new_options.default_workflow_query_reject_condition = Temporalio::Client::WorkflowQueryRejectCondition::NOT_OPEN
+      new_options = env.client.options.with(
+        default_workflow_query_reject_condition: Temporalio::Client::WorkflowQueryRejectCondition::NOT_OPEN
+      )
       new_client = Temporalio::Client.new(**new_options.to_h) # steep:ignore
       err = assert_raises(Temporalio::Error::WorkflowQueryRejectedError) do
         new_client.workflow_handle(handle.id).query('some query', 'some query arg')

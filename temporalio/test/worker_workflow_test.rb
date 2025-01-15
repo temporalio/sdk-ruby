@@ -800,12 +800,13 @@ class WorkerWorkflowTest < Test
     # Confirm there is only one good line and it has contextual info
     good_lines = lines.select { |l| l.include?('some-log-1') }
     assert_equal 1, good_lines.size
-    assert_includes good_lines.first, ':workflow_type=>"LoggerWorkflow"'
+    assert_includes good_lines.first, 'workflow_type'
+    assert_includes good_lines.first, '"LoggerWorkflow"'
 
     # Confirm there are two bad lines, and they don't have contextual info
     bad_lines = lines.select { |l| l.include?('some-log-2') }
     assert bad_lines.size >= 2
-    refute_includes bad_lines.first, ':workflow_type=>"LoggerWorkflow"'
+    refute_includes bad_lines.first, '"LoggerWorkflow"'
 
     # Confirm task failure logs
     out, = safe_capture_io do
@@ -814,9 +815,9 @@ class WorkerWorkflowTest < Test
         assert_eventually_task_fail(handle:)
       end
     end
-    lines = out.split("\n").select { |l| l.include?(':workflow_type=>"LoggerWorkflow"') }
-    assert(lines.any? { |l| l.include?('Failed activation') && l.include?(':workflow_type=>"LoggerWorkflow"') })
-    assert(lines.any? { |l| l.include?('Some failure') && l.include?(':workflow_type=>"LoggerWorkflow"') })
+    lines = out.split("\n").select { |l| l.include?('workflow_type') && l.include?('"LoggerWorkflow"') }
+    assert(lines.any? { |l| l.include?('Failed activation') })
+    assert(lines.any? { |l| l.include?('Some failure') })
   end
 
   class CancelWorkflow < Temporalio::Workflow::Definition
@@ -1029,8 +1030,9 @@ class WorkerWorkflowTest < Test
     env.ensure_common_search_attribute_keys
 
     # Create a new client with the base64 codec
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    )
     client = Temporalio::Client.new(**new_options.to_h)
     assert_encoded = lambda do |payload|
       assert_equal 'test/base64', payload.metadata['encoding']
@@ -1110,12 +1112,13 @@ class WorkerWorkflowTest < Test
     end
 
     # Workflow failure with failure encoding
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(
-      failure_converter: Ractor.make_shareable(
-        Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
-      ),
-      payload_codec: Base64Codec.new
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(
+        failure_converter: Ractor.make_shareable(
+          Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
+        ),
+        payload_codec: Base64Codec.new
+      )
     )
     client = Temporalio::Client.new(**new_options.to_h)
     execute_workflow(
@@ -1583,10 +1586,10 @@ class WorkerWorkflowTest < Test
         )
       )
     )
-    conn_opts = env.client.connection.options.dup
-    conn_opts.runtime = runtime
-    client_opts = env.client.options.dup
-    client_opts.connection = Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h)
+    )
     client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
 
     assert_equal 'done', execute_workflow(
@@ -1666,9 +1669,10 @@ class WorkerWorkflowTest < Test
   end
 
   def test_fail_workflow_payload_converter
-    new_options = env.client.options.dup
-    new_options.data_converter = Temporalio::Converters::DataConverter.new(
-      payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
+    new_options = env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(
+        payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
+      )
     )
     client = Temporalio::Client.new(**new_options.to_h)
 
