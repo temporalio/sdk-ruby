@@ -38,8 +38,8 @@ module Temporalio
         end
 
         # Have workflow arguments delivered to `execute` (and `initialize` if {workflow_init} in use) as
-        # {Converters::RawValue}s. These are wrappers for the raw payloads that have not been decoded. They can be
-        # decoded with {Workflow.payload_converter}.
+        # {Converters::RawValue}s. These are wrappers for the raw payloads that have not been converted to types (but
+        # they have been decoded by the codec if present). They can be converted with {Workflow.payload_converter}.
         #
         # @param value [Boolean] Whether the workflow accepts raw arguments.
         def workflow_raw_args(value = true) # rubocop:disable Style/OptionalBooleanParameter
