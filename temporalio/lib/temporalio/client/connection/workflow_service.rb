@@ -556,6 +556,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.ShutdownWorker API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ShutdownWorkerRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ShutdownWorkerResponse] API response.
+        def shutdown_worker(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'shutdown_worker',
+            request_class: Temporalio::Api::WorkflowService::V1::ShutdownWorkerRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ShutdownWorkerResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.QueryWorkflow API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest] API request.
@@ -956,6 +971,66 @@ module Temporalio
             rpc: 'respond_nexus_task_failed',
             request_class: Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedRequest,
             response_class: Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UpdateActivityOptionsById API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdResponse] API response.
+        def update_activity_options_by_id(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_activity_options_by_id',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.PauseActivityById API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::PauseActivityByIdRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::PauseActivityByIdResponse] API response.
+        def pause_activity_by_id(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'pause_activity_by_id',
+            request_class: Temporalio::Api::WorkflowService::V1::PauseActivityByIdRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::PauseActivityByIdResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UnpauseActivityById API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdResponse] API response.
+        def unpause_activity_by_id(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'unpause_activity_by_id',
+            request_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ResetActivityById API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ResetActivityByIdRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ResetActivityByIdResponse] API response.
+        def reset_activity_by_id(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'reset_activity_by_id',
+            request_class: Temporalio::Api::WorkflowService::V1::ResetActivityByIdRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ResetActivityByIdResponse,
             request:,
             rpc_options:
           )

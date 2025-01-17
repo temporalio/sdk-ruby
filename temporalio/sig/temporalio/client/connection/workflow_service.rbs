@@ -149,6 +149,10 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def shutdown_worker: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def query_workflow: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -254,6 +258,22 @@ module Temporalio
           ?rpc_options: RPCOptions?
         ) -> untyped
         def respond_nexus_task_failed: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_activity_options_by_id: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def pause_activity_by_id: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def unpause_activity_by_id: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def reset_activity_by_id: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped

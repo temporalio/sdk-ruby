@@ -169,6 +169,9 @@ impl Client {
                 "patch_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, patch_schedule)
                 }
+                "pause_activity_by_id" => {
+                    rpc_call!(self, callback, call, WorkflowService, pause_activity_by_id)
+                }
                 "poll_activity_task_queue" => rpc_call!(
                     self,
                     callback,
@@ -220,6 +223,9 @@ impl Client {
                     WorkflowService,
                     request_cancel_workflow_execution
                 ),
+                "reset_activity_by_id" => {
+                    rpc_call!(self, callback, call, WorkflowService, reset_activity_by_id)
+                }
                 "reset_sticky_task_queue" => rpc_call!(
                     self,
                     callback,
@@ -318,6 +324,9 @@ impl Client {
                     WorkflowService,
                     scan_workflow_executions
                 ),
+                "shutdown_worker" => {
+                    rpc_call!(self, callback, call, WorkflowService, shutdown_worker)
+                }
                 "signal_with_start_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -351,6 +360,20 @@ impl Client {
                     call,
                     WorkflowService,
                     terminate_workflow_execution
+                ),
+                "unpause_activity_by_id" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    unpause_activity_by_id
+                ),
+                "update_activity_options_by_id" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    update_activity_options_by_id
                 ),
                 "update_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, update_namespace)
@@ -438,6 +461,16 @@ impl Client {
                 "create_namespace" => {
                     rpc_call!(self, callback, call, CloudService, create_namespace)
                 }
+                "create_namespace_export_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    create_namespace_export_sink
+                ),
+                "create_nexus_endpoint" => {
+                    rpc_call!(self, callback, call, CloudService, create_nexus_endpoint)
+                }
                 "create_service_account" => {
                     rpc_call!(self, callback, call, CloudService, create_service_account)
                 }
@@ -448,6 +481,16 @@ impl Client {
                 "delete_api_key" => rpc_call!(self, callback, call, CloudService, delete_api_key),
                 "delete_namespace" => {
                     rpc_call!(self, callback, call, CloudService, delete_namespace)
+                }
+                "delete_namespace_export_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    delete_namespace_export_sink
+                ),
+                "delete_nexus_endpoint" => {
+                    rpc_call!(self, callback, call, CloudService, delete_nexus_endpoint)
                 }
                 "delete_service_account" => {
                     rpc_call!(self, callback, call, CloudService, delete_service_account)
@@ -463,13 +506,34 @@ impl Client {
                     CloudService,
                     failover_namespace_region
                 ),
+                "get_account" => rpc_call!(self, callback, call, CloudService, get_account),
                 "get_api_key" => rpc_call!(self, callback, call, CloudService, get_api_key),
                 "get_api_keys" => rpc_call!(self, callback, call, CloudService, get_api_keys),
                 "get_async_operation" => {
                     rpc_call!(self, callback, call, CloudService, get_async_operation)
                 }
                 "get_namespace" => rpc_call!(self, callback, call, CloudService, get_namespace),
+                "get_namespace_export_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    get_namespace_export_sink
+                ),
+                "get_namespace_export_sinks" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    get_namespace_export_sinks
+                ),
                 "get_namespaces" => rpc_call!(self, callback, call, CloudService, get_namespaces),
+                "get_nexus_endpoint" => {
+                    rpc_call!(self, callback, call, CloudService, get_nexus_endpoint)
+                }
+                "get_nexus_endpoints" => {
+                    rpc_call!(self, callback, call, CloudService, get_nexus_endpoints)
+                }
                 "get_region" => rpc_call!(self, callback, call, CloudService, get_region),
                 "get_regions" => rpc_call!(self, callback, call, CloudService, get_regions),
                 "get_service_account" => {
@@ -478,6 +542,7 @@ impl Client {
                 "get_service_accounts" => {
                     rpc_call!(self, callback, call, CloudService, get_service_accounts)
                 }
+                "get_usage" => rpc_call!(self, callback, call, CloudService, get_usage),
                 "get_user" => rpc_call!(self, callback, call, CloudService, get_user),
                 "get_user_group" => rpc_call!(self, callback, call, CloudService, get_user_group),
                 "get_user_groups" => rpc_call!(self, callback, call, CloudService, get_user_groups),
@@ -503,9 +568,20 @@ impl Client {
                     CloudService,
                     set_user_namespace_access
                 ),
+                "update_account" => rpc_call!(self, callback, call, CloudService, update_account),
                 "update_api_key" => rpc_call!(self, callback, call, CloudService, update_api_key),
                 "update_namespace" => {
                     rpc_call!(self, callback, call, CloudService, update_namespace)
+                }
+                "update_namespace_export_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    update_namespace_export_sink
+                ),
+                "update_nexus_endpoint" => {
+                    rpc_call!(self, callback, call, CloudService, update_nexus_endpoint)
                 }
                 "update_service_account" => {
                     rpc_call!(self, callback, call, CloudService, update_service_account)
@@ -514,6 +590,13 @@ impl Client {
                 "update_user_group" => {
                     rpc_call!(self, callback, call, CloudService, update_user_group)
                 }
+                "validate_namespace_export_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    validate_namespace_export_sink
+                ),
                 _ => Err(error!("Unknown RPC call {}", call.rpc)),
             },
             SERVICE_TEST => match call.rpc.as_str() {

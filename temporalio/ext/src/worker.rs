@@ -23,7 +23,10 @@ use temporal_sdk_core::{
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfigBuilder,
 };
-use temporal_sdk_core_api::errors::{PollActivityError, PollWfError, WorkflowErrorType};
+use temporal_sdk_core_api::{
+    errors::{PollError, WorkflowErrorType},
+    worker::SlotKind,
+};
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 
@@ -172,7 +175,7 @@ impl Worker {
                     WorkerType::Activity => {
                         match temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
-                            Err(PollActivityError::ShutDown) => Ok(None),
+                            Err(PollError::ShutDown) => Ok(None),
                             Err(err) => Err(format!("Poll error: {}", err)),
                         }
                     }
@@ -181,7 +184,7 @@ impl Worker {
                             .await
                         {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
-                            Err(PollWfError::ShutDown) => Ok(None),
+                            Err(PollError::ShutDown) => Ok(None),
                             Err(err) => Err(format!("Poll error: {}", err)),
                         }
                     }
@@ -466,10 +469,10 @@ fn build_tuner(options: Struct) -> Result<TunerHolder, Error> {
         .map_err(|err| error!("Failed building tuner options: {}", err))
 }
 
-fn build_tuner_slot_options(
+fn build_tuner_slot_options<SK: SlotKind>(
     options: Struct,
     prev_slots_options: Option<ResourceBasedSlotsOptions>,
-) -> Result<(SlotSupplierOptions, Option<ResourceBasedSlotsOptions>), Error> {
+) -> Result<(SlotSupplierOptions<SK>, Option<ResourceBasedSlotsOptions>), Error> {
     if let Some(slots) = options.member::<Option<usize>>(id!("fixed_size"))? {
         Ok((SlotSupplierOptions::FixedSize { slots }, prev_slots_options))
     } else if let Some(resource) = options.child(id!("resource_based"))? {
@@ -479,10 +482,10 @@ fn build_tuner_slot_options(
     }
 }
 
-fn build_tuner_resource_options(
+fn build_tuner_resource_options<SK: SlotKind>(
     options: Struct,
     prev_slots_options: Option<ResourceBasedSlotsOptions>,
-) -> Result<(SlotSupplierOptions, Option<ResourceBasedSlotsOptions>), Error> {
+) -> Result<(SlotSupplierOptions<SK>, Option<ResourceBasedSlotsOptions>), Error> {
     let slots_options = ResourceBasedSlotsOptionsBuilder::default()
         .target_mem_usage(options.member(id!("target_mem_usage"))?)
         .target_cpu_usage(options.member(id!("target_cpu_usage"))?)

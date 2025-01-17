@@ -346,6 +346,81 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.GetNexusEndpoints API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsResponse] API response.
+        def get_nexus_endpoints(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_nexus_endpoints',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetNexusEndpoint API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointResponse] API response.
+        def get_nexus_endpoint(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_nexus_endpoint',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateNexusEndpoint API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointResponse] API response.
+        def create_nexus_endpoint(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_nexus_endpoint',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateNexusEndpoint API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointResponse] API response.
+        def update_nexus_endpoint(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_nexus_endpoint',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteNexusEndpoint API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse] API response.
+        def delete_nexus_endpoint(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_nexus_endpoint',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.GetUserGroups API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest] API request.
@@ -506,6 +581,141 @@ module Temporalio
             rpc: 'delete_service_account',
             request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountRequest,
             response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUsage API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUsageRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUsageResponse] API response.
+        def get_usage(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_usage',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUsageRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUsageResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetAccount API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetAccountRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetAccountResponse] API response.
+        def get_account(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_account',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateAccount API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateAccountRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateAccountResponse] API response.
+        def update_account(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_account',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateNamespaceExportSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkResponse] API response.
+        def create_namespace_export_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_namespace_export_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetNamespaceExportSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkResponse] API response.
+        def get_namespace_export_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_namespace_export_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetNamespaceExportSinks API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksResponse] API response.
+        def get_namespace_export_sinks(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_namespace_export_sinks',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateNamespaceExportSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkResponse] API response.
+        def update_namespace_export_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_namespace_export_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteNamespaceExportSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkResponse] API response.
+        def delete_namespace_export_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_namespace_export_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.ValidateNamespaceExportSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse] API response.
+        def validate_namespace_export_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'validate_namespace_export_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse,
             request:,
             rpc_options:
           )
