@@ -4,27 +4,32 @@ module Temporalio
       def self.activity_name: (String | Symbol name) -> void
       def self.activity_executor: (Symbol executor_name) -> void
       def self.activity_cancel_raise: (bool cancel_raise) -> void
+      def self.activity_dynamic: (?bool value) -> void
+      def self.activity_raw_args: (?bool value) -> void
   
       def self._activity_definition_details: -> {
-        activity_name: String | Symbol,
+        activity_name: String | Symbol | nil,
         activity_executor: Symbol,
-        activity_cancel_raise: bool
+        activity_cancel_raise: bool,
+        activity_raw_args: bool
       }
   
       def execute: (*untyped) -> untyped
 
       class Info
-        attr_reader name: String | Symbol
+        attr_reader name: String | Symbol | nil
         attr_reader proc: Proc
         attr_reader executor: Symbol
         attr_reader cancel_raise: bool
+        attr_reader raw_args: bool
 
         def self.from_activity: (Definition | singleton(Definition) | Info activity) -> Info
 
         def initialize: (
-          name: String | Symbol,
+          name: String | Symbol | nil,
           ?executor: Symbol,
-          ?cancel_raise: bool
+          ?cancel_raise: bool,
+          ?raw_args: bool
         ) { (?) -> untyped } -> void
       end
     end

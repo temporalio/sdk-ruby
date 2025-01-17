@@ -64,6 +64,8 @@ module Temporalio
                             else
                               raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
                             end
+            raise 'Cannot invoke dynamic activities' unless activity_type
+
             execute_activity_with_local_backoffs(local: false, cancellation: input.cancellation) do
               seq = (@activity_counter += 1)
               @instance.add_command(
@@ -102,6 +104,8 @@ module Temporalio
                             else
                               raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
                             end
+            raise 'Cannot invoke dynamic activities' unless activity_type
+
             execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation) do |do_backoff|
               seq = (@activity_counter += 1)
               @instance.add_command(

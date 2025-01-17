@@ -3,6 +3,7 @@
 require 'temporalio/activity'
 require 'temporalio/activity/definition'
 require 'temporalio/cancellation'
+require 'temporalio/converters/raw_value'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/scoped_logger'
@@ -29,12 +30,13 @@ module Temporalio
             Activity::Context.current_or_nil&._scoped_logger_info
           }
 
-          # Build up activity hash by name, failing if any fail validation
+          # Build up activity hash by name (can be nil for dynamic), failing if any fail validation
           @activities = worker.options.activities.each_with_object({}) do |act, hash|
             # Class means create each time, instance means just call, definition
             # does nothing special
             defn = Activity::Definition::Info.from_activity(act)
             # Confirm name not in use
+            raise ArgumentError, 'Only one dynamic activity allowed' if !defn.name && hash.key?(defn.name)
             raise ArgumentError, "Multiple activities named #{defn.name}" if hash.key?(defn.name)
 
             # Confirm executor is a known executor and let it initialize
@@ -91,8 +93,8 @@ module Temporalio
         def handle_start_task(task_token, start)
           set_running_activity(task_token, nil)
 
-          # Find activity definition
-          defn = @activities[start.activity_type]
+          # Find activity definition, falling back to dynamic if present
+          defn = @activities[start.activity_type] || @activities[nil]
           if defn.nil?
             raise Error::ApplicationError.new(
               "Activity #{start.activity_type} for workflow #{start.workflow_execution.workflow_id} " \
@@ -185,10 +187,15 @@ module Temporalio
           # Build input
           input = Temporalio::Worker::Interceptor::Activity::ExecuteInput.new(
             proc: defn.proc,
-            args: ProtoUtils.convert_from_payload_array(
-              @worker.options.client.data_converter,
-              start.input.to_ary
-            ),
+            # If the activity wants raw_args, we only decode we don't convert
+            args: if defn.raw_args
+                    payloads = start.input.to_ary
+                    codec = @worker.options.client.data_converter.payload_codec
+                    payloads = codec.decode(payloads) if codec
+                    payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
+                  else
+                    ProtoUtils.convert_from_payload_array(@worker.options.client.data_converter, start.input.to_ary)
+                  end,
             headers: ProtoUtils.headers_from_proto_map(start.header_fields, @worker.options.client.data_converter) || {}
           )
 
