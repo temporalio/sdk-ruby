@@ -49,7 +49,16 @@ module Temporalio
       # @!attribute domain
       #   @return [String, nil] SNI override. This is only needed for self-hosted servers with certificates that do not
       #     match the hostname being connected to.
-      class TLSOptions; end # rubocop:disable Lint/EmptyClass
+      class TLSOptions
+        def initialize(
+          client_cert: nil,
+          client_private_key: nil,
+          server_root_ca_cert: nil,
+          domain: nil
+        )
+          super
+        end
+      end
 
       RPCRetryOptions = Data.define(
         :initial_interval,
@@ -122,7 +131,9 @@ module Temporalio
       #   @return [String, nil] Pass for HTTP basic auth for the proxy, must be combined with {basic_auth_user}.
       class HTTPConnectProxyOptions; end # rubocop:disable Lint/EmptyClass
 
-      # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
+      # @return [Options] Frozen options for this client which has the same attributes as {initialize}. Note that if
+      #   {api_key=} or {rpc_metadata=} are updated, the options object is replaced with those changes (it is not
+      #   mutated in place).
       attr_reader :options
 
       # @return [WorkflowService] Raw gRPC workflow service.
@@ -183,6 +194,7 @@ module Temporalio
           lazy_connect:
         ).freeze
         # Create core client now if not lazy
+        @core_client_mutex = Mutex.new
         _core_client unless lazy_connect
         # Create service instances
         @workflow_service = WorkflowService.new(self)
@@ -206,11 +218,43 @@ module Temporalio
         !@core_client.nil?
       end
 
+      # @return [String, nil] API key. This is a shortcut for `options.api_key`.
+      def api_key
+        @options.api_key
+      end
+
+      # Set the API key for all future calls. This also makes a new object for {options} with the changes.
+      #
+      # @param new_key [String, nil] New API key.
+      def api_key=(new_key)
+        # Mutate the client if connected then mutate options
+        @core_client_mutex.synchronize do
+          @core_client&.update_api_key(new_key)
+          @options = @options.with(api_key: new_key)
+        end
+      end
+
+      # @return [Hash<String, String>] RPC metadata (aka HTTP headers). This is a shortcut for `options.rpc_metadata`.
+      def rpc_metadata
+        @options.rpc_metadata
+      end
+
+      # Set the RPC metadata (aka HTTP headers) for all future calls. This also makes a new object for {options} with
+      # the changes.
+      #
+      # @param rpc_metadata [Hash<String, String>] New API key.
+      def rpc_metadata=(rpc_metadata)
+        # Mutate the client if connected then mutate options
+        @core_client_mutex.synchronize do
+          @core_client&.update_metadata(rpc_metadata)
+          @options = @options.with(rpc_metadata: rpc_metadata)
+        end
+      end
+
       # @!visibility private
       def _core_client
         # If lazy, this needs to be done under mutex
         if @options.lazy_connect
-          @core_client_mutex ||= Mutex.new
           @core_client_mutex.synchronize do
             @core_client ||= new_core_client
           end
