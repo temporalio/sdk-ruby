@@ -11,9 +11,7 @@ module Converters
   class DataConverterTest < Test
     def test_with_codec
       converter = Temporalio::Converters::DataConverter.new(
-        failure_converter: Ractor.make_shareable(
-          Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
-        ),
+        failure_converter: Temporalio::Converters::FailureConverter.new(encode_common_attributes: true),
         payload_codec: Base64Codec.new
       )
 

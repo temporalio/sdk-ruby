@@ -34,8 +34,6 @@ module WorkflowUtils
       task_queue:,
       activities:,
       workflows: [workflow] + more_workflows,
-      # TODO(cretz): Ractor support not currently working
-      workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default,
       workflow_failure_exception_types:,
       max_cached_workflows:,
       logger: logger || client.options.logger,

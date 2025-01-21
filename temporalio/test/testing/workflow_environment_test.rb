@@ -38,9 +38,7 @@ module Testing
         worker = Temporalio::Worker.new(
           client: env.client,
           task_queue: "tq-#{SecureRandom.uuid}",
-          workflows: [SlowWorkflow],
-          # TODO(cretz): Ractor support not currently working
-          workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+          workflows: [SlowWorkflow]
         )
         worker.run do
           # Check that timestamp is around now
@@ -63,9 +61,7 @@ module Testing
         worker = Temporalio::Worker.new(
           client: env.client,
           task_queue: "tq-#{SecureRandom.uuid}",
-          workflows: [SlowWorkflow],
-          # TODO(cretz): Ractor support not currently working
-          workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+          workflows: [SlowWorkflow]
         )
         worker.run do
           # Start workflow
@@ -121,9 +117,7 @@ module Testing
           client: env.client,
           task_queue: "tq-#{SecureRandom.uuid}",
           workflows: [HeartbeatTimeoutWorkflow],
-          activities: [HeartbeatTimeoutActivity.new(env)],
-          # TODO(cretz): Ractor support not currently working
-          workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+          activities: [HeartbeatTimeoutActivity.new(env)]
         )
         worker.run do
           # Run workflow and confirm it got heartbeat timeout

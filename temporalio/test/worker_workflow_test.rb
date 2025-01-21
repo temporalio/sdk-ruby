@@ -1114,9 +1114,7 @@ class WorkerWorkflowTest < Test
     # Workflow failure with failure encoding
     new_options = env.client.options.with(
       data_converter: Temporalio::Converters::DataConverter.new(
-        failure_converter: Ractor.make_shareable(
-          Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
-        ),
+        failure_converter: Temporalio::Converters::FailureConverter.new(encode_common_attributes: true),
         payload_codec: Base64Codec.new
       )
     )
@@ -1164,9 +1162,7 @@ class WorkerWorkflowTest < Test
     worker = Temporalio::Worker.new(
       client: env.client,
       task_queue: "tq-#{SecureRandom.uuid}",
-      workflows: [DynamicWorkflow, NonDynamicWorkflow],
-      # TODO(cretz): Ractor support not currently working
-      workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+      workflows: [DynamicWorkflow, NonDynamicWorkflow]
     )
     worker.run do
       # Non-dynamic
@@ -1670,9 +1666,7 @@ class WorkerWorkflowTest < Test
 
   def test_fail_workflow_payload_converter
     new_options = env.client.options.with(
-      data_converter: Temporalio::Converters::DataConverter.new(
-        payload_converter: Ractor.make_shareable(FailWorkflowPayloadConverter.new)
-      )
+      data_converter: Temporalio::Converters::DataConverter.new(payload_converter: FailWorkflowPayloadConverter.new)
     )
     client = Temporalio::Client.new(**new_options.to_h)
 
@@ -1746,7 +1740,6 @@ class WorkerWorkflowTest < Test
 
   # TODO(cretz): To test
   # * Common
-  #   * Ractor with global state
   #   * Eager workflow start
   #   * Unawaited futures that have exceptions, need to log warning like Java does
   #   * Enhanced stack trace?

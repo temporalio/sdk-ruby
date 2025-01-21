@@ -1,9 +1,0 @@
-module Temporalio
-  class Worker
-    class WorkflowExecutor
-      class Ractor < WorkflowExecutor
-        def self.instance: -> Ractor
-      end
-    end
-  end
-end

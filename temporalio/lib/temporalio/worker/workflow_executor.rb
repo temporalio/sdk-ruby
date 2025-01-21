@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-require 'temporalio/worker/workflow_executor/ractor'
 require 'temporalio/worker/workflow_executor/thread_pool'
 
 module Temporalio
   class Worker
     # Workflow executor that executes workflow tasks. Unlike {ActivityExecutor}, this class is not meant for user
-    # implementation. Instead, either {WorkflowExecutor::ThreadPool} or {WorkflowExecutor::Ractor} should be used.
+    # implementation. The only implementation that is currently accepted is {WorkflowExecutor::ThreadPool}.
     class WorkflowExecutor
       # @!visibility private
       def initialize

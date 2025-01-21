@@ -22,14 +22,12 @@ module Temporalio
       # @param json_generate_options [Hash] Options for {::JSON.generate}.
       # @return [PayloadConverter::Composite] Created payload converter.
       def self.new_with_defaults(json_parse_options: { create_additions: true }, json_generate_options: {})
-        Ractor.make_shareable(
-          PayloadConverter::Composite.new(
-            PayloadConverter::BinaryNull.new,
-            PayloadConverter::BinaryPlain.new,
-            PayloadConverter::JSONProtobuf.new,
-            PayloadConverter::BinaryProtobuf.new,
-            PayloadConverter::JSONPlain.new(parse_options: json_parse_options, generate_options: json_generate_options)
-          )
+        PayloadConverter::Composite.new(
+          PayloadConverter::BinaryNull.new,
+          PayloadConverter::BinaryPlain.new,
+          PayloadConverter::JSONProtobuf.new,
+          PayloadConverter::BinaryProtobuf.new,
+          PayloadConverter::JSONPlain.new(parse_options: json_parse_options, generate_options: json_generate_options)
         )
       end
 
