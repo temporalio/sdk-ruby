@@ -38,6 +38,8 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.const_set("SERVICE_HEALTH", SERVICE_HEALTH)?;
     class.define_singleton_method("async_new", function!(Client::async_new, 3))?;
     class.define_method("async_invoke_rpc", method!(Client::async_invoke_rpc, -1))?;
+    class.define_method("update_metadata", method!(Client::update_metadata, 1))?;
+    class.define_method("update_api_key", method!(Client::update_api_key, 1))?;
 
     let inner_class = class.define_error("RPCFailure", ruby.get_inner(&ROOT_ERR))?;
     inner_class.define_method("code", method!(RpcFailure::code, 0))?;
@@ -83,10 +85,16 @@ impl Client {
     pub fn async_new(runtime: &Runtime, options: Struct, queue: Value) -> Result<(), Error> {
         // Build options
         let mut opts_build = ClientOptionsBuilder::default();
+        let tls = options.child(id!("tls"))?;
         opts_build
             .target_url(
                 Url::parse(
-                    format!("http://{}", options.member::<String>(id!("target_host"))?).as_str(),
+                    format!(
+                        "{}://{}",
+                        if tls.is_some() { "https" } else { "http" },
+                        options.member::<String>(id!("target_host"))?
+                    )
+                    .as_str(),
                 )
                 .map_err(|err| error!("Failed parsing host: {}", err))?,
             )
@@ -95,7 +103,7 @@ impl Client {
             .headers(Some(options.member(id!("rpc_metadata"))?))
             .api_key(options.member(id!("api_key"))?)
             .identity(options.member(id!("identity"))?);
-        if let Some(tls) = options.child(id!("tls"))? {
+        if let Some(tls) = tls {
             opts_build.tls_cfg(TlsConfig {
                 client_tls_config: match (
                     tls.member::<Option<RString>>(id!("client_cert"))?,
@@ -222,6 +230,14 @@ impl Client {
         };
         let callback = AsyncCallback::from_queue(queue);
         self.invoke_rpc(service, callback, call)
+    }
+
+    pub fn update_metadata(&self, headers: HashMap<String, String>) {
+        self.core.get_client().set_headers(headers);
+    }
+
+    pub fn update_api_key(&self, api_key: Option<String>) {
+        self.core.get_client().set_api_key(api_key);
     }
 }
 

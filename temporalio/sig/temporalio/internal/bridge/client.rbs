@@ -105,6 +105,9 @@ module Temporalio
           queue: Queue
         ) -> void
 
+        def update_metadata: (Hash[String, String]) -> void
+        def update_api_key: (String?) -> void
+
         class RPCFailure < Error
           def code: -> Temporalio::Error::RPCError::Code::enum
           def message: -> String
