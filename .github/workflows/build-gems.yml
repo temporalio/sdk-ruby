@@ -90,7 +90,7 @@ jobs:
           - os: ubuntu-latest
             rubyPlatform: x86_64-linux
           - os: macos-intel
-            runsOn: macos-12
+            runsOn: macos-13
             rubyPlatform: x86_64-darwin
           - os: macos-latest
             rubyPlatform: arm64-darwin

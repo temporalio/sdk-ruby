@@ -113,7 +113,19 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_create_namespace_export_sink_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_create_namespace_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_create_nexus_endpoint_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -143,7 +155,19 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_delete_namespace_export_sink_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_delete_namespace_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_delete_nexus_endpoint_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -197,13 +221,31 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_update_account_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_update_api_key_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_update_namespace_export_sink_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_update_namespace_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_update_nexus_endpoint_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -670,7 +712,7 @@ module Temporalio
       
       def api_nexus_v1_endpoint_spec(value)
         @on_enter&.call(value)
-        api_sdk_v1_user_metadata(value.metadata) if value.has_metadata?
+        api_common_v1_payload(value.description) if value.has_description?
         @on_exit&.call(value)
       end
       
@@ -1223,6 +1265,15 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def coresdk_nexus_nexus_operation_result(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.completed) if value.has_completed?
+        api_failure_v1_failure(value.failed) if value.has_failed?
+        api_failure_v1_failure(value.cancelled) if value.has_cancelled?
+        api_failure_v1_failure(value.timed_out) if value.has_timed_out?
+        @on_exit&.call(value)
+      end
+      
       def coresdk_workflow_activation_cancel_workflow(value)
         @on_enter&.call(value)
         api_common_v1_payload_repeated(value.details) unless value.details.empty?
@@ -1278,6 +1329,18 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def coresdk_workflow_activation_resolve_nexus_operation(value)
+        @on_enter&.call(value)
+        coresdk_nexus_nexus_operation_result(value.result) if value.has_result?
+        @on_exit&.call(value)
+      end
+      
+      def coresdk_workflow_activation_resolve_nexus_operation_start(value)
+        @on_enter&.call(value)
+        api_failure_v1_failure(value.cancelled_before_start) if value.has_cancelled_before_start?
+        @on_exit&.call(value)
+      end
+      
       def coresdk_workflow_activation_resolve_request_cancel_external_workflow(value)
         @on_enter&.call(value)
         api_failure_v1_failure(value.failure) if value.has_failure?
@@ -1315,6 +1378,8 @@ module Temporalio
         coresdk_workflow_activation_resolve_signal_external_workflow(value.resolve_signal_external_workflow) if value.has_resolve_signal_external_workflow?
         coresdk_workflow_activation_resolve_request_cancel_external_workflow(value.resolve_request_cancel_external_workflow) if value.has_resolve_request_cancel_external_workflow?
         coresdk_workflow_activation_do_update(value.do_update) if value.has_do_update?
+        coresdk_workflow_activation_resolve_nexus_operation_start(value.resolve_nexus_operation_start) if value.has_resolve_nexus_operation_start?
+        coresdk_workflow_activation_resolve_nexus_operation(value.resolve_nexus_operation) if value.has_resolve_nexus_operation?
         @on_exit&.call(value)
       end
       
@@ -1372,6 +1437,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def coresdk_workflow_commands_schedule_nexus_operation(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.input) if value.has_input?
+        @on_exit&.call(value)
+      end
+      
       def coresdk_workflow_commands_signal_external_workflow_execution(value)
         @on_enter&.call(value)
         api_common_v1_payload_repeated(value.args) unless value.args.empty?
@@ -1403,6 +1474,7 @@ module Temporalio
       
       def coresdk_workflow_commands_workflow_command(value)
         @on_enter&.call(value)
+        api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
         coresdk_workflow_commands_schedule_activity(value.schedule_activity) if value.has_schedule_activity?
         coresdk_workflow_commands_query_result(value.respond_to_query) if value.has_respond_to_query?
         coresdk_workflow_commands_complete_workflow_execution(value.complete_workflow_execution) if value.has_complete_workflow_execution?
@@ -1414,6 +1486,7 @@ module Temporalio
         coresdk_workflow_commands_upsert_workflow_search_attributes(value.upsert_workflow_search_attributes) if value.has_upsert_workflow_search_attributes?
         coresdk_workflow_commands_modify_workflow_properties(value.modify_workflow_properties) if value.has_modify_workflow_properties?
         coresdk_workflow_commands_update_response(value.update_response) if value.has_update_response?
+        coresdk_workflow_commands_schedule_nexus_operation(value.schedule_nexus_operation) if value.has_schedule_nexus_operation?
         @on_exit&.call(value)
       end
       

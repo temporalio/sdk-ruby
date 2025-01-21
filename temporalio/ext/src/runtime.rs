@@ -10,7 +10,7 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
 use temporal_sdk_core::telemetry::{build_otlp_metric_exporter, start_prometheus_metric_exporter};
-use temporal_sdk_core::CoreRuntime;
+use temporal_sdk_core::{CoreRuntime, TokioRuntimeBuilder};
 use temporal_sdk_core_api::telemetry::{
     Logger, MetricTemporality, OtelCollectorOptionsBuilder, PrometheusExporterOptionsBuilder,
     TelemetryOptionsBuilder,
@@ -90,7 +90,7 @@ impl Runtime {
             .map_err(|err| error!("Invalid telemetry options: {}", err))?;
 
         // Create core runtime
-        let mut core = CoreRuntime::new(opts, tokio::runtime::Builder::new_multi_thread())
+        let mut core = CoreRuntime::new(opts, TokioRuntimeBuilder::default())
             .map_err(|err| error!("Failed initializing telemetry: {}", err))?;
 
         // Create metrics (created after Core runtime since it needs Tokio handle)

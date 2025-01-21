@@ -93,6 +93,26 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def get_nexus_endpoints: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_nexus_endpoint: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_nexus_endpoint: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_nexus_endpoint: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_nexus_endpoint: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def get_user_groups: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -134,6 +154,42 @@ module Temporalio
           ?rpc_options: RPCOptions?
         ) -> untyped
         def delete_service_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_usage: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_account: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_namespace_export_sink: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_namespace_export_sink: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_namespace_export_sinks: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_namespace_export_sink: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_namespace_export_sink: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def validate_namespace_export_sink: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
