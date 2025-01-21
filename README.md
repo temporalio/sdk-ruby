@@ -906,6 +906,11 @@ Some notes about activity definition:
   "Activity Concurrency and Executors" section later for more details.
 * Technically an activity definition can be created manually via `Temporalio::Activity::Definition::Info.new` that
   accepts a proc or a block, but the class form is recommended.
+* `activity_dynamic` can be used to mark an activity dynamic. Dynamic activities do not have names and handle any
+  activity that is not otherwise registered. A worker can only have one dynamic activity.
+* `workflow_raw_args` can be used to have activity arguments delivered to `execute` as
+  `Temporalio::Converters::RawValue`s. These are wrappers for the raw payloads that have not been converted to types
+  (but they have been decoded by the codec if present). They can be converted with `payload_converter` on the context.
 
 #### Activity Context
 

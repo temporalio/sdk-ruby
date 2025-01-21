@@ -822,6 +822,41 @@ class WorkerActivityTest < Test
     assert_equal ['heartbeat-val'], interceptor.calls[2][1].details
   end
 
+  class DynamicActivity < Temporalio::Activity::Definition
+    activity_dynamic
+
+    def execute(*args)
+      "Activity #{Temporalio::Activity::Context.current.info.activity_type} called with #{args}"
+    end
+  end
+
+  def test_dynamic_activity
+    assert_equal 'Activity does-not-exist called with ["arg1", 123]',
+                 execute_activity(DynamicActivity, 'arg1', 123, override_name: 'does-not-exist')
+  end
+
+  class DynamicActivityRawArgs < Temporalio::Activity::Definition
+    activity_dynamic
+    activity_raw_args
+
+    def execute(*args)
+      metadata_encodings, decoded_args = args.map do |arg|
+        raise 'Bad type' unless arg.is_a?(Temporalio::Converters::RawValue)
+
+        [arg.payload.metadata['encoding'],
+         Temporalio::Activity::Context.current.payload_converter.from_payload(arg.payload)]
+      end.transpose
+      "Activity #{Temporalio::Activity::Context.current.info.activity_type} called with " \
+        "#{decoded_args} that have encodings #{metadata_encodings}"
+    end
+  end
+
+  def test_dynamic_activity_raw_args
+    assert_equal 'Activity does-not-exist called with ' \
+                 '["arg1", nil, 123] that have encodings ["json/plain", "binary/null", "json/plain"]',
+                 execute_activity(DynamicActivityRawArgs, 'arg1', nil, 123, override_name: 'does-not-exist')
+  end
+
   # steep:ignore
   def execute_activity(
     activity,

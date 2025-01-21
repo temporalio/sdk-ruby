@@ -49,20 +49,47 @@ module Temporalio
         # @param cancel_raise [Boolean] Whether to raise.
         def activity_cancel_raise(cancel_raise)
           unless cancel_raise.is_a?(TrueClass) || cancel_raise.is_a?(FalseClass)
-            raise ArgumentError,
-                  'Must be a boolean'
+            raise ArgumentError, 'Must be a boolean'
           end
 
           @activity_cancel_raise = cancel_raise
+        end
+
+        # Set an activity as dynamic. Dynamic activities do not have names and handle any activity that is not otherwise
+        # registered. A worker can only have one dynamic activity. It is often useful to use {activity_raw_args} with
+        # this.
+        #
+        # @param value [Boolean] Whether the activity is dynamic.
+        def activity_dynamic(value = true) # rubocop:disable Style/OptionalBooleanParameter
+          raise ArgumentError, 'Must be a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+
+          @activity_dynamic = value
+        end
+
+        # Have activity arguments delivered to `execute` as {Converters::RawValue}s. These are wrappers for the raw
+        # payloads that have not been converted to types (but they have been decoded by the codec if present). They can
+        # be converted with {Context#payload_converter}.
+        #
+        # @param value [Boolean] Whether the activity accepts raw arguments.
+        def activity_raw_args(value = true) # rubocop:disable Style/OptionalBooleanParameter
+          raise ArgumentError, 'Must be a boolean' unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+
+          @activity_raw_args = value
         end
       end
 
       # @!visibility private
       def self._activity_definition_details
+        activity_name = @activity_name
+        raise 'Cannot have activity name specified for dynamic activity' if activity_name && @activity_dynamic
+
+        # Default to unqualified class name if not dynamic
+        activity_name ||= name.to_s.split('::').last unless @activity_dynamic
         {
-          activity_name: @activity_name || name.to_s.split('::').last,
+          activity_name:,
           activity_executor: @activity_executor || :default,
-          activity_cancel_raise: @activity_cancel_raise.nil? ? true : @activity_cancel_raise
+          activity_cancel_raise: @activity_cancel_raise.nil? ? true : @activity_cancel_raise,
+          activity_raw_args: @activity_raw_args.nil? ? false : @activity_raw_args
         }
       end
 
@@ -75,7 +102,7 @@ module Temporalio
       # Definition info of an activity. Activities are usually classes/instances that extend {Definition}, but
       # definitions can also be manually created with a block via {initialize} here.
       class Info
-        # @return [String, Symbol] Name of the activity.
+        # @return [String, Symbol, nil] Name of the activity, or nil if the activity is dynamic.
         attr_reader :name
 
         # @return [Proc] Proc for the activity.
@@ -86,6 +113,9 @@ module Temporalio
 
         # @return [Boolean] Whether to raise in thread/fiber on cancellation. Default is `true`.
         attr_reader :cancel_raise
+
+        # @return [Boolean] Whether to use {Converters::RawValue}s as arguments.
+        attr_reader :raw_args
 
         # Obtain definition info representing the given activity, which can be a class, instance, or definition info.
         #
@@ -105,14 +135,16 @@ module Temporalio
             new(
               name: details[:activity_name],
               executor: details[:activity_executor],
-              cancel_raise: details[:activity_cancel_raise]
+              cancel_raise: details[:activity_cancel_raise],
+              raw_args: details[:activity_raw_args]
             ) { |*args| activity.new.execute(*args) } # Instantiate and call
           when Definition
             details = activity.class._activity_definition_details
             new(
               name: details[:activity_name],
               executor: details[:activity_executor],
-              cancel_raise: details[:activity_cancel_raise]
+              cancel_raise: details[:activity_cancel_raise],
+              raw_args: details[:activity_raw_args]
             ) { |*args| activity.execute(*args) } # Just and call
           when Info
             activity
@@ -123,17 +155,19 @@ module Temporalio
 
         # Manually create activity definition info. Most users will use an instance/class of {Definition}.
         #
-        # @param name [String, Symbol] Name of the activity.
+        # @param name [String, Symbol, nil] Name of the activity or nil for dynamic activity.
         # @param executor [Symbol] Name of the executor.
         # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
+        # @param raw_args [Boolean] Whether to use {Converters::RawValue}s as arguments.
         # @yield Use this block as the activity.
-        def initialize(name:, executor: :default, cancel_raise: true, &block)
+        def initialize(name:, executor: :default, cancel_raise: true, raw_args: false, &block)
           @name = name
           raise ArgumentError, 'Must give block' unless block_given?
 
           @proc = block
           @executor = executor
           @cancel_raise = cancel_raise
+          @raw_args = raw_args
         end
       end
     end
