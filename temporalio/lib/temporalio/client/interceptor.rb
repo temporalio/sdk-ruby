@@ -38,6 +38,26 @@ module Temporalio
         :rpc_options
       )
 
+      # Input for {Outbound.start_update_with_start_workflow}.
+      StartUpdateWithStartWorkflowInput = Data.define(
+        :update_id,
+        :update,
+        :args,
+        :wait_for_stage,
+        :start_workflow_operation,
+        :headers,
+        :rpc_options
+      )
+
+      # Input for {Outbound.signal_with_start_workflow}.
+      SignalWithStartWorkflowInput = Data.define(
+        :signal,
+        :args,
+        :start_workflow_operation,
+        # Headers intentionally not defined here, because they are not separate from start_workflow_operation
+        :rpc_options
+      )
+
       # Input for {Outbound.list_workflows}.
       ListWorkflowsInput = Data.define(
         :query,
@@ -238,6 +258,23 @@ module Temporalio
         # @return [WorkflowHandle] Workflow handle.
         def start_workflow(input)
           next_interceptor.start_workflow(input)
+        end
+
+        # Called for every {Client.start_update_with_start_workflow} and {Client.execute_update_with_start_workflow}
+        # call.
+        #
+        # @param input [StartUpdateWithStartWorkflowInput] Input.
+        # @return [WorkflowUpdateHandle] Workflow update handle.
+        def start_update_with_start_workflow(input)
+          next_interceptor.start_update_with_start_workflow(input)
+        end
+
+        # Called for every {Client.signal_with_start_workflow}.
+        #
+        # @param input [SignalWithStartWorkflowInput] Input.
+        # @return [WorkflowHandle] Workflow handle.
+        def signal_with_start_workflow(input)
+          next_interceptor.signal_with_start_workflow(input)
         end
 
         # Called for every {Client.list_workflows} call.

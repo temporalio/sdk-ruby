@@ -101,6 +101,30 @@ module Temporalio
       ?first_execution_run_id: String?
     ) -> WorkflowHandle
 
+    def start_update_with_start_workflow: (
+      Workflow::Definition::Update | Symbol | String update,
+      *Object? args,
+      start_workflow_operation: WithStartWorkflowOperation,
+      wait_for_stage: WorkflowUpdateWaitStage::enum,
+      ?id: String,
+      ?rpc_options: RPCOptions?
+    ) -> WorkflowUpdateHandle
+
+    def execute_update_with_start_workflow: (
+      Workflow::Definition::Update | Symbol | String update,
+      *Object? args,
+      start_workflow_operation: WithStartWorkflowOperation,
+      ?id: String,
+      ?rpc_options: RPCOptions?
+    ) -> Object?
+
+    def signal_with_start_workflow: (
+      Workflow::Definition::Signal | Symbol | String signal,
+      *Object? args,
+      start_workflow_operation: WithStartWorkflowOperation,
+      ?rpc_options: RPCOptions?
+    ) -> WorkflowHandle
+
     def list_workflows: (
       ?String query,
       ?rpc_options: RPCOptions?

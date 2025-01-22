@@ -9,7 +9,7 @@ require 'test'
 class ClientScheduleTest < Test
   also_run_all_tests_in_fiber
 
-  def test_basics # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+  def test_basics # rubocop:disable Metrics/AbcSize
     assert_no_schedules
 
     # Create a schedule with lots of things

@@ -124,6 +124,7 @@ module Temporalio
 
       def create_grpc_status
         return Api::Common::V1::GrpcStatus.new(code: @code) unless @raw_grpc_status
+        return @raw_grpc_status if @raw_grpc_status.is_a?(Api::Common::V1::GrpcStatus)
 
         Api::Common::V1::GrpcStatus.decode(@raw_grpc_status)
       end

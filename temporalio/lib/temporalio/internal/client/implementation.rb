@@ -9,6 +9,7 @@ require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/schedule'
 require 'temporalio/client/schedule_handle'
+require 'temporalio/client/with_start_workflow_operation'
 require 'temporalio/client/workflow_execution'
 require 'temporalio/client/workflow_execution_count'
 require 'temporalio/client/workflow_handle'
@@ -41,7 +42,7 @@ module Temporalio
         end
 
         def initialize(client)
-          super(nil)
+          super(nil) # steep:ignore
           @client = client
         end
 
@@ -101,6 +102,224 @@ module Temporalio
             run_id: nil,
             result_run_id: resp.run_id,
             first_execution_run_id: resp.run_id
+          )
+        end
+
+        def start_update_with_start_workflow(input)
+          raise ArgumentError, 'Start operation is required' unless input.start_workflow_operation
+
+          if input.start_workflow_operation.options.id_conflict_policy == WorkflowIDConflictPolicy::UNSPECIFIED
+            raise ArgumentError, 'ID conflict policy is required in start operation'
+          end
+
+          # Try to mark used before using
+          input.start_workflow_operation._mark_used
+
+          # Build request
+          start_options = input.start_workflow_operation.options
+          start_req = _start_workflow_request_from_with_start_options(
+            Api::WorkflowService::V1::StartWorkflowExecutionRequest, start_options
+          )
+          req = Api::WorkflowService::V1::ExecuteMultiOperationRequest.new(
+            namespace: @client.namespace,
+            operations: [
+              Api::WorkflowService::V1::ExecuteMultiOperationRequest::Operation.new(start_workflow: start_req),
+              Api::WorkflowService::V1::ExecuteMultiOperationRequest::Operation.new(
+                update_workflow: Api::WorkflowService::V1::UpdateWorkflowExecutionRequest.new(
+                  namespace: @client.namespace,
+                  workflow_execution: Api::Common::V1::WorkflowExecution.new(
+                    workflow_id: start_options.id
+                  ),
+                  request: Api::Update::V1::Request.new(
+                    meta: Api::Update::V1::Meta.new(
+                      update_id: input.update_id,
+                      identity: @client.connection.identity
+                    ),
+                    input: Api::Update::V1::Input.new(
+                      name: Workflow::Definition::Update._name_from_parameter(input.update),
+                      args: @client.data_converter.to_payloads(input.args),
+                      header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+                    )
+                  ),
+                  wait_policy: Api::Update::V1::WaitPolicy.new(
+                    lifecycle_stage: input.wait_for_stage
+                  )
+                )
+              )
+            ]
+          )
+
+          # Continually try to start until an exception occurs, the user-asked stage is reached, or the stage is
+          # accepted. But we will set the workflow handle as soon as we can.
+          # @type var update_resp: untyped
+          update_resp = nil
+          run_id = nil
+          begin
+            loop do
+              resp = @client.workflow_service.execute_multi_operation(
+                req, rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+              )
+              run_id = resp.responses.first.start_workflow.run_id
+              # Set workflow handle (no-op if already set)
+              input.start_workflow_operation._set_workflow_handle(
+                Temporalio::Client::WorkflowHandle.new(
+                  client: @client,
+                  id: start_options.id,
+                  run_id: nil,
+                  result_run_id: run_id,
+                  first_execution_run_id: run_id
+                )
+              )
+              update_resp = resp.responses.last.update_workflow
+
+              # We're only done if the response stage is at least accepted
+              if update_resp && Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage.resolve(update_resp.stage) >=
+                                Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED
+                break
+              end
+            end
+
+            # If the user wants to wait until completed, we must poll until outcome if not already there
+            if input.wait_for_stage == Temporalio::Client::WorkflowUpdateWaitStage::COMPLETED && update_resp.outcome
+              update_resp.outcome = @client._impl.poll_workflow_update(
+                Temporalio::Client::Interceptor::PollWorkflowUpdateInput.new(
+                  workflow_id: start_options.id,
+                  run_id:,
+                  update_id: input.update_id,
+                  rpc_options: input.rpc_options
+                )
+              )
+            end
+          rescue Error => e
+            # If this is a multi-operation failure, set exception to the first present, non-OK, non-aborted error
+            if e.is_a?(Error::RPCError)
+              multi_err = e.grpc_status.details&.first&.unpack(Api::ErrorDetails::V1::MultiOperationExecutionFailure)
+              if multi_err
+                non_aborted = multi_err.statuses.find do |s|
+                  # Exists, not-ok, not-aborted
+                  s && s.code != Error::RPCError::Code::OK &&
+                    !s.details&.first&.is(Api::Failure::V1::MultiOperationExecutionAborted)
+                end
+                if non_aborted
+                  e = Error::RPCError.new(
+                    non_aborted.message,
+                    code: non_aborted.code,
+                    raw_grpc_status: Api::Common::V1::GrpcStatus.new(
+                      code: non_aborted.code, message: non_aborted.message, details: non_aborted.details.to_a
+                    )
+                  )
+                end
+              end
+            end
+            if e.is_a?(Error::RPCError)
+              # Deadline exceeded or cancel is a special error type
+              if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELED
+                e = Error::WorkflowUpdateRPCTimeoutOrCanceledError.new
+              elsif e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+                # Unpack and set already started if that's the error
+                details = e.grpc_status.details.first.unpack(
+                  Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure
+                )
+                if details
+                  e = Error::WorkflowAlreadyStartedError.new(
+                    workflow_id: start_options.id,
+                    workflow_type: start_req.workflow_type,
+                    run_id: details.run_id
+                  )
+                end
+              end
+            end
+            # Cancel is a special type
+            e = Error::WorkflowUpdateRPCTimeoutOrCanceledError.new if e.is_a?(Error::CanceledError)
+            # Before we raise here, we want to try to set the start operation exception (no-op if already set with a
+            # handle)
+            input.start_workflow_operation._set_workflow_handle(e)
+            raise e
+          end
+
+          # Return handle
+          Temporalio::Client::WorkflowUpdateHandle.new(
+            client: @client,
+            id: input.update_id,
+            workflow_id: start_options.id,
+            workflow_run_id: run_id,
+            known_outcome: update_resp.outcome
+          )
+        end
+
+        def signal_with_start_workflow(input)
+          raise ArgumentError, 'Start operation is required' unless input.start_workflow_operation
+
+          # Try to mark used before using
+          input.start_workflow_operation._mark_used
+
+          # Build req
+          start_options = input.start_workflow_operation.options
+          req = _start_workflow_request_from_with_start_options(
+            Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest, start_options
+          )
+          req.signal_name = Workflow::Definition::Signal._name_from_parameter(input.signal)
+          req.signal_input = @client.data_converter.to_payloads(input.args)
+
+          # Send request
+          begin
+            resp = @client.workflow_service.signal_with_start_workflow_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+          rescue Error::RPCError => e
+            # Unpack and raise already started if that's the error, otherwise default raise
+            if e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+              details = e.grpc_status.details.first.unpack(
+                Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure
+              )
+              if details
+                e = Error::WorkflowAlreadyStartedError.new(
+                  workflow_id: req.workflow_id,
+                  workflow_type: req.workflow_type.name,
+                  run_id: details.run_id
+                )
+              end
+            end
+            # Before we raise here, we want to the start operation exception
+            input.start_workflow_operation._set_workflow_handle(e)
+            raise e
+          end
+
+          # Set handle and return handle
+          handle = Temporalio::Client::WorkflowHandle.new(
+            client: @client,
+            id: start_options.id,
+            run_id: nil,
+            result_run_id: resp.run_id,
+            first_execution_run_id: resp.run_id
+          )
+          input.start_workflow_operation._set_workflow_handle(handle)
+          handle
+        end
+
+        def _start_workflow_request_from_with_start_options(klass, start_options)
+          klass.new(
+            request_id: SecureRandom.uuid,
+            namespace: @client.namespace,
+            workflow_type: Api::Common::V1::WorkflowType.new(
+              name: Workflow::Definition._workflow_type_from_workflow_parameter(start_options.workflow)
+            ),
+            workflow_id: start_options.id,
+            task_queue: Api::TaskQueue::V1::TaskQueue.new(name: start_options.task_queue.to_s),
+            input: @client.data_converter.to_payloads(start_options.args),
+            workflow_execution_timeout: ProtoUtils.seconds_to_duration(start_options.execution_timeout),
+            workflow_run_timeout: ProtoUtils.seconds_to_duration(start_options.run_timeout),
+            workflow_task_timeout: ProtoUtils.seconds_to_duration(start_options.task_timeout),
+            identity: @client.connection.identity,
+            workflow_id_reuse_policy: start_options.id_reuse_policy,
+            workflow_id_conflict_policy: start_options.id_conflict_policy,
+            retry_policy: start_options.retry_policy&._to_proto,
+            cron_schedule: start_options.cron_schedule,
+            memo: ProtoUtils.memo_to_proto(start_options.memo, @client.data_converter),
+            search_attributes: start_options.search_attributes&._to_proto,
+            workflow_start_delay: ProtoUtils.seconds_to_duration(start_options.start_delay),
+            header: ProtoUtils.headers_to_proto(start_options.headers, @client.data_converter)
           )
         end
 
@@ -284,11 +503,13 @@ module Temporalio
             end
           rescue Error::RPCError => e
             # Deadline exceeded or cancel is a special error type
-            if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELLED
+            if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELED
               raise Error::WorkflowUpdateRPCTimeoutOrCanceledError
             end
 
             raise
+          rescue Error::CanceledError
+            raise Error::WorkflowUpdateRPCTimeoutOrCanceledError
           end
 
           # If the user wants to wait until completed, we must poll until outcome
@@ -338,7 +559,7 @@ module Temporalio
             return resp.outcome if resp.outcome
           rescue Error::RPCError => e
             # Deadline exceeded or cancel is a special error type
-            if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELLED
+            if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELED
               raise Error::WorkflowUpdateRPCTimeoutOrCanceledError
             end
 

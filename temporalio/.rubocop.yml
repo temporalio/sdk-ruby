@@ -50,6 +50,10 @@ Metrics/BlockLength:
   Max: 100
 
 # The default is too small
+Metrics/BlockNesting:
+  Max: 5
+
+# The default is too small
 Metrics/ClassLength:
   Max: 1000
 
@@ -59,7 +63,7 @@ Metrics/CyclomaticComplexity:
 
 # The default is too small
 Metrics/MethodLength:
-  Max: 100
+  Max: 200
 
 # The default is too small
 Metrics/ModuleLength:
