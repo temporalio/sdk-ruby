@@ -152,9 +152,7 @@ worker = Temporalio::Worker.new(
   task_queue: 'my-task-queue',
   workflows: [SayHelloWorkflow],
   # There are various forms an activity can take, see "Activities" section for details
-  activities: [SayHelloActivity],
-  # During the beta period, this must be provided explicitly, see "Workers" section for details
-  workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+  activities: [SayHelloActivity]
 )
 
 # Run the worker until SIGINT. This can be done in many ways, see "Workers" section for details.
@@ -357,9 +355,7 @@ worker = Temporalio::Worker.new(
   task_queue: 'my-task-queue',
   workflows: [MyModule::MyWorkflow],
   # There are various forms an activity can take, see "Activities" section for details
-  activities: [MyModule::MyActivity],
-  # During the beta period, this must be provided explicitly, see below for details
-  workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.default
+  activities: [MyModule::MyActivity]
 )
 
 # Run the worker until block complete
@@ -372,9 +368,6 @@ Notes about the above code:
 
 * A worker uses the same client that is used for other Temporal things.
 * This just shows providing an activity class, but there are other forms, see the "Activities" section for details.
-* The `workflow_executor` defaults to `Temporalio::Worker::WorkflowExecutor::Ractor.instance` which intentionally does
-  not work during this beta period. Therefore, during this beta period, opting in to
-  `Temporalio::Worker::WorkflowExecutor::ThreadPool.default` is required explicitly.
 * The worker `run` method accepts an optional `Temporalio::Cancellation` object that can be used to cancel instead or in
   addition to providing a block that waits for completion.
 * The worker `run` method accepts a `shutdown_signals` array which will trap the signal and start shutdown when
@@ -993,6 +986,13 @@ it will raise the error raised in the activity.
 
 The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
 activity.
+
+### Ractors
+
+It was an original goal to have workflows actually be Ractors for deterministic state isolation and have the library
+support Ractors in general. However, due to the SDK's heavy use of the Google Protobuf library which
+[is not Ractor-safe](https://github.com/protocolbuffers/protobuf/issues/19321), the Temporal Ruby SDK does not currently
+work with Ractors.
 
 ### Platform Support
 

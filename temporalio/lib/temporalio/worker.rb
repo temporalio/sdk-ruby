@@ -286,7 +286,8 @@ module Temporalio
     # @param workflows [Array<Class<Workflow::Definition>>] Workflows for this worker.
     # @param tuner [Tuner] Tuner that controls the amount of concurrent activities/workflows that run at a time.
     # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
-    # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within.
+    # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within. This must be a
+    #   {WorkflowExecutor::ThreadPool} currently.
     # @param interceptors [Array<Interceptor::Activity, Interceptor::Workflow>] Interceptors specific to this worker.
     #   Note, interceptors set on the client that include the {Interceptor::Activity} or {Interceptor::Workflow} module
     #   are automatically included here, so no need to specify them again.
@@ -352,7 +353,7 @@ module Temporalio
       workflows: [],
       tuner: Tuner.create_fixed,
       activity_executors: ActivityExecutor.defaults,
-      workflow_executor: WorkflowExecutor::Ractor.instance,
+      workflow_executor: WorkflowExecutor::ThreadPool.default,
       interceptors: [],
       build_id: Worker.default_build_id,
       identity: nil,

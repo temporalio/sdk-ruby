@@ -10,7 +10,7 @@ module Temporalio
     class FailureConverter
       # @return [FailureConverter] Default failure converter.
       def self.default
-        @default ||= Ractor.make_shareable(FailureConverter.new)
+        @default ||= FailureConverter.new
       end
 
       # @return [Boolean] If +true+, the message and stack trace of the failure will be moved into the encoded attribute

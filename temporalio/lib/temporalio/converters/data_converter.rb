@@ -8,10 +8,10 @@ module Temporalio
   module Converters
     # Data converter for converting/encoding payloads to/from Ruby values.
     class DataConverter
-      # @return [PayloadConverter] Payload converter. This must be Ractor shareable.
+      # @return [PayloadConverter] Payload converter.
       attr_reader :payload_converter
 
-      # @return [FailureConverter] Failure converter. This must be Ractor shareable.
+      # @return [FailureConverter] Failure converter.
       attr_reader :failure_converter
 
       # @return [PayloadCodec, nil] Optional codec for encoding/decoding payload bytes such as for encryption.
@@ -24,17 +24,14 @@ module Temporalio
 
       # Create data converter.
       #
-      # @param payload_converter [PayloadConverter] Payload converter to use. This must be Ractor shareable.
-      # @param failure_converter [FailureConverter] Failure converter to use. This must be Ractor shareable.
+      # @param payload_converter [PayloadConverter] Payload converter to use.
+      # @param failure_converter [FailureConverter] Failure converter to use.
       # @param payload_codec [PayloadCodec, nil] Payload codec to use.
       def initialize(
         payload_converter: PayloadConverter.default,
         failure_converter: FailureConverter.default,
         payload_codec: nil
       )
-        raise 'Payload converter not shareable' unless Ractor.shareable?(payload_converter)
-        raise 'Failure converter not shareable' unless Ractor.shareable?(failure_converter)
-
         @payload_converter = payload_converter
         @failure_converter = failure_converter
         @payload_codec = payload_codec
