@@ -608,7 +608,7 @@ Or, say, to wait on the first of 5 activities or a timeout to complete:
 # Start 5 activities
 act_futs = 5.times.map do |i|
   Temporalio::Workflow::Future.new do
-    Temporalio::Workflow.execute_activity(MyActivity, "my-arg-#{i}" schedule_to_close_timeout: 300)
+    Temporalio::Workflow.execute_activity(MyActivity, "my-arg-#{i}", schedule_to_close_timeout: 300)
   end
 end
 # Start a timer
