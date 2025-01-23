@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/bridge/worker'
+
 module Temporalio
   class Worker
     # Worker tuner that allows for dynamic customization of some aspects of worker configuration.
@@ -18,6 +20,14 @@ module Temporalio
           def initialize(slots) # rubocop:disable Lint/MissingSuper
             @slots = slots
           end
+
+          # @!visibility private
+          def _to_bridge_options
+            Internal::Bridge::Worker::TunerSlotSupplierOptions.new(
+              fixed_size: slots,
+              resource_based: nil
+            )
+          end
         end
 
         # A slot supplier that will dynamically adjust the number of slots based on resource usage.
@@ -34,6 +44,25 @@ module Temporalio
             @tuner_options = tuner_options
             @slot_options = slot_options
           end
+
+          # @!visibility private
+          def _to_bridge_options
+            Internal::Bridge::Worker::TunerSlotSupplierOptions.new(
+              fixed_size: nil,
+              resource_based: Internal::Bridge::Worker::TunerResourceBasedSlotSupplierOptions.new(
+                target_mem_usage: tuner_options.target_memory_usage,
+                target_cpu_usage: tuner_options.target_cpu_usage,
+                min_slots: slot_options.min_slots,
+                max_slots: slot_options.max_slots,
+                ramp_throttle: slot_options.ramp_throttle
+              )
+            )
+          end
+        end
+
+        # @!visibility private
+        def _to_bridge_options
+          raise ArgumentError, 'Tuner slot suppliers must be instances of Fixed or ResourceBased'
         end
       end
 
@@ -145,6 +174,15 @@ module Temporalio
         @workflow_slot_supplier = workflow_slot_supplier
         @activity_slot_supplier = activity_slot_supplier
         @local_activity_slot_supplier = local_activity_slot_supplier
+      end
+
+      # @!visibility private
+      def _to_bridge_options
+        Internal::Bridge::Worker::TunerOptions.new(
+          workflow_slot_supplier: workflow_slot_supplier._to_bridge_options,
+          activity_slot_supplier: activity_slot_supplier._to_bridge_options,
+          local_activity_slot_supplier: local_activity_slot_supplier._to_bridge_options
+        )
       end
     end
   end

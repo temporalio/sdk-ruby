@@ -121,6 +121,12 @@ module Temporalio
         def replace_client: (Client client) -> void
 
         def initiate_shutdown: -> void
+
+        class WorkflowReplayer
+          def self.new: (Runtime runtime, Options options) -> [WorkflowReplayer, Worker]
+
+          def push_history: (String workflow_id, String proto) -> void
+        end
       end
     end
   end

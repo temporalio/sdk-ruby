@@ -1,0 +1,96 @@
+module Temporalio
+  class Worker
+    class WorkflowReplayer
+      class Options
+        attr_reader workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
+        attr_reader namespace: String
+        attr_reader task_queue: String
+        attr_reader data_converter: Converters::DataConverter
+        attr_reader workflow_executor: Worker::WorkflowExecutor
+        attr_reader interceptors: Array[Interceptor::Workflow]
+        attr_reader build_id: String
+        attr_reader identity: String?
+        attr_reader logger: Logger
+        attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
+        attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
+        attr_reader workflow_payload_codec_thread_pool: ThreadPool?
+        attr_reader debug_mode: bool
+        attr_reader runtime: Runtime
+  
+        def initialize: (
+          workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
+          namespace: String,
+          task_queue: String,
+          data_converter: Converters::DataConverter,
+          workflow_executor: Worker::WorkflowExecutor,
+          interceptors: Array[Interceptor::Workflow],
+          build_id: String,
+          identity: String?,
+          logger: Logger,
+          illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+          workflow_failure_exception_types: Array[singleton(Exception)],
+          workflow_payload_codec_thread_pool: ThreadPool?,
+          debug_mode: bool,
+          runtime: Runtime
+        ) -> void
+      end
+
+      attr_reader options: Options
+
+      def initialize: (
+        workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
+        ?namespace: String,
+        ?task_queue: String,
+        ?data_converter: Converters::DataConverter,
+        ?workflow_executor: Worker::WorkflowExecutor,
+        ?interceptors: Array[Interceptor::Workflow],
+        ?build_id: String,
+        ?identity: String?,
+        ?logger: Logger,
+        ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+        ?workflow_failure_exception_types: Array[singleton(Exception)],
+        ?workflow_payload_codec_thread_pool: ThreadPool?,
+        ?debug_mode: bool,
+        ?runtime: Runtime
+      ) ?{ (ReplayWorker worker) -> untyped } -> void
+
+      def replay_workflow: (
+        WorkflowHistory history,
+        ?raise_on_replay_failure: bool
+      ) -> ReplayResult
+
+      def replay_workflows: (
+        Enumerable[WorkflowHistory] histories,
+        ?raise_on_replay_failure: bool
+      ) -> Array[ReplayResult]
+
+      def with_replay_worker: [T] { (ReplayWorker worker) -> T } -> T
+
+      class ReplayResult
+        attr_reader history: WorkflowHistory
+        attr_reader replay_failure: Exception?
+
+        def initialize: (history: WorkflowHistory, replay_failure: Exception?) -> void
+      end
+
+      class ReplayWorker
+        def initialize: (
+          options: Options,
+          workflow_definitions: Hash[String?, Workflow::Definition::Info],
+          nondeterminism_as_workflow_fail: bool,
+          nondeterminism_as_workflow_fail_for_types: Array[String]
+        ) -> void
+
+        def replay_workflow: (
+          WorkflowHistory history,
+          ?raise_on_replay_failure: bool
+        ) -> ReplayResult
+
+        def _shutdown: -> void
+        def _bridge_worker: -> Internal::Bridge::Worker
+        def _initiate_shutdown: -> void
+        def _wait_all_complete: -> void
+      end
+    end
+  end
+end
