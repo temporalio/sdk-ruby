@@ -33,11 +33,47 @@ module Temporalio
           end
         end
 
-        def initialize(worker:, bridge_worker:, workflow_definitions:)
-          @executor = worker.options.workflow_executor
+        def self.bridge_workflow_failure_exception_type_options(
+          workflow_failure_exception_types:,
+          workflow_definitions:
+        )
+          as_fail = workflow_failure_exception_types.any? do |t|
+            t.is_a?(Class) && t >= Workflow::NondeterminismError
+          end
+          as_fail_for_types = workflow_definitions.values.map do |defn|
+            next unless defn.failure_exception_types.any? { |t| t.is_a?(Class) && t >= Workflow::NondeterminismError }
 
-          payload_codec = worker.options.client.data_converter.payload_codec
-          @workflow_payload_codec_thread_pool = worker.options.workflow_payload_codec_thread_pool
+            # If they tried to do this on a dynamic workflow and haven't already set worker-level option, warn
+            unless defn.name || as_fail
+              warn('Note, dynamic workflows cannot trap non-determinism errors, so worker-level ' \
+                   'workflow_failure_exception_types should be set to capture that if that is the intention')
+            end
+            defn.name
+          end.compact
+          [as_fail, as_fail_for_types]
+        end
+
+        def initialize(
+          bridge_worker:,
+          namespace:,
+          task_queue:,
+          workflow_definitions:,
+          workflow_executor:,
+          logger:,
+          data_converter:,
+          metric_meter:,
+          workflow_interceptors:,
+          disable_eager_activity_execution:,
+          illegal_workflow_calls:,
+          workflow_failure_exception_types:,
+          workflow_payload_codec_thread_pool:,
+          debug_mode:,
+          on_eviction: nil
+        )
+          @executor = workflow_executor
+
+          payload_codec = data_converter.payload_codec
+          @workflow_payload_codec_thread_pool = workflow_payload_codec_thread_pool
           if !Fiber.current_scheduler && payload_codec && !@workflow_payload_codec_thread_pool
             raise ArgumentError, 'Must have workflow payload codec thread pool if providing codec and not using fibers'
           end
@@ -55,19 +91,19 @@ module Temporalio
           @state = State.new(
             workflow_definitions:,
             bridge_worker:,
-            logger: worker.options.logger,
-            metric_meter: worker.options.client.connection.options.runtime.metric_meter,
-            data_converter: worker.options.client.data_converter,
-            deadlock_timeout: worker.options.debug_mode ? nil : 2.0,
+            logger:,
+            metric_meter:,
+            data_converter:,
+            deadlock_timeout: debug_mode ? nil : 2.0,
             # TODO(cretz): Make this more performant for the default set?
             illegal_calls: WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls(
-              worker.options.illegal_workflow_calls || {}
+              illegal_workflow_calls || {}
             ),
-            namespace: worker.options.client.namespace,
-            task_queue: worker.options.task_queue,
-            disable_eager_activity_execution: worker.options.disable_eager_activity_execution,
-            workflow_interceptors: worker._workflow_interceptors,
-            workflow_failure_exception_types: worker.options.workflow_failure_exception_types.map do |t|
+            namespace:,
+            task_queue:,
+            disable_eager_activity_execution:,
+            workflow_interceptors:,
+            workflow_failure_exception_types: workflow_failure_exception_types.map do |t|
               unless t.is_a?(Class) && t < Exception
                 raise ArgumentError, 'All failure types must classes inheriting Exception'
               end
@@ -75,9 +111,10 @@ module Temporalio
               t
             end.freeze
           )
+          @state.on_eviction = on_eviction if on_eviction
 
           # Validate worker
-          @executor._validate_worker(worker, @state)
+          @executor._validate_worker(self, @state)
         end
 
         def handle_activation(runner:, activation:, decoded:)
@@ -149,6 +186,8 @@ module Temporalio
                       :illegal_calls, :namespace, :task_queue, :disable_eager_activity_execution,
                       :workflow_interceptors, :workflow_failure_exception_types
 
+          attr_writer :on_eviction
+
           def initialize(
             workflow_definitions:, bridge_worker:, logger:, metric_meter:, data_converter:, deadlock_timeout:,
             illegal_calls:, namespace:, task_queue:, disable_eager_activity_execution:,
@@ -182,8 +221,9 @@ module Temporalio
             instance
           end
 
-          def evict_running_workflow(run_id)
+          def evict_running_workflow(run_id, cache_remove_job)
             @running_workflows_mutex.synchronize { @running_workflows.delete(run_id) }
+            @on_eviction&.call(run_id, cache_remove_job)
           end
 
           def evict_all

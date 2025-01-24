@@ -3282,6 +3282,7 @@ dependencies = [
  "temporal-sdk-core-api",
  "temporal-sdk-core-protos",
  "tokio",
+ "tokio-stream",
  "tokio-util",
  "tonic",
  "tracing",

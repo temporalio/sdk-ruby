@@ -6,10 +6,27 @@ module Temporalio
           Array[singleton(Workflow::Definition) | Workflow::Definition::Info] workflows
         ) -> Hash[String?, Workflow::Definition::Info]
 
-        def initialize: (
-          worker: Temporalio::Worker,
-          bridge_worker: Bridge::Worker,
+        def self.bridge_workflow_failure_exception_type_options: (
+          workflow_failure_exception_types: Array[singleton(Exception)],
           workflow_definitions: Hash[String?, Workflow::Definition::Info]
+        ) -> [bool, Array[String]]
+
+        def initialize: (
+          bridge_worker: Bridge::Worker,
+          namespace: String,
+          task_queue: String,
+          workflow_definitions: Hash[String?, Workflow::Definition::Info],
+          workflow_executor: Temporalio::Worker::WorkflowExecutor,
+          logger: Logger,
+          data_converter: Converters::DataConverter,
+          metric_meter: Temporalio::Metric::Meter,
+          workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
+          disable_eager_activity_execution: bool,
+          illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+          workflow_failure_exception_types: Array[singleton(Exception)],
+          workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
+          debug_mode: bool,
+          ?on_eviction: (^(String run_id, untyped cache_remove_job) -> void)?
         ) -> void
 
         def handle_activation: (
@@ -45,6 +62,8 @@ module Temporalio
           attr_reader workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
           attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
 
+          attr_writer on_eviction: ^(String run_id, untyped cache_remove_job) -> void
+
           def initialize: (
             workflow_definitions: Hash[String?, Workflow::Definition::Info],
             bridge_worker: Bridge::Worker,
@@ -61,7 +80,7 @@ module Temporalio
           ) -> void
 
           def get_or_create_running_workflow: [T] (String run_id) { -> T } -> T
-          def evict_running_workflow: (String run_id) -> void
+          def evict_running_workflow: (String run_id, untyped cache_remove_job) -> void
           def evict_all: -> void
         end
       end

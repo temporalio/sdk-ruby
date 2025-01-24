@@ -62,6 +62,7 @@ until the SDK is marked stable.
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
     - [Activity Testing](#activity-testing)
+  - [Ractors](#ractors)
   - [Platform Support](#platform-support)
 - [Development](#development)
   - [Build](#build)
@@ -853,7 +854,48 @@ the mock activity class to make it appear as the real name.
 
 #### Workflow Replay
 
-TODO: Workflow replayer not yet implemented
+Given a workflow's history, it can be replayed locally to check for things like non-determinism errors. For example,
+assuming the `history_json` parameter below is given a JSON string of history exported from the CLI or web UI, the
+following function will replay it:
+
+```ruby
+def replay_from_json(history_json)
+  replayer = Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow])
+  replayer.replay_workflow(Temporalio::WorkflowHistory.from_history_json(history_json))
+end
+```
+
+If there is a non-determinism, this will raise an exception by default.
+
+Workflow history can be loaded from more than just JSON. It can be fetched individually from a workflow handle, or even
+in a list. For example, the following code will check that all workflow histories for a certain workflow type (i.e.
+workflow class) are safe with the current workflow code.
+
+```ruby
+def check_past_histories(client)
+  replayer = Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow])
+  results = replayer.replay_workflows(client.list_workflows("WorkflowType = 'MyWorkflow'").map do |desc|
+    client.workflow_handle(desc.id, run_id: desc.run_id).fetch_history
+  end)
+  results.each { |res| raise res.replay_failure if res.replay_failure }
+end
+```
+
+But this only raises at the end because by default `replay_workflows` does not raise on failure like `replay_workflow`
+does. The `raise_on_replay_failure: true` parameter could be set, or the replay worker can be used to process each one
+like so:
+
+```ruby
+def check_past_histories(client)
+  Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow]) do |worker|
+    client.list_workflows("WorkflowType = 'MyWorkflow'").each do |desc|
+      worker.replay_workflow(client.workflow_handle(desc.id, run_id: desc.run_id).fetch_history)
+    end
+  end
+end
+```
+
+See the `WorkflowReplayer` API documentation for more details.
 
 ### Activities
 
