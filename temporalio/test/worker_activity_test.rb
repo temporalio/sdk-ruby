@@ -857,6 +857,50 @@ class WorkerActivityTest < Test
                  execute_activity(DynamicActivityRawArgs, 'arg1', nil, 123, override_name: 'does-not-exist')
   end
 
+  class ContextInstanceInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def init(outbound)
+        Temporalio::Activity::Context.current.instance.events&.<< 'interceptor-init' # steep:ignore
+        super
+      end
+
+      def execute(input)
+        Temporalio::Activity::Context.current.instance.events&.<< 'interceptor-execute' # steep:ignore
+        super
+      end
+    end
+  end
+
+  class ContextInstanceActivity < Temporalio::Activity::Definition
+    def events
+      @events ||= []
+    end
+
+    def execute
+      events << 'execute' # steep:ignore
+    end
+  end
+
+  def test_context_instance
+    # Instance-per-attempt (twice)
+    assert_equal %w[interceptor-init interceptor-execute execute],
+                 execute_activity(ContextInstanceActivity, interceptors: [ContextInstanceInterceptor.new])
+    assert_equal %w[interceptor-init interceptor-execute execute],
+                 execute_activity(ContextInstanceActivity, interceptors: [ContextInstanceInterceptor.new])
+    # Shared instance
+    shared_instance = ContextInstanceActivity.new
+    assert_equal %w[interceptor-init interceptor-execute execute],
+                 execute_activity(shared_instance, interceptors: [ContextInstanceInterceptor.new])
+    assert_equal %w[interceptor-init interceptor-execute execute interceptor-init interceptor-execute execute],
+                 execute_activity(shared_instance, interceptors: [ContextInstanceInterceptor.new])
+  end
+
   # steep:ignore
   def execute_activity(
     activity,

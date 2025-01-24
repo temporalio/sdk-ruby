@@ -53,6 +53,8 @@ module Temporalio
 
           def info: -> Workflow::Info
 
+          def instance: -> Temporalio::Workflow::Definition?
+
           def initialize_continue_as_new_error: (Workflow::ContinueAsNewError error) -> void
 
           def logger: -> ReplaySafeLogger

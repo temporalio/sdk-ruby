@@ -48,6 +48,12 @@ module Temporalio
         raise NotImplementedError
       end
 
+      # @return [Object, nil] Activity class instance. This should always be present except for advanced cases where the
+      #   definition was manually created without any instance getter/creator.
+      def instance
+        raise NotImplementedError
+      end
+
       # Record a heartbeat on the activity.
       #
       # Heartbeats should be used for all non-immediately-returning, non-local activities and they are required to
