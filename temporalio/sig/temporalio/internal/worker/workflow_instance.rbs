@@ -40,7 +40,7 @@ module Temporalio
 
         def add_command: (untyped command) -> void
 
-        def instance: -> Object
+        def instance: -> Temporalio::Workflow::Definition
 
         def search_attributes: -> SearchAttributes
 
@@ -58,7 +58,7 @@ module Temporalio
 
         def activate_internal: (untyped activation) -> untyped
 
-        def create_instance: -> Object
+        def create_instance: -> Temporalio::Workflow::Definition
 
         def apply: (untyped job) -> void
 

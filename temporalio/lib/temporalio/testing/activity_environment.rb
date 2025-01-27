@@ -80,6 +80,8 @@ module Temporalio
           Activity::Context._current_executor = executor
           executor.set_activity_context(defn, Context.new(
                                                 info: @info.dup,
+                                                instance:
+                                                  defn.instance.is_a?(Proc) ? defn.instance.call : defn.instance,
                                                 on_heartbeat: @on_heartbeat,
                                                 cancellation: @cancellation,
                                                 worker_shutdown_cancellation: @worker_shutdown_cancellation,
@@ -102,17 +104,19 @@ module Temporalio
 
       # @!visibility private
       class Context < Activity::Context
-        attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
+        attr_reader :info, :instance, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
 
         def initialize( # rubocop:disable Lint/MissingSuper
-          info: ActivityEnvironment.default_info,
-          on_heartbeat: nil,
-          cancellation: Cancellation.new,
-          worker_shutdown_cancellation: Cancellation.new,
-          payload_converter: Converters::PayloadConverter.default,
-          logger: Logger.new(nil)
+          info:,
+          instance:,
+          on_heartbeat:,
+          cancellation:,
+          worker_shutdown_cancellation:,
+          payload_converter:,
+          logger:
         )
           @info = info
+          @instance = instance
           @on_heartbeat = on_heartbeat
           @cancellation = cancellation
           @worker_shutdown_cancellation = worker_shutdown_cancellation

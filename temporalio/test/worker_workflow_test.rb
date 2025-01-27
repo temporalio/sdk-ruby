@@ -1738,6 +1738,37 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class ContextInstanceInterceptor
+    include Temporalio::Worker::Interceptor::Workflow
+
+    def intercept_workflow(next_interceptor)
+      Inbound.new(next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Workflow::Inbound
+      def execute(input)
+        Temporalio::Workflow.instance.events << 'interceptor-execute'
+        super
+      end
+    end
+  end
+
+  class ContextInstanceWorkflow < Temporalio::Workflow::Definition
+    def execute
+      events << 'execute'
+    end
+
+    workflow_query
+    def events
+      @events ||= []
+    end
+  end
+
+  def test_context_instance
+    assert_equal %w[interceptor-execute execute],
+                 execute_workflow(ContextInstanceWorkflow, interceptors: [ContextInstanceInterceptor.new])
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Eager workflow start

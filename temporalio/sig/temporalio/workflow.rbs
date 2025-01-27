@@ -64,6 +64,8 @@ module Temporalio
 
     def self.info: -> Info
 
+    def self.instance: -> Definition?
+
     def self.logger: -> ScopedLogger
 
     def self.memo: -> Hash[String, Object?]
