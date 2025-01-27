@@ -2,7 +2,14 @@ module Temporalio
   module Internal
     module Worker
       class MultiRunner
-        def initialize: (workers: Array[Temporalio::Worker], shutdown_signals: Array[String | Integer]) -> void
+        interface _Worker
+          def _bridge_worker: -> Bridge::Worker
+          def _initiate_shutdown: -> void
+          def _wait_all_complete: -> void
+        end
+
+
+        def initialize: (workers: Array[_Worker], shutdown_signals: Array[String | Integer]) -> void
 
         def apply_thread_or_fiber_block: ?{ (?) -> untyped } -> void
 
@@ -27,12 +34,12 @@ module Temporalio
 
         class Event
           class PollSuccess < Event
-            attr_reader worker: Temporalio::Worker
+            attr_reader worker: _Worker
             attr_reader worker_type: Symbol
             attr_reader bytes: String
 
             def initialize: (
-              worker: Temporalio::Worker,
+              worker: _Worker,
               worker_type: Symbol,
               bytes: String
             ) -> void
@@ -73,23 +80,23 @@ module Temporalio
           end
 
           class PollFailure < Event
-            attr_reader worker: Temporalio::Worker
+            attr_reader worker: _Worker
             attr_reader worker_type: Symbol
             attr_reader error: Exception
 
             def initialize: (
-              worker: Temporalio::Worker,
+              worker: _Worker,
               worker_type: Symbol,
               error: Exception
             ) -> void
           end
 
           class PollerShutDown < Event
-            attr_reader worker: Temporalio::Worker
+            attr_reader worker: _Worker
             attr_reader worker_type: Symbol
 
             def initialize: (
-              worker: Temporalio::Worker,
+              worker: _Worker,
               worker_type: Symbol
             ) -> void
           end

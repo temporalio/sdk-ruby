@@ -44,7 +44,8 @@ module Temporalio
 
           def evict: (
             Internal::Worker::WorkflowWorker::State worker_state,
-            String run_id
+            String run_id,
+            untyped cache_remove_job
           ) -> void
         end
 

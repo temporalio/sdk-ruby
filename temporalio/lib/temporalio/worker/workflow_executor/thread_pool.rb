@@ -36,7 +36,7 @@ module Temporalio
         end
 
         # @!visibility private
-        def _validate_worker(worker, worker_state)
+        def _validate_worker(workflow_worker, worker_state)
           # Do nothing
         end
 
@@ -137,7 +137,7 @@ module Temporalio
 
             # If it's eviction only, just evict inline and do nothing else
             if cache_remove_job && activation.jobs.size == 1
-              evict(worker_state, activation.run_id)
+              evict(worker_state, activation.run_id, cache_remove_job)
               worker_state.logger.debug('Sending empty workflow completion') if LOG_ACTIVATIONS
               yield Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
                 run_id: activation.run_id,
@@ -173,7 +173,7 @@ module Temporalio
             end
 
             # Go ahead and evict if there is an eviction job
-            evict(worker_state, activation.run_id) if cache_remove_job
+            evict(worker_state, activation.run_id, cache_remove_job) if cache_remove_job
 
             # Complete the activation
             worker_state.logger.debug("Sending workflow completion: #{completion}") if LOG_ACTIVATIONS
@@ -214,8 +214,8 @@ module Temporalio
             )
           end
 
-          def evict(worker_state, run_id)
-            worker_state.evict_running_workflow(run_id)
+          def evict(worker_state, run_id, cache_remove_job)
+            worker_state.evict_running_workflow(run_id, cache_remove_job)
             @executor._remove_workflow(worker_state, run_id)
           end
         end
