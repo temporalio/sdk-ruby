@@ -11,8 +11,9 @@ execute asynchronous, long-running business logic in a scalable and resilient wa
 
 Also see:
 
+* [Ruby SDK](https://github.com/temporalio/sdk-ruby)
 * [Ruby Samples](https://github.com/temporalio/samples-ruby)
-* [API Documentation](https://rubydoc.info/gems/temporalio/0.2.0)
+* [API Documentation](https://ruby.temporal.io)
 
 ⚠️ UNDER ACTIVE DEVELOPMENT
 

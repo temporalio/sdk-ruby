@@ -24,6 +24,7 @@ jobs:
           - os: ubuntu-latest
             rubyVersion: "3.4"
             checkTarget: true
+            docsTarget: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -88,3 +89,11 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
         run: bundle exec rake TESTOPTS="--verbose"
+
+      - name: Deploy docs
+        # Only deploy on main merge, not in PRs
+        if: ${{ github.ref == 'refs/heads/main' && matrix.docsTarget }}
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: npx vercel deploy temporalio/doc --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
