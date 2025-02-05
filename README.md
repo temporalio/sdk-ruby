@@ -15,12 +15,16 @@ Also see:
 * [Ruby Samples](https://github.com/temporalio/samples-ruby)
 * [API Documentation](https://ruby.temporal.io)
 
+**NOTE: This README is for the current branch and not necessarily what's released on RubyGems.**
+
 ⚠️ UNDER ACTIVE DEVELOPMENT
 
 This SDK is under active development and has not released a stable version yet. APIs may change in incompatible ways
 until the SDK is marked stable.
 
-**NOTE: This README is for the current branch and not necessarily what's released on RubyGems.**
+During this time, we are requesting any/all feedback from early adopters. We welcome all forms of suggestions or
+opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#ruby-sdk` channel or via email at
+`sdk@temporal.io`.
 
 ---
 
