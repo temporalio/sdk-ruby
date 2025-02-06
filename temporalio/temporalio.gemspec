@@ -24,5 +24,5 @@ Gem::Specification.new do |spec|
   spec.extensions = ['ext/Cargo.toml']
   spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.add_dependency 'google-protobuf', '>= 3.27.0'
+  spec.add_dependency 'google-protobuf', '>= 3.25.0'
 end
