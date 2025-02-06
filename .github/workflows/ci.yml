@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO(cretz): Enable ubuntu-24.04-arm when oxidize-rb/actions/setup-ruby-and-rust
-        # supports it
+        # TODO(cretz): Enable ubuntu-24.04-arm when setup-ruby-and-rust supports it, see
+        # https://github.com/oxidize-rb/actions/issues/53
         # 
         # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
         # https://github.com/temporalio/sdk-ruby/issues/172

@@ -98,8 +98,8 @@ gem install temporalio
 
 **NOTE**: Only macOS ARM/x64 and Linux ARM/x64 are supported, and the platform-specific gem chosen is based on when the
 gem/bundle install is performed. A source gem is published but cannot be used directly and will fail to build if tried.
-MinGW-based Windows and Linux MUSL do not have gems. See the [Platform Support](#platform-support) section for more
-information.
+MinGW-based Windows is not currently supported. There are caveats with the Google Protobuf dependency on musl-based
+Linux. See the [Platform Support](#platform-support) section for more information.
 
 **NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
 supported on Ruby versions 3.3 and newer.
@@ -1047,21 +1047,27 @@ This SDK is backed by a Ruby C extension written in Rust leveraging the
 [Temporal Rust Core](https://github.com/temporalio/sdk-core). Gems are currently published for the following platforms:
 
 * `aarch64-linux`
+* `aarch64-linux-musl`
 * `x86_64-linux`
+* `x86_64-linux-musl`
 * `arm64-darwin`
 * `x86_64-darwin`
 
-This means Linux and macOS for ARM and x64 have published gems. Currently, a gem is not published for
-`aarch64-linux-musl` so Alpine Linux users may need to build from scratch or use a libc-based distro.
+This means Linux and macOS for ARM and x64 have published gems.
 
 Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/172) with Windows and multi-threaded Rust, MinGW-based
 Windows (i.e. `x64-mingw-ucrt`) is not supported. But WSL is supported using the normal Linux gem.
+
+Due to [an issue](https://github.com/protocolbuffers/protobuf/issues/16853) with Google Protobuf, latest Linux versions
+of Google Protobuf gems will not work in musl-based environments. Instead use the pure "ruby" platform which will build
+the Google Protobuf gem on install (e.g.
+`gem 'google-protobuf', force_ruby_platform: RUBY_PLATFORM.include?('linux-musl')` in the `Gemfile`).
 
 At this time a pure source gem is published for documentation reasons, but it cannot be built and will fail if tried.
 Building from source requires many files across submodules and requires Rust to be installed. See the [Build](#build)
 section for how to build a the repository.
 
-The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
+The SDK works on Ruby 3.2+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
 `async` gem) are only supported on Ruby versions 3.3 and newer.
 
 ## Development
@@ -1070,7 +1076,7 @@ The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/
 
 Prerequisites:
 
-* [Ruby](https://www.ruby-lang.org/) >= 3.1 (i.e. `ruby` and `bundle` on the `PATH`)
+* [Ruby](https://www.ruby-lang.org/) >= 3.2 (i.e. `ruby` and `bundle` on the `PATH`)
 * [Rust](https://www.rust-lang.org/) latest stable (i.e. `cargo` on the `PATH`)
 * This repository, cloned recursively
 * Change to the `temporalio/` directory
