@@ -56,6 +56,8 @@ module Temporalio
 
     def update!: (*Update updates) -> void
 
+    def _raw_hash: -> Hash[Key, Object]
+
     def _to_proto: -> untyped
 
     def _to_proto_hash: -> Hash[String, untyped]

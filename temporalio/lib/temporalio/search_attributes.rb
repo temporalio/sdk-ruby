@@ -251,6 +251,14 @@ module Temporalio
       @raw_hash.length
     end
 
+    # Check equality.
+    #
+    # @param other [SearchAttributes] To compare.
+    # @return [Boolean] Whether equal.
+    def ==(other)
+      other.is_a?(SearchAttributes) && @raw_hash == other._raw_hash
+    end
+
     alias size length
 
     # Return a new search attributes collection with updates applied.
@@ -278,6 +286,11 @@ module Temporalio
           self[update.key] = update.value
         end
       end
+    end
+
+    # @!visibility private
+    def _raw_hash
+      @raw_hash
     end
 
     # @!visibility private

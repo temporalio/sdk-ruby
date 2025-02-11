@@ -131,5 +131,63 @@ module Testing
         end
       end
     end
+
+    def test_start_local_search_attributes
+      pre = 'ruby-temporal-test-'
+      attr_boolean = Temporalio::SearchAttributes::Key.new(
+        "#{pre}boolean", Temporalio::SearchAttributes::IndexedValueType::BOOLEAN
+      )
+      attr_float = Temporalio::SearchAttributes::Key.new(
+        "#{pre}float", Temporalio::SearchAttributes::IndexedValueType::FLOAT
+      )
+      attr_integer = Temporalio::SearchAttributes::Key.new(
+        "#{pre}integer", Temporalio::SearchAttributes::IndexedValueType::INTEGER
+      )
+      attr_keyword = Temporalio::SearchAttributes::Key.new(
+        "#{pre}keyword", Temporalio::SearchAttributes::IndexedValueType::KEYWORD
+      )
+      attr_keyword_list = Temporalio::SearchAttributes::Key.new(
+        "#{pre}keyword-list", Temporalio::SearchAttributes::IndexedValueType::KEYWORD_LIST
+      )
+      attr_text = Temporalio::SearchAttributes::Key.new(
+        "#{pre}text", Temporalio::SearchAttributes::IndexedValueType::TEXT
+      )
+      attr_time = Temporalio::SearchAttributes::Key.new(
+        "#{pre}time", Temporalio::SearchAttributes::IndexedValueType::TIME
+      )
+      attrs = Temporalio::SearchAttributes.new(
+        {
+          attr_boolean => true,
+          attr_float => 1.23,
+          attr_integer => 456,
+          attr_keyword => 'some keyword',
+          attr_keyword_list => ['some keyword list 1', 'some keyword list 2'],
+          attr_text => 'some text',
+          attr_time => Time.at(Time.now.to_i)
+        }
+      )
+
+      # Confirm when used in env without SAs it fails
+      Temporalio::Testing::WorkflowEnvironment.start_local do |env|
+        err = assert_raises(Temporalio::Error::RPCError) do
+          env.client.start_workflow(
+            :some_workflow,
+            id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}",
+            search_attributes: attrs
+          )
+        end
+        assert_includes err.message, 'no mapping defined'
+      end
+
+      # Confirm when used in env with SAs it succeeds
+      Temporalio::Testing::WorkflowEnvironment.start_local(search_attributes: attrs.to_h.keys) do |env|
+        handle = env.client.start_workflow(
+          :some_workflow,
+          id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}",
+          search_attributes: attrs
+        )
+        assert_equal attrs, handle.describe.search_attributes
+      end
+    end
   end
 end
