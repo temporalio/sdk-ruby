@@ -41,7 +41,7 @@ module Temporalio
       def initialize: (
         String message,
         code: Code::enum,
-        raw_grpc_status: String?
+        raw_grpc_status: String? | untyped
       ) -> void
 
       def grpc_status: -> untyped
