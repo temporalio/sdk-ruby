@@ -201,6 +201,7 @@ module Temporalio
 
           # Run
           activity = RunningActivity.new(
+            worker: @worker,
             info:,
             cancellation: Cancellation.new,
             worker_shutdown_cancellation: @worker._worker_shutdown_cancellation,
@@ -299,6 +300,7 @@ module Temporalio
           attr_accessor :instance, :_outbound_impl, :_server_requested_cancel
 
           def initialize( # rubocop:disable Lint/MissingSuper
+            worker:,
             info:,
             cancellation:,
             worker_shutdown_cancellation:,
@@ -306,6 +308,7 @@ module Temporalio
             logger:,
             runtime_metric_meter:
           )
+            @worker = worker
             @info = info
             @cancellation = cancellation
             @worker_shutdown_cancellation = worker_shutdown_cancellation
@@ -333,6 +336,10 @@ module Temporalio
                 activity_type: info.activity_type
               }
             )
+          end
+
+          def client
+            @worker.client
           end
         end
 
