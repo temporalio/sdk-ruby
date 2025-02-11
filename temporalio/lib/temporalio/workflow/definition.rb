@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/proto_utils'
 require 'temporalio/workflow'
 require 'temporalio/workflow/handler_unfinished_policy'
 
@@ -430,6 +431,7 @@ module Temporalio
           @signals = signals.dup.freeze
           @queries = queries.dup.freeze
           @updates = updates.dup.freeze
+          Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
         # @return [String] Workflow name.
@@ -473,6 +475,7 @@ module Temporalio
           @to_invoke = to_invoke
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
+          Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end
 
@@ -507,6 +510,7 @@ module Temporalio
           @name = name
           @to_invoke = to_invoke
           @raw_args = raw_args
+          Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end
 
@@ -548,6 +552,7 @@ module Temporalio
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
           @validator_to_invoke = validator_to_invoke
+          Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
         # @!visibility private

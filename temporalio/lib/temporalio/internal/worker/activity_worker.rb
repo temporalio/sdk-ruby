@@ -93,8 +93,10 @@ module Temporalio
         def handle_start_task(task_token, start)
           set_running_activity(task_token, nil)
 
-          # Find activity definition, falling back to dynamic if present
-          defn = @activities[start.activity_type] || @activities[nil]
+          # Find activity definition, falling back to dynamic if not found and not reserved name
+          defn = @activities[start.activity_type]
+          defn = @activities[nil] if !defn && !Internal::ProtoUtils.reserved_name?(start.activity_type)
+
           if defn.nil?
             raise Error::ApplicationError.new(
               "Activity #{start.activity_type} for workflow #{start.workflow_execution.workflow_id} " \

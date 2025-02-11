@@ -106,6 +106,22 @@ module Temporalio
         converter.to_payloads(values).payloads.to_ary
       end
 
+      def self.assert_non_reserved_name(name)
+        name = name&.to_s # In case it's a symbol or not present
+        return unless name
+        raise "'#{name}' cannot start with '__temporal_'" if name.start_with?('__temporal_')
+        # Might as well disable __stack_trace and __enhanced_stack_trace everywhere even though technically it's only
+        # reserved for queries
+        raise "'#{name}' name invalid" if name == '__stack_trace' || name == '__enhanced_stack_trace'
+      end
+
+      def self.reserved_name?(name)
+        name = name&.to_s # In case it's a symbol or not present
+        return false unless name
+
+        name.start_with?('__temporal_') || name == '__stack_trace' || name == '__enhanced_stack_trace'
+      end
+
       class LazyMemo
         def initialize(raw_memo, converter)
           @raw_memo = raw_memo
