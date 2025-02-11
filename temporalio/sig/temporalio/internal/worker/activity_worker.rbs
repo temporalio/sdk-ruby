@@ -21,15 +21,18 @@ module Temporalio
 
         def execute_activity: (String task_token, Activity::Definition::Info defn, untyped start) -> void
         def run_activity: (
+          Activity::Definition::Info defn,
           RunningActivity activity,
           Temporalio::Worker::Interceptor::Activity::ExecuteInput input
         ) -> void
 
         class RunningActivity < Activity::Context
+          attr_accessor instance: Activity::Definition?
           attr_accessor _outbound_impl: Temporalio::Worker::Interceptor::Activity::Outbound?
           attr_accessor _server_requested_cancel: bool
 
           def initialize: (
+            worker: Temporalio::Worker,
             info: Activity::Info,
             cancellation: Cancellation,
             worker_shutdown_cancellation: Cancellation,

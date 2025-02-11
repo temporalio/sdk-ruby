@@ -48,6 +48,12 @@ module Temporalio
         raise NotImplementedError
       end
 
+      # @return [Object, nil] Activity class instance. This should always be present except for advanced cases where the
+      #   definition was manually created without any instance getter/creator.
+      def instance
+        raise NotImplementedError
+      end
+
       # Record a heartbeat on the activity.
       #
       # Heartbeats should be used for all non-immediately-returning, non-local activities and they are required to
@@ -102,7 +108,14 @@ module Temporalio
       end
 
       # @return [Metric::Meter] Metric meter to create metrics on, with some activity-specific attributes already set.
+      # @raise [RuntimeError] Called within a {Testing::ActivityEnvironment} and it was not set.
       def metric_meter
+        raise NotImplementedError
+      end
+
+      # @return [Client] Temporal client this activity worker is running in.
+      # @raise [RuntimeError] Called within a {Testing::ActivityEnvironment} and it was not set.
+      def client
         raise NotImplementedError
       end
     end

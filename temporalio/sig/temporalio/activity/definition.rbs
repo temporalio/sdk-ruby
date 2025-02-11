@@ -18,6 +18,7 @@ module Temporalio
 
       class Info
         attr_reader name: String | Symbol | nil
+        attr_reader instance: Object | Proc | nil
         attr_reader proc: Proc
         attr_reader executor: Symbol
         attr_reader cancel_raise: bool
@@ -27,6 +28,7 @@ module Temporalio
 
         def initialize: (
           name: String | Symbol | nil,
+          ?instance: Object | Proc | nil,
           ?executor: Symbol,
           ?cancel_raise: bool,
           ?raw_args: bool

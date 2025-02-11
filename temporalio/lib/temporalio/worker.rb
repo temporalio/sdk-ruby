@@ -55,6 +55,8 @@ module Temporalio
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
+    #
+    # Note, the `client` within can be replaced via client setter.
     class Options; end # rubocop:disable Lint/EmptyClass
 
     # @return [String] Memoized default build ID. This default value is built as a checksum of all of the loaded Ruby
@@ -137,7 +139,8 @@ module Temporalio
         case event
         when Internal::Worker::MultiRunner::Event::PollSuccess
           # Successful poll
-          event.worker._on_poll_bytes(runner, event.worker_type, event.bytes)
+          event.worker #: Worker
+               ._on_poll_bytes(runner, event.worker_type, event.bytes)
         when Internal::Worker::MultiRunner::Event::PollFailure
           # Poll failure, this causes shutdown of all workers
           logger.error('Poll failure (beginning worker shutdown if not already occurring)')
@@ -274,7 +277,7 @@ module Temporalio
       end
     end
 
-    # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
+    # @return [Options] Options for this worker which has the same attributes as {initialize}.
     attr_reader :options
 
     # Create a new worker. At least one activity or workflow must be present.
@@ -411,19 +414,10 @@ module Temporalio
 
       # Preload workflow definitions and some workflow settings for the bridge
       workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
-      nondeterminism_as_workflow_fail = workflow_failure_exception_types.any? do |t|
-        t.is_a?(Class) && t >= Workflow::NondeterminismError
-      end
-      nondeterminism_as_workflow_fail_for_types = workflow_definitions.values.map do |defn|
-        next unless defn.failure_exception_types.any? { |t| t.is_a?(Class) && t >= Workflow::NondeterminismError }
-
-        # If they tried to do this on a dynamic workflow and haven't already set worker-level option, warn
-        unless defn.name || nondeterminism_as_workflow_fail
-          warn('Note, dynamic workflows cannot trap non-determinism errors, so worker-level ' \
-               'workflow_failure_exception_types should be set to capture that if that is the intention')
-        end
-        defn.name
-      end.compact
+      nondeterminism_as_workflow_fail, nondeterminism_as_workflow_fail_for_types =
+        Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
+          workflow_failure_exception_types:, workflow_definitions:
+        )
 
       # Create the bridge worker
       @bridge_worker = Internal::Bridge::Worker.new(
@@ -433,11 +427,7 @@ module Temporalio
           workflow: !workflows.empty?,
           namespace: client.namespace,
           task_queue:,
-          tuner: Internal::Bridge::Worker::TunerOptions.new(
-            workflow_slot_supplier: to_bridge_slot_supplier_options(tuner.workflow_slot_supplier),
-            activity_slot_supplier: to_bridge_slot_supplier_options(tuner.activity_slot_supplier),
-            local_activity_slot_supplier: to_bridge_slot_supplier_options(tuner.local_activity_slot_supplier)
-          ),
+          tuner: tuner._to_bridge_options,
           build_id:,
           identity_override: identity,
           max_cached_workflows:,
@@ -476,18 +466,53 @@ module Temporalio
                                                                 bridge_worker: @bridge_worker)
       end
       unless workflows.empty?
-        @workflow_worker = Internal::Worker::WorkflowWorker.new(worker: self,
-                                                                bridge_worker: @bridge_worker,
-                                                                workflow_definitions:)
+        @workflow_worker = Internal::Worker::WorkflowWorker.new(
+          bridge_worker: @bridge_worker,
+          namespace: client.namespace,
+          task_queue:,
+          workflow_definitions:,
+          workflow_executor:,
+          logger:,
+          data_converter: client.data_converter,
+          metric_meter: client.connection.options.runtime.metric_meter,
+          workflow_interceptors: @workflow_interceptors,
+          disable_eager_activity_execution:,
+          illegal_workflow_calls:,
+          workflow_failure_exception_types:,
+          workflow_payload_codec_thread_pool:,
+          debug_mode:
+        )
       end
 
       # Validate worker
       @bridge_worker.validate
+
+      # Mutex needed for accessing and replacing a client
+      @client_mutex = Mutex.new
     end
 
     # @return [String] Task queue set on the worker options.
     def task_queue
       @options.task_queue
+    end
+
+    # @return [Client] Client for this worker. This is the same as {Options.client} in {options}, but surrounded by a
+    #   mutex to be safe for client replacement in {client=}.
+    def client
+      @client_mutex.synchronize { @options.client }
+    end
+
+    # Replace the worker's client. When this is called, the client is replaced on the internal worker which means any
+    # new calls will be made on the new client (but existing calls will still complete on the previous one). This is
+    # commonly used for providing a new client with updated authentication credentials.
+    #
+    # @param new_client [Client] New client to use for new calls.
+    def client=(new_client)
+      @client_mutex.synchronize do
+        @bridge_worker.replace_client(new_client.connection._core_client)
+        @options = @options.with(client: new_client)
+        new_client
+      end
     end
 
     # Run this worker until cancellation or optional block completes. When the cancellation or block is complete, the
@@ -544,11 +569,6 @@ module Temporalio
     end
 
     # @!visibility private
-    def _workflow_interceptors
-      @workflow_interceptors
-    end
-
-    # @!visibility private
     def _on_poll_bytes(runner, worker_type, bytes)
       case worker_type
       when :activity
@@ -568,30 +588,6 @@ module Temporalio
     def _on_shutdown_complete
       @workflow_worker&.on_shutdown_complete
       @workflow_worker = nil
-    end
-
-    private
-
-    def to_bridge_slot_supplier_options(slot_supplier)
-      if slot_supplier.is_a?(Tuner::SlotSupplier::Fixed)
-        Internal::Bridge::Worker::TunerSlotSupplierOptions.new(
-          fixed_size: slot_supplier.slots,
-          resource_based: nil
-        )
-      elsif slot_supplier.is_a?(Tuner::SlotSupplier::ResourceBased)
-        Internal::Bridge::Worker::TunerSlotSupplierOptions.new(
-          fixed_size: nil,
-          resource_based: Internal::Bridge::Worker::TunerResourceBasedSlotSupplierOptions.new(
-            target_mem_usage: slot_supplier.tuner_options.target_memory_usage,
-            target_cpu_usage: slot_supplier.tuner_options.target_cpu_usage,
-            min_slots: slot_supplier.slot_options.min_slots,
-            max_slots: slot_supplier.slot_options.max_slots,
-            ramp_throttle: slot_supplier.slot_options.ramp_throttle
-          )
-        )
-      else
-        raise ArgumentError, 'Tuner slot suppliers must be instances of Fixed or ResourceBased'
-      end
     end
   end
 end

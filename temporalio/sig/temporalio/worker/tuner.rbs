@@ -17,6 +17,8 @@ module Temporalio
             slot_options: ResourceBasedSlotOptions
           ) -> void
         end
+
+        def _to_bridge_options: -> Internal::Bridge::Worker::TunerSlotSupplierOptions
       end
 
       class ResourceBasedTunerOptions
@@ -64,6 +66,8 @@ module Temporalio
         activity_slot_supplier: SlotSupplier,
         local_activity_slot_supplier: SlotSupplier
       ) -> void
+
+      def _to_bridge_options: -> Internal::Bridge::Worker::TunerOptions
     end
   end
 end

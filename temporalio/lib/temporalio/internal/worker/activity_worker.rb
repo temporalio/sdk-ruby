@@ -201,6 +201,7 @@ module Temporalio
 
           # Run
           activity = RunningActivity.new(
+            worker: @worker,
             info:,
             cancellation: Cancellation.new,
             worker_shutdown_cancellation: @worker._worker_shutdown_cancellation,
@@ -210,7 +211,7 @@ module Temporalio
           )
           Activity::Context._current_executor&.set_activity_context(defn, activity)
           set_running_activity(task_token, activity)
-          run_activity(activity, input)
+          run_activity(defn, activity, input)
         rescue Exception => e # rubocop:disable Lint/RescueException We are intending to catch everything here
           @scoped_logger.warn("Failed starting or sending completion for activity #{start.activity_type}")
           @scoped_logger.warn(e)
@@ -236,8 +237,11 @@ module Temporalio
           remove_running_activity(task_token)
         end
 
-        def run_activity(activity, input)
+        def run_activity(defn, activity, input)
           result = begin
+            # Create the instance. We choose to do this before interceptors so that it is available in the interceptor.
+            activity.instance = defn.instance.is_a?(Proc) ? defn.instance.call : defn.instance # steep:ignore
+
             # Build impl with interceptors
             # @type var impl: Temporalio::Worker::Interceptor::Activity::Inbound
             impl = InboundImplementation.new(self)
@@ -293,9 +297,10 @@ module Temporalio
 
         class RunningActivity < Activity::Context
           attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
-          attr_accessor :_outbound_impl, :_server_requested_cancel
+          attr_accessor :instance, :_outbound_impl, :_server_requested_cancel
 
           def initialize( # rubocop:disable Lint/MissingSuper
+            worker:,
             info:,
             cancellation:,
             worker_shutdown_cancellation:,
@@ -303,6 +308,7 @@ module Temporalio
             logger:,
             runtime_metric_meter:
           )
+            @worker = worker
             @info = info
             @cancellation = cancellation
             @worker_shutdown_cancellation = worker_shutdown_cancellation
@@ -330,6 +336,10 @@ module Temporalio
                 activity_type: info.activity_type
               }
             )
+          end
+
+          def client
+            @worker.client
           end
         end
 

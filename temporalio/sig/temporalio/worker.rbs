@@ -60,6 +60,8 @@ module Temporalio
         workflow_payload_codec_thread_pool: ThreadPool?,
         debug_mode: bool
       ) -> void
+
+      def with: (**Object kwargs) -> Options
     end
 
     def self.default_build_id: -> String
@@ -110,6 +112,9 @@ module Temporalio
 
     def task_queue: -> String
 
+    def client: -> Client
+    def client=: (Client new_client) -> void
+
     def run: [T] (
       ?cancellation: Cancellation,
       ?shutdown_signals: Array[String | Integer],
@@ -122,12 +127,7 @@ module Temporalio
     def _wait_all_complete: -> void
     def _bridge_worker: -> Internal::Bridge::Worker
     def _activity_interceptors: -> Array[Interceptor::Activity]
-    def _workflow_interceptors: -> Array[Interceptor::Workflow]
     def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
     def _on_shutdown_complete: -> void
-
-    private def to_bridge_slot_supplier_options: (
-      Tuner::SlotSupplier slot_supplier
-    ) -> Internal::Bridge::Worker::TunerSlotSupplierOptions
   end
 end

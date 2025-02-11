@@ -1738,13 +1738,90 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class ContextInstanceInterceptor
+    include Temporalio::Worker::Interceptor::Workflow
+
+    def intercept_workflow(next_interceptor)
+      Inbound.new(next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Workflow::Inbound
+      def execute(input)
+        Temporalio::Workflow.instance.events << 'interceptor-execute'
+        super
+      end
+    end
+  end
+
+  class ContextInstanceWorkflow < Temporalio::Workflow::Definition
+    def execute
+      events << 'execute'
+    end
+
+    workflow_query
+    def events
+      @events ||= []
+    end
+  end
+
+  def test_context_instance
+    assert_equal %w[interceptor-execute execute],
+                 execute_workflow(ContextInstanceWorkflow, interceptors: [ContextInstanceInterceptor.new])
+  end
+
+  class WorkerClientReplacementWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.wait_condition { @complete }
+    end
+
+    workflow_signal
+    def complete(value)
+      @complete = value
+    end
+  end
+
+  def test_worker_client_replacement
+    # Create a second ephemeral server and start workflow on both servers
+    Temporalio::Testing::WorkflowEnvironment.start_local do |env2|
+      # Start both workflows on different servers
+      task_queue = "tq-#{SecureRandom.uuid}"
+      handle1 = env.client.start_workflow(WorkerClientReplacementWorkflow, id: "wf-#{SecureRandom.uuid}", task_queue:)
+      handle2 = env2.client.start_workflow(WorkerClientReplacementWorkflow, id: "wf-#{SecureRandom.uuid}", task_queue:)
+
+      # Run worker on the first env. Make sure cache is off and only 1 max poller
+      worker = Temporalio::Worker.new(
+        client: env.client, task_queue:, workflows: [WorkerClientReplacementWorkflow],
+        max_cached_workflows: 0, max_concurrent_workflow_task_polls: 1
+      )
+      worker.run do
+        # Confirm first workflow has a task complete but not the second
+        assert_eventually do
+          refute_nil handle1.fetch_history_events.find(&:workflow_task_completed_event_attributes)
+        end
+        assert_nil handle2.fetch_history_events.find(&:workflow_task_completed_event_attributes)
+
+        # Replace the client
+        worker.client = env2.client
+
+        # Signal both which should allow the current poll to wake up and it'll be a task failure when trying to submit
+        # that to the new client which is ignored. But also the new client will poll for the new workflow, which we will
+        # wait for it to complete.
+        handle1.signal(WorkerClientReplacementWorkflow.complete, 'done1')
+        handle2.signal(WorkerClientReplacementWorkflow.complete, 'done2')
+
+        # Confirm second workflow on new server completes
+        assert_equal 'done2', handle2.result
+        handle1.terminate
+      end
+    end
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Eager workflow start
   #   * Unawaited futures that have exceptions, need to log warning like Java does
   #   * Enhanced stack trace?
   #   * Separate abstract/interface demonstration
-  #   * Replace worker client
   #   * Reset update randomness seed
   #   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow
   #   * Test workflow cancel causing other cancels at the same time but in different coroutines

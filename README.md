@@ -11,15 +11,20 @@ execute asynchronous, long-running business logic in a scalable and resilient wa
 
 Also see:
 
+* [Ruby SDK](https://github.com/temporalio/sdk-ruby)
 * [Ruby Samples](https://github.com/temporalio/samples-ruby)
-* [API Documentation](https://rubydoc.info/gems/temporalio/0.2.0)
+* [API Documentation](https://ruby.temporal.io)
+
+**NOTE: This README is for the current branch and not necessarily what's released on RubyGems.**
 
 ⚠️ UNDER ACTIVE DEVELOPMENT
 
 This SDK is under active development and has not released a stable version yet. APIs may change in incompatible ways
 until the SDK is marked stable.
 
-**NOTE: This README is for the current branch and not necessarily what's released on RubyGems.**
+During this time, we are requesting any/all feedback from early adopters. We welcome all forms of suggestions or
+opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#ruby-sdk` channel or via email at
+`sdk@temporal.io`.
 
 ---
 
@@ -62,6 +67,7 @@ until the SDK is marked stable.
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
     - [Activity Testing](#activity-testing)
+  - [Ractors](#ractors)
   - [Platform Support](#platform-support)
 - [Development](#development)
   - [Build](#build)
@@ -92,8 +98,8 @@ gem install temporalio
 
 **NOTE**: Only macOS ARM/x64 and Linux ARM/x64 are supported, and the platform-specific gem chosen is based on when the
 gem/bundle install is performed. A source gem is published but cannot be used directly and will fail to build if tried.
-MinGW-based Windows and Linux MUSL do not have gems. See the [Platform Support](#platform-support) section for more
-information.
+MinGW-based Windows is not currently supported. There are caveats with the Google Protobuf dependency on musl-based
+Linux. See the [Platform Support](#platform-support) section for more information.
 
 **NOTE**: Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and `async` gem) are only
 supported on Ruby versions 3.3 and newer.
@@ -608,7 +614,7 @@ Or, say, to wait on the first of 5 activities or a timeout to complete:
 # Start 5 activities
 act_futs = 5.times.map do |i|
   Temporalio::Workflow::Future.new do
-    Temporalio::Workflow.execute_activity(MyActivity, "my-arg-#{i}" schedule_to_close_timeout: 300)
+    Temporalio::Workflow.execute_activity(MyActivity, "my-arg-#{i}", schedule_to_close_timeout: 300)
   end
 end
 # Start a timer
@@ -853,7 +859,48 @@ the mock activity class to make it appear as the real name.
 
 #### Workflow Replay
 
-TODO: Workflow replayer not yet implemented
+Given a workflow's history, it can be replayed locally to check for things like non-determinism errors. For example,
+assuming the `history_json` parameter below is given a JSON string of history exported from the CLI or web UI, the
+following function will replay it:
+
+```ruby
+def replay_from_json(history_json)
+  replayer = Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow])
+  replayer.replay_workflow(Temporalio::WorkflowHistory.from_history_json(history_json))
+end
+```
+
+If there is a non-determinism, this will raise an exception by default.
+
+Workflow history can be loaded from more than just JSON. It can be fetched individually from a workflow handle, or even
+in a list. For example, the following code will check that all workflow histories for a certain workflow type (i.e.
+workflow class) are safe with the current workflow code.
+
+```ruby
+def check_past_histories(client)
+  replayer = Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow])
+  results = replayer.replay_workflows(client.list_workflows("WorkflowType = 'MyWorkflow'").map do |desc|
+    client.workflow_handle(desc.id, run_id: desc.run_id).fetch_history
+  end)
+  results.each { |res| raise res.replay_failure if res.replay_failure }
+end
+```
+
+But this only raises at the end because by default `replay_workflows` does not raise on failure like `replay_workflow`
+does. The `raise_on_replay_failure: true` parameter could be set, or the replay worker can be used to process each one
+like so:
+
+```ruby
+def check_past_histories(client)
+  Temporalio::Worker::WorkflowReplayer.new(workflows: [MyWorkflow]) do |worker|
+    client.list_workflows("WorkflowType = 'MyWorkflow'").each do |desc|
+      worker.replay_workflow(client.workflow_handle(desc.id, run_id: desc.run_id).fetch_history)
+    end
+  end
+end
+```
+
+See the `WorkflowReplayer` API documentation for more details.
 
 ### Activities
 
@@ -1000,21 +1047,27 @@ This SDK is backed by a Ruby C extension written in Rust leveraging the
 [Temporal Rust Core](https://github.com/temporalio/sdk-core). Gems are currently published for the following platforms:
 
 * `aarch64-linux`
+* `aarch64-linux-musl`
 * `x86_64-linux`
+* `x86_64-linux-musl`
 * `arm64-darwin`
 * `x86_64-darwin`
 
-This means Linux and macOS for ARM and x64 have published gems. Currently, a gem is not published for
-`aarch64-linux-musl` so Alpine Linux users may need to build from scratch or use a libc-based distro.
+This means Linux and macOS for ARM and x64 have published gems.
 
 Due to [an issue](https://github.com/temporalio/sdk-ruby/issues/172) with Windows and multi-threaded Rust, MinGW-based
 Windows (i.e. `x64-mingw-ucrt`) is not supported. But WSL is supported using the normal Linux gem.
+
+Due to [an issue](https://github.com/protocolbuffers/protobuf/issues/16853) with Google Protobuf, latest Linux versions
+of Google Protobuf gems will not work in musl-based environments. Instead use the pure "ruby" platform which will build
+the Google Protobuf gem on install (e.g.
+`gem 'google-protobuf', force_ruby_platform: RUBY_PLATFORM.include?('linux-musl')` in the `Gemfile`).
 
 At this time a pure source gem is published for documentation reasons, but it cannot be built and will fail if tried.
 Building from source requires many files across submodules and requires Rust to be installed. See the [Build](#build)
 section for how to build a the repository.
 
-The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
+The SDK works on Ruby 3.2+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
 `async` gem) are only supported on Ruby versions 3.3 and newer.
 
 ## Development
@@ -1023,7 +1076,7 @@ The SDK works on Ruby 3.1+, but due to [an issue](https://github.com/temporalio/
 
 Prerequisites:
 
-* [Ruby](https://www.ruby-lang.org/) >= 3.1 (i.e. `ruby` and `bundle` on the `PATH`)
+* [Ruby](https://www.ruby-lang.org/) >= 3.2 (i.e. `ruby` and `bundle` on the `PATH`)
 * [Rust](https://www.rust-lang.org/) latest stable (i.e. `cargo` on the `PATH`)
 * This repository, cloned recursively
 * Change to the `temporalio/` directory

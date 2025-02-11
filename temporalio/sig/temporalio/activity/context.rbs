@@ -9,6 +9,7 @@ module Temporalio
       def self._current_executor=: (Worker::ActivityExecutor? executor) -> void
 
       def info: -> Info
+      def instance: -> Definition?
       def heartbeat: (*Object? details) -> void
       def cancellation: -> Cancellation
       def worker_shutdown_cancellation: -> Cancellation
@@ -18,6 +19,7 @@ module Temporalio
       def _scoped_logger_info: -> Hash[Symbol, Object]
 
       def metric_meter: -> Metric::Meter
+      def client: -> Client
     end
   end
 end

@@ -220,6 +220,12 @@ module Temporalio
       _current.info
     end
 
+    # @return [Definition, nil] Workflow class instance. This should always be present except in
+    #   {Worker::Interceptor::Workflow::Inbound.init} where it will be nil.
+    def self.instance
+      _current.instance
+    end
+
     # @return [Logger] Logger for the workflow. This is a scoped logger that automatically appends workflow details to
     #   every log and takes care not to log during replay.
     def self.logger

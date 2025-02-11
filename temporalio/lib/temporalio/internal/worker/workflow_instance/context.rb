@@ -122,6 +122,10 @@ module Temporalio
             @instance.info
           end
 
+          def instance
+            @instance.instance
+          end
+
           def initialize_continue_as_new_error(error)
             @outbound.initialize_continue_as_new_error(
               Temporalio::Worker::Interceptor::Workflow::InitializeContinueAsNewErrorInput.new(error:)

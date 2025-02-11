@@ -27,7 +27,8 @@ module WorkflowUtils
     workflow_payload_codec_thread_pool: nil,
     id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::UNSPECIFIED,
     max_heartbeat_throttle_interval: 60.0,
-    task_timeout: nil
+    task_timeout: nil,
+    interceptors: []
   )
     worker = Temporalio::Worker.new(
       client:,
@@ -38,7 +39,8 @@ module WorkflowUtils
       max_cached_workflows:,
       logger: logger || client.options.logger,
       workflow_payload_codec_thread_pool:,
-      max_heartbeat_throttle_interval:
+      max_heartbeat_throttle_interval:,
+      interceptors:
     )
     worker.run do
       handle = client.start_workflow(

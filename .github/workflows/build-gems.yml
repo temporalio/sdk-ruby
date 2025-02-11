@@ -13,7 +13,7 @@ jobs:
       matrix:
         # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
         # https://github.com/temporalio/sdk-ruby/issues/172
-        rubyPlatform: ["aarch64-linux", "x86_64-linux", "arm64-darwin", "x86_64-darwin"]
+        rubyPlatform: ["aarch64-linux", "aarch64-linux-musl", "x86_64-linux", "x86_64-linux-musl", "arm64-darwin", "x86_64-darwin"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -86,6 +86,10 @@ jobs:
         #   https://github.com/temporalio/sdk-ruby/issues/172
         os: [ubuntu-latest, macos-intel, macos-latest]
         rubyVersion: ["3.2", "3.3", "3.4"]
+        # Container defaults to empty/none, but additional container for Alpine
+        # added later
+        container: [""]
+
         include:
           - os: ubuntu-latest
             rubyPlatform: x86_64-linux
@@ -94,7 +98,12 @@ jobs:
             rubyPlatform: x86_64-darwin
           - os: macos-latest
             rubyPlatform: arm64-darwin
+          - os: ubuntu-latest
+            rubyVersion: "3.3"
+            container: alpine/git:latest
+            rubyPlatform: x86_64-linux-musl
     runs-on: ${{ matrix.runsOn || matrix.os }}
+    container: ${{ matrix.container }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -107,12 +116,19 @@ jobs:
           name: ${{ matrix.rubyPlatform }}-gem
           path: local-gem
 
+      # This only works on official runners
       - name: Setup Ruby
+        if: ${{ matrix.container == '' }}
         uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
           ruby-version: "${{ matrix.rubyVersion }}"
           bundler-cache: true
           cargo-cache: false
+
+      # Works for Alpine
+      - name: Setup Ruby (Alpine)
+        if: ${{ matrix.container == 'alpine/git:latest' }}
+        run: apk add --no-cache ruby ruby-dev ruby-bundler build-base
 
       - name: Run smoke test
         run: ruby ./temporalio/smoke_test/smoke_test_gem.rb 'local-gem/*-${{ matrix.rubyPlatform }}.gem'

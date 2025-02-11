@@ -105,7 +105,10 @@ module Temporalio
         # @return [String, Symbol, nil] Name of the activity, or nil if the activity is dynamic.
         attr_reader :name
 
-        # @return [Proc] Proc for the activity.
+        # @return [Object, Proc, nil] The pre-created instance or the proc to create/return it.
+        attr_reader :instance
+
+        # @return [Proc] Proc for the activity. Should use {Context#instance} to access the instance.
         attr_reader :proc
 
         # @return [Symbol] Name of the executor. Default is `:default`.
@@ -134,18 +137,20 @@ module Temporalio
             details = activity._activity_definition_details
             new(
               name: details[:activity_name],
+              instance: proc { activity.new },
               executor: details[:activity_executor],
               cancel_raise: details[:activity_cancel_raise],
               raw_args: details[:activity_raw_args]
-            ) { |*args| activity.new.execute(*args) } # Instantiate and call
+            ) { |*args| Context.current.instance&.execute(*args) }
           when Definition
             details = activity.class._activity_definition_details
             new(
               name: details[:activity_name],
+              instance: activity,
               executor: details[:activity_executor],
               cancel_raise: details[:activity_cancel_raise],
               raw_args: details[:activity_raw_args]
-            ) { |*args| activity.execute(*args) } # Just and call
+            ) { |*args| Context.current.instance&.execute(*args) }
           when Info
             activity
           else
@@ -156,12 +161,21 @@ module Temporalio
         # Manually create activity definition info. Most users will use an instance/class of {Definition}.
         #
         # @param name [String, Symbol, nil] Name of the activity or nil for dynamic activity.
+        # @param instance [Object, Proc, nil] The pre-created instance or the proc to create/return it.
         # @param executor [Symbol] Name of the executor.
         # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
         # @param raw_args [Boolean] Whether to use {Converters::RawValue}s as arguments.
         # @yield Use this block as the activity.
-        def initialize(name:, executor: :default, cancel_raise: true, raw_args: false, &block)
+        def initialize(
+          name:,
+          instance: nil,
+          executor: :default,
+          cancel_raise: true,
+          raw_args: false,
+          &block
+        )
           @name = name
+          @instance = instance
           raise ArgumentError, 'Must give block' unless block_given?
 
           @proc = block
