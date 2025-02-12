@@ -32,6 +32,7 @@ module Temporalio
           attr_accessor _server_requested_cancel: bool
 
           def initialize: (
+            worker: Temporalio::Worker,
             info: Activity::Info,
             cancellation: Cancellation,
             worker_shutdown_cancellation: Cancellation,

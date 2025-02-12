@@ -43,6 +43,40 @@ module Temporalio
         ) -> void
       end
 
+      class StartUpdateWithStartWorkflowInput
+        attr_reader update_id: String
+        attr_reader update: Workflow::Definition::Update | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
+        attr_reader start_workflow_operation: WithStartWorkflowOperation
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          update_id: String,
+          update: Workflow::Definition::Update | Symbol | String,
+          args: Array[Object?],
+          wait_for_stage: WorkflowUpdateWaitStage::enum,
+          start_workflow_operation: WithStartWorkflowOperation,
+          headers: Hash[String, Object?],
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class SignalWithStartWorkflowInput
+        attr_reader signal: Workflow::Definition::Signal | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader start_workflow_operation: WithStartWorkflowOperation
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          signal: Workflow::Definition::Signal | Symbol | String,
+          args: Array[Object?],
+          start_workflow_operation: WithStartWorkflowOperation,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
       class ListWorkflowsInput
         attr_reader query: String?
         attr_reader rpc_options: RPCOptions?
@@ -365,6 +399,10 @@ module Temporalio
         def initialize: (Outbound next_interceptor) -> void
 
         def start_workflow: (StartWorkflowInput input) -> WorkflowHandle
+
+        def start_update_with_start_workflow: (StartUpdateWithStartWorkflowInput input) -> WorkflowUpdateHandle
+
+        def signal_with_start_workflow: (SignalWithStartWorkflowInput input) -> WorkflowHandle
 
         def list_workflows: (ListWorkflowsInput input) -> Enumerator[WorkflowExecution, WorkflowExecution]
 

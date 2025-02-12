@@ -47,6 +47,9 @@ module Temporalio
       # @param payload_converter [Converters::PayloadConverter] Value for {Activity::Context#payload_converter}.
       # @param logger [Logger] Value for {Activity::Context#logger}.
       # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
+      # @param metric_meter [Metric::Meter, nil] Value for {Activity::Context#metric_meter}, or nil to raise when
+      #   called.
+      # @param client [Client, nil] Value for {Activity::Context#client}, or nil to raise when called.
       def initialize(
         info: ActivityEnvironment.default_info,
         on_heartbeat: nil,
@@ -54,7 +57,9 @@ module Temporalio
         worker_shutdown_cancellation: Cancellation.new,
         payload_converter: Converters::PayloadConverter.default,
         logger: Logger.new(nil),
-        activity_executors: Worker::ActivityExecutor.defaults
+        activity_executors: Worker::ActivityExecutor.defaults,
+        metric_meter: nil,
+        client: nil
       )
         @info = info
         @on_heartbeat = on_heartbeat
@@ -63,6 +68,8 @@ module Temporalio
         @payload_converter = payload_converter
         @logger = logger
         @activity_executors = activity_executors
+        @metric_meter = metric_meter
+        @client = client
       end
 
       # Run an activity and returns its result or raises its exception.
@@ -86,7 +93,9 @@ module Temporalio
                                                 cancellation: @cancellation,
                                                 worker_shutdown_cancellation: @worker_shutdown_cancellation,
                                                 payload_converter: @payload_converter,
-                                                logger: @logger
+                                                logger: @logger,
+                                                metric_meter: @metric_meter,
+                                                client: @client
                                               ))
           queue.push([defn.proc.call(*args), nil])
         rescue Exception => e # rubocop:disable Lint/RescueException Intentionally capturing all exceptions
@@ -113,7 +122,9 @@ module Temporalio
           cancellation:,
           worker_shutdown_cancellation:,
           payload_converter:,
-          logger:
+          logger:,
+          metric_meter:,
+          client:
         )
           @info = info
           @instance = instance
@@ -122,11 +133,23 @@ module Temporalio
           @worker_shutdown_cancellation = worker_shutdown_cancellation
           @payload_converter = payload_converter
           @logger = logger
+          @metric_meter = metric_meter
+          @client = client
         end
 
         # @!visibility private
         def heartbeat(*details)
           @on_heartbeat&.call(details)
+        end
+
+        # @!visibility private
+        def metric_meter
+          @metric_meter or raise 'No metric meter configured in this test environment'
+        end
+
+        # @!visibility private
+        def client
+          @client or raise 'No client configured in this test environment'
         end
       end
 

@@ -618,4 +618,204 @@ class WorkerWorkflowHandlerTest < Test
       l.include?('"UpdateInfoWorkflow"') && l.include?('update_id') && l.include?('"update-2"')
     end)
   end
+
+  class UpdateWithStartWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :counter
+
+    def initialize
+      @counter = 0
+    end
+
+    def execute(initial_increment)
+      @counter += initial_increment
+      Temporalio::Workflow.wait_condition { false }
+    end
+
+    workflow_update
+    def increment_counter(value)
+      @counter += value
+    end
+
+    workflow_update
+    def fail
+      raise Temporalio::Error::ApplicationError, 'Intentional failure'
+    end
+
+    workflow_update
+    def start_waiting
+      Temporalio::Workflow.wait_condition { @finish_waiting }
+    end
+
+    workflow_update
+    def finish_waiting
+      @finish_waiting = true
+    end
+  end
+
+  def test_update_with_start_simple
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      # Newly started
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      # Run and confirm result of update is pre-workflow-execute
+      assert_equal 456, env.client.execute_update_with_start_workflow(
+        UpdateWithStartWorkflow.increment_counter, 456, start_workflow_operation:
+      )
+      # Confirm query is total
+      handle = start_workflow_operation.workflow_handle
+      assert_equal 579, handle.query(UpdateWithStartWorkflow.counter)
+
+      # Update with start 5 more times
+      5.times do
+        env.client.execute_update_with_start_workflow(
+          UpdateWithStartWorkflow.increment_counter, 2,
+          start_workflow_operation: Temporalio::Client::WithStartWorkflowOperation.new(
+            UpdateWithStartWorkflow, 10_000,
+            id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::USE_EXISTING
+          )
+        )
+      end
+      # Confirm 10 (i.e. 5 * 2) was added
+      assert_equal 589, handle.query(UpdateWithStartWorkflow.counter)
+
+      # Confirm we get already-exists error on start and on call if we set fail existing
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+        env.client.execute_update_with_start_workflow(
+          UpdateWithStartWorkflow.increment_counter, 456, start_workflow_operation:
+        )
+      end
+      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+        start_workflow_operation.workflow_handle
+      end
+    end
+  end
+
+  def test_update_with_start_update_failure
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      # Update failed but workflow started
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      err = assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
+        env.client.execute_update_with_start_workflow(UpdateWithStartWorkflow.fail, 456, start_workflow_operation:)
+      end
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause
+      assert_equal 'Intentional failure', err.cause.message
+      assert_equal 123, start_workflow_operation.workflow_handle.query(UpdateWithStartWorkflow.counter)
+    end
+  end
+
+  def test_update_with_start_cancel
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      # Run update in background to start with cancellation
+      cancellation, cancel_proc = Temporalio::Cancellation.new
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      background_exc_queue = Queue.new
+      run_in_background do
+        env.client.execute_update_with_start_workflow(
+          UpdateWithStartWorkflow.start_waiting, 456,
+          start_workflow_operation:, rpc_options: Temporalio::Client::RPCOptions.new(cancellation:)
+        )
+      rescue Temporalio::Error => e
+        background_exc_queue << e
+      end
+
+      # Wait until workflow ID exists
+      assert_eventually do
+        env.client.workflow_handle(id).describe
+      rescue Temporalio::Error::RPCError => e
+        flunk e.full_message
+      end
+
+      # Now cancel token and confirm it is a proper cancellation
+      cancel_proc.call
+      assert_instance_of Temporalio::Error::WorkflowUpdateRPCTimeoutOrCanceledError, background_exc_queue.pop
+    end
+  end
+
+  class SignalWithStartWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :events
+
+    def initialize
+      @events = []
+    end
+
+    def execute(event)
+      @events << event
+      Temporalio::Workflow.wait_condition { false }
+    end
+
+    workflow_signal
+    def add_event(event)
+      @events << event
+    end
+  end
+
+  def test_signal_with_start
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [SignalWithStartWorkflow]
+    )
+    worker.run do
+      # Newly started
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        SignalWithStartWorkflow, 'workflow-start',
+        id:, task_queue: worker.task_queue
+      )
+      handle = env.client.signal_with_start_workflow(
+        SignalWithStartWorkflow.add_event, 'signal', start_workflow_operation:
+      )
+      # Confirm same handle
+      assert_same handle, start_workflow_operation.workflow_handle
+      # Confirm signal event came first
+      assert_equal %w[signal workflow-start], handle.query(SignalWithStartWorkflow.events)
+
+      # Signal with start 3 more times
+      3.times do |i|
+        env.client.signal_with_start_workflow(
+          SignalWithStartWorkflow.add_event, "signal-#{i}",
+          start_workflow_operation: Temporalio::Client::WithStartWorkflowOperation.new(
+            SignalWithStartWorkflow, 'not-used',
+            id:, task_queue: worker.task_queue
+          )
+        )
+      end
+      # Confirm events
+      assert_equal %w[signal workflow-start signal-0 signal-1 signal-2], handle.query(SignalWithStartWorkflow.events)
+    end
+  end
 end

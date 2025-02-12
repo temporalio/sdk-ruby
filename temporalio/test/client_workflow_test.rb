@@ -477,8 +477,4 @@ class ClientWorkflowTest < Test
       assert_equal 'User canceled', err.message
     end
   end
-
-  # TODO(cretz): Tests to write:
-  # * Workflow cloud test
-  # * Signal/update with start
 end

@@ -8,10 +8,13 @@ require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
 require 'temporalio/client/schedule'
 require 'temporalio/client/schedule_handle'
+require 'temporalio/client/with_start_workflow_operation'
 require 'temporalio/client/workflow_execution'
 require 'temporalio/client/workflow_execution_count'
 require 'temporalio/client/workflow_handle'
 require 'temporalio/client/workflow_query_reject_condition'
+require 'temporalio/client/workflow_update_handle'
+require 'temporalio/client/workflow_update_wait_stage'
 require 'temporalio/common_enums'
 require 'temporalio/converters'
 require 'temporalio/error'
@@ -155,7 +158,7 @@ module Temporalio
         default_workflow_query_reject_condition:
       ).freeze
       # Initialize interceptors
-      @impl = interceptors.reverse_each.reduce(Internal::Client::Implementation.new(self)) do |acc, int|
+      @impl = interceptors.reverse_each.reduce(Internal::Client::Implementation.new(self)) do |acc, int| # steep:ignore
         int.intercept_client(acc)
       end
     end
@@ -332,6 +335,106 @@ module Temporalio
       first_execution_run_id: nil
     )
       WorkflowHandle.new(client: self, id: workflow_id, run_id:, result_run_id: run_id, first_execution_run_id:)
+    end
+
+    # Start an update, possibly starting the workflow at the same time if it doesn't exist (depending upon ID conflict
+    # policy). Note that in some cases this may fail but the workflow will still be started, and the handle can then be
+    # retrieved on the start workflow operation.
+    #
+    # @param update [Workflow::Definition::Update, Symbol, String] Update definition or name.
+    # @param args [Array<Object>] Update arguments.
+    # @param start_workflow_operation [WithStartWorkflowOperation] Required with-start workflow operation. This must
+    #   have an `id_conflict_policy` set.
+    # @param wait_for_stage [WorkflowUpdateWaitStage] Required stage to wait until returning. ADMITTED is not
+    #   currently supported. See https://docs.temporal.io/workflows#update for more details.
+    # @param id [String] ID of the update.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [WorkflowUpdateHandle] The update handle.
+    # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists and conflict/reuse policy does not allow.
+    # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
+    #   mean the update itself was timed out or canceled, and this doesn't mean the workflow did not start.
+    # @raise [Error::RPCError] RPC error from call.
+    def start_update_with_start_workflow(
+      update,
+      *args,
+      start_workflow_operation:,
+      wait_for_stage:,
+      id: SecureRandom.uuid,
+      rpc_options: nil
+    )
+      @impl.start_update_with_start_workflow(
+        Interceptor::StartUpdateWithStartWorkflowInput.new(
+          update_id: id,
+          update:,
+          args:,
+          wait_for_stage:,
+          start_workflow_operation:,
+          headers: {},
+          rpc_options:
+        )
+      )
+    end
+
+    # Start an update, possibly starting the workflow at the same time if it doesn't exist (depending upon ID conflict
+    # policy), and wait for update result. This is a shortcut for {start_update_with_start_workflow} +
+    # {WorkflowUpdateHandle.result}.
+    #
+    # @param update [Workflow::Definition::Update, Symbol, String] Update definition or name.
+    # @param args [Array<Object>] Update arguments.
+    # @param start_workflow_operation [WithStartWorkflowOperation] Required with-start workflow operation. This must
+    #   have an `id_conflict_policy` set.
+    # @param id [String] ID of the update.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Object] Successful update result.
+    # @raise [Error::WorkflowUpdateFailedError] If the update failed.
+    # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists and conflict/reuse policy does not allow.
+    # @raise [Error::WorkflowUpdateRPCTimeoutOrCanceledError] This update call timed out or was canceled. This doesn't
+    #   mean the update itself was timed out or canceled, and this doesn't mean the workflow did not start.
+    # @raise [Error::RPCError] RPC error from call.
+    def execute_update_with_start_workflow(
+      update,
+      *args,
+      start_workflow_operation:,
+      id: SecureRandom.uuid,
+      rpc_options: nil
+    )
+      start_update_with_start_workflow(
+        update,
+        *args,
+        start_workflow_operation:,
+        wait_for_stage: WorkflowUpdateWaitStage::COMPLETED,
+        id:,
+        rpc_options:
+      ).result
+    end
+
+    # Send a signal, possibly starting the workflow at the same time if it doesn't exist.
+    #
+    # @param signal [Workflow::Definition::Signal, Symbol, String] Signal definition or name.
+    # @param args [Array<Object>] Signal arguments.
+    # @param start_workflow_operation [WithStartWorkflowOperation] Required with-start workflow operation. This may not
+    #   support all `id_conflict_policy` options.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [WorkflowHandle] A workflow handle to the workflow.
+    # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists and conflict/reuse policy does not allow.
+    # @raise [Error::RPCError] RPC error from call.
+    def signal_with_start_workflow(
+      signal,
+      *args,
+      start_workflow_operation:,
+      rpc_options: nil
+    )
+      @impl.signal_with_start_workflow(
+        Interceptor::SignalWithStartWorkflowInput.new(
+          signal:,
+          args:,
+          start_workflow_operation:,
+          rpc_options:
+        )
+      )
     end
 
     # List workflows.

@@ -108,7 +108,14 @@ module Temporalio
       end
 
       # @return [Metric::Meter] Metric meter to create metrics on, with some activity-specific attributes already set.
+      # @raise [RuntimeError] Called within a {Testing::ActivityEnvironment} and it was not set.
       def metric_meter
+        raise NotImplementedError
+      end
+
+      # @return [Client] Temporal client this activity worker is running in.
+      # @raise [RuntimeError] Called within a {Testing::ActivityEnvironment} and it was not set.
+      def client
         raise NotImplementedError
       end
     end

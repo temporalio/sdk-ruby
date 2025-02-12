@@ -55,6 +55,8 @@ module Temporalio
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
+    #
+    # Note, the `client` within can be replaced via client setter.
     class Options; end # rubocop:disable Lint/EmptyClass
 
     # @return [String] Memoized default build ID. This default value is built as a checksum of all of the loaded Ruby
@@ -484,11 +486,33 @@ module Temporalio
 
       # Validate worker
       @bridge_worker.validate
+
+      # Mutex needed for accessing and replacing a client
+      @client_mutex = Mutex.new
     end
 
     # @return [String] Task queue set on the worker options.
     def task_queue
       @options.task_queue
+    end
+
+    # @return [Client] Client for this worker. This is the same as {Options.client} in {options}, but surrounded by a
+    #   mutex to be safe for client replacement in {client=}.
+    def client
+      @client_mutex.synchronize { @options.client }
+    end
+
+    # Replace the worker's client. When this is called, the client is replaced on the internal worker which means any
+    # new calls will be made on the new client (but existing calls will still complete on the previous one). This is
+    # commonly used for providing a new client with updated authentication credentials.
+    #
+    # @param new_client [Client] New client to use for new calls.
+    def client=(new_client)
+      @client_mutex.synchronize do
+        @bridge_worker.replace_client(new_client.connection._core_client)
+        @options = @options.with(client: new_client)
+        new_client
+      end
     end
 
     # Run this worker until cancellation or optional block completes. When the cancellation or block is complete, the

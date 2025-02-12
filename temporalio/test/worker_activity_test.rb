@@ -901,6 +901,19 @@ class WorkerActivityTest < Test
                  execute_activity(shared_instance, interceptors: [ContextInstanceInterceptor.new])
   end
 
+  class ClientAccessActivity < Temporalio::Activity::Definition
+    def execute
+      desc = Temporalio::Activity::Context.current.client.workflow_handle(
+        Temporalio::Activity::Context.current.info.workflow_id
+      ).describe
+      desc.raw_description.pending_activities.first.activity_type.name
+    end
+  end
+
+  def test_client_access
+    assert_equal 'ClientAccessActivity', execute_activity(ClientAccessActivity)
+  end
+
   # steep:ignore
   def execute_activity(
     activity,

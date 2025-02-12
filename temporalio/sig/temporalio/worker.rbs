@@ -60,6 +60,8 @@ module Temporalio
         workflow_payload_codec_thread_pool: ThreadPool?,
         debug_mode: bool
       ) -> void
+
+      def with: (**Object kwargs) -> Options
     end
 
     def self.default_build_id: -> String
@@ -109,6 +111,9 @@ module Temporalio
     ) -> void
 
     def task_queue: -> String
+
+    def client: -> Client
+    def client=: (Client new_client) -> void
 
     def run: [T] (
       ?cancellation: Cancellation,
