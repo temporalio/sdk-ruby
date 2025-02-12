@@ -14,6 +14,7 @@ module Temporalio
             attr_accessor port: Integer?
             attr_accessor database_filename: String?
             attr_accessor ui: bool
+            attr_accessor ui_port: Integer?
             attr_accessor log_format: String
             attr_accessor log_level: String
             attr_accessor extra_args: Array[String]
@@ -29,6 +30,7 @@ module Temporalio
               port: Integer?,
               database_filename: String?,
               ui: bool,
+              ui_port: Integer?,
               log_format: String,
               log_level: String,
               extra_args: Array[String]
