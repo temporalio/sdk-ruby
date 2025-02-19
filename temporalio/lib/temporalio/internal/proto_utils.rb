@@ -51,7 +51,7 @@ module Temporalio
       end
 
       def self.memo_from_proto(memo, converter)
-        return nil if memo.nil? || memo.fields.size.zero? # rubocop:disable Style/ZeroLengthPredicate Google Maps don't have empty
+        return nil if memo.nil? || memo.fields.size.zero? # rubocop:disable Style/ZeroLengthPredicate -- Google Maps don't have empty
 
         memo.fields.each_with_object({}) { |(key, val), h| h[key] = converter.from_payload(val) } # rubocop:disable Style/HashTransformValues
       end
@@ -73,7 +73,7 @@ module Temporalio
       end
 
       def self.headers_from_proto_map(headers, converter)
-        return nil if headers.nil? || headers.size.zero? # rubocop:disable Style/ZeroLengthPredicate Google Maps don't have empty
+        return nil if headers.nil? || headers.size.zero? # rubocop:disable Style/ZeroLengthPredicate -- Google Maps don't have empty
 
         headers.each_with_object({}) do |(key, val), h| # rubocop:disable Style/HashTransformValues
           # @type var h: Hash[String, Object?]

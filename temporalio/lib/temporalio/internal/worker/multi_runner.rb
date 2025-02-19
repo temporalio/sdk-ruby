@@ -34,7 +34,7 @@ module Temporalio
                                rescue InjectEventForTesting => e
                                  @queue.push(e.event)
                                  @queue.push(Event::BlockSuccess.new(result: e))
-                               rescue Exception => e # rubocop:disable Lint/RescueException Intentionally catch all
+                               rescue Exception => e # rubocop:disable Lint/RescueException -- Intentionally catch all
                                  @queue.push(Event::BlockFailure.new(error: e))
                                end
                              else
@@ -43,7 +43,7 @@ module Temporalio
                                rescue InjectEventForTesting => e
                                  @queue.push(e.event)
                                  @queue.push(Event::BlockSuccess.new(result: e))
-                               rescue Exception => e # rubocop:disable Lint/RescueException Intentionally catch all
+                               rescue Exception => e # rubocop:disable Lint/RescueException -- Intentionally catch all
                                  @queue.push(Event::BlockFailure.new(error: e))
                                end
                              end
