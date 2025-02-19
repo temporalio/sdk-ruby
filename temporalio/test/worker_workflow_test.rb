@@ -1816,6 +1816,166 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class ReservedNameDynamicActivity < Temporalio::Activity::Definition
+    activity_dynamic
+
+    def execute
+      'done'
+    end
+  end
+
+  class ReservedNameDynamicWorkflow < Temporalio::Workflow::Definition
+    workflow_dynamic
+    workflow_query_attr_reader :dyn_signals_received
+
+    def execute
+      Temporalio::Workflow.wait_condition { false }
+    end
+
+    workflow_signal dynamic: true
+    def dyn_signal(name, *)
+      (@dyn_signals_received ||= []) << "signal: #{name}"
+    end
+
+    workflow_query dynamic: true
+    def dyn_query(name, *)
+      "query: #{name}"
+    end
+
+    workflow_update dynamic: true
+    def dyn_update(name, *)
+      "update: #{name}"
+    end
+
+    workflow_update
+    def call_activity(name)
+      Temporalio::Workflow.execute_activity(
+        name,
+        start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+    end
+  end
+
+  class ReservedNameInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+    include Temporalio::Worker::Interceptor::Workflow
+
+    attr_accessor :events
+
+    def initialize
+      @events = []
+    end
+
+    def intercept_activity(next_interceptor)
+      ActivityInbound.new(self, next_interceptor)
+    end
+
+    def intercept_workflow(next_interceptor)
+      WorkflowInbound.new(self, next_interceptor)
+    end
+
+    class ActivityInbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        @root.events.push("activity: #{Temporalio::Activity::Context.current.info.activity_type}")
+        super
+      end
+    end
+
+    class WorkflowInbound < Temporalio::Worker::Interceptor::Workflow::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        @root.events.push("workflow: #{Temporalio::Workflow.info.workflow_type}")
+        super
+      end
+
+      def handle_signal(input)
+        @root.events.push("signal: #{input.signal}")
+        super
+      end
+
+      def handle_query(input)
+        @root.events.push("query: #{input.query}")
+        super
+      end
+
+      def handle_update(input)
+        @root.events.push("update: #{input.update}")
+        super
+      end
+    end
+  end
+
+  def test_reserved_names
+    # Create worker with dyn workflow/activity and interceptor
+    interceptor = ReservedNameInterceptor.new
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      activities: [ReservedNameDynamicActivity],
+      workflows: [ReservedNameDynamicWorkflow],
+      interceptors: [interceptor]
+    )
+    worker.run do
+      # Try to start a workflow with reserved name
+      handle = env.client.start_workflow(
+        :__temporal_workflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      assert_eventually_task_fail(handle:, message_contains: '__temporal_workflow is not registered')
+
+      # But it's ok started a general one, and then we'll use this one to test other things
+      handle = env.client.start_workflow(
+        :unknown_workflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+
+      # Try to call an activity with reserved name
+      err = assert_raises { handle.execute_update(:call_activity, :__temporal_activity) }
+      assert_includes err.cause.cause.message, 'is not registered on this worker, available activities:'
+
+      # Now try without reserved name
+      assert_equal 'done', handle.execute_update(:call_activity, :unknown_activity)
+
+      # Try calling handlers with reserved names
+      handle.signal(:__temporal_signal)
+      refute_includes (handle.query(:dyn_signals_received) || []), 'signal: __temporal_signal'
+      err = assert_raises { handle.query(:__temporal_query) }
+      assert_includes err.message, 'not found'
+      err = assert_raises { handle.execute_update(:__temporal_update) }
+      assert_includes err.cause.message, 'not found'
+
+      # Now try calling handlers for non-reserved
+      handle.signal(:unknown_signal)
+      assert_includes handle.query(:dyn_signals_received), 'signal: unknown_signal'
+      assert_equal 'query: unknown_query', handle.query(:unknown_query)
+      assert_equal 'update: unknown_update', handle.execute_update(:unknown_update)
+
+      # Make a stack trace query call that should succeed
+      assert_includes handle.query(:__stack_trace), 'execute'
+
+      # Check the interceptor contains ': unknown_' things but not ': __temporal' things or __stack_trace
+      assert(interceptor.events.any? { |e| e.include?(': unknown_workflow') })
+      assert(interceptor.events.any? { |e| e.include?(': unknown_activity') })
+      assert(interceptor.events.any? { |e| e.include?(': unknown_signal') })
+      assert(interceptor.events.any? { |e| e.include?(': unknown_query') })
+      assert(interceptor.events.any? { |e| e.include?(': unknown_update') })
+      assert(interceptor.events.none? { |e| e.include?(': __temporal') })
+      assert(interceptor.events.none? { |e| e.include?(': __stack_trace') })
+    end
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Eager workflow start

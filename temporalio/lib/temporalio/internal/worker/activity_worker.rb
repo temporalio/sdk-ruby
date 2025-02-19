@@ -93,8 +93,10 @@ module Temporalio
         def handle_start_task(task_token, start)
           set_running_activity(task_token, nil)
 
-          # Find activity definition, falling back to dynamic if present
-          defn = @activities[start.activity_type] || @activities[nil]
+          # Find activity definition, falling back to dynamic if not found and not reserved name
+          defn = @activities[start.activity_type]
+          defn = @activities[nil] if !defn && !Internal::ProtoUtils.reserved_name?(start.activity_type)
+
           if defn.nil?
             raise Error::ApplicationError.new(
               "Activity #{start.activity_type} for workflow #{start.workflow_execution.workflow_id} " \
@@ -114,7 +116,7 @@ module Temporalio
             # Unset at the end
             Activity::Context._current_executor = nil
           end
-        rescue Exception => e # rubocop:disable Lint/RescueException We are intending to catch everything here
+        rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
           remove_running_activity(task_token)
           @scoped_logger.warn("Failed starting activity #{start.activity_type}")
           @scoped_logger.warn(e)
@@ -212,7 +214,7 @@ module Temporalio
           Activity::Context._current_executor&.set_activity_context(defn, activity)
           set_running_activity(task_token, activity)
           run_activity(defn, activity, input)
-        rescue Exception => e # rubocop:disable Lint/RescueException We are intending to catch everything here
+        rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
           @scoped_logger.warn("Failed starting or sending completion for activity #{start.activity_type}")
           @scoped_logger.warn(e)
           # This means that the activity couldn't start or send completion (run
@@ -259,7 +261,7 @@ module Temporalio
                 result: @worker.options.client.data_converter.to_payload(result)
               )
             )
-          rescue Exception => e # rubocop:disable Lint/RescueException We are intending to catch everything here
+          rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
             if e.is_a?(Activity::CompleteAsyncError)
               # Wanting to complete async
               @scoped_logger.debug('Completing activity asynchronously')

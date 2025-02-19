@@ -299,5 +299,39 @@ module Workflow
         CODE
       )
     end
+
+    def test_reserved_names
+      # Invalid workflow, signal, query, and update
+      assert_invalid_workflow_code "'__temporal_workflow' cannot start with '__temporal_'", <<~CODE
+        class ReservedNameBadWorkflow < Temporalio::Workflow::Definition
+          workflow_name '__temporal_workflow'
+          def execute; end
+        end
+      CODE
+      assert_invalid_workflow_code "'__temporal_signal' cannot start with '__temporal_'", <<~CODE
+        class ReservedNameBadSignalWorkflow < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_signal name: :__temporal_signal
+          def some_signal; end
+        end
+      CODE
+      assert_invalid_workflow_code "'__temporal_query' cannot start with '__temporal_'", <<~CODE
+        class ReservedNameBadQueryWorkflow < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_query name: '__temporal_query'
+          def some_query; end
+        end
+      CODE
+      assert_invalid_workflow_code "'__temporal_update' cannot start with '__temporal_'", <<~CODE
+        class ReservedNameBadUpdateWorkflow < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_update name: '__temporal_update'
+          def some_update; end
+        end
+      CODE
+    end
   end
 end

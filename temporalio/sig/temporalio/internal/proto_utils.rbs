@@ -59,6 +59,9 @@ module Temporalio
         Array[Object?] values
       ) -> Array[untyped]
 
+      def self.assert_non_reserved_name: (String | Symbol | nil name) -> void
+      def self.reserved_name?: (String | Symbol | nil name) -> bool
+
       class LazyMemo
         def initialize: (
           untyped? raw_memo,

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/proto_utils'
+
 module Temporalio
   module Activity
     # Base class for all activities.
@@ -182,6 +184,7 @@ module Temporalio
           @executor = executor
           @cancel_raise = cancel_raise
           @raw_args = raw_args
+          Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end
     end

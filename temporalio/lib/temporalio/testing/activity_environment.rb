@@ -98,7 +98,7 @@ module Temporalio
                                                 client: @client
                                               ))
           queue.push([defn.proc.call(*args), nil])
-        rescue Exception => e # rubocop:disable Lint/RescueException Intentionally capturing all exceptions
+        rescue Exception => e # rubocop:disable Lint/RescueException -- Intentionally capturing all exceptions
           queue.push([nil, e])
         ensure
           executor.set_activity_context(defn, nil)

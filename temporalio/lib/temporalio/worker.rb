@@ -6,6 +6,7 @@ require 'temporalio/client'
 require 'temporalio/error'
 require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/worker'
+require 'temporalio/internal/proto_utils'
 require 'temporalio/internal/worker/activity_worker'
 require 'temporalio/internal/worker/multi_runner'
 require 'temporalio/internal/worker/workflow_instance'
@@ -380,6 +381,8 @@ module Temporalio
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
+
+      Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
       @options = Options.new(
         client:,

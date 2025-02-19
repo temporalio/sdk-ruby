@@ -186,8 +186,12 @@ module Temporalio
             raise 'Missing initialize job in initial activation' unless init_job
 
             # Obtain definition
-            definition = worker_state.workflow_definitions[init_job.workflow_type] ||
-                         worker_state.workflow_definitions[nil]
+            definition = worker_state.workflow_definitions[init_job.workflow_type]
+            # If not present and not reserved, try dynamic
+            if !definition && !Internal::ProtoUtils.reserved_name?(init_job.workflow_type)
+              definition = worker_state.workflow_definitions[nil]
+            end
+
             unless definition
               raise Error::ApplicationError.new(
                 "Workflow type #{init_job.workflow_type} is not registered on this worker, available workflows: " +

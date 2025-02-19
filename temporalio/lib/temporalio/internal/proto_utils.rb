@@ -51,7 +51,7 @@ module Temporalio
       end
 
       def self.memo_from_proto(memo, converter)
-        return nil if memo.nil? || memo.fields.size.zero? # rubocop:disable Style/ZeroLengthPredicate Google Maps don't have empty
+        return nil if memo.nil? || memo.fields.size.zero? # rubocop:disable Style/ZeroLengthPredicate -- Google Maps don't have empty
 
         memo.fields.each_with_object({}) { |(key, val), h| h[key] = converter.from_payload(val) } # rubocop:disable Style/HashTransformValues
       end
@@ -73,7 +73,7 @@ module Temporalio
       end
 
       def self.headers_from_proto_map(headers, converter)
-        return nil if headers.nil? || headers.size.zero? # rubocop:disable Style/ZeroLengthPredicate Google Maps don't have empty
+        return nil if headers.nil? || headers.size.zero? # rubocop:disable Style/ZeroLengthPredicate -- Google Maps don't have empty
 
         headers.each_with_object({}) do |(key, val), h| # rubocop:disable Style/HashTransformValues
           # @type var h: Hash[String, Object?]
@@ -104,6 +104,22 @@ module Temporalio
         return [] if values.empty?
 
         converter.to_payloads(values).payloads.to_ary
+      end
+
+      def self.assert_non_reserved_name(name)
+        name = name&.to_s # In case it's a symbol or not present
+        return unless name
+        raise "'#{name}' cannot start with '__temporal_'" if name.start_with?('__temporal_')
+        # Might as well disable __stack_trace and __enhanced_stack_trace everywhere even though technically it's only
+        # reserved for queries
+        raise "'#{name}' name invalid" if name == '__stack_trace' || name == '__enhanced_stack_trace'
+      end
+
+      def self.reserved_name?(name)
+        name = name&.to_s # In case it's a symbol or not present
+        return false unless name
+
+        name.start_with?('__temporal_') || name == '__stack_trace' || name == '__enhanced_stack_trace'
       end
 
       class LazyMemo

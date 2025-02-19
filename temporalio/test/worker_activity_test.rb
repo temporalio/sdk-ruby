@@ -914,6 +914,17 @@ class WorkerActivityTest < Test
     assert_equal 'ClientAccessActivity', execute_activity(ClientAccessActivity)
   end
 
+  class ReservedNameActivity < Temporalio::Activity::Definition
+    activity_name '__temporal_activity'
+
+    def execute; end
+  end
+
+  def test_reserved_name
+    err = assert_raises { Temporalio::Activity::Definition::Info.from_activity(ReservedNameActivity) }
+    assert_includes err.message, "'__temporal_activity' cannot start with '__temporal_'"
+  end
+
   # steep:ignore
   def execute_activity(
     activity,

@@ -348,7 +348,10 @@ module Temporalio
         end
 
         def apply_signal(job)
-          defn = signal_handlers[job.signal_name] || signal_handlers[nil]
+          # Get signal definition, falling back to dynamic if not present and not reserved
+          defn = signal_handlers[job.signal_name]
+          defn = signal_handlers[nil] if !defn && !Internal::ProtoUtils.reserved_name?(job.signal_name)
+
           handler_exec =
             if defn
               HandlerExecution.new(name: job.signal_name, update_id: nil, unfinished_policy: defn.unfinished_policy)
@@ -381,37 +384,38 @@ module Temporalio
         end
 
         def apply_query(job)
-          # TODO(cretz): __temporal_workflow_metadata
-          defn = case job.query_type
-                 when '__stack_trace'
-                   Workflow::Definition::Query.new(
-                     name: '__stack_trace',
-                     to_invoke: proc { scheduler.stack_trace }
-                   )
-                 else
-                   query_handlers[job.query_type] || query_handlers[nil]
-                 end
           schedule do
-            unless defn
-              raise "Query handler for #{job.query_type} expected but not found, " \
-                    "known queries: [#{query_handlers.keys.compact.sort.join(', ')}]"
-            end
+            # If it's a built-in, run it without interceptors, otherwise do normal behavior
+            # TODO(cretz): __temporal_workflow_metadata
+            result = if job.query_type == '__stack_trace'
+                       scheduler.stack_trace
+                     else
+                       # Get query definition, falling back to dynamic if not present and not reserved
+                       defn = query_handlers[job.query_type]
+                       defn = query_handlers[nil] if !defn && !Internal::ProtoUtils.reserved_name?(job.query_type)
 
-            result = with_context_frozen do
-              @inbound.handle_query(
-                Temporalio::Worker::Interceptor::Workflow::HandleQueryInput.new(
-                  id: job.query_id,
-                  query: job.query_type,
-                  args: begin
-                    convert_handler_args(payload_array: job.arguments, defn:)
-                  rescue StandardError => e
-                    raise "Failed converting query input arguments: #{e}"
-                  end,
-                  definition: defn,
-                  headers: ProtoUtils.headers_from_proto_map(job.headers, @payload_converter) || {}
-                )
-              )
-            end
+                       unless defn
+                         raise "Query handler for #{job.query_type} expected but not found, " \
+                               "known queries: [#{query_handlers.keys.compact.sort.join(', ')}]"
+                       end
+
+                       with_context_frozen do
+                         @inbound.handle_query(
+                           Temporalio::Worker::Interceptor::Workflow::HandleQueryInput.new(
+                             id: job.query_id,
+                             query: job.query_type,
+                             args: begin
+                               convert_handler_args(payload_array: job.arguments, defn:)
+                             rescue StandardError => e
+                               raise "Failed converting query input arguments: #{e}"
+                             end,
+                             definition: defn,
+                             headers: ProtoUtils.headers_from_proto_map(job.headers, @payload_converter) || {}
+                           )
+                         )
+                       end
+                     end
+
             add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 respond_to_query: Bridge::Api::WorkflowCommands::QueryResult.new(
@@ -435,7 +439,10 @@ module Temporalio
         end
 
         def apply_update(job)
-          defn = update_handlers[job.name] || update_handlers[nil]
+          # Get update definition, falling back to dynamic if not present and not reserved
+          defn = update_handlers[job.name]
+          defn = update_handlers[nil] if !defn && !Internal::ProtoUtils.reserved_name?(job.name)
+
           handler_exec =
             (HandlerExecution.new(name: job.name, update_id: job.id, unfinished_policy: defn.unfinished_policy) if defn)
           schedule(handler_exec:) do
