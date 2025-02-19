@@ -61,7 +61,8 @@ impl EphemeralServer {
             .ip(options.member::<String>(id!("ip"))?)
             .port(options.member::<Option<u16>>(id!("port"))?)
             .db_filename(options.member::<Option<String>>(id!("database_filename"))?)
-            .ui(options.member(id!("namespace"))?)
+            .ui(options.member(id!("ui"))?)
+            .ui_port(options.member::<Option<u16>>(id!("ui_port"))?)
             .log((
                 options.member::<String>(id!("log_format"))?,
                 options.member::<String>(id!("log_level"))?,

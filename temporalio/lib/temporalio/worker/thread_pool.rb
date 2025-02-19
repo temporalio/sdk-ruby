@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-# Much of this logic taken from
-# https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb,
-# see MIT license at
-# https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/LICENSE.txt
-
 module Temporalio
   class Worker
     # Implementation of a thread pool. This implementation is a stripped down form of Concurrent Ruby's
     # `CachedThreadPool`.
     class ThreadPool
+      # Much of this logic taken from
+      # https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/lib/concurrent-ruby/concurrent/executor/ruby_thread_pool_executor.rb,
+      # see MIT license at
+      # https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/LICENSE.txt
+
       # @return [ThreadPool] Default/shared thread pool instance with unlimited max threads.
       def self.default
         @default ||= new

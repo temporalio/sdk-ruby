@@ -18,6 +18,7 @@ module Temporalio
             :port, # Optional
             :database_filename, # Optional
             :ui,
+            :ui_port, # Optional, should be nil if ui is false
             :log_format,
             :log_level,
             :extra_args,

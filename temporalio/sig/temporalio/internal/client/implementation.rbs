@@ -1,0 +1,15 @@
+module Temporalio
+  module Internal
+    module Client
+      class Implementation < Temporalio::Client::Interceptor::Outbound
+        def self.with_default_rpc_options: (Temporalio::Client::RPCOptions? user_rpc_options) -> Temporalio::Client::RPCOptions
+
+        def initialize: (Temporalio::Client client) -> void
+                      
+        def _start_workflow_request_from_with_start_options: (
+          untyped klass, Temporalio::Client::WithStartWorkflowOperation::Options start_options
+        ) -> untyped
+      end
+    end
+  end
+end

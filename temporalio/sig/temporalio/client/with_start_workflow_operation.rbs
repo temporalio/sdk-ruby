@@ -1,0 +1,67 @@
+module Temporalio
+  class Client
+    class WithStartWorkflowOperation
+      class Options
+        attr_reader workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
+        attr_reader args: Array[Object?]
+        attr_reader id: String
+        attr_reader task_queue: String
+        attr_reader execution_timeout: duration?
+        attr_reader run_timeout: duration?
+        attr_reader task_timeout: duration?
+        attr_reader id_reuse_policy: WorkflowIDReusePolicy::enum
+        attr_reader id_conflict_policy: WorkflowIDConflictPolicy::enum
+        attr_reader retry_policy: RetryPolicy?
+        attr_reader cron_schedule: String?
+        attr_reader memo: Hash[String | Symbol, Object?]?
+        attr_reader search_attributes: SearchAttributes?
+        attr_reader start_delay: duration?
+        attr_reader headers: Hash[String, Object?]
+
+        def initialize: (
+          workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String,
+          args: Array[Object?],
+          id: String,
+          task_queue: String,
+          execution_timeout: duration?,
+          run_timeout: duration?,
+          task_timeout: duration?,
+          id_reuse_policy: WorkflowIDReusePolicy::enum,
+          id_conflict_policy: WorkflowIDConflictPolicy::enum,
+          retry_policy: RetryPolicy?,
+          cron_schedule: String?,
+          memo: Hash[String | Symbol, Object?]?,
+          search_attributes: SearchAttributes?,
+          start_delay: duration?,
+          headers: Hash[String, Object?]
+        ) -> void
+      end
+
+      attr_accessor options: Options
+
+      def initialize: (
+        singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
+        *Object? args,
+        id: String,
+        task_queue: String,
+        ?execution_timeout: duration?,
+        ?run_timeout: duration?,
+        ?task_timeout: duration?,
+        ?id_reuse_policy: WorkflowIDReusePolicy::enum,
+        ?id_conflict_policy: WorkflowIDConflictPolicy::enum,
+        ?retry_policy: RetryPolicy?,
+        ?cron_schedule: String?,
+        ?memo: Hash[String | Symbol, Object?]?,
+        ?search_attributes: SearchAttributes?,
+        ?start_delay: duration?,
+        ?headers: Hash[String, Object?]
+      ) -> void
+
+      def workflow_handle: () -> WorkflowHandle
+                         | (wait: bool) -> WorkflowHandle?
+
+      def _set_workflow_handle: (WorkflowHandle | Exception value) -> void
+      def _mark_used: -> void
+    end
+  end
+end

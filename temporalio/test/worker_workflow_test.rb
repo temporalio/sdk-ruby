@@ -1987,8 +1987,6 @@ class WorkerWorkflowTest < Test
   #   * Test workflow cancel causing other cancels at the same time but in different coroutines
   #   * 0-sleep timers vs nil timers
   #   * Interceptors
-  # * Handler
-  #   * Signal/update with start
   # * Activity
   #   * Local activity cancel (currently broken)
 end

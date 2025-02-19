@@ -10,6 +10,7 @@ require 'temporalio/converters'
 require 'temporalio/internal/bridge/testing'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/runtime'
+require 'temporalio/search_attributes'
 require 'temporalio/version'
 
 module Temporalio
@@ -34,8 +35,10 @@ module Temporalio
       # @param default_workflow_query_reject_condition [WorkflowQueryRejectCondition, nil] Default rejection condition
       #   for the client.
       # @param ip [String] IP to bind to.
-      # @param port [Integer, nil] Port to bind on, or +nil+ for random.
+      # @param port [Integer, nil] Port to bind on, or `nil` for random.
       # @param ui [Boolean] If +true+, also starts the UI.
+      # @param ui_port [Integer, nil] Port to bind on if `ui` is true, or `nil` for random.
+      # @param search_attributes [Array<SearchAttributes::Key>] Search attributes to make available on start.
       # @param runtime [Runtime] Runtime for the server and client.
       # @param dev_server_existing_path [String, nil] Existing CLI path to use instead of downloading and caching to
       #   tmp.
@@ -62,6 +65,8 @@ module Temporalio
         ip: '127.0.0.1',
         port: nil,
         ui: false, # rubocop:disable Naming/MethodParameterName
+        ui_port: nil,
+        search_attributes: [],
         runtime: Runtime.default,
         dev_server_existing_path: nil,
         dev_server_database_filename: nil,
@@ -72,6 +77,15 @@ module Temporalio
         dev_server_extra_args: [],
         &
       )
+        # Add search attribute args
+        unless search_attributes.empty?
+          dev_server_extra_args += search_attributes.flat_map do |key|
+            raise 'Search attribute must be Key' unless key.is_a?(SearchAttributes::Key)
+
+            ['--search-attribute', "#{key.name}=#{SearchAttributes::IndexedValueType::PROTO_NAMES[key.type]}"]
+          end
+        end
+
         server_options = Internal::Bridge::Testing::EphemeralServer::StartDevServerOptions.new(
           existing_path: dev_server_existing_path,
           sdk_name: 'sdk-ruby',
@@ -83,6 +97,7 @@ module Temporalio
           port:,
           database_filename: dev_server_database_filename,
           ui:,
+          ui_port: ui ? ui_port : nil,
           log_format: dev_server_log_format,
           log_level: dev_server_log_level,
           extra_args: dev_server_extra_args
