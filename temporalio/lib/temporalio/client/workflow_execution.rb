@@ -93,6 +93,25 @@ module Temporalio
         def initialize(raw_description, data_converter)
           super(raw_description.workflow_execution_info, data_converter)
           @raw_description = raw_description
+          @data_converter = data_converter
+        end
+
+        # @return [String, nil] Static summary configured on the workflow. This is currently experimental.
+        def static_summary
+          user_metadata.first
+        end
+
+        # @return [String, nil] Static details configured on the workflow. This is currently experimental.
+        def static_details
+          user_metadata.last
+        end
+
+        private
+
+        def user_metadata
+          @user_metadata ||= Internal::ProtoUtils.from_user_metadata(
+            @raw_description.execution_config&.user_metadata, @data_converter
+          )
         end
       end
     end

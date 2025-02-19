@@ -62,6 +62,17 @@ module Temporalio
       def self.assert_non_reserved_name: (String | Symbol | nil name) -> void
       def self.reserved_name?: (String | Symbol | nil name) -> bool
 
+      def self.to_user_metadata: (
+        String? summary,
+        String? details,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> untyped
+
+      def self.from_user_metadata: (
+        untyped metadata,
+        Converters::DataConverter | Converters::PayloadConverter converter
+      ) -> [String?, String?]
+
       class LazyMemo
         def initialize: (
           untyped? raw_memo,

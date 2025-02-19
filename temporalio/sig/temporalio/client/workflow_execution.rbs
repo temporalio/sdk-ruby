@@ -23,6 +23,11 @@ module Temporalio
         attr_reader raw_description: untyped
 
         def initialize: (untyped raw_description, Converters::DataConverter data_converter) -> void
+
+        def static_summary: -> String?
+        def static_details: -> String?
+
+        private def user_metadata: -> [String?, String?]
       end
     end
   end

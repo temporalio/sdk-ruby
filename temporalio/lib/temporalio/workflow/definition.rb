@@ -72,7 +72,9 @@ module Temporalio
         # `attr_accessor`. If a writer is needed alongside this, use `attr_writer`.
         #
         # @param attr_names [Array<Symbol>] Attributes to expose.
-        def workflow_query_attr_reader(*attr_names)
+        # @param description [String, nil] Description that may appear in CLI/UI, applied to each query handler
+        #   implicitly created. This is currently experimental.
+        def workflow_query_attr_reader(*attr_names, description: nil)
           @workflow_queries ||= {}
           attr_names.each do |attr_name|
             raise 'Expected attr to be a symbol' unless attr_name.is_a?(Symbol)
@@ -84,7 +86,7 @@ module Temporalio
             end
 
             # Just run this as if done manually
-            workflow_query
+            workflow_query(description:)
             define_method(attr_name) { instance_variable_get("@#{attr_name}") }
           end
         end
@@ -101,6 +103,8 @@ module Temporalio
         # values.
         #
         # @param name [String, Symbol, nil] Override the default name.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param dynamic [Boolean] If true, make the signal dynamic. This means it receives all other signals without
         #   handlers. This cannot have a name override since it is nameless. The first parameter will be the name. Often
         #   it is useful to have the second parameter be `*args` and `raw_args` be true.
@@ -110,19 +114,22 @@ module Temporalio
         #   when the workflow ends. The default warns, but this can be disabled.
         def workflow_signal(
           name: nil,
+          description: nil,
           dynamic: false,
           raw_args: false,
           unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :signal, name:, dynamic:, raw_args:, unfinished_policy: }
+          self.pending_handler_details = { type: :signal, name:, description:, dynamic:, raw_args:, unfinished_policy: }
         end
 
         # Mark the next method as a workflow query with a default name as the name of the method. Queries can not have
         # any side effects, meaning they should never mutate state or try to wait on anything.
         #
         # @param name [String, Symbol, nil] Override the default name.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param dynamic [Boolean] If true, make the query dynamic. This means it receives all other queries without
         #   handlers. This cannot have a name override since it is nameless. The first parameter will be the name. Often
         #   it is useful to have the second parameter be `*args` and `raw_args` be true.
@@ -130,18 +137,21 @@ module Temporalio
         #   {Converters::RawValue} which is a raw payload wrapper, convertible with {Workflow.payload_converter}.
         def workflow_query(
           name: nil,
+          description: nil,
           dynamic: false,
           raw_args: false
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :query, name:, dynamic:, raw_args: }
+          self.pending_handler_details = { type: :query, name:, description:, dynamic:, raw_args: }
         end
 
         # Mark the next method as a workflow update with a default name as the name of the method. Updates can return
         # values. Separate validation methods can be provided via {workflow_update_validator}.
         #
         # @param name [String, Symbol, nil] Override the default name.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param dynamic [Boolean] If true, make the update dynamic. This means it receives all other updates without
         #   handlers. This cannot have a name override since it is nameless. The first parameter will be the name. Often
         #   it is useful to have the second parameter be `*args` and `raw_args` be true.
@@ -151,13 +161,14 @@ module Temporalio
         #   when the workflow ends. The default warns, but this can be disabled.
         def workflow_update(
           name: nil,
+          description: nil,
           dynamic: false,
           raw_args: false,
           unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :update, name:, dynamic:, raw_args:, unfinished_policy: }
+          self.pending_handler_details = { type: :update, name:, description:, dynamic:, raw_args:, unfinished_policy: }
         end
 
         # Mark the next method as a workflow update validator to the given update method. The validator is expected to
@@ -226,6 +237,7 @@ module Temporalio
             [Signal.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
               to_invoke: method_name,
+              description: handler[:description],
               raw_args: handler[:raw_args],
               unfinished_policy: handler[:unfinished_policy]
             ), @workflow_signals, [@workflow_queries, @workflow_updates]]
@@ -233,12 +245,14 @@ module Temporalio
             [Query.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
               to_invoke: method_name,
+              description: handler[:description],
               raw_args: handler[:raw_args]
             ), @workflow_queries, [@workflow_signals, @workflow_updates]]
           when :update
             [Update.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
               to_invoke: method_name,
+              description: handler[:description],
               raw_args: handler[:raw_args],
               unfinished_policy: handler[:unfinished_policy]
             ), @workflow_updates, [@workflow_signals, @workflow_queries]]
@@ -443,7 +457,7 @@ module Temporalio
       # A signal definition. This is usually built as a result of a {Definition.workflow_signal} method, but can be
       # manually created to set at runtime on {Workflow.signal_handlers}.
       class Signal
-        attr_reader :name, :to_invoke, :raw_args, :unfinished_policy
+        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy
 
         # @!visibility private
         def self._name_from_parameter(signal)
@@ -462,17 +476,21 @@ module Temporalio
         #
         # @param name [String, nil] Name or nil if dynamic.
         # @param to_invoke [Symbol, Proc] Method name or proc to invoke.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param raw_args [Boolean] Whether the parameters should be raw values.
         # @param unfinished_policy [HandlerUnfinishedPolicy] How the workflow reacts when this handler is still running
         #   on workflow completion.
         def initialize(
           name:,
           to_invoke:,
+          description: nil,
           raw_args: false,
           unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
         )
           @name = name
           @to_invoke = to_invoke
+          @description = description
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
           Internal::ProtoUtils.assert_non_reserved_name(name)
@@ -482,7 +500,7 @@ module Temporalio
       # A query definition. This is usually built as a result of a {Definition.workflow_query} method, but can be
       # manually created to set at runtime on {Workflow.query_handlers}.
       class Query
-        attr_reader :name, :to_invoke, :raw_args
+        attr_reader :name, :to_invoke, :description, :raw_args
 
         # @!visibility private
         def self._name_from_parameter(query)
@@ -501,14 +519,18 @@ module Temporalio
         #
         # @param name [String, nil] Name or nil if dynamic.
         # @param to_invoke [Symbol, Proc] Method name or proc to invoke.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param raw_args [Boolean] Whether the parameters should be raw values.
         def initialize(
           name:,
           to_invoke:,
+          description: nil,
           raw_args: false
         )
           @name = name
           @to_invoke = to_invoke
+          @description = description
           @raw_args = raw_args
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
@@ -517,7 +539,7 @@ module Temporalio
       # An update definition. This is usually built as a result of a {Definition.workflow_update} method, but can be
       # manually created to set at runtime on {Workflow.update_handlers}.
       class Update
-        attr_reader :name, :to_invoke, :raw_args, :unfinished_policy, :validator_to_invoke
+        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy, :validator_to_invoke
 
         # @!visibility private
         def self._name_from_parameter(update)
@@ -536,6 +558,8 @@ module Temporalio
         #
         # @param name [String, nil] Name or nil if dynamic.
         # @param to_invoke [Symbol, Proc] Method name or proc to invoke.
+        # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
+        #   experimental.
         # @param raw_args [Boolean] Whether the parameters should be raw values.
         # @param unfinished_policy [HandlerUnfinishedPolicy] How the workflow reacts when this handler is still running
         #   on workflow completion.
@@ -543,12 +567,14 @@ module Temporalio
         def initialize(
           name:,
           to_invoke:,
+          description: nil,
           raw_args: false,
           unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON,
           validator_to_invoke: nil
         )
           @name = name
           @to_invoke = to_invoke
+          @description = description
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
           @validator_to_invoke = validator_to_invoke
@@ -560,6 +586,7 @@ module Temporalio
           Update.new(
             name:,
             to_invoke:,
+            description:,
             raw_args:,
             unfinished_policy:,
             validator_to_invoke:

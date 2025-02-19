@@ -69,6 +69,9 @@ module Temporalio
             search_attributes: input.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(input.start_delay),
             request_eager_execution: input.request_eager_start,
+            user_metadata: ProtoUtils.to_user_metadata(
+              input.static_summary, input.static_details, @client.data_converter
+            ),
             header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
           )
 
@@ -319,6 +322,9 @@ module Temporalio
             memo: ProtoUtils.memo_to_proto(start_options.memo, @client.data_converter),
             search_attributes: start_options.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(start_options.start_delay),
+            user_metadata: ProtoUtils.to_user_metadata(
+              start_options.static_summary, start_options.static_details, @client.data_converter
+            ),
             header: ProtoUtils.headers_to_proto(start_options.headers, @client.data_converter)
           )
         end

@@ -23,6 +23,8 @@ module Temporalio
         :args,
         :workflow_id,
         :task_queue,
+        :static_summary,
+        :static_details,
         :execution_timeout,
         :run_timeout,
         :task_timeout,

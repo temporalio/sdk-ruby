@@ -167,6 +167,8 @@ module Temporalio
           :args,
           :id,
           :task_queue,
+          :static_summary,
+          :static_details,
           :execution_timeout,
           :run_timeout,
           :task_timeout,
@@ -186,6 +188,14 @@ module Temporalio
         #   @return [String] Unique identifier for the workflow execution.
         # @!attribute task_queue
         #   @return [String] Task queue to run the workflow on.
+        # @!attribute static_summary
+        #   @return [String, nil] Fixed single-line summary for this workflow execution that may appear in CLI/UI.
+        #     This can be in single-line Temporal markdown format. This is currently experimental.
+        # @!attribute static_details
+        #   @return [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can be in
+        #     Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
+        #     updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is
+        #     currently experimental.
         # @!attribute execution_timeout
         #   @return [Float, nil] Total workflow execution timeout in seconds including retries and continue as new.
         # @!attribute run_timeout
@@ -212,6 +222,12 @@ module Temporalio
             # @param args [Array<Object>] Arguments to the workflow.
             # @param id [String] Unique identifier for the workflow execution.
             # @param task_queue [String] Task queue to run the workflow on.
+            # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear
+            #   in CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+            # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI.
+            #   This can be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow
+            #   that cannot be updated. For details that can be updated, use {Workflow.current_details=} within the
+            #   workflow. This is currently experimental.
             # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and
             #   continue as new.
             # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
@@ -225,6 +241,8 @@ module Temporalio
               *args,
               id:,
               task_queue:,
+              static_summary: nil,
+              static_details: nil,
               execution_timeout: nil,
               run_timeout: nil,
               task_timeout: nil,
@@ -238,6 +256,8 @@ module Temporalio
                 args:,
                 id:,
                 task_queue:,
+                static_summary:,
+                static_details:,
                 execution_timeout:,
                 run_timeout:,
                 task_timeout:,
@@ -251,11 +271,14 @@ module Temporalio
 
           # @!visibility private
           def self._from_proto(raw_info, data_converter)
+            (summary, details) = Internal::ProtoUtils.from_user_metadata(raw_info.user_metadata, data_converter)
             StartWorkflow.new(
               raw_info.workflow_type.name,
               *data_converter.from_payloads(raw_info.input),
               id: raw_info.workflow_id,
               task_queue: raw_info.task_queue.name,
+              static_summary: summary,
+              static_details: details,
               execution_timeout: Internal::ProtoUtils.duration_to_seconds(raw_info.workflow_execution_timeout),
               run_timeout: Internal::ProtoUtils.duration_to_seconds(raw_info.workflow_run_timeout),
               task_timeout: Internal::ProtoUtils.duration_to_seconds(raw_info.workflow_task_timeout),
@@ -280,7 +303,8 @@ module Temporalio
                 retry_policy: retry_policy&._to_proto,
                 memo: Internal::ProtoUtils.memo_to_proto(memo, data_converter),
                 search_attributes: search_attributes&._to_proto,
-                header: Internal::ProtoUtils.headers_to_proto(headers, data_converter)
+                header: Internal::ProtoUtils.headers_to_proto(headers, data_converter),
+                user_metadata: Internal::ProtoUtils.to_user_metadata(static_summary, static_details, data_converter)
               )
             )
           end

@@ -56,6 +56,7 @@ module Temporalio
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_history_length,
                     :current_history_size, :replaying, :random, :signal_handlers, :query_handlers, :update_handlers,
                     :context_frozen
+        attr_accessor :current_details
 
         def initialize(details)
           # Initialize general state
@@ -386,9 +387,10 @@ module Temporalio
         def apply_query(job)
           schedule do
             # If it's a built-in, run it without interceptors, otherwise do normal behavior
-            # TODO(cretz): __temporal_workflow_metadata
             result = if job.query_type == '__stack_trace'
                        scheduler.stack_trace
+                     elsif job.query_type == '__temporal_workflow_metadata'
+                       workflow_metadata
                      else
                        # Get query definition, falling back to dynamic if not present and not reserved
                        defn = query_handlers[job.query_type]
@@ -676,6 +678,30 @@ module Temporalio
           else
             ProtoUtils.convert_from_payload_array(@payload_converter, payload_array)
           end
+        end
+
+        def workflow_metadata
+          Temporalio::Api::Sdk::V1::WorkflowMetadata.new(
+            definition: Temporalio::Api::Sdk::V1::WorkflowDefinition.new(
+              type: info.workflow_type,
+              query_definitions: query_handlers.values.map do |defn|
+                Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+                  name: defn.name || '', description: defn.description || ''
+                )
+              end,
+              signal_definitions: signal_handlers.values.map do |defn|
+                Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+                  name: defn.name || '', description: defn.description || ''
+                )
+              end,
+              update_definitions: update_handlers.values.map do |defn|
+                Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+                  name: defn.name || '', description: defn.description || ''
+                )
+              end
+            ),
+            current_details: current_details || ''
+          )
         end
 
         def scoped_logger_info

@@ -19,6 +19,8 @@ class ClientScheduleTest < Test
       { actions: [{ result: { value: 'some-result' } }] },
       id: "wf-#{SecureRandom.uuid}",
       task_queue:,
+      static_summary: 'my-summary',
+      static_details: 'my-details',
       execution_timeout: 1.23,
       memo: { 'memokey1' => 'memoval1' }
     )
@@ -73,6 +75,8 @@ class ClientScheduleTest < Test
     assert_instance_of Temporalio::Client::Schedule::Action::StartWorkflow, desc_action
     assert_equal action.workflow, desc_action.workflow
     assert_equal 'some-result', desc_action.args.first['actions'].first['result']['value'] # steep:ignore
+    assert_equal 'my-summary', desc_action.static_summary
+    assert_equal 'my-details', desc_action.static_details
     assert_equal action.execution_timeout, desc_action.execution_timeout
     assert_equal({ 'memokey1' => 'memoval1' }, desc_action.memo)
     assert_equal({ 'memokey2' => 'memoval2' }, desc.memo)

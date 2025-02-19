@@ -132,6 +132,7 @@ module Temporalio
           attr_reader activity: singleton(Temporalio::Activity::Definition) | Symbol | String
           attr_reader args: Array[Object?]
           attr_reader task_queue: String
+          attr_reader summary: String?
           attr_reader schedule_to_close_timeout: duration?
           attr_reader schedule_to_start_timeout: duration?
           attr_reader start_to_close_timeout: duration?
@@ -147,6 +148,7 @@ module Temporalio
             activity: singleton(Temporalio::Activity::Definition) | Symbol | String,
             args: Array[Object?],
             task_queue: String,
+            summary: String?,
             schedule_to_close_timeout: duration?,
             schedule_to_start_timeout: duration?,
             start_to_close_timeout: duration?,
@@ -247,6 +249,8 @@ module Temporalio
           attr_reader args: Array[Object?]
           attr_reader id: String
           attr_reader task_queue: String
+          attr_reader static_summary: String?
+          attr_reader static_details: String?
           attr_reader cancellation: Cancellation
           attr_reader cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum
           attr_reader parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum
@@ -265,6 +269,8 @@ module Temporalio
             args: Array[Object?],
             id: String,
             task_queue: String,
+            static_summary: String?,
+            static_details: String?,
             cancellation: Cancellation,
             cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::enum,
             parent_close_policy: Temporalio::Workflow::ParentClosePolicy::enum,

@@ -194,6 +194,12 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
+    # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
+    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
+    #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
+    #   experimental.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
@@ -220,6 +226,8 @@ module Temporalio
       *args,
       id:,
       task_queue:,
+      static_summary: nil,
+      static_details: nil,
       execution_timeout: nil,
       run_timeout: nil,
       task_timeout: nil,
@@ -238,6 +246,8 @@ module Temporalio
                              args:,
                              workflow_id: id,
                              task_queue:,
+                             static_summary:,
+                             static_details:,
                              execution_timeout:,
                              run_timeout:,
                              task_timeout:,
@@ -260,6 +270,12 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
+    # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
+    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
+    #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
+    #   experimental.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
@@ -287,6 +303,8 @@ module Temporalio
       *args,
       id:,
       task_queue:,
+      static_summary: nil,
+      static_details: nil,
       execution_timeout: nil,
       run_timeout: nil,
       task_timeout: nil,
@@ -305,6 +323,8 @@ module Temporalio
         *args,
         id:,
         task_queue:,
+        static_summary:,
+        static_details:,
         execution_timeout:,
         run_timeout:,
         task_timeout:,

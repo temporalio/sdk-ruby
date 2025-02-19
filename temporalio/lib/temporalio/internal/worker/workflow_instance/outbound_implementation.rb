@@ -84,7 +84,8 @@ module Temporalio
                     retry_policy: input.retry_policy&._to_proto,
                     cancellation_type: input.cancellation_type,
                     do_not_eagerly_execute: input.disable_eager_execution
-                  )
+                  ),
+                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
                 )
               )
               seq
@@ -300,7 +301,8 @@ module Temporalio
                 start_timer: Bridge::Api::WorkflowCommands::StartTimer.new(
                   seq:,
                   start_to_fire_timeout: ProtoUtils.seconds_to_duration(duration)
-                )
+                ),
+                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
               )
             )
             @instance.pending_timers[seq] = Fiber.current
@@ -354,6 +356,9 @@ module Temporalio
                   memo: ProtoUtils.memo_to_proto_hash(input.memo, @instance.payload_converter),
                   search_attributes: input.search_attributes&._to_proto_hash,
                   cancellation_type: input.cancellation_type
+                ),
+                user_metadata: ProtoUtils.to_user_metadata(
+                  input.static_summary, input.static_details, @instance.payload_converter
                 )
               )
             )
