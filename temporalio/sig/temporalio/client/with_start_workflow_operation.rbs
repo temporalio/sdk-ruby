@@ -6,6 +6,8 @@ module Temporalio
         attr_reader args: Array[Object?]
         attr_reader id: String
         attr_reader task_queue: String
+        attr_reader static_summary: String?
+        attr_reader static_details: String?
         attr_reader execution_timeout: duration?
         attr_reader run_timeout: duration?
         attr_reader task_timeout: duration?
@@ -23,6 +25,8 @@ module Temporalio
           args: Array[Object?],
           id: String,
           task_queue: String,
+          static_summary: String?,
+          static_details: String?,
           execution_timeout: duration?,
           run_timeout: duration?,
           task_timeout: duration?,
@@ -44,6 +48,8 @@ module Temporalio
         *Object? args,
         id: String,
         task_queue: String,
+        ?static_summary: String?,
+        ?static_details: String?,
         ?execution_timeout: duration?,
         ?run_timeout: duration?,
         ?task_timeout: duration?,

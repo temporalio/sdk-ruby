@@ -1976,6 +1976,140 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class UserMetadataWorkflow < Temporalio::Workflow::Definition
+    def execute(return_immediately)
+      return 'done' if return_immediately
+
+      # Timer, activity, and child with metadata
+      Temporalio::Workflow.sleep(0.1, summary: 'my-timer')
+
+      # Timeout over wait condition
+      begin
+        Temporalio::Workflow.timeout(0.1, summary: 'my-timeout-timer') { Temporalio::Workflow.wait_condition { false } }
+        raise 'Did not timeout'
+      rescue Timeout::Error
+        # Ignore
+      end
+
+      # Activity
+      Temporalio::Workflow.execute_activity(
+        UserMetadataActivity,
+        start_to_close_timeout: 30,
+        summary: 'my-activity'
+      )
+
+      # Child
+      Temporalio::Workflow.execute_child_workflow(
+        UserMetadataWorkflow, true,
+        static_summary: 'my-child', static_details: 'my-child-details'
+      )
+    end
+  end
+
+  class UserMetadataActivity < Temporalio::Activity::Definition
+    def execute
+      'done'
+    end
+  end
+
+  def test_user_metadata
+    execute_workflow(UserMetadataWorkflow, false, activities: [UserMetadataActivity]) do |handle|
+      assert_equal 'done', handle.result
+      # Check history
+      events = handle.fetch_history.events
+      timers = events.select(&:timer_started_event_attributes)
+      assert_equal '"my-timer"', timers.first.user_metadata.summary.data
+      assert_equal '"my-timeout-timer"', timers.last.user_metadata.summary.data
+      assert_equal '"my-activity"', events.find(&:activity_task_scheduled_event_attributes).user_metadata.summary.data
+      child = events.find(&:start_child_workflow_execution_initiated_event_attributes)
+      assert_equal '"my-child"', child.user_metadata.summary.data
+      assert_equal '"my-child-details"', child.user_metadata.details.data
+
+      # Describe the child and confirm metadata
+      child_desc = env.client.workflow_handle(
+        child.start_child_workflow_execution_initiated_event_attributes.workflow_id
+      ).describe
+      assert_equal 'my-child', child_desc.static_summary
+      assert_equal 'my-child-details', child_desc.static_details
+    end
+  end
+
+  class WorkflowMetadataWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :continue, description: 'continue description'
+
+    def execute
+      Temporalio::Workflow.current_details = 'initial current details'
+      Temporalio::Workflow.signal_handlers['some manual signal'] = Temporalio::Workflow::Definition::Signal.new(
+        name: 'some manual signal',
+        to_invoke: proc {},
+        description: 'some manual signal description'
+      )
+      Temporalio::Workflow.wait_condition { @continue }
+      Temporalio::Workflow.current_details = 'final current details'
+    end
+
+    workflow_signal
+    def some_signal; end
+
+    workflow_signal name: 'some signal', description: 'some signal description'
+    def some_other_signal; end
+
+    workflow_query description: 'some query description', dynamic: true
+    def some_query(name, *args); end
+
+    workflow_update description: 'some update description'
+    def some_update
+      @continue = true
+    end
+
+    workflow_update name: 'some update'
+    def some_other_update; end
+  end
+
+  def test_workflow_metadata
+    execute_workflow(WorkflowMetadataWorkflow) do |handle|
+      # Check workflow metadata
+      assert_equal Temporalio::Api::Sdk::V1::WorkflowMetadata.new(
+        definition: Temporalio::Api::Sdk::V1::WorkflowDefinition.new(
+          type: 'WorkflowMetadataWorkflow',
+          query_definitions: [
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'continue', description: 'continue description'
+            ),
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              description: 'some query description'
+            )
+          ],
+          signal_definitions: [
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'some_signal'
+            ),
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'some signal', description: 'some signal description'
+            ),
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'some manual signal', description: 'some manual signal description'
+            )
+          ],
+          update_definitions: [
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'some_update', description: 'some update description'
+            ),
+            Temporalio::Api::Sdk::V1::WorkflowInteractionDefinition.new(
+              name: 'some update'
+            )
+          ]
+        ),
+        current_details: 'initial current details'
+      ), handle.query(:__temporal_workflow_metadata)
+
+      # Complete and check final details
+      handle.execute_update(WorkflowMetadataWorkflow.some_update)
+      handle.result
+      assert_equal 'final current details', handle.query(:__temporal_workflow_metadata).current_details
+    end
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Eager workflow start

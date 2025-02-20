@@ -122,6 +122,22 @@ module Temporalio
         name.start_with?('__temporal_') || name == '__stack_trace' || name == '__enhanced_stack_trace'
       end
 
+      def self.to_user_metadata(summary, details, converter)
+        return nil if (!summary || summary.empty?) && (!details || details.empty?)
+
+        metadata = Temporalio::Api::Sdk::V1::UserMetadata.new
+        metadata.summary = converter.to_payload(summary) if summary && !summary.empty?
+        metadata.details = converter.to_payload(details) if details && !details.empty?
+        metadata
+      end
+
+      def self.from_user_metadata(metadata, converter)
+        [
+          (converter.from_payload(metadata.summary) if metadata&.summary), #: String?
+          (converter.from_payload(metadata.details) if metadata&.details) #: String?
+        ]
+      end
+
       class LazyMemo
         def initialize(raw_memo, converter)
           @raw_memo = raw_memo

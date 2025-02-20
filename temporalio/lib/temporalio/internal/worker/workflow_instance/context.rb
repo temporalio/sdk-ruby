@@ -32,6 +32,16 @@ module Temporalio
             @instance.continue_as_new_suggested
           end
 
+          def current_details
+            @instance.current_details || ''
+          end
+
+          def current_details=(details)
+            raise 'Details must be a String' unless details.nil? || details.is_a?(String)
+
+            @instance.current_details = (details || '')
+          end
+
           def current_history_length
             @instance.current_history_length
           end
@@ -52,6 +62,7 @@ module Temporalio
             activity,
             *args,
             task_queue:,
+            summary:,
             schedule_to_close_timeout:,
             schedule_to_start_timeout:,
             start_to_close_timeout:,
@@ -67,6 +78,7 @@ module Temporalio
                 activity:,
                 args:,
                 task_queue: task_queue || info.task_queue,
+                summary:,
                 schedule_to_close_timeout:,
                 schedule_to_start_timeout:,
                 start_to_close_timeout:,
@@ -191,6 +203,8 @@ module Temporalio
             *args,
             id:,
             task_queue:,
+            static_summary:,
+            static_details:,
             cancellation:,
             cancellation_type:,
             parent_close_policy:,
@@ -209,6 +223,8 @@ module Temporalio
                 args:,
                 id:,
                 task_queue:,
+                static_summary:,
+                static_details:,
                 cancellation:,
                 cancellation_type:,
                 parent_close_policy:,

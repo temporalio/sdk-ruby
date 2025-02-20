@@ -95,6 +95,7 @@ class ProtoGen
         require 'temporalio/api/errordetails/v1/message'
         require 'temporalio/api/export/v1/message'
         require 'temporalio/api/operatorservice'
+        require 'temporalio/api/sdk/v1/workflow_metadata'
         require 'temporalio/api/workflowservice'
 
         module Temporalio

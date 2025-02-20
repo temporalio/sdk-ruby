@@ -38,6 +38,24 @@ module Temporalio
       _current.continue_as_new_suggested
     end
 
+    # Get current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value
+    # can be updated throughout the life of the workflow. This can be in Temporal markdown format and can span multiple
+    # lines. This is currently experimental.
+    #
+    # @return [String] Current details. Default is empty string.
+    def self.current_details
+      _current.current_details
+    end
+
+    # Set current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value
+    # can be updated throughout the life of the workflow. This can be in Temporal markdown format and can span multiple
+    # lines. This is currently experimental.
+    #
+    # @param details [String] Current details. Can use empty string to unset.
+    def self.current_details=(details)
+      _current.current_details = details
+    end
+
     # @return [Integer] Current number of events in history. This value is the current history event count up until the
     #   current task. Note, this value may not be up to date when accessed in a query.
     def self.current_history_length
@@ -77,6 +95,8 @@ module Temporalio
     # @param activity [Class<Activity::Definition>, Symbol, String] Activity definition class or activity name.
     # @param args [Array<Object>] Arguments to the activity.
     # @param task_queue [String] Task queue to run the activity on. Defaults to the current workflow's task queue.
+    # @param summary [String, nil] Single-line summary for this activity that may appear in CLI/UI. This can be in
+    #   single-line Temporal markdown format. This is currently experimental.
     # @param schedule_to_close_timeout [Float, nil] Max amount of time the activity can take from first being scheduled
     #   to being completed before it times out. This is inclusive of all retries.
     # @param schedule_to_start_timeout [Float, nil] Max amount of time the activity can take to be started from first
@@ -107,6 +127,7 @@ module Temporalio
       activity,
       *args,
       task_queue: info.task_queue,
+      summary: nil,
       schedule_to_close_timeout: nil,
       schedule_to_start_timeout: nil,
       start_to_close_timeout: nil,
@@ -119,7 +140,7 @@ module Temporalio
     )
       _current.execute_activity(
         activity, *args,
-        task_queue:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
+        task_queue:, summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:
       )
     end
@@ -130,6 +151,8 @@ module Temporalio
       *args,
       id: random.uuid,
       task_queue: info.task_queue,
+      static_summary: nil,
+      static_details: nil,
       cancellation: Workflow.cancellation,
       cancellation_type: ChildWorkflowCancellationType::WAIT_CANCELLATION_COMPLETED,
       parent_close_policy: ParentClosePolicy::TERMINATE,
@@ -144,8 +167,9 @@ module Temporalio
     )
       start_child_workflow(
         workflow, *args,
-        id:, task_queue:, cancellation:, cancellation_type:, parent_close_policy:, execution_timeout:, run_timeout:,
-        task_timeout:, id_reuse_policy:, retry_policy:, cron_schedule:, memo:, search_attributes:
+        id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
+        parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
+        retry_policy:, cron_schedule:, memo:, search_attributes:
       ).result
     end
 
@@ -304,7 +328,7 @@ module Temporalio
     #   value cannot be negative. Since Temporal timers are server-side, timer resolution may not end up as precise as
     #   system timers.
     # @param summary [String, nil] A simple string identifying this timer that may be visible in UI/CLI. While it can be
-    #   normal text, it is best to treat as a timer ID.
+    #   normal text, it is best to treat as a timer ID. This is currently experimental.
     # @param cancellation [Cancellation] Cancellation for this timer.
     # @raise [Error::CanceledError] Sleep canceled.
     def self.sleep(duration, summary: nil, cancellation: Workflow.cancellation)
@@ -317,6 +341,12 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the workflow.
     # @param id [String] Unique identifier for the workflow execution. Defaults to a new UUID from {random}.
     # @param task_queue [String] Task queue to run the workflow on. Defaults to the current workflow's task queue.
+    # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
+    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
+    #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
+    #   experimental.
     # @param cancellation [Cancellation] Cancellation to apply to the child workflow. How cancellation is treated is
     #   based on `cancellation_type`. This defaults to the workflow's cancellation.
     # @param cancellation_type [ChildWorkflowCancellationType] How the child workflow will react to cancellation.
@@ -339,6 +369,8 @@ module Temporalio
       *args,
       id: random.uuid,
       task_queue: info.task_queue,
+      static_summary: nil,
+      static_details: nil,
       cancellation: Workflow.cancellation,
       cancellation_type: ChildWorkflowCancellationType::WAIT_CANCELLATION_COMPLETED,
       parent_close_policy: ParentClosePolicy::TERMINATE,
@@ -353,8 +385,9 @@ module Temporalio
     )
       _current.start_child_workflow(
         workflow, *args,
-        id:, task_queue:, cancellation:, cancellation_type:, parent_close_policy:, execution_timeout:, run_timeout:,
-        task_timeout:, id_reuse_policy:, retry_policy:, cron_schedule:, memo:, search_attributes:
+        id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
+        parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
+        retry_policy:, cron_schedule:, memo:, search_attributes:
       )
     end
 
@@ -367,8 +400,8 @@ module Temporalio
     #   exception.
     # @param message [String] Message to use for timeout exception. Defaults to "execution expired" like
     #   {::Timeout.timeout}.
-    # @param summary [String] Timer summer for the timer created by this timeout. This is backed by {sleep} so see that
-    #   method for details.
+    # @param summary [String] Timer summary for the timer created by this timeout. This is backed by {sleep} so see that
+    #   method for details. This is currently experimental.
     #
     # @yield Block to run with a timeout.
     # @return [Object] The result of the block.

@@ -764,6 +764,60 @@ class WorkerWorkflowHandlerTest < Test
     end
   end
 
+  def test_update_with_start_start_fail
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      id = "wf-#{SecureRandom.uuid}"
+      # Start the workflow
+      env.client.start_workflow(UpdateWithStartWorkflow, 123, id:, task_queue: worker.task_queue)
+      # Try to update-with-start on already existing, confirm call and getting handle fail
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+        env.client.start_update_with_start_workflow(
+          UpdateWithStartWorkflow.increment_counter, 456,
+          wait_for_stage: Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED, start_workflow_operation:
+        )
+      end
+      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+        start_workflow_operation.workflow_handle
+      end
+    end
+  end
+
+  def test_update_with_start_user_metadata
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue,
+        static_summary: 'my-summary', static_details: 'my-details',
+        id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      # Run and confirm metadata present
+      env.client.start_update_with_start_workflow(
+        UpdateWithStartWorkflow.increment_counter, 456,
+        wait_for_stage: Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED, start_workflow_operation:
+      )
+      desc = start_workflow_operation.workflow_handle.describe
+      assert_equal 'my-summary', desc.static_summary
+      assert_equal 'my-details', desc.static_details
+    end
+  end
+
   class SignalWithStartWorkflow < Temporalio::Workflow::Definition
     workflow_query_attr_reader :events
 
@@ -816,6 +870,30 @@ class WorkerWorkflowHandlerTest < Test
       end
       # Confirm events
       assert_equal %w[signal workflow-start signal-0 signal-1 signal-2], handle.query(SignalWithStartWorkflow.events)
+    end
+  end
+
+  def test_signal_with_start_user_metadata
+    # Run worker
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [SignalWithStartWorkflow]
+    )
+    worker.run do
+      # Newly started
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        SignalWithStartWorkflow, 'workflow-start',
+        id:, task_queue: worker.task_queue,
+        static_summary: 'my-summary', static_details: 'my-details'
+      )
+      handle = env.client.signal_with_start_workflow(
+        SignalWithStartWorkflow.add_event, 'signal', start_workflow_operation:
+      )
+      desc = handle.describe
+      assert_equal 'my-summary', desc.static_summary
+      assert_equal 'my-details', desc.static_details
     end
   end
 end

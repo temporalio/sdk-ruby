@@ -6,6 +6,9 @@ module Temporalio
 
     def self.continue_as_new_suggested: -> bool
 
+    def self.current_details: -> String
+    def self.current_details=: (String? details) -> void
+
     def self.current_history_length: -> Integer
 
     def self.current_history_size: -> Integer
@@ -16,6 +19,7 @@ module Temporalio
       singleton(Activity::Definition) | Symbol | String activity,
       *Object? args,
       ?task_queue: String,
+      ?summary: String?,
       ?schedule_to_close_timeout: duration?,
       ?schedule_to_start_timeout: duration?,
       ?start_to_close_timeout: duration?,
@@ -32,6 +36,8 @@ module Temporalio
       *Object? args,
       ?id: String,
       ?task_queue: String,
+      ?static_summary: String?,
+      ?static_details: String?,
       ?cancellation: Cancellation,
       ?cancellation_type: ChildWorkflowCancellationType::enum,
       ?parent_close_policy: ParentClosePolicy::enum,
@@ -93,6 +99,8 @@ module Temporalio
       *Object? args,
       ?id: String,
       ?task_queue: String,
+      ?static_summary: String?,
+      ?static_details: String?,
       ?cancellation: Cancellation,
       ?cancellation_type: Workflow::ChildWorkflowCancellationType::enum,
       ?parent_close_policy: Workflow::ParentClosePolicy::enum,

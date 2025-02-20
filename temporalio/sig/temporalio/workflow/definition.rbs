@@ -5,12 +5,13 @@ module Temporalio
       def self.workflow_dynamic: (?bool value) -> void
       def self.workflow_raw_args: (?bool value) -> void
       def self.workflow_failure_exception_type: (*singleton(Exception) types) -> void
-      def self.workflow_query_attr_reader: (*Symbol attr_names) -> void
+      def self.workflow_query_attr_reader: (*Symbol attr_names, ?description: String?) -> void
 
       def self.workflow_init: (?bool value) -> void
 
       def self.workflow_signal: (
         ?name: String | Symbol | nil,
+        ?description: String?,
         ?dynamic: bool,
         ?raw_args: bool,
         ?unfinished_policy: HandlerUnfinishedPolicy::enum
@@ -18,12 +19,14 @@ module Temporalio
 
       def self.workflow_query: (
         ?name: String | Symbol | nil,
+        ?description: String?,
         ?dynamic: bool,
         ?raw_args: bool
       ) -> void
 
       def self.workflow_update: (
         ?name: String | Symbol | nil,
+        ?description: String?,
         ?dynamic: bool,
         ?raw_args: bool,
         ?unfinished_policy: HandlerUnfinishedPolicy::enum
@@ -75,6 +78,7 @@ module Temporalio
       class Signal
         attr_reader name: String?
         attr_reader to_invoke: Symbol | Proc
+        attr_reader description: String?
         attr_reader raw_args: bool
         attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
 
@@ -83,6 +87,7 @@ module Temporalio
         def initialize: (
           name: String?,
           to_invoke: Symbol | Proc,
+          ?description: String?,
           ?raw_args: bool,
           ?unfinished_policy: HandlerUnfinishedPolicy::enum
         ) -> void
@@ -91,6 +96,7 @@ module Temporalio
       class Query
         attr_reader name: String?
         attr_reader to_invoke: Symbol | Proc
+        attr_reader description: String?
         attr_reader raw_args: bool
 
         def self._name_from_parameter: (Workflow::Definition::Query | String | Symbol) -> String
@@ -98,6 +104,7 @@ module Temporalio
         def initialize: (
           name: String?,
           to_invoke: Symbol | Proc,
+          ?description: String?,
           ?raw_args: bool
         ) -> void
       end
@@ -105,6 +112,7 @@ module Temporalio
       class Update
         attr_reader name: String?
         attr_reader to_invoke: Symbol | Proc
+        attr_reader description: String?
         attr_reader raw_args: bool
         attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
         attr_reader validator_to_invoke: Symbol | Proc | nil
@@ -114,6 +122,7 @@ module Temporalio
         def initialize: (
           name: String?,
           to_invoke: Symbol | Proc,
+          ?description: String?,
           ?raw_args: bool,
           ?unfinished_policy: HandlerUnfinishedPolicy::enum,
           ?validator_to_invoke: Symbol | Proc | nil

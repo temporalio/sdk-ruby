@@ -34,6 +34,8 @@ module Temporalio
         attr_reader update_handlers: Hash[String?, Workflow::Definition::Update]
         attr_reader context_frozen: bool
 
+        attr_accessor current_details: String?
+
         def initialize: (Details details) -> void
 
         def activate: (untyped activation) -> untyped
@@ -89,6 +91,8 @@ module Temporalio
           raw_args: bool,
           ?ignore_first_param: bool
         ) -> Array[Object?]
+
+        def workflow_metadata: -> untyped
 
         def scoped_logger_info: -> Hash[Symbol, Object?]
 
