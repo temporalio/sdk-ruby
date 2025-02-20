@@ -37,7 +37,7 @@ module Temporalio
           end
 
           def current_details=(details)
-            raise 'Details must be String' unless details.nil? || details.is_a?(String)
+            raise 'Details must be a String' unless details.nil? || details.is_a?(String)
 
             @instance.current_details = (details || '')
           end
