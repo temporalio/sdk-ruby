@@ -807,7 +807,7 @@ class WorkerWorkflowHandlerTest < Test
         static_summary: 'my-summary', static_details: 'my-details',
         id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
       )
-      # Run and confirm result of update is pre-workflow-execute
+      # Run and confirm metadata present
       env.client.start_update_with_start_workflow(
         UpdateWithStartWorkflow.increment_counter, 456,
         wait_for_stage: Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED, start_workflow_operation:
