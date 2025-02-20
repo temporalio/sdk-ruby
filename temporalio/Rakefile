@@ -94,7 +94,7 @@ Rake::Task[:build].enhance([:copy_parent_files]) do
 end
 
 task :rust_lint do
-  sh 'cargo', 'clippy', '--', '-Dwarnings'
+  sh 'cargo', 'clippy', '-p', 'temporalio_bridge', '--no-deps', '--', '-Dwarnings'
   sh 'cargo', 'fmt', '--check'
 end
 
