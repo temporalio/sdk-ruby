@@ -67,13 +67,15 @@ module Temporalio
       attr_reader metric_periodicity: Float?
       attr_reader metric_temporality: MetricTemporality
       attr_reader durations_as_seconds: bool
+      attr_reader http: bool
 
       def initialize: (
         url: String,
         ?headers: Hash[String, String]?,
         ?metric_periodicity: Float?,
         ?metric_temporality: MetricTemporality,
-        ?durations_as_seconds: bool
+        ?durations_as_seconds: bool,
+        ?http: bool
       ) -> void
 
       def _to_bridge: -> Internal::Bridge::Runtime::OpenTelemetryMetricsOptions
