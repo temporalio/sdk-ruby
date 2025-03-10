@@ -28,7 +28,8 @@ module WorkflowUtils
     id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::UNSPECIFIED,
     max_heartbeat_throttle_interval: 60.0,
     task_timeout: nil,
-    interceptors: []
+    interceptors: [],
+    on_worker_run: nil
   )
     worker = Temporalio::Worker.new(
       client:,
@@ -43,6 +44,7 @@ module WorkflowUtils
       interceptors:
     )
     worker.run do
+      on_worker_run&.call
       handle = client.start_workflow(
         workflow,
         *args,

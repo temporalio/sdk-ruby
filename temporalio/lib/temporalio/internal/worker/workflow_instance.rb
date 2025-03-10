@@ -116,6 +116,7 @@ module Temporalio
               continued_run_id: ProtoUtils.string_or(@init_job.continued_from_execution_run_id),
               cron_schedule: ProtoUtils.string_or(@init_job.cron_schedule),
               execution_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_execution_timeout),
+              headers: ProtoUtils.headers_from_proto_map(@init_job.headers, @payload_converter) || {},
               last_failure: if @init_job.continued_failure
                               @failure_converter.from_failure(@init_job.continued_failure, @payload_converter)
                             end,
@@ -536,7 +537,7 @@ module Temporalio
           result = @inbound.execute(
             Temporalio::Worker::Interceptor::Workflow::ExecuteInput.new(
               args: @workflow_arguments,
-              headers: ProtoUtils.headers_from_proto_map(@init_job.headers, @payload_converter) || {}
+              headers: @info.headers
             )
           )
           add_command(

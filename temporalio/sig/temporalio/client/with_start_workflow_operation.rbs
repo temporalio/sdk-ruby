@@ -2,7 +2,7 @@ module Temporalio
   class Client
     class WithStartWorkflowOperation
       class Options
-        attr_reader workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
+        attr_reader workflow: String
         attr_reader args: Array[Object?]
         attr_reader id: String
         attr_reader task_queue: String
@@ -21,7 +21,7 @@ module Temporalio
         attr_reader headers: Hash[String, Object?]
 
         def initialize: (
-          workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String,
+          workflow: String,
           args: Array[Object?],
           id: String,
           task_queue: String,

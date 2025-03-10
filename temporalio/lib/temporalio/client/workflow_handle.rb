@@ -222,7 +222,7 @@ module Temporalio
         @client._impl.signal_workflow(Interceptor::SignalWorkflowInput.new(
                                         workflow_id: id,
                                         run_id:,
-                                        signal:,
+                                        signal: Workflow::Definition::Signal._name_from_parameter(signal),
                                         args:,
                                         headers: {},
                                         rpc_options:
@@ -254,7 +254,7 @@ module Temporalio
         @client._impl.query_workflow(Interceptor::QueryWorkflowInput.new(
                                        workflow_id: id,
                                        run_id:,
-                                       query:,
+                                       query: Workflow::Definition::Query._name_from_parameter(query),
                                        args:,
                                        reject_condition:,
                                        headers: {},
@@ -291,7 +291,7 @@ module Temporalio
                                               workflow_id: self.id,
                                               run_id:,
                                               update_id: id,
-                                              update:,
+                                              update: Workflow::Definition::Update._name_from_parameter(update),
                                               args:,
                                               wait_for_stage:,
                                               headers: {},
