@@ -48,13 +48,15 @@ module Temporalio
           attr_accessor metric_periodicity: Float?
           attr_accessor metric_temporality_delta: bool
           attr_accessor durations_as_seconds: bool
+          attr_accessor http: bool
     
           def initialize: (
             url: String,
             headers: Hash[String, String]?,
             metric_periodicity: Float?,
             metric_temporality_delta: bool,
-            durations_as_seconds: bool
+            durations_as_seconds: bool,
+            http: bool
           ) -> void
         end
     

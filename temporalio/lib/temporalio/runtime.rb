@@ -164,7 +164,8 @@ module Temporalio
       :headers,
       :metric_periodicity,
       :metric_temporality,
-      :durations_as_seconds
+      :durations_as_seconds,
+      :http
     )
 
     # Options for exporting metrics to OpenTelemetry.
@@ -181,6 +182,8 @@ module Temporalio
     # @!attribute durations_as_seconds
     #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations, default is
     #     +false+.
+    # @!attribute http
+    #   @return [Boolean] True if the protocol is HTTP, false if gRPC (the default).
     class OpenTelemetryMetricsOptions
       # OpenTelemetry metric temporality.
       module MetricTemporality
@@ -196,12 +199,14 @@ module Temporalio
       # @param metric_temporality [MetricTemporality] How frequently metrics should be exported.
       # @param durations_as_seconds [Boolean] Whether to use float seconds instead of integer milliseconds for
       #   durations.
+      # @param http [Boolean] True if the protocol is HTTP, false if gRPC (the default).
       def initialize(
         url:,
         headers: nil,
         metric_periodicity: nil,
         metric_temporality: MetricTemporality::CUMULATIVE,
-        durations_as_seconds: false
+        durations_as_seconds: false,
+        http: false
       )
         super
       end
@@ -218,7 +223,8 @@ module Temporalio
                                     when MetricTemporality::DELTA then true
                                     else raise 'Unrecognized metric temporality'
                                     end,
-          durations_as_seconds:
+          durations_as_seconds:,
+          http:
         )
       end
     end
