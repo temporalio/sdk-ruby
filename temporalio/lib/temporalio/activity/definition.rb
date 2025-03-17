@@ -90,7 +90,7 @@ module Temporalio
         {
           activity_name:,
           activity_executor: @activity_executor || :default,
-          activity_cancel_raise: @activity_cancel_raise.nil? ? true : @activity_cancel_raise,
+          activity_cancel_raise: @activity_cancel_raise.nil? || @activity_cancel_raise,
           activity_raw_args: @activity_raw_args.nil? ? false : @activity_raw_args
         }
       end

@@ -8,7 +8,7 @@ module Temporalio
     # workflows.
     class Future
       # Return a future that completes when any of the given futures complete. The returned future will return the first
-      # completed futures value or raise the first completed futures exception. To not raise the exception, see
+      # completed future's value or raise the first completed future's exception. To not raise the exception, see
       # {try_any_of}.
       #
       # @param futures [Array<Future<Object>>] Futures to wait for the first to complete.
@@ -16,7 +16,7 @@ module Temporalio
       def self.any_of(*futures)
         Future.new do
           Workflow.wait_condition(cancellation: nil) { futures.any?(&:done?) }
-          # We know a future is always returned from find, the & just helps type checker
+          # We know a future is always returned from find, the || just helps type checker
           (futures.find(&:done?) || raise).wait
         end
       end
