@@ -47,13 +47,10 @@ module Temporalio
         end
 
         def start_workflow(input)
-          # TODO(cretz): Signal/update with start
           req = Api::WorkflowService::V1::StartWorkflowExecutionRequest.new(
             request_id: SecureRandom.uuid,
             namespace: @client.namespace,
-            workflow_type: Api::Common::V1::WorkflowType.new(
-              name: Workflow::Definition._workflow_type_from_workflow_parameter(input.workflow)
-            ),
+            workflow_type: Api::Common::V1::WorkflowType.new(name: input.workflow),
             workflow_id: input.workflow_id,
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
             input: @client.data_converter.to_payloads(input.args),
@@ -139,7 +136,7 @@ module Temporalio
                       identity: @client.connection.identity
                     ),
                     input: Api::Update::V1::Input.new(
-                      name: Workflow::Definition::Update._name_from_parameter(input.update),
+                      name: input.update,
                       args: @client.data_converter.to_payloads(input.args),
                       header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
                     )
@@ -261,7 +258,7 @@ module Temporalio
           req = _start_workflow_request_from_with_start_options(
             Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest, start_options
           )
-          req.signal_name = Workflow::Definition::Signal._name_from_parameter(input.signal)
+          req.signal_name = input.signal
           req.signal_input = @client.data_converter.to_payloads(input.args)
 
           # Send request
@@ -305,9 +302,7 @@ module Temporalio
           klass.new(
             request_id: SecureRandom.uuid,
             namespace: @client.namespace,
-            workflow_type: Api::Common::V1::WorkflowType.new(
-              name: Workflow::Definition._workflow_type_from_workflow_parameter(start_options.workflow)
-            ),
+            workflow_type: Api::Common::V1::WorkflowType.new(name: start_options.workflow),
             workflow_id: start_options.id,
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: start_options.task_queue.to_s),
             input: @client.data_converter.to_payloads(start_options.args),
@@ -416,7 +411,7 @@ module Temporalio
                 workflow_id: input.workflow_id,
                 run_id: input.run_id || ''
               ),
-              signal_name: Workflow::Definition::Signal._name_from_parameter(input.signal),
+              signal_name: input.signal,
               input: @client.data_converter.to_payloads(input.args),
               header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
               identity: @client.connection.identity,
@@ -437,7 +432,7 @@ module Temporalio
                   run_id: input.run_id || ''
                 ),
                 query: Api::Query::V1::WorkflowQuery.new(
-                  query_type: Workflow::Definition::Query._name_from_parameter(input.query),
+                  query_type: input.query,
                   query_args: @client.data_converter.to_payloads(input.args),
                   header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
                 ),
@@ -480,7 +475,7 @@ module Temporalio
                 identity: @client.connection.identity
               ),
               input: Api::Update::V1::Input.new(
-                name: Workflow::Definition::Update._name_from_parameter(input.update),
+                name: input.update,
                 args: @client.data_converter.to_payloads(input.args),
                 header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
               )

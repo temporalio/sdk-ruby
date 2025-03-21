@@ -12,6 +12,10 @@ group :development do
   gem 'grpc', '~> 1.69'
   gem 'grpc-tools', '~> 1.69'
   gem 'minitest'
+  # We are intentionally not pinning OTel versions here so that CI tests the latest. This also means that the OTel
+  # contrib library also does not require specific versions, we are relying on the compatibility rigor of OTel.
+  gem 'opentelemetry-api'
+  gem 'opentelemetry-sdk'
   gem 'rake'
   gem 'rake-compiler'
   gem 'rbs', '~> 3.5.3'

@@ -1,0 +1,39 @@
+module Contrib
+  class OpenTelemetryTest < Test
+    def init_tracer_and_exporter: -> [untyped, untyped]
+    def trace: (
+      ?tracer_and_exporter: [untyped, untyped]
+    ) { (Temporalio::Client) -> void } -> untyped
+    def trace_workflow: (
+      Symbol scenario,
+      ?tracer_and_exporter: [untyped, untyped]
+    ) { (Temporalio::Client::WorkflowHandle) -> void } -> untyped
+
+    class ExpectedSpan
+      def self.from_span_data: (untyped all_spans) -> Array[ExpectedSpan]
+
+      attr_reader name: String
+      attr_reader children: Array[ExpectedSpan]
+      attr_reader attributes: Hash[untyped, untyped]
+      attr_reader links: Array[ExpectedSpan]
+      attr_reader exception_message: String?
+
+      def initialize: (
+        name: String,
+        ?children: Array[ExpectedSpan],
+        ?attributes: Hash[untyped, untyped],
+        ?links: Array[ExpectedSpan],
+        ?exception_message: String?
+      ) -> void
+
+      def add_child: (
+        name: String,
+        ?attributes: Hash[untyped, untyped],
+        ?links: Array[ExpectedSpan],
+        ?exception_message: String?
+      ) -> ExpectedSpan
+
+      def to_s_indented: (?indent: String) -> String
+    end
+  end
+end

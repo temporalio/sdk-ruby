@@ -4,7 +4,7 @@ module Temporalio
       def intercept_client: (Outbound next_interceptor) -> Outbound
 
       class StartWorkflowInput
-        attr_reader workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String
+        attr_reader workflow: String
         attr_reader args: Array[Object?]
         attr_reader workflow_id: String
         attr_reader task_queue: String
@@ -25,7 +25,7 @@ module Temporalio
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
-          workflow: singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String,
+          workflow: String,
           args: Array[Object?],
           workflow_id: String,
           task_queue: String,
@@ -49,7 +49,7 @@ module Temporalio
 
       class StartUpdateWithStartWorkflowInput
         attr_reader update_id: String
-        attr_reader update: Workflow::Definition::Update | Symbol | String
+        attr_reader update: String
         attr_reader args: Array[Object?]
         attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
         attr_reader start_workflow_operation: WithStartWorkflowOperation
@@ -58,7 +58,7 @@ module Temporalio
 
         def initialize: (
           update_id: String,
-          update: Workflow::Definition::Update | Symbol | String,
+          update: String,
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
           start_workflow_operation: WithStartWorkflowOperation,
@@ -68,13 +68,13 @@ module Temporalio
       end
 
       class SignalWithStartWorkflowInput
-        attr_reader signal: Workflow::Definition::Signal | Symbol | String
+        attr_reader signal: String
         attr_reader args: Array[Object?]
         attr_reader start_workflow_operation: WithStartWorkflowOperation
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
-          signal: Workflow::Definition::Signal | Symbol | String,
+          signal: String,
           args: Array[Object?],
           start_workflow_operation: WithStartWorkflowOperation,
           rpc_options: RPCOptions?
@@ -134,7 +134,7 @@ module Temporalio
       class SignalWorkflowInput
         attr_reader workflow_id: String
         attr_reader run_id: String?
-        attr_reader signal: Workflow::Definition::Signal | Symbol | String
+        attr_reader signal: String
         attr_reader args: Array[Object?]
         attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
@@ -142,7 +142,7 @@ module Temporalio
         def initialize: (
           workflow_id: String,
           run_id: String?,
-          signal: Workflow::Definition::Signal | Symbol | String,
+          signal: String,
           args: Array[Object?],
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
@@ -152,7 +152,7 @@ module Temporalio
       class QueryWorkflowInput
         attr_reader workflow_id: String
         attr_reader run_id: String?
-        attr_reader query: Workflow::Definition::Query | Symbol | String
+        attr_reader query: String
         attr_reader args: Array[Object?]
         attr_reader reject_condition: WorkflowQueryRejectCondition::enum?
         attr_reader headers: Hash[String, Object?]
@@ -161,7 +161,7 @@ module Temporalio
         def initialize: (
           workflow_id: String,
           run_id: String?,
-          query: Workflow::Definition::Query | Symbol | String,
+          query: String,
           args: Array[Object?],
           reject_condition: WorkflowQueryRejectCondition::enum?,
           headers: Hash[String, Object?],
@@ -173,7 +173,7 @@ module Temporalio
         attr_reader workflow_id: String
         attr_reader run_id: String?
         attr_reader update_id: String
-        attr_reader update: Workflow::Definition::Update | Symbol | String
+        attr_reader update: String
         attr_reader args: Array[Object?]
         attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
         attr_reader headers: Hash[String, Object?]
@@ -183,7 +183,7 @@ module Temporalio
           workflow_id: String,
           run_id: String?,
           update_id: String,
-          update: Workflow::Definition::Update | Symbol | String,
+          update: String,
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
           headers: Hash[String, Object?],

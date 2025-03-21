@@ -56,16 +56,6 @@ module Temporalio
               raise ArgumentError, 'Activity must have schedule_to_close_timeout or start_to_close_timeout'
             end
 
-            activity_type = case input.activity
-                            when Class
-                              Activity::Definition::Info.from_activity(input.activity).name
-                            when Symbol, String
-                              input.activity.to_s
-                            else
-                              raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
-                            end
-            raise 'Cannot invoke dynamic activities' unless activity_type
-
             execute_activity_with_local_backoffs(local: false, cancellation: input.cancellation) do
               seq = (@activity_counter += 1)
               @instance.add_command(
@@ -73,7 +63,7 @@ module Temporalio
                   schedule_activity: Bridge::Api::WorkflowCommands::ScheduleActivity.new(
                     seq:,
                     activity_id: input.activity_id || seq.to_s,
-                    activity_type:,
+                    activity_type: input.activity,
                     task_queue: input.task_queue,
                     headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
                     arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
@@ -97,16 +87,6 @@ module Temporalio
               raise ArgumentError, 'Activity must have schedule_to_close_timeout or start_to_close_timeout'
             end
 
-            activity_type = case input.activity
-                            when Class
-                              Activity::Definition::Info.from_activity(input.activity).name
-                            when Symbol, String
-                              input.activity.to_s
-                            else
-                              raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
-                            end
-            raise 'Cannot invoke dynamic activities' unless activity_type
-
             execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation) do |do_backoff|
               seq = (@activity_counter += 1)
               @instance.add_command(
@@ -114,7 +94,7 @@ module Temporalio
                   schedule_local_activity: Bridge::Api::WorkflowCommands::ScheduleLocalActivity.new(
                     seq:,
                     activity_id: input.activity_id || seq.to_s,
-                    activity_type:,
+                    activity_type: input.activity,
                     headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
                     arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
                     schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
@@ -233,7 +213,7 @@ module Temporalio
             seq = (@external_signal_counter += 1)
             cmd = Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution.new(
               seq:,
-              signal_name: Workflow::Definition::Signal._name_from_parameter(signal),
+              signal_name: signal,
               args: ProtoUtils.convert_to_payload_array(@instance.payload_converter, args),
               headers: ProtoUtils.headers_to_proto_hash(headers, @instance.payload_converter)
             )
@@ -342,7 +322,7 @@ module Temporalio
                   seq:,
                   namespace: @instance.info.namespace,
                   workflow_id: input.id,
-                  workflow_type: Workflow::Definition._workflow_type_from_workflow_parameter(input.workflow),
+                  workflow_type: input.workflow,
                   task_queue: input.task_queue,
                   input: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
                   workflow_execution_timeout: ProtoUtils.seconds_to_duration(input.execution_timeout),

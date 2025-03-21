@@ -73,6 +73,16 @@ module Temporalio
             activity_id:,
             disable_eager_execution:
           )
+            activity = case activity
+                       when Class
+                         Activity::Definition::Info.from_activity(activity).name&.to_s
+                       when Symbol, String
+                         activity.to_s
+                       else
+                         raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
+                       end
+            raise 'Cannot invoke dynamic activities' unless activity
+
             @outbound.execute_activity(
               Temporalio::Worker::Interceptor::Workflow::ExecuteActivityInput.new(
                 activity:,
@@ -105,6 +115,16 @@ module Temporalio
             cancellation_type:,
             activity_id:
           )
+            activity = case activity
+                       when Class
+                         Activity::Definition::Info.from_activity(activity).name&.to_s
+                       when Symbol, String
+                         activity.to_s
+                       else
+                         raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
+                       end
+            raise 'Cannot invoke dynamic activities' unless activity
+
             @outbound.execute_local_activity(
               Temporalio::Worker::Interceptor::Workflow::ExecuteLocalActivityInput.new(
                 activity:,
@@ -219,7 +239,7 @@ module Temporalio
           )
             @outbound.start_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput.new(
-                workflow:,
+                workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
                 args:,
                 id:,
                 task_queue:,
@@ -239,6 +259,10 @@ module Temporalio
                 headers: {}
               )
             )
+          end
+
+          def storage
+            @storage ||= {}
           end
 
           def timeout(duration, exception_class, *exception_args, summary:, &)
@@ -322,7 +346,7 @@ module Temporalio
             @outbound.signal_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::SignalChildWorkflowInput.new(
                 id:,
-                signal:,
+                signal: Workflow::Definition::Signal._name_from_parameter(signal),
                 args:,
                 cancellation:,
                 headers: {}
@@ -335,7 +359,7 @@ module Temporalio
               Temporalio::Worker::Interceptor::Workflow::SignalExternalWorkflowInput.new(
                 id:,
                 run_id:,
-                signal:,
+                signal: Workflow::Definition::Signal._name_from_parameter(signal),
                 args:,
                 cancellation:,
                 headers: {}

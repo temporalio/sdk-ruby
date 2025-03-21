@@ -67,6 +67,10 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
     - [Activity Testing](#activity-testing)
+  - [Telemetry](#telemetry)
+    - [Metrics](#metrics)
+    - [OpenTelemetry Tracing](#opentelemetry-tracing)
+      - [OpenTelemetry Tracing in Workflows](#opentelemetry-tracing-in-workflows)
   - [Ractors](#ractors)
   - [Platform Support](#platform-support)
 - [Development](#development)
@@ -1033,6 +1037,122 @@ it will raise the error raised in the activity.
 
 The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
 activity.
+
+### Telemetry
+
+#### Metrics
+
+Metrics can be configured on a `Temporalio::Runtime`. Only one runtime is expected to be created for the entire
+application and it should be created before any clients are created. For example, this configures Prometheus to export
+metrics at `http://127.0.0.1:9000/metrics`:
+
+```ruby
+require 'temporalio/runtime'
+
+Temporalio::Runtime.default = Temporalio::Runtime.new(
+  telemetry: Temporalio::Runtime::TelemetryOptions.new(
+    metrics: Temporalio::Runtime::MetricsOptions.new(
+      prometheus: Temporalio::Runtime::PrometheusMetricsOptions.new(
+        bind_address: '127.0.0.1:9000'
+      )
+    )
+  )
+)
+```
+
+Now every client created will use this runtime. Setting the default will fail if a runtime has already been requested or
+a default already set. Technically a runtime can be created without setting the default and be set on each client via
+the `runtime` parameter, but this is discouraged because a runtime represents a heavy internal engine not meant to be
+created multiple times.
+
+OpenTelemetry metrics can be configured instead by passing `Temporalio::Runtime::OpenTelemetryMetricsOptions` as the
+`opentelemetry` parameter to the metrics options. See API documentation for details.
+
+#### OpenTelemetry Tracing
+
+OpenTelemetry tracing for clients, activities, and workflows can be enabled using the
+`Temporalio::Contrib::OpenTelemetry::TracingInterceptor`. Specifically, when creating a client, set the interceptor like
+so:
+
+```ruby
+require 'opentelemetry/api'
+require 'opentelemetry/sdk'
+require 'temporalio/client'
+require 'temporalio/contrib/open_telemetry'
+
+# ... assumes my_otel_tracer_provider is a tracer provider created by the user
+my_tracer = my_otel_tracer_provider.tracer('my-otel-tracer')
+
+my_client = Temporalio::Client.connect(
+  'localhost:7233', 'my-namespace',
+  interceptors: [Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(my_tracer)]
+)
+```
+
+Now many high-level client calls and activities/workflows on workers using this client will have spans created on that
+OpenTelemetry tracer.
+
+##### OpenTelemetry Tracing in Workflows
+
+OpenTelemetry works by creating spans as necessary and in some cases serializing them to Temporal headers to be
+deserialized by workflows/activities to be set on the context. However, OpenTelemetry requires spans to be finished
+where they start, so spans cannot be resumed. This is fine for client calls and activity attempts, but Temporal
+workflows are resumable functions that may start on a different machine than they complete. Due to this, spans created
+by workflows are immediately closed since there is no way for the span to actually span machines. They are also not
+created during replay. The spans still become the proper parents of other spans if they are created.
+
+Custom spans can be created inside of workflows using class methods on the
+`Temporalio::Contrib::OpenTelemetry::Workflow` module. For example:
+
+```ruby
+class MyWorkflow < Temporalio::Workflow::Definition
+  def execute
+    # Sleep for a bit
+    Temporalio::Workflow.sleep(10)
+    # Run activity in span
+    Temporalio::Contrib::OpenTelemetry::Workflow.with_completed_span(
+      'my-span',
+      attributes: { 'my-attr' => 'some val' }
+    ) do
+      # Execute an activity
+      Temporalio::Workflow.execute_activity(MyActivity, start_to_close_timeout: 10)
+    end
+  end
+end
+```
+
+If this all executes on one worker (because Temporal has a concept of stickiness that caches instances), the span tree
+may look like:
+
+```
+StartWorkflow:MyWorkflow          <-- created by client outbound
+  RunWorkflow:MyWorkflow          <-- created inside workflow on first task
+    my-span                       <-- created inside workflow by code
+      StartActivity:MyActivity    <-- created inside workflow when first called
+        RunActivity:MyActivity    <-- created inside activity attempt 1
+    CompleteWorkflow:MyWorkflow   <-- created inside workflow on last task
+```
+
+However if, say, the worker crashed during the 10s sleep and the workflow was resumed (i.e. replayed) on another worker,
+the span tree may look like:
+
+```
+StartWorkflow:MyWorkflow          <-- created by client outbound
+  RunWorkflow:MyWorkflow          <-- created by workflow inbound on first task
+  my-span                         <-- created inside the workflow
+    StartActivity:MyActivity      <-- created by workflow outbound
+      RunActivity:MyActivity      <-- created by activity attempt 1 inbound
+  CompleteWorkflow:MyWorkflow     <-- created by workflow inbound on last task
+```
+
+Notice how the spans are no longer under `RunWorkflow`. This is because spans inside the workflow are not created on
+replay, so there is no parent on replay. But there are no orphans because we still have the overarching parent of
+`StartWorkflow` that was created by the client and is serialized into Temporal headers so it can always be the parent.
+
+And reminder that `StartWorkflow` and `RunActivity` spans do last the length of their calls (so time to start the
+workflow and time to run the activity attempt respectively), but the other spans have no measurable time because they
+are created in workflows and closed immediately since long-lived spans cannot work for durable software that may resume
+on other machines.
 
 ### Ractors
 

@@ -58,7 +58,7 @@ module Temporalio
         headers: {}
       )
         @options = Options.new(
-          workflow:,
+          workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
           args:,
           id:,
           task_queue:,

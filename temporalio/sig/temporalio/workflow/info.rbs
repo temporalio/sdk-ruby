@@ -5,6 +5,7 @@ module Temporalio
       attr_reader continued_run_id: String?
       attr_reader cron_schedule: String?
       attr_reader execution_timeout: Float?
+      attr_reader headers: Hash[String, untyped]
       attr_reader last_failure: Exception?
       attr_reader last_result: Object?
       attr_reader namespace: String
@@ -23,6 +24,7 @@ module Temporalio
         continued_run_id: String?,
         cron_schedule: String?,
         execution_timeout: Float?,
+        headers: Hash[String, untyped],
         last_failure: Exception?,
         last_result: Object?,
         namespace: String,

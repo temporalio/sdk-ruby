@@ -391,6 +391,12 @@ module Temporalio
       )
     end
 
+    # @return [Hash<Object, Object>] General in-workflow storage. Most users will store state on the workflow class
+    #   instance instead, this is only for utilities without access to the class instance.
+    def self.storage
+      _current.storage
+    end
+
     # Run the block until the timeout is reached. This is backed by {sleep}. This does not accept cancellation because
     # it is expected the block within will properly handle/bubble cancellation.
     #

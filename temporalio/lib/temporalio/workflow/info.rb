@@ -7,6 +7,7 @@ module Temporalio
       :continued_run_id,
       :cron_schedule,
       :execution_timeout,
+      :headers,
       :last_failure,
       :last_result,
       :namespace,
@@ -32,6 +33,8 @@ module Temporalio
     #   @return [String, nil] Cron schedule if applicable.
     # @!attribute execution_timeout
     #   @return [Float, nil] Execution timeout for the workflow.
+    # @!attribute headers
+    #   @return [Hash<String, Api::Common::V1::Payload>] Headers.
     # @!attribute last_failure
     #   @return [Exception, nil] Failure if this workflow run is a continuation of a failure.
     # @!attribute last_result

@@ -59,6 +59,9 @@ module Temporalio
     #   @return [String] Workflow run ID that started this activity.
     # @!attribute workflow_type
     #   @return [String] Workflow type name that started this activity.
+    #
+    # @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate this
+    #   class or it may break in incompatible ways.
     class Info; end # rubocop:disable Lint/EmptyClass
   end
 end

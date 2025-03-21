@@ -1,0 +1,61 @@
+module Temporalio
+  module Contrib
+    module OpenTelemetry
+      class TracingInterceptor
+        include Client::Interceptor
+        include Worker::Interceptor::Activity
+        include Worker::Interceptor::Workflow
+
+        attr_reader tracer: untyped
+
+        def initialize: (
+          untyped tracer,
+          ?header_key: String,
+          ?propagator: untyped
+        ) -> void
+
+        def _apply_context_to_headers: (Hash[String, untyped] headers, ?context: untyped) -> void
+        def _attach_context: (Hash[String, untyped] headers) -> void
+        def _context_from_headers: (Hash[String, untyped] headers) -> untyped
+        def _with_started_span: [T] (
+          name: String,
+          kind: Symbol,
+          ?attributes: Hash[untyped, untyped]?,
+          ?outbound_input: untyped
+        ) { () -> T } -> T
+
+        class WorkflowInbound < Worker::Interceptor::Workflow::Inbound
+          def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Inbound next_interceptor) -> void
+
+          def _links_from_headers: (Hash[String, untyped] headers) -> Array[untyped]
+        end
+
+        class WorkflowOutbound < Worker::Interceptor::Workflow::Outbound
+          def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Outbound next_interceptor) -> void
+
+          def _apply_span_to_headers: (Hash[String, untyped] headers, untyped span) -> void
+        end
+      end
+
+      module Workflow
+        def self.with_completed_span: [T] (
+          String name,
+          ?attributes: Hash[untyped, untyped],
+          ?links: Array[untyped]?,
+          ?kind: Symbol?,
+          ?exception: Exception?,
+          ?even_during_replay: bool
+        ) { -> T } -> T
+
+        def self.completed_span: (
+          String name,
+          ?attributes: Hash[untyped, untyped],
+          ?links: Array[untyped]?,
+          ?kind: Symbol?,
+          ?exception: Exception?,
+          ?even_during_replay: bool
+        ) -> untyped
+      end
+    end
+  end
+end
