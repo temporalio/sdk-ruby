@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
   spec.metadata['rubygems_mfa_required'] = 'true'
 
   spec.add_dependency 'google-protobuf', '>= 3.25.0'
+  spec.add_dependency 'logger'
 end
