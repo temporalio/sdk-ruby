@@ -4,6 +4,7 @@ require 'temporalio/internal/bridge'
 require 'temporalio/internal/bridge/runtime'
 require 'temporalio/internal/metric'
 require 'temporalio/metric'
+require 'temporalio/runtime/metric_buffer'
 
 module Temporalio
   # Runtime for Temporal Ruby SDK.
@@ -107,6 +108,7 @@ module Temporalio
     MetricsOptions = Data.define(
       :opentelemetry,
       :prometheus,
+      :buffer,
       :attach_service_name,
       :global_tags,
       :metric_prefix
@@ -116,10 +118,13 @@ module Temporalio
     #
     # @!attribute opentelemetry
     #   @return [OpenTelemetryMetricsOptions, nil] OpenTelemetry options if using OpenTelemetry. This is mutually
-    #     exclusive with +prometheus+.
+    #     exclusive with `prometheus` and `buffer`.
     # @!attribute prometheus
     #   @return [PrometheusMetricsOptions, nil] Prometheus options if using Prometheus. This is mutually exclusive with
-    #     +opentelemetry+.
+    #     `opentelemetry` and `buffer`.
+    # @!attribute buffer
+    #   @return [MetricBuffer, nil] Metric buffer to send all metrics to. This is mutually exclusive with `prometheus`
+    #     and `opentelemetry`.
     # @!attribute attach_service_name
     #   @return [Boolean] Whether to put the service_name on every metric.
     # @!attribute global_tags
@@ -130,19 +135,26 @@ module Temporalio
       # Create metrics options. Either `opentelemetry` or `prometheus` required, but not both.
       #
       # @param opentelemetry [OpenTelemetryMetricsOptions, nil] OpenTelemetry options if using OpenTelemetry. This is
-      #   mutually exclusive with `prometheus`.
+      #   mutually exclusive with `prometheus` and `buffer`.
       # @param prometheus [PrometheusMetricsOptions, nil] Prometheus options if using Prometheus. This is mutually
-      #   exclusive with `opentelemetry`.
+      #   exclusive with `opentelemetry` and `buffer`.
+      # @param buffer [MetricBuffer, nil] Metric buffer to send all metrics to. This is mutually exclusive with
+      #   `prometheus` and `opentelemetry`.
       # @param attach_service_name [Boolean] Whether to put the service_name on every metric.
       # @param global_tags [Hash<String, String>, nil] Resource tags to be applied to all metrics.
       # @param metric_prefix [String, nil] Prefix to put on every Temporal metric. If unset, defaults to `temporal_`.
       def initialize(
         opentelemetry: nil,
         prometheus: nil,
+        buffer: nil,
         attach_service_name: true,
         global_tags: nil,
         metric_prefix: nil
       )
+        if [opentelemetry, prometheus, buffer].count { |v| !v.nil? } > 1
+          raise 'Can only have one of opentelemetry, prometheus, or buffer'
+        end
+
         super
       end
 
@@ -152,6 +164,7 @@ module Temporalio
         Internal::Bridge::Runtime::MetricsOptions.new(
           opentelemetry: opentelemetry&._to_bridge,
           prometheus: prometheus&._to_bridge,
+          buffered_with_size: buffer&._buffer_size,
           attach_service_name:,
           global_tags:,
           metric_prefix:
@@ -301,6 +314,9 @@ module Temporalio
     #
     # @param telemetry [TelemetryOptions] Telemetry options to set.
     def initialize(telemetry: TelemetryOptions.new)
+      # Set runtime on the buffer which will fail if the buffer is used on another runtime
+      telemetry.metrics&.buffer&._set_runtime(self)
+
       @core_runtime = Internal::Bridge::Runtime.new(
         Internal::Bridge::Runtime::Options.new(telemetry: telemetry._to_bridge)
       )

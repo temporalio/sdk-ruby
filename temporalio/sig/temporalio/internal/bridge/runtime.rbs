@@ -29,6 +29,7 @@ module Temporalio
         class MetricsOptions
           attr_accessor opentelemetry: OpenTelemetryMetricsOptions?
           attr_accessor prometheus: PrometheusMetricsOptions?
+          attr_accessor buffered_with_size: Integer?
           attr_accessor attach_service_name: bool
           attr_accessor global_tags: Hash[String, String]?
           attr_accessor metric_prefix: String?
@@ -36,6 +37,7 @@ module Temporalio
           def initialize: (
             opentelemetry: OpenTelemetryMetricsOptions?,
             prometheus: PrometheusMetricsOptions?,
+            buffered_with_size: Integer?,
             attach_service_name: bool,
             global_tags: Hash[String, String]?,
             metric_prefix: String?
@@ -79,6 +81,8 @@ module Temporalio
         def self.new: (Options options) -> Runtime
 
         def run_command_loop: -> void
+
+        def retrieve_buffered_metrics: (bool durations_as_seconds) -> Array[Temporalio::Runtime::MetricBuffer::Update]
       end
     end
   end

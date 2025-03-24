@@ -1,14 +1,18 @@
-use std::{sync::Arc, time::Duration};
+use std::{any::Any, rc::Rc, sync::Arc, time::Duration};
 
 use magnus::{
-    class, function, method,
+    class, function,
+    gc::register_mark_object,
+    method,
     prelude::*,
     r_hash::ForEach,
-    value::{IntoId, Qfalse, Qtrue},
-    DataTypeFunctions, Error, Float, Integer, RHash, RString, Ruby, Symbol, TryConvert, TypedData,
-    Value,
+    value::{BoxValue, IntoId, Lazy, Qfalse, Qtrue},
+    DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
+    Symbol, TryConvert, TypedData, Value,
 };
-use temporal_sdk_core_api::telemetry::metrics;
+use temporal_sdk_core_api::telemetry::metrics::{
+    self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
+};
 
 use crate::{error, id, runtime::Runtime, ROOT_MOD};
 
@@ -267,4 +271,229 @@ fn metric_key_value(k: Value, v: Value) -> Result<metrics::MetricKeyValue, Error
         ));
     };
     Ok(metrics::MetricKeyValue::new(key, val))
+}
+
+#[derive(Clone, Debug)]
+pub struct BufferedMetricRef {
+    value: Rc<BoxValue<Value>>,
+}
+
+impl BufferInstrumentRef for BufferedMetricRef {}
+
+// We can't use Ruby Opaque because it doesn't protect the object from being
+// GC'd, but we trust ourselves not to access this value outside of Ruby
+// context (which has global GVL to ensure thread safety).
+unsafe impl Send for BufferedMetricRef {}
+unsafe impl Sync for BufferedMetricRef {}
+
+#[derive(Debug)]
+struct BufferedMetricAttributes {
+    value: BoxValue<RHash>,
+}
+
+// See Send/Sync for BufferedMetricRef for details on why we do this
+unsafe impl Send for BufferedMetricAttributes {}
+unsafe impl Sync for BufferedMetricAttributes {}
+
+impl CustomMetricAttributes for BufferedMetricAttributes {
+    fn as_any(self: Arc<Self>) -> Arc<dyn Any + Send + Sync> {
+        self as Arc<dyn Any + Send + Sync>
+    }
+}
+
+static METRIC_BUFFER_UPDATE: Lazy<RClass> = Lazy::new(|ruby| {
+    let cls = ruby
+        .class_object()
+        .const_get::<_, RModule>("Temporalio")
+        .unwrap()
+        .const_get::<_, RClass>("Runtime")
+        .unwrap()
+        .const_get::<_, RClass>("MetricBuffer")
+        .unwrap()
+        .const_get("Update")
+        .unwrap();
+    // Make sure class is not GC'd
+    register_mark_object(cls);
+    cls
+});
+
+static METRIC_BUFFER_METRIC: Lazy<RClass> = Lazy::new(|ruby| {
+    let cls = ruby
+        .class_object()
+        .const_get::<_, RModule>("Temporalio")
+        .unwrap()
+        .const_get::<_, RClass>("Runtime")
+        .unwrap()
+        .const_get::<_, RClass>("MetricBuffer")
+        .unwrap()
+        .const_get("Metric")
+        .unwrap();
+    // Make sure class is not GC'd
+    register_mark_object(cls);
+    cls
+});
+
+static METRIC_KIND_COUNTER: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("counter"));
+static METRIC_KIND_GAUGE: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("gauge"));
+static METRIC_KIND_HISTOGRAM: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("histogram"));
+
+pub fn convert_metric_events(
+    ruby: &Ruby,
+    events: Vec<MetricEvent<BufferedMetricRef>>,
+    durations_as_seconds: bool,
+) -> Result<Vec<Value>, Error> {
+    let temp: Result<Vec<Option<Value>>, Error> = events
+        .into_iter()
+        .map(|e| convert_metric_event(ruby, e, durations_as_seconds))
+        .collect();
+    Ok(temp?.into_iter().flatten().collect())
+}
+
+fn convert_metric_event(
+    ruby: &Ruby,
+    event: MetricEvent<BufferedMetricRef>,
+    durations_as_seconds: bool,
+) -> Result<Option<Value>, Error> {
+    match event {
+        // Create the metric and put it on the lazy ref
+        MetricEvent::Create {
+            params,
+            populate_into,
+            kind,
+        } => {
+            let cls = ruby.get_inner(&METRIC_BUFFER_METRIC);
+            let val: Value = cls.funcall(
+                "new",
+                (
+                    // Name
+                    params.name.to_string(),
+                    // Description
+                    Some(params.description)
+                        .filter(|s| !s.is_empty())
+                        .map(|s| s.to_string()),
+                    // Unit
+                    if matches!(kind, metrics::MetricKind::HistogramDuration)
+                        && params.unit == "duration"
+                    {
+                        if durations_as_seconds {
+                            Some("s".to_owned())
+                        } else {
+                            Some("ms".to_owned())
+                        }
+                    } else if params.unit.is_empty() {
+                        None
+                    } else {
+                        Some(params.unit.to_string())
+                    },
+                    // Kind
+                    match kind {
+                        metrics::MetricKind::Counter => ruby.get_inner(&METRIC_KIND_COUNTER),
+                        metrics::MetricKind::Gauge | metrics::MetricKind::GaugeF64 => {
+                            ruby.get_inner(&METRIC_KIND_GAUGE)
+                        }
+                        metrics::MetricKind::Histogram
+                        | metrics::MetricKind::HistogramF64
+                        | metrics::MetricKind::HistogramDuration => {
+                            ruby.get_inner(&METRIC_KIND_HISTOGRAM)
+                        }
+                    },
+                ),
+            )?;
+            // Put on lazy ref
+            populate_into
+                .set(Arc::new(BufferedMetricRef {
+                    value: Rc::new(BoxValue::new(val)),
+                }))
+                .map_err(|_| error!("Failed setting metric ref"))?;
+            Ok(None)
+        }
+        // Create the attributes and put it on the lazy ref
+        MetricEvent::CreateAttributes {
+            populate_into,
+            append_from,
+            attributes,
+        } => {
+            // Create a hash (from existing or new)
+            let hash: RHash = match append_from {
+                Some(existing) => {
+                    let attrs = existing
+                        .get()
+                        .clone()
+                        .as_any()
+                        .downcast::<BufferedMetricAttributes>()
+                        .map_err(|_| {
+                            error!("Unable to downcast to expected buffered metric attributes")
+                        })?;
+                    attrs.value.as_ref().funcall("dup", ())?
+                }
+                None => ruby.hash_new_capa(attributes.len()),
+            };
+            // Add attributes
+            for kv in attributes.into_iter() {
+                match kv.value {
+                    metrics::MetricValue::String(v) => hash.aset(kv.key, v)?,
+                    metrics::MetricValue::Int(v) => hash.aset(kv.key, v)?,
+                    metrics::MetricValue::Float(v) => hash.aset(kv.key, v)?,
+                    metrics::MetricValue::Bool(v) => hash.aset(kv.key, v)?,
+                };
+            }
+            hash.freeze();
+            // Put on lazy ref
+            populate_into
+                .set(Arc::new(BufferedMetricAttributes {
+                    value: BoxValue::new(hash),
+                }))
+                .map_err(|_| error!("Failed setting metric attrs"))?;
+            Ok(None)
+        }
+        // Convert to Ruby metric update
+        MetricEvent::Update {
+            instrument,
+            attributes,
+            update,
+        } => {
+            let cls = ruby.get_inner(&METRIC_BUFFER_UPDATE);
+            Ok(Some(
+                cls.funcall(
+                    "new",
+                    (
+                        // Metric
+                        **instrument.get().clone().value.clone(),
+                        // Value
+                        match update {
+                            metrics::MetricUpdateVal::Duration(v) if durations_as_seconds => {
+                                ruby.into_value(v.as_secs_f64())
+                            }
+                            metrics::MetricUpdateVal::Duration(v) => {
+                                // As of this writing, https://github.com/matsadler/magnus/pull/136 not released, so we will do
+                                // the logic ourselves
+                                let val = v.as_millis();
+                                if val <= u64::MAX as u128 {
+                                    ruby.into_value(val as u64)
+                                } else {
+                                    ruby.module_kernel()
+                                        .funcall("Integer", (val.to_string(),))
+                                        .unwrap()
+                                }
+                            }
+                            metrics::MetricUpdateVal::Delta(v) => ruby.into_value(v),
+                            metrics::MetricUpdateVal::DeltaF64(v) => ruby.into_value(v),
+                            metrics::MetricUpdateVal::Value(v) => ruby.into_value(v),
+                            metrics::MetricUpdateVal::ValueF64(v) => ruby.into_value(v),
+                        },
+                        // Attributes
+                        *attributes
+                            .get()
+                            .clone()
+                            .as_any()
+                            .downcast::<BufferedMetricAttributes>()
+                            .map_err(|_| {
+                                error!("Unable to downcast to expected buffered metric attributes")
+                            })?
+                            .value,
+                    ),
+                )?,
+            ))
+        }
+    }
 }

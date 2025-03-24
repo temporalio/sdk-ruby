@@ -1,0 +1,49 @@
+module Temporalio
+  class Runtime
+    class MetricBuffer
+      module DurationFormat
+        type enum = Symbol
+    
+        MILLISECONDS: enum
+        SECONDS: enum
+      end
+
+      class Update
+        attr_reader metric: Metric
+        attr_reader value: Integer | Float
+        attr_reader attributes: Hash[String, String | Integer | Float | bool]
+
+        def initialize: (
+          metric: Metric,
+          value: Integer | Float,
+          attributes: Hash[String, String | Integer | Float | bool]
+        ) -> void
+      end
+
+      class Metric
+        attr_reader name: String
+        attr_reader description: String?
+        attr_reader unit: String?
+        attr_reader kind: (:counter | :histogram | :gauge)
+
+        def initialize: (
+          name: String,
+          description: String?,
+          unit: String?,
+          kind: (:counter | :histogram | :gauge)
+        ) -> void
+      end
+
+      def initialize: (
+        Integer buffer_size,
+        ?duration_format: DurationFormat::enum
+      ) -> void
+
+      def retrieve_updates: -> Array[Update]
+
+      def _buffer_size: -> Integer
+
+      def _set_runtime: (Runtime runtime) -> void
+    end
+  end
+end
