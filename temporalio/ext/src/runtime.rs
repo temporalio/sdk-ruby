@@ -12,8 +12,8 @@ use std::{future::Future, sync::Arc};
 use temporal_sdk_core::telemetry::{build_otlp_metric_exporter, start_prometheus_metric_exporter};
 use temporal_sdk_core::{CoreRuntime, TokioRuntimeBuilder};
 use temporal_sdk_core_api::telemetry::{
-    Logger, MetricTemporality, OtelCollectorOptionsBuilder, PrometheusExporterOptionsBuilder,
-    TelemetryOptionsBuilder,
+    Logger, MetricTemporality, OtelCollectorOptionsBuilder, OtlpProtocol,
+    PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder,
 };
 use tracing::error as log_error;
 use url::Url;
@@ -116,6 +116,9 @@ impl Runtime {
                     }
                     if let Some(global_tags) = metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))? {
                         opts_build.global_tags(global_tags);
+                    }
+                    if opentelemetry.member::<bool>(id!("http"))? {
+                        opts_build.protocol(OtlpProtocol::Http);
                     }
                     let opts = opts_build
                         .build()

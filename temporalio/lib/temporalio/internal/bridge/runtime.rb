@@ -37,6 +37,7 @@ module Temporalio
           :metric_periodicity, # Optional
           :metric_temporality_delta,
           :durations_as_seconds,
+          :http,
           keyword_init: true
         )
 

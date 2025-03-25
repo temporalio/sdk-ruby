@@ -4,6 +4,7 @@ require 'json'
 require 'temporalio'
 require 'temporalio/activity/definition'
 require 'temporalio/api'
+require 'temporalio/converters/payload_converter'
 require 'temporalio/converters/raw_value'
 require 'temporalio/error'
 require 'temporalio/internal/bridge/api'
@@ -389,9 +390,11 @@ module Temporalio
           schedule do
             # If it's a built-in, run it without interceptors, otherwise do normal behavior
             result = if job.query_type == '__stack_trace'
-                       scheduler.stack_trace
+                       # Use raw value built from default converter because we don't want to use user-conversion
+                       Converters::RawValue.new(Converters::PayloadConverter.default.to_payload(scheduler.stack_trace))
                      elsif job.query_type == '__temporal_workflow_metadata'
-                       workflow_metadata
+                       # Use raw value built from default converter because we don't want to use user-conversion
+                       Converters::RawValue.new(Converters::PayloadConverter.default.to_payload(workflow_metadata))
                      else
                        # Get query definition, falling back to dynamic if not present and not reserved
                        defn = query_handlers[job.query_type]
