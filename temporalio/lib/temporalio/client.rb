@@ -242,7 +242,7 @@ module Temporalio
       rpc_options: nil
     )
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
-                             workflow:,
+                             workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
                              args:,
                              workflow_id: id,
                              task_queue:,
@@ -386,7 +386,7 @@ module Temporalio
       @impl.start_update_with_start_workflow(
         Interceptor::StartUpdateWithStartWorkflowInput.new(
           update_id: id,
-          update:,
+          update: Workflow::Definition::Update._name_from_parameter(update),
           args:,
           wait_for_stage:,
           start_workflow_operation:,
@@ -449,7 +449,7 @@ module Temporalio
     )
       @impl.signal_with_start_workflow(
         Interceptor::SignalWithStartWorkflowInput.new(
-          signal:,
+          signal: Workflow::Definition::Signal._name_from_parameter(signal),
           args:,
           start_workflow_operation:,
           rpc_options:
