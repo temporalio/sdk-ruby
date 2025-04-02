@@ -1630,6 +1630,130 @@ class WorkerWorkflowTest < Test
     assert line.end_with?(' 4560')
   end
 
+  def test_workflow_buffered_metrics
+    # Create runtime with metric buffer
+    buffer = Temporalio::Runtime::MetricBuffer.new(10_000)
+    runtime = Temporalio::Runtime.new(
+      telemetry: Temporalio::Runtime::TelemetryOptions.new(metrics: Temporalio::Runtime::MetricsOptions.new(buffer:))
+    )
+
+    # Confirm nothing there yet
+    assert_equal [], buffer.retrieve_updates
+
+    # Create a counter and make one with more attrs
+    runtime_counter = runtime.metric_meter.create_metric(
+      :counter, 'runtime-counter', description: 'runtime-counter-desc', unit: 'runtime-counter-unit'
+    )
+    runtime_counter_with_attrs = runtime_counter.with_additional_attributes({ 'foo' => 'bar', 'baz' => 123 })
+
+    # Send adds to both
+    runtime_counter.record(100)
+    runtime_counter_with_attrs.record(200)
+
+    # Get updates and check their values
+    updates1 = buffer.retrieve_updates
+    assert_equal [
+      Temporalio::Runtime::MetricBuffer::Update.new(
+        metric: Temporalio::Runtime::MetricBuffer::Metric.new(
+          name: 'runtime-counter', description: 'runtime-counter-desc', unit: 'runtime-counter-unit', kind: :counter
+        ),
+        value: 100,
+        attributes: { 'service_name' => 'temporal-core-sdk' }
+      ),
+      Temporalio::Runtime::MetricBuffer::Update.new(
+        metric: Temporalio::Runtime::MetricBuffer::Metric.new(
+          name: 'runtime-counter', description: 'runtime-counter-desc', unit: 'runtime-counter-unit', kind: :counter
+        ),
+        value: 200,
+        attributes: { 'service_name' => 'temporal-core-sdk', 'foo' => 'bar', 'baz' => 123 }
+      )
+    ], updates1
+    # Also confirm that for performance reasons the metrics are actually the same object
+    assert_same updates1.first.metric, updates1.last.metric
+
+    # Confirm no more updates
+    assert_equal [], buffer.retrieve_updates
+
+    # Send some more adds and check
+    runtime_counter.record(300)
+    runtime_counter_with_attrs.record(400)
+    updates2 = buffer.retrieve_updates
+    assert_equal 2, updates2.size
+    assert_same updates1.first.metric, updates2.first.metric
+    assert_same updates1.first.attributes, updates2.first.attributes
+    assert_equal 300, updates2.first.value
+    assert_same updates1.last.metric, updates2.last.metric
+    assert_same updates1.last.attributes, updates2.last.attributes
+    assert_equal 400, updates2.last.value
+
+    # Confirm no more updates
+    assert_equal [], buffer.retrieve_updates
+
+    # Test simple gauge
+    runtime_gauge = runtime.metric_meter.create_metric(:gauge, 'runtime-gauge', value_type: :float)
+    runtime_gauge.record(1.23, additional_attributes: { 'somekey' => true })
+    updates3 = buffer.retrieve_updates
+    assert_equal [
+      Temporalio::Runtime::MetricBuffer::Update.new(
+        metric: Temporalio::Runtime::MetricBuffer::Metric.new(
+          name: 'runtime-gauge', description: nil, unit: nil, kind: :gauge
+        ),
+        value: 1.23,
+        attributes: { 'service_name' => 'temporal-core-sdk', 'somekey' => true }
+      )
+    ], updates3
+
+    # Confirm no more updates
+    assert_equal [], buffer.retrieve_updates
+
+    # Create a new client on the runtime and execute the custom metric workflow
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h)
+    )
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
+    task_queue = "tq-#{SecureRandom.uuid}"
+    assert_equal 'done', execute_workflow(
+      CustomMetricsWorkflow,
+      activities: [CustomMetricsActivity],
+      client:,
+      task_queue:
+    )
+
+    # Drain updates and confirm updates exist as expected
+    updates = buffer.retrieve_updates
+    # Workflow histogram
+    assert_includes updates, Temporalio::Runtime::MetricBuffer::Update.new(
+      metric: Temporalio::Runtime::MetricBuffer::Metric.new(
+        name: 'my-workflow-histogram', description: nil, unit: nil, kind: :histogram
+      ),
+      value: 4560,
+      attributes: {
+        'service_name' => 'temporal-core-sdk',
+        'namespace' => 'default',
+        'task_queue' => task_queue,
+        'workflow_type' => 'CustomMetricsWorkflow',
+        'someattr' => 'someval2',
+        'anotherattr' => 'anotherval2'
+      }
+    )
+    # Activity counter
+    assert_includes updates, Temporalio::Runtime::MetricBuffer::Update.new(
+      metric: Temporalio::Runtime::MetricBuffer::Metric.new(
+        name: 'my-activity-counter', description: nil, unit: nil, kind: :counter
+      ),
+      value: 123,
+      attributes: {
+        'service_name' => 'temporal-core-sdk',
+        'namespace' => 'default',
+        'task_queue' => task_queue,
+        'activity_type' => 'CustomMetricsActivity',
+        'someattr' => 'someval1',
+        'anotherattr' => 'anotherval1'
+      }
+    )
+  end
+
   class FailWorkflowPayloadConverter < Temporalio::Converters::PayloadConverter
     def to_payload(value)
       if value == 'fail-on-this-result'

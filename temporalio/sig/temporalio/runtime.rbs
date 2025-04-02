@@ -39,6 +39,7 @@ module Temporalio
     class MetricsOptions
       attr_reader opentelemetry: OpenTelemetryMetricsOptions?
       attr_reader prometheus: PrometheusMetricsOptions?
+      attr_reader buffer: MetricBuffer?
       attr_reader attach_service_name: bool
       attr_reader global_tags: Hash[String, String]?
       attr_reader metric_prefix: String?
@@ -46,6 +47,7 @@ module Temporalio
       def initialize: (
         ?opentelemetry: OpenTelemetryMetricsOptions?,
         ?prometheus: PrometheusMetricsOptions?,
+        ?buffer: MetricBuffer?,
         ?attach_service_name: bool,
         ?global_tags: Hash[String, String]?,
         ?metric_prefix: String?

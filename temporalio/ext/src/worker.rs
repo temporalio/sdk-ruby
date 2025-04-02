@@ -225,21 +225,23 @@ impl Worker {
                             Ok(None) => ruby.qnil().as_value(),
                             Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
-                        callback.push(ruby.ary_new_from_values(&[
-                            poll_result.worker_index.into_value(),
-                            worker_type.into_value(),
-                            result,
-                        ]))
+                        callback.push(
+                            &ruby,
+                            ruby.ary_new_from_values(&[
+                                poll_result.worker_index.into_value(),
+                                worker_type.into_value(),
+                                result,
+                            ]),
+                        )
                     })));
                 }
             },
             move |ruby, _| {
                 // Call with nil, nil, nil to say done
-                complete_callback.push(ruby.ary_new_from_values(&[
-                    ruby.qnil(),
-                    ruby.qnil(),
-                    ruby.qnil(),
-                ]))
+                complete_callback.push(
+                    &ruby,
+                    ruby.ary_new_from_values(&[ruby.qnil(), ruby.qnil(), ruby.qnil()]),
+                )
             },
         );
         Ok(())
@@ -289,13 +291,16 @@ impl Worker {
             },
             move |ruby, errs| {
                 if errs.is_empty() {
-                    callback.push(ruby.qnil())
+                    callback.push(&ruby, ruby.qnil())
                 } else {
-                    callback.push(new_error!(
-                        "{} worker(s) failed to finalize, reasons: {}",
-                        errs.len(),
-                        errs.join(", ")
-                    ))
+                    callback.push(
+                        &ruby,
+                        new_error!(
+                            "{} worker(s) failed to finalize, reasons: {}",
+                            errs.len(),
+                            errs.join(", ")
+                        ),
+                    )
                 }
             },
         );
@@ -308,8 +313,8 @@ impl Worker {
         self.runtime_handle.spawn(
             async move { temporal_sdk_core_api::Worker::validate(&*worker).await },
             move |ruby, result| match result {
-                Ok(()) => callback.push(ruby.qnil()),
-                Err(err) => callback.push(new_error!("Failed validating worker: {}", err)),
+                Ok(()) => callback.push(&ruby, ruby.qnil()),
+                Err(err) => callback.push(&ruby, new_error!("Failed validating worker: {}", err)),
             },
         );
         Ok(())
@@ -325,8 +330,8 @@ impl Worker {
                 temporal_sdk_core_api::Worker::complete_activity_task(&*worker, completion).await
             },
             move |ruby, result| match result {
-                Ok(()) => callback.push((ruby.qnil(),)),
-                Err(err) => callback.push((new_error!("Completion failure: {}", err),)),
+                Ok(()) => callback.push(&ruby, (ruby.qnil(),)),
+                Err(err) => callback.push(&ruby, (new_error!("Completion failure: {}", err),)),
             },
         );
         Ok(())
@@ -357,16 +362,19 @@ impl Worker {
                     .await
             },
             move |ruby, result| {
-                callback.push(ruby.ary_new_from_values(&[
-                    (-1).into_value_with(&ruby),
-                    run_id.into_value_with(&ruby),
-                    match result {
-                        Ok(()) => ruby.qnil().into_value_with(&ruby),
-                        Err(err) => {
-                            new_error!("Completion failure: {}", err).into_value_with(&ruby)
-                        }
-                    },
-                ]))
+                callback.push(
+                    &ruby,
+                    ruby.ary_new_from_values(&[
+                        (-1).into_value_with(&ruby),
+                        run_id.into_value_with(&ruby),
+                        match result {
+                            Ok(()) => ruby.qnil().into_value_with(&ruby),
+                            Err(err) => {
+                                new_error!("Completion failure: {}", err).into_value_with(&ruby)
+                            }
+                        },
+                    ]),
+                )
             },
         );
         Ok(())

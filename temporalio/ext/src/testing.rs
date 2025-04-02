@@ -77,13 +77,16 @@ impl EphemeralServer {
         let runtime_handle = runtime.handle.clone();
         runtime.handle.spawn(
             async move { opts.start_server().await },
-            move |_, result| match result {
-                Ok(core) => callback.push(EphemeralServer {
-                    target: core.target.clone(),
-                    core: Mutex::new(Some(core)),
-                    runtime_handle,
-                }),
-                Err(err) => callback.push(new_error!("Failed starting server: {}", err)),
+            move |ruby, result| match result {
+                Ok(core) => callback.push(
+                    &ruby,
+                    EphemeralServer {
+                        target: core.target.clone(),
+                        core: Mutex::new(Some(core)),
+                        runtime_handle,
+                    },
+                ),
+                Err(err) => callback.push(&ruby, new_error!("Failed starting server: {}", err)),
             },
         );
         Ok(())
@@ -109,13 +112,16 @@ impl EphemeralServer {
         let runtime_handle = runtime.handle.clone();
         runtime.handle.spawn(
             async move { opts.start_server().await },
-            move |_, result| match result {
-                Ok(core) => callback.push(EphemeralServer {
-                    target: core.target.clone(),
-                    core: Mutex::new(Some(core)),
-                    runtime_handle,
-                }),
-                Err(err) => callback.push(new_error!("Failed starting server: {}", err)),
+            move |ruby, result| match result {
+                Ok(core) => callback.push(
+                    &ruby,
+                    EphemeralServer {
+                        target: core.target.clone(),
+                        core: Mutex::new(Some(core)),
+                        runtime_handle,
+                    },
+                ),
+                Err(err) => callback.push(&ruby, new_error!("Failed starting server: {}", err)),
             },
         );
         Ok(())
@@ -149,9 +155,9 @@ impl EphemeralServer {
                 .spawn(
                     async move { core.shutdown().await },
                     move |ruby, result| match result {
-                        Ok(_) => callback.push(ruby.qnil()),
+                        Ok(_) => callback.push(&ruby, ruby.qnil()),
                         Err(err) => {
-                            callback.push(new_error!("Failed shutting down server: {}", err))
+                            callback.push(&ruby, new_error!("Failed shutting down server: {}", err))
                         }
                     },
                 )

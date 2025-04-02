@@ -103,27 +103,44 @@ where
     }
 }
 
+/// Utility for pushing a result to a queue in an async callback.
 pub(crate) struct AsyncCallback {
-    queue: BoxValue<Value>,
+    queue: SendSyncBoxValue<Value>,
 }
-
-// We trust our usage of this across threads. We would use Opaque but we can't
-// box that properly/safely. The inner queue is always expected to be a Ruby
-// Queue.
-unsafe impl Send for AsyncCallback {}
-unsafe impl Sync for AsyncCallback {}
 
 impl AsyncCallback {
     pub(crate) fn from_queue(queue: Value) -> Self {
         Self {
-            queue: BoxValue::new(queue),
+            queue: SendSyncBoxValue::new(queue),
         }
     }
 
-    pub(crate) fn push<V>(&self, value: V) -> Result<(), Error>
+    pub(crate) fn push<V>(&self, ruby: &Ruby, value: V) -> Result<(), Error>
     where
         V: IntoValue,
     {
-        self.queue.funcall(id!("push"), (value,)).map(|_: Value| ())
+        let queue = self.queue.value(ruby);
+        queue.funcall(id!("push"), (value,)).map(|_: Value| ())
+    }
+}
+
+/// Utility that basically combines Magnus BoxValue with Magnus Opaque. It's a
+/// Send/Sync safe Ruby value that prevents GC until dropped and is only
+/// accessible from a Ruby thread.
+#[derive(Debug)]
+pub(crate) struct SendSyncBoxValue<T: ReprValue>(BoxValue<T>);
+
+// We trust our usage of this across threads. We would use Opaque but we can't
+// box that properly/safely to ensure it does not get GC'd.
+unsafe impl<T: ReprValue> Send for SendSyncBoxValue<T> {}
+unsafe impl<T: ReprValue> Sync for SendSyncBoxValue<T> {}
+
+impl<T: ReprValue> SendSyncBoxValue<T> {
+    pub fn new(val: T) -> Self {
+        Self(BoxValue::new(val))
+    }
+
+    pub fn value(&self, _: &Ruby) -> T {
+        *self.0
     }
 }
