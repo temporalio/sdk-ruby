@@ -1,4 +1,4 @@
-use std::{any::Any, rc::Rc, sync::Arc, time::Duration};
+use std::{any::Any, sync::Arc, time::Duration};
 
 use magnus::{
     class, function,
@@ -6,7 +6,7 @@ use magnus::{
     method,
     prelude::*,
     r_hash::ForEach,
-    value::{BoxValue, IntoId, Lazy, Qfalse, Qtrue},
+    value::{IntoId, Lazy, Qfalse, Qtrue},
     DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
     Symbol, TryConvert, TypedData, Value,
 };
@@ -14,7 +14,7 @@ use temporal_sdk_core_api::telemetry::metrics::{
     self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
 };
 
-use crate::{error, id, runtime::Runtime, ROOT_MOD};
+use crate::{error, id, runtime::Runtime, util::SendSyncBoxValue, ROOT_MOD};
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
@@ -275,25 +275,15 @@ fn metric_key_value(k: Value, v: Value) -> Result<metrics::MetricKeyValue, Error
 
 #[derive(Clone, Debug)]
 pub struct BufferedMetricRef {
-    value: Rc<BoxValue<Value>>,
+    value: Arc<SendSyncBoxValue<Value>>,
 }
 
 impl BufferInstrumentRef for BufferedMetricRef {}
 
-// We can't use Ruby Opaque because it doesn't protect the object from being
-// GC'd, but we trust ourselves not to access this value outside of Ruby
-// context (which has global GVL to ensure thread safety).
-unsafe impl Send for BufferedMetricRef {}
-unsafe impl Sync for BufferedMetricRef {}
-
 #[derive(Debug)]
 struct BufferedMetricAttributes {
-    value: BoxValue<RHash>,
+    value: SendSyncBoxValue<RHash>,
 }
-
-// See Send/Sync for BufferedMetricRef for details on why we do this
-unsafe impl Send for BufferedMetricAttributes {}
-unsafe impl Sync for BufferedMetricAttributes {}
 
 impl CustomMetricAttributes for BufferedMetricAttributes {
     fn as_any(self: Arc<Self>) -> Arc<dyn Any + Send + Sync> {
@@ -402,7 +392,7 @@ fn convert_metric_event(
             // Put on lazy ref
             populate_into
                 .set(Arc::new(BufferedMetricRef {
-                    value: Rc::new(BoxValue::new(val)),
+                    value: Arc::new(SendSyncBoxValue::new(val)),
                 }))
                 .map_err(|_| error!("Failed setting metric ref"))?;
             Ok(None)
@@ -423,8 +413,10 @@ fn convert_metric_event(
                         .downcast::<BufferedMetricAttributes>()
                         .map_err(|_| {
                             error!("Unable to downcast to expected buffered metric attributes")
-                        })?;
-                    attrs.value.as_ref().funcall("dup", ())?
+                        })?
+                        .value
+                        .value(ruby);
+                    attrs.funcall("dup", ())?
                 }
                 None => ruby.hash_new_capa(attributes.len()),
             };
@@ -441,7 +433,7 @@ fn convert_metric_event(
             // Put on lazy ref
             populate_into
                 .set(Arc::new(BufferedMetricAttributes {
-                    value: BoxValue::new(hash),
+                    value: SendSyncBoxValue::new(hash),
                 }))
                 .map_err(|_| error!("Failed setting metric attrs"))?;
             Ok(None)
@@ -458,7 +450,7 @@ fn convert_metric_event(
                     "new",
                     (
                         // Metric
-                        **instrument.get().clone().value.clone(),
+                        instrument.get().clone().value.clone().value(ruby),
                         // Value
                         match update {
                             metrics::MetricUpdateVal::Duration(v) if durations_as_seconds => {
@@ -482,7 +474,7 @@ fn convert_metric_event(
                             metrics::MetricUpdateVal::ValueF64(v) => ruby.into_value(v),
                         },
                         // Attributes
-                        *attributes
+                        attributes
                             .get()
                             .clone()
                             .as_any()
@@ -490,7 +482,8 @@ fn convert_metric_event(
                             .map_err(|_| {
                                 error!("Unable to downcast to expected buffered metric attributes")
                             })?
-                            .value,
+                            .value
+                            .value(ruby),
                     ),
                 )?,
             ))
