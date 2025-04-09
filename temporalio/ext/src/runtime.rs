@@ -1,7 +1,8 @@
 use super::{error, id, ROOT_MOD};
+use crate::metric::{convert_metric_events, BufferedMetricRef};
 use crate::util::{without_gvl, Struct};
 use magnus::{
-    class, function, method, prelude::*, DataTypeFunctions, Error, Ruby, TypedData, Value,
+    class, function, method, prelude::*, DataTypeFunctions, Error, RArray, Ruby, TypedData, Value,
 };
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -9,11 +10,13 @@ use std::str::FromStr;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
-use temporal_sdk_core::telemetry::{build_otlp_metric_exporter, start_prometheus_metric_exporter};
+use temporal_sdk_core::telemetry::{
+    build_otlp_metric_exporter, start_prometheus_metric_exporter, MetricsCallBuffer,
+};
 use temporal_sdk_core::{CoreRuntime, TokioRuntimeBuilder};
 use temporal_sdk_core_api::telemetry::{
-    Logger, MetricTemporality, OtelCollectorOptionsBuilder, OtlpProtocol,
-    PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder,
+    metrics::MetricCallBufferer, Logger, MetricTemporality, OtelCollectorOptionsBuilder,
+    OtlpProtocol, PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder,
 };
 use tracing::error as log_error;
 use url::Url;
@@ -24,6 +27,10 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
         .define_class("Runtime", class::object())?;
     class.define_singleton_method("new", function!(Runtime::new, 1))?;
     class.define_method("run_command_loop", method!(Runtime::run_command_loop, 0))?;
+    class.define_method(
+        "retrieve_buffered_metrics",
+        method!(Runtime::retrieve_buffered_metrics, 1),
+    )?;
     Ok(())
 }
 
@@ -33,6 +40,7 @@ pub struct Runtime {
     /// Separate cloneable handle that can be referenced in other Rust objects.
     pub(crate) handle: RuntimeHandle,
     async_command_rx: Receiver<AsyncCommand>,
+    metrics_call_buffer: Option<Arc<MetricsCallBuffer<BufferedMetricRef>>>,
 }
 
 #[derive(Clone)]
@@ -94,9 +102,10 @@ impl Runtime {
             .map_err(|err| error!("Failed initializing telemetry: {}", err))?;
 
         // Create metrics (created after Core runtime since it needs Tokio handle)
+        let mut metrics_call_buffer = None;
         if let Some(metrics) = telemetry.child(id!("metrics"))? {
             let _guard = core.tokio_handle().enter();
-            match (metrics.child(id!("opentelemetry"))?, metrics.child(id!("prometheus"))?, metrics.child(id!("buffered_with_size"))?) {
+            match (metrics.child(id!("opentelemetry"))?, metrics.child(id!("prometheus"))?, metrics.member::<Option<usize>>(id!("buffered_with_size"))?) {
                 // Build OTel
                 (Some(opentelemetry), None, None) => {
                     let mut opts_build = OtelCollectorOptionsBuilder::default();
@@ -148,8 +157,11 @@ impl Runtime {
                         |err| error!("Failed building starting Prometheus exporter: {}", err),
                     )?.meter);
                 },
-                // TODO(cretz): Metric buffering
-                (None, None, Some(_buffer_size)) => return Err(error!("Metric buffering not yet supported")),
+                (None, None, Some(buffer_size)) => {
+                    let buffer = Arc::new(MetricsCallBuffer::new(buffer_size));
+                    core.telemetry_mut().attach_late_init_metrics(buffer.clone());
+                    metrics_call_buffer = Some(buffer);
+                },
                 _ => return Err(error!("One and only one of opentelemetry, prometheus, or buffered_with_size must be set"))
             };
         }
@@ -163,6 +175,7 @@ impl Runtime {
                 async_command_tx,
             },
             async_command_rx,
+            metrics_call_buffer,
         })
     }
 
@@ -192,6 +205,16 @@ impl Runtime {
                 }
             }
         }
+    }
+
+    pub fn retrieve_buffered_metrics(&self, durations_as_seconds: bool) -> Result<RArray, Error> {
+        let ruby = Ruby::get().expect("Not in Ruby thread");
+        let buff = self
+            .metrics_call_buffer
+            .clone()
+            .expect("Attempting to retrieve buffered metrics without buffer");
+        let updates = convert_metric_events(&ruby, buff.retrieve(), durations_as_seconds)?;
+        Ok(ruby.ary_new_from_values(&updates))
     }
 }
 

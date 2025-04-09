@@ -176,12 +176,15 @@ impl Client {
                     .await?;
                 Ok(core)
             },
-            move |_, result: Result<CoreClient, ClientInitError>| match result {
-                Ok(core) => callback.push(Client {
-                    core,
-                    runtime_handle,
-                }),
-                Err(err) => callback.push(new_error!("Failed client connect: {}", err)),
+            move |ruby, result: Result<CoreClient, ClientInitError>| match result {
+                Ok(core) => callback.push(
+                    &ruby,
+                    Client {
+                        core,
+                        runtime_handle,
+                    },
+                ),
+                Err(err) => callback.push(&ruby, new_error!("Failed client connect: {}", err)),
             },
         );
         Ok(())
@@ -325,12 +328,12 @@ where
             };
             res.map(|msg| msg.get_ref().encode_to_vec())
         },
-        move |_, result| {
+        move |ruby, result| {
             match result {
                 // TODO(cretz): Any reasonable way to prevent byte copy that is just going to get decoded into proto
                 // object?
-                Ok(val) => callback.push(RString::from_slice(&val)),
-                Err(status) => callback.push(RpcFailure { status }),
+                Ok(val) => callback.push(&ruby, RString::from_slice(&val)),
+                Err(status) => callback.push(&ruby, RpcFailure { status }),
             }
         },
     );
