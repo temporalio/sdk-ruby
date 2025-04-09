@@ -13,8 +13,8 @@ module Temporalio
     # cancellation can be set, users create this for each activity that is run. There is no real performance penalty for
     # creating an environment for every run.
     class ActivityEnvironment
-      # @return [Activity::Info] The activity info used by default. This is frozen, but can be dup'd and mutated to pass
-      #   in to {initialize}.
+      # @return [Activity::Info] The activity info used by default. This is frozen, but `with` can be used to make a new
+      #   instance with changes to pass in to {initialize}.
       def self.default_info
         @default_info ||= Activity::Info.new(
           activity_id: 'test',
@@ -34,12 +34,13 @@ module Temporalio
           workflow_namespace: 'default',
           workflow_run_id: 'test-run',
           workflow_type: 'test'
-        ).freeze
+        )
       end
 
       # Create a test environment for activities.
       #
-      # @param info [Activity::Info] Value for {Activity::Context#info}.
+      # @param info [Activity::Info] Value for {Activity::Context#info}. Users should not try to instantiate this
+      #   themselves, but rather use `with` on {default_info}.
       # @param on_heartbeat [Proc(Array), nil] Proc that is called with all heartbeat details when
       #   {Activity::Context#heartbeat} is called.
       # @param cancellation [Cancellation] Value for {Activity::Context#cancellation}.

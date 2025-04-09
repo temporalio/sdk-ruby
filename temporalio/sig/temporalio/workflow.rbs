@@ -114,6 +114,8 @@ module Temporalio
       ?search_attributes: SearchAttributes?
     ) -> ChildWorkflowHandle
 
+    def self.storage: -> Hash[Object, Object]
+
     def self.timeout: [T] (
       duration? duration,
       ?singleton(Exception) exception_class,
