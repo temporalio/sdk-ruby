@@ -61,6 +61,8 @@ module Temporalio
 
           def initialize_continue_as_new_error: (Workflow::ContinueAsNewError error) -> void
 
+          def io_enabled: [T] { -> T } -> T
+
           def logger: -> ReplaySafeLogger
 
           def memo: -> ExternallyImmutableHash[String, Object?]

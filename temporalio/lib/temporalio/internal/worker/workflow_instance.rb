@@ -57,7 +57,7 @@ module Temporalio
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_history_length,
                     :current_history_size, :replaying, :random, :signal_handlers, :query_handlers, :update_handlers,
                     :context_frozen
-        attr_accessor :current_details
+        attr_accessor :io_enabled, :current_details
 
         def initialize(details)
           # Initialize general state
@@ -68,6 +68,7 @@ module Temporalio
           @logger = ReplaySafeLogger.new(logger: details.logger, instance: self)
           @logger.scoped_values_getter = proc { scoped_logger_info }
           @runtime_metric_meter = details.metric_meter
+          @io_enabled = details.unsafe_workflow_io_enabled
           @scheduler = Scheduler.new(self)
           @payload_converter = details.payload_converter
           @failure_converter = details.failure_converter
