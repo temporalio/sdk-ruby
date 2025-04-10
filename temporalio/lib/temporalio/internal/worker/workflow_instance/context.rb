@@ -164,6 +164,16 @@ module Temporalio
             )
           end
 
+          def io_enabled(&)
+            prev = @instance.io_enabled
+            @instance.io_enabled = true
+            begin
+              yield
+            ensure
+              @instance.io_enabled = prev
+            end
+          end
+
           def logger
             @instance.logger
           end

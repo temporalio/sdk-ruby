@@ -2234,6 +2234,37 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class UnsafeIOWorkflow < Temporalio::Workflow::Definition
+    def execute(unsafe_io_enabled)
+      if unsafe_io_enabled
+        Temporalio::Workflow::Unsafe.io_enabled { do_http_call }
+      else
+        do_http_call
+      end
+    end
+
+    def do_http_call
+      Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
+        Net::HTTP.get(URI('https://example.com'))
+      end
+    end
+  end
+
+  def test_unsafe_io
+    # Not allowed by default
+    execute_workflow(UnsafeIOWorkflow, false) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot perform IO from inside a workflow')
+    end
+
+    # Allowed when enabled narrowly inside workflow
+    res = execute_workflow(UnsafeIOWorkflow, true)
+    assert_includes res, '<html>'
+
+    # Allowed when enabled at worker level
+    res = execute_workflow(UnsafeIOWorkflow, false, unsafe_workflow_io_enabled: true)
+    assert_includes res, '<html>'
+  end
+
   # TODO(cretz): To test
   # * Common
   #   * Eager workflow start

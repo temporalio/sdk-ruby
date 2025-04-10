@@ -213,7 +213,8 @@ module Temporalio
                 interceptors: worker_state.workflow_interceptors,
                 disable_eager_activity_execution: worker_state.disable_eager_activity_execution,
                 illegal_calls: worker_state.illegal_calls,
-                workflow_failure_exception_types: worker_state.workflow_failure_exception_types
+                workflow_failure_exception_types: worker_state.workflow_failure_exception_types,
+                unsafe_workflow_io_enabled: worker_state.unsafe_workflow_io_enabled
               )
             )
           end

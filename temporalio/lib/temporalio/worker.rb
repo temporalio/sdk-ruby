@@ -52,6 +52,7 @@ module Temporalio
       :illegal_workflow_calls,
       :workflow_failure_exception_types,
       :workflow_payload_codec_thread_pool,
+      :unsafe_workflow_io_enabled,
       :debug_mode
     )
 
@@ -347,6 +348,9 @@ module Temporalio
     # @param workflow_payload_codec_thread_pool [ThreadPool, nil] Thread pool to run payload codec encode/decode within.
     #   This is required if a payload codec exists and the worker is not fiber based. Codecs can potentially block
     #   execution which is why they need to be run in the background.
+    # @param unsafe_workflow_io_enabled [Boolean] If false, the default, workflow code that invokes io_wait on the fiber
+    #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
+    #   with a block for narrower enabling of IO.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -378,6 +382,7 @@ module Temporalio
       illegal_workflow_calls: Worker.default_illegal_workflow_calls,
       workflow_failure_exception_types: [],
       workflow_payload_codec_thread_pool: nil,
+      unsafe_workflow_io_enabled: false,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -412,6 +417,7 @@ module Temporalio
         illegal_workflow_calls:,
         workflow_failure_exception_types:,
         workflow_payload_codec_thread_pool:,
+        unsafe_workflow_io_enabled:,
         debug_mode:
       ).freeze
 
@@ -483,6 +489,7 @@ module Temporalio
           illegal_workflow_calls:,
           workflow_failure_exception_types:,
           workflow_payload_codec_thread_pool:,
+          unsafe_workflow_io_enabled:,
           debug_mode:
         )
       end

@@ -67,6 +67,7 @@ module Temporalio
           illegal_workflow_calls:,
           workflow_failure_exception_types:,
           workflow_payload_codec_thread_pool:,
+          unsafe_workflow_io_enabled:,
           debug_mode:,
           on_eviction: nil
         )
@@ -109,7 +110,8 @@ module Temporalio
               end
 
               t
-            end.freeze
+            end.freeze,
+            unsafe_workflow_io_enabled:
           )
           @state.on_eviction = on_eviction if on_eviction
 
@@ -184,14 +186,14 @@ module Temporalio
         class State
           attr_reader :workflow_definitions, :bridge_worker, :logger, :metric_meter, :data_converter, :deadlock_timeout,
                       :illegal_calls, :namespace, :task_queue, :disable_eager_activity_execution,
-                      :workflow_interceptors, :workflow_failure_exception_types
+                      :workflow_interceptors, :workflow_failure_exception_types, :unsafe_workflow_io_enabled
 
           attr_writer :on_eviction
 
           def initialize(
             workflow_definitions:, bridge_worker:, logger:, metric_meter:, data_converter:, deadlock_timeout:,
             illegal_calls:, namespace:, task_queue:, disable_eager_activity_execution:,
-            workflow_interceptors:, workflow_failure_exception_types:
+            workflow_interceptors:, workflow_failure_exception_types:, unsafe_workflow_io_enabled:
           )
             @workflow_definitions = workflow_definitions
             @bridge_worker = bridge_worker
@@ -205,6 +207,7 @@ module Temporalio
             @disable_eager_activity_execution = disable_eager_activity_execution
             @workflow_interceptors = workflow_interceptors
             @workflow_failure_exception_types = workflow_failure_exception_types
+            @unsafe_workflow_io_enabled = unsafe_workflow_io_enabled
 
             @running_workflows = {}
             @running_workflows_mutex = Mutex.new
