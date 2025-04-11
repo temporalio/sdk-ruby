@@ -2,11 +2,16 @@ module Contrib
   class OpenTelemetryTest < Test
     def init_tracer_and_exporter: -> [untyped, untyped]
     def trace: (
-      ?tracer_and_exporter: [untyped, untyped]
+      ?tracer_and_exporter: [untyped, untyped],
+      ?always_create_workflow_spans: bool,
+      ?check_root: bool
     ) { (Temporalio::Client) -> void } -> untyped
     def trace_workflow: (
       Symbol scenario,
-      ?tracer_and_exporter: [untyped, untyped]
+      ?tracer_and_exporter: [untyped, untyped],
+      ?start_with_untraced_client: bool,
+      ?always_create_workflow_spans: bool,
+      ?check_root: bool
     ) { (Temporalio::Client::WorkflowHandle) -> void } -> untyped
 
     class ExpectedSpan
@@ -30,7 +35,8 @@ module Contrib
         name: String,
         ?attributes: Hash[untyped, untyped],
         ?links: Array[ExpectedSpan],
-        ?exception_message: String?
+        ?exception_message: String?,
+        ?insert_at: Integer?
       ) -> ExpectedSpan
 
       def to_s_indented: (?indent: String) -> String

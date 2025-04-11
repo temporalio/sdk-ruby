@@ -29,7 +29,8 @@ module WorkflowUtils
     max_heartbeat_throttle_interval: 60.0,
     task_timeout: nil,
     interceptors: [],
-    on_worker_run: nil
+    on_worker_run: nil,
+    start_workflow_client: client
   )
     worker = Temporalio::Worker.new(
       client:,
@@ -45,7 +46,7 @@ module WorkflowUtils
     )
     worker.run do
       on_worker_run&.call
-      handle = client.start_workflow(
+      handle = start_workflow_client.start_workflow(
         workflow,
         *args,
         id:,

@@ -96,10 +96,12 @@ module Contrib
           ) do
             Temporalio::Workflow.execute_local_activity(TestActivity, :fail_first_attempt, start_to_close_timeout: 30)
           end
-        when :child_workflow
-          # Start a child, send child signal and external signal, finish
+        when :child_workflow_child_signal
           handle = Temporalio::Workflow.start_child_workflow(TestWorkflow, :wait_on_signal)
-          handle.signal(TestWorkflow.signal, :complete)
+          handle.signal(TestWorkflow.signal, :mark_finished)
+          [handle.id, handle.first_execution_run_id, handle.result]
+        when :child_workflow_external_signal
+          handle = Temporalio::Workflow.start_child_workflow(TestWorkflow, :wait_on_signal)
           Temporalio::Workflow.external_workflow_handle(handle.id).signal(TestWorkflow.signal, :mark_finished)
           [handle.id, handle.first_execution_run_id, handle.result]
         else
@@ -138,11 +140,18 @@ module Contrib
       [tracer, exporter]
     end
 
-    def trace(tracer_and_exporter: init_tracer_and_exporter, &)
+    def trace(
+      tracer_and_exporter: init_tracer_and_exporter,
+      always_create_workflow_spans: false,
+      check_root: true,
+      &
+    )
       tracer, exporter = tracer_and_exporter
 
       # Make client with interceptors
-      interceptor = Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(tracer)
+      interceptor = Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(
+        tracer, always_create_workflow_spans:
+      )
       new_options = env.client.options.with(interceptors: [interceptor])
       client = Temporalio::Client.new(**new_options.to_h) # steep:ignore
 
@@ -153,13 +162,22 @@ module Contrib
 
       # Convert spans, confirm there is only the outer, and return children
       spans = ExpectedSpan.from_span_data(exporter.finished_spans)
-      assert_equal 1, spans.size
-      assert_equal 'root', spans.first&.name
+      if check_root
+        assert_equal 1, spans.size
+        assert_equal 'root', spans.first&.name
+      end
       spans.first
     end
 
-    def trace_workflow(scenario, tracer_and_exporter: init_tracer_and_exporter, &)
-      trace(tracer_and_exporter:) do |client|
+    def trace_workflow(
+      scenario,
+      tracer_and_exporter: init_tracer_and_exporter,
+      start_with_untraced_client: false,
+      always_create_workflow_spans: false,
+      check_root: true,
+      &
+    )
+      trace(tracer_and_exporter:, always_create_workflow_spans:, check_root:) do |client|
         # Must capture and attach outer context
         outer_context = OpenTelemetry::Context.current
         attach_token = nil
@@ -169,7 +187,8 @@ module Contrib
           client:,
           activities: [TestActivity.new(tracer_and_exporter.first)],
           # Have to reattach outer context inside worker run to check outer span
-          on_worker_run: proc { attach_token = OpenTelemetry::Context.attach(outer_context) }
+          on_worker_run: proc { attach_token = OpenTelemetry::Context.attach(outer_context) },
+          start_workflow_client: start_with_untraced_client ? env.client : client
         ) do |handle|
           yield handle
         ensure
@@ -398,42 +417,61 @@ module Contrib
     end
 
     def test_child_and_external
-      exp_root = ExpectedSpan.new(name: 'root')
-      act_root = trace_workflow(:wait_on_signal) do |handle|
-        exp_cl_attrs = { 'temporalWorkflowID' => handle.id }
-        exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
-        exp_start_wf = exp_root.add_child(name: 'StartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
-        exp_start_wf.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_run_attrs)
+      # We have to test child signal and external signal separately because sending both back-to-back can result in
+      # rare cases where one is delivered before the other (yes, even if you wait on the first to get an initiated
+      # event)
+      %i[child_workflow_child_signal child_workflow_external_signal].each do |scenario|
+        exp_root = ExpectedSpan.new(name: 'root')
+        act_root = trace_workflow(:wait_on_signal) do |handle|
+          exp_cl_attrs = { 'temporalWorkflowID' => handle.id }
+          exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
+          exp_start_wf = exp_root.add_child(name: 'StartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
+          exp_start_wf.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_run_attrs)
 
-        # Wait for task completion so update isn't accidentally first before run
-        assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+          # Wait for task completion so update isn't accidentally first before run
+          assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
 
-        # Update calls child and sends signals to it in two ways
-        child_id, child_run_id, child_result = handle.execute_update(TestWorkflow.update,
-                                                                     :child_workflow, id: 'my-update-id')
-        exp_update = exp_root.add_child(name: 'StartWorkflowUpdate:update',
-                                        attributes: exp_cl_attrs.merge({ 'temporalUpdateID' => 'my-update-id' }))
-        # Expected span for update
-        exp_hnd_update = exp_start_wf.add_child(
-          name: 'HandleUpdate:update',
-          attributes: exp_run_attrs.merge({ 'temporalUpdateID' => 'my-update-id' }),
-          links: [exp_update]
-        )
-        # Expected for children
-        exp_child_run_attrs = { 'temporalWorkflowID' => child_id, 'temporalRunID' => child_run_id }
-        exp_child_start = exp_hnd_update.add_child(name: 'StartChildWorkflow:TestWorkflow', attributes: exp_run_attrs)
-        exp_child_start
-          .add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_child_run_attrs)
-          .add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_child_run_attrs)
-        # Two signals we send to the child
-        exp_sig_child = exp_hnd_update.add_child(name: 'SignalChildWorkflow:signal', attributes: exp_run_attrs)
-        exp_sig_ext = exp_hnd_update.add_child(name: 'SignalExternalWorkflow:signal', attributes: exp_run_attrs)
-        exp_child_start.add_child(name: 'HandleSignal:signal', attributes: exp_child_run_attrs, links: [exp_sig_child])
-        exp_child_start.add_child(name: 'HandleSignal:signal', attributes: exp_child_run_attrs, links: [exp_sig_ext])
+          # Update calls child and sends signals to it in two ways
+          child_id, child_run_id, child_result = handle.execute_update(TestWorkflow.update,
+                                                                       scenario, id: 'my-update-id')
+          exp_update = exp_root.add_child(name: 'StartWorkflowUpdate:update',
+                                          attributes: exp_cl_attrs.merge({ 'temporalUpdateID' => 'my-update-id' }))
+          # Expected span for update
+          exp_hnd_update = exp_start_wf.add_child(
+            name: 'HandleUpdate:update',
+            attributes: exp_run_attrs.merge({ 'temporalUpdateID' => 'my-update-id' }),
+            links: [exp_update]
+          )
+          # Expected for children
+          exp_child_run_attrs = { 'temporalWorkflowID' => child_id, 'temporalRunID' => child_run_id }
+          exp_child_start = exp_hnd_update.add_child(name: 'StartChildWorkflow:TestWorkflow', attributes: exp_run_attrs)
+          exp_child_start
+            .add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_child_run_attrs)
+            .add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_child_run_attrs)
 
-        assert_equal 'workflow-done', child_result
+          # There are cases where signal comes _before_ start and cases where signal _comes_ after and server gives us
+          # no way of knowing that a child _actually_ began running, so we check whether task completed comes before
+          # signal
+          assert_equal 'workflow-done', child_result
+          child_events = env.client.workflow_handle(child_id.to_s).fetch_history_events.to_a
+          signal_comes_first = child_events.index(&:workflow_execution_signaled_event_attributes).to_i <
+                               child_events.index(&:workflow_task_completed_event_attributes).to_i
+          # Signal we send to the child
+          exp_sig = if scenario == :child_workflow_child_signal
+                      exp_hnd_update.add_child(name: 'SignalChildWorkflow:signal', attributes: exp_run_attrs)
+                    else
+                      exp_hnd_update.add_child(name: 'SignalExternalWorkflow:signal', attributes: exp_run_attrs)
+                    end
+          exp_child_start.add_child(
+            name: 'HandleSignal:signal',
+            attributes: exp_child_run_attrs,
+            links: [exp_sig],
+            insert_at: signal_comes_first ? 0 : 1
+          )
+        end
+        assert_equal exp_root.to_s_indented, act_root.to_s_indented,
+                     "Expected:\n#{exp_root.to_s_indented}\nActual:#{act_root.to_s_indented}"
       end
-      assert_equal exp_root.to_s_indented, act_root.to_s_indented
     end
 
     def test_continue_as_new
@@ -456,6 +494,29 @@ module Contrib
                              exception_message: 'Continue as new')
       end
       assert_equal exp_root.to_s_indented, act_root.to_s_indented
+    end
+
+    def test_always_create_workflow_spans
+      # Untraced client has no spans by default
+      act = trace_workflow(:complete, start_with_untraced_client: true, check_root: false) do |handle|
+        assert_equal 'workflow-done', handle.result
+      end
+      assert_empty act.children
+
+      # Untraced client has no spans by default
+      exp_root = ExpectedSpan.new(name: 'root')
+      act = trace_workflow(
+        :complete,
+        start_with_untraced_client: true,
+        always_create_workflow_spans: true,
+        check_root: false
+      ) do |handle|
+        exp_attrs = { 'temporalWorkflowID' => handle.id, 'temporalRunID' => handle.result_run_id }
+        exp_run_wf = exp_root.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_attrs)
+        exp_run_wf.add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_attrs)
+        assert_equal 'workflow-done', handle.result
+      end
+      assert_equal exp_root.children.first&.to_s_indented, act.to_s_indented
     end
 
     ExpectedSpan = Data.define(:name, :children, :attributes, :links, :exception_message) # rubocop:disable Layout/ClassStructure
@@ -493,13 +554,16 @@ module Contrib
       end
 
       def initialize(name:, children: [], attributes: {}, links: [], exception_message: nil)
-        children = children.to_set
         super
       end
 
-      def add_child(name:, attributes: {}, links: [], exception_message: nil)
+      def add_child(name:, attributes: {}, links: [], exception_message: nil, insert_at: nil)
         span = ExpectedSpan.new(name:, attributes:, links:, exception_message:)
-        children << span
+        if insert_at.nil?
+          children << span
+        else
+          children.insert(insert_at, span)
+        end
         span
       end
 
