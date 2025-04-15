@@ -17,7 +17,9 @@ module WorkflowUtils
     ?id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::enum,
     ?max_heartbeat_throttle_interval: Float,
     ?task_timeout: duration?,
-    ?on_worker_run: Proc?
+    ?on_worker_run: Proc?,
+    ?unsafe_workflow_io_enabled: bool,
+    ?start_workflow_client: Temporalio::Client
   ) -> Object? |
   [T] (
     singleton(Temporalio::Workflow::Definition) workflow,
@@ -37,7 +39,9 @@ module WorkflowUtils
     ?id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::enum,
     ?max_heartbeat_throttle_interval: Float,
     ?task_timeout: duration?,
-    ?on_worker_run: Proc?
+    ?on_worker_run: Proc?,
+    ?unsafe_workflow_io_enabled: bool,
+    ?start_workflow_client: Temporalio::Client
   ) { (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T
 
   def assert_eventually_task_fail: (

@@ -503,6 +503,13 @@ module Temporalio
       def self.illegal_call_tracing_disabled(&)
         Workflow._current.illegal_call_tracing_disabled(&)
       end
+
+      # Run a block of code with IO enabled. Specifically this allows the `io_wait` call of the fiber scheduler to work.
+      # Users should be cautious about using this as it can often signify unsafe code. Note, this is often only
+      # applicable to network code as file IO and most process-based IO does not go through scheduler `io_wait`.
+      def self.io_enabled(&)
+        Workflow._current.io_enabled(&)
+      end
     end
 
     # Error that is raised by a workflow out of the primary workflow method to issue a continue-as-new.
