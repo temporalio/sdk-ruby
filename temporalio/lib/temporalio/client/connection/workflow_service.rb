@@ -841,6 +841,201 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.DescribeDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeDeploymentResponse] API response.
+        def describe_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DescribeWorkerDeploymentVersion API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionResponse] API response.
+        def describe_worker_deployment_version(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_worker_deployment_version',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ListDeployments API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ListDeploymentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ListDeploymentsResponse] API response.
+        def list_deployments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'list_deployments',
+            request_class: Temporalio::Api::WorkflowService::V1::ListDeploymentsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ListDeploymentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.GetDeploymentReachability API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityResponse] API response.
+        def get_deployment_reachability(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_deployment_reachability',
+            request_class: Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.GetCurrentDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentResponse] API response.
+        def get_current_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_current_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.SetCurrentDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentResponse] API response.
+        def set_current_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_current_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.SetWorkerDeploymentCurrentVersion API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionResponse] API response.
+        def set_worker_deployment_current_version(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_worker_deployment_current_version',
+            request_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DescribeWorkerDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentResponse] API response.
+        def describe_worker_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_worker_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DeleteWorkerDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentResponse] API response.
+        def delete_worker_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_worker_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DeleteWorkerDeploymentVersion API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionResponse] API response.
+        def delete_worker_deployment_version(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_worker_deployment_version',
+            request_class: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.SetWorkerDeploymentRampingVersion API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionResponse] API response.
+        def set_worker_deployment_ramping_version(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_worker_deployment_ramping_version',
+            request_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ListWorkerDeployments API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse] API response.
+        def list_worker_deployments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'list_worker_deployments',
+            request_class: Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UpdateWorkerDeploymentVersionMetadata API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataResponse] API response.
+        def update_worker_deployment_version_metadata(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_worker_deployment_version_metadata',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.UpdateWorkflowExecution API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest] API request.
@@ -976,61 +1171,76 @@ module Temporalio
           )
         end
 
-        # Calls WorkflowService.UpdateActivityOptionsById API call.
+        # Calls WorkflowService.UpdateActivityOptions API call.
         #
-        # @param request [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdRequest] API request.
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest] API request.
         # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-        # @return [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdResponse] API response.
-        def update_activity_options_by_id(request, rpc_options: nil)
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse] API response.
+        def update_activity_options(request, rpc_options: nil)
           invoke_rpc(
-            rpc: 'update_activity_options_by_id',
-            request_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdRequest,
-            response_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsByIdResponse,
+            rpc: 'update_activity_options',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse,
             request:,
             rpc_options:
           )
         end
 
-        # Calls WorkflowService.PauseActivityById API call.
+        # Calls WorkflowService.UpdateWorkflowExecutionOptions API call.
         #
-        # @param request [Temporalio::Api::WorkflowService::V1::PauseActivityByIdRequest] API request.
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRequest] API request.
         # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-        # @return [Temporalio::Api::WorkflowService::V1::PauseActivityByIdResponse] API response.
-        def pause_activity_by_id(request, rpc_options: nil)
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsResponse] API response.
+        def update_workflow_execution_options(request, rpc_options: nil)
           invoke_rpc(
-            rpc: 'pause_activity_by_id',
-            request_class: Temporalio::Api::WorkflowService::V1::PauseActivityByIdRequest,
-            response_class: Temporalio::Api::WorkflowService::V1::PauseActivityByIdResponse,
+            rpc: 'update_workflow_execution_options',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsResponse,
             request:,
             rpc_options:
           )
         end
 
-        # Calls WorkflowService.UnpauseActivityById API call.
+        # Calls WorkflowService.PauseActivity API call.
         #
-        # @param request [Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdRequest] API request.
+        # @param request [Temporalio::Api::WorkflowService::V1::PauseActivityRequest] API request.
         # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-        # @return [Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdResponse] API response.
-        def unpause_activity_by_id(request, rpc_options: nil)
+        # @return [Temporalio::Api::WorkflowService::V1::PauseActivityResponse] API response.
+        def pause_activity(request, rpc_options: nil)
           invoke_rpc(
-            rpc: 'unpause_activity_by_id',
-            request_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdRequest,
-            response_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityByIdResponse,
+            rpc: 'pause_activity',
+            request_class: Temporalio::Api::WorkflowService::V1::PauseActivityRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::PauseActivityResponse,
             request:,
             rpc_options:
           )
         end
 
-        # Calls WorkflowService.ResetActivityById API call.
+        # Calls WorkflowService.UnpauseActivity API call.
         #
-        # @param request [Temporalio::Api::WorkflowService::V1::ResetActivityByIdRequest] API request.
+        # @param request [Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest] API request.
         # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-        # @return [Temporalio::Api::WorkflowService::V1::ResetActivityByIdResponse] API response.
-        def reset_activity_by_id(request, rpc_options: nil)
+        # @return [Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse] API response.
+        def unpause_activity(request, rpc_options: nil)
           invoke_rpc(
-            rpc: 'reset_activity_by_id',
-            request_class: Temporalio::Api::WorkflowService::V1::ResetActivityByIdRequest,
-            response_class: Temporalio::Api::WorkflowService::V1::ResetActivityByIdResponse,
+            rpc: 'unpause_activity',
+            request_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ResetActivity API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ResetActivityRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ResetActivityResponse] API response.
+        def reset_activity(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'reset_activity',
+            request_class: Temporalio::Api::WorkflowService::V1::ResetActivityRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ResetActivityResponse,
             request:,
             rpc_options:
           )

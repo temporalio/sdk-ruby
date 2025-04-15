@@ -31,6 +31,20 @@ impl Client {
                 "delete_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, delete_schedule)
                 }
+                "delete_worker_deployment" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    delete_worker_deployment
+                ),
+                "delete_worker_deployment_version" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    delete_worker_deployment_version
+                ),
                 "delete_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -48,6 +62,9 @@ impl Client {
                     WorkflowService,
                     describe_batch_operation
                 ),
+                "describe_deployment" => {
+                    rpc_call!(self, callback, call, WorkflowService, describe_deployment)
+                }
                 "describe_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, describe_namespace)
                 }
@@ -57,6 +74,20 @@ impl Client {
                 "describe_task_queue" => {
                     rpc_call!(self, callback, call, WorkflowService, describe_task_queue)
                 }
+                "describe_worker_deployment" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    describe_worker_deployment
+                ),
+                "describe_worker_deployment_version" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    describe_worker_deployment_version
+                ),
                 "describe_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -74,6 +105,20 @@ impl Client {
                 "get_cluster_info" => {
                     rpc_call!(self, callback, call, WorkflowService, get_cluster_info)
                 }
+                "get_current_deployment" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    get_current_deployment
+                ),
+                "get_deployment_reachability" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    get_deployment_reachability
+                ),
                 "get_search_attributes" => {
                     rpc_call!(self, callback, call, WorkflowService, get_search_attributes)
                 }
@@ -132,6 +177,9 @@ impl Client {
                     WorkflowService,
                     list_closed_workflow_executions
                 ),
+                "list_deployments" => {
+                    rpc_call!(self, callback, call, WorkflowService, list_deployments)
+                }
                 "list_namespaces" => {
                     rpc_call!(self, callback, call, WorkflowService, list_namespaces)
                 }
@@ -159,6 +207,13 @@ impl Client {
                     WorkflowService,
                     list_task_queue_partitions
                 ),
+                "list_worker_deployments" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    list_worker_deployments
+                ),
                 "list_workflow_executions" => rpc_call!(
                     self,
                     callback,
@@ -169,8 +224,8 @@ impl Client {
                 "patch_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, patch_schedule)
                 }
-                "pause_activity_by_id" => {
-                    rpc_call!(self, callback, call, WorkflowService, pause_activity_by_id)
+                "pause_activity" => {
+                    rpc_call!(self, callback, call, WorkflowService, pause_activity)
                 }
                 "poll_activity_task_queue" => rpc_call!(
                     self,
@@ -223,8 +278,8 @@ impl Client {
                     WorkflowService,
                     request_cancel_workflow_execution
                 ),
-                "reset_activity_by_id" => {
-                    rpc_call!(self, callback, call, WorkflowService, reset_activity_by_id)
+                "reset_activity" => {
+                    rpc_call!(self, callback, call, WorkflowService, reset_activity)
                 }
                 "reset_sticky_task_queue" => rpc_call!(
                     self,
@@ -324,6 +379,27 @@ impl Client {
                     WorkflowService,
                     scan_workflow_executions
                 ),
+                "set_current_deployment" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    set_current_deployment
+                ),
+                "set_worker_deployment_current_version" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    set_worker_deployment_current_version
+                ),
+                "set_worker_deployment_ramping_version" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    set_worker_deployment_ramping_version
+                ),
                 "shutdown_worker" => {
                     rpc_call!(self, callback, call, WorkflowService, shutdown_worker)
                 }
@@ -361,19 +437,15 @@ impl Client {
                     WorkflowService,
                     terminate_workflow_execution
                 ),
-                "unpause_activity_by_id" => rpc_call!(
+                "unpause_activity" => {
+                    rpc_call!(self, callback, call, WorkflowService, unpause_activity)
+                }
+                "update_activity_options" => rpc_call!(
                     self,
                     callback,
                     call,
                     WorkflowService,
-                    unpause_activity_by_id
-                ),
-                "update_activity_options_by_id" => rpc_call!(
-                    self,
-                    callback,
-                    call,
-                    WorkflowService,
-                    update_activity_options_by_id
+                    update_activity_options
                 ),
                 "update_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, update_namespace)
@@ -388,6 +460,13 @@ impl Client {
                     WorkflowService,
                     update_worker_build_id_compatibility
                 ),
+                "update_worker_deployment_version_metadata" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    update_worker_deployment_version_metadata
+                ),
                 "update_worker_versioning_rules" => rpc_call!(
                     self,
                     callback,
@@ -401,6 +480,13 @@ impl Client {
                     call,
                     WorkflowService,
                     update_workflow_execution
+                ),
+                "update_workflow_execution_options" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    update_workflow_execution_options
                 ),
                 _ => Err(error!("Unknown RPC call {}", call.rpc)),
             },

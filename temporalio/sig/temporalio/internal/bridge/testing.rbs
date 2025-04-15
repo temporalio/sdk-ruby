@@ -18,6 +18,7 @@ module Temporalio
             attr_accessor log_format: String
             attr_accessor log_level: String
             attr_accessor extra_args: Array[String]
+            attr_accessor download_ttl: Float?
 
             def initialize: (
               existing_path: String?,
@@ -33,7 +34,8 @@ module Temporalio
               ui_port: Integer?,
               log_format: String,
               log_level: String,
-              extra_args: Array[String]
+              extra_args: Array[String],
+              download_ttl: Float?
             ) -> void
           end
 
@@ -45,6 +47,7 @@ module Temporalio
             attr_accessor download_dest_dir: String?
             attr_accessor port: Integer?
             attr_accessor extra_args: Array[String]
+            attr_accessor download_ttl: Float?
 
             def initialize: (
               existing_path: String?,
@@ -53,7 +56,8 @@ module Temporalio
               download_version: String,
               download_dest_dir: String?,
               port: Integer?,
-              extra_args: Array[String]
+              extra_args: Array[String],
+              download_ttl: Float?
             ) -> void
           end
 

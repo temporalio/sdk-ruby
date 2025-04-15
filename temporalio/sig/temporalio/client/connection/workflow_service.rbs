@@ -225,6 +225,58 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def describe_deployment: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def describe_worker_deployment_version: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def list_deployments: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_deployment_reachability: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_current_deployment: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def set_current_deployment: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def set_worker_deployment_current_version: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def describe_worker_deployment: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_worker_deployment: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_worker_deployment_version: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def set_worker_deployment_ramping_version: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def list_worker_deployments: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_worker_deployment_version_metadata: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def update_workflow_execution: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -261,19 +313,23 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
-        def update_activity_options_by_id: (
+        def update_activity_options: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
-        def pause_activity_by_id: (
+        def update_workflow_execution_options: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
-        def unpause_activity_by_id: (
+        def pause_activity: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
-        def reset_activity_by_id: (
+        def unpause_activity: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def reset_activity: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped

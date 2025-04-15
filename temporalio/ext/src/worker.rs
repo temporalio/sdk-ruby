@@ -26,7 +26,7 @@ use temporal_sdk_core::{
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
-    worker::SlotKind,
+    worker::{PollerBehavior, SlotKind, WorkerVersioningStrategy},
 };
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
@@ -447,18 +447,26 @@ fn build_config(options: Struct) -> Result<WorkerConfig, Error> {
     WorkerConfigBuilder::default()
         .namespace(options.member::<String>(id!("namespace"))?)
         .task_queue(options.member::<String>(id!("task_queue"))?)
-        .worker_build_id(options.member::<String>(id!("build_id"))?)
+        // TODO(cretz): Replace with more involved versioning strategy
+        .versioning_strategy({
+            let build_id = options.member::<String>(id!("build_id"))?;
+            if options.member::<bool>(id!("use_worker_versioning"))? {
+                WorkerVersioningStrategy::LegacyBuildIdBased { build_id }
+            } else {
+                WorkerVersioningStrategy::None { build_id }
+            }
+        })
         .client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
         .max_cached_workflows(options.member::<usize>(id!("max_cached_workflows"))?)
-        .max_concurrent_wft_polls(
+        .workflow_task_poller_behavior(PollerBehavior::SimpleMaximum(
             options.member::<usize>(id!("max_concurrent_workflow_task_polls"))?,
-        )
+        ))
         .nonsticky_to_sticky_poll_ratio(
             options.member::<f32>(id!("nonsticky_to_sticky_poll_ratio"))?,
         )
-        .max_concurrent_at_polls(
+        .activity_task_poller_behavior(PollerBehavior::SimpleMaximum(
             options.member::<usize>(id!("max_concurrent_activity_task_polls"))?,
-        )
+        ))
         .no_remote_activities(options.member::<bool>(id!("no_remote_activities"))?)
         .sticky_queue_schedule_to_start_timeout(Duration::from_secs_f64(
             options.member(id!("sticky_queue_schedule_to_start_timeout"))?,
@@ -478,7 +486,6 @@ fn build_config(options: Struct) -> Result<WorkerConfig, Error> {
         .graceful_shutdown_period(Duration::from_secs_f64(
             options.member(id!("graceful_shutdown_period"))?,
         ))
-        .use_worker_versioning(options.member::<bool>(id!("use_worker_versioning"))?)
         .tuner(Arc::new(build_tuner(
             options
                 .child(id!("tuner"))?

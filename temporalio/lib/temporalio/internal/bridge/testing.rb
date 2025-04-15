@@ -22,6 +22,7 @@ module Temporalio
             :log_format,
             :log_level,
             :extra_args,
+            :download_ttl, # Optional
             keyword_init: true
           )
 
@@ -33,6 +34,7 @@ module Temporalio
             :download_dest_dir, # Optional
             :port, # Optional
             :extra_args,
+            :download_ttl, # Optional
             keyword_init: true
           )
 

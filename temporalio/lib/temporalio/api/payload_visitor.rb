@@ -395,6 +395,30 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_deployment_v1_deployment_info(value)
+        @on_enter&.call(value)
+        value.metadata.values.each { |v| api_common_v1_payload(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_deployment_v1_update_deployment_metadata(value)
+        @on_enter&.call(value)
+        value.upsert_entries.values.each { |v| api_common_v1_payload(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_deployment_v1_version_metadata(value)
+        @on_enter&.call(value)
+        value.entries.values.each { |v| api_common_v1_payload(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_deployment_v1_worker_deployment_version_info(value)
+        @on_enter&.call(value)
+        api_deployment_v1_version_metadata(value.metadata) if value.has_metadata?
+        @on_exit&.call(value)
+      end
+      
       def api_export_v1_workflow_execution(value)
         @on_enter&.call(value)
         api_history_v1_history(value.history) if value.has_history?
@@ -798,6 +822,7 @@ module Temporalio
       def api_query_v1_workflow_query_result(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.answer) if value.has_answer?
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -916,11 +941,23 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_describe_deployment_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_deployment_info(value.deployment_info) if value.has_deployment_info?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_describe_schedule_response(value)
         @on_enter&.call(value)
         api_schedule_v1_schedule(value.schedule) if value.has_schedule?
         api_common_v1_memo(value.memo) if value.has_memo?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_describe_worker_deployment_version_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_worker_deployment_version_info(value.worker_deployment_version_info) if value.has_worker_deployment_version_info?
         @on_exit&.call(value)
       end
       
@@ -957,6 +994,18 @@ module Temporalio
         @on_enter&.call(value)
         api_workflowservice_v1_start_workflow_execution_response(value.start_workflow) if value.has_start_workflow?
         api_workflowservice_v1_update_workflow_execution_response(value.update_workflow) if value.has_update_workflow?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_get_current_deployment_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_deployment_info(value.current_deployment_info) if value.has_current_deployment_info?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_get_deployment_reachability_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_deployment_info(value.deployment_info) if value.has_deployment_info?
         @on_exit&.call(value)
       end
       
@@ -1114,6 +1163,7 @@ module Temporalio
       def api_workflowservice_v1_respond_query_task_completed_request(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.query_result) if value.has_query_result?
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -1142,6 +1192,19 @@ module Temporalio
       def api_workflowservice_v1_scan_workflow_executions_response(value)
         @on_enter&.call(value)
         value.executions.each { |v| api_workflow_v1_workflow_execution_info(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_set_current_deployment_request(value)
+        @on_enter&.call(value)
+        api_deployment_v1_update_deployment_metadata(value.update_metadata) if value.has_update_metadata?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_set_current_deployment_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_deployment_info(value.current_deployment_info) if value.has_current_deployment_info?
+        api_deployment_v1_deployment_info(value.previous_deployment_info) if value.has_previous_deployment_info?
         @on_exit&.call(value)
       end
       
@@ -1198,6 +1261,18 @@ module Temporalio
         @on_enter&.call(value)
         api_schedule_v1_schedule(value.schedule) if value.has_schedule?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_update_worker_deployment_version_metadata_request(value)
+        @on_enter&.call(value)
+        value.upsert_entries.values.each { |v| api_common_v1_payload(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_update_worker_deployment_version_metadata_response(value)
+        @on_enter&.call(value)
+        api_deployment_v1_version_metadata(value.metadata) if value.has_metadata?
         @on_exit&.call(value)
       end
       
@@ -1271,12 +1346,6 @@ module Temporalio
         api_failure_v1_failure(value.failed) if value.has_failed?
         api_failure_v1_failure(value.cancelled) if value.has_cancelled?
         api_failure_v1_failure(value.timed_out) if value.has_timed_out?
-        @on_exit&.call(value)
-      end
-      
-      def coresdk_workflow_activation_cancel_workflow(value)
-        @on_enter&.call(value)
-        api_common_v1_payload_repeated(value.details) unless value.details.empty?
         @on_exit&.call(value)
       end
       
@@ -1370,7 +1439,6 @@ module Temporalio
         @on_enter&.call(value)
         coresdk_workflow_activation_initialize_workflow(value.initialize_workflow) if value.has_initialize_workflow?
         coresdk_workflow_activation_query_workflow(value.query_workflow) if value.has_query_workflow?
-        coresdk_workflow_activation_cancel_workflow(value.cancel_workflow) if value.has_cancel_workflow?
         coresdk_workflow_activation_signal_workflow(value.signal_workflow) if value.has_signal_workflow?
         coresdk_workflow_activation_resolve_activity(value.resolve_activity) if value.has_resolve_activity?
         coresdk_workflow_activation_resolve_child_workflow_execution_start(value.resolve_child_workflow_execution_start) if value.has_resolve_child_workflow_execution_start?
