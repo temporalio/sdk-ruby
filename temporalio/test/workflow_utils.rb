@@ -30,6 +30,7 @@ module WorkflowUtils
     task_timeout: nil,
     interceptors: [],
     on_worker_run: nil,
+    unsafe_workflow_io_enabled: false,
     start_workflow_client: client
   )
     worker = Temporalio::Worker.new(
@@ -42,7 +43,8 @@ module WorkflowUtils
       logger: logger || client.options.logger,
       workflow_payload_codec_thread_pool:,
       max_heartbeat_throttle_interval:,
-      interceptors:
+      interceptors:,
+      unsafe_workflow_io_enabled:
     )
     worker.run do
       on_worker_run&.call

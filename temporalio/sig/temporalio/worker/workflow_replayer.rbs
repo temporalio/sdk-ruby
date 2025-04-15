@@ -14,6 +14,7 @@ module Temporalio
         attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
         attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
         attr_reader workflow_payload_codec_thread_pool: ThreadPool?
+        attr_reader unsafe_workflow_io_enabled: bool
         attr_reader debug_mode: bool
         attr_reader runtime: Runtime
   
@@ -30,6 +31,7 @@ module Temporalio
           illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
           workflow_failure_exception_types: Array[singleton(Exception)],
           workflow_payload_codec_thread_pool: ThreadPool?,
+          unsafe_workflow_io_enabled: bool,
           debug_mode: bool,
           runtime: Runtime
         ) -> void
@@ -50,6 +52,7 @@ module Temporalio
         ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
         ?workflow_failure_exception_types: Array[singleton(Exception)],
         ?workflow_payload_codec_thread_pool: ThreadPool?,
+        ?unsafe_workflow_io_enabled: bool,
         ?debug_mode: bool,
         ?runtime: Runtime
       ) ?{ (ReplayWorker worker) -> untyped } -> void

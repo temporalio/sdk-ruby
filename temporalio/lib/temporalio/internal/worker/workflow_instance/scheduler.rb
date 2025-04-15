@@ -137,8 +137,28 @@ module Temporalio
           end
 
           def io_wait(io, events, timeout)
-            # TODO(cretz): This in a blocking fashion?
-            raise NotImplementedError, 'TODO'
+            # Do not allow if IO disabled
+            unless @instance.io_enabled
+              raise Workflow::NondeterminismError,
+                    'Cannot perform IO from inside a workflow. If this is known to be safe, ' \
+                    'the code can be run in a Temporalio::Workflow::Unsafe.io_enabled block.'
+            end
+
+            # Use regular Ruby behavior of blocking this thread. There is no Ruby implementation of io_wait we can just
+            # delegate to at this time (or default scheduler or anything like that), so we had to implement this
+            # ourselves.
+            readers = events.nobits?(IO::READABLE) ? nil : [io]
+            writers = events.nobits?(IO::WRITABLE) ? nil : [io]
+            priority = events.nobits?(IO::PRIORITY) ? nil : [io]
+            ready = IO.select(readers, writers, priority, timeout) # steep:ignore
+
+            result = 0
+            unless ready.nil?
+              result |= IO::READABLE if ready[0]&.include?(io)
+              result |= IO::WRITABLE if ready[1]&.include?(io)
+              result |= IO::PRIORITY if ready[2]&.include?(io)
+            end
+            result
           end
 
           def kernel_sleep(duration = nil)

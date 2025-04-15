@@ -25,6 +25,7 @@ module Temporalio
           illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
           workflow_failure_exception_types: Array[singleton(Exception)],
           workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
+          unsafe_workflow_io_enabled: bool,
           debug_mode: bool,
           ?on_eviction: (^(String run_id, untyped cache_remove_job) -> void)?
         ) -> void
@@ -61,6 +62,7 @@ module Temporalio
           attr_reader disable_eager_activity_execution: bool
           attr_reader workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
           attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
+          attr_reader unsafe_workflow_io_enabled: bool
 
           attr_writer on_eviction: ^(String run_id, untyped cache_remove_job) -> void
 
@@ -76,7 +78,8 @@ module Temporalio
             task_queue: String,
             disable_eager_activity_execution: bool,
             workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
-            workflow_failure_exception_types: Array[singleton(Exception)]
+            workflow_failure_exception_types: Array[singleton(Exception)],
+            unsafe_workflow_io_enabled: bool
           ) -> void
 
           def get_or_create_running_workflow: [T] (String run_id) { -> T } -> T

@@ -18,6 +18,7 @@ module WorkflowUtils
     ?max_heartbeat_throttle_interval: Float,
     ?task_timeout: duration?,
     ?on_worker_run: Proc?,
+    ?unsafe_workflow_io_enabled: bool,
     ?start_workflow_client: Temporalio::Client
   ) -> Object? |
   [T] (
@@ -39,6 +40,7 @@ module WorkflowUtils
     ?max_heartbeat_throttle_interval: Float,
     ?task_timeout: duration?,
     ?on_worker_run: Proc?,
+    ?unsafe_workflow_io_enabled: bool,
     ?start_workflow_client: Temporalio::Client
   ) { (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T
 
