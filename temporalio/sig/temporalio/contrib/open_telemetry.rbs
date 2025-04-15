@@ -11,7 +11,8 @@ module Temporalio
         def initialize: (
           untyped tracer,
           ?header_key: String,
-          ?propagator: untyped
+          ?propagator: untyped,
+          ?always_create_workflow_spans: bool
         ) -> void
 
         def _apply_context_to_headers: (Hash[String, untyped] headers, ?context: untyped) -> void
@@ -23,6 +24,7 @@ module Temporalio
           ?attributes: Hash[untyped, untyped]?,
           ?outbound_input: untyped
         ) { () -> T } -> T
+        def _always_create_workflow_spans: -> bool
 
         class WorkflowInbound < Worker::Interceptor::Workflow::Inbound
           def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Inbound next_interceptor) -> void
