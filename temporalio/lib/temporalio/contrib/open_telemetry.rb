@@ -23,6 +23,11 @@ module Temporalio
         # @param tracer [OpenTelemetry::Trace::Tracer] Tracer to use.
         # @param header_key [String] Temporal header name to serialize spans to/from. Most users should not change this.
         # @param propagator [Object] Propagator to use. Most users should not change this.
+        # @param always_create_workflow_spans [Boolean] When false, the default, spans are only created in workflows
+        #   when an overarching span from the client is present. In cases of starting a workflow elsewhere, e.g. CLI or
+        #   schedules, a client-created span is not present and workflow spans will not be created. Setting this to true
+        #   will create spans in workflows no matter what, but there is a risk of them being orphans since they may not
+        #   have a parent span after replaying.
         def initialize(
           tracer,
           header_key: '_tracer-data',
@@ -31,11 +36,13 @@ module Temporalio
               ::OpenTelemetry::Trace::Propagation::TraceContext::TextMapPropagator.new,
               ::OpenTelemetry::Baggage::Propagation::TextMapPropagator.new
             ]
-          )
+          ),
+          always_create_workflow_spans: false
         )
           @tracer = tracer
           @header_key = header_key
           @propagator = propagator
+          @always_create_workflow_spans = always_create_workflow_spans
         end
 
         # @!visibility private
@@ -83,6 +90,11 @@ module Temporalio
             _apply_context_to_headers(outbound_input.headers) if outbound_input
             yield
           end
+        end
+
+        # @!visibility private
+        def _always_create_workflow_spans
+          @always_create_workflow_spans
         end
 
         # @!visibility private
@@ -423,30 +435,34 @@ module Temporalio
           even_during_replay: false
         )
           # Get root interceptor, which also checks if in workflow
-          root = Temporalio::Workflow.storage[:__temporal_opentelemetry_tracing_interceptor]
+          root = Temporalio::Workflow.storage[:__temporal_opentelemetry_tracing_interceptor] #: TracingInterceptor?
           raise 'Tracing interceptor not configured' unless root
 
           # Do nothing if replaying and not wanted during replay
           return nil if !even_during_replay && Temporalio::Workflow::Unsafe.replaying?
 
-          # Do nothing if there is no span on the context. We do not want orphan spans coming from workflows, so we
-          # require a parent (i.e. a current).
-          # TODO(cretz): This matches Python behavior but not .NET behavior (which will create no matter what), is that
-          # ok?
-          return nil if ::OpenTelemetry::Trace.current_span == ::OpenTelemetry::Trace::Span::INVALID
+          # If there is no span on the context and the user hasn't opted in to always creating, do not create. This
+          # prevents orphans if there was no span originally created from the client start-workflow call.
+          if ::OpenTelemetry::Trace.current_span == ::OpenTelemetry::Trace::Span::INVALID &&
+             !root._always_create_workflow_spans
+            return nil
+          end
 
           # Create attributes, adding user-defined ones
           attributes = { 'temporalWorkflowID' => Temporalio::Workflow.info.workflow_id,
                          'temporalRunID' => Temporalio::Workflow.info.run_id }.merge(attributes)
 
-          # Create span
-          time = Temporalio::Workflow.now
-          timestamp = (time.to_i * 1_000_000_000) + time.nsec
-          span = root.tracer.start_span(name, attributes:, links:, start_timestamp: timestamp, kind:) # steep:ignore
-          # Record exception if present
-          span.record_exception(exception) if exception
-          # Finish the span (returns self)
-          span.finish(end_timestamp: timestamp)
+          # Create span, which has to be done with illegal call disabling because OTel asks for full exception message
+          # which uses error highlighting and such which accesses File#path
+          Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
+            time = Temporalio::Workflow.now
+            timestamp = (time.to_i * 1_000_000_000) + time.nsec
+            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: timestamp, kind:) # steep:ignore
+            # Record exception if present
+            span.record_exception(exception) if exception
+            # Finish the span (returns self)
+            span.finish(end_timestamp: timestamp)
+          end
         end
       end
     end

@@ -30,7 +30,8 @@ module WorkflowUtils
     task_timeout: nil,
     interceptors: [],
     on_worker_run: nil,
-    unsafe_workflow_io_enabled: false
+    unsafe_workflow_io_enabled: false,
+    start_workflow_client: client
   )
     worker = Temporalio::Worker.new(
       client:,
@@ -47,7 +48,7 @@ module WorkflowUtils
     )
     worker.run do
       on_worker_run&.call
-      handle = client.start_workflow(
+      handle = start_workflow_client.start_workflow(
         workflow,
         *args,
         id:,
