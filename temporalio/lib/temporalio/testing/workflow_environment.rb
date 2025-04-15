@@ -49,6 +49,8 @@ module Temporalio
       # @param dev_server_download_version [String] Version of dev server to download and cache.
       # @param dev_server_download_dest_dir [String, nil] Where to download. Defaults to tmp.
       # @param dev_server_extra_args [Array<String>] Any extra arguments for the CLI dev server.
+      # @param dev_server_download_ttl [Float, nil] How long the automatic download should be cached for. If nil, cached
+      #   indefinitely.
       #
       # @yield [environment] If a block is given, it is called with the environment and upon complete the environment is
       #   shutdown.
@@ -75,6 +77,7 @@ module Temporalio
         dev_server_download_version: 'default',
         dev_server_download_dest_dir: nil,
         dev_server_extra_args: [],
+        dev_server_download_ttl: nil,
         &
       )
         # Add search attribute args
@@ -100,7 +103,8 @@ module Temporalio
           ui_port: ui ? ui_port : nil,
           log_format: dev_server_log_format,
           log_level: dev_server_log_level,
-          extra_args: dev_server_extra_args
+          extra_args: dev_server_extra_args,
+          download_ttl: dev_server_download_ttl
         )
         _with_core_server(
           core_server: Internal::Bridge::Testing::EphemeralServer.start_dev_server(
@@ -137,6 +141,8 @@ module Temporalio
       # @param test_server_download_version [String] Version of test server to download and cache.
       # @param test_server_download_dest_dir [String, nil] Where to download. Defaults to tmp.
       # @param test_server_extra_args [Array<String>] Any extra arguments for the test server.
+      # @param test_server_download_ttl [Float, nil] How long the automatic download should be cached for. If nil,
+      #   cached indefinitely.
       #
       # @yield [environment] If a block is given, it is called with the environment and upon complete the environment is
       #   shutdown.
@@ -155,6 +161,7 @@ module Temporalio
         test_server_download_version: 'default',
         test_server_download_dest_dir: nil,
         test_server_extra_args: [],
+        test_server_download_ttl: nil,
         &
       )
         server_options = Internal::Bridge::Testing::EphemeralServer::StartTestServerOptions.new(
@@ -164,7 +171,8 @@ module Temporalio
           download_version: test_server_download_version,
           download_dest_dir: test_server_download_dest_dir,
           port:,
-          extra_args: test_server_extra_args
+          extra_args: test_server_extra_args,
+          download_ttl: test_server_download_ttl
         )
         _with_core_server(
           core_server: Internal::Bridge::Testing::EphemeralServer.start_test_server(

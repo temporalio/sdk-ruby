@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use magnus::{
     class, function, method, prelude::*, DataTypeFunctions, Error, Ruby, TypedData, Value,
 };
@@ -140,6 +142,9 @@ impl EphemeralServer {
                     download_version => EphemeralExeVersion::Fixed(download_version),
                 },
                 dest_dir: options.member(id!("download_dest_dir"))?,
+                ttl: options
+                    .member::<Option<f64>>(id!("download_ttl"))?
+                    .map(Duration::from_secs_f64),
             })
         }
     }
