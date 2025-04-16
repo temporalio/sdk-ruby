@@ -13,6 +13,7 @@ module Temporalio
       :namespace,
       :parent,
       :retry_policy,
+      :root,
       :run_id,
       :run_timeout,
       :start_time,
@@ -45,6 +46,9 @@ module Temporalio
     #   @return [ParentInfo, nil] Parent information for the workflow if this is a child.
     # @!attribute retry_policy
     #   @return [RetryPolicy, nil] Retry policy for the workflow.
+    # @!attribute root
+    #   @return [RootInfo, nil] Root information for the workflow. This is nil in pre-1.27.0 server versions or if there
+    #     is no root (i.e. the root is itself).
     # @!attribute run_id
     #   @return [String] Run ID for the workflow.
     # @!attribute run_timeout
@@ -76,6 +80,21 @@ module Temporalio
       #   this class or it may break in incompatible ways.
       ParentInfo = Struct.new(
         :namespace,
+        :run_id,
+        :workflow_id,
+        keyword_init: true
+      )
+
+      # Information about a root of a workflow.
+      #
+      # @!attribute run_id
+      #   @return [String] Run ID for the root.
+      # @!attribute workflow_id
+      #   @return [String] Workflow ID for the root.
+      #
+      # @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate
+      #   this class or it may break in incompatible ways.
+      RootInfo = Struct.new(
         :run_id,
         :workflow_id,
         keyword_init: true
