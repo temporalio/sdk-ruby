@@ -70,6 +70,7 @@ module Temporalio
       attr_reader metric_temporality: MetricTemporality
       attr_reader durations_as_seconds: bool
       attr_reader http: bool
+      attr_reader histogram_bucket_overrides: Hash[String, Array[Numeric]]?
 
       def initialize: (
         url: String,
@@ -77,7 +78,8 @@ module Temporalio
         ?metric_periodicity: Float?,
         ?metric_temporality: MetricTemporality,
         ?durations_as_seconds: bool,
-        ?http: bool
+        ?http: bool,
+        ?histogram_bucket_overrides: Hash[String, Array[Numeric]]?
       ) -> void
 
       def _to_bridge: -> Internal::Bridge::Runtime::OpenTelemetryMetricsOptions
@@ -88,12 +90,14 @@ module Temporalio
       attr_reader counters_total_suffix: bool
       attr_reader unit_suffix: bool
       attr_reader durations_as_seconds: bool
+      attr_reader histogram_bucket_overrides: Hash[String, Array[Numeric]]?
 
       def initialize: (
         bind_address: String,
         ?counters_total_suffix: bool,
         ?unit_suffix: bool,
-        ?durations_as_seconds: bool
+        ?durations_as_seconds: bool,
+        ?histogram_bucket_overrides: Hash[String, Array[Numeric]]?
       ) -> void
 
       def _to_bridge: -> Internal::Bridge::Runtime::PrometheusMetricsOptions

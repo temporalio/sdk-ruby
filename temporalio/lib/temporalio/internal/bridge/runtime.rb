@@ -38,6 +38,7 @@ module Temporalio
           :metric_temporality_delta,
           :durations_as_seconds,
           :http,
+          :histogram_bucket_overrides, # Optional
           keyword_init: true
         )
 
@@ -46,6 +47,7 @@ module Temporalio
           :counters_total_suffix,
           :unit_suffix,
           :durations_as_seconds,
+          :histogram_bucket_overrides, # Optional
           keyword_init: true
         )
       end

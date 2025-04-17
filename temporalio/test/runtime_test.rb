@@ -127,4 +127,43 @@ class RuntimeTest < Test
     assert_bad_call { counter_int.record(1, additional_attributes: { 123 => 'foo' }) }
     # steep:ignore:end
   end
+
+  def test_histogram_bucket_overrides
+    # Prom metrics with custom histogram buckets
+    prom_addr = "127.0.0.1:#{find_free_port}"
+    runtime = Temporalio::Runtime.new(
+      telemetry: Temporalio::Runtime::TelemetryOptions.new(
+        metrics: Temporalio::Runtime::MetricsOptions.new(
+          prometheus: Temporalio::Runtime::PrometheusMetricsOptions.new(
+            bind_address: prom_addr,
+            histogram_bucket_overrides: {
+              'temporal_request_latency' => [123.4, 567.89],
+              'custom_histogram' => [5, 6, 7]
+            }
+          )
+        )
+      )
+    )
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    )
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
+
+    # Generate metrics
+    client.workflow_service.get_system_info(Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest.new)
+    hist = runtime.metric_meter.create_metric(:histogram, 'custom_histogram', value_type: :float)
+    hist.record(4.5)
+    hist.record(5.5)
+    hist.record(6.5)
+    hist.record(7.5)
+
+    # Check metrics
+    dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
+    assert_metric_line(dump, 'temporal_request_latency_bucket', le: '123.4')
+    assert_metric_line(dump, 'temporal_request_latency_bucket', le: '567.89')
+    assert_equal '1', assert_metric_line(dump, 'custom_histogram_bucket', le: '5')
+    assert_equal '2', assert_metric_line(dump, 'custom_histogram_bucket', le: '6')
+    assert_equal '3', assert_metric_line(dump, 'custom_histogram_bucket', le: '7')
+  end
 end

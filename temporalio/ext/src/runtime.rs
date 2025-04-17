@@ -14,6 +14,7 @@ use temporal_sdk_core::telemetry::{
     build_otlp_metric_exporter, start_prometheus_metric_exporter, MetricsCallBuffer,
 };
 use temporal_sdk_core::{CoreRuntime, TokioRuntimeBuilder};
+use temporal_sdk_core_api::telemetry::HistogramBucketOverrides;
 use temporal_sdk_core_api::telemetry::{
     metrics::MetricCallBufferer, Logger, MetricTemporality, OtelCollectorOptionsBuilder,
     OtlpProtocol, PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder,
@@ -129,6 +130,9 @@ impl Runtime {
                     if opentelemetry.member::<bool>(id!("http"))? {
                         opts_build.protocol(OtlpProtocol::Http);
                     }
+                    if let Some(overrides) = opentelemetry.member::<Option<HashMap<String, Vec<f64>>>>(id!("histogram_bucket_overrides"))? {
+                        opts_build.histogram_bucket_overrides(HistogramBucketOverrides { overrides });
+                    }
                     let opts = opts_build
                         .build()
                         .map_err(|err| error!("Invalid OpenTelemetry options: {}", err))?;
@@ -149,6 +153,9 @@ impl Runtime {
                         .use_seconds_for_durations(prom.member(id!("durations_as_seconds"))?);
                     if let Some(global_tags) = metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))? {
                         opts_build.global_tags(global_tags);
+                    }
+                    if let Some(overrides) = prom.member::<Option<HashMap<String, Vec<f64>>>>(id!("histogram_bucket_overrides"))? {
+                        opts_build.histogram_bucket_overrides(HistogramBucketOverrides { overrides });
                     }
                     let opts = opts_build
                         .build()

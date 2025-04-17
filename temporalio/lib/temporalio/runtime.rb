@@ -178,7 +178,8 @@ module Temporalio
       :metric_periodicity,
       :metric_temporality,
       :durations_as_seconds,
-      :http
+      :http,
+      :histogram_bucket_overrides
     )
 
     # Options for exporting metrics to OpenTelemetry.
@@ -197,6 +198,9 @@ module Temporalio
     #     +false+.
     # @!attribute http
     #   @return [Boolean] True if the protocol is HTTP, false if gRPC (the default).
+    # @!attribute histogram_bucket_overrides
+    #   @return [Hash<String, Array<Numeric>>, nil] Override default histogram buckets. Key of the hash it the metric
+    #     name, value is an array of floats for the set of buckets.
     class OpenTelemetryMetricsOptions
       # OpenTelemetry metric temporality.
       module MetricTemporality
@@ -213,13 +217,16 @@ module Temporalio
       # @param durations_as_seconds [Boolean] Whether to use float seconds instead of integer milliseconds for
       #   durations.
       # @param http [Boolean] True if the protocol is HTTP, false if gRPC (the default).
+      # @param histogram_bucket_overrides [Hash<String, Array<Numeric>>, nil] Override default histogram buckets. Key of
+      #   the hash it the metric name, value is an array of floats for the set of buckets.
       def initialize(
         url:,
         headers: nil,
         metric_periodicity: nil,
         metric_temporality: MetricTemporality::CUMULATIVE,
         durations_as_seconds: false,
-        http: false
+        http: false,
+        histogram_bucket_overrides: nil
       )
         super
       end
@@ -237,7 +244,8 @@ module Temporalio
                                     else raise 'Unrecognized metric temporality'
                                     end,
           durations_as_seconds:,
-          http:
+          http:,
+          histogram_bucket_overrides:
         )
       end
     end
@@ -246,7 +254,8 @@ module Temporalio
       :bind_address,
       :counters_total_suffix,
       :unit_suffix,
-      :durations_as_seconds
+      :durations_as_seconds,
+      :histogram_bucket_overrides
     )
 
     # Options for exporting metrics to Prometheus.
@@ -259,6 +268,9 @@ module Temporalio
     #   @return [Boolean] If `true`, all histograms will include the unit in their name as a suffix.
     # @!attribute durations_as_seconds
     #   @return [Boolean] Whether to use float seconds instead of integer milliseconds for durations.
+    # @!attribute histogram_bucket_overrides
+    #   @return [Hash<String, Array<Numeric>>, nil] Override default histogram buckets. Key of the hash it the metric
+    #     name, value is an array of floats for the set of buckets.
     class PrometheusMetricsOptions
       # Create Prometheus options.
       #
@@ -267,11 +279,14 @@ module Temporalio
       # @param unit_suffix [Boolean] If `true`, all histograms will include the unit in their name as a suffix.
       # @param durations_as_seconds [Boolean] Whether to use float seconds instead of integer milliseconds for
       #   durations.
+      # @param histogram_bucket_overrides [Hash<String, Array<Numeric>>, nil] Override default histogram buckets. Key of
+      #   the hash it the metric name, value is an array of floats for the set of buckets.
       def initialize(
         bind_address:,
         counters_total_suffix: false,
         unit_suffix: false,
-        durations_as_seconds: false
+        durations_as_seconds: false,
+        histogram_bucket_overrides: nil
       )
         super
       end
@@ -283,7 +298,8 @@ module Temporalio
           bind_address:,
           counters_total_suffix:,
           unit_suffix:,
-          durations_as_seconds:
+          durations_as_seconds:,
+          histogram_bucket_overrides:
         )
       end
     end
