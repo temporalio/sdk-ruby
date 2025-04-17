@@ -141,11 +141,21 @@ class WorkerWorkflowTest < Test
 
   class InfoWorkflow < Temporalio::Workflow::Definition
     def execute
-      Temporalio::Workflow.info.to_h
+      Temporalio::Workflow.info.to_h.tap do |h|
+        h['parent'] = Temporalio::Workflow.info.parent.to_h if Temporalio::Workflow.info.parent
+        h['root'] = Temporalio::Workflow.info.root.to_h if Temporalio::Workflow.info.root
+      end
+    end
+  end
+
+  class InfoFromChildWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_child_workflow(InfoWorkflow)
     end
   end
 
   def test_info
+    # Normal info
     execute_workflow(InfoWorkflow) do |handle, worker|
       info = handle.result #: Hash[String, untyped]
       assert_equal 1, info['attempt']
@@ -157,6 +167,7 @@ class WorkerWorkflowTest < Test
       assert_equal env.client.namespace, info['namespace']
       assert_nil info.fetch('parent')
       assert_nil info.fetch('retry_policy')
+      assert_nil info.fetch('root')
       assert_equal handle.result_run_id, info['run_id']
       assert_nil info.fetch('run_timeout')
       refute_nil info['start_time']
@@ -164,6 +175,15 @@ class WorkerWorkflowTest < Test
       assert_equal 10.0, info['task_timeout']
       assert_equal handle.id, info['workflow_id']
       assert_equal 'InfoWorkflow', info['workflow_type']
+    end
+    # Child info
+    execute_workflow(InfoFromChildWorkflow, more_workflows: [InfoWorkflow]) do |handle|
+      info = handle.result #: Hash[String, untyped]
+      assert_equal env.client.namespace, info['parent']['namespace']
+      assert_equal handle.id, info['parent']['workflow_id']
+      assert_equal handle.result_run_id, info['parent']['run_id']
+      assert_equal handle.id, info['root']['workflow_id']
+      assert_equal handle.result_run_id, info['root']['run_id']
     end
   end
 

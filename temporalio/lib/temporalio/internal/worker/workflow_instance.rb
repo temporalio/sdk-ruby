@@ -134,6 +134,12 @@ module Temporalio
                         )
                       end,
               retry_policy: (RetryPolicy._from_proto(@init_job.retry_policy) if @init_job.retry_policy),
+              root: if @init_job.root_workflow
+                      Workflow::Info::RootInfo.new(
+                        run_id: @init_job.root_workflow.run_id,
+                        workflow_id: @init_job.root_workflow.workflow_id
+                      )
+                    end,
               run_id: details.initial_activation.run_id,
               run_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_run_timeout),
               start_time: ProtoUtils.timestamp_to_time(details.initial_activation.timestamp) || raise,

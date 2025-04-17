@@ -11,6 +11,7 @@ module Temporalio
       attr_reader namespace: String
       attr_reader parent: ParentInfo?
       attr_reader retry_policy: RetryPolicy?
+      attr_reader root: RootInfo?
       attr_reader run_id: String
       attr_reader run_timeout: Float?
       attr_reader start_time: Time
@@ -30,6 +31,7 @@ module Temporalio
         namespace: String,
         parent: ParentInfo?,
         retry_policy: RetryPolicy?,
+        root: RootInfo?,
         run_id: String,
         run_timeout: Float?,
         start_time: Time,
@@ -48,6 +50,18 @@ module Temporalio
 
         def initialize: (
           namespace: String,
+          run_id: String,
+          workflow_id: String
+        ) -> void
+
+        def to_h: -> Hash[Symbol, untyped]
+      end
+
+      class RootInfo
+        attr_reader run_id: String
+        attr_reader workflow_id: String
+
+        def initialize: (
           run_id: String,
           workflow_id: String
         ) -> void
