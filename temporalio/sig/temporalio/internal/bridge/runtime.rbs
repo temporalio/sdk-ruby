@@ -51,6 +51,7 @@ module Temporalio
           attr_accessor metric_temporality_delta: bool
           attr_accessor durations_as_seconds: bool
           attr_accessor http: bool
+          attr_accessor histogram_bucket_overrides: Hash[String, Array[Numeric]]?
     
           def initialize: (
             url: String,
@@ -58,7 +59,8 @@ module Temporalio
             metric_periodicity: Float?,
             metric_temporality_delta: bool,
             durations_as_seconds: bool,
-            http: bool
+            http: bool,
+            histogram_bucket_overrides: Hash[String, Array[Numeric]]?
           ) -> void
         end
     
@@ -67,12 +69,14 @@ module Temporalio
           attr_accessor counters_total_suffix: bool
           attr_accessor unit_suffix: bool
           attr_accessor durations_as_seconds: bool
+          attr_accessor histogram_bucket_overrides: Hash[String, Array[Numeric]]?
     
           def initialize: (
             bind_address: String,
             counters_total_suffix: bool,
             unit_suffix: bool,
-            durations_as_seconds: bool
+            durations_as_seconds: bool,
+            histogram_bucket_overrides: Hash[String, Array[Numeric]]?
           ) -> void
         end
 
