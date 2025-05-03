@@ -4,6 +4,9 @@ on:
     branches:
       - main
       - "releases/*"
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build-platform-gems:
