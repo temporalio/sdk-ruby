@@ -55,6 +55,34 @@ module Testing
       end
     end
 
+    def test_auto_time_skipping_disabled
+      skip_if_not_x86!
+      Temporalio::Testing::WorkflowEnvironment.start_time_skipping(logger: Logger.new($stdout)) do |env|
+        worker = Temporalio::Worker.new(
+          client: env.client,
+          task_queue: "tq-#{SecureRandom.uuid}",
+          workflows: [SlowWorkflow]
+        )
+        worker.run do
+          # Check that timestamp is around now
+          assert_in_delta(Time.now, env.current_time, 30.0)
+
+          # Run workflow
+          handle = env.client.start_workflow(
+            SlowWorkflow,
+            id: "wf-#{SecureRandom.uuid}",
+            task_queue: worker.task_queue
+          )
+          env.auto_time_skipping_disabled do
+            handle.signal(SlowWorkflow.some_signal)
+          end
+          # Check that timestamp is now about two days from now
+          assert_equal 'all done', handle.result
+          assert_in_delta Time.now + SlowWorkflow::TWO_DAYS, env.current_time, 30.0
+        end
+      end
+    end
+
     def test_time_skipping_manual
       skip_if_not_x86!
       Temporalio::Testing::WorkflowEnvironment.start_time_skipping(logger: Logger.new($stdout)) do |env|

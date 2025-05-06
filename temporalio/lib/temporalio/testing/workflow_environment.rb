@@ -322,7 +322,7 @@ module Temporalio
           raise 'Block required' unless block_given?
           return super unless supports_time_skipping?
 
-          already_disabled = @auto_time_skipping
+          already_disabled = !@auto_time_skipping
           @auto_time_skipping = false
           begin
             yield
