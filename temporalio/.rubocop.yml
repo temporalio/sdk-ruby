@@ -4,7 +4,7 @@ inherit_mode:
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   SuggestExtensions: false
   Exclude:
     - ext/**/*
@@ -17,11 +17,6 @@ AllCops:
 
 # Keep cop rule settings in alphabetical order. For each rule setting, provide
 # justification for the change from default.
-
-# Temporarily disabled per https://github.com/rake-compiler/rake-compiler-dock/issues/145#issuecomment-2596848639
-# until that is fixed
-Gemspec/RequiredRubyVersion:
-  Enabled: false
 
 # We want our classes in a certain order
 Layout/ClassStructure:
