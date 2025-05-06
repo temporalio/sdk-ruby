@@ -418,7 +418,7 @@ class GreetingWorkflow < Temporalio::Workflow::Definition
       # on wait_condition calls, so Cancellation object doesn't need to be passed
       # explicitly.
       Temporalio::Workflow.wait_condition { @greeting_params_update || @complete }
-      
+
       # If there was an update, exchange and rerun. If it's _only_ a complete, finish
       # workflow with the greeting.
       if @greeting_params_update
@@ -1203,9 +1203,11 @@ Prerequisites:
 
 First, install dependencies:
 
-    bundle install
+    # Optional: Change bundler install path to be local
+    bundle config --local path $(pwd)/.bundle
+    bundle instal
 
-To build shared library for development use:
+To build shared library for development use (ensure you have cloned submodules :
 
     bundle exec rake compile
 
