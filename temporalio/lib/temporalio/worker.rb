@@ -463,7 +463,11 @@ module Temporalio
           use_worker_versioning:,
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
-          deployment_options: deployment_options._to_bridge_options
+          deployment_options: if deployment_options.nil?
+                                nil
+                              else
+                                deployment_options._to_bridge_options
+                              end
         )
       )
 

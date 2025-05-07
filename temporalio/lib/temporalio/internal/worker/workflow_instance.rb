@@ -107,14 +107,16 @@ module Temporalio
           end
           @query_handlers = HandlerHash.new(details.definition.queries, Workflow::Definition::Query)
           @update_handlers = HandlerHash.new(details.definition.updates, Workflow::Definition::Update)
+          @definition_options = Workflow::DefinitionOptions.new(
+            failure_exception_types: details.definition.failure_exception_types,
+            versioning_behavior: details.definition.versioning_behavior
+          )
 
           @assert_valid_local_activity = details.assert_valid_local_activity
 
           # Create all things needed from initial job
           @init_job = details.initial_activation.jobs.find { |j| !j.initialize_workflow.nil? }&.initialize_workflow
           raise 'Missing init job from first activation' unless @init_job
-
-          # TODO: Behavior from dynamic getter
 
           illegal_call_tracing_disabled do
             @info = Workflow::Info.new(
@@ -149,7 +151,6 @@ module Temporalio
               start_time: ProtoUtils.timestamp_to_time(details.initial_activation.timestamp) || raise,
               task_queue: details.task_queue,
               task_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_task_timeout) || raise,
-              versioning_behavior: @definition.versioning_behavior,
               workflow_id: @init_job.workflow_id,
               workflow_type: @init_job.workflow_type
             ).freeze
@@ -296,7 +297,7 @@ module Temporalio
             Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
               run_id: activation.run_id,
               successful: Bridge::Api::WorkflowCompletion::Success.new(
-                commands: @commands, versioning_behavior: @definition.versioning_behavior
+                commands: @commands, versioning_behavior: @definition_options.versioning_behavior
               )
             )
           end
@@ -318,11 +319,26 @@ module Temporalio
           @inbound.init(OutboundImplementation.new(self))
 
           # Create the user instance
-          if @definition.init
-            @definition.workflow_class.new(*@workflow_arguments)
-          else
-            @definition.workflow_class.new
+          instance = if @definition.init
+                       @definition.workflow_class.new(*@workflow_arguments)
+                     else
+                       @definition.workflow_class.new
+                     end
+
+          # Run Dynamic config getter
+          unless @definition.dynamic_options_method.nil?
+            dynamic_options = instance.send @definition.dynamic_options_method
           end
+          unless dynamic_options.nil?
+            unless dynamic_options.versioning_behavior.nil?
+              @definition_options.versioning_behavior = dynamic_options.versioning_behavior
+            end
+            unless dynamic_options.failure_exception_types.nil?
+              @definition_options.failure_exception_types = dynamic_options.failure_exception_types
+            end
+          end
+
+          instance
         end
 
         def apply(job)

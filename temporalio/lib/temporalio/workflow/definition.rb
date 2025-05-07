@@ -190,6 +190,26 @@ module Temporalio
           self.pending_handler_details = { type: :update_validator, update_method: }
         end
 
+        # Mark the next method as returning some dynamic configuraion.
+        #
+        # Because dynamic workflows may conceptually represent more than one workflow type, it may
+        # be desirable to have different settings for fields that would normally be passed to
+        # `workflow_xxx` setters, but vary based on the workflow type name or other information
+        # available in the workflow's context. This function will be called after the workflow's
+        # `initialize`, if it has one, but before the workflow's `execute` method.
+        #
+        # The method must only take self as a parameter, and any values set in the class it returns
+        # will override those provided to other `workflow_xxx` setters.
+        #
+        # Cannot be specified on non-dynamic workflows.
+        #
+        # @param update_method [Symbol] Name of the dynamic options method.
+        def workflow_dynamic_options
+          raise 'Dynamic options method can only be set on workflows using `workflow_dynamic`' unless @workflow_dynamic
+
+          self.pending_handler_details = { type: :dynamic_options }
+        end
+
         private
 
         attr_reader :pending_handler_details
@@ -265,6 +285,11 @@ module Temporalio
               raw_args: handler[:raw_args],
               unfinished_policy: handler[:unfinished_policy]
             ), @workflow_updates, [@workflow_signals, @workflow_queries]]
+          when :dynamic_options
+            raise 'Dynamic options method already set' if @dynamic_options_method
+
+            @dynamic_options_method = method_name
+            return
           else
             raise "Unrecognized handler type #{handler[:type]}"
           end
@@ -406,7 +431,8 @@ module Temporalio
           signals:,
           queries:,
           updates:,
-          versioning_behavior: @versioning_behavior
+          versioning_behavior: @versioning_behavior,
+          dynamic_options_method: @dynamic_options_method
         )
       end
 
@@ -419,7 +445,8 @@ module Temporalio
       # Information about the workflow definition. This is usually not used directly.
       class Info
         attr_reader :workflow_class, :override_name, :dynamic, :init, :raw_args,
-                    :failure_exception_types, :signals, :queries, :updates, :versioning_behavior
+                    :failure_exception_types, :signals, :queries, :updates, :versioning_behavior,
+                    :dynamic_options_method
 
         # Derive the workflow definition info from the class.
         #
@@ -445,7 +472,8 @@ module Temporalio
           signals: {},
           queries: {},
           updates: {},
-          versioning_behavior: VersioningBehavior::UNSPECIFIED
+          versioning_behavior: VersioningBehavior::UNSPECIFIED,
+          dynamic_options_method: nil
         )
           @workflow_class = workflow_class
           @override_name = override_name
@@ -457,6 +485,7 @@ module Temporalio
           @queries = queries.dup.freeze
           @updates = updates.dup.freeze
           @versioning_behavior = versioning_behavior
+          @dynamic_options_method = dynamic_options_method
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
@@ -604,6 +633,31 @@ module Temporalio
             validator_to_invoke:
           )
         end
+      end
+    end
+
+    DefinitionOptions = Struct.new(
+      :failure_exception_types,
+      :versioning_behavior
+    )
+    # @!attribute failure_exception_types
+    #   Dynamic equivalent of {Definition.workflow_failure_exception_types}.
+    #   Will override any types set there if set, including if set to an empty array.
+    #   @return [Array<Class<Exception>>, nil] The failure exception types
+    #
+    # @!attribute versioning_behavior
+    #   Dynamic equivalent of {Definition.workflow_versioning_behavior}.
+    #   Will override any behavior set there if set.
+    #   WARNING: Deployment-based versioning is experimental and APIs may change.
+    #   @return [VersioningBehavior, nil] The versioning behavior
+    #
+    # @return [VersioningBehavior, nil] The versioning behavior
+    class DefinitionOptions
+      def initialize(
+        failure_exception_types: nil,
+        versioning_behavior: nil
+      )
+        super
       end
     end
   end
