@@ -9,6 +9,7 @@ require 'temporalio/worker'
 require 'temporalio/worker/deployment_options'
 require 'temporalio/worker_versioning'
 require 'temporalio/workflow'
+require 'temporalio/workflow/definition'
 require 'test'
 require 'timeout'
 
@@ -2571,8 +2572,9 @@ class WorkerWorkflowTest < Test
     workflow_dynamic
     workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
 
-    def dynamic_config
-      Temporalio::Workflow::DynamicConfig.new(
+    workflow_dynamic_options
+    def dynamic_options
+      Temporalio::Workflow::DefinitionOptions.new(
         versioning_behavior: Temporalio::VersioningBehavior::AUTO_UPGRADE
       )
     end
