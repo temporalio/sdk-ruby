@@ -2492,6 +2492,179 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     end
   end
 
+  def test_worker_deployment_ramp
+    deployment_name = "deployment-ramping-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
+    worker_v2 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '2.0')
+
+    # Create workers
+    workers = []
+    begin
+      # Worker 1
+      worker1 = Temporalio::Worker.new(
+        client: env.client,
+        task_queue: "tq-#{SecureRandom.uuid}",
+        workflows: [DeploymentVersioningWorkflowV1AutoUpgrade],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(
+          version: worker_v1,
+          use_worker_versioning: true
+        )
+      )
+      workers << worker1
+
+      # Worker 2
+      worker2 = Temporalio::Worker.new(
+        client: env.client,
+        task_queue: worker1.task_queue,
+        workflows: [DeploymentVersioningWorkflowV2Pinned],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(
+          version: worker_v2,
+          use_worker_versioning: true
+        )
+      )
+      workers << worker2
+
+      Temporalio::Worker.run_all(*workers) do
+        # Wait for worker deployments to be visible
+        wait_until_worker_deployment_visible(env.client, worker_v1)
+        describe_resp = wait_until_worker_deployment_visible(env.client, worker_v2)
+
+        # Set current version to v1 and ramp v2 to 100%
+        conflict_token = set_current_deployment_version(
+          env.client,
+          describe_resp.conflict_token,
+          worker_v1
+        ).conflict_token
+        conflict_token = set_ramping_version(
+          env.client,
+          conflict_token,
+          worker_v2,
+          100
+        ).conflict_token
+
+        # Run workflows and verify they run on v2
+        3.times do |i|
+          handle = env.client.start_workflow(
+            DeploymentVersioningWorkflowV2Pinned,
+            id: "versioning-ramp-100-#{i}-#{SecureRandom.uuid}",
+            task_queue: worker1.task_queue
+          )
+          handle.signal(DeploymentVersioningWorkflowV2Pinned.do_finish)
+          assert_equal 'version-v2', handle.result
+        end
+
+        # Set ramp to 0, expecting workflows to run on v1
+        conflict_token = set_ramping_version(
+          env.client,
+          conflict_token,
+          worker_v2,
+          0
+        ).conflict_token
+
+        3.times do |i|
+          handle = env.client.start_workflow(
+            DeploymentVersioningWorkflowV1AutoUpgrade,
+            id: "versioning-ramp-0-#{i}-#{SecureRandom.uuid}",
+            task_queue: worker1.task_queue
+          )
+          handle.signal(DeploymentVersioningWorkflowV1AutoUpgrade.do_finish)
+          assert_equal 'version-v1', handle.result
+        end
+
+        # Set ramp to 50 and eventually verify workflows run on both versions
+        set_ramping_version(env.client, conflict_token, worker_v2, 50)
+        seen_results = Set.new
+
+        # Keep running workflows until we've seen both versions
+        assert_eventually do
+          handle = env.client.start_workflow(
+            DeploymentVersioningWorkflowV1AutoUpgrade,
+            id: "versioning-ramp-50-#{SecureRandom.uuid}",
+            task_queue: worker1.task_queue
+          )
+          handle.signal(DeploymentVersioningWorkflowV1AutoUpgrade.do_finish)
+          res = handle.result
+          seen_results.add(res)
+          seen_results.include?('version-v1') && seen_results.include?('version-v2')
+        end
+      end
+    end
+  end
+
+  class DynamicWorkflowVersioningOnDefn < Temporalio::Workflow::Definition
+    workflow_dynamic
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def execute(*_raw_args)
+      'dynamic'
+    end
+  end
+
+  class DynamicWorkflowVersioningOnConfigMethod < Temporalio::Workflow::Definition
+    workflow_dynamic
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def dynamic_config
+      Temporalio::Workflow::DynamicConfig.new(
+        versioning_behavior: Temporalio::VersioningBehavior::AUTO_UPGRADE
+      )
+    end
+
+    def execute(*_raw_args)
+      'dynamic'
+    end
+  end
+
+  def test_worker_deployment_dynamic_workflow_with_pinned
+    _test_worker_deployment_dynamic_workflow(
+      DynamicWorkflowVersioningOnDefn,
+      Temporalio::Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_PINNED
+    )
+  end
+
+  def test_worker_deployment_dynamic_workflow_with_auto_upgrade
+    _test_worker_deployment_dynamic_workflow(
+      DynamicWorkflowVersioningOnConfigMethod,
+      Temporalio::Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_AUTO_UPGRADE
+    )
+  end
+
+  def _test_worker_deployment_dynamic_workflow(workflow_class, expected_versioning_behavior)
+    deployment_name = "deployment-dynamic-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
+
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [workflow_class],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v1,
+        use_worker_versioning: true
+      )
+    )
+
+    worker.run do
+      describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
+      set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+
+      handle = env.client.start_workflow(
+        'cooldynamicworkflow',
+        id: "dynamic-workflow-versioning-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      result = handle.result
+      assert_equal 'dynamic', result
+
+      events = handle.fetch_history.events
+      has_expected_behavior = events.any? do |event|
+        event.workflow_task_completed_event_attributes &&
+          event.workflow_task_completed_event_attributes.versioning_behavior ==
+            Temporalio::Api::Enums::V1::VersioningBehavior.lookup(expected_versioning_behavior.to_i)
+      end
+      assert has_expected_behavior, "Expected versioning behavior #{expected_versioning_behavior} not found in history"
+    end
+  end
+
   def wait_until_worker_deployment_visible(client, version)
     assert_eventually do
       res = client.workflow_service.describe_worker_deployment(
@@ -2517,6 +2690,18 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
         deployment_name: version.deployment_name,
         version: version.to_canonical_string,
         conflict_token: conflict_token
+      )
+    )
+  end
+
+  def set_ramping_version(client, conflict_token, version, percentage)
+    client.workflow_service.set_worker_deployment_ramping_version(
+      Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionRequest.new(
+        namespace: client.namespace,
+        deployment_name: version.deployment_name,
+        version: version.to_canonical_string,
+        conflict_token: conflict_token,
+        percentage: percentage
       )
     )
   end

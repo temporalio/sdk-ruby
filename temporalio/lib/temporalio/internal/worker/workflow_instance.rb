@@ -243,7 +243,9 @@ module Temporalio
           @commands = []
           @current_activation_error = nil
           @continue_as_new_suggested = activation.continue_as_new_suggested
-          @current_deployment_version = WorkerDeploymentVersion._from_bridge(activation.deployment_version_for_current_task)
+          @current_deployment_version = WorkerDeploymentVersion._from_bridge(
+            activation.deployment_version_for_current_task
+          )
           @current_history_length = activation.history_length
           @current_history_size = activation.history_size_bytes
           @replaying = activation.is_replaying
