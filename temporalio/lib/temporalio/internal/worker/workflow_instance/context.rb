@@ -42,6 +42,10 @@ module Temporalio
             @instance.current_details = (details || '')
           end
 
+          def current_deployment_version
+            @instance.current_deployment_version
+          end
+
           def current_history_length
             @instance.current_history_length
           end

@@ -19,6 +19,7 @@ module Temporalio
       :start_time,
       :task_queue,
       :task_timeout,
+      :versioning_behavior,
       :workflow_id,
       :workflow_type,
       keyword_init: true
@@ -59,6 +60,8 @@ module Temporalio
     #   @return [String] Task queue for the workflow.
     # @!attribute task_timeout
     #   @return [Float] Task timeout for the workflow.
+    # @!attribute versioning_behavior
+    #   @return [VersioningBehavior] Versioning behavior for the workflow, if any.
     # @!attribute workflow_id
     #   @return [String] ID for the workflow.
     # @!attribute workflow_type

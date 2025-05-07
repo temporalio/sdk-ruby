@@ -54,9 +54,9 @@ module Temporalio
         attr_reader :context, :logger, :info, :scheduler, :disable_eager_activity_execution, :pending_activities,
                     :pending_timers, :pending_child_workflow_starts, :pending_child_workflows,
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
-                    :failure_converter, :cancellation, :continue_as_new_suggested, :current_history_length,
-                    :current_history_size, :replaying, :random, :signal_handlers, :query_handlers, :update_handlers,
-                    :context_frozen, :assert_valid_local_activity
+                    :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
+                    :current_history_length, :current_history_size, :replaying, :random,
+                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_history
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -114,6 +114,8 @@ module Temporalio
           @init_job = details.initial_activation.jobs.find { |j| !j.initialize_workflow.nil? }&.initialize_workflow
           raise 'Missing init job from first activation' unless @init_job
 
+          # TODO: Behavior from dynamic getter
+
           illegal_call_tracing_disabled do
             @info = Workflow::Info.new(
               attempt: @init_job.attempt,
@@ -147,6 +149,7 @@ module Temporalio
               start_time: ProtoUtils.timestamp_to_time(details.initial_activation.timestamp) || raise,
               task_queue: details.task_queue,
               task_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_task_timeout) || raise,
+              versioning_behavior: @definition.versioning_behavior,
               workflow_id: @init_job.workflow_id,
               workflow_type: @init_job.workflow_type
             ).freeze
@@ -240,6 +243,7 @@ module Temporalio
           @commands = []
           @current_activation_error = nil
           @continue_as_new_suggested = activation.continue_as_new_suggested
+          @current_deployment_version = WorkerDeploymentVersion._from_bridge(activation.deployment_version_for_current_task)
           @current_history_length = activation.history_length
           @current_history_size = activation.history_size_bytes
           @replaying = activation.is_replaying
@@ -289,7 +293,9 @@ module Temporalio
           else
             Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
               run_id: activation.run_id,
-              successful: Bridge::Api::WorkflowCompletion::Success.new(commands: @commands)
+              successful: Bridge::Api::WorkflowCompletion::Success.new(
+                commands: @commands, versioning_behavior: @definition.versioning_behavior
+              )
             )
           end
         ensure

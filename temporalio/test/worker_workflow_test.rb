@@ -3,6 +3,7 @@
 require 'base64_codec'
 require 'net/http'
 require 'temporalio/client'
+require 'temporalio/common_enums'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/worker/deployment_options'
@@ -2322,7 +2323,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
 
   class DeploymentVersioningWorkflowV1AutoUpgrade < Temporalio::Workflow::Definition
     workflow_name :DeploymentVersioningWorkflow
-    workflow_versioning_behavior :auto_upgrade
+    workflow_versioning_behavior Temporalio::VersioningBehavior::AUTO_UPGRADE
     workflow_query_attr_reader :state
 
     def initialize
@@ -2343,7 +2344,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
 
   class DeploymentVersioningWorkflowV2Pinned < Temporalio::Workflow::Definition
     workflow_name :DeploymentVersioningWorkflow
-    workflow_versioning_behavior :pinned
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
     workflow_query_attr_reader :state
 
     def initialize
@@ -2353,7 +2354,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
 
     def execute
       Temporalio::Workflow.wait_condition { @finish }
-      depver = Temporalio::Workflow.info.current_deployment_version
+      depver = Temporalio::Workflow.current_deployment_version
       raise 'No deployment version' unless depver
       raise 'Wrong build id' unless depver.build_id == '2.0'
 
@@ -2370,7 +2371,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
 
   class DeploymentVersioningWorkflowV3AutoUpgrade < Temporalio::Workflow::Definition
     workflow_name :DeploymentVersioningWorkflow
-    workflow_versioning_behavior :auto_upgrade
+    workflow_versioning_behavior Temporalio::VersioningBehavior::AUTO_UPGRADE
     workflow_query_attr_reader :state
 
     def initialize

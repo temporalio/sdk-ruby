@@ -21,6 +21,11 @@ module Temporalio
       new(parts[0], parts[1])
     end
 
+    # @!visibility private
+    def self._from_bridge(bridge)
+      new(deployment_name: bridge.deployment_name, build_id: bridge.build_id)
+    end
+
     # Create WorkerDeploymentVersion.
     #
     # @param deployment_name [String] The name of the deployment.

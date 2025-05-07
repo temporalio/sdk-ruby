@@ -1239,6 +1239,9 @@ the gem at `lib/temporalio/internal/bridge/3.2/temporalio_bridge.so` and
 
 ### Testing
 
+Note you can set `TEMPORAL_TEST_CLIENT_TARGET_HOST` and `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE`
+(optional, defaults to 'default') environment variables to use an existing server.
+
 This project uses `minitest`. To test:
 
     bundle exec rake test
