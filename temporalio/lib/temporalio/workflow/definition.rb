@@ -405,7 +405,8 @@ module Temporalio
           failure_exception_types: @workflow_failure_exception_types || [],
           signals:,
           queries:,
-          updates:
+          updates:,
+          versioning_behavior: @versioning_behavior
         )
       end
 
@@ -418,7 +419,7 @@ module Temporalio
       # Information about the workflow definition. This is usually not used directly.
       class Info
         attr_reader :workflow_class, :override_name, :dynamic, :init, :raw_args,
-                    :failure_exception_types, :signals, :queries, :updates
+                    :failure_exception_types, :signals, :queries, :updates, :versioning_behavior
 
         # Derive the workflow definition info from the class.
         #
@@ -443,7 +444,8 @@ module Temporalio
           failure_exception_types: [],
           signals: {},
           queries: {},
-          updates: {}
+          updates: {},
+          versioning_behavior: VersioningBehavior::UNSPECIFIED
         )
           @workflow_class = workflow_class
           @override_name = override_name
@@ -454,6 +456,7 @@ module Temporalio
           @signals = signals.dup.freeze
           @queries = queries.dup.freeze
           @updates = updates.dup.freeze
+          @versioning_behavior = versioning_behavior
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 

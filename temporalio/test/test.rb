@@ -7,7 +7,10 @@ require 'minitest/autorun'
 require 'securerandom'
 require 'singleton'
 require 'socket'
+require 'temporalio/client'
+require 'temporalio/converters'
 require 'temporalio/internal/bridge'
+require 'temporalio/runtime'
 require 'temporalio/testing'
 require 'timeout'
 require 'workflow_utils'
@@ -139,18 +142,32 @@ class Test < Minitest::Test
     attr_reader :server
 
     def initialize
-      @server = Temporalio::Testing::WorkflowEnvironment.start_local(
-        logger: Logger.new($stdout),
-        dev_server_extra_args: [
-          # Allow continue as new to be immediate
-          '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
-          '--dynamic-config-value', 'frontend.enableVersioningWorkflowAPIs=true',
-          '--dynamic-config-value', 'frontend.enableVersioningDataAPIs=true',
-          '--dynamic-config-value', 'system.enableDeploymentVersions=true'
-        ]
-      )
-      Minitest.after_run do
-        @server.shutdown
+      # Start workflow env for an existing server if env vars present
+      if ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST']
+        client = Temporalio::Client.connect(
+          ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST'],
+          ENV['TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE'] || 'default',
+          data_converter: Temporalio::Converters::DataConverter.default,
+          interceptors: [],
+          logger: Logger.new($stdout, level: Logger::WARN),
+          default_workflow_query_reject_condition: nil,
+          runtime: Temporalio::Runtime.default
+        )
+        @server = Temporalio::Testing::WorkflowEnvironment.new(client)
+      else
+        @server = Temporalio::Testing::WorkflowEnvironment.start_local(
+          logger: Logger.new($stdout),
+          dev_server_extra_args: [
+            # Allow continue as new to be immediate
+            '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
+            '--dynamic-config-value', 'frontend.enableVersioningWorkflowAPIs=true',
+            '--dynamic-config-value', 'frontend.enableVersioningDataAPIs=true',
+            '--dynamic-config-value', 'system.enableDeploymentVersions=true'
+          ]
+        )
+        Minitest.after_run do
+          @server.shutdown
+        end
       end
     end
 
