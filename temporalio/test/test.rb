@@ -143,7 +143,10 @@ class Test < Minitest::Test
         logger: Logger.new($stdout),
         dev_server_extra_args: [
           # Allow continue as new to be immediate
-          '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"'
+          '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
+          '--dynamic-config-value', 'frontend.enableVersioningWorkflowAPIs=true',
+          '--dynamic-config-value', 'frontend.enableVersioningDataAPIs=true',
+          '--dynamic-config-value', 'system.enableDeploymentVersions=true'
         ]
       )
       Minitest.after_run do

@@ -53,6 +53,7 @@ module Temporalio
       :workflow_failure_exception_types,
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
+      :deployment_options,
       :debug_mode
     )
 
@@ -299,6 +300,7 @@ module Temporalio
     # @param build_id [String] Unique identifier for the current runtime. This is best set as a unique value
     #   representing all code and should change only when code does. This can be something like a git commit hash. If
     #   unset, default is hash of known Ruby code.
+    #   Exclusive with `deployment_options`.
     # @param identity [String, nil] Override the identity for this worker. If unset, client identity is used.
     # @param logger [Logger] Logger to override client logger with. Default is the client logger.
     # @param max_cached_workflows [Integer] Number of workflows held in cache for use by sticky task queue. If set to 0,
@@ -330,6 +332,7 @@ module Temporalio
     # @param use_worker_versioning [Boolean] If true, the `build_id` argument must be specified, and this worker opts
     #   into the worker versioning feature. This ensures it only receives workflow tasks for workflows which it claims
     #   to be compatible with. For more information, see https://docs.temporal.io/workers#worker-versioning.
+    #   Exclusive with `deployment_options`.
     # @param disable_eager_activity_execution [Boolean] If true, disables eager activity execution. Eager activity
     #   execution is an optimization on some servers that sends activities back to the same worker as the calling
     #   workflow if they can run there. This should be set to true for `max_task_queue_activities_per_second` to work
@@ -351,6 +354,9 @@ module Temporalio
     # @param unsafe_workflow_io_enabled [Boolean] If false, the default, workflow code that invokes io_wait on the fiber
     #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
     #   with a block for narrower enabling of IO.
+    # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
+    #   Exclusive with `build_id` and `use_worker_versioning`.
+    #   WARNING: This is an experimental feature and may change in the future.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -383,6 +389,7 @@ module Temporalio
       workflow_failure_exception_types: [],
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
+      deployment_options: nil,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -418,6 +425,7 @@ module Temporalio
         workflow_failure_exception_types:,
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
+        deployment_options:,
         debug_mode:
       ).freeze
 
@@ -454,7 +462,8 @@ module Temporalio
           graceful_shutdown_period:,
           use_worker_versioning:,
           nondeterminism_as_workflow_fail:,
-          nondeterminism_as_workflow_fail_for_types:
+          nondeterminism_as_workflow_fail_for_types:,
+          deployment_options: deployment_options._to_bridge_options
         )
       )
 

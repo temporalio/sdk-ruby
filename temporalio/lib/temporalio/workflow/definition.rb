@@ -91,6 +91,15 @@ module Temporalio
           end
         end
 
+        # Set the versioning behavior of this workflow.
+        #
+        # WARNING: This method is experimental and may change in future versions.
+        #
+        # @param behavior [VersioningBehavior] The versioning behavior.
+        def workflow_versioning_behavior(behavior)
+          @versioning_behavior = behavior
+        end
+
         # Mark an `initialize` as needing the workflow start arguments. Otherwise, `initialize` must accept no required
         # arguments. This must be placed above the `initialize` method or it will fail.
         #
