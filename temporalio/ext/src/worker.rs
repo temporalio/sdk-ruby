@@ -6,32 +6,35 @@ use std::{
 };
 
 use crate::{
+    ROOT_MOD,
     client::Client,
     enter_sync, error, id, new_error,
     runtime::{AsyncCommand, Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
-    ROOT_MOD,
 };
+use futures::{StreamExt, stream::BoxStream};
 use futures::{future, stream};
-use futures::{stream::BoxStream, StreamExt};
 use magnus::{
-    class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
-    RString, RTypedData, Ruby, TypedData, Value,
+    DataTypeFunctions, Error, IntoValue, RArray, RString, RTypedData, Ruby, TypedData, Value,
+    class, function, method, prelude::*, typed_data,
 };
 use prost::Message;
 use temporal_sdk_core::{
-    replay::{HistoryForReplay, ReplayWorkerInput},
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
+    replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
-    worker::{PollerBehavior, SlotKind, WorkerVersioningStrategy},
+    worker::{
+        PollerBehavior, SlotKind, WorkerDeploymentOptions, WorkerDeploymentVersion,
+        WorkerVersioningStrategy,
+    },
 };
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use temporal_sdk_core_protos::temporal::api::history::v1::History;
-use tokio::sync::mpsc::{channel, Sender};
+use tokio::sync::mpsc::{Sender, channel};
 use tokio_stream::wrappers::ReceiverStream;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -447,13 +450,36 @@ fn build_config(options: Struct) -> Result<WorkerConfig, Error> {
     WorkerConfigBuilder::default()
         .namespace(options.member::<String>(id!("namespace"))?)
         .task_queue(options.member::<String>(id!("task_queue"))?)
-        // TODO(cretz): Replace with more involved versioning strategy
         .versioning_strategy({
-            let build_id = options.member::<String>(id!("build_id"))?;
-            if options.member::<bool>(id!("use_worker_versioning"))? {
-                WorkerVersioningStrategy::LegacyBuildIdBased { build_id }
+            let deploy_options = options.child(id!("deployment_options"))?;
+            if let Some(dopts) = deploy_options {
+                let version = dopts
+                    .child(id!("version"))?
+                    .ok_or(error!("Worker::DeploymentOptions must set version"))?;
+                WorkerVersioningStrategy::WorkerDeploymentBased(WorkerDeploymentOptions {
+                    version: WorkerDeploymentVersion {
+                        deployment_name: version.member::<String>(id!("deployment_name"))?,
+                        build_id: version.member::<String>(id!("build_id"))?,
+                    },
+                    use_worker_versioning: dopts.member::<bool>(id!("use_worker_versioning"))?,
+                    default_versioning_behavior: {
+                        let val = dopts.member::<i32>(id!("default_versioning_behavior"))?;
+                        if val == 0 {
+                            None
+                        } else {
+                            Some(val.try_into().map_err(|_| {
+                                error!("Unknown default versioning behavior: {}", val)
+                            })?)
+                        }
+                    },
+                })
             } else {
-                WorkerVersioningStrategy::None { build_id }
+                let build_id = options.member::<String>(id!("build_id"))?;
+                if options.member::<bool>(id!("use_worker_versioning"))? {
+                    WorkerVersioningStrategy::LegacyBuildIdBased { build_id }
+                } else {
+                    WorkerVersioningStrategy::None { build_id }
+                }
             }
         })
         .client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
