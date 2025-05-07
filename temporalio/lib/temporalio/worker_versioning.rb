@@ -30,7 +30,7 @@ module Temporalio
     #
     # @param deployment_name [String] The name of the deployment.
     # @param build_id [String] The build identifier specific to this worker build.
-    def initialize(deployment_name:, build_id:)
+    def initialize(deployment_name:, build_id:) # rubocop:disable Lint/UselessMethodDefinition
       super
     end
 
