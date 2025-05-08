@@ -2667,6 +2667,87 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     end
   end
 
+  class NoVersioningAnnotationWorkflow < Temporalio::Workflow::Definition
+    def execute
+      'whee'
+    end
+  end
+
+  class NoVersioningAnnotationDynamicWorkflow < Temporalio::Workflow::Definition
+    workflow_dynamic
+
+    def execute(*_raw_args)
+      'whee'
+    end
+  end
+
+  def test_workflows_must_have_versioning_behavior_when_feature_turned_on
+    error = assert_raises(ArgumentError) do
+      Temporalio::Worker.new(
+        client: env.client,
+        task_queue: 'whatever',
+        workflows: [NoVersioningAnnotationWorkflow],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(
+          version: Temporalio::WorkerDeploymentVersion.new('whatever', '1.0'),
+          use_worker_versioning: true
+        )
+      )
+    end
+    assert_includes error.message, 'must specify a versioning behavior'
+
+    print "?huh"
+    error = assert_raises(ArgumentError) do
+      Temporalio::Worker.new(
+        client: env.client,
+        task_queue: 'whatever',
+        workflows: [NoVersioningAnnotationDynamicWorkflow],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(
+          version: Temporalio::WorkerDeploymentVersion.new('whatever', '1.0'),
+          use_worker_versioning: true
+        )
+      )
+    end
+    assert_includes error.message, 'must specify a versioning behavior'
+  end
+
+  def test_workflows_can_use_default_versioning_behavior
+    deployment_name = "deployment-default-versioning-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
+
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [NoVersioningAnnotationWorkflow],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v1,
+        use_worker_versioning: true,
+        default_versioning_behavior: Temporalio::VersioningBehavior::PINNED
+      )
+    )
+
+    worker.run do
+      describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
+      set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+
+      handle = env.client.start_workflow(
+        NoVersioningAnnotationWorkflow,
+        id: "default-versioning-behavior-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      handle.result
+
+      events = handle.fetch_history.events
+      has_expected_behavior = events.any? do |event|
+        event.workflow_task_completed_event_attributes &&
+          event.workflow_task_completed_event_attributes.versioning_behavior ==
+            Temporalio::Api::Enums::V1::VersioningBehavior.lookup(
+              Temporalio::Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_PINNED.to_i
+            )
+      end
+      assert has_expected_behavior, 'Expected versioning behavior PINNED not found in history'
+    end
+  end
+
   def wait_until_worker_deployment_visible(client, version)
     assert_eventually do
       res = client.workflow_service.describe_worker_deployment(

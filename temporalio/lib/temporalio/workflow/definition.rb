@@ -431,7 +431,7 @@ module Temporalio
           signals:,
           queries:,
           updates:,
-          versioning_behavior: @versioning_behavior,
+          versioning_behavior: @versioning_behavior || VersioningBehavior::UNSPECIFIED,
           dynamic_options_method: @dynamic_options_method
         )
       end
