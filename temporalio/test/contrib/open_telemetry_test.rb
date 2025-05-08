@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'opentelemetry/sdk'
-require 'set'
 require 'temporalio/contrib/open_telemetry'
 require 'test'
 

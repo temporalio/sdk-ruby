@@ -7,3 +7,4 @@ temporalio/test/golangworker/golangworker
 temporalio/.yardoc
 temporalio/doc
 temporalio/pkg
+temporalio/lib/temporalio/internal/bridge/temporalio_bridge.bundle
