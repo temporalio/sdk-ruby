@@ -429,8 +429,15 @@ module Temporalio
         debug_mode:
       ).freeze
 
+      should_enforce_versioning_behavior =
+        !deployment_options.nil? &&
+        deployment_options.use_worker_versioning &&
+        deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
       # Preload workflow definitions and some workflow settings for the bridge
-      workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
+      workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
+        workflows,
+        should_enforce_versioning_behavior:
+      )
       nondeterminism_as_workflow_fail, nondeterminism_as_workflow_fail_for_types =
         Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
           workflow_failure_exception_types:, workflow_definitions:
