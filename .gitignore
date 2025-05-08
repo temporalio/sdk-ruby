@@ -9,3 +9,4 @@ temporalio/doc
 temporalio/pkg
 temporalio/lib/temporalio/internal/bridge/temporalio_bridge.bundle
 temporalio/.bundle
+.idea/
