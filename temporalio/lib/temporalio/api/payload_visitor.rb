@@ -569,6 +569,7 @@ module Temporalio
         api_history_v1_nexus_operation_failed_event_attributes(value.nexus_operation_failed_event_attributes) if value.has_nexus_operation_failed_event_attributes?
         api_history_v1_nexus_operation_canceled_event_attributes(value.nexus_operation_canceled_event_attributes) if value.has_nexus_operation_canceled_event_attributes?
         api_history_v1_nexus_operation_timed_out_event_attributes(value.nexus_operation_timed_out_event_attributes) if value.has_nexus_operation_timed_out_event_attributes?
+        api_history_v1_nexus_operation_cancel_request_failed_event_attributes(value.nexus_operation_cancel_request_failed_event_attributes) if value.has_nexus_operation_cancel_request_failed_event_attributes?
         @on_exit&.call(value)
       end
       
@@ -576,6 +577,12 @@ module Temporalio
         @on_enter&.call(value)
         value.details.values.each { |v| api_common_v1_payloads(v) }
         api_common_v1_header(value.header) if value.has_header?
+        api_failure_v1_failure(value.failure) if value.has_failure?
+        @on_exit&.call(value)
+      end
+      
+      def api_history_v1_nexus_operation_cancel_request_failed_event_attributes(value)
+        @on_enter&.call(value)
         api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end

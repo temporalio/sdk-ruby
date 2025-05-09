@@ -333,6 +333,26 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def create_workflow_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def describe_workflow_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_workflow_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def list_workflow_rules: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def trigger_workflow_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end
