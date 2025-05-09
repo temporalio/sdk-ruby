@@ -116,7 +116,7 @@ module Temporalio
           runtime:
         ).freeze
         # Preload definitions and other settings
-        @workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
+        @workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows, false)
         @nondeterminism_as_workflow_fail, @nondeterminism_as_workflow_fail_for_types =
           Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
             workflow_failure_exception_types:, workflow_definitions: @workflow_definitions

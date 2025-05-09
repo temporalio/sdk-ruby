@@ -659,8 +659,7 @@ class WorkerActivityTest < Test
       Temporalio::Worker.new(
         client: env.client,
         task_queue: "tq-#{index}-#{SecureRandom.uuid}",
-        activities: [activity],
-        build_id: 'ignore'
+        activities: [activity]
       )
     end
     Temporalio::Worker.run_all(*workers) do

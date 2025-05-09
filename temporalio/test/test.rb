@@ -147,11 +147,7 @@ class Test < Minitest::Test
         client = Temporalio::Client.connect(
           ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST'],
           ENV['TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE'] || 'default',
-          data_converter: Temporalio::Converters::DataConverter.default,
-          interceptors: [],
-          logger: Logger.new($stdout, level: Logger::WARN),
-          default_workflow_query_reject_condition: nil,
-          runtime: Temporalio::Runtime.default
+          logger: Logger.new($stdout)
         )
         @server = Temporalio::Testing::WorkflowEnvironment.new(client)
       else

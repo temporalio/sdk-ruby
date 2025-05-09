@@ -13,7 +13,7 @@ module Temporalio
     module Worker
       # Worker for handling workflow activations. Most activation work is delegated to the workflow executor.
       class WorkflowWorker
-        def self.workflow_definitions(workflows, should_enforce_versioning_behavior: false)
+        def self.workflow_definitions(workflows, should_enforce_versioning_behavior)
           workflows.each_with_object({}) do |workflow, hash|
             # Load definition
             defn = begin
@@ -31,7 +31,7 @@ module Temporalio
 
             # Enforce versioning behavior is set when versioning is on
             if should_enforce_versioning_behavior &&
-               defn.versioning_behavior == VersioningBehavior::UNSPECIFIED && defn.dynamic_options_method.nil?
+               defn.versioning_behavior == VersioningBehavior::UNSPECIFIED && !defn.dynamic_options_method
               raise ArgumentError, "Workflow #{defn.name} must specify a versioning behavior"
             end
 

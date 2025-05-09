@@ -5,13 +5,13 @@ require 'temporalio/common_enums'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/worker/deployment_options'
-require 'temporalio/worker_versioning'
+require 'temporalio/worker_deployment_version'
 require 'temporalio/workflow'
 require 'temporalio/workflow/definition'
 require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < Test
+class WorkerWorkflowVersioningTest < Test
   class DeploymentVersioningWorkflowV1AutoUpgrade < Temporalio::Workflow::Definition
     workflow_name :DeploymentVersioningWorkflow
     workflow_versioning_behavior Temporalio::VersioningBehavior::AUTO_UPGRADE
