@@ -1245,6 +1245,81 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls WorkflowService.CreateWorkflowRule API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleResponse] API response.
+        def create_workflow_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_workflow_rule',
+            request_class: Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DescribeWorkflowRule API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleResponse] API response.
+        def describe_workflow_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_workflow_rule',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DeleteWorkflowRule API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleResponse] API response.
+        def delete_workflow_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_workflow_rule',
+            request_class: Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ListWorkflowRules API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ListWorkflowRulesRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ListWorkflowRulesResponse] API response.
+        def list_workflow_rules(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'list_workflow_rules',
+            request_class: Temporalio::Api::WorkflowService::V1::ListWorkflowRulesRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ListWorkflowRulesResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.TriggerWorkflowRule API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleResponse] API response.
+        def trigger_workflow_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'trigger_workflow_rule',
+            request_class: Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end
