@@ -202,8 +202,6 @@ module Temporalio
         # will override those provided to other `workflow_xxx` setters.
         #
         # Cannot be specified on non-dynamic workflows.
-        #
-        # @param update_method [Symbol] Name of the dynamic options method.
         def workflow_dynamic_options
           raise 'Dynamic options method can only be set on workflows using `workflow_dynamic`' unless @workflow_dynamic
 
@@ -420,6 +418,10 @@ module Temporalio
         end
 
         raise 'Workflow cannot be given a name and be dynamic' if dynamic && override_name
+
+        if !dynamic && !@dynamic_options_method.nil?
+          raise 'Workflow cannot have a dynamic_options_method unless it is dynamic'
+        end
 
         Info.new(
           workflow_class: self,

@@ -24,6 +24,7 @@ require 'temporalio/internal/worker/workflow_instance/scheduler'
 require 'temporalio/retry_policy'
 require 'temporalio/scoped_logger'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker_deployment_version'
 require 'temporalio/workflow/info'
 require 'temporalio/workflow/update_info'
 require 'timeout'
@@ -90,7 +91,7 @@ module Temporalio
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
-          @failure_exception_types = details.workflow_failure_exception_types + @definition.failure_exception_types
+          @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
             details.definition.signals,
             Workflow::Definition::Signal
@@ -326,14 +327,12 @@ module Temporalio
                      end
 
           # Run Dynamic config getter
-          unless @definition.dynamic_options_method.nil?
-            dynamic_options = instance.send @definition.dynamic_options_method
-          end
-          unless dynamic_options.nil?
-            unless dynamic_options.versioning_behavior.nil?
+          if @definition.dynamic_options_method
+            dynamic_options = instance.send(@definition.dynamic_options_method)
+            if dynamic_options&.versioning_behavior
               @definition_options.versioning_behavior = dynamic_options.versioning_behavior
             end
-            unless dynamic_options.failure_exception_types.nil?
+            if dynamic_options&.failure_exception_types
               @definition_options.failure_exception_types = dynamic_options.failure_exception_types
             end
           end
@@ -652,9 +651,11 @@ module Temporalio
         end
 
         def failure_exception?(err)
-          err.is_a?(Error::Failure) || err.is_a?(Timeout::Error) || @failure_exception_types.any? do |cls|
-            err.is_a?(cls)
-          end
+          err.is_a?(Error::Failure) || err.is_a?(Timeout::Error) ||
+            ((@workflow_failure_exception_types || []) +
+             (@definition_options.failure_exception_types || [])).any? do |cls|
+              err.is_a?(cls)
+            end
         end
 
         def with_context_frozen(&)

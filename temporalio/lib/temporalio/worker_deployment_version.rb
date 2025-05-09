@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/bridge/worker'
+
 module Temporalio
   WorkerDeploymentVersion = Data.define(
     :deployment_name,
@@ -12,6 +14,9 @@ module Temporalio
   class WorkerDeploymentVersion
     # Parse a version from a canonical string, which must be in the format
     # `<deployment_name>.<build_id>`. Deployment name must not have a `.` in it.
+    #
+    # @param canonical [String] The canonical string representation of the version.
+    # @return [WorkerDeploymentVersion] The parsed version.
     def self.from_canonical_string(canonical)
       parts = canonical.split('.', 2)
       if parts.length != 2
@@ -23,6 +28,8 @@ module Temporalio
 
     # @!visibility private
     def self._from_bridge(bridge)
+      return nil if bridge.nil?
+
       new(deployment_name: bridge.deployment_name, build_id: bridge.build_id)
     end
 

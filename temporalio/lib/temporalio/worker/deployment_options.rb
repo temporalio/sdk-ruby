@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'temporalio/common_enums'
+require 'temporalio/worker_deployment_version'
+
 module Temporalio
   class Worker
     DeploymentOptions = Data.define(
