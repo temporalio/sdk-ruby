@@ -1,0 +1,16 @@
+module Temporalio
+  class WorkerDeploymentVersion
+    attr_reader deployment_name: String
+    attr_reader build_id: String
+
+    def self.from_canonical_string: (String canonical) -> WorkerDeploymentVersion
+
+    def self._from_bridge: (untyped bridge) -> WorkerDeploymentVersion?
+
+    def initialize: (deployment_name: String, build_id: String) -> void
+
+    def to_canonical_string: -> String
+
+    def _to_bridge_options: -> Internal::Bridge::Worker::WorkerDeploymentVersion
+  end
+end

@@ -83,9 +83,15 @@ class WorkerWorkflowVersioningTest < Test
 
   def test_worker_deployment_version
     deployment_name = "deployment-#{SecureRandom.uuid}"
-    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
-    worker_v2 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '2.0')
-    worker_v3 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '3.0')
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
+    worker_v2 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '2.0'
+    )
+    worker_v3 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '3.0'
+    )
 
     task_queue = "tq-#{SecureRandom.uuid}"
 
@@ -185,8 +191,12 @@ class WorkerWorkflowVersioningTest < Test
 
   def test_worker_deployment_ramp
     deployment_name = "deployment-ramping-#{SecureRandom.uuid}"
-    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
-    worker_v2 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '2.0')
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
+    worker_v2 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '2.0'
+    )
 
     # Create workers
     workers = []
@@ -230,7 +240,7 @@ class WorkerWorkflowVersioningTest < Test
           env.client,
           conflict_token,
           worker_v2,
-          100
+          100.0
         ).conflict_token
 
         # Run workflows and verify they run on v2
@@ -249,7 +259,7 @@ class WorkerWorkflowVersioningTest < Test
           env.client,
           conflict_token,
           worker_v2,
-          0
+          0.0
         ).conflict_token
 
         3.times do |i|
@@ -263,7 +273,7 @@ class WorkerWorkflowVersioningTest < Test
         end
 
         # Set ramp to 50 and eventually verify workflows run on both versions
-        set_ramping_version(env.client, conflict_token, worker_v2, 50)
+        set_ramping_version(env.client, conflict_token, worker_v2, 50.0)
         seen_results = Set.new
 
         # Keep running workflows until we've seen both versions
@@ -323,7 +333,9 @@ class WorkerWorkflowVersioningTest < Test
 
   def _test_worker_deployment_dynamic_workflow(workflow_class, expected_versioning_behavior)
     deployment_name = "deployment-dynamic-#{SecureRandom.uuid}"
-    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
 
     worker = Temporalio::Worker.new(
       client: env.client,
@@ -378,7 +390,9 @@ class WorkerWorkflowVersioningTest < Test
         task_queue: 'whatever',
         workflows: [NoVersioningAnnotationWorkflow],
         deployment_options: Temporalio::Worker::DeploymentOptions.new(
-          version: Temporalio::WorkerDeploymentVersion.new('whatever', '1.0'),
+          version: Temporalio::WorkerDeploymentVersion.new(
+            deployment_name: 'whatever', build_id: '1.0'
+          ),
           use_worker_versioning: true
         )
       )
@@ -391,7 +405,9 @@ class WorkerWorkflowVersioningTest < Test
         task_queue: 'whatever',
         workflows: [NoVersioningAnnotationDynamicWorkflow],
         deployment_options: Temporalio::Worker::DeploymentOptions.new(
-          version: Temporalio::WorkerDeploymentVersion.new('whatever', '1.0'),
+          version: Temporalio::WorkerDeploymentVersion.new(
+            deployment_name: 'whatever', build_id: '1.0'
+          ),
           use_worker_versioning: true
         )
       )
@@ -401,7 +417,9 @@ class WorkerWorkflowVersioningTest < Test
 
   def test_workflows_can_use_default_versioning_behavior
     deployment_name = "deployment-default-versioning-#{SecureRandom.uuid}"
-    worker_v1 = Temporalio::WorkerDeploymentVersion.new(deployment_name, '1.0')
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
 
     worker = Temporalio::Worker.new(
       client: env.client,
@@ -445,9 +463,9 @@ class WorkerWorkflowVersioningTest < Test
           deployment_name: version.deployment_name
         )
       )
-      assert res.worker_deployment_info.version_summaries.any? do |vs|
+      assert(res.worker_deployment_info.version_summaries.any? do |vs|
         vs.version == version.to_canonical_string
-      end
+      end)
       res
     rescue Temporalio::Error::RPCError
       # Expected

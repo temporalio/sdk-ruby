@@ -222,7 +222,8 @@ module Temporalio
               graceful_shutdown_period: 0.0,
               use_worker_versioning: false,
               nondeterminism_as_workflow_fail:,
-              nondeterminism_as_workflow_fail_for_types:
+              nondeterminism_as_workflow_fail_for_types:,
+              deployment_options: nil
             )
           )
 

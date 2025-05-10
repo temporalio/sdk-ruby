@@ -18,6 +18,8 @@ module Temporalio
 
           def current_history_size: -> Integer
 
+          def current_deployment_version: -> WorkerDeploymentVersion?
+
           def current_update_info: -> Workflow::UpdateInfo?
 
           def deprecate_patch: (Symbol | String patch_id) -> void
