@@ -23,7 +23,7 @@ module Temporalio
         raise ArgumentError,
               "Cannot parse version string: #{canonical}, must be in format <deployment_name>.<build_id>"
       end
-      new(parts[0], parts[1])
+      new(deployment_name: parts[0], build_id: parts[1])
     end
 
     # @!visibility private

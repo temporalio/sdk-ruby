@@ -33,7 +33,9 @@ module Temporalio
       # @!visibility private
       def _to_bridge_options
         Internal::Bridge::Worker::DeploymentOptions.new(
-          version: version,
+          version: Internal::Bridge::Worker::WorkerDeploymentVersion.new(
+            deployment_name: version.deployment_name, build_id: version.build_id
+          ),
           use_worker_versioning: use_worker_versioning,
           default_versioning_behavior: default_versioning_behavior
         )

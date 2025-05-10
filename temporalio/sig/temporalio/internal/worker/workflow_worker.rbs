@@ -3,7 +3,8 @@ module Temporalio
     module Worker
       class WorkflowWorker
         def self.workflow_definitions: (
-          Array[singleton(Workflow::Definition) | Workflow::Definition::Info] workflows
+          Array[singleton(Workflow::Definition) | Workflow::Definition::Info] workflows,
+          bool should_enforce_versioning_behavior
         ) -> Hash[String?, Workflow::Definition::Info]
 
         def self.bridge_workflow_failure_exception_type_options: (
