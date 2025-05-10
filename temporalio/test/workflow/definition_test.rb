@@ -63,6 +63,7 @@ module Workflow
 
     class ValidWorkflowAdvanced1 < ValidWorkflowAdvancedBase
       workflow_name 'custom-workflow-name'
+      workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
       workflow_raw_args
 
       workflow_init
@@ -99,6 +100,13 @@ module Workflow
 
       workflow_update name: 'custom-update-name'
       def another_update; end
+
+      workflow_dynamic_options
+      def myopts
+        Temporalio::Workflow::DefinitionOptions.new(
+          versioning_behavior: Temporalio::VersioningBehavior::AUTO_UPGRADE
+        )
+      end
     end
 
     def test_valid_advanced
@@ -122,6 +130,7 @@ module Workflow
                    defn.updates['custom-update-name'].unfinished_policy
       assert_equal :another_update_validator, defn.updates['custom-update-name'].validator_to_invoke
       assert_equal 'custom-update-name', ValidWorkflowAdvanced1.another_update.name
+      assert_equal Temporalio::VersioningBehavior::PINNED, defn.versioning_behavior
 
       defn = Temporalio::Workflow::Definition::Info.from_class(ValidWorkflowAdvanced2)
 
@@ -136,6 +145,7 @@ module Workflow
       assert_equal :my_renamed_signal, defn.signals['custom-signal-name-2'].to_invoke
       assert_equal :my_base_signal3, defn.signals['my_base_signal3'].to_invoke
       assert_equal :my_new_signal, defn.signals['my_new_signal'].to_invoke
+      assert defn.dynamic_options_method
     end
 
     def assert_invalid_workflow_code(message_contains, code_to_eval)

@@ -24,6 +24,7 @@ module Temporalio
           attr_accessor use_worker_versioning: bool
           attr_accessor nondeterminism_as_workflow_fail: bool
           attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
+          attr_accessor deployment_options: DeploymentOptions?
     
           def initialize: (
             activity: bool,
@@ -46,7 +47,8 @@ module Temporalio
             graceful_shutdown_period: Float,
             use_worker_versioning: bool,
             nondeterminism_as_workflow_fail: bool,
-            nondeterminism_as_workflow_fail_for_types: Array[String]
+            nondeterminism_as_workflow_fail_for_types: Array[String],
+            deployment_options: DeploymentOptions?
           ) -> void
         end
 
@@ -121,6 +123,28 @@ module Temporalio
         def replace_client: (Client client) -> void
 
         def initiate_shutdown: -> void
+
+        class WorkerDeploymentVersion
+          attr_accessor deployment_name: String
+          attr_accessor build_id: String
+
+          def initialize: (
+            deployment_name: String,
+            build_id: String
+          ) -> void
+        end
+
+        class DeploymentOptions
+          attr_accessor version: WorkerDeploymentVersion
+          attr_accessor use_worker_versioning: bool
+          attr_accessor default_versioning_behavior: Integer
+
+          def initialize: (
+            version: WorkerDeploymentVersion,
+            use_worker_versioning: bool,
+            default_versioning_behavior: Integer
+          ) -> void
+        end
 
         class WorkflowReplayer
           def self.new: (Runtime runtime, Options options) -> [WorkflowReplayer, Worker]

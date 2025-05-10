@@ -28,6 +28,9 @@ impl Client {
                 "create_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, create_schedule)
                 }
+                "create_workflow_rule" => {
+                    rpc_call!(self, callback, call, WorkflowService, create_workflow_rule)
+                }
                 "delete_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, delete_schedule)
                 }
@@ -52,6 +55,9 @@ impl Client {
                     WorkflowService,
                     delete_workflow_execution
                 ),
+                "delete_workflow_rule" => {
+                    rpc_call!(self, callback, call, WorkflowService, delete_workflow_rule)
+                }
                 "deprecate_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, deprecate_namespace)
                 }
@@ -94,6 +100,13 @@ impl Client {
                     call,
                     WorkflowService,
                     describe_workflow_execution
+                ),
+                "describe_workflow_rule" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    describe_workflow_rule
                 ),
                 "execute_multi_operation" => rpc_call!(
                     self,
@@ -221,6 +234,9 @@ impl Client {
                     WorkflowService,
                     list_workflow_executions
                 ),
+                "list_workflow_rules" => {
+                    rpc_call!(self, callback, call, WorkflowService, list_workflow_rules)
+                }
                 "patch_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, patch_schedule)
                 }
@@ -437,6 +453,9 @@ impl Client {
                     WorkflowService,
                     terminate_workflow_execution
                 ),
+                "trigger_workflow_rule" => {
+                    rpc_call!(self, callback, call, WorkflowService, trigger_workflow_rule)
+                }
                 "unpause_activity" => {
                     rpc_call!(self, callback, call, WorkflowService, unpause_activity)
                 }
