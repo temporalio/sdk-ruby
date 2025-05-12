@@ -455,13 +455,12 @@ module Temporalio
           # Create span, which has to be done with illegal call disabling because OTel asks for full exception message
           # which uses error highlighting and such which accesses File#path
           Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
-            time = Temporalio::Workflow.now
-            timestamp = (time.to_i * 1_000_000_000) + time.nsec
-            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: timestamp, kind:) # steep:ignore
+            time = Temporalio::Workflow.now.dup
+            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
             # Record exception if present
             span.record_exception(exception) if exception
             # Finish the span (returns self)
-            span.finish(end_timestamp: timestamp)
+            span.finish(end_timestamp: time)
           end
         end
       end

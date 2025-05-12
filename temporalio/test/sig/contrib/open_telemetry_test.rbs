@@ -4,14 +4,16 @@ module Contrib
     def trace: (
       ?tracer_and_exporter: [untyped, untyped],
       ?always_create_workflow_spans: bool,
-      ?check_root: bool
+      ?check_root: bool,
+      ?append_finished_spans_to: Array[untyped]?
     ) { (Temporalio::Client) -> void } -> untyped
     def trace_workflow: (
       Symbol scenario,
       ?tracer_and_exporter: [untyped, untyped],
       ?start_with_untraced_client: bool,
       ?always_create_workflow_spans: bool,
-      ?check_root: bool
+      ?check_root: bool,
+      ?append_finished_spans_to: Array[untyped]?
     ) { (Temporalio::Client::WorkflowHandle) -> void } -> untyped
 
     class ExpectedSpan

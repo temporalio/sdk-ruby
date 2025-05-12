@@ -143,6 +143,7 @@ module Contrib
       tracer_and_exporter: init_tracer_and_exporter,
       always_create_workflow_spans: false,
       check_root: true,
+      append_finished_spans_to: nil,
       &
     )
       tracer, exporter = tracer_and_exporter
@@ -160,6 +161,7 @@ module Contrib
       end
 
       # Convert spans, confirm there is only the outer, and return children
+      append_finished_spans_to&.append(*exporter.finished_spans)
       spans = ExpectedSpan.from_span_data(exporter.finished_spans)
       if check_root
         assert_equal 1, spans.size
@@ -174,9 +176,10 @@ module Contrib
       start_with_untraced_client: false,
       always_create_workflow_spans: false,
       check_root: true,
+      append_finished_spans_to: nil,
       &
     )
-      trace(tracer_and_exporter:, always_create_workflow_spans:, check_root:) do |client|
+      trace(tracer_and_exporter:, always_create_workflow_spans:, check_root:, append_finished_spans_to:) do |client|
         # Must capture and attach outer context
         outer_context = OpenTelemetry::Context.current
         attach_token = nil
@@ -318,7 +321,8 @@ module Contrib
 
     def test_activity
       exp_root = ExpectedSpan.new(name: 'root')
-      act_root = trace_workflow(:wait_on_signal) do |handle|
+      raw_finished_spans = []
+      act_root = trace_workflow(:wait_on_signal, append_finished_spans_to: raw_finished_spans) do |handle|
         exp_cl_attrs = { 'temporalWorkflowID' => handle.id }
         exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
         exp_start_wf = exp_root.add_child(name: 'StartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
@@ -375,6 +379,11 @@ module Contrib
                      handle.execute_update(TestWorkflow.update, :call_local_activity, id: 'my-update-id2')
       end
       assert_equal exp_root.to_s_indented, act_root.to_s_indented
+
+      # Confirm the custom in-workflow span time is within 5m of the given time
+      custom_span = raw_finished_spans.find { |span| span.name == 'custom-workflow-span' } || raise
+      assert_equal custom_span.start_timestamp, custom_span.end_timestamp
+      assert_in_delta Time.now, Time.at(0, custom_span.start_timestamp, :nanosecond), 5 * 60.0
     end
 
     def test_client_fail
