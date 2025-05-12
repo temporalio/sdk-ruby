@@ -142,7 +142,7 @@ module Temporalio
                     end,
               run_id: details.initial_activation.run_id,
               run_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_run_timeout),
-              start_time: ProtoUtils.timestamp_to_time(details.initial_activation.timestamp) || raise,
+              start_time: ProtoUtils.timestamp_to_time(@init_job.start_time) || raise,
               task_queue: details.task_queue,
               task_timeout: ProtoUtils.duration_to_seconds(@init_job.workflow_task_timeout) || raise,
               workflow_id: @init_job.workflow_id,

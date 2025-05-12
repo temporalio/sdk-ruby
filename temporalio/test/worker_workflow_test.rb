@@ -158,6 +158,7 @@ class WorkerWorkflowTest < Test
     # Normal info
     execute_workflow(InfoWorkflow) do |handle, worker|
       info = handle.result #: Hash[String, untyped]
+      desc = handle.describe
       assert_equal 1, info['attempt']
       assert_nil info.fetch('continued_run_id')
       assert_nil info.fetch('cron_schedule')
@@ -170,7 +171,7 @@ class WorkerWorkflowTest < Test
       assert_nil info.fetch('root')
       assert_equal handle.result_run_id, info['run_id']
       assert_nil info.fetch('run_timeout')
-      refute_nil info['start_time']
+      assert_equal desc.start_time.to_s, info['start_time']
       assert_equal worker.task_queue, info['task_queue']
       assert_equal 10.0, info['task_timeout']
       assert_equal handle.id, info['workflow_id']
