@@ -56,7 +56,7 @@ module Temporalio
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_history_length,
                     :current_history_size, :replaying, :random, :signal_handlers, :query_handlers, :update_handlers,
-                    :context_frozen
+                    :context_frozen, :assert_valid_local_activity
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -107,6 +107,8 @@ module Temporalio
           end
           @query_handlers = HandlerHash.new(details.definition.queries, Workflow::Definition::Query)
           @update_handlers = HandlerHash.new(details.definition.updates, Workflow::Definition::Update)
+
+          @assert_valid_local_activity = details.assert_valid_local_activity
 
           # Create all things needed from initial job
           @init_job = details.initial_activation.jobs.find { |j| !j.initialize_workflow.nil? }&.initialize_workflow

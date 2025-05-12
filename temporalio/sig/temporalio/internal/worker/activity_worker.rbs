@@ -26,6 +26,8 @@ module Temporalio
           Temporalio::Worker::Interceptor::Activity::ExecuteInput input
         ) -> void
 
+        def assert_valid_activity: (String activity) -> void
+
         class RunningActivity < Activity::Context
           attr_accessor instance: Activity::Definition?
           attr_accessor _outbound_impl: Temporalio::Worker::Interceptor::Activity::Outbound?

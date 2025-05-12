@@ -8,7 +8,8 @@ module Temporalio
         class Details
           attr_reader :namespace, :task_queue, :definition, :initial_activation, :logger, :metric_meter,
                       :payload_converter, :failure_converter, :interceptors, :disable_eager_activity_execution,
-                      :illegal_calls, :workflow_failure_exception_types, :unsafe_workflow_io_enabled
+                      :illegal_calls, :workflow_failure_exception_types, :unsafe_workflow_io_enabled,
+                      :assert_valid_local_activity
 
           def initialize(
             namespace:,
@@ -23,7 +24,8 @@ module Temporalio
             disable_eager_activity_execution:,
             illegal_calls:,
             workflow_failure_exception_types:,
-            unsafe_workflow_io_enabled:
+            unsafe_workflow_io_enabled:,
+            assert_valid_local_activity:
           )
             @namespace = namespace
             @task_queue = task_queue
@@ -38,6 +40,7 @@ module Temporalio
             @illegal_calls = illegal_calls
             @workflow_failure_exception_types = workflow_failure_exception_types
             @unsafe_workflow_io_enabled = unsafe_workflow_io_enabled
+            @assert_valid_local_activity = assert_valid_local_activity
           end
         end
       end

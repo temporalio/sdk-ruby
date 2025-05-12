@@ -33,6 +33,7 @@ module Temporalio
         attr_reader query_handlers: Hash[String?, Workflow::Definition::Query]
         attr_reader update_handlers: Hash[String?, Workflow::Definition::Update]
         attr_reader context_frozen: bool
+        attr_reader assert_valid_local_activity: ^(String) -> void
 
         attr_accessor io_enabled: bool
         attr_accessor current_details: String?

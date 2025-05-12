@@ -490,7 +490,8 @@ module Temporalio
           workflow_failure_exception_types:,
           workflow_payload_codec_thread_pool:,
           unsafe_workflow_io_enabled:,
-          debug_mode:
+          debug_mode:,
+          assert_valid_local_activity: ->(activity) { _assert_valid_local_activity(activity) }
         )
       end
 
@@ -598,6 +599,18 @@ module Temporalio
     def _on_shutdown_complete
       @workflow_worker&.on_shutdown_complete
       @workflow_worker = nil
+    end
+
+    # @!visibility private
+    def _assert_valid_local_activity(activity)
+      unless @activity_worker.nil?
+        @activity_worker.assert_valid_activity(activity)
+        return
+      end
+
+      raise ArgumentError,
+            "Activity #{activity} " \
+            'is not registered on this worker, no available activities.'
     end
   end
 end
