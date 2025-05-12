@@ -208,6 +208,15 @@ module Temporalio
         # Reset details
         self.pending_handler_details = nil
 
+        # Disallow kwargs in parameters
+        begin
+          if instance_method(method_name).parameters.any? { |t, _| t == :key || t == :keyreq }
+            raise "Workflow #{handler[:type]} cannot have keyword arguments"
+          end
+        rescue NameError
+          # Ignore name error
+        end
+
         # Initialize class variables if not done already
         @workflow_signals ||= {}
         @workflow_queries ||= {}
@@ -316,6 +325,11 @@ module Temporalio
         # Make sure there isn't dangling pending handler details
         if pending_handler_details
           raise "Leftover #{pending_handler_details&.[](:type)} handler not applied to a method"
+        end
+
+        # Disallow kwargs in execute parameters
+        if instance_method(:execute).parameters.any? { |t, _| t == :key || t == :keyreq }
+          raise 'Workflow execute cannot have keyword arguments'
         end
 
         # Apply all update validators before merging with super

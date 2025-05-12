@@ -925,6 +925,17 @@ class WorkerActivityTest < Test
     assert_includes err.message, "'__temporal_activity' cannot start with '__temporal_'"
   end
 
+  class KeywordArgumentActivity < Temporalio::Activity::Definition
+    def execute(foo, bar: 'baz'); end
+  end
+
+  def test_keyword_arguments
+    err = assert_raises { Temporalio::Activity::Definition::Info.from_activity(KeywordArgumentActivity) }
+    assert_includes err.message, 'Activity execute cannot have keyword arguments'
+    err = assert_raises { Temporalio::Activity::Definition::Info.from_activity(KeywordArgumentActivity.new) }
+    assert_includes err.message, 'Activity execute cannot have keyword arguments'
+  end
+
   # steep:ignore
   def execute_activity(
     activity,
