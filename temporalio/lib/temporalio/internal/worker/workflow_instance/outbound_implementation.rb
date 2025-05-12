@@ -87,6 +87,8 @@ module Temporalio
               raise ArgumentError, 'Activity must have schedule_to_close_timeout or start_to_close_timeout'
             end
 
+            @instance.assert_valid_local_activity.call(input.activity)
+
             execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation) do |do_backoff|
               seq = (@activity_counter += 1)
               @instance.add_command(

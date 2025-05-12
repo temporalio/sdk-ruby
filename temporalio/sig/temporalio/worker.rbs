@@ -132,5 +132,6 @@ module Temporalio
     def _activity_interceptors: -> Array[Interceptor::Activity]
     def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
     def _on_shutdown_complete: -> void
+    def _assert_valid_local_activity: (String) -> void
   end
 end
