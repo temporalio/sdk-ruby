@@ -652,10 +652,8 @@ module Temporalio
 
         def failure_exception?(err)
           err.is_a?(Error::Failure) || err.is_a?(Timeout::Error) ||
-            ((@workflow_failure_exception_types || []) +
-             (@definition_options.failure_exception_types || [])).any? do |cls|
-              err.is_a?(cls)
-            end
+            @workflow_failure_exception_types&.any? { |cls| err.is_a?(cls) } ||
+            @definition_options.failure_exception_types&.any? { |cls| err.is_a?(cls) }
         end
 
         def with_context_frozen(&)

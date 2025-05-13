@@ -42,6 +42,8 @@ module Temporalio
     end
 
     # Returns the canonical string representation of the version.
+    #
+    # @return [String]
     def to_canonical_string
       "#{deployment_name}.#{build_id}"
     end

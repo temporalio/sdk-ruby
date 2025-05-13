@@ -13,7 +13,7 @@ module Temporalio
     module Worker
       # Worker for handling workflow activations. Most activation work is delegated to the workflow executor.
       class WorkflowWorker
-        def self.workflow_definitions(workflows, should_enforce_versioning_behavior)
+        def self.workflow_definitions(workflows, should_enforce_versioning_behavior:)
           workflows.each_with_object({}) do |workflow, hash|
             # Load definition
             defn = begin

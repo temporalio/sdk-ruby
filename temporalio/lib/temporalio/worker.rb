@@ -421,7 +421,7 @@ module Temporalio
       # Preload workflow definitions and some workflow settings for the bridge
       workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
         workflows,
-        should_enforce_versioning_behavior
+        should_enforce_versioning_behavior: should_enforce_versioning_behavior
       )
       nondeterminism_as_workflow_fail, nondeterminism_as_workflow_fail_for_types =
         Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
@@ -437,7 +437,6 @@ module Temporalio
           namespace: client.namespace,
           task_queue:,
           tuner: tuner._to_bridge_options,
-          build_id: '',
           identity_override: identity,
           max_cached_workflows:,
           max_concurrent_workflow_task_polls:,
