@@ -455,6 +455,31 @@ class WorkerWorkflowVersioningTest < Test
     end
   end
 
+  def test_default_build_id
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [NoVersioningAnnotationWorkflow],
+    )
+    build_id = Temporalio::Worker.default_build_id
+
+    worker.run do
+      handle = env.client.start_workflow(
+        NoVersioningAnnotationWorkflow,
+        id: "default-build-id-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      handle.result
+
+      events = handle.fetch_history.events
+      has_expected_behavior = events.any? do |event|
+        event.workflow_task_completed_event_attributes &&
+          event.workflow_task_completed_event_attributes.worker_version.build_id == build_id
+      end
+      assert has_expected_behavior, 'Expected versioning behavior PINNED not found in history'
+    end
+  end
+
   def wait_until_worker_deployment_visible(client, version)
     assert_eventually do
       res = client.workflow_service.describe_worker_deployment(

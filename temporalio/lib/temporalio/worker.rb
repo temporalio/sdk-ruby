@@ -414,8 +414,14 @@ module Temporalio
         debug_mode:
       ).freeze
 
+      if deployment_options.nil?
+        deployment_options = DeploymentOptions.new(
+          version: WorkerDeploymentVersion.new(deployment_name: '',
+                                               build_id: Worker.default_build_id)
+        )
+      end
+
       should_enforce_versioning_behavior =
-        !deployment_options.nil? &&
         deployment_options.use_worker_versioning &&
         deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
       # Preload workflow definitions and some workflow settings for the bridge
@@ -451,14 +457,9 @@ module Temporalio
           max_worker_activities_per_second: max_activities_per_second,
           max_task_queue_activities_per_second:,
           graceful_shutdown_period:,
-          use_worker_versioning: false,
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
-          deployment_options: if deployment_options.nil?
-                                nil
-                              else
-                                deployment_options._to_bridge_options
-                              end
+          deployment_options: deployment_options._to_bridge_options
         )
       )
 
