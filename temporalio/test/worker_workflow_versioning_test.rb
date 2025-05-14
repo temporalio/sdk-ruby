@@ -459,7 +459,7 @@ class WorkerWorkflowVersioningTest < Test
     worker = Temporalio::Worker.new(
       client: env.client,
       task_queue: "tq-#{SecureRandom.uuid}",
-      workflows: [NoVersioningAnnotationWorkflow],
+      workflows: [NoVersioningAnnotationWorkflow]
     )
     build_id = Temporalio::Worker.default_build_id
 

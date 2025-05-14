@@ -8,7 +8,6 @@ module Temporalio
         attr_reader data_converter: Converters::DataConverter
         attr_reader workflow_executor: Worker::WorkflowExecutor
         attr_reader interceptors: Array[Interceptor::Workflow]
-        attr_reader build_id: String
         attr_reader identity: String?
         attr_reader logger: Logger
         attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
@@ -17,7 +16,7 @@ module Temporalio
         attr_reader unsafe_workflow_io_enabled: bool
         attr_reader debug_mode: bool
         attr_reader runtime: Runtime
-  
+
         def initialize: (
           workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
           namespace: String,
@@ -25,7 +24,6 @@ module Temporalio
           data_converter: Converters::DataConverter,
           workflow_executor: Worker::WorkflowExecutor,
           interceptors: Array[Interceptor::Workflow],
-          build_id: String,
           identity: String?,
           logger: Logger,
           illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
@@ -46,7 +44,6 @@ module Temporalio
         ?data_converter: Converters::DataConverter,
         ?workflow_executor: Worker::WorkflowExecutor,
         ?interceptors: Array[Interceptor::Workflow],
-        ?build_id: String,
         ?identity: String?,
         ?logger: Logger,
         ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
