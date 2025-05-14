@@ -2317,6 +2317,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       assert_eventually_task_fail(handle:, message_contains:)
     end
   end
+end
 
 # TODO(cretz): To test
 # * Common

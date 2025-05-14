@@ -12,5 +12,6 @@ module Temporalio
     def to_canonical_string: -> String
 
     def _to_bridge_options: -> Internal::Bridge::Worker::WorkerDeploymentVersion
+    def _to_proto: -> untyped
   end
 end

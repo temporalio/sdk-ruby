@@ -520,4 +520,51 @@ class WorkerWorkflowVersioningTest < Test
       )
     )
   end
+
+  def test_workflows_can_use_versioning_override
+    # Test that versioning override works when starting a workflow
+    deployment_name = "deployment-versioning-override-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name,
+      build_id: '1.0'
+    )
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    require 'temporalio/versioning_override'
+
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      workflows: [DeploymentVersioningWorkflowV1AutoUpgrade],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v1, use_worker_versioning: true
+      )
+    )
+
+    worker.run do
+      # Wait for deployment to be visible
+      describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
+      # Set current deployment version
+      set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+
+      # Start workflow with pinned versioning override
+      handle = env.client.start_workflow(
+        DeploymentVersioningWorkflowV1AutoUpgrade,
+        id: "override-versioning-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        versioning_override: Temporalio::VersioningOverride.pinned(worker_v1)
+      )
+
+      # Send signal to finish
+      handle.signal(:do_finish)
+      # Wait for workflow to complete
+      handle.result
+
+      # Verify in the history that versioning override was applied
+      history = handle.fetch_history
+      execution_started_event = history.events.find { |evt| evt.event_type == :EVENT_TYPE_WORKFLOW_EXECUTION_STARTED }
+      # Check if the versioning override is present in the workflow execution started event
+      assert(execution_started_event.workflow_execution_started_event_attributes.versioning_override)
+    end
+  end
 end

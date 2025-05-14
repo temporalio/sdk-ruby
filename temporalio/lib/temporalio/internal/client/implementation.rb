@@ -69,7 +69,8 @@ module Temporalio
             user_metadata: ProtoUtils.to_user_metadata(
               input.static_summary, input.static_details, @client.data_converter
             ),
-            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
+            versioning_override: input.versioning_override&._to_proto
           )
 
           # Send request

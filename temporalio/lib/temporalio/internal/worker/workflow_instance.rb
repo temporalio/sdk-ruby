@@ -57,7 +57,7 @@ module Temporalio
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
-                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_history
+                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)

@@ -55,5 +55,13 @@ module Temporalio
         build_id: build_id
       )
     end
+
+    # @!visibility private
+    def _to_proto
+      Api::Deployment::V1::WorkerDeploymentVersion.new(
+        deployment_name: deployment_name,
+        build_id: build_id
+      )
+    end
   end
 end

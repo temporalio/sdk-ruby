@@ -643,7 +643,7 @@ module Temporalio
       :versioning_behavior
     )
     # @!attribute failure_exception_types
-    #   Dynamic equivalent of {Definition.Info.workflow_failure_exception_types}.
+    #   Dynamic equivalent of {Definition.workflow_failure_exception_type}.
     #   Will override any types set there if set, including if set to an empty array.
     #   @return [Array<Class<Exception>>, nil] The failure exception types
     #
