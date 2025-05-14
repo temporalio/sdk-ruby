@@ -88,6 +88,14 @@ module Temporalio
       build_id
     end
 
+    # @return [DeploymentOptions] Default deployment options, which does not use worker versioning
+    #   or a deployment name, and sets the build id to the one from {self.default_build_id}.
+    def self.default_deployment_options
+      @default_deployment_options ||= DeploymentOptions.new(
+        version: WorkerDeploymentVersion.new(deployment_name: '', build_id: Worker.default_build_id)
+      )
+    end
+
     # Run all workers until cancellation or optional block completes. When the cancellation or block is complete, the
     # workers are shut down. This will return the block result if everything successful or raise an error if not. See
     # {run} for details on how worker shutdown works.
@@ -376,7 +384,7 @@ module Temporalio
       workflow_failure_exception_types: [],
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
-      deployment_options: nil,
+      deployment_options: Worker.default_deployment_options,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -413,13 +421,6 @@ module Temporalio
         deployment_options:,
         debug_mode:
       ).freeze
-
-      if deployment_options.nil?
-        deployment_options = DeploymentOptions.new(
-          version: WorkerDeploymentVersion.new(deployment_name: '',
-                                               build_id: Worker.default_build_id)
-        )
-      end
 
       should_enforce_versioning_behavior =
         deployment_options.use_worker_versioning &&

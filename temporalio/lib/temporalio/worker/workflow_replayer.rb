@@ -217,10 +217,7 @@ module Temporalio
               graceful_shutdown_period: 0.0,
               nondeterminism_as_workflow_fail:,
               nondeterminism_as_workflow_fail_for_types:,
-              deployment_options: DeploymentOptions.new(
-                version: WorkerDeploymentVersion.new(deployment_name: '',
-                                                     build_id: Worker.default_build_id)
-              )._to_bridge_options
+              deployment_options: Worker.default_deployment_options._to_bridge_options
             )
           )
 

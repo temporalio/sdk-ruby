@@ -65,6 +65,7 @@ module Temporalio
 
     def self.default_build_id: -> String
     def self._load_default_build_id: -> String
+    def self.default_deployment_options: -> Worker::DeploymentOptions
 
     def self.run_all: [T] (
       *Worker workers,
