@@ -9,7 +9,6 @@ module Temporalio
       attr_reader activity_executors: Hash[Symbol, Worker::ActivityExecutor]
       attr_reader workflow_executor: Worker::WorkflowExecutor
       attr_reader interceptors: Array[Interceptor::Activity | Interceptor::Workflow]
-      attr_reader build_id: String
       attr_reader identity: String
       attr_reader logger: Logger
       attr_reader max_cached_workflows: Integer
@@ -23,7 +22,6 @@ module Temporalio
       attr_reader max_activities_per_second: Float?
       attr_reader max_task_queue_activities_per_second: Float?
       attr_reader graceful_shutdown_period: Float
-      attr_reader use_worker_versioning: bool
       attr_reader disable_eager_activity_execution: bool
       attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
       attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
@@ -40,7 +38,6 @@ module Temporalio
         activity_executors: Hash[Symbol, Worker::ActivityExecutor],
         workflow_executor: Worker::WorkflowExecutor,
         interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
-        build_id: String,
         identity: String?,
         logger: Logger,
         max_cached_workflows: Integer,
@@ -54,12 +51,12 @@ module Temporalio
         max_activities_per_second: Float?,
         max_task_queue_activities_per_second: Float?,
         graceful_shutdown_period: Float,
-        use_worker_versioning: bool,
         disable_eager_activity_execution: bool,
         illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
         workflow_failure_exception_types: Array[singleton(Exception)],
         workflow_payload_codec_thread_pool: ThreadPool?,
         unsafe_workflow_io_enabled: bool,
+        deployment_options: Worker::DeploymentOptions,
         debug_mode: bool
       ) -> void
 
@@ -68,6 +65,7 @@ module Temporalio
 
     def self.default_build_id: -> String
     def self._load_default_build_id: -> String
+    def self.default_deployment_options: -> Worker::DeploymentOptions
 
     def self.run_all: [T] (
       *Worker workers,
@@ -90,7 +88,6 @@ module Temporalio
       ?activity_executors: Hash[Symbol, Worker::ActivityExecutor],
       ?workflow_executor: Worker::WorkflowExecutor,
       ?interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
-      ?build_id: String,
       ?identity: String?,
       ?logger: Logger,
       ?max_cached_workflows: Integer,
@@ -104,12 +101,12 @@ module Temporalio
       ?max_activities_per_second: Float?,
       ?max_task_queue_activities_per_second: Float?,
       ?graceful_shutdown_period: Float,
-      ?use_worker_versioning: bool,
       ?disable_eager_activity_execution: bool,
       ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
       ?workflow_failure_exception_types: Array[singleton(Exception)],
       ?workflow_payload_codec_thread_pool: ThreadPool?,
       ?unsafe_workflow_io_enabled: bool,
+      ?deployment_options: Worker::DeploymentOptions,
       ?debug_mode: bool
     ) -> void
 

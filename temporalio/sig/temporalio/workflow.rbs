@@ -11,6 +11,8 @@ module Temporalio
 
     def self.current_history_length: -> Integer
 
+    def self.current_deployment_version: -> WorkerDeploymentVersion?
+
     def self.current_history_size: -> Integer
 
     def self.current_update_info: -> UpdateInfo?

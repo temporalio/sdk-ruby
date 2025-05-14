@@ -26,7 +26,10 @@ use temporal_sdk_core::{
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
-    worker::{PollerBehavior, SlotKind, WorkerVersioningStrategy},
+    worker::{
+        PollerBehavior, SlotKind, WorkerDeploymentOptions, WorkerDeploymentVersion,
+        WorkerVersioningStrategy,
+    },
 };
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
@@ -447,13 +450,32 @@ fn build_config(options: Struct) -> Result<WorkerConfig, Error> {
     WorkerConfigBuilder::default()
         .namespace(options.member::<String>(id!("namespace"))?)
         .task_queue(options.member::<String>(id!("task_queue"))?)
-        // TODO(cretz): Replace with more involved versioning strategy
         .versioning_strategy({
-            let build_id = options.member::<String>(id!("build_id"))?;
-            if options.member::<bool>(id!("use_worker_versioning"))? {
-                WorkerVersioningStrategy::LegacyBuildIdBased { build_id }
+            let deploy_options = options.child(id!("deployment_options"))?;
+            if let Some(dopts) = deploy_options {
+                let version = dopts
+                    .child(id!("version"))?
+                    .ok_or(error!("Worker::DeploymentOptions must set version"))?;
+                WorkerVersioningStrategy::WorkerDeploymentBased(WorkerDeploymentOptions {
+                    version: WorkerDeploymentVersion {
+                        deployment_name: version.member::<String>(id!("deployment_name"))?,
+                        build_id: version.member::<String>(id!("build_id"))?,
+                    },
+                    use_worker_versioning: dopts.member::<bool>(id!("use_worker_versioning"))?,
+                    default_versioning_behavior: {
+                        let val = dopts.member::<i32>(id!("default_versioning_behavior"))?;
+                        if val == 0 {
+                            None
+                        } else {
+                            Some(val.try_into().map_err(|_| {
+                                error!("Unknown default versioning behavior: {}", val)
+                            })?)
+                        }
+                    },
+                })
             } else {
-                WorkerVersioningStrategy::None { build_id }
+                // Ruby side should always set deployment options w/ default build ID
+                return Err(error!("SDK must set Worker deployment_options"));
             }
         })
         .client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)

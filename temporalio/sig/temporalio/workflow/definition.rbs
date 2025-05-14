@@ -7,6 +7,8 @@ module Temporalio
       def self.workflow_failure_exception_type: (*singleton(Exception) types) -> void
       def self.workflow_query_attr_reader: (*Symbol attr_names, ?description: String?) -> void
 
+      def self.workflow_versioning_behavior: (VersioningBehavior::enum value) -> void
+
       def self.workflow_init: (?bool value) -> void
 
       def self.workflow_signal: (
@@ -34,6 +36,8 @@ module Temporalio
 
       def self.workflow_update_validator: (Symbol update_method) -> void
 
+      def self.workflow_dynamic_options: () -> void
+
       def self.pending_handler_details: -> Hash[Symbol, untyped]?
       def self.pending_handler_details=: (Hash[Symbol, untyped]? value) -> void
 
@@ -57,6 +61,8 @@ module Temporalio
         attr_reader signals: Hash[String?, Signal]
         attr_reader queries: Hash[String?, Query]
         attr_reader updates: Hash[String?, Update]
+        attr_reader versioning_behavior: Integer?
+        attr_reader dynamic_options_method: Symbol?
 
         def self.from_class: (singleton(Definition) workflow_class) -> Info
 
@@ -69,7 +75,9 @@ module Temporalio
           ?failure_exception_types: Array[singleton(Exception)],
           ?signals: Hash[String, Signal],
           ?queries: Hash[String, Query],
-          ?updates: Hash[String, Update]
+          ?updates: Hash[String, Update],
+          ?versioning_behavior: Integer?,
+          ?dynamic_options_method: Symbol?
         ) -> void
 
         def name: -> String?
