@@ -42,7 +42,7 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
     - [Cloud Client Using mTLS](#cloud-client-using-mtls)
     - [Cloud Client Using API Key](#cloud-client-using-api-key)
     - [Data Conversion](#data-conversion)
-      - [ActiveRecord and ActiveModel](#activerecord-and-activemodel)
+      - [ActiveModel](#activemodel)
   - [Workers](#workers)
   - [Workflows](#workflows)
     - [Workflow Definition](#workflow-definition)
@@ -71,6 +71,9 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
     - [Metrics](#metrics)
     - [OpenTelemetry Tracing](#opentelemetry-tracing)
       - [OpenTelemetry Tracing in Workflows](#opentelemetry-tracing-in-workflows)
+  - [Rails](#rails)
+    - [ActiveRecord](#activerecord)
+    - [Lazy/Eager Loading](#lazyeager-loading)
   - [Ractors](#ractors)
   - [Platform Support](#platform-support)
 - [Development](#development)
@@ -295,57 +298,43 @@ will be tried in order until one accepts (default falls through to the JSON one)
 `encoding` metadata value which is used to know which converter to use on deserialize. Custom encoding converters can be
 created, or even the entire payload converter can be replaced with a different implementation.
 
-##### ActiveRecord and ActiveModel
+**NOTE:** For ActiveRecord, or other general/ORM models that are used for a different purpose, it is not recommended to
+try to reuse them as Temporal models. Eventually model purposes diverge and models for a Temporal workflows/activities
+should be specific to their use for clarity and compatibility reasons. Also many Ruby ORMs do many lazy things and
+therefore provide unclear serialization semantics. Instead, consider having models specific for workflows/activities and
+translate to/from existing models as needed. See the next section on how to do this with ActiveModel objects.
 
-By default, `ActiveRecord` and `ActiveModel` objects do not natively support the `JSON` module. A mixin can be created
-to add this support for `ActiveRecord`, for example:
+##### ActiveModel
 
-```ruby
-module ActiveRecordJSONSupport
-  extend ActiveSupport::Concern
-  include ActiveModel::Serializers::JSON
-
-  included do
-    def to_json(*args)
-      hash = as_json
-      hash[::JSON.create_id] = self.class.name
-      hash.to_json(*args)
-    end
-
-    def self.json_create(object)
-      object.delete(::JSON.create_id)
-      ret = new
-      ret.attributes = object
-      ret
-    end
-  end
-end
-```
-
-Similarly, a mixin for `ActiveModel` that adds `attributes` accessors can leverage this same mixin, for example:
+By default, ActiveModel objects do not natively support the `JSON` module. A mixin can be created to add this support
+for ActiveRecord, for example:
 
 ```ruby
 module ActiveModelJSONSupport
   extend ActiveSupport::Concern
-  include ActiveRecordJSONSupport
+  include ActiveModel::Serializers::JSON
 
   included do
-    def attributes=(hash)
-      hash.each do |key, value|
-        send("#{key}=", value)
-      end
+    def as_json(*)
+      super.merge(::JSON.create_id => self.class.name)
     end
 
-    def attributes
-      instance_values
+    def to_json(*args)
+      as_json.to_json(*args)
+    end
+
+    def self.json_create(object)
+      object = object.dup
+      object.delete(::JSON.create_id)
+      new(**object.symbolize_keys)
     end
   end
 end
 ```
 
-Now `include ActiveRecordJSONSupport` or `include ActiveModelJSONSupport` will make the models work with Ruby `JSON`
-module and therefore Temporal. Of course any other approach to make the models work with the `JSON` module will work as
-well.
+Now if `include ActiveModelJSONSupport` is present on any ActiveModel class, on serialization `to_json` will be used
+which will use `as_json` which calls the super `as_json` but also includes the fully qualified class name as the JSON
+`create_id` key. On deserialization, Ruby JSON then uses this key to know what class to call `json_create` on.
 
 ### Workers
 
@@ -1153,6 +1142,43 @@ And reminder that `StartWorkflow` and `RunActivity` spans do last the length of 
 workflow and time to run the activity attempt respectively), but the other spans have no measurable time because they
 are created in workflows and closed immediately since long-lived spans cannot work for durable software that may resume
 on other machines.
+
+### Rails
+
+Temporal Ruby SDK is a generic Ruby library that can work in any Ruby environment. However, there are some common
+conventions for Rails users to be aware of.
+
+See the [rails_app](https://github.com/temporalio/samples-ruby/tree/main/rails_app) sample for an example of using
+Temporal from Rails.
+
+#### ActiveRecord
+
+For ActiveRecord, or other general/ORM models that are used for a different purpose, it is not recommended to
+try to reuse them as Temporal models. Eventually model purposes diverge and models for a Temporal workflows/activities
+should be specific to their use for clarity and compatibility reasons. Also many Ruby ORMs do many lazy things and
+therefore provide unclear serialization semantics. Instead, consider having models specific for workflows/activities and
+translate to/from existing models as needed. See the [ActiveModel](#activemodel) section on how to do this with
+ActiveModel objects.
+
+#### Lazy/Eager Loading
+
+By default, Rails
+[eagerly loads](https://guides.rubyonrails.org/v7.2/autoloading_and_reloading_constants.html#eager-loading) all
+application code on application start in production, but lazily loads it in non-production environments. Temporal
+workflows by default disallow use of IO during the workflow run. With lazy loading enabled in dev/test environments,
+when an activity class is referenced in a workflow before it has been explicitly `require`d, it can give an error like:
+
+> Cannot access File path from inside a workflow. If this is known to be safe, the code can be run in a
+> Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled block.
+
+This comes from `bootsnap` via `zeitwork` because it is lazily loading a class/module at workflow runtime. It is not
+good to lazily load code durnig a workflow run because it can be side effecting. Workflows and the classes they
+reference should not be eagerly loaded.
+
+To resolve this, either always eagerly load (e.g. `config.eager_load = true`) or explicitly `require` what is used by a
+workflow at the top of the file.
+
+Note, this only affects non-production environments.
 
 ### Ractors
 
