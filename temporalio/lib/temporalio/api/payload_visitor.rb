@@ -88,6 +88,12 @@ module Temporalio
 
       ### Generated method bodies below ###
 
+      def api_batch_v1_batch_operation_reset(value)
+        @on_enter&.call(value)
+        value.post_reset_operations.each { |v| api_workflow_v1_post_reset_operation(v) }
+        @on_exit&.call(value)
+      end
+      
       def api_batch_v1_batch_operation_signal(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.input) if value.has_input?
@@ -915,6 +921,19 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflow_v1_post_reset_operation(value)
+        @on_enter&.call(value)
+        api_workflow_v1_post_reset_operation_signal_workflow(value.signal_workflow) if value.has_signal_workflow?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflow_v1_post_reset_operation_signal_workflow(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.input) if value.has_input?
+        api_common_v1_header(value.header) if value.has_header?
+        @on_exit&.call(value)
+      end
+      
       def api_workflow_v1_workflow_execution_config(value)
         @on_enter&.call(value)
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
@@ -1111,6 +1130,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_reset_workflow_execution_request(value)
+        @on_enter&.call(value)
+        value.post_reset_operations.each { |v| api_workflow_v1_post_reset_operation(v) }
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_respond_activity_task_canceled_by_id_request(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.details) if value.has_details?
@@ -1237,6 +1262,7 @@ module Temporalio
         @on_enter&.call(value)
         api_batch_v1_batch_operation_termination(value.termination_operation) if value.has_termination_operation?
         api_batch_v1_batch_operation_signal(value.signal_operation) if value.has_signal_operation?
+        api_batch_v1_batch_operation_reset(value.reset_operation) if value.has_reset_operation?
         @on_exit&.call(value)
       end
       
