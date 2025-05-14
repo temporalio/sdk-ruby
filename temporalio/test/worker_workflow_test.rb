@@ -144,6 +144,7 @@ class WorkerWorkflowTest < Test
       Temporalio::Workflow.info.to_h.tap do |h|
         h['parent'] = Temporalio::Workflow.info.parent.to_h if Temporalio::Workflow.info.parent
         h['root'] = Temporalio::Workflow.info.root.to_h if Temporalio::Workflow.info.root
+        h['start_time'] = Temporalio::Workflow.info.start_time.to_s
       end
     end
   end
