@@ -54,7 +54,7 @@ module Temporalio
     # @!attribute run_timeout
     #   @return [Float, nil] Run timeout for the workflow.
     # @!attribute start_time
-    #   @return [Time] Time when the workflow started.
+    #   @return [Time] Time when the workflow started on the server.
     # @!attribute task_queue
     #   @return [String] Task queue for the workflow.
     # @!attribute task_timeout
