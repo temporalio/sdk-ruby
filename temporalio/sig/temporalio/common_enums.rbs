@@ -16,4 +16,12 @@ module Temporalio
     USE_EXISTING: enum
     TERMINATE_EXISTING: enum
   end
+
+  module VersioningBehavior
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    PINNED: enum
+    AUTO_UPGRADE: enum
+  end
 end

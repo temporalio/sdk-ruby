@@ -8,7 +8,6 @@ module Temporalio
           attr_accessor namespace: String
           attr_accessor task_queue: String
           attr_accessor tuner: TunerOptions
-          attr_accessor build_id: String
           attr_accessor identity_override: String?
           attr_accessor max_cached_workflows: Integer
           attr_accessor max_concurrent_workflow_task_polls: Integer
@@ -21,17 +20,16 @@ module Temporalio
           attr_accessor max_worker_activities_per_second: Float?
           attr_accessor max_task_queue_activities_per_second: Float?
           attr_accessor graceful_shutdown_period: Float
-          attr_accessor use_worker_versioning: bool
           attr_accessor nondeterminism_as_workflow_fail: bool
           attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
-    
+          attr_accessor deployment_options: DeploymentOptions?
+
           def initialize: (
             activity: bool,
             workflow: bool,
             namespace: String,
             task_queue: String,
             tuner: TunerOptions,
-            build_id: String,
             identity_override: String?,
             max_cached_workflows: Integer,
             max_concurrent_workflow_task_polls: Integer,
@@ -44,9 +42,9 @@ module Temporalio
             max_worker_activities_per_second: Float?,
             max_task_queue_activities_per_second: Float?,
             graceful_shutdown_period: Float,
-            use_worker_versioning: bool,
             nondeterminism_as_workflow_fail: bool,
-            nondeterminism_as_workflow_fail_for_types: Array[String]
+            nondeterminism_as_workflow_fail_for_types: Array[String],
+            deployment_options: DeploymentOptions?
           ) -> void
         end
 
@@ -121,6 +119,28 @@ module Temporalio
         def replace_client: (Client client) -> void
 
         def initiate_shutdown: -> void
+
+        class WorkerDeploymentVersion
+          attr_accessor deployment_name: String
+          attr_accessor build_id: String
+
+          def initialize: (
+            deployment_name: String,
+            build_id: String
+          ) -> void
+        end
+
+        class DeploymentOptions
+          attr_accessor version: WorkerDeploymentVersion
+          attr_accessor use_worker_versioning: bool
+          attr_accessor default_versioning_behavior: Integer
+
+          def initialize: (
+            version: WorkerDeploymentVersion,
+            use_worker_versioning: bool,
+            default_versioning_behavior: Integer
+          ) -> void
+        end
 
         class WorkflowReplayer
           def self.new: (Runtime runtime, Options options) -> [WorkflowReplayer, Worker]

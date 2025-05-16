@@ -22,6 +22,7 @@ module Temporalio
         attr_reader start_delay: duration?
         attr_reader request_eager_start: bool
         attr_reader headers: Hash[String, Object?]
+        attr_reader versioning_override: VersioningOverride?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
@@ -43,6 +44,7 @@ module Temporalio
           start_delay: duration?,
           request_eager_start: bool,
           headers: Hash[String, Object?],
+          versioning_override: VersioningOverride?,
           rpc_options: RPCOptions?
         ) -> void
       end

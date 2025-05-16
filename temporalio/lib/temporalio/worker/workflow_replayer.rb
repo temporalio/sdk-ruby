@@ -24,7 +24,6 @@ module Temporalio
         :data_converter,
         :workflow_executor,
         :interceptors,
-        :build_id,
         :identity,
         :logger,
         :illegal_workflow_calls,
@@ -51,9 +50,6 @@ module Temporalio
       # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within. This must be a
       #   {WorkflowExecutor::ThreadPool} currently.
       # @param interceptors [Array<Interceptor::Workflow>] Workflow interceptors.
-      # @param build_id [String] Unique identifier for the current runtime. This is best set as a unique value
-      #   representing all code and should change only when code does. This can be something like a git commit hash. If
-      #   unset, default is hash of known Ruby code.
       # @param identity [String, nil] Override the identity for this replater.
       # @param logger [Logger] Logger to use. Defaults to stdout with warn level. Callers setting this logger are
       #   responsible for closing it.
@@ -87,7 +83,6 @@ module Temporalio
         data_converter: Converters::DataConverter.default,
         workflow_executor: WorkflowExecutor::ThreadPool.default,
         interceptors: [],
-        build_id: Worker.default_build_id,
         identity: nil,
         logger: Logger.new($stdout, level: Logger::WARN),
         illegal_workflow_calls: Worker.default_illegal_workflow_calls,
@@ -105,7 +100,6 @@ module Temporalio
           data_converter:,
           workflow_executor:,
           interceptors:,
-          build_id:,
           identity:,
           logger:,
           illegal_workflow_calls:,
@@ -116,7 +110,9 @@ module Temporalio
           runtime:
         ).freeze
         # Preload definitions and other settings
-        @workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
+        @workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
+          workflows, should_enforce_versioning_behavior: false
+        )
         @nondeterminism_as_workflow_fail, @nondeterminism_as_workflow_fail_for_types =
           Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
             workflow_failure_exception_types:, workflow_definitions: @workflow_definitions
@@ -207,7 +203,6 @@ module Temporalio
               tuner: Tuner.create_fixed(
                 workflow_slots: 2, activity_slots: 1, local_activity_slots: 1
               )._to_bridge_options,
-              build_id: options.build_id,
               identity_override: options.identity,
               max_cached_workflows: 2,
               max_concurrent_workflow_task_polls: 1,
@@ -220,9 +215,9 @@ module Temporalio
               max_worker_activities_per_second: nil,
               max_task_queue_activities_per_second: nil,
               graceful_shutdown_period: 0.0,
-              use_worker_versioning: false,
               nondeterminism_as_workflow_fail:,
-              nondeterminism_as_workflow_fail_for_types:
+              nondeterminism_as_workflow_fail_for_types:,
+              deployment_options: Worker.default_deployment_options._to_bridge_options
             )
           )
 
@@ -245,7 +240,8 @@ module Temporalio
             workflow_payload_codec_thread_pool: options.workflow_payload_codec_thread_pool,
             unsafe_workflow_io_enabled: options.unsafe_workflow_io_enabled,
             debug_mode: options.debug_mode,
-            on_eviction: proc { |_, remove_job| @last_workflow_remove_job = remove_job } # steep:ignore
+            on_eviction: proc { |_, remove_job| @last_workflow_remove_job = remove_job }, # steep:ignore
+            assert_valid_local_activity: ->(_) {}
           )
 
           # Create the runner

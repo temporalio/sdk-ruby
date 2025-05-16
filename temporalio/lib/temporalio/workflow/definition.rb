@@ -91,6 +91,15 @@ module Temporalio
           end
         end
 
+        # Set the versioning behavior of this workflow.
+        #
+        # WARNING: This method is experimental and may change in future versions.
+        #
+        # @param behavior [VersioningBehavior] The versioning behavior.
+        def workflow_versioning_behavior(behavior)
+          @versioning_behavior = behavior
+        end
+
         # Mark an `initialize` as needing the workflow start arguments. Otherwise, `initialize` must accept no required
         # arguments. This must be placed above the `initialize` method or it will fail.
         #
@@ -181,6 +190,24 @@ module Temporalio
           self.pending_handler_details = { type: :update_validator, update_method: }
         end
 
+        # Mark the next method as returning some dynamic configuraion.
+        #
+        # Because dynamic workflows may conceptually represent more than one workflow type, it may
+        # be desirable to have different settings for fields that would normally be passed to
+        # `workflow_xxx` setters, but vary based on the workflow type name or other information
+        # available in the workflow's context. This function will be called after the workflow's
+        # `initialize`, if it has one, but before the workflow's `execute` method.
+        #
+        # The method must only take self as a parameter, and any values set in the class it returns
+        # will override those provided to other `workflow_xxx` setters.
+        #
+        # Cannot be specified on non-dynamic workflows.
+        def workflow_dynamic_options
+          raise 'Dynamic options method can only be set on workflows using `workflow_dynamic`' unless @workflow_dynamic
+
+          self.pending_handler_details = { type: :dynamic_options }
+        end
+
         private
 
         attr_reader :pending_handler_details
@@ -265,6 +292,11 @@ module Temporalio
               raw_args: handler[:raw_args],
               unfinished_policy: handler[:unfinished_policy]
             ), @workflow_updates, [@workflow_signals, @workflow_queries]]
+          when :dynamic_options
+            raise 'Dynamic options method already set' if @dynamic_options_method
+
+            @dynamic_options_method = method_name
+            return
           else
             raise "Unrecognized handler type #{handler[:type]}"
           end
@@ -401,6 +433,10 @@ module Temporalio
 
         raise 'Workflow cannot be given a name and be dynamic' if dynamic && override_name
 
+        if !dynamic && !@dynamic_options_method.nil?
+          raise 'Workflow cannot have a dynamic_options_method unless it is dynamic'
+        end
+
         Info.new(
           workflow_class: self,
           override_name:,
@@ -410,7 +446,9 @@ module Temporalio
           failure_exception_types: @workflow_failure_exception_types || [],
           signals:,
           queries:,
-          updates:
+          updates:,
+          versioning_behavior: @versioning_behavior || VersioningBehavior::UNSPECIFIED,
+          dynamic_options_method: @dynamic_options_method
         )
       end
 
@@ -423,7 +461,8 @@ module Temporalio
       # Information about the workflow definition. This is usually not used directly.
       class Info
         attr_reader :workflow_class, :override_name, :dynamic, :init, :raw_args,
-                    :failure_exception_types, :signals, :queries, :updates
+                    :failure_exception_types, :signals, :queries, :updates, :versioning_behavior,
+                    :dynamic_options_method
 
         # Derive the workflow definition info from the class.
         #
@@ -448,7 +487,9 @@ module Temporalio
           failure_exception_types: [],
           signals: {},
           queries: {},
-          updates: {}
+          updates: {},
+          versioning_behavior: VersioningBehavior::UNSPECIFIED,
+          dynamic_options_method: nil
         )
           @workflow_class = workflow_class
           @override_name = override_name
@@ -459,6 +500,8 @@ module Temporalio
           @signals = signals.dup.freeze
           @queries = queries.dup.freeze
           @updates = updates.dup.freeze
+          @versioning_behavior = versioning_behavior
+          @dynamic_options_method = dynamic_options_method
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
@@ -606,6 +649,31 @@ module Temporalio
             validator_to_invoke:
           )
         end
+      end
+    end
+
+    DefinitionOptions = Struct.new(
+      :failure_exception_types,
+      :versioning_behavior
+    )
+    # @!attribute failure_exception_types
+    #   Dynamic equivalent of {Definition.workflow_failure_exception_type}.
+    #   Will override any types set there if set, including if set to an empty array.
+    #   @return [Array<Class<Exception>>, nil] The failure exception types
+    #
+    # @!attribute versioning_behavior
+    #   Dynamic equivalent of {Definition.workflow_versioning_behavior}.
+    #   Will override any behavior set there if set.
+    #   WARNING: Deployment-based versioning is experimental and APIs may change.
+    #   @return [VersioningBehavior, nil] The versioning behavior
+    #
+    # @return [VersioningBehavior, nil] The versioning behavior
+    class DefinitionOptions
+      def initialize(
+        failure_exception_types: nil,
+        versioning_behavior: nil
+      )
+        super
       end
     end
   end
