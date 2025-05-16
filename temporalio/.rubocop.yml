@@ -67,7 +67,7 @@ Metrics/ModuleLength:
 
 # The default is too small
 Metrics/PerceivedComplexity:
-  Max: 40
+  Max: 60
 
 # We want the `*args` syntax instead of `*` so we can document clearly in YARD
 Style/ArgumentsForwarding:

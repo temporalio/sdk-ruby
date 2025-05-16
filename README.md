@@ -490,7 +490,8 @@ definition/behavior of the method:
   side effects, meaning they should never mutate state or try to wait on anything.
 
 Workflows can be inherited, but subclass workflow-level decorators override superclass ones, and the same method can't
-be decorated with different handler types/names in the hierarchy.
+be decorated with different handler types/names in the hierarchy. Workflow handlers (execute or any marked method)
+cannot accept keyword arguments.
 
 #### Running Workflows
 
@@ -955,6 +956,7 @@ Some notes about activity definition:
 * `workflow_raw_args` can be used to have activity arguments delivered to `execute` as
   `Temporalio::Converters::RawValue`s. These are wrappers for the raw payloads that have not been converted to types
   (but they have been decoded by the codec if present). They can be converted with `payload_converter` on the context.
+* Activities cannot accept keyword arguments.
 
 #### Activity Context
 
