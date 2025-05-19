@@ -343,5 +343,57 @@ module Workflow
         end
       CODE
     end
+
+    def test_kwargs
+      assert_invalid_workflow_code 'Workflow execute cannot have keyword arguments', <<~CODE
+        class TestExecuteKeywordArgs < Temporalio::Workflow::Definition
+          def execute(foo, bar:)
+          end
+        end
+      CODE
+      assert_invalid_workflow_code 'Workflow init cannot have keyword arguments', <<~CODE
+        class TestInitKeywordArgs < Temporalio::Workflow::Definition
+          workflow_init
+          def initialize(foo, bar:); end
+
+          def execute; end
+        end
+      CODE
+      assert_invalid_workflow_code 'Workflow signal cannot have keyword arguments', <<~CODE
+        class TestSignalKeywordArgs < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_signal
+          def some_handler(foo, bar: 'baz'); end
+        end
+      CODE
+      assert_invalid_workflow_code 'Workflow query cannot have keyword arguments', <<~CODE
+        class TestQueryKeywordArgs < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_query
+          def some_handler(foo, bar:); end
+        end
+      CODE
+      assert_invalid_workflow_code 'Workflow update cannot have keyword arguments', <<~CODE
+        class TestUpdateKeywordArgs < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_update
+          def some_handler(foo, bar:); end
+        end
+      CODE
+      assert_invalid_workflow_code 'Workflow update_validator cannot have keyword arguments', <<~CODE
+        class TestUpdateValidatorKeywordArgs < Temporalio::Workflow::Definition
+          def execute; end
+
+          workflow_update_validator(:some_handler)
+          def validate_some_handler(foo, bar:); end
+
+          workflow_update
+          def some_handler(foo, bar:); end
+        end
+      CODE
+    end
   end
 end
