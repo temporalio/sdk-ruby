@@ -407,7 +407,7 @@ class GreetingWorkflow < Temporalio::Workflow::Definition
       # on wait_condition calls, so Cancellation object doesn't need to be passed
       # explicitly.
       Temporalio::Workflow.wait_condition { @greeting_params_update || @complete }
-      
+
       # If there was an update, exchange and rerun. If it's _only_ a complete, finish
       # workflow with the greeting.
       if @greeting_params_update
@@ -479,7 +479,8 @@ definition/behavior of the method:
   side effects, meaning they should never mutate state or try to wait on anything.
 
 Workflows can be inherited, but subclass workflow-level decorators override superclass ones, and the same method can't
-be decorated with different handler types/names in the hierarchy.
+be decorated with different handler types/names in the hierarchy. Workflow handlers (execute or any marked method)
+cannot accept keyword arguments.
 
 #### Running Workflows
 
@@ -944,6 +945,7 @@ Some notes about activity definition:
 * `workflow_raw_args` can be used to have activity arguments delivered to `execute` as
   `Temporalio::Converters::RawValue`s. These are wrappers for the raw payloads that have not been converted to types
   (but they have been decoded by the codec if present). They can be converted with `payload_converter` on the context.
+* Activities cannot accept keyword arguments.
 
 #### Activity Context
 
@@ -1229,9 +1231,11 @@ Prerequisites:
 
 First, install dependencies:
 
-    bundle install
+    # Optional: Change bundler install path to be local
+    bundle config --local path $(pwd)/.bundle
+    bundle instal
 
-To build shared library for development use:
+To build shared library for development use (ensure you have cloned submodules :
 
     bundle exec rake compile
 
@@ -1262,6 +1266,9 @@ the gem at `lib/temporalio/internal/bridge/3.2/temporalio_bridge.so` and
 `lib/temporalio/internal/bridge/3.3/temporalio_bridge.so`.
 
 ### Testing
+
+Note you can set `TEMPORAL_TEST_CLIENT_TARGET_HOST` and `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE`
+(optional, defaults to 'default') environment variables to use an existing server.
 
 This project uses `minitest`. To test:
 

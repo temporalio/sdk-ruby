@@ -24,6 +24,7 @@ require 'temporalio/internal/worker/workflow_instance/scheduler'
 require 'temporalio/retry_policy'
 require 'temporalio/scoped_logger'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker_deployment_version'
 require 'temporalio/workflow/info'
 require 'temporalio/workflow/update_info'
 require 'timeout'
@@ -54,9 +55,9 @@ module Temporalio
         attr_reader :context, :logger, :info, :scheduler, :disable_eager_activity_execution, :pending_activities,
                     :pending_timers, :pending_child_workflow_starts, :pending_child_workflows,
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
-                    :failure_converter, :cancellation, :continue_as_new_suggested, :current_history_length,
-                    :current_history_size, :replaying, :random, :signal_handlers, :query_handlers, :update_handlers,
-                    :context_frozen, :assert_valid_local_activity
+                    :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
+                    :current_history_length, :current_history_size, :replaying, :random,
+                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -90,7 +91,7 @@ module Temporalio
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
-          @failure_exception_types = details.workflow_failure_exception_types + @definition.failure_exception_types
+          @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
             details.definition.signals,
             Workflow::Definition::Signal
@@ -107,6 +108,10 @@ module Temporalio
           end
           @query_handlers = HandlerHash.new(details.definition.queries, Workflow::Definition::Query)
           @update_handlers = HandlerHash.new(details.definition.updates, Workflow::Definition::Update)
+          @definition_options = Workflow::DefinitionOptions.new(
+            failure_exception_types: details.definition.failure_exception_types,
+            versioning_behavior: details.definition.versioning_behavior
+          )
 
           @assert_valid_local_activity = details.assert_valid_local_activity
 
@@ -240,6 +245,9 @@ module Temporalio
           @commands = []
           @current_activation_error = nil
           @continue_as_new_suggested = activation.continue_as_new_suggested
+          @current_deployment_version = WorkerDeploymentVersion._from_bridge(
+            activation.deployment_version_for_current_task
+          )
           @current_history_length = activation.history_length
           @current_history_size = activation.history_size_bytes
           @replaying = activation.is_replaying
@@ -289,7 +297,9 @@ module Temporalio
           else
             Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
               run_id: activation.run_id,
-              successful: Bridge::Api::WorkflowCompletion::Success.new(commands: @commands)
+              successful: Bridge::Api::WorkflowCompletion::Success.new(
+                commands: @commands, versioning_behavior: @definition_options.versioning_behavior
+              )
             )
           end
         ensure
@@ -310,11 +320,24 @@ module Temporalio
           @inbound.init(OutboundImplementation.new(self))
 
           # Create the user instance
-          if @definition.init
-            @definition.workflow_class.new(*@workflow_arguments)
-          else
-            @definition.workflow_class.new
+          instance = if @definition.init
+                       @definition.workflow_class.new(*@workflow_arguments)
+                     else
+                       @definition.workflow_class.new
+                     end
+
+          # Run Dynamic config getter
+          if @definition.dynamic_options_method
+            dynamic_options = instance.send(@definition.dynamic_options_method)
+            if dynamic_options&.versioning_behavior
+              @definition_options.versioning_behavior = dynamic_options.versioning_behavior
+            end
+            if dynamic_options&.failure_exception_types
+              @definition_options.failure_exception_types = dynamic_options.failure_exception_types
+            end
           end
+
+          instance
         end
 
         def apply(job)
@@ -628,9 +651,9 @@ module Temporalio
         end
 
         def failure_exception?(err)
-          err.is_a?(Error::Failure) || err.is_a?(Timeout::Error) || @failure_exception_types.any? do |cls|
-            err.is_a?(cls)
-          end
+          err.is_a?(Error::Failure) || err.is_a?(Timeout::Error) ||
+            @workflow_failure_exception_types&.any? { |cls| err.is_a?(cls) } ||
+            @definition_options.failure_exception_types&.any? { |cls| err.is_a?(cls) }
         end
 
         def with_context_frozen(&)

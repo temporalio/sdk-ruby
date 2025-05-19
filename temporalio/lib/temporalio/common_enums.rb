@@ -38,4 +38,18 @@ module Temporalio
     # Terminate the running workflow before starting a new one.
     TERMINATE_EXISTING = Api::Enums::V1::WorkflowIdConflictPolicy::WORKFLOW_ID_CONFLICT_POLICY_TERMINATE_EXISTING
   end
+
+  # Specifies when a workflow might move from a worker of one Build Id to another.
+  #
+  # WARNING: Experimental API.
+  module VersioningBehavior
+    # Unspecified versioning behavior. By default, workers opting into worker versioning will
+    # be required to specify a behavior.
+    UNSPECIFIED = Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_UNSPECIFIED
+    # The workflow will be pinned to the current Build ID unless manually moved.
+    PINNED = Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_PINNED
+    # The workflow will automatically move to the latest version (default Build ID of the task
+    # queue) when the next task is dispatched.
+    AUTO_UPGRADE = Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_AUTO_UPGRADE
+  end
 end

@@ -33,7 +33,6 @@ module Temporalio
       :activity_executors,
       :workflow_executor,
       :interceptors,
-      :build_id,
       :identity,
       :logger,
       :max_cached_workflows,
@@ -47,12 +46,12 @@ module Temporalio
       :max_activities_per_second,
       :max_task_queue_activities_per_second,
       :graceful_shutdown_period,
-      :use_worker_versioning,
       :disable_eager_activity_execution,
       :illegal_workflow_calls,
       :workflow_failure_exception_types,
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
+      :deployment_options,
       :debug_mode
     )
 
@@ -87,6 +86,14 @@ module Temporalio
       raise 'Temporal bridge library not in $LOADED_FEATURES, unable to calculate default build ID' unless saw_bridge
 
       build_id
+    end
+
+    # @return [DeploymentOptions] Default deployment options, which does not use worker versioning
+    #   or a deployment name, and sets the build id to the one from {self.default_build_id}.
+    def self.default_deployment_options
+      @default_deployment_options ||= DeploymentOptions.new(
+        version: WorkerDeploymentVersion.new(deployment_name: '', build_id: Worker.default_build_id)
+      )
     end
 
     # Run all workers until cancellation or optional block completes. When the cancellation or block is complete, the
@@ -296,9 +303,6 @@ module Temporalio
     # @param interceptors [Array<Interceptor::Activity, Interceptor::Workflow>] Interceptors specific to this worker.
     #   Note, interceptors set on the client that include the {Interceptor::Activity} or {Interceptor::Workflow} module
     #   are automatically included here, so no need to specify them again.
-    # @param build_id [String] Unique identifier for the current runtime. This is best set as a unique value
-    #   representing all code and should change only when code does. This can be something like a git commit hash. If
-    #   unset, default is hash of known Ruby code.
     # @param identity [String, nil] Override the identity for this worker. If unset, client identity is used.
     # @param logger [Logger] Logger to override client logger with. Default is the client logger.
     # @param max_cached_workflows [Integer] Number of workflows held in cache for use by sticky task queue. If set to 0,
@@ -327,9 +331,6 @@ module Temporalio
     #   multiple workers on the same queue have different values set, they will thrash with the last poller winning.
     # @param graceful_shutdown_period [Float] Amount of time after shutdown is called that activities are given to
     #   complete before their tasks are canceled.
-    # @param use_worker_versioning [Boolean] If true, the `build_id` argument must be specified, and this worker opts
-    #   into the worker versioning feature. This ensures it only receives workflow tasks for workflows which it claims
-    #   to be compatible with. For more information, see https://docs.temporal.io/workers#worker-versioning.
     # @param disable_eager_activity_execution [Boolean] If true, disables eager activity execution. Eager activity
     #   execution is an optimization on some servers that sends activities back to the same worker as the calling
     #   workflow if they can run there. This should be set to true for `max_task_queue_activities_per_second` to work
@@ -351,6 +352,8 @@ module Temporalio
     # @param unsafe_workflow_io_enabled [Boolean] If false, the default, workflow code that invokes io_wait on the fiber
     #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
     #   with a block for narrower enabling of IO.
+    # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
+    #   WARNING: This is an experimental feature and may change in the future.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -363,7 +366,6 @@ module Temporalio
       activity_executors: ActivityExecutor.defaults,
       workflow_executor: WorkflowExecutor::ThreadPool.default,
       interceptors: [],
-      build_id: Worker.default_build_id,
       identity: nil,
       logger: client.options.logger,
       max_cached_workflows: 1000,
@@ -377,12 +379,12 @@ module Temporalio
       max_activities_per_second: nil,
       max_task_queue_activities_per_second: nil,
       graceful_shutdown_period: 0,
-      use_worker_versioning: false,
       disable_eager_activity_execution: false,
       illegal_workflow_calls: Worker.default_illegal_workflow_calls,
       workflow_failure_exception_types: [],
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
+      deployment_options: Worker.default_deployment_options,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -398,7 +400,6 @@ module Temporalio
         activity_executors:,
         workflow_executor:,
         interceptors:,
-        build_id:,
         identity:,
         logger:,
         max_cached_workflows:,
@@ -412,17 +413,23 @@ module Temporalio
         max_activities_per_second:,
         max_task_queue_activities_per_second:,
         graceful_shutdown_period:,
-        use_worker_versioning:,
         disable_eager_activity_execution:,
         illegal_workflow_calls:,
         workflow_failure_exception_types:,
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
+        deployment_options:,
         debug_mode:
       ).freeze
 
+      should_enforce_versioning_behavior =
+        deployment_options.use_worker_versioning &&
+        deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
       # Preload workflow definitions and some workflow settings for the bridge
-      workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(workflows)
+      workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
+        workflows,
+        should_enforce_versioning_behavior: should_enforce_versioning_behavior
+      )
       nondeterminism_as_workflow_fail, nondeterminism_as_workflow_fail_for_types =
         Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
           workflow_failure_exception_types:, workflow_definitions:
@@ -437,7 +444,6 @@ module Temporalio
           namespace: client.namespace,
           task_queue:,
           tuner: tuner._to_bridge_options,
-          build_id:,
           identity_override: identity,
           max_cached_workflows:,
           max_concurrent_workflow_task_polls:,
@@ -452,9 +458,9 @@ module Temporalio
           max_worker_activities_per_second: max_activities_per_second,
           max_task_queue_activities_per_second:,
           graceful_shutdown_period:,
-          use_worker_versioning:,
           nondeterminism_as_workflow_fail:,
-          nondeterminism_as_workflow_fail_for_types:
+          nondeterminism_as_workflow_fail_for_types:,
+          deployment_options: deployment_options._to_bridge_options
         )
       )
 

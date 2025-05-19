@@ -56,6 +56,18 @@ module Temporalio
       _current.current_details = details
     end
 
+    # Get the deployment version of the worker which executed the current Workflow Task.
+    #
+    # May be nil if the task was completed by a worker without a deployment version or build id. If
+    # this worker is the one executing this task for the first time and has a deployment version
+    # set, then its ID will be used. This value may change over the lifetime of the workflow run,
+    # but is deterministic and safe to use for branching. This is currently experimental.
+    #
+    # @return [WorkerDeploymentVersion, nil] the current deployment version if any.
+    def self.current_deployment_version
+      _current.current_deployment_version
+    end
+
     # @return [Integer] Current number of events in history. This value is the current history event count up until the
     #   current task. Note, this value may not be up to date when accessed in a query.
     def self.current_history_length
