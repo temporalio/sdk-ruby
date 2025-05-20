@@ -144,6 +144,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       Temporalio::Workflow.info.to_h.tap do |h|
         h['parent'] = Temporalio::Workflow.info.parent.to_h if Temporalio::Workflow.info.parent
         h['root'] = Temporalio::Workflow.info.root.to_h if Temporalio::Workflow.info.root
+        h['start_time'] = Temporalio::Workflow.info.start_time.to_s
       end
     end
   end
@@ -158,6 +159,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     # Normal info
     execute_workflow(InfoWorkflow) do |handle, worker|
       info = handle.result #: Hash[String, untyped]
+      desc = handle.describe
       assert_equal 1, info['attempt']
       assert_nil info.fetch('continued_run_id')
       assert_nil info.fetch('cron_schedule')
@@ -170,7 +172,7 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       assert_nil info.fetch('root')
       assert_equal handle.result_run_id, info['run_id']
       assert_nil info.fetch('run_timeout')
-      refute_nil info['start_time']
+      assert_equal desc.start_time.to_s, info['start_time']
       assert_equal worker.task_queue, info['task_queue']
       assert_equal 10.0, info['task_timeout']
       assert_equal handle.id, info['workflow_id']
