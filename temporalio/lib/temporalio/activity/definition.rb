@@ -85,6 +85,11 @@ module Temporalio
         activity_name = @activity_name
         raise 'Cannot have activity name specified for dynamic activity' if activity_name && @activity_dynamic
 
+        # Disallow kwargs in execute parameters
+        if instance_method(:execute).parameters.any? { |t, _| t == :key || t == :keyreq }
+          raise 'Activity execute cannot have keyword arguments'
+        end
+
         # Default to unqualified class name if not dynamic
         activity_name ||= name.to_s.split('::').last unless @activity_dynamic
         {

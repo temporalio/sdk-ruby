@@ -12,7 +12,6 @@ module Temporalio
           :namespace,
           :task_queue,
           :tuner,
-          :build_id,
           :identity_override,
           :max_cached_workflows,
           :max_concurrent_workflow_task_polls,
@@ -25,9 +24,9 @@ module Temporalio
           :max_worker_activities_per_second,
           :max_task_queue_activities_per_second,
           :graceful_shutdown_period,
-          :use_worker_versioning,
           :nondeterminism_as_workflow_fail,
           :nondeterminism_as_workflow_fail_for_types,
+          :deployment_options,
           keyword_init: true
         )
 
@@ -50,6 +49,19 @@ module Temporalio
           :min_slots,
           :max_slots,
           :ramp_throttle,
+          keyword_init: true
+        )
+
+        WorkerDeploymentVersion = Struct.new(
+          :deployment_name,
+          :build_id,
+          keyword_init: true
+        )
+
+        DeploymentOptions = Struct.new(
+          :version,
+          :use_worker_versioning,
+          :default_versioning_behavior,
           keyword_init: true
         )
 

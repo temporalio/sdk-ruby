@@ -1,0 +1,17 @@
+module Temporalio
+  class Worker
+    class DeploymentOptions
+      attr_reader version: WorkerDeploymentVersion
+      attr_reader use_worker_versioning: bool
+      attr_reader default_versioning_behavior: VersioningBehavior::enum
+
+      def initialize: (
+        version: WorkerDeploymentVersion,
+        ?use_worker_versioning: bool,
+        ?default_versioning_behavior: VersioningBehavior::enum
+      ) -> void
+
+      def _to_bridge_options: -> Internal::Bridge::Worker::DeploymentOptions
+    end
+  end
+end

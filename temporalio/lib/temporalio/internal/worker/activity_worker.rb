@@ -297,6 +297,17 @@ module Temporalio
           )
         end
 
+        def assert_valid_activity(activity)
+          defn = @activities[activity]
+          defn = @activities[nil] if !defn && !Internal::ProtoUtils.reserved_name?(activity)
+
+          return unless defn.nil?
+
+          raise ArgumentError,
+                "Activity #{activity} " \
+                "is not registered on this worker, available activities: #{@activities.keys.sort.join(', ')}"
+        end
+
         class RunningActivity < Activity::Context
           attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
           attr_accessor :instance, :_outbound_impl, :_server_requested_cancel

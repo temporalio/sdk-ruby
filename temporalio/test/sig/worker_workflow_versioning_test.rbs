@@ -1,0 +1,6 @@
+class WorkerWorkflowVersioningTest < Test
+  def _test_worker_deployment_dynamic_workflow: (untyped workflow_type, untyped expected_versioning_behavior) -> void
+  def wait_until_worker_deployment_visible: (untyped client, Temporalio::WorkerDeploymentVersion version) -> untyped
+  def set_current_deployment_version: (untyped client, String task_queue, Temporalio::WorkerDeploymentVersion version) -> untyped
+  def set_ramping_version: (untyped client, String task_queue, Temporalio::WorkerDeploymentVersion version, Float rate) -> untyped
+end

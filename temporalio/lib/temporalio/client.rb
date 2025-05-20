@@ -22,6 +22,7 @@ require 'temporalio/internal/client/implementation'
 require 'temporalio/retry_policy'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
+require 'temporalio/versioning_override'
 require 'temporalio/workflow/definition'
 
 module Temporalio
@@ -239,6 +240,7 @@ module Temporalio
       search_attributes: nil,
       start_delay: nil,
       request_eager_start: false,
+      versioning_override: nil,
       rpc_options: nil
     )
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
@@ -260,6 +262,7 @@ module Temporalio
                              start_delay:,
                              request_eager_start:,
                              headers: {},
+                             versioning_override:,
                              rpc_options:
                            ))
     end
@@ -316,9 +319,11 @@ module Temporalio
       search_attributes: nil,
       start_delay: nil,
       request_eager_start: false,
+      versioning_override: nil,
+      follow_runs: true,
       rpc_options: nil
     )
-      start_workflow(
+      handle = start_workflow(
         workflow,
         *args,
         id:,
@@ -336,8 +341,10 @@ module Temporalio
         search_attributes:,
         start_delay:,
         request_eager_start:,
+        versioning_override:,
         rpc_options:
-      ).result
+      )
+      follow_runs ? handle.result : handle
     end
 
     # Get a workflow handle to an existing workflow by its ID.

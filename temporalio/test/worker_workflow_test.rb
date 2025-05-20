@@ -9,7 +9,7 @@ require 'temporalio/workflow'
 require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < Test
+class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -2287,17 +2287,50 @@ class WorkerWorkflowTest < Test
     assert_includes res, '<html>'
   end
 
-  # TODO(cretz): To test
-  # * Common
-  #   * Eager workflow start
-  #   * Unawaited futures that have exceptions, need to log warning like Java does
-  #   * Enhanced stack trace?
-  #   * Separate abstract/interface demonstration
-  #   * Reset update randomness seed
-  #   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow
-  #   * Test workflow cancel causing other cancels at the same time but in different coroutines
-  #   * 0-sleep timers vs nil timers
-  #   * Interceptors
-  # * Activity
-  #   * Local activity cancel (currently broken)
+  class MissingLocalActivityWorkflow < Temporalio::Workflow::Definition
+    def execute
+      # Start 30 10ms timers and wait on them all
+      Temporalio::Workflow.execute_local_activity('does-not-exist',
+                                                  start_to_close_timeout: 1000)
+    end
+  end
+
+  def test_missing_local_activity
+    activities = [PatchPreActivity]
+    message_contains = 'Activity does-not-exist is not registered on this worker, ' \
+                       'available activities: PatchPreActivity'
+
+    execute_workflow(MissingLocalActivityWorkflow, activities:) do |handle|
+      assert_eventually_task_fail(handle:,
+                                  message_contains:)
+    end
+  end
+
+  def test_dynamic_local_activity
+    activities = [ReservedNameDynamicActivity]
+
+    assert_equal 'done', execute_workflow(MissingLocalActivityWorkflow, activities:)
+  end
+
+  def test_no_local_activity
+    message_contains = 'Activity does-not-exist is not registered on this worker, no available activities.'
+
+    execute_workflow(MissingLocalActivityWorkflow, false) do |handle|
+      assert_eventually_task_fail(handle:, message_contains:)
+    end
+  end
 end
+
+# TODO(cretz): To test
+# * Common
+#   * Eager workflow start
+#   * Unawaited futures that have exceptions, need to log warning like Java does
+#   * Enhanced stack trace?
+#   * Separate abstract/interface demonstration
+#   * Reset update randomness seed
+#   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow
+#   * Test workflow cancel causing other cancels at the same time but in different coroutines
+#   * 0-sleep timers vs nil timers
+#   * Interceptors
+# * Activity
+#   * Local activity cancel (currently broken)
