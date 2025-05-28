@@ -13,6 +13,7 @@ require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/activity_executor'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
 require 'temporalio/worker/workflow_executor'
@@ -52,7 +53,9 @@ module Temporalio
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
       :deployment_options,
-      :debug_mode
+      :debug_mode,
+      :workflow_task_poller_behavior,
+      :activity_task_poller_behavior
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
@@ -385,6 +388,8 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
+      workflow_task_poller_behavior: nil,
+      activity_task_poller_behavior: nil,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -419,7 +424,9 @@ module Temporalio
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
         deployment_options:,
-        debug_mode:
+        debug_mode:,
+        workflow_task_poller_behavior:,
+        activity_task_poller_behavior:
       ).freeze
 
       should_enforce_versioning_behavior =
@@ -435,6 +442,10 @@ module Temporalio
           workflow_failure_exception_types:, workflow_definitions:
         )
 
+      # Convert deprecated max concurrent polls to poller behaviors if not specified
+      workflow_task_poller_behavior ||= SimpleMaximumPollerBehavior.new(maximum: max_concurrent_workflow_task_polls)
+      activity_task_poller_behavior ||= SimpleMaximumPollerBehavior.new(maximum: max_concurrent_activity_task_polls)
+
       # Create the bridge worker
       @bridge_worker = Internal::Bridge::Worker.new(
         client.connection._core_client,
@@ -446,9 +457,9 @@ module Temporalio
           tuner: tuner._to_bridge_options,
           identity_override: identity,
           max_cached_workflows:,
-          max_concurrent_workflow_task_polls:,
+          workflow_task_poller_behavior: workflow_task_poller_behavior._to_bridge_options,
           nonsticky_to_sticky_poll_ratio:,
-          max_concurrent_activity_task_polls:,
+          activity_task_poller_behavior: activity_task_poller_behavior._to_bridge_options,
           # For shutdown to work properly, we must disable remote activities
           # ourselves if there are no activities
           no_remote_activities: no_remote_activities || activities.empty?,

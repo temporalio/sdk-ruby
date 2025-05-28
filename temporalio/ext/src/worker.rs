@@ -6,23 +6,23 @@ use std::{
 };
 
 use crate::{
+    ROOT_MOD,
     client::Client,
     enter_sync, error, id, new_error,
     runtime::{AsyncCommand, Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
-    ROOT_MOD,
 };
+use futures::{StreamExt, stream::BoxStream};
 use futures::{future, stream};
-use futures::{stream::BoxStream, StreamExt};
 use magnus::{
-    class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
-    RString, RTypedData, Ruby, TypedData, Value,
+    DataTypeFunctions, Error, IntoValue, RArray, RString, RTypedData, Ruby, TypedData, Value,
+    class, function, method, prelude::*, typed_data,
 };
 use prost::Message;
 use temporal_sdk_core::{
-    replay::{HistoryForReplay, ReplayWorkerInput},
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
+    replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
@@ -34,7 +34,7 @@ use temporal_sdk_core_api::{
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use temporal_sdk_core_protos::temporal::api::history::v1::History;
-use tokio::sync::mpsc::{channel, Sender};
+use tokio::sync::mpsc::{Sender, channel};
 use tokio_stream::wrappers::ReceiverStream;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -480,15 +480,21 @@ fn build_config(options: Struct) -> Result<WorkerConfig, Error> {
         })
         .client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
         .max_cached_workflows(options.member::<usize>(id!("max_cached_workflows"))?)
-        .workflow_task_poller_behavior(PollerBehavior::SimpleMaximum(
-            options.member::<usize>(id!("max_concurrent_workflow_task_polls"))?,
-        ))
+        .workflow_task_poller_behavior({
+            let poller_behavior = options
+                .child(id!("workflow_task_poller_behavior"))?
+                .ok_or_else(|| error!("Worker options must have workflow_task_poller_behavior"))?;
+            extract_poller_behavior(poller_behavior)?
+        })
         .nonsticky_to_sticky_poll_ratio(
             options.member::<f32>(id!("nonsticky_to_sticky_poll_ratio"))?,
         )
-        .activity_task_poller_behavior(PollerBehavior::SimpleMaximum(
-            options.member::<usize>(id!("max_concurrent_activity_task_polls"))?,
-        ))
+        .activity_task_poller_behavior({
+            let poller_behavior = options
+                .child(id!("activity_task_poller_behavior"))?
+                .ok_or_else(|| error!("Worker options must have activity_task_poller_behavior"))?;
+            extract_poller_behavior(poller_behavior)?
+        })
         .no_remote_activities(options.member::<bool>(id!("no_remote_activities"))?)
         .sticky_queue_schedule_to_start_timeout(Duration::from_secs_f64(
             options.member(id!("sticky_queue_schedule_to_start_timeout"))?,
@@ -604,4 +610,16 @@ fn build_tuner_resource_options<SK: SlotKind>(
         )),
         Some(slots_options),
     ))
+}
+
+fn extract_poller_behavior(poller_behavior: Struct) -> Result<PollerBehavior, Error> {
+    Ok(if poller_behavior.member::<usize>(id!("initial")).is_ok() {
+        PollerBehavior::Autoscaling {
+            minimum: poller_behavior.member::<usize>(id!("minimum"))?,
+            maximum: poller_behavior.member::<usize>(id!("maximum"))?,
+            initial: poller_behavior.member::<usize>(id!("initial"))?,
+        }
+    } else {
+        PollerBehavior::SimpleMaximum(poller_behavior.member::<usize>(id!("maximum"))?)
+    })
 }

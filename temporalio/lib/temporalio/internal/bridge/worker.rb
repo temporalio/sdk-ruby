@@ -14,9 +14,9 @@ module Temporalio
           :tuner,
           :identity_override,
           :max_cached_workflows,
-          :max_concurrent_workflow_task_polls,
+          :workflow_task_poller_behavior,
           :nonsticky_to_sticky_poll_ratio,
-          :max_concurrent_activity_task_polls,
+          :activity_task_poller_behavior,
           :no_remote_activities,
           :sticky_queue_schedule_to_start_timeout,
           :max_heartbeat_throttle_interval,
@@ -62,6 +62,18 @@ module Temporalio
           :version,
           :use_worker_versioning,
           :default_versioning_behavior,
+          keyword_init: true
+        )
+
+        PollerBehaviorSimpleMaximum = Struct.new(
+          :simple_maximum,
+          keyword_init: true
+        )
+
+        PollerBehaviorAutoscaling = Struct.new(
+          :minimum,
+          :maximum,
+          :initial,
           keyword_init: true
         )
 
