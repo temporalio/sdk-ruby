@@ -37,6 +37,7 @@ module Temporalio
         :start_delay,
         :request_eager_start,
         :headers,
+        :priority,
         :versioning_override,
         :rpc_options
       )

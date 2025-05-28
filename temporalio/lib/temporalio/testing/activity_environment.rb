@@ -24,6 +24,7 @@ module Temporalio
           heartbeat_details: [],
           heartbeat_timeout: nil,
           local?: false,
+          priority: Temporalio::Priority.default,
           schedule_to_close_timeout: 1.0,
           scheduled_time: Time.at(0),
           start_to_close_timeout: 1.0,

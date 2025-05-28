@@ -205,7 +205,7 @@ module Temporalio
               )._to_bridge_options,
               identity_override: options.identity,
               max_cached_workflows: 2,
-              max_concurrent_workflow_task_polls: 1,
+              max_concurrent_workflow_task_polls: 2,
               nonsticky_to_sticky_poll_ratio: 1.0,
               max_concurrent_activity_task_polls: 1,
               no_remote_activities: true,

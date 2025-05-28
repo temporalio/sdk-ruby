@@ -8,6 +8,7 @@ module Temporalio
       attr_reader heartbeat_details: Array[Object?]
       attr_reader heartbeat_timeout: Float?
       attr_reader local?: bool
+      attr_reader priority: Temporalio::Priority?
       attr_reader schedule_to_close_timeout: Float?
       attr_reader scheduled_time: Time
       attr_reader start_to_close_timeout: Float?
@@ -27,6 +28,7 @@ module Temporalio
         heartbeat_details: Array[Object?],
         heartbeat_timeout: Float?,
         local?: bool,
+        priority: Temporalio::Priority?,
         schedule_to_close_timeout: Float?,
         scheduled_time: Time,
         start_to_close_timeout: Float?,

@@ -19,6 +19,7 @@ require 'temporalio/common_enums'
 require 'temporalio/converters'
 require 'temporalio/error'
 require 'temporalio/internal/client/implementation'
+require 'temporalio/priority'
 require 'temporalio/retry_policy'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
@@ -217,6 +218,9 @@ module Temporalio
     #   with `cron_schedule`.
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
+    # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
+    #   This is currently experimental.
+    # @param priority [Priority] Priority of the workflow. This is currently experimental.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowHandle] A workflow handle to the started workflow.
@@ -241,6 +245,7 @@ module Temporalio
       start_delay: nil,
       request_eager_start: false,
       versioning_override: nil,
+      priority: Priority.default,
       rpc_options: nil
     )
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
@@ -263,6 +268,7 @@ module Temporalio
                              request_eager_start:,
                              headers: {},
                              versioning_override:,
+                             priority:,
                              rpc_options:
                            ))
     end
@@ -295,6 +301,9 @@ module Temporalio
     #   with `cron_schedule`.
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
+    # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
+    #   This is currently experimental.
+    # @param priority [Priority] Priority for the workflow. This is currently experimental.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Object] Successful result of the workflow.
@@ -320,6 +329,7 @@ module Temporalio
       start_delay: nil,
       request_eager_start: false,
       versioning_override: nil,
+      priority: Priority.default,
       follow_runs: true,
       rpc_options: nil
     )
@@ -342,6 +352,7 @@ module Temporalio
         start_delay:,
         request_eager_start:,
         versioning_override:,
+        priority:,
         rpc_options:
       )
       follow_runs ? handle.result : handle

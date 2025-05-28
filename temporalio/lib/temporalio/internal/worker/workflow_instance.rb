@@ -140,6 +140,7 @@ module Temporalio
                           workflow_id: @init_job.parent_workflow_info.workflow_id
                         )
                       end,
+              priority: Priority._from_proto(@init_job.priority),
               retry_policy: (RetryPolicy._from_proto(@init_job.retry_policy) if @init_job.retry_policy),
               root: if @init_job.root_workflow
                       Workflow::Info::RootInfo.new(

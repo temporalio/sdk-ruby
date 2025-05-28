@@ -18,7 +18,7 @@ module Temporalio
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
-              
+
       def with: (**untyped) -> Options
     end
 
@@ -75,6 +75,7 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: duration?,
       ?request_eager_start: bool,
+      ?priority: Priority,
       ?versioning_override: VersioningOverride?,
       ?rpc_options: RPCOptions?
     ) -> WorkflowHandle
@@ -97,6 +98,7 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: duration?,
       ?request_eager_start: bool,
+      ?priority: Priority,
       ?versioning_override: VersioningOverride?,
       ?follow_runs: bool,
       ?rpc_options: RPCOptions?
