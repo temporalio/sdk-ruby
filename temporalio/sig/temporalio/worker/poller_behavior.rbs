@@ -7,7 +7,7 @@ module Temporalio
     class SimpleMaximum < PollerBehavior
       attr_reader maximum: Integer
 
-      def initialize: (?maximum: Integer) -> void
+      def initialize: (Integer) -> void
       def _to_bridge_options: -> Internal::Bridge::Worker::PollerBehaviorSimpleMaximum
     end
 

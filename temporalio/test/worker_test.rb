@@ -207,23 +207,22 @@ class WorkerTest < Test
       )
     )
     worker.run do
-      # Give pollers a beat to get started
-      sleep(0.3)
+      assert_eventually do
+        dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
+        lines = dump.split("\n")
 
-      dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
-      lines = dump.split("\n")
+        matches = lines.select { |l| l.include?('temporal_num_pollers') }
+        activity_pollers = matches.select { |l| l.include?('activity_task') }
+        assert_equal 1, activity_pollers.size
+        assert activity_pollers[0].end_with?('2')
 
-      matches = lines.select { |l| l.include?('temporal_num_pollers') }
-      activity_pollers = matches.select { |l| l.include?('activity_task') }
-      assert_equal 1, activity_pollers.size
-      assert activity_pollers[0].end_with?('2')
-
-      workflow_pollers = matches.select { |l| l.include?('workflow_task') }
-      assert_equal 2, workflow_pollers.size
-      # There's sticky & non-sticky pollers, and they may have a count of 1 or 2 depending on
-      # initialization timing.
-      assert(workflow_pollers[0].end_with?('2') || workflow_pollers[0].end_with?('1'))
-      assert(workflow_pollers[1].end_with?('2') || workflow_pollers[1].end_with?('1'))
+        workflow_pollers = matches.select { |l| l.include?('workflow_task') }
+        assert_equal 2, workflow_pollers.size
+        # There's sticky & non-sticky pollers, and they may have a count of 1 or 2 depending on
+        # initialization timing.
+        assert(workflow_pollers[0].end_with?('2') || workflow_pollers[0].end_with?('1'))
+        assert(workflow_pollers[1].end_with?('2') || workflow_pollers[1].end_with?('1'))
+      end
 
       handles = Array.new(20) do
         env.client.start_workflow(

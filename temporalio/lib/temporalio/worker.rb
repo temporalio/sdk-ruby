@@ -392,8 +392,8 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
-      workflow_task_poller_behavior: SimpleMaximumPollerBehavior.new(maximum: max_concurrent_workflow_task_polls),
-      activity_task_poller_behavior: SimpleMaximumPollerBehavior.new(maximum: max_concurrent_activity_task_polls),
+      workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
+      activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?

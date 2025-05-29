@@ -16,7 +16,7 @@ module Temporalio
         attr_reader :maximum
 
         # @param maximum [Integer] Maximum number of concurrent poll requests.
-        def initialize(maximum: 5)
+        def initialize(maximum)
           super()
           @maximum = maximum
         end
