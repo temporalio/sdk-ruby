@@ -2,7 +2,7 @@ module Temporalio
   class Priority
     attr_reader priority_key: Integer?
 
-    def initialize: (?priority_key: Integer?) -> void
+    def initialize: (priority_key: Integer?) -> void
 
     def self._from_proto: (untyped) -> Priority
 
