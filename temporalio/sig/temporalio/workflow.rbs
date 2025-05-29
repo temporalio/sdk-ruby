@@ -30,7 +30,8 @@ module Temporalio
       ?cancellation: Cancellation,
       ?cancellation_type: ActivityCancellationType::enum,
       ?activity_id: String?,
-      ?disable_eager_execution: bool
+      ?disable_eager_execution: bool,
+      ?priority: Priority
     ) -> Object?
 
     def self.execute_child_workflow: (
@@ -50,7 +51,8 @@ module Temporalio
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
       ?memo: Hash[String | Symbol, Object?]?,
-      ?search_attributes: SearchAttributes?
+      ?search_attributes: SearchAttributes?,
+      ?priority: Priority
     ) -> Object?
 
     def self.execute_local_activity: (
@@ -113,7 +115,8 @@ module Temporalio
       ?retry_policy: RetryPolicy?,
       ?cron_schedule: String?,
       ?memo: Hash[String | Symbol, Object?]?,
-      ?search_attributes: SearchAttributes?
+      ?search_attributes: SearchAttributes?,
+      ?priority: Priority
     ) -> ChildWorkflowHandle
 
     def self.storage: -> Hash[Object, Object]

@@ -143,6 +143,7 @@ module Temporalio
           attr_reader activity_id: String?
           attr_reader disable_eager_execution: bool
           attr_reader headers: Hash[String, Object?]
+          attr_reader priority: Temporalio::Priority
 
           def initialize: (
             activity: String,
@@ -158,7 +159,8 @@ module Temporalio
             cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum,
             activity_id: String?,
             disable_eager_execution: bool,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            priority: Temporalio::Priority
           ) -> void
         end
 
@@ -263,6 +265,7 @@ module Temporalio
           attr_reader memo: Hash[String | Symbol, Object?]?
           attr_reader search_attributes: SearchAttributes?
           attr_reader headers: Hash[String, Object?]
+          attr_reader priority: Temporalio::Priority
 
           def initialize: (
             workflow: String,
@@ -282,7 +285,8 @@ module Temporalio
             cron_schedule: String?,
             memo: Hash[String | Symbol, Object?]?,
             search_attributes: SearchAttributes?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            priority: Temporalio::Priority
           ) -> void
         end
 

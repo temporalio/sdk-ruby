@@ -174,6 +174,7 @@ module Temporalio
             ),
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
+            priority: Priority._from_proto(start.priority),
             schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.schedule_to_close_timeout),
             scheduled_time: Internal::ProtoUtils.timestamp_to_time(start.scheduled_time) || raise, # Never nil
             start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.start_to_close_timeout),

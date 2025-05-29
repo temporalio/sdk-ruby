@@ -10,6 +10,7 @@ module Temporalio
       attr_reader last_result: Object?
       attr_reader namespace: String
       attr_reader parent: ParentInfo?
+      attr_reader priority: Temporalio::Priority
       attr_reader retry_policy: RetryPolicy?
       attr_reader root: RootInfo?
       attr_reader run_id: String
@@ -30,6 +31,7 @@ module Temporalio
         last_result: Object?,
         namespace: String,
         parent: ParentInfo?,
+        priority: Temporalio::Priority?,
         retry_policy: RetryPolicy?,
         root: RootInfo?,
         run_id: String,

@@ -19,7 +19,8 @@ module WorkflowUtils
     ?task_timeout: duration?,
     ?on_worker_run: Proc?,
     ?unsafe_workflow_io_enabled: bool,
-    ?start_workflow_client: Temporalio::Client
+    ?start_workflow_client: Temporalio::Client,
+    ?priority: Temporalio::Priority
   ) -> Object? |
   [T] (
     singleton(Temporalio::Workflow::Definition) workflow,
@@ -41,7 +42,8 @@ module WorkflowUtils
     ?task_timeout: duration?,
     ?on_worker_run: Proc?,
     ?unsafe_workflow_io_enabled: bool,
-    ?start_workflow_client: Temporalio::Client
+    ?start_workflow_client: Temporalio::Client,
+    ?priority: Temporalio::Priority
   ) { (Temporalio::Client::WorkflowHandle, Temporalio::Worker) -> T } -> T
 
   def assert_eventually_task_fail: (

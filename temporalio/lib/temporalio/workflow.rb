@@ -2,6 +2,7 @@
 
 require 'random/formatter'
 require 'temporalio/error'
+require 'temporalio/priority'
 require 'temporalio/workflow/activity_cancellation_type'
 require 'temporalio/workflow/child_workflow_cancellation_type'
 require 'temporalio/workflow/child_workflow_handle'
@@ -130,6 +131,7 @@ module Temporalio
     #   optimization on some servers that sends activities back to the same worker as the calling workflow if they can
     #   run there. If `false` (the default), eager execution may still be disabled at the worker level or may not be
     #   requested due to lack of available slots.
+    # @param priority [Priority] Priority of the activity. This is currently experimental.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -148,12 +150,14 @@ module Temporalio
       cancellation: Workflow.cancellation,
       cancellation_type: ActivityCancellationType::TRY_CANCEL,
       activity_id: nil,
-      disable_eager_execution: false
+      disable_eager_execution: false,
+      priority: Priority.default
     )
       _current.execute_activity(
         activity, *args,
         task_queue:, summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
-        heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:
+        heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:,
+        priority:
       )
     end
 
@@ -175,13 +179,14 @@ module Temporalio
       retry_policy: nil,
       cron_schedule: nil,
       memo: nil,
-      search_attributes: nil
+      search_attributes: nil,
+      priority: Priority.default
     )
       start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:
       ).result
     end
 
@@ -372,6 +377,7 @@ module Temporalio
     # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
     # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
+    # @param priority [Priority] Priority of the workflow. This is currently experimental.
     #
     # @return [ChildWorkflowHandle] Workflow handle to the started workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists for the ID.
@@ -393,13 +399,14 @@ module Temporalio
       retry_policy: nil,
       cron_schedule: nil,
       memo: nil,
-      search_attributes: nil
+      search_attributes: nil,
+      priority: Priority.default
     )
       _current.start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:
       )
     end
 

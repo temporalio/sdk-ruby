@@ -75,7 +75,8 @@ module Temporalio
             cancellation:,
             cancellation_type:,
             activity_id:,
-            disable_eager_execution:
+            disable_eager_execution:,
+            priority:
           )
             activity = case activity
                        when Class
@@ -102,6 +103,7 @@ module Temporalio
                 cancellation_type:,
                 activity_id:,
                 disable_eager_execution: disable_eager_execution || @instance.disable_eager_activity_execution,
+                priority:,
                 headers: {}
               )
             )
@@ -249,7 +251,8 @@ module Temporalio
             retry_policy:,
             cron_schedule:,
             memo:,
-            search_attributes:
+            search_attributes:,
+            priority:
           )
             @outbound.start_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput.new(
@@ -270,6 +273,7 @@ module Temporalio
                 cron_schedule:,
                 memo:,
                 search_attributes:,
+                priority:,
                 headers: {}
               )
             )

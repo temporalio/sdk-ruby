@@ -10,6 +10,7 @@ module Temporalio
       :heartbeat_details,
       :heartbeat_timeout,
       :local?,
+      :priority,
       :schedule_to_close_timeout,
       :scheduled_time,
       :start_to_close_timeout,
@@ -38,6 +39,8 @@ module Temporalio
     #   @return [Float, nil] Heartbeat timeout set by the caller.
     # @!attribute local?
     #   @return [Boolean] Whether the activity is a local activity or not.
+    # @!attribute priority
+    #   @return [Priority] The priority of this activity.
     # @!attribute schedule_to_close_timeout
     #   @return [Float, nil] Schedule to close timeout set by the caller.
     # @!attribute scheduled_time

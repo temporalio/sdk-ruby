@@ -38,6 +38,7 @@ module Temporalio
         :request_eager_start,
         :headers,
         :versioning_override,
+        :priority,
         :rpc_options
       )
 

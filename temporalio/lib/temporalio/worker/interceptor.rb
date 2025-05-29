@@ -216,7 +216,8 @@ module Temporalio
           :cancellation_type,
           :activity_id,
           :disable_eager_execution,
-          :headers
+          :headers,
+          :priority
         )
 
         # Input for {Outbound.execute_local_activity}.
@@ -284,7 +285,8 @@ module Temporalio
           :cron_schedule,
           :memo,
           :search_attributes,
-          :headers
+          :headers,
+          :priority
         )
 
         # Outbound interceptor for intercepting outbound workflow calls. This should be extended by users needing to

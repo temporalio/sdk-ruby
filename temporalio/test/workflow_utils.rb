@@ -31,6 +31,7 @@ module WorkflowUtils
     interceptors: [],
     on_worker_run: nil,
     unsafe_workflow_io_enabled: false,
+    priority: Temporalio::Priority.default,
     start_workflow_client: client
   )
     worker = Temporalio::Worker.new(
@@ -57,7 +58,8 @@ module WorkflowUtils
         memo:,
         retry_policy:,
         id_conflict_policy:,
-        task_timeout:
+        task_timeout:,
+        priority:
       )
       if block_given?
         yield handle, worker

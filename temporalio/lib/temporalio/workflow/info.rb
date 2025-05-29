@@ -12,6 +12,7 @@ module Temporalio
       :last_result,
       :namespace,
       :parent,
+      :priority,
       :retry_policy,
       :root,
       :run_id,
@@ -44,6 +45,8 @@ module Temporalio
     #   @return [String] Namespace for the workflow.
     # @!attribute parent
     #   @return [ParentInfo, nil] Parent information for the workflow if this is a child.
+    # @!attribute priority
+    #   @return [Priority] The priority of this workflow.
     # @!attribute retry_policy
     #   @return [RetryPolicy, nil] Retry policy for the workflow.
     # @!attribute root
