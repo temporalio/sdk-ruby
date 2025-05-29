@@ -160,4 +160,83 @@ class WorkerTest < Test
       end
     end
   end
+
+  class WaitOnSignalWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.wait_condition { @complete }
+      Temporalio::Workflow.execute_activity(
+        SimpleActivity,
+        'dogg',
+        start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+    end
+
+    workflow_signal
+    def complete(value)
+      @complete = value
+    end
+  end
+
+  def test_can_run_with_autoscaling_poller_behavior
+    prom_addr = "127.0.0.1:#{find_free_port}"
+    runtime = Temporalio::Runtime.new(
+      telemetry: Temporalio::Runtime::TelemetryOptions.new(
+        metrics: Temporalio::Runtime::MetricsOptions.new(
+          prometheus: Temporalio::Runtime::PrometheusMetricsOptions.new(
+            bind_address: prom_addr
+          )
+        )
+      )
+    )
+    conn_opts = env.client.connection.options.with(runtime:)
+    client_opts = env.client.options.with(
+      connection: Temporalio::Client::Connection.new(**conn_opts.to_h) # steep:ignore
+    )
+    client = Temporalio::Client.new(**client_opts.to_h) # steep:ignore
+    worker = Temporalio::Worker.new(
+      client: client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [WaitOnSignalWorkflow],
+      activities: [SimpleActivity],
+      workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior::Autoscaling.new(
+        initial: 2
+      ),
+      activity_task_poller_behavior: Temporalio::Worker::PollerBehavior::Autoscaling.new(
+        initial: 2
+      )
+    )
+    worker.run do
+      assert_eventually do
+        dump = Net::HTTP.get(URI("http://#{prom_addr}/metrics"))
+        lines = dump.split("\n")
+
+        matches = lines.select { |l| l.include?('temporal_num_pollers') }
+        activity_pollers = matches.select { |l| l.include?('activity_task') }
+        assert_equal 1, activity_pollers.size
+        assert activity_pollers[0].end_with?('2')
+
+        workflow_pollers = matches.select { |l| l.include?('workflow_task') }
+        assert_equal 2, workflow_pollers.size
+        # There's sticky & non-sticky pollers, and they may have a count of 1 or 2 depending on
+        # initialization timing.
+        assert(workflow_pollers[0].end_with?('2') || workflow_pollers[0].end_with?('1'))
+        assert(workflow_pollers[1].end_with?('2') || workflow_pollers[1].end_with?('1'))
+      end
+
+      handles = Array.new(20) do
+        env.client.start_workflow(
+          WaitOnSignalWorkflow,
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue: worker.task_queue
+        )
+      end
+      handles.each do |handle|
+        handle.signal(:complete, true)
+      end
+      handles.each do |handle| # rubocop:disable Style/CombinableLoops
+        assert_equal 'Hello, dogg!', handle.result
+      end
+    end
+  end
 end

@@ -10,9 +10,9 @@ module Temporalio
           attr_accessor tuner: TunerOptions
           attr_accessor identity_override: String?
           attr_accessor max_cached_workflows: Integer
-          attr_accessor max_concurrent_workflow_task_polls: Integer
+          attr_accessor workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
           attr_accessor nonsticky_to_sticky_poll_ratio: Float
-          attr_accessor max_concurrent_activity_task_polls: Integer
+          attr_accessor activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
           attr_accessor no_remote_activities: bool
           attr_accessor sticky_queue_schedule_to_start_timeout: Float
           attr_accessor max_heartbeat_throttle_interval: Float
@@ -32,9 +32,9 @@ module Temporalio
             tuner: TunerOptions,
             identity_override: String?,
             max_cached_workflows: Integer,
-            max_concurrent_workflow_task_polls: Integer,
+            workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
             nonsticky_to_sticky_poll_ratio: Float,
-            max_concurrent_activity_task_polls: Integer,
+            activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
             no_remote_activities: bool,
             sticky_queue_schedule_to_start_timeout: Float,
             max_heartbeat_throttle_interval: Float,
@@ -140,6 +140,20 @@ module Temporalio
             use_worker_versioning: bool,
             default_versioning_behavior: Integer
           ) -> void
+        end
+
+        class PollerBehaviorSimpleMaximum
+          attr_accessor simple_maximum: Integer
+
+          def initialize: (simple_maximum: Integer) -> void
+        end
+
+        class PollerBehaviorAutoscaling
+          attr_accessor minimum: Integer
+          attr_accessor maximum: Integer
+          attr_accessor initial: Integer
+
+          def initialize: (minimum: Integer, maximum: Integer, initial: Integer) -> void
         end
 
         class WorkflowReplayer

@@ -1,0 +1,23 @@
+module Temporalio
+  class Worker
+    class PollerBehavior
+      def _to_bridge_options: -> untyped
+    end
+
+    class SimpleMaximum < PollerBehavior
+      attr_reader maximum: Integer
+
+      def initialize: (Integer) -> void
+      def _to_bridge_options: -> Internal::Bridge::Worker::PollerBehaviorSimpleMaximum
+    end
+
+    class Autoscaling < PollerBehavior
+      attr_reader minimum: Integer
+      attr_reader maximum: Integer
+      attr_reader initial: Integer
+
+      def initialize: (?minimum: Integer, ?maximum: Integer, ?initial: Integer) -> void
+      def _to_bridge_options: -> Internal::Bridge::Worker::PollerBehaviorAutoscaling
+    end
+  end
+end

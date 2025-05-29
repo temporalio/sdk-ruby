@@ -1,5 +1,6 @@
 module Temporalio
   class Worker
+
     class Options
       attr_reader client: Client
       attr_reader task_queue: String
@@ -27,6 +28,8 @@ module Temporalio
       attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
       attr_reader workflow_payload_codec_thread_pool: ThreadPool?
       attr_reader unsafe_workflow_io_enabled: bool
+      attr_reader workflow_task_poller_behavior: PollerBehavior
+      attr_reader activity_task_poller_behavior: PollerBehavior
       attr_reader debug_mode: bool
 
       def initialize: (
@@ -56,6 +59,8 @@ module Temporalio
         workflow_failure_exception_types: Array[singleton(Exception)],
         workflow_payload_codec_thread_pool: ThreadPool?,
         unsafe_workflow_io_enabled: bool,
+        workflow_task_poller_behavior: PollerBehavior,
+        activity_task_poller_behavior: PollerBehavior,
         deployment_options: Worker::DeploymentOptions,
         debug_mode: bool
       ) -> void
@@ -106,6 +111,8 @@ module Temporalio
       ?workflow_failure_exception_types: Array[singleton(Exception)],
       ?workflow_payload_codec_thread_pool: ThreadPool?,
       ?unsafe_workflow_io_enabled: bool,
+      ?workflow_task_poller_behavior: PollerBehavior,
+      ?activity_task_poller_behavior: PollerBehavior,
       ?deployment_options: Worker::DeploymentOptions,
       ?debug_mode: bool
     ) -> void

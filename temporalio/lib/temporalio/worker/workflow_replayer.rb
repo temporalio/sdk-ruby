@@ -7,6 +7,7 @@ require 'temporalio/internal/bridge/worker'
 require 'temporalio/internal/worker/multi_runner'
 require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
 require 'temporalio/worker/workflow_executor'
@@ -205,9 +206,11 @@ module Temporalio
               )._to_bridge_options,
               identity_override: options.identity,
               max_cached_workflows: 2,
-              max_concurrent_workflow_task_polls: 2,
+              workflow_task_poller_behavior:
+                Temporalio::Worker::PollerBehavior::SimpleMaximum.new(2)._to_bridge_options,
               nonsticky_to_sticky_poll_ratio: 1.0,
-              max_concurrent_activity_task_polls: 1,
+              activity_task_poller_behavior:
+                Temporalio::Worker::PollerBehavior::SimpleMaximum.new(1)._to_bridge_options,
               no_remote_activities: true,
               sticky_queue_schedule_to_start_timeout: 1.0,
               max_heartbeat_throttle_interval: 1.0,

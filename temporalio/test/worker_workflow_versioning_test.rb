@@ -552,7 +552,7 @@ class WorkerWorkflowVersioningTest < Test
         DeploymentVersioningWorkflowV1AutoUpgrade,
         id: "override-versioning-#{SecureRandom.uuid}",
         task_queue: task_queue,
-        versioning_override: Temporalio::VersioningOverride.pinned(worker_v1)
+        versioning_override: Temporalio::VersioningOverride::Pinned.new(worker_v1)
       )
 
       # Send signal to finish

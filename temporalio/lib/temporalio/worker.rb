@@ -13,6 +13,7 @@ require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/activity_executor'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
 require 'temporalio/worker/workflow_executor'
@@ -52,6 +53,8 @@ module Temporalio
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
       :deployment_options,
+      :workflow_task_poller_behavior,
+      :activity_task_poller_behavior,
       :debug_mode
     )
 
@@ -354,6 +357,10 @@ module Temporalio
     #   with a block for narrower enabling of IO.
     # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
     #   WARNING: This is an experimental feature and may change in the future.
+    # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
+    #   polling. Defaults to a 5-poller maximum.
+    # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task
+    #   polling. Defaults to a 5-poller maximum.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -385,6 +392,8 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
+      workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
+      activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -419,6 +428,8 @@ module Temporalio
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
         deployment_options:,
+        workflow_task_poller_behavior:,
+        activity_task_poller_behavior:,
         debug_mode:
       ).freeze
 
@@ -446,9 +457,9 @@ module Temporalio
           tuner: tuner._to_bridge_options,
           identity_override: identity,
           max_cached_workflows:,
-          max_concurrent_workflow_task_polls:,
+          workflow_task_poller_behavior: workflow_task_poller_behavior._to_bridge_options,
           nonsticky_to_sticky_poll_ratio:,
-          max_concurrent_activity_task_polls:,
+          activity_task_poller_behavior: activity_task_poller_behavior._to_bridge_options,
           # For shutdown to work properly, we must disable remote activities
           # ourselves if there are no activities
           no_remote_activities: no_remote_activities || activities.empty?,
