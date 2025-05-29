@@ -206,9 +206,11 @@ module Temporalio
               )._to_bridge_options,
               identity_override: options.identity,
               max_cached_workflows: 2,
-              workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior.simple_maximum(2)._to_bridge_options,
+              workflow_task_poller_behavior:
+                Temporalio::Worker::PollerBehavior::SimpleMaximum.new(2)._to_bridge_options,
               nonsticky_to_sticky_poll_ratio: 1.0,
-              activity_task_poller_behavior: Temporalio::Worker::PollerBehavior.simple_maximum(1)._to_bridge_options,
+              activity_task_poller_behavior:
+                Temporalio::Worker::PollerBehavior::SimpleMaximum.new(1)._to_bridge_options,
               no_remote_activities: true,
               sticky_queue_schedule_to_start_timeout: 1.0,
               max_heartbeat_throttle_interval: 1.0,

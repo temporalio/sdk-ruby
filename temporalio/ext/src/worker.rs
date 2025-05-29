@@ -6,23 +6,23 @@ use std::{
 };
 
 use crate::{
-    ROOT_MOD,
     client::Client,
     enter_sync, error, id, new_error,
     runtime::{AsyncCommand, Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
+    ROOT_MOD,
 };
-use futures::{StreamExt, stream::BoxStream};
 use futures::{future, stream};
+use futures::{stream::BoxStream, StreamExt};
 use magnus::{
-    DataTypeFunctions, Error, IntoValue, RArray, RString, RTypedData, Ruby, TypedData, Value,
-    class, function, method, prelude::*, typed_data,
+    class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
+    RString, RTypedData, Ruby, TypedData, Value,
 };
 use prost::Message;
 use temporal_sdk_core::{
+    replay::{HistoryForReplay, ReplayWorkerInput},
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
-    replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
@@ -34,7 +34,7 @@ use temporal_sdk_core_api::{
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use temporal_sdk_core_protos::temporal::api::history::v1::History;
-use tokio::sync::mpsc::{Sender, channel};
+use tokio::sync::mpsc::{channel, Sender};
 use tokio_stream::wrappers::ReceiverStream;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -620,6 +620,6 @@ fn extract_poller_behavior(poller_behavior: Struct) -> Result<PollerBehavior, Er
             initial: poller_behavior.member::<usize>(id!("initial"))?,
         }
     } else {
-        PollerBehavior::SimpleMaximum(poller_behavior.member::<usize>(id!("maximum"))?)
+        PollerBehavior::SimpleMaximum(poller_behavior.member::<usize>(id!("simple_maximum"))?)
     })
 }

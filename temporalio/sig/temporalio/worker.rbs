@@ -111,8 +111,8 @@ module Temporalio
       ?workflow_failure_exception_types: Array[singleton(Exception)],
       ?workflow_payload_codec_thread_pool: ThreadPool?,
       ?unsafe_workflow_io_enabled: bool,
-      ?workflow_task_poller_behavior: SimpleMaximumPollerBehavior | AutoscalingPollerBehavior,
-      ?activity_task_poller_behavior: SimpleMaximumPollerBehavior | AutoscalingPollerBehavior,
+      ?workflow_task_poller_behavior: PollerBehavior,
+      ?activity_task_poller_behavior: PollerBehavior,
       ?deployment_options: Worker::DeploymentOptions,
       ?debug_mode: bool
     ) -> void

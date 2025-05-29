@@ -199,10 +199,10 @@ class WorkerTest < Test
       task_queue: "tq-#{SecureRandom.uuid}",
       workflows: [WaitOnSignalWorkflow],
       activities: [SimpleActivity],
-      workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior.autoscaling(
+      workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior::Autoscaling.new(
         initial: 2
       ),
-      activity_task_poller_behavior: Temporalio::Worker::PollerBehavior.autoscaling(
+      activity_task_poller_behavior: Temporalio::Worker::PollerBehavior::Autoscaling.new(
         initial: 2
       )
     )

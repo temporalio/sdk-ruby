@@ -53,9 +53,9 @@ module Temporalio
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
       :deployment_options,
-      :debug_mode,
       :workflow_task_poller_behavior,
-      :activity_task_poller_behavior
+      :activity_task_poller_behavior,
+      :debug_mode
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
@@ -357,6 +357,10 @@ module Temporalio
     #   with a block for narrower enabling of IO.
     # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
     #   WARNING: This is an experimental feature and may change in the future.
+    # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
+    #   polling. Defaults to a 5-poller maximum.
+    # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task
+    #   polling. Defaults to a 5-poller maximum.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -388,8 +392,8 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
-      workflow_task_poller_behavior: nil,
-      activity_task_poller_behavior: nil,
+      workflow_task_poller_behavior: SimpleMaximumPollerBehavior.new(maximum: max_concurrent_workflow_task_polls),
+      activity_task_poller_behavior: SimpleMaximumPollerBehavior.new(maximum: max_concurrent_activity_task_polls),
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
       raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
@@ -424,9 +428,9 @@ module Temporalio
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
         deployment_options:,
-        debug_mode:,
         workflow_task_poller_behavior:,
-        activity_task_poller_behavior:
+        activity_task_poller_behavior:,
+        debug_mode:
       ).freeze
 
       should_enforce_versioning_behavior =
@@ -441,10 +445,6 @@ module Temporalio
         Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
           workflow_failure_exception_types:, workflow_definitions:
         )
-
-      # Convert deprecated max concurrent polls to poller behaviors if not specified
-      workflow_task_poller_behavior ||= SimpleMaximumPollerBehavior.new(maximum: max_concurrent_workflow_task_polls)
-      activity_task_poller_behavior ||= SimpleMaximumPollerBehavior.new(maximum: max_concurrent_activity_task_polls)
 
       # Create the bridge worker
       @bridge_worker = Internal::Bridge::Worker.new(
