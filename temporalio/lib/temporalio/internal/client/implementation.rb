@@ -70,7 +70,7 @@ module Temporalio
               input.static_summary, input.static_details, @client.data_converter
             ),
             header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
-            priority: input.priority&._to_proto,
+            priority: input.priority._to_proto,
             versioning_override: input.versioning_override&._to_proto
           )
 

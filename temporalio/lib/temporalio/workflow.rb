@@ -2,6 +2,7 @@
 
 require 'random/formatter'
 require 'temporalio/error'
+require 'temporalio/priority'
 require 'temporalio/workflow/activity_cancellation_type'
 require 'temporalio/workflow/child_workflow_cancellation_type'
 require 'temporalio/workflow/child_workflow_handle'

@@ -46,7 +46,7 @@ module Temporalio
     # @!attribute parent
     #   @return [ParentInfo, nil] Parent information for the workflow if this is a child.
     # @!attribute priority
-    #   @return [Priority, nil] The priority of this workflow.
+    #   @return [Priority] The priority of this workflow.
     # @!attribute retry_policy
     #   @return [RetryPolicy, nil] Retry policy for the workflow.
     # @!attribute root

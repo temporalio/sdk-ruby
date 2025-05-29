@@ -74,7 +74,7 @@ module Temporalio
                     retry_policy: input.retry_policy&._to_proto,
                     cancellation_type: input.cancellation_type,
                     do_not_eagerly_execute: input.disable_eager_execution,
-                    priority: input.priority&._to_proto
+                    priority: input.priority._to_proto
                   ),
                   user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
                 )
@@ -339,7 +339,7 @@ module Temporalio
                   memo: ProtoUtils.memo_to_proto_hash(input.memo, @instance.payload_converter),
                   search_attributes: input.search_attributes&._to_proto_hash,
                   cancellation_type: input.cancellation_type,
-                  priority: input.priority&._to_proto
+                  priority: input.priority._to_proto
                 ),
                 user_metadata: ProtoUtils.to_user_metadata(
                   input.static_summary, input.static_details, @instance.payload_converter

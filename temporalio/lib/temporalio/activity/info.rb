@@ -40,7 +40,7 @@ module Temporalio
     # @!attribute local?
     #   @return [Boolean] Whether the activity is a local activity or not.
     # @!attribute priority
-    #   @return [Priority, nil] The priority of this activity.
+    #   @return [Priority] The priority of this activity.
     # @!attribute schedule_to_close_timeout
     #   @return [Float, nil] Schedule to close timeout set by the caller.
     # @!attribute scheduled_time

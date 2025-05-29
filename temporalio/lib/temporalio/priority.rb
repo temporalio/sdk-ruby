@@ -3,6 +3,10 @@
 require 'temporalio/api'
 
 module Temporalio
+  Priority = Data.define(
+    :priority_key
+  )
+
   # Priority contains metadata that controls relative ordering of task processing when tasks are
   # backlogged in a queue. Initially, Priority will be used in activity and workflow task
   # queues, which are typically where backlogs exist. Priority is (for now) attached to
@@ -15,19 +19,17 @@ module Temporalio
   # The overall semantics of Priority are:
   # 1. First, consider "priority_key": lower number goes first.
   # (more will be added here later).
+  #
+  # @!attribute priority_key
+  #   @return [Integer, nil] The priority key, which is a positive integer from 1 to n, where
+  #     smaller integers correspond to higher priorities (tasks run sooner). In general, tasks in a
+  #     queue should be processed in close to priority order, although small deviations are possible.
+  #     The maximum priority value (minimum priority) is determined by server configuration, and
+  #     defaults to 5.
+  #
+  #     The default priority is (min+max)/2. With the default max of 5 and min of 1, that comes
+  #     out to 3.
   class Priority
-    # The priority key, which is a positive integer from 1 to n, where smaller integers
-    # correspond to higher priorities (tasks run sooner). In general, tasks in a queue should
-    # be processed in close to priority order, although small deviations are possible. The
-    # maximum priority value (minimum priority) is determined by server configuration, and
-    # defaults to 5.
-    #
-    # The default priority is (min+max)/2. With the default max of 5 and min of 1, that comes
-    # out to 3.
-    #
-    # @return [Integer, nil] The priority key
-    attr_reader :priority_key
-
     # @!visibility private
     def self._from_proto(priority)
       return default if priority.nil?
@@ -39,14 +41,7 @@ module Temporalio
     #
     # @return [Priority] The default priority
     def self.default
-      @default ||= new
-    end
-
-    # Create a new Priority instance
-    #
-    # @param priority_key [Integer, nil] The priority key
-    def initialize(priority_key: nil)
-      @priority_key = priority_key
+      @default ||= new(priority_key: nil)
     end
 
     # @!visibility private
