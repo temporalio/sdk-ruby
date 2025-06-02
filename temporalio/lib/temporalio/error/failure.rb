@@ -46,6 +46,9 @@ module Temporalio
       # @return [Float, nil] Delay in seconds before the next activity retry attempt.
       attr_reader :next_retry_delay
 
+      # @return [Category] Error category.
+      attr_reader :category
+
       # Create an application error.
       #
       # @param message [String] Error message.
@@ -53,17 +56,32 @@ module Temporalio
       # @param type [String, nil] Error type.
       # @param non_retryable [Boolean] Whether this error should be considered non-retryable.
       # @param next_retry_delay [Float, nil] Specific amount of time to delay before next retry.
-      def initialize(message, *details, type: nil, non_retryable: false, next_retry_delay: nil)
+      # @param category [Category] Error category.
+      def initialize(
+        message,
+        *details,
+        type: nil,
+        non_retryable: false,
+        next_retry_delay: nil,
+        category: Category::UNSPECIFIED
+      )
         super(message)
         @details = details
         @type = type
         @non_retryable = non_retryable
         @next_retry_delay = next_retry_delay
+        @category = category
       end
 
       # @return [Boolean] Inverse of {non_retryable}.
       def retryable?
         !@non_retryable
+      end
+
+      # Error category.
+      module Category
+        UNSPECIFIED = Api::Enums::V1::ApplicationErrorCategory::APPLICATION_ERROR_CATEGORY_UNSPECIFIED
+        BENIGN = Api::Enums::V1::ApplicationErrorCategory::APPLICATION_ERROR_CATEGORY_BENIGN
       end
     end
 

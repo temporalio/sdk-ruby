@@ -45,7 +45,8 @@ module Temporalio
             type: error.type,
             non_retryable: error.non_retryable,
             details: converter.to_payloads(error.details),
-            next_retry_delay: Internal::ProtoUtils.seconds_to_duration(error.next_retry_delay)
+            next_retry_delay: Internal::ProtoUtils.seconds_to_duration(error.next_retry_delay),
+            category: error.category
           )
         when Error::TimeoutError
           failure.timeout_failure_info = Api::Failure::V1::TimeoutFailureInfo.new(
@@ -132,7 +133,9 @@ module Temporalio
                     non_retryable: failure.application_failure_info.non_retryable,
                     next_retry_delay: Internal::ProtoUtils.duration_to_seconds(
                       failure.application_failure_info.next_retry_delay
-                    )
+                    ),
+                    category: Internal::ProtoUtils.enum_to_int(Api::Enums::V1::ApplicationErrorCategory,
+                                                               failure.application_failure_info.category)
                   )
                 elsif failure.timeout_failure_info
                   Error::TimeoutError.new(
