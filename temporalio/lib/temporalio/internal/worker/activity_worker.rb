@@ -279,8 +279,13 @@ module Temporalio
               )
             else
               # General failure
-              @scoped_logger.warn('Completing activity as failed')
-              @scoped_logger.warn(e)
+              log_level = if e.is_a?(Error::ApplicationError) && e.category == Error::ApplicationError::Category::BENIGN
+                            Logger::DEBUG
+                          else
+                            Logger::WARN
+                          end
+              @scoped_logger.add(log_level, 'Completing activity as failed')
+              @scoped_logger.add(log_level, e)
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 failed: Bridge::Api::ActivityResult::Failure.new(
                   failure: @worker.options.client.data_converter.to_failure(e)

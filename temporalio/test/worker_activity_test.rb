@@ -178,6 +178,12 @@ class WorkerActivityTest < Test
           non_retryable: true,
           next_retry_delay: 1.23
         )
+      when 'application-benign'
+        raise Temporalio::Error::ApplicationError.new(
+          'application-error-benign',
+          type: 'some-error-type',
+          category: Temporalio::Error::ApplicationError::Category::BENIGN
+        )
       end
     end
   end
@@ -203,6 +209,14 @@ class WorkerActivityTest < Test
     assert_equal 'some-error-type', error.cause.cause.type
     assert error.cause.cause.non_retryable
     assert_equal 1.23, error.cause.cause.next_retry_delay
+
+    # Check that benign application error category is set
+    error = assert_raises(Temporalio::Error::WorkflowFailedError) do
+      execute_activity(FailureActivity, 'application-benign')
+    end
+    assert_equal 'application-error-benign', error.cause.cause.message
+    assert_equal 'some-error-type', error.cause.cause.type
+    assert_equal Temporalio::Error::ApplicationError::Category::BENIGN, error.cause.cause.category
   end
 
   class UnimplementedExecuteActivity < Temporalio::Activity::Definition

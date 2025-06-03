@@ -16,16 +16,25 @@ module Temporalio
       attr_reader type: String?
       attr_reader non_retryable: bool
       attr_reader next_retry_delay: duration?
+      attr_reader category: Category::enum
 
       def initialize: (
         String message,
         *Object? details,
         ?type: String?,
         ?non_retryable: bool,
-        ?next_retry_delay: duration?
+        ?next_retry_delay: duration?,
+        ?category: Category::enum
       ) -> void
 
       def retryable?: -> bool
+
+      module Category
+        type enum = Integer
+
+        UNSPECIFIED: enum
+        BENIGN: enum
+      end
     end
 
     class CanceledError < Failure
