@@ -361,6 +361,39 @@ class WorkerActivityTest < Test
                  execute_activity(HeartbeatDetailsActivity, retry_max_attempts: 2, heartbeat_timeout: 0.8)
   end
 
+  class BackgroundHeartbeatActivity < Temporalio::Activity::Definition
+    def execute
+      # First attempt sends a heartbeat with details and fails,
+      # next attempt just returns the first attempt's details
+      if Temporalio::Activity::Context.current.info.attempt == 1
+        # Send heartbeat in background, and wait on background call
+        # to complete before raising error
+        queue = Queue.new
+        context = Temporalio::Activity::Context.current
+        if Fiber.current_scheduler
+          Fiber.schedule do
+            context.heartbeat('some detail')
+            queue.push(nil)
+          end
+        else
+          Thread.new do
+            context.heartbeat('some detail')
+            queue.push(nil)
+          end
+        end
+        queue.pop
+        raise 'Intentional error'
+      else
+        "details: #{Temporalio::Activity::Context.current.info.heartbeat_details}"
+      end
+    end
+  end
+
+  def test_background_heartbeat
+    assert_equal 'details: ["some detail"]',
+                 execute_activity(BackgroundHeartbeatActivity, retry_max_attempts: 2, heartbeat_timeout: 0.8)
+  end
+
   class ShieldingActivity < Temporalio::Activity::Definition
     attr_reader :canceled, :levels_reached
 

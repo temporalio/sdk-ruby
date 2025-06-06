@@ -49,7 +49,7 @@ module Temporalio
         end
 
         class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
-          def initialize: (ActivityWorker worker) -> void
+          def initialize: (ActivityWorker worker, String task_token) -> void
         end
       end
     end
