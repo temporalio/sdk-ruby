@@ -251,7 +251,7 @@ module Temporalio
             impl = @worker._activity_interceptors.reverse_each.reduce(impl) do |acc, int|
               int.intercept_activity(acc)
             end
-            impl.init(OutboundImplementation.new(self))
+            impl.init(OutboundImplementation.new(self, activity.info.task_token))
 
             # Execute
             result = impl.execute(input)
@@ -381,15 +381,16 @@ module Temporalio
         end
 
         class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
-          def initialize(worker)
+          def initialize(worker, task_token)
             super(nil) # steep:ignore
             @worker = worker
+            @task_token = task_token
           end
 
           def heartbeat(input)
             @worker.bridge_worker.record_activity_heartbeat(
               Bridge::Api::CoreInterface::ActivityHeartbeat.new(
-                task_token: Activity::Context.current.info.task_token,
+                task_token: @task_token,
                 details: ProtoUtils.convert_to_payload_array(@worker.worker.options.client.data_converter,
                                                              input.details)
               ).to_proto

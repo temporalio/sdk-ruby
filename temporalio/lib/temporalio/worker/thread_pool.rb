@@ -125,7 +125,7 @@ module Temporalio
 
       private
 
-      def locked_assign_worker(&block)
+      def locked_assign_worker(&block) # rubocop:disable Naming/PredicateMethod
         # keep growing if the pool is not at the minimum yet
         worker, = @ready.pop || locked_add_busy_worker
         if worker
