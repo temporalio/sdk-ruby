@@ -65,6 +65,10 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def delete_namespace_region: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def get_regions: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -134,6 +138,18 @@ module Temporalio
           ?rpc_options: RPCOptions?
         ) -> untyped
         def set_user_group_namespace_access: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def add_user_group_member: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def remove_user_group_member: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_user_group_members: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped

@@ -43,8 +43,10 @@ module Temporalio
       # @param info [Activity::Info] Value for {Activity::Context#info}. Users should not try to instantiate this
       #   themselves, but rather use `with` on {default_info}.
       # @param on_heartbeat [Proc(Array), nil] Proc that is called with all heartbeat details when
-      #   {Activity::Context#heartbeat} is called.
+      #   {Activity::Context#heartbeat} is called. Should return a value
       # @param cancellation [Cancellation] Value for {Activity::Context#cancellation}.
+      # @param on_cancellation_details [Proc, nil] Proc that is called when {Activity::Context#cancellation_details} is
+      #   called. Defaults to a proc that returns an instance if canceled with `cancel_requested` as true.
       # @param worker_shutdown_cancellation [Cancellation] Value for {Activity::Context#worker_shutdown_cancellation}.
       # @param payload_converter [Converters::PayloadConverter] Value for {Activity::Context#payload_converter}.
       # @param logger [Logger] Value for {Activity::Context#logger}.
@@ -56,6 +58,7 @@ module Temporalio
         info: ActivityEnvironment.default_info,
         on_heartbeat: nil,
         cancellation: Cancellation.new,
+        on_cancellation_details: nil,
         worker_shutdown_cancellation: Cancellation.new,
         payload_converter: Converters::PayloadConverter.default,
         logger: Logger.new(nil),
@@ -66,6 +69,9 @@ module Temporalio
         @info = info
         @on_heartbeat = on_heartbeat
         @cancellation = cancellation
+        @on_cancellation_details = on_cancellation_details || proc do
+          @_cancellation_details ||= Activity::CancellationDetails.new if @cancellation.canceled?
+        end
         @worker_shutdown_cancellation = worker_shutdown_cancellation
         @payload_converter = payload_converter
         @logger = logger
@@ -93,6 +99,7 @@ module Temporalio
                                                   defn.instance.is_a?(Proc) ? defn.instance.call : defn.instance,
                                                 on_heartbeat: @on_heartbeat,
                                                 cancellation: @cancellation,
+                                                on_cancellation_details: @on_cancellation_details,
                                                 worker_shutdown_cancellation: @worker_shutdown_cancellation,
                                                 payload_converter: @payload_converter,
                                                 logger: @logger,
@@ -122,6 +129,7 @@ module Temporalio
           instance:,
           on_heartbeat:,
           cancellation:,
+          on_cancellation_details:,
           worker_shutdown_cancellation:,
           payload_converter:,
           logger:,
@@ -132,6 +140,7 @@ module Temporalio
           @instance = instance
           @on_heartbeat = on_heartbeat
           @cancellation = cancellation
+          @on_cancellation_details = on_cancellation_details
           @worker_shutdown_cancellation = worker_shutdown_cancellation
           @payload_converter = payload_converter
           @logger = logger
@@ -152,6 +161,11 @@ module Temporalio
         # @!visibility private
         def client
           @client or raise 'No client configured in this test environment'
+        end
+
+        # @!visibility private
+        def cancellation_details
+          @on_cancellation_details.call
         end
       end
 

@@ -562,6 +562,9 @@ impl Client {
                 "add_namespace_region" => {
                     rpc_call!(self, callback, call, CloudService, add_namespace_region)
                 }
+                "add_user_group_member" => {
+                    rpc_call!(self, callback, call, CloudService, add_user_group_member)
+                }
                 "create_api_key" => rpc_call!(self, callback, call, CloudService, create_api_key),
                 "create_namespace" => {
                     rpc_call!(self, callback, call, CloudService, create_namespace)
@@ -594,6 +597,9 @@ impl Client {
                     CloudService,
                     delete_namespace_export_sink
                 ),
+                "delete_namespace_region" => {
+                    rpc_call!(self, callback, call, CloudService, delete_namespace_region)
+                }
                 "delete_nexus_endpoint" => {
                     rpc_call!(self, callback, call, CloudService, delete_nexus_endpoint)
                 }
@@ -650,8 +656,14 @@ impl Client {
                 "get_usage" => rpc_call!(self, callback, call, CloudService, get_usage),
                 "get_user" => rpc_call!(self, callback, call, CloudService, get_user),
                 "get_user_group" => rpc_call!(self, callback, call, CloudService, get_user_group),
+                "get_user_group_members" => {
+                    rpc_call!(self, callback, call, CloudService, get_user_group_members)
+                }
                 "get_user_groups" => rpc_call!(self, callback, call, CloudService, get_user_groups),
                 "get_users" => rpc_call!(self, callback, call, CloudService, get_users),
+                "remove_user_group_member" => {
+                    rpc_call!(self, callback, call, CloudService, remove_user_group_member)
+                }
                 "rename_custom_search_attribute" => rpc_call!(
                     self,
                     callback,

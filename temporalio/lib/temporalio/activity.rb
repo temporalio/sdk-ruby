@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/activity/cancellation_details'
 require 'temporalio/activity/complete_async_error'
 require 'temporalio/activity/context'
 require 'temporalio/activity/definition'

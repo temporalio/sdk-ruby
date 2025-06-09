@@ -29,9 +29,9 @@ module Temporalio
         def assert_valid_activity: (String activity) -> void
 
         class RunningActivity < Activity::Context
+          attr_reader _server_requested_cancel: bool
           attr_accessor instance: Activity::Definition?
           attr_accessor _outbound_impl: Temporalio::Worker::Interceptor::Activity::Outbound?
-          attr_accessor _server_requested_cancel: bool
 
           def initialize: (
             worker: Temporalio::Worker,
@@ -41,6 +41,11 @@ module Temporalio
             payload_converter: Converters::PayloadConverter,
             logger: ScopedLogger,
             runtime_metric_meter: Metric::Meter
+          ) -> void
+
+          def _cancel: (
+            reason: String,
+            details: Activity::CancellationDetails
           ) -> void
         end
 

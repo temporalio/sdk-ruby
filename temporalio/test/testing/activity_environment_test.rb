@@ -96,5 +96,49 @@ module Testing
       assert_equal [123, '456'], queue.pop
       assert_equal ['other-id'], queue.pop
     end
+
+    class CancellationDetailsActivity < Temporalio::Activity::Definition
+      def initialize(started_queue)
+        @started_queue = started_queue
+      end
+
+      def execute
+        @started_queue << 'started'
+        ctx = Temporalio::Activity::Context.current
+        ctx.cancellation.wait
+        ctx.cancellation.check!
+        'not canceled'
+      rescue Temporalio::Error::CanceledError
+        det = Temporalio::Activity::Context.current.cancellation_details
+        "canceled, requested: #{det&.cancel_requested?}, paused: #{det&.paused?}"
+      end
+    end
+
+    def test_cancellation_details
+      # Without detail callback set
+      cancellation, cancel_proc = Temporalio::Cancellation.new
+      env = Temporalio::Testing::ActivityEnvironment.new(cancellation:)
+      started_queue = Queue.new
+      res_queue = Queue.new
+      run_in_background { res_queue << env.run(CancellationDetailsActivity.new(started_queue)) }
+      started_queue.pop(timeout: 5)
+      cancel_proc.call
+      assert_equal 'canceled, requested: true, paused: false', res_queue.pop(timeout: 5)
+
+      # With detail callback set
+      cancellation, cancel_proc = Temporalio::Cancellation.new
+      env = Temporalio::Testing::ActivityEnvironment.new(
+        cancellation:,
+        on_cancellation_details: proc do
+          Temporalio::Activity::CancellationDetails.new(cancel_requested: false, paused: true)
+        end
+      )
+      started_queue = Queue.new
+      res_queue = Queue.new
+      run_in_background { res_queue << env.run(CancellationDetailsActivity.new(started_queue)) }
+      started_queue.pop(timeout: 5)
+      cancel_proc.call
+      assert_equal 'canceled, requested: false, paused: true', res_queue.pop(timeout: 5)
+    end
   end
 end

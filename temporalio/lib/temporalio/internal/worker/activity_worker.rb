@@ -148,10 +148,18 @@ module Temporalio
             @scoped_logger.warn("Cannot find activity to cancel for token #{task_token}")
             return
           end
-          activity._server_requested_cancel = true
-          _, cancel_proc = activity.cancellation
           begin
-            cancel_proc.call(reason: cancel.reason.to_s)
+            activity._cancel(
+              reason: cancel.reason.to_s,
+              details: Activity::CancellationDetails.new(
+                gone_from_server: cancel.details.is_not_found,
+                cancel_requested: cancel.details.is_cancelled,
+                timed_out: cancel.details.is_timed_out,
+                worker_shutdown: cancel.details.is_worker_shutdown,
+                paused: cancel.details.is_paused,
+                reset: cancel.details.is_reset
+              )
+            )
           rescue StandardError => e
             @scoped_logger.warn("Failed cancelling activity #{activity.info.activity_type} \
               with ID #{activity.info.activity_id}")
@@ -269,6 +277,30 @@ module Temporalio
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 will_complete_async: Bridge::Api::ActivityResult::WillCompleteAsync.new
               )
+            elsif e.is_a?(Error::CanceledError) && activity.cancellation_details&.paused?
+              # Server requested pause
+              @scoped_logger.debug('Completing activity as failed due to exception caused by pause')
+              Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+                failed: Bridge::Api::ActivityResult::Failure.new(
+                  failure: @worker.options.client.data_converter.to_failure(
+                    Error._with_backtrace_and_cause(
+                      Error::ApplicationError.new('Activity paused', type: 'ActivityPause'), backtrace: nil, cause: e
+                    )
+                  )
+                )
+              )
+            elsif e.is_a?(Error::CanceledError) && activity.cancellation_details&.reset?
+              # Server requested reset
+              @scoped_logger.debug('Completing activity as failed due to exception caused by reset')
+              Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+                failed: Bridge::Api::ActivityResult::Failure.new(
+                  failure: @worker.options.client.data_converter.to_failure(
+                    Error._with_backtrace_and_cause(
+                      Error::ApplicationError.new('Activity reset', type: 'ActivityReset'), backtrace: nil, cause: e
+                    )
+                  )
+                )
+              )
             elsif e.is_a?(Error::CanceledError) && activity._server_requested_cancel
               # Server requested cancel
               @scoped_logger.debug('Completing activity as canceled')
@@ -315,8 +347,9 @@ module Temporalio
         end
 
         class RunningActivity < Activity::Context
-          attr_reader :info, :cancellation, :worker_shutdown_cancellation, :payload_converter, :logger
-          attr_accessor :instance, :_outbound_impl, :_server_requested_cancel
+          attr_reader :info, :cancellation, :cancellation_details, :worker_shutdown_cancellation,
+                      :payload_converter, :logger, :_server_requested_cancel
+          attr_accessor :instance, :_outbound_impl
 
           def initialize( # rubocop:disable Lint/MissingSuper
             worker:,
@@ -330,6 +363,7 @@ module Temporalio
             @worker = worker
             @info = info
             @cancellation = cancellation
+            @cancellation_details = nil
             @worker_shutdown_cancellation = worker_shutdown_cancellation
             @payload_converter = payload_converter
             @logger = logger
@@ -359,6 +393,17 @@ module Temporalio
 
           def client
             @worker.client
+          end
+
+          def _cancel(reason:, details:)
+            # Do not issue cancel if already canceled
+            return if @cancellation_details
+
+            @_server_requested_cancel = true
+            # Set the cancellation details _before_ issuing the cancel itself
+            @cancellation_details = details
+            _, cancel_proc = cancellation
+            cancel_proc.call(reason:)
           end
         end
 

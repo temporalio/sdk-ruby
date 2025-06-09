@@ -7,6 +7,7 @@ module Temporalio
         ?info: Activity::Info,
         ?on_heartbeat: Proc?,
         ?cancellation: Cancellation,
+        ?on_cancellation_details: Proc?,
         ?worker_shutdown_cancellation: Cancellation,
         ?payload_converter: Converters::PayloadConverter,
         ?logger: Logger,
