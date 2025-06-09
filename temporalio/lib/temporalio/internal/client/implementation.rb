@@ -492,6 +492,10 @@ module Temporalio
           # the user cannot specify sooner than ACCEPTED)
           # @type var resp: untyped
           resp = nil
+          expected_stage = ProtoUtils.enum_to_int(Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage,
+                                                  req.wait_policy.lifecycle_stage)
+          accepted_stage = ProtoUtils.enum_to_int(Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage,
+                                                  Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED)
           loop do
             resp = @client.workflow_service.update_workflow_execution(
               req,
@@ -500,10 +504,8 @@ module Temporalio
 
             # We're only done if the response stage is after the requested stage
             # or the response stage is accepted
-            if resp.stage >= req.wait_policy.lifecycle_stage ||
-               resp.stage >= Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED
-              break
-            end
+            actual_stage = ProtoUtils.enum_to_int(Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage, resp.stage)
+            break if actual_stage >= expected_stage || actual_stage >= accepted_stage
           rescue Error::RPCError => e
             # Deadline exceeded or cancel is a special error type
             if e.code == Error::RPCError::Code::DEADLINE_EXCEEDED || e.code == Error::RPCError::Code::CANCELED
