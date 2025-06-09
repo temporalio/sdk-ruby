@@ -656,7 +656,7 @@ class WorkerWorkflowHandlerTest < Test
         buffer.retrieve_updates.each do |update|
           if update.metric.name == 'temporal_long_request' &&
              update.attributes['operation'] == 'UpdateWorkflowExecution'
-            update_requests += update.value
+            update_requests += update.value # steep:ignore
           end
         end
         assert update_requests >= 2
