@@ -24,6 +24,8 @@ module Temporalio
 
           def deprecate_patch: (Symbol | String patch_id) -> void
 
+          def durable_scheduler_disabled: [T] { -> T } -> T
+
           def execute_activity: (
             singleton(Activity::Definition) | Symbol | String activity,
             *Object? args,

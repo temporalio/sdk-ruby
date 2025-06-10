@@ -145,6 +145,8 @@ module Temporalio
       def self.illegal_call_tracing_disabled: [T] { -> T } -> T
 
       def self.io_enabled: [T] { -> T } -> T
+
+      def self.durable_scheduler_disabled: [T] { -> T } -> T
     end
 
     class ContinueAsNewError < Error

@@ -2319,6 +2319,37 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       assert_eventually_task_fail(handle:, message_contains:)
     end
   end
+
+  class NonDurableTimerWorkfow < Temporalio::Workflow::Definition
+    def execute
+      sleep(0.1)
+      Temporalio::Workflow::Unsafe.durable_scheduler_disabled { sleep(0.2) }
+      begin
+        Timeout.timeout(0.3) { Queue.new.pop }
+        raise 'Expected timeout'
+      rescue Timeout::Error
+        # Ignore
+      end
+      Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+        Timeout.timeout(0.4) { Queue.new.pop }
+        raise 'Expected timeout'
+      rescue Timeout::Error
+        # Ignore
+      end
+    end
+  end
+
+  def test_non_durable_timer
+    execute_workflow(NonDurableTimerWorkfow) do |handle|
+      # Let workflow complete
+      handle.result
+      # Confirm only the durable timers of 0.1 and 0.3 were set
+      assert_equal([0.1, 0.3], handle.fetch_history_events
+                                     .map(&:timer_started_event_attributes)
+                                     .compact
+                                     .map { |a| a.start_to_fire_timeout.to_f })
+    end
+  end
 end
 
 # TODO(cretz): To test
