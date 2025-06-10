@@ -259,4 +259,89 @@ class WorkerWorkflowActivityTest < Test
       end)
     end
   end
+
+  class CancellationDetailsActivity < Temporalio::Activity::Definition
+    def initialize(queue)
+      @queue = queue
+    end
+
+    def execute(swallow)
+      @queue << Temporalio::Activity::Context.current.info.activity_id
+      loop do
+        Temporalio::Activity::Context.current.heartbeat
+        sleep(0.1)
+      end
+    rescue Temporalio::Error::CanceledError
+      Temporalio::Activity::Context.current.heartbeat('final-heartbeat')
+      # Reraise if not catching
+      raise unless swallow
+
+      det = Temporalio::Activity::Context.current.cancellation_details
+      "canceled - paused: #{det&.paused?}, requested: #{det&.cancel_requested?}"
+    end
+  end
+
+  class CancellationDetailsWorkflow < Temporalio::Workflow::Definition
+    def execute(swallow)
+      Temporalio::Workflow.execute_activity(
+        CancellationDetailsActivity, swallow,
+        start_to_close_timeout: 1000, heartbeat_timeout: 3
+      )
+    end
+  end
+
+  def test_cancellation_pause
+    # Swallow
+    queue = Queue.new
+    execute_workflow(
+      CancellationDetailsWorkflow, true,
+      activities: [CancellationDetailsActivity.new(queue)]
+    ) do |handle|
+      # Wait for activity to start
+      activity_id = queue.pop(timeout: 10)
+      assert activity_id
+      # Send pause, and confirm we get what we expect
+      req = Temporalio::Api::WorkflowService::V1::PauseActivityRequest.new(
+        namespace: env.client.namespace,
+        execution: Temporalio::Api::Common::V1::WorkflowExecution.new(
+          workflow_id: handle.id,
+          run_id: handle.result_run_id
+        ),
+        identity: env.client.connection.options.identity,
+        id: activity_id,
+        reason: 'my reason'
+      )
+      env.client.workflow_service.pause_activity(req)
+      assert_equal 'canceled - paused: true, requested: false', handle.result
+    end
+
+    # Re-raise
+    queue = Queue.new
+    execute_workflow(
+      CancellationDetailsWorkflow, false,
+      activities: [CancellationDetailsActivity.new(queue)]
+    ) do |handle|
+      # Wait for activity to start
+      activity_id = queue.pop(timeout: 10)
+      assert activity_id
+      # Send pause, and confirm we get what we expect
+      req = Temporalio::Api::WorkflowService::V1::PauseActivityRequest.new(
+        namespace: env.client.namespace,
+        execution: Temporalio::Api::Common::V1::WorkflowExecution.new(
+          workflow_id: handle.id,
+          run_id: handle.result_run_id
+        ),
+        identity: env.client.connection.options.identity,
+        id: activity_id,
+        reason: 'my reason'
+      )
+      env.client.workflow_service.pause_activity(req)
+      assert_eventually do
+        acts = handle.describe.raw_description.pending_activities
+        assert acts.size == 1
+        assert acts.first.paused
+        assert_equal '"final-heartbeat"', acts.first.heartbeat_details&.payloads&.first&.data # rubocop:disable Style/SafeNavigationChainLength
+      end
+    end
+  end
 end

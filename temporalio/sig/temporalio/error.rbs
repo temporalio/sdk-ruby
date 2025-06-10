@@ -4,7 +4,7 @@ module Temporalio
 
     def self._with_backtrace_and_cause: (
       Exception err,
-      backtrace: Array[String],
+      backtrace: Array[String]?,
       cause: Exception?
     ) -> Exception
 

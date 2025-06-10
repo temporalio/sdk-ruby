@@ -1,0 +1,21 @@
+module Temporalio
+  module Activity
+    class CancellationDetails
+      def initialize: (
+        ?gone_from_server: bool,
+        ?cancel_requested: bool,
+        ?timed_out: bool,
+        ?worker_shutdown: bool,
+        ?paused: bool,
+        ?reset: bool
+      ) -> void
+
+      def gone_from_server?: -> bool
+      def cancel_requested?: -> bool
+      def timed_out?: -> bool
+      def worker_shutdown?: -> bool
+      def paused?: -> bool
+      def reset?: -> bool
+    end
+  end
+end

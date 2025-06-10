@@ -27,7 +27,7 @@ module Temporalio
           e
         end
       else
-        err.set_backtrace(backtrace)
+        err.set_backtrace(backtrace) if backtrace
         err
       end
     end

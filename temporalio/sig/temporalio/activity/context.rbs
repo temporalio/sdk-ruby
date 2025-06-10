@@ -12,6 +12,7 @@ module Temporalio
       def instance: -> Definition?
       def heartbeat: (*Object? details) -> void
       def cancellation: -> Cancellation
+      def cancellation_details: -> CancellationDetails?
       def worker_shutdown_cancellation: -> Cancellation
       def payload_converter: -> Converters::PayloadConverter
       def logger: -> ScopedLogger

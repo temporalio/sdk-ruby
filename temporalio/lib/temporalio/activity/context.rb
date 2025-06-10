@@ -70,6 +70,14 @@ module Temporalio
         raise NotImplementedError
       end
 
+      # @return [CancellationDetails, nil] Cancellation details if canceled. These are set just before cancellation is
+      #   actually canceled. These details only represent when the cancel was first performed. Once set, this object is
+      #   never mutated. Therefore, the situation on the server may have changed (e.g. unpause), but this still
+      #   represents the values when cancellation first occurred for this attempt.
+      def cancellation_details
+        raise NotImplementedError
+      end
+
       # @return [Cancellation] Cancellation that is canceled when the worker is shutting down. On worker shutdown, this
       #   is canceled, then the `graceful_shutdown_period` is waited (default 0s), then the activity is canceled.
       def worker_shutdown_cancellation

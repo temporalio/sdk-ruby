@@ -241,6 +241,21 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.DeleteNamespaceRegion API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionResponse] API response.
+        def delete_namespace_region(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_namespace_region',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.GetRegions API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::GetRegionsRequest] API request.
@@ -506,6 +521,51 @@ module Temporalio
             rpc: 'set_user_group_namespace_access',
             request_class: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessRequest,
             response_class: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.AddUserGroupMember API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberResponse] API response.
+        def add_user_group_member(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'add_user_group_member',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.RemoveUserGroupMember API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberResponse] API response.
+        def remove_user_group_member(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'remove_user_group_member',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUserGroupMembers API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersResponse] API response.
+        def get_user_group_members(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_user_group_members',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersResponse,
             request:,
             rpc_options:
           )
