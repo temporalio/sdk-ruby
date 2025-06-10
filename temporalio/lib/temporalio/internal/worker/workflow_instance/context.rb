@@ -62,6 +62,16 @@ module Temporalio
             @instance.patch(patch_id:, deprecated: true)
           end
 
+          def durable_scheduler_disabled(&)
+            prev = Fiber.current_scheduler
+            illegal_call_tracing_disabled { Fiber.set_scheduler(nil) }
+            begin
+              yield
+            ensure
+              illegal_call_tracing_disabled { Fiber.set_scheduler(prev) }
+            end
+          end
+
           def execute_activity(
             activity,
             *args,
