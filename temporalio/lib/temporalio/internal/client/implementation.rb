@@ -26,6 +26,8 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
+        require_relative 'implementation/list_workflow_page'
+
         def self.with_default_rpc_options(user_rpc_options)
           # If the user did not provide an override_retry, we need to make sure
           # we use an option set that has it as "true"
@@ -327,22 +329,14 @@ module Temporalio
         end
 
         def list_workflows(input)
-          Enumerator.new do |yielder|
-            req = Api::WorkflowService::V1::ListWorkflowExecutionsRequest.new(
-              namespace: @client.namespace,
-              query: input.query || ''
-            )
-            loop do
-              resp = @client.workflow_service.list_workflow_executions(
-                req,
-                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
-              )
-              resp.executions.each do |raw_info|
-                yielder << Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
-              end
-              break if resp.next_page_token.empty?
+          page = ListWorkflowPage.new(@client, input: input)
+          return page unless input.page_size.nil?
 
-              req.next_page_token = resp.next_page_token
+          # If page_size is nil, automatically fetch all pages:
+          Enumerator.new do |yielder|
+            until page.nil?
+              page.each { |execution| yielder << execution }
+              page = page.next_page
             end
           end
         end
