@@ -55,7 +55,7 @@ module Temporalio
         # @param types [Array<Class<Exception>>] Exception types to turn into workflow failures.
         def workflow_failure_exception_type(*types)
           types.each do |t|
-            raise ArgumentError, 'All types must classes inheriting Exception' unless t.is_a?(Class) && t < Exception
+            raise ArgumentError, 'All types must classes inheriting Exception' unless t.is_a?(Class) && t <= Exception
           end
           @workflow_failure_exception_types ||= []
           @workflow_failure_exception_types.concat(types)
