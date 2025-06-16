@@ -111,7 +111,7 @@ module Temporalio
             disable_eager_activity_execution:,
             workflow_interceptors:,
             workflow_failure_exception_types: workflow_failure_exception_types.map do |t|
-              unless t.is_a?(Class) && t < Exception
+              unless t.is_a?(Class) && t <= Exception
                 raise ArgumentError, 'All failure types must classes inheriting Exception'
               end
 
