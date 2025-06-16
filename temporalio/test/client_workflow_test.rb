@@ -260,6 +260,21 @@ class ClientWorkflowTest < Test
         assert_equal 2, wfs.size
       end
 
+      # Paginated list workflows query
+      assert_eventually do
+        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'", page_size: 2)
+        assert_equal 2, wfs.count
+        all_wfs = wfs.to_a
+        # Check next page
+        next_page = wfs.next_page_token
+        wfs = env.client.list_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'",
+                                        next_page_token: next_page).to_a
+        assert_equal 3, wfs.count
+        all_wfs += wfs.to_a
+        # Check all IDs are present
+        assert_equal handles.map(&:id).sort, all_wfs.map(&:id).sort
+      end
+
       # Normal count
       assert_eventually do
         count = env.client.count_workflows("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'")

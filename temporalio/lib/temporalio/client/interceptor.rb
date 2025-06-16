@@ -65,6 +65,8 @@ module Temporalio
       # Input for {Outbound.list_workflows}.
       ListWorkflowsInput = Data.define(
         :query,
+        :next_page_token,
+        :page_size,
         :rpc_options
       )
 
