@@ -7,13 +7,15 @@ module Temporalio
 
           def execute_activity_with_local_backoffs: (
             local: bool,
-            cancellation: Cancellation
+            cancellation: Cancellation,
+            result_hint: Object?
           ) { (untyped?) -> Integer } -> Object?
 
           def execute_activity_once: (
             local: bool,
             cancellation: Cancellation,
-            last_local_backoff: untyped?
+            last_local_backoff: untyped?,
+            result_hint: Object?
           ) { (untyped?) -> Integer } -> Object?
 
           def _signal_external_workflow: (
@@ -23,6 +25,7 @@ module Temporalio
             signal: Workflow::Definition::Signal | Symbol | String,
             args: Array[Object?],
             cancellation: Cancellation,
+            arg_hints: Array[Object]?,
             headers: Hash[String, Object?]
           ) -> void
         end

@@ -16,8 +16,9 @@ module Temporalio
         # handle it, the resulting payload must have +encoding+ metadata on the payload set to the value of {encoding}.
         #
         # @param value [Object] Ruby value to possibly convert.
+        # @param hint [Object, nil] Hint, if any, to assist conversion.
         # @return [Api::Common::V1::Payload, nil] Converted payload if it can handle it, +nil+ otherwise.
-        def to_payload(value)
+        def to_payload(value, hint: nil)
           raise NotImplementedError
         end
 
@@ -25,8 +26,9 @@ module Temporalio
         # will error if it cannot convert.
         #
         # @param payload [Api::Common::V1::Payload] Payload to convert.
+        # @param hint [Object, nil] Hint, if any, to assist conversion.
         # @return [Object] Converted Ruby value.
-        def from_payload(payload)
+        def from_payload(payload, hint: nil)
           raise NotImplementedError
         end
       end

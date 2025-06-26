@@ -7,11 +7,14 @@ module Temporalio
         class ExecuteInput
           attr_reader proc: Proc
           attr_reader args: Array[Object?]
+          attr_reader arg_hints: Array[Object]?
+          attr_reader result_hint: Object?
           attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             proc: Proc,
             args: Array[Object?],
+            result_hint: Object?,
             headers: Hash[String, Object?]
           ) -> void
         end
@@ -28,8 +31,9 @@ module Temporalio
 
         class HeartbeatInput
           attr_reader details: Array[Object?]
+          attr_reader detail_hints: Array[Object]?
 
-          def initialize: (details: Array[Object?]) -> void
+          def initialize: (details: Array[Object?], detail_hints: Array[Object]?) -> void
         end
 
         class Outbound
@@ -142,8 +146,10 @@ module Temporalio
           attr_reader cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
           attr_reader activity_id: String?
           attr_reader disable_eager_execution: bool
-          attr_reader headers: Hash[String, Object?]
           attr_reader priority: Temporalio::Priority
+          attr_reader arg_hints: Array[Object]?
+          attr_reader result_hint: Object?
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             activity: String,
@@ -159,8 +165,10 @@ module Temporalio
             cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum,
             activity_id: String?,
             disable_eager_execution: bool,
-            headers: Hash[String, Object?],
-            priority: Temporalio::Priority
+            priority: Temporalio::Priority,
+            arg_hints: Array[Object]?,
+            result_hint: Object?,
+            headers: Hash[String, Object?]
           ) -> void
         end
 
@@ -175,6 +183,8 @@ module Temporalio
           attr_reader cancellation: Cancellation
           attr_reader cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum
           attr_reader activity_id: String?
+          attr_reader arg_hints: Array[Object]?
+          attr_reader result_hint: Object?
           attr_reader headers: Hash[String, Object?]
 
           def initialize: (
@@ -188,6 +198,8 @@ module Temporalio
             cancellation: Cancellation,
             cancellation_type: Temporalio::Workflow::ActivityCancellationType::enum,
             activity_id: String?,
+            arg_hints: Array[Object]?,
+            result_hint: Object?,
             headers: Hash[String, Object?]
           ) -> void
         end
@@ -205,6 +217,7 @@ module Temporalio
           attr_reader signal: String
           attr_reader args: Array[Object?]
           attr_reader cancellation: Cancellation
+          attr_reader arg_hints: Array[Object]?
           attr_reader headers: Hash[String, Object?]
 
           def initialize: (
@@ -212,6 +225,7 @@ module Temporalio
             signal: String,
             args: Array[Object?],
             cancellation: Cancellation,
+            arg_hints: Array[Object]?,
             headers: Hash[String, Object?]
           ) -> void
         end
@@ -222,6 +236,7 @@ module Temporalio
           attr_reader signal: String
           attr_reader args: Array[Object?]
           attr_reader cancellation: Cancellation
+          attr_reader arg_hints: Array[Object]?
           attr_reader headers: Hash[String, Object?]
 
           def initialize: (
@@ -230,6 +245,7 @@ module Temporalio
             signal: String,
             args: Array[Object?],
             cancellation: Cancellation,
+            arg_hints: Array[Object]?,
             headers: Hash[String, Object?]
           ) -> void
         end
@@ -264,8 +280,10 @@ module Temporalio
           attr_reader cron_schedule: String?
           attr_reader memo: Hash[String | Symbol, Object?]?
           attr_reader search_attributes: SearchAttributes?
-          attr_reader headers: Hash[String, Object?]
           attr_reader priority: Temporalio::Priority
+          attr_reader arg_hints: Array[Object]?
+          attr_reader result_hint: Object?
+          attr_reader headers: Hash[String, Object?]
 
           def initialize: (
             workflow: String,
@@ -285,8 +303,10 @@ module Temporalio
             cron_schedule: String?,
             memo: Hash[String | Symbol, Object?]?,
             search_attributes: SearchAttributes?,
-            headers: Hash[String, Object?],
-            priority: Temporalio::Priority
+            priority: Temporalio::Priority,
+            arg_hints: Array[Object]?,
+            result_hint: Object?,
+            headers: Hash[String, Object?]
           ) -> void
         end
 

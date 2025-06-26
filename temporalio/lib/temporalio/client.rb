@@ -221,6 +221,10 @@ module Temporalio
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
     #   This is currently experimental.
     # @param priority [Priority] Priority of the workflow. This is currently experimental.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+    #   workflow definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
+    #   definition has result hint, it is used by default.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowHandle] A workflow handle to the started workflow.
@@ -246,10 +250,15 @@ module Temporalio
       request_eager_start: false,
       versioning_override: nil,
       priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil,
       rpc_options: nil
     )
+      # Take hints from definition if there is a definition
+      workflow, defn_arg_hints, defn_result_hint =
+        Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(workflow)
       @impl.start_workflow(Interceptor::StartWorkflowInput.new(
-                             workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
+                             workflow:,
                              args:,
                              workflow_id: id,
                              task_queue:,
@@ -269,6 +278,8 @@ module Temporalio
                              headers: {},
                              versioning_override:,
                              priority:,
+                             arg_hints: arg_hints || defn_arg_hints,
+                             result_hint: result_hint || defn_result_hint,
                              rpc_options:
                            ))
     end
@@ -304,6 +315,10 @@ module Temporalio
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
     #   This is currently experimental.
     # @param priority [Priority] Priority for the workflow. This is currently experimental.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+    #   workflow definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
+    #   definition has result hint, it is used by default.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Object] Successful result of the workflow.
@@ -330,10 +345,11 @@ module Temporalio
       request_eager_start: false,
       versioning_override: nil,
       priority: Priority.default,
-      follow_runs: true,
+      arg_hints: nil,
+      result_hint: nil,
       rpc_options: nil
     )
-      handle = start_workflow(
+      start_workflow(
         workflow,
         *args,
         id:,
@@ -353,9 +369,10 @@ module Temporalio
         request_eager_start:,
         versioning_override:,
         priority:,
+        arg_hints:,
+        result_hint:,
         rpc_options:
-      )
-      follow_runs ? handle.result : handle
+      ).result
     end
 
     # Get a workflow handle to an existing workflow by its ID.
@@ -365,14 +382,18 @@ module Temporalio
     #   interactions occur on the latest of the workflow ID.
     # @param first_execution_run_id [String, nil] First execution run ID used for some calls like cancellation and
     #   termination to ensure the affected workflow is only within the same chain as this given run ID.
+    # @param result_hint [Object, nil] Converter hint for the workflow's result.
     #
     # @return [WorkflowHandle] The workflow handle.
     def workflow_handle(
       workflow_id,
       run_id: nil,
-      first_execution_run_id: nil
+      first_execution_run_id: nil,
+      result_hint: nil
     )
-      WorkflowHandle.new(client: self, id: workflow_id, run_id:, result_run_id: run_id, first_execution_run_id:)
+      WorkflowHandle.new(
+        client: self, id: workflow_id, run_id:, result_run_id: run_id, first_execution_run_id:, result_hint:
+      )
     end
 
     # Start an update, possibly starting the workflow at the same time if it doesn't exist (depending upon ID conflict
@@ -386,6 +407,10 @@ module Temporalio
     # @param wait_for_stage [WorkflowUpdateWaitStage] Required stage to wait until returning. ADMITTED is not
     #   currently supported. See https://docs.temporal.io/workflows#update for more details.
     # @param id [String] ID of the update.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for update arguments if any. If unset/nil and the
+    #   update definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for update result if any. If unset/nil and the update
+    #   definition has result hint, it is used by default.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowUpdateHandle] The update handle.
@@ -399,15 +424,20 @@ module Temporalio
       start_workflow_operation:,
       wait_for_stage:,
       id: SecureRandom.uuid,
+      arg_hints: nil,
+      result_hint: nil,
       rpc_options: nil
     )
+      update, defn_arg_hints, defn_result_hint = Workflow::Definition::Update._name_and_hints_from_parameter(update)
       @impl.start_update_with_start_workflow(
         Interceptor::StartUpdateWithStartWorkflowInput.new(
           update_id: id,
-          update: Workflow::Definition::Update._name_from_parameter(update),
+          update:,
           args:,
           wait_for_stage:,
           start_workflow_operation:,
+          arg_hints: arg_hints || defn_arg_hints,
+          result_hint: result_hint || defn_result_hint,
           headers: {},
           rpc_options:
         )
@@ -423,6 +453,10 @@ module Temporalio
     # @param start_workflow_operation [WithStartWorkflowOperation] Required with-start workflow operation. This must
     #   have an `id_conflict_policy` set.
     # @param id [String] ID of the update.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for update arguments if any. If unset/nil and the
+    #   update definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for update result if any. If unset/nil and the update
+    #   definition has result hint, it is used by default.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Object] Successful update result.
@@ -436,6 +470,8 @@ module Temporalio
       *args,
       start_workflow_operation:,
       id: SecureRandom.uuid,
+      arg_hints: nil,
+      result_hint: nil,
       rpc_options: nil
     )
       start_update_with_start_workflow(
@@ -444,6 +480,8 @@ module Temporalio
         start_workflow_operation:,
         wait_for_stage: WorkflowUpdateWaitStage::COMPLETED,
         id:,
+        arg_hints:,
+        result_hint:,
         rpc_options:
       ).result
     end
@@ -454,6 +492,8 @@ module Temporalio
     # @param args [Array<Object>] Signal arguments.
     # @param start_workflow_operation [WithStartWorkflowOperation] Required with-start workflow operation. This may not
     #   support all `id_conflict_policy` options.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for signal arguments if any. If unset/nil and the
+    #   signal definition has arg hints, those are used by default.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [WorkflowHandle] A workflow handle to the workflow.
@@ -463,13 +503,16 @@ module Temporalio
       signal,
       *args,
       start_workflow_operation:,
+      arg_hints: nil,
       rpc_options: nil
     )
+      signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
       @impl.signal_with_start_workflow(
         Interceptor::SignalWithStartWorkflowInput.new(
-          signal: Workflow::Definition::Signal._name_from_parameter(signal),
+          signal:,
           args:,
           start_workflow_operation:,
+          arg_hints: arg_hints || defn_arg_hints,
           rpc_options:
         )
       )

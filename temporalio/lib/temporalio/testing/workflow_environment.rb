@@ -394,8 +394,8 @@ module Temporalio
           end
 
           # @!visibility private
-          def result(follow_runs: true, rpc_options: nil)
-            @env.time_skipping_unlocked { super(follow_runs:, rpc_options:) }
+          def result(follow_runs: true, result_hint: nil, rpc_options: nil)
+            @env.time_skipping_unlocked { super(follow_runs:, result_hint:, rpc_options:) }
           end
         end
       end

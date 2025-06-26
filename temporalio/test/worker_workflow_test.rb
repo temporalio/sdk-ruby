@@ -1777,16 +1777,16 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
   end
 
   class FailWorkflowPayloadConverter < Temporalio::Converters::PayloadConverter
-    def to_payload(value)
+    def to_payload(value, hint: nil)
       if value == 'fail-on-this-result'
         raise Temporalio::Error::ApplicationError.new('Intentional error', type: 'IntentionalError')
       end
 
-      Temporalio::Converters::PayloadConverter.default.to_payload(value)
+      Temporalio::Converters::PayloadConverter.default.to_payload(value, hint:)
     end
 
-    def from_payload(payload)
-      value = Temporalio::Converters::PayloadConverter.default.from_payload(payload)
+    def from_payload(payload, hint: nil)
+      value = Temporalio::Converters::PayloadConverter.default.from_payload(payload, hint:)
       if value == 'fail-on-this'
         raise Temporalio::Error::ApplicationError.new('Intentional error', type: 'IntentionalError')
       end
@@ -2318,6 +2318,198 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     execute_workflow(MissingLocalActivityWorkflow, false) do |handle|
       assert_eventually_task_fail(handle:, message_contains:)
     end
+  end
+
+  class HintTrackingJSONConverter < Temporalio::Converters::PayloadConverter::JSONPlain
+    attr_accessor :outbound_hints, :inbound_hints
+
+    def to_payload(value, hint: nil)
+      (@outbound_hints ||= []) << { value:, hint: }
+      super
+    end
+
+    def from_payload(payload, hint: nil)
+      super.tap { |value| (@inbound_hints ||= []) << { value:, hint: } }
+    end
+  end
+
+  class HintActivity < Temporalio::Activity::Definition
+    activity_arg_hint :activity_arg1, :activity_arg2
+    activity_result_hint :activity_result
+
+    def execute(_arg1, _arg2)
+      'act_result'
+    end
+  end
+
+  class HintWorkflow < Temporalio::Workflow::Definition
+    workflow_arg_hint :workflow_arg1, :workflow_arg2
+    workflow_result_hint :workflow_result
+
+    def execute(_arg1, _arg2)
+      # Complete if we're continued
+      return 'wf_result' if Temporalio::Workflow.info.continued_run_id
+
+      Temporalio::Workflow.execute_activity(HintActivity, 'act_arg1', 'act_arg2', start_to_close_timeout: 10)
+      Temporalio::Workflow.wait_condition { @got_update }
+      raise Temporalio::Workflow::ContinueAsNewError.new('cont_wf_arg1', 'cont_wf_arg2')
+    end
+
+    workflow_signal arg_hints: :signal_arg1
+    def my_signal(_arg1)
+      # No-op
+    end
+
+    workflow_query arg_hints: :query_arg1, result_hint: :query_result
+    def my_query(_arg1)
+      'que_result'
+    end
+
+    workflow_update arg_hints: :update_arg1, result_hint: :update_result
+    def my_update(_arg1)
+      # Start child workflow, send signal to it, wait for completion
+      handle = Temporalio::Workflow.start_child_workflow(HintChildWorkflow, 'child_wf_arg1')
+      handle.signal(HintChildWorkflow.my_signal, 'child_sig_arg1')
+      handle.result
+      @got_update = true
+      'upd_result'
+    end
+  end
+
+  class HintChildWorkflow < Temporalio::Workflow::Definition
+    workflow_arg_hint :child_workflow_arg1
+    workflow_result_hint :child_workflow_result
+
+    def execute(_arg1)
+      Temporalio::Workflow.wait_condition { @got_signal }
+      'child_wf_result'
+    end
+
+    workflow_signal arg_hints: :child_signal_arg1
+    def my_signal(_arg1)
+      @got_signal = true
+    end
+  end
+
+  class HintWithStartWorkflow < Temporalio::Workflow::Definition
+    # Intentionally one less hint than args and no result hint
+    workflow_arg_hint :with_start_arg1
+
+    def execute(_arg1, _arg2)
+      Temporalio::Workflow.wait_condition { @result }
+    end
+
+    workflow_signal arg_hints: :with_start_signal_arg1
+    def my_signal(_arg1)
+      @result = 'sig_with_start_wf_result'
+    end
+
+    # Intentionally no arg hint
+    workflow_update result_hint: :with_start_update_result
+    def my_update(_arg1)
+      @result = 'upd_with_start_wf_result'
+      'upd_with_start_upd_result'
+    end
+  end
+
+  def test_hints
+    # New client with tracking JSON converter
+    conv = HintTrackingJSONConverter.new
+    client = Temporalio::Client.new(**env.client.options.with(
+      data_converter: Temporalio::Converters::DataConverter.new(
+        payload_converter: Temporalio::Converters::PayloadConverter::Composite.new(
+          *Temporalio::Converters::PayloadConverter.default.converters.values.map do |c|
+            c.is_a?(Temporalio::Converters::PayloadConverter::JSONPlain) ? conv : c
+          end
+        )
+      )
+    ).to_h)
+    @expected_outbound_hints = []
+    @expected_inbound_hints = []
+
+    # Start worker
+    task_queue = "tq-#{SecureRandom.uuid}"
+    Temporalio::Worker.new(client:, task_queue:,
+                           workflows: [HintWorkflow, HintChildWorkflow, HintWithStartWorkflow],
+                           activities: [HintActivity]).run do
+      # Run workflow
+      wf_hints = [{ value: 'wf_arg1', hint: :workflow_arg1 },
+                  { value: 'wf_arg2', hint: :workflow_arg2 },
+                  { value: 'wf_result', hint: :workflow_result }]
+      act_hints = [{ value: 'act_arg1', hint: :activity_arg1 },
+                   { value: 'act_arg2', hint: :activity_arg2 },
+                   { value: 'act_result', hint: :activity_result }]
+      @expected_outbound_hints.push(*wf_hints, *act_hints)
+      @expected_inbound_hints.push(*wf_hints, *act_hints)
+      handle = client.start_workflow(
+        HintWorkflow,
+        'wf_arg1', 'wf_arg2',
+        id: "wf-#{SecureRandom.uuid}", task_queue:
+      )
+
+      # Send messages
+      msg_hints = [{ value: 'sig_arg1', hint: :signal_arg1 },
+                   { value: 'que_arg1', hint: :query_arg1 },
+                   { value: 'que_result', hint: :query_result },
+                   { value: 'upd_arg1', hint: :update_arg1 },
+                   { value: 'upd_result', hint: :update_result }]
+      @expected_outbound_hints.push(*msg_hints)
+      @expected_inbound_hints.push(*msg_hints)
+      handle.signal(HintWorkflow.my_signal, 'sig_arg1')
+      assert_equal 'que_result', handle.query(HintWorkflow.my_query, 'que_arg1')
+      assert_equal 'upd_result', handle.execute_update(HintWorkflow.my_update, 'upd_arg1')
+
+      # Other things that happened
+      child_hints = [{ value: 'child_wf_arg1', hint: :child_workflow_arg1 },
+                     { value: 'child_sig_arg1', hint: :child_signal_arg1 },
+                     { value: 'child_wf_result', hint: :child_workflow_result }]
+      cont_hints = [{ value: 'cont_wf_arg1', hint: :workflow_arg1 },
+                    { value: 'cont_wf_arg2', hint: :workflow_arg2 }]
+      @expected_outbound_hints.push(*child_hints, *cont_hints)
+      @expected_inbound_hints.push(*child_hints, *cont_hints)
+
+      # Check result
+      assert_equal 'wf_result', handle.result
+
+      # Signal with start
+      sig_with_start_hints = [{ value: 'sig_with_start_wf_arg1', hint: :with_start_arg1 },
+                              { value: 'sig_with_start_wf_arg2', hint: nil },
+                              { value: 'sig_with_start_sig_arg1', hint: :with_start_signal_arg1 },
+                              { value: 'sig_with_start_wf_result', hint: nil }]
+      @expected_outbound_hints.push(*sig_with_start_hints)
+      @expected_inbound_hints.push(*sig_with_start_hints)
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        HintWithStartWorkflow, 'sig_with_start_wf_arg1', 'sig_with_start_wf_arg2',
+        id: "wf-#{SecureRandom.uuid}", task_queue:
+      )
+      client.signal_with_start_workflow(
+        HintWithStartWorkflow.my_signal, 'sig_with_start_sig_arg1',
+        start_workflow_operation:
+      )
+      assert_equal 'sig_with_start_wf_result', start_workflow_operation.workflow_handle.result
+
+      # Update with start
+      upd_with_start_hints = [{ value: 'upd_with_start_wf_arg1', hint: :with_start_arg1 },
+                              { value: 'upd_with_start_wf_arg2', hint: nil },
+                              { value: 'upd_with_start_upd_arg1', hint: nil },
+                              { value: 'upd_with_start_upd_result', hint: :with_start_update_result },
+                              { value: 'upd_with_start_wf_result', hint: nil }]
+      @expected_outbound_hints.push(*upd_with_start_hints)
+      @expected_inbound_hints.push(*upd_with_start_hints)
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        HintWithStartWorkflow, 'upd_with_start_wf_arg1', 'upd_with_start_wf_arg2',
+        id: "wf-#{SecureRandom.uuid}", task_queue:, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      assert_equal 'upd_with_start_upd_result', client.execute_update_with_start_workflow(
+        HintWithStartWorkflow.my_update, 'upd_with_start_upd_arg1',
+        start_workflow_operation:
+      )
+      assert_equal 'upd_with_start_wf_result', start_workflow_operation.workflow_handle.result
+    end
+
+    # Check hints
+    assert_equal @expected_outbound_hints.to_set, conv.outbound_hints.to_set
+    assert_equal @expected_inbound_hints.to_set, conv.inbound_hints.to_set
   end
 end
 

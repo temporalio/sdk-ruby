@@ -24,6 +24,8 @@ module Temporalio
         :memo,
         :search_attributes,
         :start_delay,
+        :arg_hints,
+        :result_hint,
         :headers
       )
 
@@ -55,10 +57,14 @@ module Temporalio
         memo: nil,
         search_attributes: nil,
         start_delay: nil,
+        arg_hints: nil,
+        result_hint: nil,
         headers: {}
       )
+        workflow, defn_arg_hints, defn_result_hint =
+          Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(workflow)
         @options = Options.new(
-          workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
+          workflow:,
           args:,
           id:,
           task_queue:,
@@ -74,6 +80,8 @@ module Temporalio
           memo:,
           search_attributes:,
           start_delay:,
+          arg_hints: arg_hints || defn_arg_hints,
+          result_hint: result_hint || defn_result_hint,
           headers:
         )
         @workflow_handle_mutex = Mutex.new

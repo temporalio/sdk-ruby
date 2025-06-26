@@ -43,6 +43,7 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
     - [Cloud Client Using API Key](#cloud-client-using-api-key)
     - [Data Conversion](#data-conversion)
       - [ActiveModel](#activemodel)
+      - [Converter Hints](#converter-hints)
   - [Workers](#workers)
   - [Workflows](#workflows)
     - [Workflow Definition](#workflow-definition)
@@ -335,6 +336,25 @@ end
 Now if `include ActiveModelJSONSupport` is present on any ActiveModel class, on serialization `to_json` will be used
 which will use `as_json` which calls the super `as_json` but also includes the fully qualified class name as the JSON
 `create_id` key. On deserialization, Ruby JSON then uses this key to know what class to call `json_create` on.
+
+##### Converter Hints
+
+In most places where objects are converted to payloads or vice versa, a "hint" can be provided to tell the converter
+something else about the object/payload to assist conversion. The default converters ignore these hints, but custom
+converters can be written to take advantage of them. For example, hints may be used to provide a custom converter the
+Ruby type to deserialize a payload into.
+
+These hints manifest themselves various ways throughout the API. The most obvious way is when making definitions. An
+activity can define `activity_arg_hint` (which accepts multiple) and/or `activity_result_hint` for activity-level hints.
+Similarly, a workflow can define `workflow_arg_hint` and/or `workflow_result_hint` for workflow-level hints.
+`workflow_signal`, `workflow_query`, and `workflow_update` all similarly accept `arg_hints` and `result_hint` (except
+signal of course). These definition-level hints are passed to converters both from the caller side and the
+implementation side.
+
+There are some advanced payload uses in the SDK that do not currently have a way to set hints. These include
+workflow/schedule memo, workflow get/upsert memo, activity last heartbeat details, and application error details. In
+some cases, users can use `Temporalio::Converters::RawValue` and then manually convert with hints. For others, hints can
+be added as needed, please open an issue or otherwise contact Temporal.
 
 ### Workers
 

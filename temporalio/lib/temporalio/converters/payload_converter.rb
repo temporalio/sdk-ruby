@@ -34,37 +34,47 @@ module Temporalio
       # Convert a Ruby value to a payload.
       #
       # @param value [Object] Ruby value.
+      # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Api::Common::V1::Payload] Converted payload.
-      def to_payload(value)
+      def to_payload(value, hint: nil)
         raise NotImplementedError
       end
 
       # Convert multiple Ruby values to a payload set.
       #
       # @param values [Object] Ruby values, converted to array via {::Array}.
+      # @param hints [Array<Object>, nil] Hints, if any, to assist conversion. Note, when using the default converter
+      #   that converts a payload at a time, hints for each value are taken from the array at that value's index. So if
+      #   there are fewer hints than values, some values will not have a hint. Similarly if there are more hints than
+      #   values, the trailing hints are not used.
       # @return [Api::Common::V1::Payloads] Converted payload set.
-      def to_payloads(values)
+      def to_payloads(values, hints: nil)
         Api::Common::V1::Payloads.new(
-          payloads: Array(values).map { |value| to_payload(value) }
+          payloads: Array(values).zip(Array(hints)).map { |value, hint| to_payload(value, hint:) }
         )
       end
 
       # Convert a payload to a Ruby value.
       #
       # @param payload [Api::Common::V1::Payload] Payload.
+      # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Object] Converted Ruby value.
-      def from_payload(payload)
+      def from_payload(payload, hint: nil)
         raise NotImplementedError
       end
 
       # Convert a payload set to Ruby values.
       #
       # @param payloads [Api::Common::V1::Payloads, nil] Payload set.
+      # @param hints [Array<Object>, nil] Hints, if any, to assist conversion. Note, when using the default converter
+      #   that converts a value at a time, hints for each payload are taken from the array at that payload's index. So
+      #   if there are fewer hints than payloads, some payloads will not have a hint. Similarly if there are more hints
+      #   than payloads, the trailing hints are not used.
       # @return [Array<Object>] Converted Ruby values.
-      def from_payloads(payloads)
+      def from_payloads(payloads, hints: nil)
         return [] unless payloads
 
-        payloads.payloads.map { |payload| from_payload(payload) }
+        payloads.payloads.zip(Array(hints)).map { |payload, hint| from_payload(payload, hint:) }
       end
     end
   end

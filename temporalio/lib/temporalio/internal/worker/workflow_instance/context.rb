@@ -76,16 +76,21 @@ module Temporalio
             cancellation_type:,
             activity_id:,
             disable_eager_execution:,
-            priority:
+            priority:,
+            arg_hints:,
+            result_hint:
           )
-            activity = case activity
-                       when Class
-                         Activity::Definition::Info.from_activity(activity).name&.to_s
-                       when Symbol, String
-                         activity.to_s
-                       else
-                         raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
-                       end
+            activity, defn_arg_hints, defn_result_hint =
+              case activity
+              when Class
+                defn = Activity::Definition::Info.from_activity(activity)
+                [defn.name&.to_s, defn.arg_hints, defn.result_hint]
+              when Symbol, String
+                [activity.to_s, nil, nil]
+              else
+                raise ArgumentError,
+                      'Activity must be a definition class, or a symbol/string'
+              end
             raise 'Cannot invoke dynamic activities' unless activity
 
             @outbound.execute_activity(
@@ -104,6 +109,8 @@ module Temporalio
                 activity_id:,
                 disable_eager_execution: disable_eager_execution || @instance.disable_eager_activity_execution,
                 priority:,
+                arg_hints: arg_hints || defn_arg_hints,
+                result_hint: result_hint || defn_result_hint,
                 headers: {}
               )
             )
@@ -119,16 +126,20 @@ module Temporalio
             local_retry_threshold:,
             cancellation:,
             cancellation_type:,
-            activity_id:
+            activity_id:,
+            arg_hints:,
+            result_hint:
           )
-            activity = case activity
-                       when Class
-                         Activity::Definition::Info.from_activity(activity).name&.to_s
-                       when Symbol, String
-                         activity.to_s
-                       else
-                         raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
-                       end
+            activity, defn_arg_hints, defn_result_hint =
+              case activity
+              when Class
+                defn = Activity::Definition::Info.from_activity(activity)
+                [defn.name&.to_s, defn.arg_hints, defn.result_hint]
+              when Symbol, String
+                [activity.to_s, nil, nil]
+              else
+                raise ArgumentError, 'Activity must be a definition class, or a symbol/string'
+              end
             raise 'Cannot invoke dynamic activities' unless activity
 
             @outbound.execute_local_activity(
@@ -143,6 +154,8 @@ module Temporalio
                 cancellation:,
                 cancellation_type:,
                 activity_id:,
+                arg_hints: arg_hints || defn_arg_hints,
+                result_hint: result_hint || defn_result_hint,
                 headers: {}
               )
             )
@@ -252,11 +265,15 @@ module Temporalio
             cron_schedule:,
             memo:,
             search_attributes:,
-            priority:
+            priority:,
+            arg_hints:,
+            result_hint:
           )
+            workflow, defn_arg_hints, defn_result_hint =
+              Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(workflow)
             @outbound.start_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput.new(
-                workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
+                workflow:,
                 args:,
                 id:,
                 task_queue:,
@@ -274,6 +291,8 @@ module Temporalio
                 memo:,
                 search_attributes:,
                 priority:,
+                arg_hints: arg_hints || defn_arg_hints,
+                result_hint: result_hint || defn_result_hint,
                 headers: {}
               )
             )
@@ -360,26 +379,30 @@ module Temporalio
             @outbound = outbound
           end
 
-          def _signal_child_workflow(id:, signal:, args:, cancellation:)
+          def _signal_child_workflow(id:, signal:, args:, cancellation:, arg_hints:)
+            signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
             @outbound.signal_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::SignalChildWorkflowInput.new(
                 id:,
-                signal: Workflow::Definition::Signal._name_from_parameter(signal),
+                signal:,
                 args:,
                 cancellation:,
+                arg_hints: arg_hints || defn_arg_hints,
                 headers: {}
               )
             )
           end
 
-          def _signal_external_workflow(id:, run_id:, signal:, args:, cancellation:)
+          def _signal_external_workflow(id:, run_id:, signal:, args:, cancellation:, arg_hints:)
+            signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
             @outbound.signal_external_workflow(
               Temporalio::Worker::Interceptor::Workflow::SignalExternalWorkflowInput.new(
                 id:,
                 run_id:,
-                signal: Workflow::Definition::Signal._name_from_parameter(signal),
+                signal:,
                 args:,
                 cancellation:,
+                arg_hints: arg_hints || defn_arg_hints,
                 headers: {}
               )
             )

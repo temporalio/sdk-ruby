@@ -36,9 +36,11 @@ module Temporalio
         :search_attributes,
         :start_delay,
         :request_eager_start,
-        :headers,
         :versioning_override,
         :priority,
+        :arg_hints,
+        :result_hint,
+        :headers,
         :rpc_options
       )
 
@@ -49,6 +51,8 @@ module Temporalio
         :args,
         :wait_for_stage,
         :start_workflow_operation,
+        :arg_hints,
+        :result_hint,
         :headers,
         :rpc_options
       )
@@ -58,6 +62,7 @@ module Temporalio
         :signal,
         :args,
         :start_workflow_operation,
+        :arg_hints,
         # Headers intentionally not defined here, because they are not separate from start_workflow_operation
         :rpc_options
       )
@@ -97,6 +102,7 @@ module Temporalio
         :run_id,
         :signal,
         :args,
+        :arg_hints,
         :headers,
         :rpc_options
       )
@@ -108,6 +114,8 @@ module Temporalio
         :query,
         :args,
         :reject_condition,
+        :arg_hints,
+        :result_hint,
         :headers,
         :rpc_options
       )
@@ -120,6 +128,8 @@ module Temporalio
         :update,
         :args,
         :wait_for_stage,
+        :arg_hints,
+        :result_hint,
         :headers,
         :rpc_options
       )
@@ -218,6 +228,7 @@ module Temporalio
       HeartbeatAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :details,
+        :detail_hints,
         :rpc_options
       )
 
@@ -225,6 +236,7 @@ module Temporalio
       CompleteAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :result,
+        :result_hint,
         :rpc_options
       )
 
@@ -233,6 +245,7 @@ module Temporalio
         :task_token_or_id_reference,
         :error,
         :last_heartbeat_details,
+        :last_heartbeat_detail_hints,
         :rpc_options
       )
 
@@ -240,6 +253,7 @@ module Temporalio
       ReportCancellationAsyncActivityInput = Data.define(
         :task_token_or_id_reference,
         :details,
+        :detail_hints,
         :rpc_options
       )
 

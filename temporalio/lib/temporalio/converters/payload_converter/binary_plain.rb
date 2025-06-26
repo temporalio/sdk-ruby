@@ -16,7 +16,7 @@ module Temporalio
         end
 
         # (see Encoding.to_payload)
-        def to_payload(value)
+        def to_payload(value, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           return nil unless value.is_a?(String) && value.encoding == ::Encoding::ASCII_8BIT
 
           Temporalio::Api::Common::V1::Payload.new(
@@ -26,7 +26,7 @@ module Temporalio
         end
 
         # (see Encoding.from_payload)
-        def from_payload(payload)
+        def from_payload(payload, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           payload.data
         end
       end

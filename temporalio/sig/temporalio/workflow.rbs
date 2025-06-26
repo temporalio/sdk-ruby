@@ -31,7 +31,9 @@ module Temporalio
       ?cancellation_type: ActivityCancellationType::enum,
       ?activity_id: String?,
       ?disable_eager_execution: bool,
-      ?priority: Priority
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?
     ) -> Object?
 
     def self.execute_child_workflow: (
@@ -52,7 +54,9 @@ module Temporalio
       ?cron_schedule: String?,
       ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
-      ?priority: Priority
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?
     ) -> Object?
 
     def self.execute_local_activity: (
@@ -65,7 +69,9 @@ module Temporalio
       ?local_retry_threshold: duration?,
       ?cancellation: Cancellation,
       ?cancellation_type: ActivityCancellationType::enum,
-      ?activity_id: String?
+      ?activity_id: String?,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?
     ) -> Object?
 
     def self.external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
@@ -116,7 +122,9 @@ module Temporalio
       ?cron_schedule: String?,
       ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
-      ?priority: Priority
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?
     ) -> ChildWorkflowHandle
 
     def self.storage: -> Hash[Object, Object]
@@ -156,6 +164,7 @@ module Temporalio
       attr_accessor retry_policy: RetryPolicy?
       attr_accessor memo: Hash[String | Symbol, Object?]?
       attr_accessor search_attributes: SearchAttributes?
+      attr_accessor arg_hints: Array[Object]?
       attr_accessor headers: Hash[String, Object?]
 
       def initialize: (
@@ -167,6 +176,7 @@ module Temporalio
         ?retry_policy: RetryPolicy?,
         ?memo: Hash[String | Symbol, Object?]?,
         ?search_attributes: SearchAttributes?,
+        ?arg_hints: Array[Object]?,
         ?headers: Hash[String, Object?]
       ) -> void
     end

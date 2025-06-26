@@ -48,13 +48,21 @@ module Temporalio
       # @return [String, nil] First execution run ID.
       attr_reader :first_execution_run_id
 
+      # Result hint for the result of this workflow. If this handle was created via {Client.start_workflow}, this is set
+      # from there (either via result hint on that call or workflow definition's result hint). Otherwise, the result
+      # hint is set by the creator of the handle.
+      #
+      # @return [Object, nil] Result hint.
+      attr_reader :result_hint
+
       # @!visibility private
-      def initialize(client:, id:, run_id:, result_run_id:, first_execution_run_id:)
+      def initialize(client:, id:, run_id:, result_run_id:, first_execution_run_id:, result_hint:)
         @client = client
         @id = id
         @run_id = run_id
         @result_run_id = result_run_id
         @first_execution_run_id = first_execution_run_id
+        @result_hint = result_hint
       end
 
       # Wait for the result of the workflow.
@@ -64,6 +72,8 @@ module Temporalio
       #
       # @param follow_runs [Boolean] If +true+, workflow runs will be continually fetched across retries and continue as
       #   new until the latest one is found. If +false+, the first result is used.
+      # @param result_hint [Object, nil] Override the result hint for the result. If unset/nil, uses one on the handle
+      #   itself.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object] Result of the workflow after being converted by the data converter.
@@ -71,7 +81,7 @@ module Temporalio
       # @raise [Error::WorkflowFailedError] Workflow failed with +cause+ as the cause.
       # @raise [Error::WorkflowContinuedAsNewError] Workflow continued as new and +follow_runs+ is +false+.
       # @raise [Error::RPCError] RPC error from call.
-      def result(follow_runs: true, rpc_options: nil)
+      def result(follow_runs: true, result_hint: nil, rpc_options: nil)
         # Wait on the close event, following as needed
         hist_run_id = result_run_id
         loop do
@@ -91,7 +101,7 @@ module Temporalio
             hist_run_id = attrs.new_execution_run_id
             next if follow_runs && hist_run_id && !hist_run_id.empty?
 
-            return @client.data_converter.from_payloads(attrs.result).first
+            return @client.data_converter.from_payloads(attrs.result, hints: Array(@result_hint || result_hint)).first
           when :EVENT_TYPE_WORKFLOW_EXECUTION_FAILED
             attrs = event.workflow_execution_failed_event_attributes
             hist_run_id = attrs.new_execution_run_id
@@ -212,18 +222,22 @@ module Temporalio
       #
       # @param signal [Workflow::Definition::Signal, Symbol, String] Signal definition or name.
       # @param args [Array<Object>] Signal arguments.
+      # @param arg_hints [Array<Object>, nil] Signal argument hints. If unset/nil and a signal definition is passed,
+      #   uses the ones on the signal definition if present.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @raise [Error::RPCError] RPC error from call.
       #
       # @note Handles created as a result of {Client.start_workflow} will signal the latest workflow with the same
       #   workflow ID even if it is unrelated to the started workflow.
-      def signal(signal, *args, rpc_options: nil)
+      def signal(signal, *args, arg_hints: nil, rpc_options: nil)
+        signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
         @client._impl.signal_workflow(Interceptor::SignalWorkflowInput.new(
                                         workflow_id: id,
                                         run_id:,
-                                        signal: Workflow::Definition::Signal._name_from_parameter(signal),
+                                        signal:,
                                         args:,
+                                        arg_hints: arg_hints || defn_arg_hints,
                                         headers: {},
                                         rpc_options:
                                       ))
@@ -235,6 +249,10 @@ module Temporalio
       # @param query [Workflow::Definition::Query, Symbol, String] Query definition or name.
       # @param args [Array<Object>] Query arguments.
       # @param reject_condition [WorkflowQueryRejectCondition, nil] Condition for rejecting the query.
+      # @param arg_hints [Array<Object>, nil] Query argument hints. If unset/nil and a query definition is passed,
+      #   uses the ones on the query definition if present.
+      # @param result_hint [Object, nil] Query result hints. If unset/nil and a query definition is passed, uses the
+      #   one on the query definition if present.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object, nil] Query result.
@@ -249,14 +267,19 @@ module Temporalio
         query,
         *args,
         reject_condition: @client.options.default_workflow_query_reject_condition,
+        arg_hints: nil,
+        result_hint: nil,
         rpc_options: nil
       )
+        query, defn_arg_hints, defn_result_hint = Workflow::Definition::Query._name_and_hints_from_parameter(query)
         @client._impl.query_workflow(Interceptor::QueryWorkflowInput.new(
                                        workflow_id: id,
                                        run_id:,
-                                       query: Workflow::Definition::Query._name_from_parameter(query),
+                                       query:,
                                        args:,
                                        reject_condition:,
+                                       arg_hints: arg_hints || defn_arg_hints,
+                                       result_hint: result_hint || defn_result_hint,
                                        headers: {},
                                        rpc_options:
                                      ))
@@ -270,6 +293,10 @@ module Temporalio
       # @param wait_for_stage [WorkflowUpdateWaitStage] Required stage to wait until returning. ADMITTED is not
       #   currently supported. See https://docs.temporal.io/workflows#update for more details.
       # @param id [String] ID of the update.
+      # @param arg_hints [Array<Object>, nil] Update argument hints. If unset/nil and am update definition is passed,
+      #   uses the ones on the update definition if present.
+      # @param result_hint [Object, nil] Update result hints. If unset/nil and an update definition is passed, uses the
+      #   one on the update definition if present.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [WorkflowUpdateHandle] The update handle.
@@ -285,15 +312,20 @@ module Temporalio
         *args,
         wait_for_stage:,
         id: SecureRandom.uuid,
+        arg_hints: nil,
+        result_hint: nil,
         rpc_options: nil
       )
+        update, defn_arg_hints, defn_result_hint = Workflow::Definition::Update._name_and_hints_from_parameter(update)
         @client._impl.start_workflow_update(Interceptor::StartWorkflowUpdateInput.new(
                                               workflow_id: self.id,
                                               run_id:,
                                               update_id: id,
-                                              update: Workflow::Definition::Update._name_from_parameter(update),
+                                              update:,
                                               args:,
                                               wait_for_stage:,
+                                              arg_hints: arg_hints || defn_arg_hints,
+                                              result_hint: result_hint || defn_result_hint,
                                               headers: {},
                                               rpc_options:
                                             ))
@@ -305,6 +337,10 @@ module Temporalio
       # @param update [Workflow::Definition::Update, Symbol, String] Update definition or name.
       # @param args [Array<Object>] Update arguments.
       # @param id [String] ID of the update.
+      # @param arg_hints [Array<Object>, nil] Update argument hints. If unset/nil and am update definition is passed,
+      #   uses the ones on the update definition if present.
+      # @param result_hint [Object, nil] Update result hints. If unset/nil and an update definition is passed, uses the
+      #   one on the update definition if present.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [Object, nil] Update result.
@@ -316,12 +352,14 @@ module Temporalio
       #
       # @note Handles created as a result of {Client.start_workflow} will send updates the latest workflow with the same
       #   workflow ID even if it is unrelated to the started workflow.
-      def execute_update(update, *args, id: SecureRandom.uuid, rpc_options: nil)
+      def execute_update(update, *args, id: SecureRandom.uuid, arg_hints: nil, result_hint: nil, rpc_options: nil)
         start_update(
           update,
           *args,
           wait_for_stage: WorkflowUpdateWaitStage::COMPLETED,
           id:,
+          arg_hints:,
+          result_hint:,
           rpc_options:
         ).result
       end
@@ -331,15 +369,17 @@ module Temporalio
       # @param id [String] ID of the update.
       # @param specific_run_id [String, nil] Workflow run ID to get update handle for. Default is the {run_id}. Most
       #   users will not need to set this and instead use the one on the class.
+      # @param result_hint [Object, nil] Result hint for the update result to set on the handle.
       #
       # @return [WorkflowUpdateHandle] The update handle.
-      def update_handle(id, specific_run_id: run_id)
+      def update_handle(id, specific_run_id: run_id, result_hint: nil)
         WorkflowUpdateHandle.new(
           client: @client,
           id:,
           workflow_id: self.id,
           workflow_run_id: specific_run_id,
-          known_outcome: nil
+          known_outcome: nil,
+          result_hint:
         )
       end
 

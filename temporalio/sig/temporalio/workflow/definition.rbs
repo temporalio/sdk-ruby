@@ -4,6 +4,8 @@ module Temporalio
       def self.workflow_name: (String | Symbol workflow_name) -> void
       def self.workflow_dynamic: (?bool value) -> void
       def self.workflow_raw_args: (?bool value) -> void
+      def self.workflow_arg_hint: (*Object hints) -> void
+      def self.workflow_result_hint: (Object hint) -> void
       def self.workflow_failure_exception_type: (*singleton(Exception) types) -> void
       def self.workflow_query_attr_reader: (*Symbol attr_names, ?description: String?) -> void
 
@@ -16,14 +18,17 @@ module Temporalio
         ?description: String?,
         ?dynamic: bool,
         ?raw_args: bool,
-        ?unfinished_policy: HandlerUnfinishedPolicy::enum
+        ?unfinished_policy: HandlerUnfinishedPolicy::enum,
+        ?arg_hints: Object | Array[Object] | nil
       ) -> void
 
       def self.workflow_query: (
         ?name: String | Symbol | nil,
         ?description: String?,
         ?dynamic: bool,
-        ?raw_args: bool
+        ?raw_args: bool,
+        ?arg_hints: Object | Array[Object] | nil,
+        ?result_hint: Object?
       ) -> void
 
       def self.workflow_update: (
@@ -31,7 +36,9 @@ module Temporalio
         ?description: String?,
         ?dynamic: bool,
         ?raw_args: bool,
-        ?unfinished_policy: HandlerUnfinishedPolicy::enum
+        ?unfinished_policy: HandlerUnfinishedPolicy::enum,
+        ?arg_hints: Object | Array[Object] | nil,
+        ?result_hint: Object?
       ) -> void
 
       def self.workflow_update_validator: (Symbol update_method) -> void
@@ -43,9 +50,9 @@ module Temporalio
 
       def self._workflow_definition: -> Info
 
-      def self._workflow_type_from_workflow_parameter: (
+      def self._workflow_type_and_hints_from_workflow_parameter: (
         singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow
-      ) -> String
+      ) -> [String, Array[Object]?, Object?]
 
       def self._build_workflow_definition: -> Info
 
@@ -63,6 +70,8 @@ module Temporalio
         attr_reader updates: Hash[String?, Update]
         attr_reader versioning_behavior: Integer?
         attr_reader dynamic_options_method: Symbol?
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
 
         def self.from_class: (singleton(Definition) workflow_class) -> Info
 
@@ -77,7 +86,9 @@ module Temporalio
           ?queries: Hash[String, Query],
           ?updates: Hash[String, Update],
           ?versioning_behavior: Integer?,
-          ?dynamic_options_method: Symbol?
+          ?dynamic_options_method: Symbol?,
+          ?arg_hints: Array[Object]?,
+          ?result_hint: Object?
         ) -> void
 
         def name: -> String?
@@ -89,15 +100,19 @@ module Temporalio
         attr_reader description: String?
         attr_reader raw_args: bool
         attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
+        attr_reader arg_hints: Array[Object]?
 
-        def self._name_from_parameter: (Workflow::Definition::Signal | String | Symbol) -> String
+        def self._name_and_hints_from_parameter: (
+          Workflow::Definition::Signal | String | Symbol signal
+        ) -> [String, Array[Object]?]
 
         def initialize: (
           name: String?,
           to_invoke: Symbol | Proc,
           ?description: String?,
           ?raw_args: bool,
-          ?unfinished_policy: HandlerUnfinishedPolicy::enum
+          ?unfinished_policy: HandlerUnfinishedPolicy::enum,
+          ?arg_hints: Array[Object]?
         ) -> void
       end
 
@@ -106,14 +121,20 @@ module Temporalio
         attr_reader to_invoke: Symbol | Proc
         attr_reader description: String?
         attr_reader raw_args: bool
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
 
-        def self._name_from_parameter: (Workflow::Definition::Query | String | Symbol) -> String
+        def self._name_and_hints_from_parameter: (
+          Workflow::Definition::Query | String | Symbol query
+        ) -> [String, Array[Object]?, Object?]
 
         def initialize: (
           name: String?,
           to_invoke: Symbol | Proc,
           ?description: String?,
-          ?raw_args: bool
+          ?raw_args: bool,
+          ?arg_hints: Array[Object]?,
+          ?result_hint: Object?
         ) -> void
       end
 
@@ -124,8 +145,12 @@ module Temporalio
         attr_reader raw_args: bool
         attr_reader unfinished_policy: HandlerUnfinishedPolicy::enum
         attr_reader validator_to_invoke: Symbol | Proc | nil
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
 
-        def self._name_from_parameter: (Workflow::Definition::Update | String | Symbol) -> String
+        def self._name_and_hints_from_parameter: (
+          Workflow::Definition::Update | String | Symbol update
+        ) -> [String, Array[Object]?, Object?]
 
         def initialize: (
           name: String?,
@@ -133,7 +158,9 @@ module Temporalio
           ?description: String?,
           ?raw_args: bool,
           ?unfinished_policy: HandlerUnfinishedPolicy::enum,
-          ?validator_to_invoke: Symbol | Proc | nil
+          ?validator_to_invoke: Symbol | Proc | nil,
+          ?arg_hints: Array[Object]?,
+          ?result_hint: Object?
         ) -> void
 
         def _with_validator_to_invoke: (Symbol | Proc | nil validator_to_invoke) -> Update

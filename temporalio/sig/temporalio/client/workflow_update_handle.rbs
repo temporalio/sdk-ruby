@@ -4,18 +4,21 @@ module Temporalio
       attr_reader id: String
       attr_reader workflow_id: String
       attr_reader workflow_run_id: String?
+      attr_reader result_hint: Object?
 
       def initialize: (
         client: Client,
         id: String,
         workflow_id: String,
         workflow_run_id: String?,
-        known_outcome: untyped?
+        known_outcome: untyped?,
+        result_hint: Object?
       ) -> void
 
       def result_obtained?: -> bool
 
       def result: (
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> Object?
     end
