@@ -136,10 +136,15 @@ module Temporalio
 
     def list_workflows: (
       ?String query,
+      ?rpc_options: RPCOptions?
+    ) -> Enumerator[WorkflowExecution, WorkflowExecution]
+
+    def list_workflow_page: (
+      ?String query,
       ?next_page_token: String?,
       ?page_size: Integer?,
       ?rpc_options: RPCOptions?
-    ) -> Enumerator[WorkflowExecution, WorkflowExecution]
+    ) -> Interceptor::ListWorkflowPageOutput
 
     def count_workflows: (
       ?String query,

@@ -65,10 +65,25 @@ module Temporalio
       # Input for {Outbound.list_workflows}.
       ListWorkflowsInput = Data.define(
         :query,
+        :rpc_options
+      )
+
+      # Input for {Outbound.list_workflows}.
+      ListWorkflowPageInput = Data.define(
+        :query,
         :next_page_token,
         :page_size,
         :rpc_options
       )
+
+      # Output for {Outbound.list_workflow_page}.
+      ListWorkflowPageOutput = Data.define(:executions, :next_page_token) do
+        include Enumerable
+
+        def each(...) # rubocop:disable Style/DocumentationMethod
+          executions.each(...)
+        end
+      end
 
       # Input for {Outbound.count_workflows}.
       CountWorkflowsInput = Data.define(
@@ -289,6 +304,14 @@ module Temporalio
         # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
         def list_workflows(input)
           next_interceptor.list_workflows(input)
+        end
+
+        # Called for every {Client.list_workflow_page} call.
+        #
+        # @param input [ListWorkflowPageInput] Input.
+        # @return [Interceptor::ListWorkflowPageOutput] Enumerable workflow executions, with a #next_page_token method.
+        def list_workflow_page(input)
+          next_interceptor.list_workflow_page(input)
         end
 
         # Called for every {Client.count_workflows} call.

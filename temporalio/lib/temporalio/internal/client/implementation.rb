@@ -26,8 +26,6 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
-        require_relative 'implementation/list_workflow_page'
-
         def self.with_default_rpc_options(user_rpc_options)
           # If the user did not provide an override_retry, we need to make sure
           # we use an option set that has it as "true"
@@ -329,16 +327,41 @@ module Temporalio
         end
 
         def list_workflows(input)
-          page = ListWorkflowPage.new(@client, input: input)
-          return page unless input.page_size.nil?
-
-          # If page_size is nil, automatically fetch all pages:
+          next_page_token = nil
+          list_workflow_page_input = Temporalio::Client::Interceptor::ListWorkflowPageInput.new(
+            query: input.query,
+            rpc_options: input.rpc_options,
+            next_page_token: next_page_token,
+            page_size: nil
+          )
           Enumerator.new do |yielder|
-            until page.nil?
+            loop do
+              page = @client._impl.list_workflow_page(list_workflow_page_input.with(next_page_token: next_page_token))
               page.each { |execution| yielder << execution }
-              page = page.next_page
+              next_page_token = page.next_page_token
+              break if next_page_token.empty?
             end
           end
+        end
+
+        def list_workflow_page(input)
+          req = Api::WorkflowService::V1::ListWorkflowExecutionsRequest.new(
+            namespace: @client.namespace,
+            query: input.query || '',
+            next_page_token: input.next_page_token,
+            page_size: input.page_size
+          )
+          resp = @client.workflow_service.list_workflow_executions(
+            req,
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          executions = resp.executions.map do |raw_info|
+            Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
+          end
+          Temporalio::Client::Interceptor::ListWorkflowPageOutput.new(
+            executions: executions,
+            next_page_token: resp.next_page_token
+          )
         end
 
         def count_workflows(input)

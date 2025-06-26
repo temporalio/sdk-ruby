@@ -478,8 +478,6 @@ module Temporalio
     # List workflows.
     #
     # @param query [String, nil] A Temporal visibility list filter.
-    # @param next_page_token [String, nil] Token for the next page of results. If not set, the first page is returned.
-    # @param page_size [Integer, nil] Maximum number of results to return. If not set, all results are returned.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
@@ -487,8 +485,27 @@ module Temporalio
     # @raise [Error::RPCError] RPC error from call.
     #
     # @see https://docs.temporal.io/visibility
-    def list_workflows(query = nil, next_page_token: nil, page_size: nil, rpc_options: nil)
-      @impl.list_workflows(Interceptor::ListWorkflowsInput.new(query:, next_page_token:, page_size:, rpc_options:))
+    def list_workflows(query = nil, rpc_options: nil)
+      @impl.list_workflows(Interceptor::ListWorkflowsInput.new(query:, rpc_options:))
+    end
+
+    # List workflows one page at a time.
+    #
+    # @param query [String, nil] A Temporal visibility list filter.
+    # @param next_page_token [String, nil] Token for the next page of results. If not set, the first page is returned.
+    # @param page_size [Integer, nil] Maximum number of results to return.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Interceptor::ListWorkflowPageOutput] Enumerable workflow executions, with a #next_page_token method.
+    #
+    # @raise [Error::RPCError] RPC error from call.
+    #
+    # @see https://docs.temporal.io/visibility
+    def list_workflow_page(query = nil, next_page_token: nil, page_size: nil, rpc_options: nil)
+      @impl.list_workflow_page(Interceptor::ListWorkflowPageInput.new(query:,
+                                                                      next_page_token:,
+                                                                      page_size:,
+                                                                      rpc_options:))
     end
 
     # Count workflows.
