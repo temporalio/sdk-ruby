@@ -23,7 +23,7 @@ module Temporalio
           metric_meter: Temporalio::Metric::Meter,
           workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
           disable_eager_activity_execution: bool,
-          illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+          illegal_workflow_calls: Hash[String, :all | Array[Symbol | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator],
           workflow_failure_exception_types: Array[singleton(Exception)],
           workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
           unsafe_workflow_io_enabled: bool,
@@ -58,7 +58,7 @@ module Temporalio
           attr_reader metric_meter: Temporalio::Metric::Meter
           attr_reader data_converter: Converters::DataConverter
           attr_reader deadlock_timeout: Float?
-          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, bool]]
+          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator]
           attr_reader namespace: String
           attr_reader task_queue: String
           attr_reader disable_eager_activity_execution: bool
@@ -76,7 +76,7 @@ module Temporalio
             metric_meter: Temporalio::Metric::Meter,
             data_converter: Converters::DataConverter,
             deadlock_timeout: Float?,
-            illegal_calls: Hash[String, :all | Hash[Symbol, bool]],
+            illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator],
             namespace: String,
             task_queue: String,
             disable_eager_activity_execution: bool,
