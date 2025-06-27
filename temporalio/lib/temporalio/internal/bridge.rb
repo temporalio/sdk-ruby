@@ -25,7 +25,7 @@ module Temporalio
               'see https://github.com/temporalio/sdk-ruby/issues/162'
       end
 
-      def self.fibers_supported
+      def self.fibers_supported # rubocop:disable Naming/PredicateMethod
         # We do not allow fibers on < 3.3 due to a bug we still need to dig
         # into: https://github.com/temporalio/sdk-ruby/issues/162
         major, minor = RUBY_VERSION.split('.').take(2).map(&:to_i)

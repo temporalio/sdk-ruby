@@ -9,7 +9,7 @@ require 'temporalio/workflow'
 require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
+class WorkerWorkflowTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -45,8 +45,14 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
         Thread.new { 'wut' }.join
       when :time_new
         Time.new
+      when :time_new_parse
+        Time.new('2000-12-31 23:59:59.5')
+      when :time_new_explicit
+        Time.new(2000, 1, 2, 3, 4, 5)
       when :time_now
         Time.now
+      when :time_iso8601
+        Time.iso8601('2011-10-05T22:26:12-04:00')
       else
         raise NotImplementedError
       end
@@ -75,7 +81,10 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     exec.call(:random_new, 'Random::Base initialize')
     exec.call(:thread_new, 'Thread new')
     exec.call(:time_new, 'Time initialize')
+    exec.call(:time_new_parse, nil) # This call is ok
+    exec.call(:time_new_explicit, nil) # This call is ok
     exec.call(:time_now, 'Time now')
+    exec.call(:time_iso8601, nil) # This call is ok
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition

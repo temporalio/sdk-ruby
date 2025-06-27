@@ -24,7 +24,7 @@ module Temporalio
       attr_reader max_task_queue_activities_per_second: Float?
       attr_reader graceful_shutdown_period: Float
       attr_reader disable_eager_activity_execution: bool
-      attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol]]
+      attr_reader illegal_workflow_calls: Hash[String, :all | Array[Symbol | IllegalWorkflowCallValidator] | IllegalWorkflowCallValidator]
       attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
       attr_reader workflow_payload_codec_thread_pool: ThreadPool?
       attr_reader unsafe_workflow_io_enabled: bool
@@ -55,7 +55,7 @@ module Temporalio
         max_task_queue_activities_per_second: Float?,
         graceful_shutdown_period: Float,
         disable_eager_activity_execution: bool,
-        illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+        illegal_workflow_calls: Hash[String, :all | Array[Symbol | IllegalWorkflowCallValidator] | IllegalWorkflowCallValidator],
         workflow_failure_exception_types: Array[singleton(Exception)],
         workflow_payload_codec_thread_pool: ThreadPool?,
         unsafe_workflow_io_enabled: bool,
@@ -80,7 +80,7 @@ module Temporalio
       ?wait_block_complete: bool
     ) ?{ -> T } -> T
 
-    def self.default_illegal_workflow_calls: -> Hash[String, :all | Array[Symbol]]
+    def self.default_illegal_workflow_calls: -> Hash[String, :all | Array[Symbol | IllegalWorkflowCallValidator] | IllegalWorkflowCallValidator]
 
     attr_reader options: Options
 
@@ -107,7 +107,7 @@ module Temporalio
       ?max_task_queue_activities_per_second: Float?,
       ?graceful_shutdown_period: Float,
       ?disable_eager_activity_execution: bool,
-      ?illegal_workflow_calls: Hash[String, :all | Array[Symbol]],
+      ?illegal_workflow_calls: Hash[String, :all | Array[Symbol | IllegalWorkflowCallValidator] | IllegalWorkflowCallValidator],
       ?workflow_failure_exception_types: Array[singleton(Exception)],
       ?workflow_payload_codec_thread_pool: ThreadPool?,
       ?unsafe_workflow_io_enabled: bool,
