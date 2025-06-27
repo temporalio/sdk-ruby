@@ -85,18 +85,18 @@ module Temporalio
         ) -> void
       end
 
-      class ListWorkflowPageInput
+      class ListWorkflowPageInput < Data
         attr_reader query: String?
         attr_reader next_page_token: String?
         attr_reader page_size: Integer?
         attr_reader rpc_options: RPCOptions?
 
-        def initialize: (
+        def self.new: (
           query: String?,
           next_page_token: String?,
           page_size: Integer?,
           rpc_options: RPCOptions?
-        ) -> void
+        ) -> instance
       end
 
       class CountWorkflowsInput

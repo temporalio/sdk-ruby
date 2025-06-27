@@ -508,7 +508,7 @@ module Temporalio
           page = @impl.list_workflow_page(list_workflow_page_input.with(next_page_token: next_page_token))
           page.executions.each { |execution| yielder << execution }
           next_page_token = page.next_page_token
-          break if next_page_token.empty?
+          break if (next_page_token || '').empty?
         end
       end
     end
