@@ -326,24 +326,6 @@ module Temporalio
           )
         end
 
-        def list_workflows(input)
-          next_page_token = nil
-          list_workflow_page_input = Temporalio::Client::Interceptor::ListWorkflowPageInput.new(
-            query: input.query,
-            rpc_options: input.rpc_options,
-            next_page_token: next_page_token,
-            page_size: nil
-          )
-          Enumerator.new do |yielder|
-            loop do
-              page = @client._impl.list_workflow_page(list_workflow_page_input.with(next_page_token: next_page_token))
-              page.each { |execution| yielder << execution }
-              next_page_token = page.next_page_token
-              break if next_page_token.empty?
-            end
-          end
-        end
-
         def list_workflow_page(input)
           req = Api::WorkflowService::V1::ListWorkflowExecutionsRequest.new(
             namespace: @client.namespace,
@@ -358,7 +340,7 @@ module Temporalio
           executions = resp.executions.map do |raw_info|
             Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
           end
-          Temporalio::Client::Interceptor::ListWorkflowPageOutput.new(
+          Temporalio::Client::ListWorkflowPage.new(
             executions: executions,
             next_page_token: resp.next_page_token
           )

@@ -85,16 +85,6 @@ module Temporalio
         ) -> void
       end
 
-      class ListWorkflowsInput
-        attr_reader query: String?
-        attr_reader rpc_options: RPCOptions?
-
-        def initialize: (
-          query: String?,
-          rpc_options: RPCOptions?
-        ) -> void
-      end
-
       class ListWorkflowPageInput
         attr_reader query: String?
         attr_reader next_page_token: String?
@@ -106,18 +96,6 @@ module Temporalio
           next_page_token: String?,
           page_size: Integer?,
           rpc_options: RPCOptions?
-        ) -> void
-      end
-
-      class ListWorkflowPageOutput
-        include Enumerable[WorkflowExecution, WorkflowExecution]
-
-        attr_reader executions: Array[WorkflowExecution]
-        attr_reader next_page_token: String?
-
-        def initialize: (
-          executions: Array[WorkflowExecution],
-          next_page_token: String?
         ) -> void
       end
 
@@ -438,7 +416,7 @@ module Temporalio
 
         def signal_with_start_workflow: (SignalWithStartWorkflowInput input) -> WorkflowHandle
 
-        def list_workflows: (ListWorkflowsInput input) -> Enumerator[WorkflowExecution, WorkflowExecution]
+        def list_workflow_page: (ListWorkflowPageInput input) -> Client::ListWorkflowPage
 
         def count_workflows: (CountWorkflowsInput input) -> WorkflowExecutionCount
 

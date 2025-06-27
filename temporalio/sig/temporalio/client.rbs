@@ -22,6 +22,16 @@ module Temporalio
       def with: (**untyped) -> Options
     end
 
+    class ListWorkflowPage
+      attr_reader executions: Array[WorkflowExecution]
+      attr_reader next_page_token: String?
+
+      def initialize: (
+        executions: Array[WorkflowExecution],
+        next_page_token: String?
+      ) -> void
+    end
+
     def self.connect: (
       String target_host,
       String namespace,
@@ -144,7 +154,7 @@ module Temporalio
       ?next_page_token: String?,
       ?page_size: Integer?,
       ?rpc_options: RPCOptions?
-    ) -> Interceptor::ListWorkflowPageOutput
+    ) -> ListWorkflowPage
 
     def count_workflows: (
       ?String query,

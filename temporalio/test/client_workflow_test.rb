@@ -263,14 +263,14 @@ class ClientWorkflowTest < Test
       # Paginated list workflows query
       assert_eventually do
         wfs = env.client.list_workflow_page("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'", page_size: 2)
-        assert_equal 2, wfs.count
-        all_wfs = wfs.to_a
+        assert_equal 2, wfs.executions.size
+        all_wfs = wfs.executions
         # Check next page
         next_page = wfs.next_page_token
         wfs = env.client.list_workflow_page("`#{ATTR_KEY_TEXT.name}` = '#{text_val}'",
-                                            next_page_token: next_page).to_a
-        assert_equal 3, wfs.count
-        all_wfs += wfs.to_a
+                                            next_page_token: next_page)
+        assert_equal 3, wfs.executions.size
+        all_wfs += wfs.executions
         # Check all IDs are present
         assert_equal handles.map(&:id).sort, all_wfs.map(&:id).sort
       end

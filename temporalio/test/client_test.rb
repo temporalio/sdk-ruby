@@ -50,11 +50,6 @@ class ClientTest < Test
         super
       end
 
-      def list_workflows(input)
-        @root.calls.push(['list_workflows', input])
-        super
-      end
-
       def list_workflow_page(input)
         @root.calls.push(['list_workflow_page', input])
         super
@@ -146,7 +141,7 @@ class ClientTest < Test
       track.calls.clear
       assert_empty client.list_workflows("WorkflowType = 'test-interceptor-does-not-exist'").to_a
       assert_equal 0, client.count_workflows("WorkflowType = 'test-interceptor-does-not-exist'").count
-      assert_equal(%w[list_workflows list_workflow_page count_workflows], track.calls.map(&:first))
+      assert_equal(%w[list_workflow_page count_workflows], track.calls.map(&:first))
     end
   end
 end
