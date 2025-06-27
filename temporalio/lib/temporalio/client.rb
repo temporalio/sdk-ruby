@@ -497,15 +497,15 @@ module Temporalio
     # @see https://docs.temporal.io/visibility
     def list_workflows(query = nil, rpc_options: nil)
       next_page_token = nil
-      list_workflow_page_input = Interceptor::ListWorkflowPageInput.new(
-        query: query,
-        rpc_options: rpc_options,
-        next_page_token: next_page_token,
-        page_size: nil
-      )
       Enumerator.new do |yielder|
         loop do
-          page = @impl.list_workflow_page(list_workflow_page_input.with(next_page_token: next_page_token))
+          list_workflow_page_input = Interceptor::ListWorkflowPageInput.new(
+            query: query,
+            rpc_options: rpc_options,
+            next_page_token: next_page_token,
+            page_size: nil
+          )
+          page = @impl.list_workflow_page(list_workflow_page_input)
           page.executions.each { |execution| yielder << execution }
           next_page_token = page.next_page_token
           break if (next_page_token || '').empty?
