@@ -131,7 +131,7 @@ impl Worker {
                         match temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
                             Err(PollError::ShutDown) => Ok(None),
-                            Err(err) => Err(format!("Poll error: {}", err)),
+                            Err(err) => Err(format!("Poll error: {err}")),
                         }
                     }
                     WorkerType::Workflow => {
@@ -140,7 +140,7 @@ impl Worker {
                         {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
                             Err(PollError::ShutDown) => Ok(None),
-                            Err(err) => Err(format!("Poll error: {}", err)),
+                            Err(err) => Err(format!("Poll error: {err}")),
                         }
                     }
                 };
