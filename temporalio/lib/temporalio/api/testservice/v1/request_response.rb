@@ -10,7 +10,7 @@ require 'google/protobuf/timestamp_pb'
 
 descriptor_data = "\n2temporal/api/testservice/v1/request_response.proto\x12\x1btemporal.api.testservice.v1\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x19\n\x17LockTimeSkippingRequest\"\x1a\n\x18LockTimeSkippingResponse\"\x1b\n\x19UnlockTimeSkippingRequest\"\x1c\n\x1aUnlockTimeSkippingResponse\"B\n\x11SleepUntilRequest\x12-\n\ttimestamp\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\";\n\x0cSleepRequest\x12+\n\x08\x64uration\x18\x01 \x01(\x0b\x32\x19.google.protobuf.Duration\"\x0f\n\rSleepResponse\"B\n\x16GetCurrentTimeResponse\x12(\n\x04time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\xaa\x01\n\x1eio.temporal.api.testservice.v1B\x14RequestResponseProtoP\x01Z-go.temporal.io/api/testservice/v1;testservice\xaa\x02\x1dTemporalio.Api.TestService.V1\xea\x02 Temporalio::Api::TestService::V1b\x06proto3"
 
-pool = Google::Protobuf::DescriptorPool.generated_pool
+pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
 
 module Temporalio
