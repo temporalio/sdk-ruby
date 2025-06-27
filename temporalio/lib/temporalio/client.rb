@@ -525,7 +525,7 @@ module Temporalio
     # @raise [Error::RPCError] RPC error from call.
     #
     # @see https://docs.temporal.io/visibility
-    def list_workflow_page(query = nil, next_page_token: nil, page_size: nil, rpc_options: nil)
+    def list_workflow_page(query = nil, page_size: nil, next_page_token: nil, rpc_options: nil)
       @impl.list_workflow_page(Interceptor::ListWorkflowPageInput.new(query:,
                                                                       next_page_token:,
                                                                       page_size:,
