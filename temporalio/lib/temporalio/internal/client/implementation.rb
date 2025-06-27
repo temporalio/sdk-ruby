@@ -326,25 +326,24 @@ module Temporalio
           )
         end
 
-        def list_workflows(input)
-          Enumerator.new do |yielder|
-            req = Api::WorkflowService::V1::ListWorkflowExecutionsRequest.new(
-              namespace: @client.namespace,
-              query: input.query || ''
-            )
-            loop do
-              resp = @client.workflow_service.list_workflow_executions(
-                req,
-                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
-              )
-              resp.executions.each do |raw_info|
-                yielder << Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
-              end
-              break if resp.next_page_token.empty?
-
-              req.next_page_token = resp.next_page_token
-            end
+        def list_workflow_page(input)
+          req = Api::WorkflowService::V1::ListWorkflowExecutionsRequest.new(
+            namespace: @client.namespace,
+            query: input.query || '',
+            next_page_token: input.next_page_token,
+            page_size: input.page_size
+          )
+          resp = @client.workflow_service.list_workflow_executions(
+            req,
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          executions = resp.executions.map do |raw_info|
+            Temporalio::Client::WorkflowExecution.new(raw_info, @client.data_converter)
           end
+          Temporalio::Client::ListWorkflowPage.new(
+            executions: executions,
+            next_page_token: resp.next_page_token
+          )
         end
 
         def count_workflows(input)

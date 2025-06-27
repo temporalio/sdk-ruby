@@ -50,6 +50,16 @@ module Temporalio
     # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
     class Options; end # rubocop:disable Lint/EmptyClass
 
+    ListWorkflowPage = Data.define(:executions, :next_page_token)
+
+    # A page of workflow executions returned by {Client#list_workflow_page}.
+    #
+    # @!attribute executions
+    #   @return [Array<WorkflowExecution>] List of workflow executions in this page.
+    # @!attribute next_page_token
+    #   @return [String, nil] Token for the next page of results. nil if there are no more results.
+    class ListWorkflowPage; end # rubocop:disable Lint/EmptyClass
+
     # Connect to Temporal server. This is a shortcut for +Connection.new+ followed by +Client.new+.
     #
     # @param target_host [String] +host:port+ for the Temporal server. For local development, this is often
@@ -486,7 +496,40 @@ module Temporalio
     #
     # @see https://docs.temporal.io/visibility
     def list_workflows(query = nil, rpc_options: nil)
-      @impl.list_workflows(Interceptor::ListWorkflowsInput.new(query:, rpc_options:))
+      next_page_token = nil
+      Enumerator.new do |yielder|
+        loop do
+          list_workflow_page_input = Interceptor::ListWorkflowPageInput.new(
+            query: query,
+            rpc_options: rpc_options,
+            next_page_token: next_page_token,
+            page_size: nil
+          )
+          page = @impl.list_workflow_page(list_workflow_page_input)
+          page.executions.each { |execution| yielder << execution }
+          next_page_token = page.next_page_token
+          break if (next_page_token || '').empty?
+        end
+      end
+    end
+
+    # List workflows one page at a time.
+    #
+    # @param query [String, nil] A Temporal visibility list filter.
+    # @param page_size [Integer, nil] Maximum number of results to return.
+    # @param next_page_token [String, nil] Token for the next page of results. If not set, the first page is returned.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [ListWorkflowPage] Page of workflow executions, along with a next_page_token to keep fetching.
+    #
+    # @raise [Error::RPCError] RPC error from call.
+    #
+    # @see https://docs.temporal.io/visibility
+    def list_workflow_page(query = nil, page_size: nil, next_page_token: nil, rpc_options: nil)
+      @impl.list_workflow_page(Interceptor::ListWorkflowPageInput.new(query:,
+                                                                      next_page_token:,
+                                                                      page_size:,
+                                                                      rpc_options:))
     end
 
     # Count workflows.
