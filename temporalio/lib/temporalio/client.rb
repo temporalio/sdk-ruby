@@ -492,8 +492,8 @@ module Temporalio
     # List workflows one page at a time.
     #
     # @param query [String, nil] A Temporal visibility list filter.
-    # @param next_page_token [String, nil] Token for the next page of results. If not set, the first page is returned.
     # @param page_size [Integer, nil] Maximum number of results to return.
+    # @param next_page_token [String, nil] Token for the next page of results. If not set, the first page is returned.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Interceptor::ListWorkflowPageOutput] Enumerable workflow executions, with a #next_page_token method.
