@@ -32,7 +32,7 @@ module Temporalio
             # When the xmlschema (aliased as iso8601) call is made, zone_offset is called which has a default parameter
             # of Time.now.year. We want to prevent failing in that specific case. It is expensive to access the caller
             # stack, but this is only done in the rare case they are calling this safely.
-            next if caller_locations&.any? { |loc| loc.label == 'Time.zone_offset' }
+            next if caller_locations&.any? { |loc| loc.label == 'zone_offset' || loc.label == 'Time.zone_offset' }
 
             raise 'Invalid Time.now call'
           end
