@@ -417,12 +417,12 @@ class WorkerWorkflowTest < Test
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_stdlib) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_workflow) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do
       execute_workflow(TimerWorkflow, :timeout_custom_info)
@@ -707,15 +707,15 @@ class WorkerWorkflowTest < Test
       execute_workflow(TaskFailureWorkflow, 1, workflow_failure_exception_types: [TaskFailureError1])
     end
     assert_equal 'one', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError1', err.cause.type
+    assert_equal 'TaskFailureError1', err.cause.type
 
     # Fails workflow when configured on workflow, including inherited
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 2) }
     assert_equal 'two', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError2', err.cause.type
+    assert_equal 'TaskFailureError2', err.cause.type
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 4) }
     assert_equal 'four', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError4', err.cause.type
+    assert_equal 'TaskFailureError4', err.cause.type
 
     # Also supports stdlib errors
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do

@@ -7,12 +7,14 @@ require 'test'
 
 module Converters
   class FailureConverterTest < Test
+    class CustomError < StandardError; end
+
     def test_failure_with_causes
       # Make multiple nested errors
       orig_err = assert_raises do
         begin
           begin
-            raise 'Unset error class'
+            raise CustomError, 'Custom error class'
           rescue StandardError
             raise Temporalio::Error::ApplicationError, 'Application error no details'
           end
@@ -45,8 +47,8 @@ module Converters
       assert_instance_of Temporalio::Error::ApplicationError, orig_err.cause.cause
       assert_equal 'Application error no details', orig_err.cause.cause.message
       assert_empty orig_err.cause.cause.details
-      assert_instance_of RuntimeError, orig_err.cause.cause.cause
-      assert_equal 'Unset error class', orig_err.cause.cause.cause.message
+      assert_instance_of CustomError, orig_err.cause.cause.cause
+      assert_equal 'Custom error class', orig_err.cause.cause.cause.message
 
       # Confirm serialized as expected
       failure = Temporalio::Converters::DataConverter.default.to_failure(orig_err)
@@ -63,8 +65,8 @@ module Converters
       refute_nil failure.cause.application_failure_info.details
       assert_equal 'Application error no details', failure.cause.cause.message
       assert_empty failure.cause.cause.application_failure_info.details.payloads
-      assert_equal 'Unset error class', failure.cause.cause.cause.message
-      assert_equal 'RuntimeError', failure.cause.cause.cause.application_failure_info.type
+      assert_equal 'Custom error class', failure.cause.cause.cause.message
+      assert_equal 'CustomError', failure.cause.cause.cause.application_failure_info.type
 
       # Confirm deserialized as expected
       new_err = Temporalio::Converters::DataConverter.default.from_failure(failure) #: untyped
@@ -83,8 +85,8 @@ module Converters
       assert_empty new_err.cause.cause.details
       assert_instance_of Temporalio::Error::ApplicationError, new_err.cause.cause.cause
       assert_equal orig_err.cause.cause.cause.backtrace, new_err.cause.cause.cause.backtrace
-      assert_equal 'Unset error class', new_err.cause.cause.cause.message
-      assert_equal 'RuntimeError', new_err.cause.cause.cause.type
+      assert_equal 'Custom error class', new_err.cause.cause.cause.message
+      assert_equal 'CustomError', new_err.cause.cause.cause.type
     end
 
     # TODO(cretz): Test with encoded
