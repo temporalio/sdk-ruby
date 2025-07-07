@@ -7,7 +7,7 @@ require 'google/protobuf'
 
 descriptor_data = "\n!temporal/api/enums/v1/nexus.proto\x12\x15temporal.api.enums.v1*\xbc\x01\n\x1eNexusHandlerErrorRetryBehavior\x12\x32\n.NEXUS_HANDLER_ERROR_RETRY_BEHAVIOR_UNSPECIFIED\x10\x00\x12\x30\n,NEXUS_HANDLER_ERROR_RETRY_BEHAVIOR_RETRYABLE\x10\x01\x12\x34\n0NEXUS_HANDLER_ERROR_RETRY_BEHAVIOR_NON_RETRYABLE\x10\x02\x42\x82\x01\n\x18io.temporal.api.enums.v1B\nNexusProtoP\x01Z!go.temporal.io/api/enums/v1;enums\xaa\x02\x17Temporalio.Api.Enums.V1\xea\x02\x1aTemporalio::Api::Enums::V1b\x06proto3"
 
-pool = Google::Protobuf::DescriptorPool.generated_pool
+pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
 
 module Temporalio

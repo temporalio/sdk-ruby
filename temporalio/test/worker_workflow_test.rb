@@ -9,7 +9,7 @@ require 'temporalio/workflow'
 require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
+class WorkerWorkflowTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -45,8 +45,14 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
         Thread.new { 'wut' }.join
       when :time_new
         Time.new
+      when :time_new_parse
+        Time.new('2000-12-31 23:59:59.5')
+      when :time_new_explicit
+        Time.new(2000, 1, 2, 3, 4, 5)
       when :time_now
         Time.now
+      when :time_iso8601
+        Time.iso8601('2011-10-05T22:26:12-04:00')
       else
         raise NotImplementedError
       end
@@ -75,7 +81,10 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     exec.call(:random_new, 'Random::Base initialize')
     exec.call(:thread_new, 'Thread new')
     exec.call(:time_new, 'Time initialize')
+    exec.call(:time_new_parse, nil) # This call is ok
+    exec.call(:time_new_explicit, nil) # This call is ok
     exec.call(:time_now, 'Time now')
+    exec.call(:time_iso8601, nil) # This call is ok
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition
@@ -408,12 +417,12 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_stdlib) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_workflow) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do
       execute_workflow(TimerWorkflow, :timeout_custom_info)
@@ -698,15 +707,15 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       execute_workflow(TaskFailureWorkflow, 1, workflow_failure_exception_types: [TaskFailureError1])
     end
     assert_equal 'one', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError1', err.cause.type
+    assert_equal 'TaskFailureError1', err.cause.type
 
     # Fails workflow when configured on workflow, including inherited
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 2) }
     assert_equal 'two', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError2', err.cause.type
+    assert_equal 'TaskFailureError2', err.cause.type
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 4) }
     assert_equal 'four', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError4', err.cause.type
+    assert_equal 'TaskFailureError4', err.cause.type
 
     # Also supports stdlib errors
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do

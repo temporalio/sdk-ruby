@@ -13,7 +13,7 @@ module Temporalio
           attr_reader failure_converter: Converters::FailureConverter
           attr_reader interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
           attr_reader disable_eager_activity_execution: bool
-          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, bool]]
+          attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator]
           attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
           attr_reader unsafe_workflow_io_enabled: bool
           attr_reader assert_valid_local_activity: ^(String) -> void
@@ -29,7 +29,7 @@ module Temporalio
             failure_converter: Converters::FailureConverter,
             interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
             disable_eager_activity_execution: bool,
-            illegal_calls: Hash[String, :all | Hash[Symbol, bool]],
+            illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator],
             workflow_failure_exception_types: Array[singleton(Exception)],
             unsafe_workflow_io_enabled: bool,
             assert_valid_local_activity: ^(String) -> void

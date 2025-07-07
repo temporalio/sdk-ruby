@@ -13,6 +13,7 @@ require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/activity_executor'
 require 'temporalio/worker/deployment_options'
+require 'temporalio/worker/illegal_workflow_call_validator'
 require 'temporalio/worker/interceptor'
 require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
@@ -243,8 +244,9 @@ module Temporalio
       end
     end
 
-    # @return [Hash<String, [:all, Array<Symbol>]>] Default, immutable set illegal calls used for the
-    #   `illegal_workflow_calls` worker option. See the documentation of that option for more details.
+    # @return [Hash<String, [:all, Array<Symbol, IllegalWorkflowCallValidator>, IllegalWorkflowCallValidator]>] Default,
+    #   immutable set illegal calls used for the `illegal_workflow_calls` worker option. See the documentation of that
+    #   option for more details.
     def self.default_illegal_workflow_calls
       @default_illegal_workflow_calls ||= begin
         hash = {
@@ -283,7 +285,7 @@ module Temporalio
           'Thread' => %i[abort_on_exception= exit fork handle_interrupt ignore_deadlock= kill new pass
                          pending_interrupt? report_on_exception= start stop initialize join name= priority= raise run
                          terminate thread_variable_set wakeup],
-          'Time' => %i[initialize now]
+          'Time' => IllegalWorkflowCallValidator.default_time_validators
         } #: Hash[String, :all | Array[Symbol]]
         hash.each_value(&:freeze)
         hash.freeze
@@ -340,11 +342,14 @@ module Temporalio
     #   workflow if they can run there. This should be set to true for `max_task_queue_activities_per_second` to work
     #   and in a future version of this API may be implied as such (i.e. this setting will be ignored if that setting is
     #   set).
-    # @param illegal_workflow_calls [Hash<String, [:all, Array<Symbol>]>] Set of illegal workflow calls that are
-    #   considered unsafe/non-deterministic and will raise if seen. The key of the hash is the fully qualified string
-    #   class name (no leading `::`). The value is either `:all` which means any use of the class, or an array of
-    #   symbols for methods on the class that cannot be used. The methods refer to either instance or class methods,
-    #   there is no way to differentiate at this time.
+    # @param illegal_workflow_calls [Hash<String,
+    #   [:all, Array<Symbol, IllegalWorkflowCallValidator>, IllegalWorkflowCallValidator]>] Set of illegal workflow
+    #   calls that are considered unsafe/non-deterministic and will raise if seen. The key of the hash is the fully
+    #   qualified string class name (no leading `::`). The value can be `:all` which means any use of the class is
+    #   illegal. The value can be an array of symbols/validators for methods on the class that cannot be used. The
+    #   methods refer to either instance or class methods, there is no way to differentiate at this time. Symbol method
+    #   names are the normal way to say the method cannot be used, validators are only for advanced situations. Finally,
+    #   for advanced situations, the hash value can be a class-level validator that is not tied to a specific method.
     # @param workflow_failure_exception_types [Array<Class<Exception>>] Workflow failure exception types. This is the
     #   set of exception types that, if a workflow-thrown exception extends, will cause the workflow/update to fail
     #   instead of suspending the workflow via task failure. These are applied in addition to the
