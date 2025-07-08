@@ -3,13 +3,15 @@ module Temporalio
     class ChildWorkflowHandle
       def id: -> String
       def first_execution_run_id: -> String
+      def result_hint: -> Object?
 
-      def result: -> Object?
+      def result: (?result_hint: Object?) -> Object?
 
       def signal: (
         Workflow::Definition::Signal | Symbol | String signal,
         *Object? args,
-        ?cancellation: Cancellation
+        ?cancellation: Cancellation,
+        ?arg_hints: Array[Object]?
       ) -> void
     end
   end

@@ -28,7 +28,9 @@ module Temporalio
       # @param signal [Workflow::Definition::Signal, Symbol, String] Signal definition or name.
       # @param args [Array<Object>] Signal args.
       # @param cancellation [Cancellation] Cancellation for canceling the signalling.
-      def signal(signal, *args, cancellation: Workflow.cancellation)
+      # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+      #   signal definition has arg hints, those are used by default.
+      def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil)
         raise NotImplementedError
       end
 

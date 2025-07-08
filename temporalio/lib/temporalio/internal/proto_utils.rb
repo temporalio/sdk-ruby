@@ -94,16 +94,16 @@ module Temporalio
         enum_val
       end
 
-      def self.convert_from_payload_array(converter, payloads)
+      def self.convert_from_payload_array(converter, payloads, hints:)
         return [] if payloads.empty?
 
-        converter.from_payloads(Api::Common::V1::Payloads.new(payloads:))
+        converter.from_payloads(Api::Common::V1::Payloads.new(payloads:), hints:)
       end
 
-      def self.convert_to_payload_array(converter, values)
+      def self.convert_to_payload_array(converter, values, hints:)
         return [] if values.empty?
 
-        converter.to_payloads(values).payloads.to_ary
+        converter.to_payloads(values, hints:).payloads.to_ary
       end
 
       def self.assert_non_reserved_name(name)

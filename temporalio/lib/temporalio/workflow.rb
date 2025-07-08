@@ -132,6 +132,10 @@ module Temporalio
     #   run there. If `false` (the default), eager execution may still be disabled at the worker level or may not be
     #   requested due to lack of available slots.
     # @param priority [Priority] Priority of the activity. This is currently experimental.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+    #   activity definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
+    #   definition has result hint, it is used by default.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -151,13 +155,15 @@ module Temporalio
       cancellation_type: ActivityCancellationType::TRY_CANCEL,
       activity_id: nil,
       disable_eager_execution: false,
-      priority: Priority.default
+      priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil
     )
       _current.execute_activity(
         activity, *args,
         task_queue:, summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:,
-        priority:
+        priority:, arg_hints:, result_hint:
       )
     end
 
@@ -180,13 +186,15 @@ module Temporalio
       cron_schedule: nil,
       memo: nil,
       search_attributes: nil,
-      priority: Priority.default
+      priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil
     )
       start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
       ).result
     end
 
@@ -217,6 +225,10 @@ module Temporalio
     #   workflow.
     # @param activity_id [String, nil] Optional unique identifier for the activity. This is an advanced setting that
     #   should not be set unless users are sure they need to. Contact Temporal before setting this value.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+    #   activity definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
+    #   definition has result hint, it is used by default.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -232,12 +244,15 @@ module Temporalio
       local_retry_threshold: nil,
       cancellation: Workflow.cancellation,
       cancellation_type: ActivityCancellationType::TRY_CANCEL,
-      activity_id: nil
+      activity_id: nil,
+      arg_hints: nil,
+      result_hint: nil
     )
       _current.execute_local_activity(
         activity, *args,
         schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
-        retry_policy:, local_retry_threshold:, cancellation:, cancellation_type:, activity_id:
+        retry_policy:, local_retry_threshold:, cancellation:, cancellation_type:,
+        activity_id:, arg_hints:, result_hint:
       )
     end
 
@@ -378,6 +393,10 @@ module Temporalio
     # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
     # @param priority [Priority] Priority of the workflow. This is currently experimental.
+    # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+    #   workflow definition has arg hints, those are used by default.
+    # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
+    #   definition has result hint, it is used by default.
     #
     # @return [ChildWorkflowHandle] Workflow handle to the started workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists for the ID.
@@ -400,13 +419,15 @@ module Temporalio
       cron_schedule: nil,
       memo: nil,
       search_attributes: nil,
-      priority: Priority.default
+      priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil
     )
       _current.start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
       )
     end
 
@@ -542,7 +563,7 @@ module Temporalio
     # Error that is raised by a workflow out of the primary workflow method to issue a continue-as-new.
     class ContinueAsNewError < Error
       attr_accessor :args, :workflow, :task_queue, :run_timeout, :task_timeout,
-                    :retry_policy, :memo, :search_attributes, :headers
+                    :retry_policy, :memo, :search_attributes, :arg_hints, :headers
 
       # Create a continue as new error.
       #
@@ -561,6 +582,8 @@ module Temporalio
       #   is used.
       # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow. If unset/nil, the current
       #   workflow search attributes are used.
+      # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+      #   workflow definition has arg hints, those are used by default.
       # @param headers [Hash<String, Object>] Headers for the workflow. The default is _not_ carried over from the
       #   current workflow.
       def initialize(
@@ -572,6 +595,7 @@ module Temporalio
         retry_policy: nil,
         memo: nil,
         search_attributes: nil,
+        arg_hints: nil,
         headers: {}
       )
         super('Continue as new')
@@ -583,6 +607,7 @@ module Temporalio
         @retry_policy = retry_policy
         @memo = memo
         @search_attributes = search_attributes
+        @arg_hints = arg_hints
         @headers = headers
         Workflow._current.initialize_continue_as_new_error(self)
       end

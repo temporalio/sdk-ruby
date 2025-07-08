@@ -61,7 +61,8 @@ module Temporalio
       # Users do not have to be concerned with burdening the server by calling this too frequently.
       #
       # @param details [Array<Object>] Details to record with the heartbeat.
-      def heartbeat(*details)
+      # @param detail_hints [Array<Object>, nil] Hints to pass to converter.
+      def heartbeat(*details, detail_hints: nil)
         raise NotImplementedError
       end
 

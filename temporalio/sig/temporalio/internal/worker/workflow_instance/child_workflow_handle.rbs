@@ -8,7 +8,8 @@ module Temporalio
             first_execution_run_id: String,
             instance: WorkflowInstance,
             cancellation: Cancellation,
-            cancel_callback_key: Object
+            cancel_callback_key: Object,
+            result_hint: Object?
           ) -> void
 
           def _resolve: (untyped resolution) -> void

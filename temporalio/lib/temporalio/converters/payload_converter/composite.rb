@@ -32,14 +32,15 @@ module Temporalio
         # Convert Ruby value to a payload by going over each encoding converter in order until one can convert.
         #
         # @param value [Object] Ruby value to convert.
+        # @param hint [Object, nil] Hint, if any, to assist conversion.
         # @return [Api::Common::V1::Payload] Converted payload.
         # @raise [ConverterNotFound] If no converters can process the value.
-        def to_payload(value)
+        def to_payload(value, hint: nil)
           # As a special case, raw values just return the payload within
           return value.payload if value.is_a?(RawValue)
 
           converters.each_value do |converter|
-            payload = converter.to_payload(value)
+            payload = converter.to_payload(value, hint:)
             return payload unless payload.nil?
           end
           raise ConverterNotFound, "Value of type #{value} has no known converter"
@@ -48,17 +49,18 @@ module Temporalio
         # Convert payload to Ruby value based on its +encoding+ metadata on the payload.
         #
         # @param payload [Api::Common::V1::Payload] Payload to convert.
+        # @param hint [Object, nil] Hint, if any, to assist conversion.
         # @return [Object] Converted Ruby value.
         # @raise [EncodingNotSet] If encoding not set on the metadata.
         # @raise [ConverterNotFound] If no converter found for the encoding.
-        def from_payload(payload)
+        def from_payload(payload, hint: nil)
           encoding = payload.metadata['encoding']
           raise EncodingNotSet, 'Missing payload encoding' unless encoding
 
           converter = converters[encoding]
           raise ConverterNotFound, "No converter for encoding #{encoding}" unless converter
 
-          converter.from_payload(payload)
+          converter.from_payload(payload, hint:)
         end
       end
     end

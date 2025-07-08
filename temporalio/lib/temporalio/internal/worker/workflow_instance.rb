@@ -312,7 +312,8 @@ module Temporalio
           # Convert workflow arguments
           @workflow_arguments = convert_args(payload_array: @init_job.arguments,
                                              method_name: :execute,
-                                             raw_args: @definition.raw_args)
+                                             raw_args: @definition.raw_args,
+                                             arg_hints: @definition.arg_hints)
 
           # Initialize interceptors
           @inbound = @interceptors.reverse_each.reduce(InboundImplementation.new(self)) do |acc, int|
@@ -420,6 +421,7 @@ module Temporalio
         end
 
         def apply_query(job)
+          result_hint = nil
           schedule do
             # If it's a built-in, run it without interceptors, otherwise do normal behavior
             result = if job.query_type == '__stack_trace'
@@ -437,6 +439,7 @@ module Temporalio
                          raise "Query handler for #{job.query_type} expected but not found, " \
                                "known queries: [#{query_handlers.keys.compact.sort.join(', ')}]"
                        end
+                       result_hint = defn.result_hint
 
                        with_context_frozen do
                          @inbound.handle_query(
@@ -460,7 +463,7 @@ module Temporalio
                 respond_to_query: Bridge::Api::WorkflowCommands::QueryResult.new(
                   query_id: job.query_id,
                   succeeded: Bridge::Api::WorkflowCommands::QuerySuccess.new(
-                    response: @payload_converter.to_payload(result)
+                    response: @payload_converter.to_payload(result, hint: result_hint)
                   )
                 )
               )
@@ -549,7 +552,7 @@ module Temporalio
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 update_response: Bridge::Api::WorkflowCommands::UpdateResponse.new(
                   protocol_instance_id: job.protocol_instance_id,
-                  completed: @payload_converter.to_payload(result)
+                  completed: @payload_converter.to_payload(result, hint: defn.result_hint)
                 )
               )
             )
@@ -579,7 +582,7 @@ module Temporalio
           add_command(
             Bridge::Api::WorkflowCommands::WorkflowCommand.new(
               complete_workflow_execution: Bridge::Api::WorkflowCommands::CompleteWorkflowExecution.new(
-                result: @payload_converter.to_payload(result)
+                result: @payload_converter.to_payload(result, hint: @definition.result_hint)
               )
             )
           )
@@ -607,14 +610,19 @@ module Temporalio
         def on_top_level_exception(err)
           if err.is_a?(Workflow::ContinueAsNewError)
             @logger.debug('Workflow requested continue as new')
+            workflow_type, defn_arg_hints, =
+              if err.workflow
+                Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(err.workflow)
+              else
+                [nil, @definition.arg_hints, nil]
+              end
             add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 continue_as_new_workflow_execution: Bridge::Api::WorkflowCommands::ContinueAsNewWorkflowExecution.new(
-                  workflow_type: if err.workflow
-                                   Workflow::Definition._workflow_type_from_workflow_parameter(err.workflow)
-                                 end,
+                  workflow_type:,
                   task_queue: err.task_queue,
-                  arguments: ProtoUtils.convert_to_payload_array(payload_converter, err.args),
+                  arguments: ProtoUtils.convert_to_payload_array(payload_converter, err.args,
+                                                                 hints: err.arg_hints || defn_arg_hints),
                   workflow_run_timeout: ProtoUtils.seconds_to_duration(err.run_timeout),
                   workflow_task_timeout: ProtoUtils.seconds_to_duration(err.task_timeout),
                   memo: ProtoUtils.memo_to_proto_hash(err.memo, payload_converter),
@@ -669,11 +677,12 @@ module Temporalio
             payload_array:,
             method_name: defn.to_invoke.is_a?(Symbol) ? defn.to_invoke : nil,
             raw_args: defn.raw_args,
+            arg_hints: defn.arg_hints,
             ignore_first_param: defn.name.nil? # Dynamic
           )
         end
 
-        def convert_args(payload_array:, method_name:, raw_args:, ignore_first_param: false)
+        def convert_args(payload_array:, method_name:, raw_args:, arg_hints:, ignore_first_param: false)
           # Just in case it is not an array
           payload_array = payload_array.to_ary
 
@@ -713,7 +722,7 @@ module Temporalio
           if raw_args
             payload_array.map { |p| Converters::RawValue.new(p) }
           else
-            ProtoUtils.convert_from_payload_array(@payload_converter, payload_array)
+            ProtoUtils.convert_from_payload_array(@payload_converter, payload_array, hints: arg_hints)
           end
         end
 

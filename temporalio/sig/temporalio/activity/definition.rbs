@@ -6,12 +6,16 @@ module Temporalio
       def self.activity_cancel_raise: (bool cancel_raise) -> void
       def self.activity_dynamic: (?bool value) -> void
       def self.activity_raw_args: (?bool value) -> void
+      def self.activity_arg_hint: (*Object hints) -> void
+      def self.activity_result_hint: (Object? hint) -> void
   
       def self._activity_definition_details: -> {
         activity_name: String | Symbol | nil,
         activity_executor: Symbol,
         activity_cancel_raise: bool,
-        activity_raw_args: bool
+        activity_raw_args: bool,
+        activity_arg_hints: Array[Object]?,
+        activity_result_hint: Object?
       }
   
       def execute: (*untyped) -> untyped
@@ -23,6 +27,8 @@ module Temporalio
         attr_reader executor: Symbol
         attr_reader cancel_raise: bool
         attr_reader raw_args: bool
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
 
         def self.from_activity: (Definition | singleton(Definition) | Info activity) -> Info
 
@@ -31,7 +37,9 @@ module Temporalio
           ?instance: Object | Proc | nil,
           ?executor: Symbol,
           ?cancel_raise: bool,
-          ?raw_args: bool
+          ?raw_args: bool,
+          ?arg_hints: Array[Object]?,
+          ?result_hint: Object?
         ) { (?) -> untyped } -> void
       end
     end

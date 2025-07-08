@@ -18,8 +18,8 @@ module Temporalio
             @instance = instance
           end
 
-          def signal(signal, *args, cancellation: Workflow.cancellation)
-            @instance.context._signal_external_workflow(id:, run_id:, signal:, args:, cancellation:)
+          def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil)
+            @instance.context._signal_external_workflow(id:, run_id:, signal:, args:, cancellation:, arg_hints:)
           end
 
           def cancel

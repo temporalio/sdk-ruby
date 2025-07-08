@@ -12,22 +12,26 @@ module Temporalio
 
       def heartbeat: (
         *Object? details,
+        ?detail_hints: Array[Object]?,
         ?rpc_options: RPCOptions?
       ) -> void
 
       def complete: (
         ?Object? result,
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> void
 
       def fail: (
         Exception error,
         ?last_heartbeat_details: Array[Object?],
+        ?last_heartbeat_detail_hints: Array[Object]?,
         ?rpc_options: RPCOptions?
       ) -> void
 
       def report_cancellation: (
         *Object? details,
+        ?detail_hints: Array[Object]?,
         ?rpc_options: RPCOptions?
       ) -> void
 

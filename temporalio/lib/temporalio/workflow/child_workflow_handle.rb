@@ -21,12 +21,18 @@ module Temporalio
         raise NotImplementedError
       end
 
+      # @return [Object, nil] Hint for the result if any.
+      def result_hint
+        raise NotImplementedError
+      end
+
       # Wait for the result.
       #
+      # @param result_hint [Object, nil] Override the result hint, or if nil uses the one on the handle.
       # @return [Object] Result of the child workflow.
       #
       # @raise [Error::ChildWorkflowError] Workflow failed with +cause+ as the cause.
-      def result
+      def result(result_hint: nil)
         raise NotImplementedError
       end
 
@@ -35,7 +41,9 @@ module Temporalio
       # @param signal [Workflow::Definition::Signal, Symbol, String] Signal definition or name.
       # @param args [Array<Object>] Signal args.
       # @param cancellation [Cancellation] Cancellation for canceling the signalling.
-      def signal(signal, *args, cancellation: Workflow.cancellation)
+      # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
+      #   signal definition has arg hints, those are used by default.
+      def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil)
         raise NotImplementedError
       end
     end

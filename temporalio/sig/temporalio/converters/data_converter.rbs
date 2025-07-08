@@ -13,11 +13,11 @@ module Temporalio
         ?payload_codec: PayloadCodec?
       ) -> void
 
-      def to_payload: (Object? value) -> untyped
-      def to_payloads: (Array[Object?] values) -> untyped
+      def to_payload: (Object? value, ?hint: Object?) -> untyped
+      def to_payloads: (Array[Object?] values, ?hints: Array[Object]?) -> untyped
 
-      def from_payload: (untyped payload) -> Object?
-      def from_payloads: (untyped payloads) -> Array[Object?]
+      def from_payload: (untyped payload, ?hint: Object?) -> Object?
+      def from_payloads: (untyped payloads, ?hints: Array[Object]?) -> Array[Object?]
 
       def to_failure: (Exception error) -> untyped
       def from_failure: (untyped failure) -> Exception

@@ -47,6 +47,21 @@ module Temporalio
           @workflow_raw_args = value
         end
 
+        # Add workflow hints to be passed to converter for workflow args.
+        #
+        # @param hints [Array<Object>] Hints to add.
+        def workflow_arg_hint(*hints)
+          @workflow_arg_hints ||= []
+          @workflow_arg_hints.concat(hints)
+        end
+
+        # Set workflow result hint to be passed to converter for workflow result.
+        #
+        # @param hint [Object] Hint to set.
+        def workflow_result_hint(hint)
+          @workflow_result_hint = hint
+        end
+
         # Configure workflow failure exception types. This sets the types of exceptions that, if a
         # workflow-thrown exception extends, will cause the workflow/update to fail instead of suspending the workflow
         # via task failure. These are applied in addition to the worker option. If {::Exception} is set, it effectively
@@ -121,16 +136,20 @@ module Temporalio
         #   {Converters::RawValue} which is a raw payload wrapper, convertible with {Workflow.payload_converter}.
         # @param unfinished_policy [HandlerUnfinishedPolicy] How to treat unfinished handlers if they are still running
         #   when the workflow ends. The default warns, but this can be disabled.
+        # @param arg_hints [Array<Object>, nil] Argument hint(s) for the signal.
         def workflow_signal(
           name: nil,
           description: nil,
           dynamic: false,
           raw_args: false,
-          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
+          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON,
+          arg_hints: nil
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :signal, name:, description:, dynamic:, raw_args:, unfinished_policy: }
+          self.pending_handler_details =
+            { type: :signal, name:, description:, dynamic:, raw_args:, unfinished_policy:,
+              arg_hints: Array(arg_hints) }
         end
 
         # Mark the next method as a workflow query with a default name as the name of the method. Queries can not have
@@ -144,15 +163,20 @@ module Temporalio
         #   it is useful to have the second parameter be `*args` and `raw_args` be true.
         # @param raw_args [Boolean] If true, does not convert arguments, but instead provides each argument as
         #   {Converters::RawValue} which is a raw payload wrapper, convertible with {Workflow.payload_converter}.
+        # @param arg_hints [Object, Array<Object>, nil] Argument hint(s) for the query.
+        # @param result_hint [Object, nil] Result hint for the query.
         def workflow_query(
           name: nil,
           description: nil,
           dynamic: false,
-          raw_args: false
+          raw_args: false,
+          arg_hints: nil,
+          result_hint: nil
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :query, name:, description:, dynamic:, raw_args: }
+          self.pending_handler_details = { type: :query, name:, description:, dynamic:, raw_args:,
+                                           arg_hints: Array(arg_hints), result_hint: }
         end
 
         # Mark the next method as a workflow update with a default name as the name of the method. Updates can return
@@ -168,16 +192,21 @@ module Temporalio
         #   {Converters::RawValue} which is a raw payload wrapper, convertible with {Workflow.payload_converter}.
         # @param unfinished_policy [HandlerUnfinishedPolicy] How to treat unfinished handlers if they are still running
         #   when the workflow ends. The default warns, but this can be disabled.
+        # @param arg_hints [Object, Array<Object>, nil] Argument hint(s) for the update.
+        # @param result_hint [Object, nil] Result hint for the update.
         def workflow_update(
           name: nil,
           description: nil,
           dynamic: false,
           raw_args: false,
-          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
+          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON,
+          arg_hints: nil,
+          result_hint: nil
         )
           raise 'Cannot provide name if dynamic is true' if name && dynamic
 
-          self.pending_handler_details = { type: :update, name:, description:, dynamic:, raw_args:, unfinished_policy: }
+          self.pending_handler_details = { type: :update, name:, description:, dynamic:, raw_args:, unfinished_policy:,
+                                           arg_hints: Array(arg_hints), result_hint: }
         end
 
         # Mark the next method as a workflow update validator to the given update method. The validator is expected to
@@ -275,14 +304,17 @@ module Temporalio
               to_invoke: method_name,
               description: handler[:description],
               raw_args: handler[:raw_args],
-              unfinished_policy: handler[:unfinished_policy]
+              unfinished_policy: handler[:unfinished_policy],
+              arg_hints: handler[:arg_hints]
             ), @workflow_signals, [@workflow_queries, @workflow_updates]]
           when :query
             [Query.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
               to_invoke: method_name,
               description: handler[:description],
-              raw_args: handler[:raw_args]
+              raw_args: handler[:raw_args],
+              arg_hints: handler[:arg_hints],
+              result_hint: handler[:result_hint]
             ), @workflow_queries, [@workflow_signals, @workflow_updates]]
           when :update
             [Update.new(
@@ -290,7 +322,9 @@ module Temporalio
               to_invoke: method_name,
               description: handler[:description],
               raw_args: handler[:raw_args],
-              unfinished_policy: handler[:unfinished_policy]
+              unfinished_policy: handler[:unfinished_policy],
+              arg_hints: handler[:arg_hints],
+              result_hint: handler[:result_hint]
             ), @workflow_updates, [@workflow_signals, @workflow_queries]]
           when :dynamic_options
             raise 'Dynamic options method already set' if @dynamic_options_method
@@ -334,7 +368,7 @@ module Temporalio
       end
 
       # @!visibility private
-      def self._workflow_type_from_workflow_parameter(workflow)
+      def self._workflow_type_and_hints_from_workflow_parameter(workflow)
         case workflow
         when Class
           unless workflow < Definition
@@ -342,11 +376,15 @@ module Temporalio
           end
 
           info = Info.from_class(workflow)
-          info.name || raise(ArgumentError, 'Cannot pass dynamic workflow to start')
+          raise(ArgumentError, 'Cannot pass dynamic workflow to start') unless info.name
+
+          [info.name.to_s, info.arg_hints, info.result_hint]
         when Info
-          workflow.name || raise(ArgumentError, 'Cannot pass dynamic workflow to start')
+          raise(ArgumentError, 'Cannot pass dynamic workflow to start') unless workflow.name
+
+          [workflow.name.to_s, nil, nil]
         when String, Symbol
-          workflow.to_s
+          [workflow.to_s, nil, nil]
         else
           raise ArgumentError, 'Workflow is not a workflow class or string/symbol'
         end
@@ -448,7 +486,9 @@ module Temporalio
           queries:,
           updates:,
           versioning_behavior: @versioning_behavior || VersioningBehavior::UNSPECIFIED,
-          dynamic_options_method: @dynamic_options_method
+          dynamic_options_method: @dynamic_options_method,
+          arg_hints: @workflow_arg_hints,
+          result_hint: @workflow_result_hint
         )
       end
 
@@ -462,7 +502,7 @@ module Temporalio
       class Info
         attr_reader :workflow_class, :override_name, :dynamic, :init, :raw_args,
                     :failure_exception_types, :signals, :queries, :updates, :versioning_behavior,
-                    :dynamic_options_method
+                    :dynamic_options_method, :arg_hints, :result_hint
 
         # Derive the workflow definition info from the class.
         #
@@ -489,7 +529,9 @@ module Temporalio
           queries: {},
           updates: {},
           versioning_behavior: VersioningBehavior::UNSPECIFIED,
-          dynamic_options_method: nil
+          dynamic_options_method: nil,
+          arg_hints: nil,
+          result_hint: nil
         )
           @workflow_class = workflow_class
           @override_name = override_name
@@ -502,6 +544,8 @@ module Temporalio
           @updates = updates.dup.freeze
           @versioning_behavior = versioning_behavior
           @dynamic_options_method = dynamic_options_method
+          @arg_hints = arg_hints
+          @result_hint = result_hint
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
@@ -514,15 +558,17 @@ module Temporalio
       # A signal definition. This is usually built as a result of a {Definition.workflow_signal} method, but can be
       # manually created to set at runtime on {Workflow.signal_handlers}.
       class Signal
-        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy
+        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy, :arg_hints
 
         # @!visibility private
-        def self._name_from_parameter(signal)
+        def self._name_and_hints_from_parameter(signal)
           case signal
           when Workflow::Definition::Signal
-            signal.name || raise(ArgumentError, 'Cannot call dynamic signal directly')
+            raise(ArgumentError, 'Cannot call dynamic signal directly') unless signal.name
+
+            [signal.name, signal.arg_hints]
           when String, Symbol
-            signal.to_s
+            [signal.to_s, nil]
           else
             raise ArgumentError, 'Signal is not a definition or string/symbol'
           end
@@ -538,18 +584,21 @@ module Temporalio
         # @param raw_args [Boolean] Whether the parameters should be raw values.
         # @param unfinished_policy [HandlerUnfinishedPolicy] How the workflow reacts when this handler is still running
         #   on workflow completion.
+        # @param arg_hints [Array<Object>, nil] Argument hints for the signal.
         def initialize(
           name:,
           to_invoke:,
           description: nil,
           raw_args: false,
-          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON
+          unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON,
+          arg_hints: nil
         )
           @name = name
           @to_invoke = to_invoke
           @description = description
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
+          @arg_hints = arg_hints
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end
@@ -557,15 +606,17 @@ module Temporalio
       # A query definition. This is usually built as a result of a {Definition.workflow_query} method, but can be
       # manually created to set at runtime on {Workflow.query_handlers}.
       class Query
-        attr_reader :name, :to_invoke, :description, :raw_args
+        attr_reader :name, :to_invoke, :description, :raw_args, :arg_hints, :result_hint
 
         # @!visibility private
-        def self._name_from_parameter(query)
+        def self._name_and_hints_from_parameter(query)
           case query
           when Workflow::Definition::Query
-            query.name || raise(ArgumentError, 'Cannot call dynamic query directly')
+            raise(ArgumentError, 'Cannot call dynamic query directly') unless query.name
+
+            [query.name, query.arg_hints, query.result_hint]
           when String, Symbol
-            query.to_s
+            [query.to_s, nil, nil]
           else
             raise ArgumentError, 'Query is not a definition or string/symbol'
           end
@@ -579,16 +630,22 @@ module Temporalio
         # @param description [String, nil] Description for this handler that may appear in CLI/UI. This is currently
         #   experimental.
         # @param raw_args [Boolean] Whether the parameters should be raw values.
+        # @param arg_hints [Array<Object>, nil] Argument hints for the query.
+        # @param result_hint [Object, nil] Result hints for the query.
         def initialize(
           name:,
           to_invoke:,
           description: nil,
-          raw_args: false
+          raw_args: false,
+          arg_hints: nil,
+          result_hint: nil
         )
           @name = name
           @to_invoke = to_invoke
           @description = description
           @raw_args = raw_args
+          @arg_hints = arg_hints
+          @result_hint = result_hint
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end
@@ -596,15 +653,18 @@ module Temporalio
       # An update definition. This is usually built as a result of a {Definition.workflow_update} method, but can be
       # manually created to set at runtime on {Workflow.update_handlers}.
       class Update
-        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy, :validator_to_invoke
+        attr_reader :name, :to_invoke, :description, :raw_args, :unfinished_policy, :validator_to_invoke,
+                    :arg_hints, :result_hint
 
         # @!visibility private
-        def self._name_from_parameter(update)
+        def self._name_and_hints_from_parameter(update)
           case update
           when Workflow::Definition::Update
-            update.name || raise(ArgumentError, 'Cannot call dynamic update directly')
+            raise(ArgumentError, 'Cannot call dynamic update directly') unless update.name
+
+            [update.name, update.arg_hints, update.result_hint]
           when String, Symbol
-            update.to_s
+            [update.to_s, nil, nil]
           else
             raise ArgumentError, 'Update is not a definition or string/symbol'
           end
@@ -621,13 +681,17 @@ module Temporalio
         # @param unfinished_policy [HandlerUnfinishedPolicy] How the workflow reacts when this handler is still running
         #   on workflow completion.
         # @param validator_to_invoke [Symbol, Proc, nil] Method name or proc validator to invoke.
+        # @param arg_hints [Array<Object>, nil] Argument hints for the update.
+        # @param result_hint [Object, nil] Result hints for the update.
         def initialize(
           name:,
           to_invoke:,
           description: nil,
           raw_args: false,
           unfinished_policy: HandlerUnfinishedPolicy::WARN_AND_ABANDON,
-          validator_to_invoke: nil
+          validator_to_invoke: nil,
+          arg_hints: nil,
+          result_hint: nil
         )
           @name = name
           @to_invoke = to_invoke
@@ -635,6 +699,8 @@ module Temporalio
           @raw_args = raw_args
           @unfinished_policy = unfinished_policy
           @validator_to_invoke = validator_to_invoke
+          @arg_hints = arg_hints
+          @result_hint = result_hint
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
 
@@ -646,7 +712,9 @@ module Temporalio
             description:,
             raw_args:,
             unfinished_policy:,
-            validator_to_invoke:
+            validator_to_invoke:,
+            arg_hints:,
+            result_hint:
           )
         end
       end

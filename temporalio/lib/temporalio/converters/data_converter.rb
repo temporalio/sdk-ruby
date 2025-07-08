@@ -40,9 +40,10 @@ module Temporalio
       # Convert a Ruby value to a payload and encode it.
       #
       # @param value [Object] Ruby value.
+      # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Api::Common::V1::Payload] Converted and encoded payload.
-      def to_payload(value)
-        payload = payload_converter.to_payload(value)
+      def to_payload(value, hint: nil)
+        payload = payload_converter.to_payload(value, hint:)
         payload = payload_codec.encode([payload]).first if payload_codec
         payload
       end
@@ -50,9 +51,13 @@ module Temporalio
       # Convert multiple Ruby values to a payload set and encode it.
       #
       # @param values [Object] Ruby values, converted to array via {::Array}.
+      # @param hints [Array<Object>, nil] Hints, if any, to assist conversion. Note, when using the default converter
+      #   that converts a payload at a time, hints for each value are taken from the array at that value's index. So if
+      #   there are fewer hints than values, some values will not have a hint. Similarly if there are more hints than
+      #   values, the trailing hints are not used.
       # @return [Api::Common::V1::Payloads] Converted and encoded payload set.
-      def to_payloads(values)
-        payloads = payload_converter.to_payloads(values)
+      def to_payloads(values, hints: nil)
+        payloads = payload_converter.to_payloads(values, hints:)
         payloads.payloads.replace(payload_codec.encode(payloads.payloads)) if payload_codec && !payloads.payloads.empty?
         payloads
       end
@@ -60,23 +65,28 @@ module Temporalio
       # Decode and convert a payload to a Ruby value.
       #
       # @param payload [Api::Common::V1::Payload] Encoded payload.
+      # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Object] Decoded and converted Ruby value.
-      def from_payload(payload)
+      def from_payload(payload, hint: nil)
         payload = payload_codec.decode([payload]).first if payload_codec
-        payload_converter.from_payload(payload)
+        payload_converter.from_payload(payload, hint:)
       end
 
       # Decode and convert a payload set to Ruby values.
       #
       # @param payloads [Api::Common::V1::Payloads, nil] Encoded payload set.
+      # @param hints [Array<Object>, nil] Hints, if any, to assist conversion. Note, when using the default converter
+      #   that converts a value at a time, hints for each payload are taken from the array at that payload's index. So
+      #   if there are fewer hints than payloads, some payloads will not have a hint. Similarly if there are more hints
+      #   than payloads, the trailing hints are not used.
       # @return [Array<Object>] Decoded and converted Ruby values.
-      def from_payloads(payloads)
+      def from_payloads(payloads, hints: nil)
         return [] unless payloads && !payloads.payloads.empty?
 
         if payload_codec && !payloads.payloads.empty?
           payloads = Api::Common::V1::Payloads.new(payloads: payload_codec.decode(payloads.payloads))
         end
-        payload_converter.from_payloads(payloads)
+        payload_converter.from_payloads(payloads, hints:)
       end
 
       # Convert a Ruby error to a Temporal failure and encode it.

@@ -16,7 +16,7 @@ module Temporalio
         end
 
         # (see Encoding.to_payload)
-        def to_payload(value)
+        def to_payload(value, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           return nil unless value.nil?
 
           Api::Common::V1::Payload.new(
@@ -25,7 +25,7 @@ module Temporalio
         end
 
         # (see Encoding.from_payload)
-        def from_payload(payload) # rubocop:disable Lint/UnusedMethodArgument
+        def from_payload(payload, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           nil
         end
       end

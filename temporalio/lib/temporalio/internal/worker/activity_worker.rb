@@ -178,7 +178,8 @@ module Temporalio
             ) || raise, # Never nil
             heartbeat_details: ProtoUtils.convert_from_payload_array(
               @worker.options.client.data_converter,
-              start.heartbeat_details.to_ary
+              start.heartbeat_details.to_ary,
+              hints: nil
             ),
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
@@ -205,8 +206,13 @@ module Temporalio
                     payloads = codec.decode(payloads) if codec
                     payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
                   else
-                    ProtoUtils.convert_from_payload_array(@worker.options.client.data_converter, start.input.to_ary)
+                    ProtoUtils.convert_from_payload_array(
+                      @worker.options.client.data_converter,
+                      start.input.to_ary,
+                      hints: defn.arg_hints
+                    )
                   end,
+            result_hint: defn.result_hint,
             headers: ProtoUtils.headers_from_proto_map(start.header_fields, @worker.options.client.data_converter) || {}
           )
 
@@ -267,7 +273,7 @@ module Temporalio
             # Success
             Bridge::Api::ActivityResult::ActivityExecutionResult.new(
               completed: Bridge::Api::ActivityResult::Success.new(
-                result: @worker.options.client.data_converter.to_payload(result)
+                result: @worker.options.client.data_converter.to_payload(result, hint: input.result_hint)
               )
             )
           rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
@@ -372,13 +378,15 @@ module Temporalio
             @_server_requested_cancel = false
           end
 
-          def heartbeat(*details)
+          def heartbeat(*details, detail_hints: nil)
             raise 'Implementation not set yet' if _outbound_impl.nil?
 
             # No-op if local
             return if info.local?
 
-            _outbound_impl.heartbeat(Temporalio::Worker::Interceptor::Activity::HeartbeatInput.new(details:))
+            _outbound_impl.heartbeat(
+              Temporalio::Worker::Interceptor::Activity::HeartbeatInput.new(details:, detail_hints:)
+            )
           end
 
           def metric_meter
@@ -437,7 +445,8 @@ module Temporalio
               Bridge::Api::CoreInterface::ActivityHeartbeat.new(
                 task_token: @task_token,
                 details: ProtoUtils.convert_to_payload_array(@worker.worker.options.client.data_converter,
-                                                             input.details)
+                                                             input.details,
+                                                             hints: input.detail_hints)
               ).to_proto
             )
           end

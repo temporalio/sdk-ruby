@@ -18,6 +18,8 @@ module Temporalio
         attr_reader memo: Hash[String | Symbol, Object?]?
         attr_reader search_attributes: SearchAttributes?
         attr_reader start_delay: duration?
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
         attr_reader headers: Hash[String, Object?]
 
         def initialize: (
@@ -37,6 +39,8 @@ module Temporalio
           memo: Hash[String | Symbol, Object?]?,
           search_attributes: SearchAttributes?,
           start_delay: duration?,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
           headers: Hash[String, Object?]
         ) -> void
       end
@@ -60,6 +64,8 @@ module Temporalio
         ?memo: Hash[String | Symbol, Object?]?,
         ?search_attributes: SearchAttributes?,
         ?start_delay: duration?,
+        ?arg_hints: Array[Object]?,
+        ?result_hint: Object?,
         ?headers: Hash[String, Object?]
       ) -> void
 

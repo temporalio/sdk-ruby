@@ -27,7 +27,7 @@ module Temporalio
         end
 
         # (see Encoding.to_payload)
-        def to_payload(value)
+        def to_payload(value, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           Api::Common::V1::Payload.new(
             metadata: { 'encoding' => ENCODING },
             data: JSON.generate(value, @generate_options).b
@@ -35,7 +35,7 @@ module Temporalio
         end
 
         # (see Encoding.from_payload)
-        def from_payload(payload)
+        def from_payload(payload, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           JSON.parse(payload.data, @parse_options)
         end
       end
