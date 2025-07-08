@@ -550,6 +550,14 @@ module Temporalio
       def self.io_enabled(&)
         Workflow._current.io_enabled(&)
       end
+
+      # Run a block of code with the durable/deterministic workflow Fiber scheduler off. This means fallback to default
+      # fiber scheduler and no workflow helpers will be available in the block. This is usually only needed in advanced
+      # situations where a third party library does something like use "Timeout" in a way that shouldn't be made
+      # durable.
+      def self.durable_scheduler_disabled(&)
+        Workflow._current.durable_scheduler_disabled(&)
+      end
     end
 
     # Error that is raised by a workflow out of the primary workflow method to issue a continue-as-new.

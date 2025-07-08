@@ -1253,9 +1253,9 @@ First, install dependencies:
 
     # Optional: Change bundler install path to be local
     bundle config --local path $(pwd)/.bundle
-    bundle instal
+    bundle install
 
-To build shared library for development use (ensure you have cloned submodules :
+To build shared library for development use (ensure you have cloned submodules) :
 
     bundle exec rake compile
 

@@ -67,9 +67,11 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.list_workflows}.
-      ListWorkflowsInput = Data.define(
+      # Input for {Outbound.list_workflow_page}.
+      ListWorkflowPageInput = Data.define(
         :query,
+        :next_page_token,
+        :page_size,
         :rpc_options
       )
 
@@ -295,12 +297,12 @@ module Temporalio
           next_interceptor.signal_with_start_workflow(input)
         end
 
-        # Called for every {Client.list_workflows} call.
+        # Called for every {Client.list_workflow_page} call.
         #
-        # @param input [ListWorkflowsInput] Input.
-        # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
-        def list_workflows(input)
-          next_interceptor.list_workflows(input)
+        # @param input [ListWorkflowPageInput] Input.
+        # @return [Client::ListWorkflowPage] Enumerable workflow executions, with a #next_page_token method.
+        def list_workflow_page(input)
+          next_interceptor.list_workflow_page(input)
         end
 
         # Called for every {Client.count_workflows} call.

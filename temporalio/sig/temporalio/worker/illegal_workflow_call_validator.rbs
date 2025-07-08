@@ -1,0 +1,24 @@
+module Temporalio
+  class Worker
+    class IllegalWorkflowCallValidator
+      class CallInfo
+        attr_reader class_name: String
+        attr_reader method_name: Symbol
+        attr_reader trace_point: TracePoint
+
+        def initialize: (
+          class_name: String,
+          method_name: Symbol,
+          trace_point: TracePoint
+        ) -> void
+      end
+
+      def self.default_time_validators: -> Array[IllegalWorkflowCallValidator]
+
+      attr_reader method_name: Symbol?
+      attr_reader block: ^(CallInfo) -> void
+
+      def initialize: (?method_name: Symbol?) { (CallInfo) -> void } -> void
+    end
+  end
+end

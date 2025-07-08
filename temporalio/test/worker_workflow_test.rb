@@ -9,7 +9,7 @@ require 'temporalio/workflow'
 require 'test'
 require 'timeout'
 
-class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
+class WorkerWorkflowTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
@@ -45,8 +45,14 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
         Thread.new { 'wut' }.join
       when :time_new
         Time.new
+      when :time_new_parse
+        Time.new('2000-12-31 23:59:59.5')
+      when :time_new_explicit
+        Time.new(2000, 1, 2, 3, 4, 5)
       when :time_now
         Time.now
+      when :time_iso8601
+        Time.iso8601('2011-10-05T22:26:12-04:00')
       else
         raise NotImplementedError
       end
@@ -75,7 +81,10 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     exec.call(:random_new, 'Random::Base initialize')
     exec.call(:thread_new, 'Thread new')
     exec.call(:time_new, 'Time initialize')
+    exec.call(:time_new_parse, nil) # This call is ok
+    exec.call(:time_new_explicit, nil) # This call is ok
     exec.call(:time_now, 'Time now')
+    exec.call(:time_iso8601, nil) # This call is ok
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition
@@ -408,12 +417,12 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_stdlib) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_workflow) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
     assert_equal 'execution expired', err.cause.message
-    assert_equal 'Timeout::Error', err.cause.type
+    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do
       execute_workflow(TimerWorkflow, :timeout_custom_info)
@@ -698,15 +707,15 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
       execute_workflow(TaskFailureWorkflow, 1, workflow_failure_exception_types: [TaskFailureError1])
     end
     assert_equal 'one', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError1', err.cause.type
+    assert_equal 'TaskFailureError1', err.cause.type
 
     # Fails workflow when configured on workflow, including inherited
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 2) }
     assert_equal 'two', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError2', err.cause.type
+    assert_equal 'TaskFailureError2', err.cause.type
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TaskFailureWorkflow, 4) }
     assert_equal 'four', err.cause.message
-    assert_equal 'WorkerWorkflowTest::TaskFailureError4', err.cause.type
+    assert_equal 'TaskFailureError4', err.cause.type
 
     # Also supports stdlib errors
     err = assert_raises(Temporalio::Error::WorkflowFailedError) do
@@ -2510,6 +2519,37 @@ class WorkerWorkflowTest < Test # rubocop:disable Metrics/ClassLength
     # Check hints
     assert_equal @expected_outbound_hints.to_set, conv.outbound_hints.to_set
     assert_equal @expected_inbound_hints.to_set, conv.inbound_hints.to_set
+  end
+
+  class NonDurableTimerWorkfow < Temporalio::Workflow::Definition
+    def execute
+      sleep(0.1)
+      Temporalio::Workflow::Unsafe.durable_scheduler_disabled { sleep(0.2) }
+      begin
+        Timeout.timeout(0.3) { Queue.new.pop }
+        raise 'Expected timeout'
+      rescue Timeout::Error
+        # Ignore
+      end
+      Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+        Timeout.timeout(0.4) { Queue.new.pop }
+        raise 'Expected timeout'
+      rescue Timeout::Error
+        # Ignore
+      end
+    end
+  end
+
+  def test_non_durable_timer
+    execute_workflow(NonDurableTimerWorkfow) do |handle|
+      # Let workflow complete
+      handle.result
+      # Confirm only the durable timers of 0.1 and 0.3 were set
+      assert_equal([0.1, 0.3], handle.fetch_history_events
+                                     .map(&:timer_started_event_attributes)
+                                     .compact
+                                     .map { |a| a.start_to_fire_timeout.to_f })
+    end
   end
 end
 
