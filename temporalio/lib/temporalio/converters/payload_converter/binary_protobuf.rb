@@ -17,7 +17,7 @@ module Temporalio
         end
 
         # (see Encoding.to_payload)
-        def to_payload(value)
+        def to_payload(value, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           return nil unless value.is_a?(Google::Protobuf::MessageExts)
 
           # @type var value: Google::Protobuf::MessageExts
@@ -28,7 +28,7 @@ module Temporalio
         end
 
         # (see Encoding.from_payload)
-        def from_payload(payload)
+        def from_payload(payload, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
           type = payload.metadata['messageType']
           # @type var desc: untyped
           desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(type)

@@ -40,7 +40,9 @@ module Temporalio
             cancellation_type: Workflow::ActivityCancellationType::enum,
             activity_id: String?,
             disable_eager_execution: bool,
-            priority: Priority
+            priority: Priority,
+            arg_hints: Array[Object]?,
+            result_hint: Object?
           ) -> Object?
 
           def execute_local_activity: (
@@ -53,7 +55,9 @@ module Temporalio
             local_retry_threshold: duration?,
             cancellation: Cancellation,
             cancellation_type: Workflow::ActivityCancellationType::enum,
-            activity_id: String?
+            activity_id: String?,
+            arg_hints: Array[Object]?,
+            result_hint: Object?
           ) -> Object?
 
           def external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
@@ -110,7 +114,9 @@ module Temporalio
             cron_schedule: String?,
             memo: Hash[String | Symbol, Object?]?,
             search_attributes: SearchAttributes?,
-            priority: Priority
+            priority: Priority,
+            arg_hints: Array[Object]?,
+            result_hint: Object?
           ) -> ChildWorkflowHandle
 
           def storage: -> Hash[Object, Object]
@@ -138,7 +144,8 @@ module Temporalio
             id: String,
             signal: Workflow::Definition::Signal | Symbol | String,
             args: Array[Object?],
-            cancellation: Cancellation
+            cancellation: Cancellation,
+            arg_hints: Array[Object]?
           ) -> void
 
           def _signal_external_workflow: (
@@ -146,7 +153,8 @@ module Temporalio
             run_id: String?,
             signal: Workflow::Definition::Signal | Symbol | String,
             args: Array[Object?],
-            cancellation: Cancellation
+            cancellation: Cancellation,
+            arg_hints: Array[Object]?
           ) -> void
         end
       end

@@ -56,7 +56,8 @@ module Temporalio
               raise ArgumentError, 'Activity must have schedule_to_close_timeout or start_to_close_timeout'
             end
 
-            execute_activity_with_local_backoffs(local: false, cancellation: input.cancellation) do
+            execute_activity_with_local_backoffs(local: false, cancellation: input.cancellation,
+                                                 result_hint: input.result_hint) do
               seq = (@activity_counter += 1)
               @instance.add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
@@ -66,7 +67,9 @@ module Temporalio
                     activity_type: input.activity,
                     task_queue: input.task_queue,
                     headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
-                    arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
+                    arguments: ProtoUtils.convert_to_payload_array(
+                      @instance.payload_converter, input.args, hints: input.arg_hints
+                    ),
                     schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
                     schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
                     start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
@@ -90,7 +93,8 @@ module Temporalio
 
             @instance.assert_valid_local_activity.call(input.activity)
 
-            execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation) do |do_backoff|
+            execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation,
+                                                 result_hint: input.result_hint) do |do_backoff|
               seq = (@activity_counter += 1)
               @instance.add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
@@ -99,7 +103,9 @@ module Temporalio
                     activity_id: input.activity_id || seq.to_s,
                     activity_type: input.activity,
                     headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
-                    arguments: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
+                    arguments: ProtoUtils.convert_to_payload_array(
+                      @instance.payload_converter, input.args, hints: input.arg_hints
+                    ),
                     schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
                     schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
                     start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
@@ -115,7 +121,7 @@ module Temporalio
             end
           end
 
-          def execute_activity_with_local_backoffs(local:, cancellation:, &)
+          def execute_activity_with_local_backoffs(local:, cancellation:, result_hint:, &)
             # We do not even want to schedule if the cancellation is already cancelled. We choose to use canceled
             # failure instead of wrapping in activity failure which is similar to what other SDKs do, with the accepted
             # tradeoff that it makes rescue more difficult (hence the presence of Error.canceled? helper).
@@ -124,7 +130,7 @@ module Temporalio
             # This has to be done in a loop for local activity backoff
             last_local_backoff = nil
             loop do
-              result = execute_activity_once(local:, cancellation:, last_local_backoff:, &)
+              result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &)
               return result unless result.is_a?(Bridge::Api::ActivityResult::DoBackoff)
 
               # @type var result: untyped
@@ -136,7 +142,7 @@ module Temporalio
           end
 
           # If this doesn't raise, it returns success | DoBackoff
-          def execute_activity_once(local:, cancellation:, last_local_backoff:, &)
+          def execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &)
             # Add to pending activities (removed by the resolver)
             seq = yield last_local_backoff
             @instance.pending_activities[seq] = Fiber.current
@@ -169,7 +175,7 @@ module Temporalio
 
             case resolution.status
             when :completed
-              @instance.payload_converter.from_payload(resolution.completed.result)
+              @instance.payload_converter.from_payload(resolution.completed.result, hint: result_hint)
             when :failed
               raise @instance.failure_converter.from_failure(resolution.failed.failure, @instance.payload_converter)
             when :cancelled
@@ -193,6 +199,7 @@ module Temporalio
               signal: input.signal,
               args: input.args,
               cancellation: input.cancellation,
+              arg_hints: input.arg_hints,
               headers: input.headers
             )
           end
@@ -205,11 +212,12 @@ module Temporalio
               signal: input.signal,
               args: input.args,
               cancellation: input.cancellation,
+              arg_hints: input.arg_hints,
               headers: input.headers
             )
           end
 
-          def _signal_external_workflow(id:, run_id:, child:, signal:, args:, cancellation:, headers:)
+          def _signal_external_workflow(id:, run_id:, child:, signal:, args:, cancellation:, arg_hints:, headers:)
             raise Error::CanceledError, 'Signal canceled before scheduled' if cancellation.canceled?
 
             # Add command
@@ -217,7 +225,7 @@ module Temporalio
             cmd = Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution.new(
               seq:,
               signal_name: signal,
-              args: ProtoUtils.convert_to_payload_array(@instance.payload_converter, args),
+              args: ProtoUtils.convert_to_payload_array(@instance.payload_converter, args, hints: arg_hints),
               headers: ProtoUtils.headers_to_proto_hash(headers, @instance.payload_converter)
             )
             if child
@@ -327,7 +335,8 @@ module Temporalio
                   workflow_id: input.id,
                   workflow_type: input.workflow,
                   task_queue: input.task_queue,
-                  input: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args),
+                  input: ProtoUtils.convert_to_payload_array(@instance.payload_converter, input.args,
+                                                             hints: input.arg_hints),
                   workflow_execution_timeout: ProtoUtils.seconds_to_duration(input.execution_timeout),
                   workflow_run_timeout: ProtoUtils.seconds_to_duration(input.run_timeout),
                   workflow_task_timeout: ProtoUtils.seconds_to_duration(input.task_timeout),
@@ -374,7 +383,8 @@ module Temporalio
                 first_execution_run_id: resolution.succeeded.run_id,
                 instance: @instance,
                 cancellation: input.cancellation,
-                cancel_callback_key:
+                cancel_callback_key:,
+                result_hint: input.result_hint
               )
               @instance.pending_child_workflows[seq] = handle
               handle

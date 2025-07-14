@@ -51,12 +51,14 @@ module Temporalio
 
       def self.convert_from_payload_array: (
         Converters::DataConverter | Converters::PayloadConverter converter,
-        Array[untyped] payloads
+        Array[untyped] payloads,
+        hints: Array[Object]?
       ) -> Array[Object?]
 
       def self.convert_to_payload_array: (
         Converters::DataConverter | Converters::PayloadConverter converter,
-        Array[Object?] values
+        Array[Object?] values,
+        hints: Array[Object]?
       ) -> Array[untyped]
 
       def self.assert_non_reserved_name: (String | Symbol | nil name) -> void

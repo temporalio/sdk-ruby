@@ -21,9 +21,11 @@ module Temporalio
         attr_reader search_attributes: SearchAttributes?
         attr_reader start_delay: duration?
         attr_reader request_eager_start: bool
-        attr_reader headers: Hash[String, Object?]
-        attr_reader priority: Priority
         attr_reader versioning_override: VersioningOverride?
+        attr_reader priority: Priority
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
+        attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
@@ -44,9 +46,11 @@ module Temporalio
           search_attributes: SearchAttributes?,
           start_delay: duration?,
           request_eager_start: bool,
-          headers: Hash[String, Object?],
-          priority: Priority,
           versioning_override: VersioningOverride?,
+          priority: Priority,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
+          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -57,6 +61,8 @@ module Temporalio
         attr_reader args: Array[Object?]
         attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
         attr_reader start_workflow_operation: WithStartWorkflowOperation
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
         attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
@@ -66,6 +72,8 @@ module Temporalio
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
           start_workflow_operation: WithStartWorkflowOperation,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
@@ -75,12 +83,14 @@ module Temporalio
         attr_reader signal: String
         attr_reader args: Array[Object?]
         attr_reader start_workflow_operation: WithStartWorkflowOperation
+        attr_reader arg_hints: Array[Object]?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           signal: String,
           args: Array[Object?],
           start_workflow_operation: WithStartWorkflowOperation,
+          arg_hints: Array[Object]?,
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -144,6 +154,7 @@ module Temporalio
         attr_reader run_id: String?
         attr_reader signal: String
         attr_reader args: Array[Object?]
+        attr_reader arg_hints: Array[Object]?
         attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
@@ -152,6 +163,7 @@ module Temporalio
           run_id: String?,
           signal: String,
           args: Array[Object?],
+          arg_hints: Array[Object]?,
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
@@ -163,6 +175,8 @@ module Temporalio
         attr_reader query: String
         attr_reader args: Array[Object?]
         attr_reader reject_condition: WorkflowQueryRejectCondition::enum?
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
         attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
@@ -172,6 +186,8 @@ module Temporalio
           query: String,
           args: Array[Object?],
           reject_condition: WorkflowQueryRejectCondition::enum?,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
@@ -184,6 +200,8 @@ module Temporalio
         attr_reader update: String
         attr_reader args: Array[Object?]
         attr_reader wait_for_stage: WorkflowUpdateWaitStage::enum
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
         attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
@@ -194,6 +212,8 @@ module Temporalio
           update: String,
           args: Array[Object?],
           wait_for_stage: WorkflowUpdateWaitStage::enum,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
           headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
@@ -358,11 +378,13 @@ module Temporalio
       class HeartbeatAsyncActivityInput
         attr_reader task_token_or_id_reference: String | ActivityIDReference
         attr_reader details: Array[Object?]
+        attr_reader detail_hints: Array[Object]?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           details: Array[Object?],
+          detail_hints: Array[Object]?,
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -370,11 +392,13 @@ module Temporalio
       class CompleteAsyncActivityInput
         attr_reader task_token_or_id_reference: String | ActivityIDReference
         attr_reader result: Object?
+        attr_reader result_hint: Object?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           result: Object?,
+          result_hint: Object?,
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -383,12 +407,14 @@ module Temporalio
         attr_reader task_token_or_id_reference: String | ActivityIDReference
         attr_reader error: Exception
         attr_reader last_heartbeat_details: Array[Object?]
+        attr_reader last_heartbeat_detail_hints: Array[Object]?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           error: Exception,
           last_heartbeat_details: Array[Object?],
+          last_heartbeat_detail_hints: Array[Object]?,
           rpc_options: RPCOptions?
         ) -> void
       end
@@ -396,12 +422,13 @@ module Temporalio
       class ReportCancellationAsyncActivityInput
         attr_reader task_token_or_id_reference: String | ActivityIDReference
         attr_reader details: Array[Object?]
+        attr_reader detail_hints: Array[Object]?
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           task_token_or_id_reference: String | ActivityIDReference,
           details: Array[Object?],
-          rpc_options: RPCOptions?
+          detail_hints: Array[Object]?,          rpc_options: RPCOptions?
         ) -> void
       end
 

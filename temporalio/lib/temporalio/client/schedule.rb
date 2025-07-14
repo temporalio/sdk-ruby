@@ -175,6 +175,7 @@ module Temporalio
           :retry_policy,
           :memo,
           :search_attributes,
+          :arg_hints,
           :headers
         )
 
@@ -208,6 +209,9 @@ module Temporalio
         #   @return [Hash<String, Object>, nil] Memo for the workflow.
         # @!attribute search_attributes
         #   @return [SearchAttributes, nil] Search attributes for the workflow.
+        # @!attribute arg_hints
+        #   @return [Array<Object>, nil] Converter hints for workflow arguments. This is only user-set (e.g. on create)
+        #     and is not persisted and therefore will not be set when describing a workflow.
         # @!attribute headers
         #   @return [Hash<String, Object>, nil] Headers for the workflow.
         class StartWorkflow
@@ -249,10 +253,13 @@ module Temporalio
               retry_policy: nil,
               memo: nil,
               search_attributes: nil,
+              arg_hints: nil,
               headers: nil
             )
+              workflow, defn_arg_hints, =
+                Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(workflow)
               _original_new( # steep:ignore
-                workflow: Workflow::Definition._workflow_type_from_workflow_parameter(workflow),
+                workflow:,
                 args:,
                 id:,
                 task_queue:,
@@ -264,6 +271,7 @@ module Temporalio
                 retry_policy:,
                 memo:,
                 search_attributes:,
+                arg_hints: arg_hints || defn_arg_hints,
                 headers:
               )
             end
@@ -296,7 +304,7 @@ module Temporalio
                 workflow_id: id,
                 workflow_type: Api::Common::V1::WorkflowType.new(name: workflow),
                 task_queue: Api::TaskQueue::V1::TaskQueue.new(name: task_queue),
-                input: data_converter.to_payloads(args),
+                input: data_converter.to_payloads(args, hints: arg_hints),
                 workflow_execution_timeout: Internal::ProtoUtils.seconds_to_duration(execution_timeout),
                 workflow_run_timeout: Internal::ProtoUtils.seconds_to_duration(run_timeout),
                 workflow_task_timeout: Internal::ProtoUtils.seconds_to_duration(task_timeout),

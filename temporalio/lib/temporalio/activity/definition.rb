@@ -78,6 +78,21 @@ module Temporalio
 
           @activity_raw_args = value
         end
+
+        # Add activity hints to be passed to converter for activity args.
+        #
+        # @param hints [Array<Object>] Hints to add.
+        def activity_arg_hint(*hints)
+          @activity_arg_hints ||= []
+          @activity_arg_hints.concat(hints)
+        end
+
+        # Set activity result hint to be passed to converter for activity result.
+        #
+        # @param hint [Object] Hint to set.
+        def activity_result_hint(hint)
+          @activity_result_hint = hint
+        end
       end
 
       # @!visibility private
@@ -96,7 +111,9 @@ module Temporalio
           activity_name:,
           activity_executor: @activity_executor || :default,
           activity_cancel_raise: @activity_cancel_raise.nil? || @activity_cancel_raise,
-          activity_raw_args: @activity_raw_args.nil? ? false : @activity_raw_args
+          activity_raw_args: @activity_raw_args.nil? ? false : @activity_raw_args,
+          activity_arg_hints: @activity_arg_hints,
+          activity_result_hint: @activity_result_hint
         }
       end
 
@@ -127,6 +144,12 @@ module Temporalio
         # @return [Boolean] Whether to use {Converters::RawValue}s as arguments.
         attr_reader :raw_args
 
+        # @return [Array<Object>, nil] Argument hints.
+        attr_reader :arg_hints
+
+        # @return [Object, nil] Result hint
+        attr_reader :result_hint
+
         # Obtain definition info representing the given activity, which can be a class, instance, or definition info.
         #
         # @param activity [Definition, Class<Definition>, Info] Activity to get info for.
@@ -147,7 +170,9 @@ module Temporalio
               instance: proc { activity.new },
               executor: details[:activity_executor],
               cancel_raise: details[:activity_cancel_raise],
-              raw_args: details[:activity_raw_args]
+              raw_args: details[:activity_raw_args],
+              arg_hints: details[:activity_arg_hints],
+              result_hint: details[:activity_result_hint]
             ) { |*args| Context.current.instance&.execute(*args) }
           when Definition
             details = activity.class._activity_definition_details
@@ -156,7 +181,9 @@ module Temporalio
               instance: activity,
               executor: details[:activity_executor],
               cancel_raise: details[:activity_cancel_raise],
-              raw_args: details[:activity_raw_args]
+              raw_args: details[:activity_raw_args],
+              arg_hints: details[:activity_arg_hints],
+              result_hint: details[:activity_result_hint]
             ) { |*args| Context.current.instance&.execute(*args) }
           when Info
             activity
@@ -172,6 +199,8 @@ module Temporalio
         # @param executor [Symbol] Name of the executor.
         # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
         # @param raw_args [Boolean] Whether to use {Converters::RawValue}s as arguments.
+        # @param arg_hints [Array<Object>, nil] Argument hints.
+        # @param result_hint [Object, nil] Result hint.
         # @yield Use this block as the activity.
         def initialize(
           name:,
@@ -179,6 +208,8 @@ module Temporalio
           executor: :default,
           cancel_raise: true,
           raw_args: false,
+          arg_hints: nil,
+          result_hint: nil,
           &block
         )
           @name = name
@@ -189,6 +220,8 @@ module Temporalio
           @executor = executor
           @cancel_raise = cancel_raise
           @raw_args = raw_args
+          @arg_hints = arg_hints
+          @result_hint = result_hint
           Internal::ProtoUtils.assert_non_reserved_name(name)
         end
       end

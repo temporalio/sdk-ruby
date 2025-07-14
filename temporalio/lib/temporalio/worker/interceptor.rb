@@ -22,6 +22,7 @@ module Temporalio
         ExecuteInput = Data.define(
           :proc,
           :args,
+          :result_hint,
           :headers
         )
 
@@ -59,7 +60,8 @@ module Temporalio
 
         # Input for {Outbound.heartbeat}.
         HeartbeatInput = Data.define(
-          :details
+          :details,
+          :detail_hints
         )
 
         # Outbound interceptor for intercepting outbound activity calls. This should be extended by users needing to
@@ -216,8 +218,10 @@ module Temporalio
           :cancellation_type,
           :activity_id,
           :disable_eager_execution,
-          :headers,
-          :priority
+          :priority,
+          :arg_hints,
+          :result_hint,
+          :headers
         )
 
         # Input for {Outbound.execute_local_activity}.
@@ -232,6 +236,8 @@ module Temporalio
           :cancellation,
           :cancellation_type,
           :activity_id,
+          :arg_hints,
+          :result_hint,
           :headers
         )
 
@@ -246,6 +252,7 @@ module Temporalio
           :signal,
           :args,
           :cancellation,
+          :arg_hints,
           :headers
         )
 
@@ -256,6 +263,7 @@ module Temporalio
           :signal,
           :args,
           :cancellation,
+          :arg_hints,
           :headers
         )
 
@@ -285,8 +293,10 @@ module Temporalio
           :cron_schedule,
           :memo,
           :search_attributes,
-          :headers,
-          :priority
+          :priority,
+          :arg_hints,
+          :result_hint,
+          :headers
         )
 
         # Outbound interceptor for intercepting outbound workflow calls. This should be extended by users needing to

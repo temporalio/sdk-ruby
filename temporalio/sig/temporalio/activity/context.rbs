@@ -10,7 +10,7 @@ module Temporalio
 
       def info: -> Info
       def instance: -> Definition?
-      def heartbeat: (*Object? details) -> void
+      def heartbeat: (*Object? details, ?detail_hints: Array[Object]?) -> void
       def cancellation: -> Cancellation
       def cancellation_details: -> CancellationDetails?
       def worker_shutdown_cancellation: -> Cancellation

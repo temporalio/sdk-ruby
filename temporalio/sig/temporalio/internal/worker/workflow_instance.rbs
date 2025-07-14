@@ -91,6 +91,7 @@ module Temporalio
           payload_array: Array[untyped],
           method_name: Symbol?,
           raw_args: bool,
+          arg_hints: Array[Object]?,
           ?ignore_first_param: bool
         ) -> Array[Object?]
 

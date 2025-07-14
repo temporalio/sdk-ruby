@@ -5,17 +5,20 @@ module Temporalio
       attr_reader run_id: String?
       attr_reader result_run_id: String?
       attr_reader first_execution_run_id: String?
+      attr_reader result_hint: Object?
 
       def initialize: (
         client: Client,
         id: String,
         run_id: String?,
         result_run_id: String?,
-        first_execution_run_id: String?
+        first_execution_run_id: String?,
+        result_hint: Object?
       ) -> void
 
       def result: (
         ?follow_runs: bool,
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> Object?
 
@@ -39,6 +42,7 @@ module Temporalio
       def signal: (
         Workflow::Definition::Signal | Symbol | String signal,
         *Object? args,
+        ?arg_hints: Array[Object]?,
         ?rpc_options: RPCOptions?
       ) -> void
 
@@ -46,6 +50,8 @@ module Temporalio
         Workflow::Definition::Query | Symbol | String query,
         *Object? args,
         ?reject_condition: WorkflowQueryRejectCondition::enum?,
+        ?arg_hints: Array[Object]?,
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> Object?
 
@@ -54,6 +60,8 @@ module Temporalio
         *Object? args,
         wait_for_stage: WorkflowUpdateWaitStage::enum,
         ?id: String,
+        ?arg_hints: Array[Object]?,
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> WorkflowUpdateHandle
 
@@ -61,12 +69,15 @@ module Temporalio
         Workflow::Definition::Update | Symbol | String update,
         *Object? args,
         ?id: String,
+        ?arg_hints: Array[Object]?,
+        ?result_hint: Object?,
         ?rpc_options: RPCOptions?
       ) -> Object?
 
       def update_handle: (
         String id,
-        ?specific_run_id: String?
+        ?specific_run_id: String?,
+        ?result_hint: Object?
       ) -> WorkflowUpdateHandle
 
       def cancel: (

@@ -85,8 +85,10 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: duration?,
       ?request_eager_start: bool,
-      ?priority: Priority,
       ?versioning_override: VersioningOverride?,
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
       ?rpc_options: RPCOptions?
     ) -> WorkflowHandle
 
@@ -108,16 +110,18 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?start_delay: duration?,
       ?request_eager_start: bool,
-      ?priority: Priority,
       ?versioning_override: VersioningOverride?,
-      ?follow_runs: bool,
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
       ?rpc_options: RPCOptions?
     ) -> Object?
 
     def workflow_handle: (
       String workflow_id,
       ?run_id: String?,
-      ?first_execution_run_id: String?
+      ?first_execution_run_id: String?,
+      ?result_hint: Object?
     ) -> WorkflowHandle
 
     def start_update_with_start_workflow: (
@@ -126,6 +130,8 @@ module Temporalio
       start_workflow_operation: WithStartWorkflowOperation,
       wait_for_stage: WorkflowUpdateWaitStage::enum,
       ?id: String,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
       ?rpc_options: RPCOptions?
     ) -> WorkflowUpdateHandle
 
@@ -134,6 +140,8 @@ module Temporalio
       *Object? args,
       start_workflow_operation: WithStartWorkflowOperation,
       ?id: String,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
       ?rpc_options: RPCOptions?
     ) -> Object?
 
@@ -141,6 +149,7 @@ module Temporalio
       Workflow::Definition::Signal | Symbol | String signal,
       *Object? args,
       start_workflow_operation: WithStartWorkflowOperation,
+      ?arg_hints: Array[Object]?,
       ?rpc_options: RPCOptions?
     ) -> WorkflowHandle
 
