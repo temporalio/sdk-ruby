@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'temporalio/activity/context'
+require 'temporalio/internal/proto_utils'
+
 module Temporalio
   module Activity
     Info = Data.define(
@@ -7,10 +10,10 @@ module Temporalio
       :activity_type,
       :attempt,
       :current_attempt_scheduled_time,
-      :heartbeat_details,
       :heartbeat_timeout,
       :local?,
       :priority,
+      :raw_heartbeat_details,
       :schedule_to_close_timeout,
       :scheduled_time,
       :start_to_close_timeout,
@@ -33,14 +36,15 @@ module Temporalio
     #   @return [Integer] Attempt the activity is on.
     # @!attribute current_attempt_scheduled_time
     #   @return [Time] When the current attempt was scheduled.
-    # @!attribute heartbeat_details
-    #   @return [Array<Object>] Details from the last heartbeat of the last attempt.
     # @!attribute heartbeat_timeout
     #   @return [Float, nil] Heartbeat timeout set by the caller.
     # @!attribute local?
     #   @return [Boolean] Whether the activity is a local activity or not.
     # @!attribute priority
     #   @return [Priority] The priority of this activity.
+    # @!attribute raw_heartbeat_details
+    #   @return [Array<Converter::RawValue>] Raw details from the last heartbeat of the last attempt. Can use
+    #     {heartbeat_details} to get lazily-converted values.
     # @!attribute schedule_to_close_timeout
     #   @return [Float, nil] Schedule to close timeout set by the caller.
     # @!attribute scheduled_time
@@ -65,6 +69,20 @@ module Temporalio
     #
     # @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate this
     #   class or it may break in incompatible ways.
-    class Info; end # rubocop:disable Lint/EmptyClass
+    class Info
+      # Convert raw heartbeat details into Ruby types.
+      #
+      # Note, this live-converts every invocation.
+      #
+      # @param hints [Array<Object>, nil] Hints, if any, to assist conversion.
+      # @return [Array<Object>] Converted details.
+      def heartbeat_details(hints: nil)
+        Internal::ProtoUtils.convert_from_payload_array(
+          Context.current.payload_converter,
+          raw_heartbeat_details.map(&:payload),
+          hints:
+        )
+      end
+    end
   end
 end

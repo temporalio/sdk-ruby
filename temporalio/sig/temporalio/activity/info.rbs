@@ -5,10 +5,10 @@ module Temporalio
       attr_reader activity_type: String
       attr_reader attempt: Integer
       attr_reader current_attempt_scheduled_time: Time
-      attr_reader heartbeat_details: Array[Object?]
       attr_reader heartbeat_timeout: Float?
       attr_reader local?: bool
       attr_reader priority: Temporalio::Priority
+      attr_reader raw_heartbeat_details: Array[Converters::RawValue]
       attr_reader schedule_to_close_timeout: Float?
       attr_reader scheduled_time: Time
       attr_reader start_to_close_timeout: Float?
@@ -25,10 +25,10 @@ module Temporalio
         activity_type: String,
         attempt: Integer,
         current_attempt_scheduled_time: Time,
-        heartbeat_details: Array[Object?],
         heartbeat_timeout: Float?,
         local?: bool,
         priority: Temporalio::Priority?,
+        raw_heartbeat_details: Array[Converters::RawValue],
         schedule_to_close_timeout: Float?,
         scheduled_time: Time,
         start_to_close_timeout: Float?,
@@ -40,6 +40,8 @@ module Temporalio
         workflow_run_id: String,
         workflow_type: String
       ) -> void
+
+      def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
 
       def with: (**untyped) -> Info
     end
