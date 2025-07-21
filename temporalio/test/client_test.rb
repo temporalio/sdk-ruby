@@ -3,6 +3,7 @@
 require 'async'
 require 'temporalio/client'
 require 'temporalio/testing'
+require 'temporalio/worker'
 require 'test'
 
 class ClientTest < Test
@@ -143,5 +144,97 @@ class ClientTest < Test
       assert_equal 0, client.count_workflows("WorkflowType = 'test-interceptor-does-not-exist'").count
       assert_equal(%w[list_workflow_page count_workflows], track.calls.map(&:first))
     end
+  end
+
+  class SimpleWorkflow < Temporalio::Workflow::Definition
+    def execute(name)
+      "Hello, #{name}!"
+    end
+  end
+
+  def test_fork
+    # Cannot use client on other side of fork from where created
+    pre_fork_client = env.client
+    pid = fork do
+      pre_fork_client.start_workflow(
+        'some-workflow', id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}"
+      )
+    rescue Temporalio::Internal::Bridge::Error => e
+      exit! 123 if e.message.start_with?('Cannot use clients across forks')
+      raise
+    end
+    _, status = Process.wait2(pid)
+    assert_equal 123, status.exitstatus
+
+    # Cannot create client on other side of fork from runtime
+    pid = fork do
+      Temporalio::Client.connect(env.client.options.connection.target_host, env.client.options.namespace)
+    rescue Temporalio::Internal::Bridge::Error => e
+      exit! 234 if e.message.start_with?('Cannot create clients across forks')
+      raise
+    end
+    _, status = Process.wait2(pid)
+    assert_equal 234, status.exitstatus
+
+    # Cannot create worker on other side of fork from runtime. For whatever reason, the exit status is overwritten here
+    # so we use a pipe to relay back
+    reader, writer = IO.pipe
+    pid = fork do
+      reader.close
+      Temporalio::Worker.new(
+        client: pre_fork_client, task_queue: "tq-#{SecureRandom.uuid}", workflows: [SimpleWorkflow]
+      )
+      writer.puts 'success'
+    rescue Temporalio::Internal::Bridge::Error => e
+      writer.puts e.message.start_with?('Cannot create workers across forks') ? 'fork-fail' : 'fail'
+      exit!
+    end
+    Process.wait2(pid)
+    writer.close
+    assert_equal 'fork-fail', reader.read.strip
+
+    # Cannot use worker on other side of fork from runtime. For whatever reason, the exit status is overwritten here
+    # so we use a pipe to relay back
+    pre_fork_worker = Temporalio::Worker.new(
+      client: pre_fork_client, task_queue: "tq-#{SecureRandom.uuid}", workflows: [SimpleWorkflow]
+    )
+    reader, writer = IO.pipe
+    pid = fork do
+      reader.close
+      pre_fork_worker.run
+      writer.puts 'success'
+    rescue Temporalio::Internal::Bridge::Error => e
+      writer.puts e.message.start_with?('Cannot use workers across forks') ? 'fork-fail' : 'fail'
+      exit!
+    end
+    Process.wait2(pid)
+    writer.close
+    assert_equal 'fork-fail', reader.read.strip
+
+    # But use of a client and worker in the fork with their own runtime is fine
+    reader, writer = IO.pipe
+    pid = fork do
+      reader.close
+      client = Temporalio::Client.connect(
+        env.client.options.connection.target_host,
+        env.client.options.namespace,
+        runtime: Temporalio::Runtime.new
+      )
+      worker = Temporalio::Worker.new(
+        client:, task_queue: "tq-#{SecureRandom.uuid}", workflows: [SimpleWorkflow]
+      )
+      worker.run do
+        result = client.execute_workflow(
+          SimpleWorkflow, 'some-user',
+          id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue
+        )
+        writer.puts "Workflow result: #{result}"
+      end
+      exit! 0
+    end
+    _, status = Process.wait2(pid)
+    writer.close
+    assert status.success?
+    assert_equal 'Workflow result: Hello, some-user!', reader.read.strip
   end
 end

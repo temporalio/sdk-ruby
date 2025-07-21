@@ -83,6 +83,13 @@ macro_rules! rpc_call {
 
 impl Client {
     pub fn async_new(runtime: &Runtime, options: Struct, queue: Value) -> Result<(), Error> {
+        if runtime.handle.pid != std::process::id() {
+            return Err(error!(
+                "Cannot create clients across forks (original runtime PID is {}, current is {})",
+                runtime.handle.pid,
+                std::process::id()
+            ));
+        }
         // Build options
         let mut opts_build = ClientOptionsBuilder::default();
         let tls = options.child(id!("tls"))?;
@@ -191,6 +198,13 @@ impl Client {
     }
 
     pub fn async_invoke_rpc(&self, args: &[Value]) -> Result<(), Error> {
+        if self.runtime_handle.pid != std::process::id() {
+            return Err(error!(
+                "Cannot use clients across forks (original runtime PID is {}, current is {})",
+                self.runtime_handle.pid,
+                std::process::id()
+            ));
+        }
         let args = scan_args::scan_args::<(), (), (), (), _, ()>(args)?;
         let (service, rpc, request, retry, metadata, timeout, cancel_token, queue) =
             scan_args::get_kwargs::<

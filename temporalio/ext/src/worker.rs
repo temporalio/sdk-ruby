@@ -96,6 +96,14 @@ struct PollResult {
 
 impl Worker {
     pub fn new(client: &Client, options: Struct) -> Result<Self, Error> {
+        if client.runtime_handle.pid != std::process::id() {
+            return Err(error!(
+                "Cannot create workers across forks (original runtime PID is {}, current is {})",
+                client.runtime_handle.pid,
+                std::process::id()
+            ));
+        }
+
         enter_sync!(client.runtime_handle);
 
         let activity = options.member::<bool>(id!("activity"))?;
@@ -167,6 +175,14 @@ impl Worker {
             .entry::<typed_data::Obj<Worker>>(0)?
             .runtime_handle
             .clone();
+
+        if runtime.pid != std::process::id() {
+            return Err(error!(
+                "Cannot use workers across forks (original runtime PID is {}, current is {})",
+                runtime.pid,
+                std::process::id()
+            ));
+        }
 
         // Create streams of poll calls
         let worker_streams = workers
