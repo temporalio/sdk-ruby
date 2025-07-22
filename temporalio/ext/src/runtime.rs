@@ -260,4 +260,17 @@ impl RuntimeHandle {
                 )));
         });
     }
+
+    pub(crate) fn fork_check(&self, action: &'static str) -> Result<(), Error> {
+        if self.pid != std::process::id() {
+            Err(error!(
+                "Cannot {} across forks (original runtime PID is {}, current is {})",
+                action,
+                self.pid,
+                std::process::id()
+            ))
+        } else {
+            Ok(())
+        }
+    }
 }

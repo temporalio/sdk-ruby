@@ -160,7 +160,7 @@ class ClientTest < Test
         'some-workflow', id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}"
       )
     rescue Temporalio::Internal::Bridge::Error => e
-      exit! 123 if e.message.start_with?('Cannot use clients across forks')
+      exit! 123 if e.message.start_with?('Cannot use client across forks')
       raise
     end
     _, status = Process.wait2(pid)
@@ -170,7 +170,7 @@ class ClientTest < Test
     pid = fork do
       Temporalio::Client.connect(env.client.options.connection.target_host, env.client.options.namespace)
     rescue Temporalio::Internal::Bridge::Error => e
-      exit! 234 if e.message.start_with?('Cannot create clients across forks')
+      exit! 234 if e.message.start_with?('Cannot create client across forks')
       raise
     end
     _, status = Process.wait2(pid)
@@ -186,7 +186,7 @@ class ClientTest < Test
       )
       writer.puts 'success'
     rescue Temporalio::Internal::Bridge::Error => e
-      writer.puts e.message.start_with?('Cannot create workers across forks') ? 'fork-fail' : 'fail'
+      writer.puts e.message.start_with?('Cannot create worker across forks') ? 'fork-fail' : 'fail'
       exit!
     end
     Process.wait2(pid)
@@ -204,7 +204,7 @@ class ClientTest < Test
       pre_fork_worker.run
       writer.puts 'success'
     rescue Temporalio::Internal::Bridge::Error => e
-      writer.puts e.message.start_with?('Cannot use workers across forks') ? 'fork-fail' : 'fail'
+      writer.puts e.message.start_with?('Cannot use worker across forks') ? 'fork-fail' : 'fail'
       exit!
     end
     Process.wait2(pid)
