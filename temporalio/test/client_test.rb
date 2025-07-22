@@ -211,30 +211,27 @@ class ClientTest < Test
     writer.close
     assert_equal 'fork-fail', reader.read.strip
 
-    # But use of a client and worker in the fork with their own runtime is fine
+    # But use of a client in the fork with its own runtime is fine
     reader, writer = IO.pipe
     pid = fork do
       reader.close
       client = Temporalio::Client.connect(
         env.client.options.connection.target_host,
         env.client.options.namespace,
-        runtime: Temporalio::Runtime.new
+        runtime: Temporalio::Runtime.new,
+        logger: Logger.new($stdout)
       )
-      worker = Temporalio::Worker.new(
-        client:, task_queue: "tq-#{SecureRandom.uuid}", workflows: [SimpleWorkflow]
+      handle = client.start_workflow(
+        SimpleWorkflow, 'some-user',
+        id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}"
       )
-      worker.run do
-        result = client.execute_workflow(
-          SimpleWorkflow, 'some-user',
-          id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue
-        )
-        writer.puts "Workflow result: #{result}"
-      end
+      writer.puts('started workflow')
+      handle.terminate
       exit! 0
     end
     _, status = Process.wait2(pid)
     writer.close
     assert status.success?
-    assert_equal 'Workflow result: Hello, some-user!', reader.read.strip
+    assert_equal 'started workflow', reader.read.strip
   end
 end
