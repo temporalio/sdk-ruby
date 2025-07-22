@@ -353,9 +353,9 @@ signal of course). These definition-level hints are passed to converters both fr
 implementation side.
 
 There are some advanced payload uses in the SDK that do not currently have a way to set hints. These include
-workflow/schedule memo, workflow get/upsert memo, activity last heartbeat details, and application error details. In
-some cases, users can use `Temporalio::Converters::RawValue` and then manually convert with hints. For others, hints can
-be added as needed, please open an issue or otherwise contact Temporal.
+workflow/schedule memo, workflow get/upsert memo, and application error details. In some cases, users can use
+`Temporalio::Converters::RawValue` and then manually convert with hints. For others, hints can be added as needed,
+please open an issue or otherwise contact Temporal.
 
 ### Workers
 
