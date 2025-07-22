@@ -176,14 +176,15 @@ module Temporalio
             current_attempt_scheduled_time: Internal::ProtoUtils.timestamp_to_time(
               start.current_attempt_scheduled_time
             ) || raise, # Never nil
-            heartbeat_details: ProtoUtils.convert_from_payload_array(
-              @worker.options.client.data_converter,
-              start.heartbeat_details.to_ary,
-              hints: nil
-            ),
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
             priority: Priority._from_proto(start.priority),
+            raw_heartbeat_details: begin
+              payloads = start.heartbeat_details.to_ary
+              codec = @worker.options.client.data_converter.payload_codec
+              payloads = codec.decode(payloads) if codec
+              payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
+            end,
             schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.schedule_to_close_timeout),
             scheduled_time: Internal::ProtoUtils.timestamp_to_time(start.scheduled_time) || raise, # Never nil
             start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.start_to_close_timeout),
@@ -194,7 +195,7 @@ module Temporalio
             workflow_namespace: start.workflow_namespace,
             workflow_run_id: start.workflow_execution.run_id,
             workflow_type: start.workflow_type
-          ).freeze
+          )
 
           # Build input
           input = Temporalio::Worker::Interceptor::Activity::ExecuteInput.new(
