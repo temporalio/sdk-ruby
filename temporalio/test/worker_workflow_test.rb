@@ -2282,6 +2282,10 @@ class WorkerWorkflowTest < Test
   end
 
   def test_unsafe_io
+    # Ruby 3.2 on macOS has Fiber scheduling issues with IO.select
+    major, minor = RUBY_VERSION.split('.').take(2).map(&:to_i)
+    return if major.nil? || major != 3 || minor.nil? || minor < 3
+
     # Not allowed by default
     execute_workflow(UnsafeIOWorkflow, false) do |handle|
       assert_eventually_task_fail(handle:, message_contains: 'Cannot perform IO from inside a workflow')
