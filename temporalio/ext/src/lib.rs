@@ -1,4 +1,4 @@
-use magnus::{prelude::*, value::Lazy, Error, ExceptionClass, RModule, Ruby};
+use magnus::{Error, ExceptionClass, RModule, Ruby, prelude::*, value::Lazy};
 
 mod client;
 mod client_rpc_generated;

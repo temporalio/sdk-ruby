@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use magnus::{
-    class, function, method, prelude::*, DataTypeFunctions, Error, Ruby, TypedData, Value,
+    DataTypeFunctions, Error, Ruby, TypedData, Value, class, function, method, prelude::*,
 };
 use parking_lot::Mutex;
 use temporal_sdk_core::ephemeral_server::{
@@ -10,10 +10,9 @@ use temporal_sdk_core::ephemeral_server::{
 };
 
 use crate::{
-    error, id, new_error,
+    ROOT_MOD, error, id, new_error,
     runtime::{Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
-    ROOT_MOD,
 };
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {

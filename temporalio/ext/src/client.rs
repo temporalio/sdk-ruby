@@ -7,17 +7,17 @@ use temporal_client::{
 };
 
 use magnus::{
-    class, function, method, prelude::*, scan_args, DataTypeFunctions, Error, RString, Ruby,
-    TypedData, Value,
+    DataTypeFunctions, Error, RString, Ruby, TypedData, Value, class, function, method, prelude::*,
+    scan_args,
 };
-use tonic::{metadata::MetadataKey, Status};
+use tonic::{Status, metadata::MetadataKey};
 use url::Url;
 
-use super::{error, id, new_error, ROOT_MOD};
+use super::{ROOT_MOD, error, id, new_error};
 use crate::{
+    ROOT_ERR,
     runtime::{Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
-    ROOT_ERR,
 };
 use std::str::FromStr;
 
@@ -119,7 +119,7 @@ impl Client {
                     _ => {
                         return Err(error!(
                             "Must have both client cert and private key or neither"
-                        ))
+                        ));
                     }
                 },
                 server_root_ca_cert: tls

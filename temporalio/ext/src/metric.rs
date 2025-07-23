@@ -1,20 +1,19 @@
 use std::{any::Any, sync::Arc, time::Duration};
 
 use magnus::{
-    class, function,
+    DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
+    Symbol, TryConvert, TypedData, Value, class, function,
     gc::register_mark_object,
     method,
     prelude::*,
     r_hash::ForEach,
     value::{IntoId, Lazy, Qfalse, Qtrue},
-    DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
-    Symbol, TryConvert, TypedData, Value,
 };
 use temporal_sdk_core_api::telemetry::metrics::{
     self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
 };
 
-use crate::{error, id, runtime::Runtime, util::SendSyncBoxValue, ROOT_MOD};
+use crate::{ROOT_MOD, error, id, runtime::Runtime, util::SendSyncBoxValue};
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
