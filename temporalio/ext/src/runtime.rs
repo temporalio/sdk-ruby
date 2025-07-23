@@ -46,6 +46,7 @@ pub struct Runtime {
 
 #[derive(Clone)]
 pub(crate) struct RuntimeHandle {
+    pub(crate) pid: u32,
     pub(crate) core: Arc<CoreRuntime>,
     pub(crate) async_command_tx: Sender<AsyncCommand>,
 }
@@ -178,6 +179,7 @@ impl Runtime {
             channel();
         Ok(Self {
             handle: RuntimeHandle {
+                pid: std::process::id(),
                 core: Arc::new(core),
                 async_command_tx,
             },
@@ -257,5 +259,18 @@ impl RuntimeHandle {
                     },
                 )));
         });
+    }
+
+    pub(crate) fn fork_check(&self, action: &'static str) -> Result<(), Error> {
+        if self.pid != std::process::id() {
+            Err(error!(
+                "Cannot {} across forks (original runtime PID is {}, current is {})",
+                action,
+                self.pid,
+                std::process::id()
+            ))
+        } else {
+            Ok(())
+        }
     }
 }

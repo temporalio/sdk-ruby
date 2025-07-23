@@ -96,6 +96,8 @@ struct PollResult {
 
 impl Worker {
     pub fn new(client: &Client, options: Struct) -> Result<Self, Error> {
+        client.runtime_handle.fork_check("create worker")?;
+
         enter_sync!(client.runtime_handle);
 
         let activity = options.member::<bool>(id!("activity"))?;
@@ -167,6 +169,8 @@ impl Worker {
             .entry::<typed_data::Obj<Worker>>(0)?
             .runtime_handle
             .clone();
+
+        runtime.fork_check("use worker")?;
 
         // Create streams of poll calls
         let worker_streams = workers

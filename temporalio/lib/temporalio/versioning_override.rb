@@ -31,10 +31,11 @@ module Temporalio
 
       # @!visibility private
       def _to_proto
-        Temporalio::Api::Workflow::V1::VersioningOverride.new(
-          behavior: Temporalio::Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_PINNED,
+        Api::Workflow::V1::VersioningOverride.new(
+          behavior: Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_PINNED,
           pinned_version: @version.to_canonical_string,
-          pinned: Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride.new(
+          pinned: Api::Workflow::V1::VersioningOverride::PinnedOverride.new(
+            behavior: Api::Workflow::V1::VersioningOverride::PinnedOverrideBehavior::PINNED_OVERRIDE_BEHAVIOR_PINNED,
             version: @version._to_proto
           )
         )
@@ -45,8 +46,8 @@ module Temporalio
     class AutoUpgrade < VersioningOverride
       # @!visibility private
       def _to_proto
-        Temporalio::Api::Workflow::V1::VersioningOverride.new(
-          behavior: Temporalio::Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_AUTO_UPGRADE,
+        Api::Workflow::V1::VersioningOverride.new(
+          behavior: Api::Enums::V1::VersioningBehavior::VERSIONING_BEHAVIOR_AUTO_UPGRADE,
           auto_upgrade: true
         )
       end

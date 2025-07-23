@@ -83,6 +83,7 @@ macro_rules! rpc_call {
 
 impl Client {
     pub fn async_new(runtime: &Runtime, options: Struct, queue: Value) -> Result<(), Error> {
+        runtime.handle.fork_check("create client")?;
         // Build options
         let mut opts_build = ClientOptionsBuilder::default();
         let tls = options.child(id!("tls"))?;
@@ -191,6 +192,7 @@ impl Client {
     }
 
     pub fn async_invoke_rpc(&self, args: &[Value]) -> Result<(), Error> {
+        self.runtime_handle.fork_check("use client")?;
         let args = scan_args::scan_args::<(), (), (), (), _, ()>(args)?;
         let (service, rpc, request, retry, metadata, timeout, cancel_token, queue) =
             scan_args::get_kwargs::<
