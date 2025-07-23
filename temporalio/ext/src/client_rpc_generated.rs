@@ -227,6 +227,7 @@ impl Client {
                     WorkflowService,
                     list_worker_deployments
                 ),
+                "list_workers" => rpc_call!(self, callback, call, WorkflowService, list_workers),
                 "list_workflow_executions" => rpc_call!(
                     self,
                     callback,
@@ -283,6 +284,13 @@ impl Client {
                     call,
                     WorkflowService,
                     record_activity_task_heartbeat_by_id
+                ),
+                "record_worker_heartbeat" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    record_worker_heartbeat
                 ),
                 "register_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, register_namespace)

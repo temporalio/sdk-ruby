@@ -1320,6 +1320,36 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls WorkflowService.RecordWorkerHeartbeat API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatResponse] API response.
+        def record_worker_heartbeat(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'record_worker_heartbeat',
+            request_class: Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ListWorkers API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ListWorkersRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ListWorkersResponse] API response.
+        def list_workers(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'list_workers',
+            request_class: Temporalio::Api::WorkflowService::V1::ListWorkersRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ListWorkersResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end

@@ -169,28 +169,28 @@ trait Instrument: Send + Sync {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error>;
 }
 
-impl Instrument for Arc<dyn metrics::Counter> {
+impl Instrument for metrics::Counter {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         self.add(TryConvert::try_convert(value)?, attrs);
         Ok(())
     }
 }
 
-impl Instrument for Arc<dyn metrics::Histogram> {
+impl Instrument for metrics::Histogram {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         self.record(TryConvert::try_convert(value)?, attrs);
         Ok(())
     }
 }
 
-impl Instrument for Arc<dyn metrics::HistogramF64> {
+impl Instrument for metrics::HistogramF64 {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         self.record(TryConvert::try_convert(value)?, attrs);
         Ok(())
     }
 }
 
-impl Instrument for Arc<dyn metrics::HistogramDuration> {
+impl Instrument for metrics::HistogramDuration {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         let secs = f64::try_convert(value)?;
         if secs < 0.0 {
@@ -201,14 +201,14 @@ impl Instrument for Arc<dyn metrics::HistogramDuration> {
     }
 }
 
-impl Instrument for Arc<dyn metrics::Gauge> {
+impl Instrument for metrics::Gauge {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         self.record(TryConvert::try_convert(value)?, attrs);
         Ok(())
     }
 }
 
-impl Instrument for Arc<dyn metrics::GaugeF64> {
+impl Instrument for metrics::GaugeF64 {
     fn record_value(&self, value: Value, attrs: &metrics::MetricAttributes) -> Result<(), Error> {
         self.record(TryConvert::try_convert(value)?, attrs);
         Ok(())

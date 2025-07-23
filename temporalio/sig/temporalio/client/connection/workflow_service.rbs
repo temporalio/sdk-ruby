@@ -353,6 +353,14 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def record_worker_heartbeat: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def list_workers: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end

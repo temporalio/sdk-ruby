@@ -103,7 +103,7 @@ impl Client {
             .client_version(options.member::<String>(id!("client_version"))?)
             .headers(Some(options.member(id!("rpc_metadata"))?))
             .api_key(options.member(id!("api_key"))?)
-            .identity(options.member(id!("identity"))?);
+            .identity(options.member::<String>(id!("identity"))?);
         if let Some(tls) = tls {
             opts_build.tls_cfg(TlsConfig {
                 client_tls_config: match (
