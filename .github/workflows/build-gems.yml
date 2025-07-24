@@ -30,19 +30,22 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
+      # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
+      # need --mount-toolchains to get latest Rust, see
+      # https://github.com/oxidize-rb/actions/issues/61
       - name: Cross compile gem
-        uses: oxidize-rb/actions/cross-gem@v1
         id: cross-gem
-        with:
-          platform: ${{ matrix.rubyPlatform }}
-          ruby-versions: "3.2,3.3,3.4"
-          working-directory: ./temporalio
+        working-directory: ./temporalio
+        run: |
+          bundle exec rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.2,3.3,3.4" --mount-toolchains --build
+          echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> $GITHUB_OUTPUT
 
       - name: Upload gem
         uses: actions/upload-artifact@v4
         with:
+          if-no-files-found: error
           name: ${{ matrix.rubyPlatform }}-gem
-          path: ${{ steps.cross-gem.outputs.gem-path }}
+          path: ./temporalio/${{ steps.cross-gem.outputs.gem-path }}
 
   build-source-gem:
     runs-on: ubuntu-latest
@@ -84,7 +87,11 @@ jobs:
         #
         # TODO(cretz): Enable windows-latest if we can figure out Windows issue, see
         #   https://github.com/temporalio/sdk-ruby/issues/172
-        os: [ubuntu-latest, macos-intel, macos-latest]
+        #
+        # TODO(cretz): macos-intel (macos-13) is not tested against because the GH runner for it
+        #   does not have updated certificates and it is not easy to update them, see
+        #   https://github.com/temporalio/sdk-ruby/issues/306
+        os: [ubuntu-latest, macos-latest]
         rubyVersion: ["3.2", "3.3", "3.4"]
         # Container defaults to empty/none, but additional container for Alpine
         # added later
@@ -93,16 +100,13 @@ jobs:
         include:
           - os: ubuntu-latest
             rubyPlatform: x86_64-linux
-          - os: macos-intel
-            runsOn: macos-13
-            rubyPlatform: x86_64-darwin
           - os: macos-latest
             rubyPlatform: arm64-darwin
           - os: ubuntu-latest
             rubyVersion: "3.3"
             container: alpine/git:latest
             rubyPlatform: x86_64-linux-musl
-    runs-on: ${{ matrix.runsOn || matrix.os }}
+    runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
       - name: Checkout repository
