@@ -1246,14 +1246,17 @@ popular approach to developing in Temporal with Ruby. While Temporal encourages 
 features and support, this section covers differences from the Coinbase SDK to help those looking to migrate.
 
 See [this Ruby sample](https://github.com/temporalio/samples-ruby/tree/main/coinbase_ruby) which demonstrates
-interoperability between Coinbase Ruby and Temporal Ruby clients, workflows, and activities. Specifically it discusses
-how to disable API class loading on the Coinbase Ruby side if needing to use both dependencies in the same project since
-two sets of API classes cannot both be present.
+interoperability between Coinbase Ruby and Temporal Ruby clients, workflows, and activities. Specifically, it discusses
+how to disable API class loading on the Coinbase Ruby side if needing to use both dependencies in the same project,
+since two sets of API classes cannot both be present.
 
 Migration cannot be done on a live, running workflow. Overall, Coinbase Ruby workflow events are incompatible with
-Temporal Ruby workflow events at runtime, so a live workflow migration cannot occur, an alternative task queue would be
-needed. However, Coinbase Ruby clients, workflows, and activities can be used with Temporal Ruby clients, workflows, and
-activities in either direction.
+Temporal Ruby workflow events at runtime, so both SDK versions cannot have workers for the same task queue. A live
+workflow migration cannot occur, an separate task queue would be needed. However, Coinbase Ruby clients, workflows, and
+activities can be used with Temporal Ruby clients, workflows, and activities in either direction. Migrating from the
+Coinbase Ruby SDK to the Temporal Ruby SDK would be similar to migrating from Temporal Go SDK to Temporal Java SDK. You
+can interact across, but the workflow events are incompatible and therefore the task queues cannot be served by both at
+the same time.
 
 Here is an overview of the primary differences between the SDKs:
 
