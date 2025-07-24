@@ -73,7 +73,7 @@ where
     where
         F: FnMut() -> R,
     {
-        let mut func: F = *Box::from_raw(data as _);
+        let mut func: F = unsafe { *Box::from_raw(data as _) };
 
         // TODO(cretz): Handle panics/unwind via call_handle_error?
         Box::into_raw(Box::new(func())) as _
@@ -83,7 +83,7 @@ where
     where
         U: FnMut(),
     {
-        let mut func: U = *Box::from_raw(data as _);
+        let mut func: U = unsafe { *Box::from_raw(data as _) };
 
         func();
     }

@@ -146,7 +146,6 @@ class Test < Minitest::Test
       if ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST'].blank?
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
-          dev_server_download_version: 'v1.3.1-priority.0',
           dev_server_extra_args: [
             # Allow continue as new to be immediate
             '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',

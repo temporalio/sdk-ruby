@@ -6,23 +6,23 @@ use std::{
 };
 
 use crate::{
+    ROOT_MOD,
     client::Client,
     enter_sync, error, id, new_error,
     runtime::{AsyncCommand, Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
-    ROOT_MOD,
 };
+use futures::{StreamExt, stream::BoxStream};
 use futures::{future, stream};
-use futures::{stream::BoxStream, StreamExt};
 use magnus::{
-    class, function, method, prelude::*, typed_data, DataTypeFunctions, Error, IntoValue, RArray,
-    RString, RTypedData, Ruby, TypedData, Value,
+    DataTypeFunctions, Error, IntoValue, RArray, RString, RTypedData, Ruby, TypedData, Value,
+    class, function, method, prelude::*, typed_data,
 };
 use prost::Message;
 use temporal_sdk_core::{
-    replay::{HistoryForReplay, ReplayWorkerInput},
     ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
     SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
+    replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use temporal_sdk_core_api::{
     errors::{PollError, WorkflowErrorType},
@@ -34,7 +34,7 @@ use temporal_sdk_core_api::{
 use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
 use temporal_sdk_core_protos::coresdk::{ActivityHeartbeat, ActivityTaskCompletion};
 use temporal_sdk_core_protos::temporal::api::history::v1::History;
-use tokio::sync::mpsc::{channel, Sender};
+use tokio::sync::mpsc::{Sender, channel};
 use tokio_stream::wrappers::ReceiverStream;
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
@@ -96,6 +96,8 @@ struct PollResult {
 
 impl Worker {
     pub fn new(client: &Client, options: Struct) -> Result<Self, Error> {
+        client.runtime_handle.fork_check("create worker")?;
+
         enter_sync!(client.runtime_handle);
 
         let activity = options.member::<bool>(id!("activity"))?;
@@ -167,6 +169,8 @@ impl Worker {
             .entry::<typed_data::Obj<Worker>>(0)?
             .runtime_handle
             .clone();
+
+        runtime.fork_check("use worker")?;
 
         // Create streams of poll calls
         let worker_streams = workers

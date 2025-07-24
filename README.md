@@ -75,6 +75,7 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
   - [Rails](#rails)
     - [ActiveRecord](#activerecord)
     - [Lazy/Eager Loading](#lazyeager-loading)
+  - [Forking](#forking)
   - [Ractors](#ractors)
   - [Platform Support](#platform-support)
   - [Migration from Coinbase Ruby SDK](#migration-from-coinbase-ruby-sdk)
@@ -1202,6 +1203,16 @@ To resolve this, either always eagerly load (e.g. `config.eager_load = true`) or
 workflow at the top of the file.
 
 Note, this only affects non-production environments.
+
+### Forking
+
+Objects created with the Temporal Ruby SDK cannot be used across forks. This includes runtimes, clients, and workers. By
+default, using `Client.connect` uses `Runtime.default` which is lazily created. If it was already created on the parent,
+an exception will occur when trying to reuse it to create clients or workers in a forked child. Similarly any RPC
+invocation or worker execution inside of a forked child separate from where the runtime or client or worker were created
+will raise an exception.
+
+If forking must be used, make sure Temporal objects are only created _inside_ the fork.
 
 ### Ractors
 
