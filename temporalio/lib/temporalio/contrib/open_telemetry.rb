@@ -453,19 +453,15 @@ module Temporalio
                          'temporalRunID' => Temporalio::Workflow.info.run_id }.merge(attributes)
 
           time = Temporalio::Workflow.now.dup
-          # Disable illegal call tracing because OTel asks for full exception message which uses error highlighting and
-          # such which accesses File#path, and they also use loggers accessing current time
-          Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
-            # Disable durable scheduler because 1) synchronous/non-batch span processors in OTel use network (though
-            # could have just used Unafe.io_enabled for this if not for the next point) and 2) OTel uses Ruby Timeout
-            # which we don't want to use durable timers.
-            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
-              span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
-              # Record exception if present
-              span.record_exception(exception) if exception
-              # Finish the span (returns self)
-              span.finish(end_timestamp: time)
-            end
+          # Disable durable scheduler because 1) synchronous/non-batch span processors in OTel use network (though could
+          # have just used Unafe.io_enabled for this if not for the next point) and 2) OTel uses Ruby Timeout which we
+          # don't want to use durable timers.
+          Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
+            # Record exception if present
+            span.record_exception(exception) if exception
+            # Finish the span (returns self)
+            span.finish(end_timestamp: time)
           end
         end
       end

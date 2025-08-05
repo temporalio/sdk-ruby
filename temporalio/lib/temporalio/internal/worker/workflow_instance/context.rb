@@ -64,11 +64,12 @@ module Temporalio
 
           def durable_scheduler_disabled(&)
             prev = Fiber.current_scheduler
-            illegal_call_tracing_disabled { Fiber.set_scheduler(nil) }
-            begin
+            # Imply illegal call tracing disabled
+            illegal_call_tracing_disabled do
+              Fiber.set_scheduler(nil)
               yield
             ensure
-              illegal_call_tracing_disabled { Fiber.set_scheduler(prev) }
+              Fiber.set_scheduler(prev)
             end
           end
 

@@ -141,7 +141,8 @@ module Temporalio
             unless @instance.io_enabled
               raise Workflow::NondeterminismError,
                     'Cannot perform IO from inside a workflow. If this is known to be safe, ' \
-                    'the code can be run in a Temporalio::Workflow::Unsafe.io_enabled block.'
+                    'the code can be run in a Temporalio::Workflow::Unsafe.durable_scheduler_disabled ' \
+                    'or Temporalio::Workflow::Unsafe.io_enabled block.'
             end
 
             # Use regular Ruby behavior of blocking this thread. There is no Ruby implementation of io_wait we can just

@@ -571,6 +571,10 @@ class WorkerWorkflowTest < Test
   def test_deadlock
     # TODO(cretz): Do we need more tests? This attempts to interrupt the workflow via a raise on the thread, but do we
     # need to concern ourselves with what happens if that's accidentally swallowed?
+    # TODO(cretz): Note that often mutexes and cond vars are not subject to Timeout.timeout which means they can not be
+    # interrupted by deadlock detection
+    # TODO(cretz): Note that a thread.join that does get deadlock detected may crash the VM on exit with a
+    # "[BUG] pthread_mutex_lock: Invalid argument (EINVAL)"
     # TODO(cretz): Decrease deadlock detection timeout to make test faster? It is 4s now because shutdown waits on
     # second task.
     execute_workflow(DeadlockWorkflow) do |handle|
