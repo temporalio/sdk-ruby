@@ -555,6 +555,8 @@ module Temporalio
       # fiber scheduler and no workflow helpers will be available in the block. This is usually only needed in advanced
       # situations where a third party library does something like use "Timeout" in a way that shouldn't be made
       # durable.
+      #
+      # This implies {illegal_call_tracing_disabled}.
       def self.durable_scheduler_disabled(&)
         Workflow._current.durable_scheduler_disabled(&)
       end

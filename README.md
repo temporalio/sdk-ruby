@@ -61,6 +61,9 @@ opinions. Please communicate with us on [Slack](https://t.mp/slack) in the `#rub
       - [Manual Time Skipping](#manual-time-skipping)
       - [Mocking Activities](#mocking-activities)
     - [Workflow Replay](#workflow-replay)
+    - [Advanced Workflow Safety and Escaping](#advanced-workflow-safety-and-escaping)
+      - [Durable Fiber Scheduler](#durable-fiber-scheduler)
+      - [Illegal Call Tracing](#illegal-call-tracing)
   - [Activities](#activities)
     - [Activity Definition](#activity-definition)
     - [Activity Context](#activity-context)
@@ -716,6 +719,11 @@ Ruby workflows. This means there are several things workflows cannot do such as:
 * Make any random calls
 * Make any not-guaranteed-deterministic calls
 
+This means you can't even call `puts` or logger calls outside of `Temporalio::Workflow.logger` because they use mutexes
+which may be hit during periods of high-contention, but they are not completely disabled since users may do quick
+debugging with them. See the [Advanced Workflow Safety and Escaping](#advanced-workflow-safety-and-escaping) section if
+needing to work around this.
+
 #### Workflow Testing
 
 Workflow testing can be done in an integration-test fashion against a real server. However, it is hard to simulate
@@ -917,6 +925,46 @@ end
 ```
 
 See the `WorkflowReplayer` API documentation for more details.
+
+#### Advanced Workflow Safety and Escaping
+
+Workflows use a custom fiber scheduler to make things like certain blocking calls and timeouts durable. There is also
+call tracing to prevent accidentally making illegal workflow calls. But sometimes in advanced situations, workarounds
+may be needed. This section describes advanced situations working with the workflow Fiber scheduler and illegal call
+tracer.
+
+##### Durable Fiber Scheduler
+
+The custom fiber scheduler that powers workflows makes otherwise-local, blocking things durable. This is why `sleep` and
+`Timeout.timeout` and `Queue` and other things work durably. However, there are cases where it may be desired for these
+to work locally inside a workflow such as for logging or `puts` or other side-effecting, known-non-deterministic
+aspects.
+
+Users can pass a block to `Temporalio::Workflow::Unsafe.durable_scheduler_disabled` to not use the durable scheduler.
+This should be used any time the scheduler needs to be bypassed, e.g. for local stdout. Not doing this can cause
+workflows to get hung in high contention situations. For instance, if there is a `puts` or a logger (that isn't the
+safe-to-use `Temporalio::Workflow.logger`) in a workflow, _technically_ Ruby surrounds the IO writes with a mutex and
+in extreme high contention that mutex may durably block and then the workflow task may complete causing hung workflows
+because no event comes to wake the mutex.
+
+Also, by default anything that relies on IO wait that is not inside `durable_scheduler_disabled` will fail. It is
+recommended to put things that need this in `durable_scheduler_disabled`, but if the durable scheduler is still needed
+but IO wait is also needed, then a block passed to `Temporalio::Workflow::Unsafe.io_enabled` can be used.
+
+Note `durable_scheduler_disabled` implies `illegal_call_tracing_disabled` (see next section). Many use of 
+`durable_scheduler_disabled`, such as for tracing or logging, often surround themselves in a
+`unless Temporalio::Workflow.replaying?` block to make sure they don't duplicate the side effects on replay.
+
+##### Illegal Call Tracing
+
+Ruby workflow threads employ a `TracePoint` to catch illegal calls such as `Time.now` or `Thread.new`. The set of
+illegal calls can be configured via the `illegal_workflow_calls` parameter when creating a worker. The default set is at
+`Temporalio::Worker.default_illegal_workflow_calls`.
+
+When an illegal call is encountered, an exception is thrown. In advanced cases there may be a need to allow an illegal
+call that is known to be used deterministically. This code can be in a block passed to
+`Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled`. If this has side-effecting behavior that needs to use the
+non-durable scheduler, use `durable_scheduler_disabled` instead (which implies this, see previous section).
 
 ### Activities
 

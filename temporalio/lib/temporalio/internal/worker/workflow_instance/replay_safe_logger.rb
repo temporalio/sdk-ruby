@@ -27,8 +27,11 @@ module Temporalio
               return true
             end
 
-            # Disable illegal call tracing for the log call
-            @instance.illegal_call_tracing_disabled { super }
+            # Disable scheduler since logs technically have local mutexes in them that cannot be done durably or they
+            # will block workflows
+            @instance.context.durable_scheduler_disabled do
+              super
+            end
           end
         end
       end
