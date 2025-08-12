@@ -537,18 +537,30 @@ module Temporalio
       # Run a block of code with illegal call tracing disabled. Users should be cautious about using this as it can
       # often signify unsafe code.
       #
+      # If this is invoked outside of a workflow, it just runs the block.
+      #
       # @yield Block to run with call tracing disabled
       #
       # @return [Object] Result of the block.
       def self.illegal_call_tracing_disabled(&)
-        Workflow._current.illegal_call_tracing_disabled(&)
+        if Workflow.in_workflow?
+          Workflow._current.illegal_call_tracing_disabled(&)
+        else
+          yield
+        end
       end
 
       # Run a block of code with IO enabled. Specifically this allows the `io_wait` call of the fiber scheduler to work.
       # Users should be cautious about using this as it can often signify unsafe code. Note, this is often only
       # applicable to network code as file IO and most process-based IO does not go through scheduler `io_wait`.
+      #
+      # If this is invoked outside of a workflow, it just runs the block.
       def self.io_enabled(&)
-        Workflow._current.io_enabled(&)
+        if Workflow.in_workflow?
+          Workflow._current.io_enabled(&)
+        else
+          yield
+        end
       end
 
       # Run a block of code with the durable/deterministic workflow Fiber scheduler off. This means fallback to default
@@ -556,9 +568,41 @@ module Temporalio
       # situations where a third party library does something like use "Timeout" in a way that shouldn't be made
       # durable.
       #
+      # If this is invoked outside of a workflow, it just runs the block.
+      #
       # This implies {illegal_call_tracing_disabled}.
       def self.durable_scheduler_disabled(&)
-        Workflow._current.durable_scheduler_disabled(&)
+        if Workflow.in_workflow?
+          Workflow._current.durable_scheduler_disabled(&)
+        else
+          yield
+        end
+      end
+
+      # @!visibility private
+      def self._wrap_ruby_class_as_legal(target_class)
+        Class.new do
+          define_method(:initialize) do |*args, **kwargs, &block|
+            @underlying = Unsafe.illegal_call_tracing_disabled do
+              target_class.new(*args, **kwargs, &block) # steep:ignore
+            end
+          end
+
+          # @!visibility private
+          def method_missing(name, ...)
+            if @underlying.respond_to?(name)
+              # Call with tracing disabled
+              Unsafe.illegal_call_tracing_disabled { @underlying.public_send(name, ...) }
+            else
+              super
+            end
+          end
+
+          # @!visibility private
+          def respond_to_missing?(name, include_all = false)
+            @underlying.respond_to?(name, include_all) || super
+          end
+        end
       end
     end
 
@@ -625,5 +669,29 @@ module Temporalio
     # error can still be used with configuring workflow failure exception types to change non-deterministic errors from
     # task failures to workflow failures.
     class NondeterminismError < Error; end
+
+    # Mutex is a workflow-safe wrapper around {::Mutex}.
+    #
+    # As of this writing, all methods on Mutex are safe for workflow use and are implicitly made deterministic by the
+    # Fiber scheduler. The primary reason this is wrapped as safe is to be able to catch unintentional uses of Mutex by
+    # non-workflow-safe code. However, users may prefer to use the more powerful {wait_condition} approach as a mutex
+    # (e.g. wait until a certain attribute is set to false then set it to true before continuing).
+    Mutex = Unsafe._wrap_ruby_class_as_legal(::Mutex)
+
+    # Queue is a workflow-safe wrapper around {::Queue}.
+    #
+    # As of this writing, all methods on Queue are safe for workflow use and are implicitly made deterministic by the
+    # Fiber scheduler. The primary reason this is wrapped as safe is to be able to catch unintentional uses of Queue by
+    # non-workflow-safe code. However, users may prefer to use the more powerful {wait_condition} approach as a queue
+    # (e.g. wait until an array is non-empty before continuing).
+    Queue = Unsafe._wrap_ruby_class_as_legal(::Queue)
+
+    # SizedQueue is a workflow-safe wrapper around {::SizedQueue}.
+    #
+    # As of this writing, all methods on SizedQueue are safe for workflow use and are implicitly made deterministic by
+    # the Fiber scheduler. The primary reason this is wrapped as safe is to be able to catch unintentional uses of
+    # SizedQueue by non-workflow-safe code. However, users may prefer to use the more powerful {wait_condition} approach
+    # as a queue (e.g. wait until an array is non-empty before continuing).
+    SizedQueue = Unsafe._wrap_ruby_class_as_legal(::SizedQueue)
   end
 end

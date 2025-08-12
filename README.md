@@ -571,9 +571,7 @@ Some things to note about the above code:
 
 * A timer is represented by `Temporalio::Workflow.sleep`.
   * Timers are also started on `Temporalio::Workflow.timeout`.
-  * _Technically_ `Kernel.sleep` and `Timeout.timeout` also delegate to the above calls, but the more explicit workflow
-    forms are encouraged because they accept more options and are not subject to Ruby standard library implementation
-    changes.
+  * `Kernel.sleep` and `Timeout.timeout` are considered illegal by default.
   * Each timer accepts a `Cancellation`, but if none is given, it defaults to `Temporalio::Workflow.cancellation`.
 * `Temporalio::Workflow.wait_condition` accepts a block that waits until the evaluated block result is truthy, then
   returns the value.
@@ -586,7 +584,10 @@ Some things to note about the above code:
 #### Workflow Fiber Scheduling and Cancellation
 
 Workflows are backed by a custom, deterministic `Fiber::Scheduler`. All fiber calls inside a workflow use this scheduler
-to ensure coroutines run deterministically.
+to ensure coroutines run deterministically. Although this means that `Kernel.sleep` and `Mutex` and such should work and
+since they are Fiber-aware, Temporal intentionally disables their use by default to prevent accidental use. See
+"Workflow Logic Constraints" and "Advanced Workflow Safety and Escaping" for more details, and see "Workflow Utilities"
+for alternatives.
 
 Every workflow contains a `Temporalio::Cancellation` at `Temporalio::Workflow.cancellation`. This is canceled when the
 workflow is canceled. For all workflow calls that accept a cancellation token, this is the default. So if a workflow is
@@ -678,6 +679,9 @@ from workflows including:
   nil key for dynamic). `[]=` or `store` can be called on these to update the handlers, though defined handlers are
   encouraged over runtime-set ones.
 
+There are also classes for `Temporalio::Workflow::Mutex`, `Temporalio::Workflow::Queue`, and
+`Temporalio::Workflow::SizedQueue` that are workflow-safe wrappers around the standard library forms.
+
 `Temporalio::Workflow::ContinueAsNewError` can be raised to continue-as-new the workflow. It accepts positional args and
 defaults the workflow to the same as the current, though it can be changed with the `workflow` kwarg. See API
 documentation for other details.
@@ -714,15 +718,15 @@ Ruby workflows. This means there are several things workflows cannot do such as:
 
 * Perform IO (network, disk, stdio, etc)
 * Access/alter external mutable state
-* Do any threading
+* Do any threading or blocking calls
 * Do anything using the system clock (e.g. `Time.Now`)
 * Make any random calls
 * Make any not-guaranteed-deterministic calls
 
-This means you can't even call `puts` or logger calls outside of `Temporalio::Workflow.logger` because they use mutexes
-which may be hit during periods of high-contention, but they are not completely disabled since users may do quick
-debugging with them. See the [Advanced Workflow Safety and Escaping](#advanced-workflow-safety-and-escaping) section if
-needing to work around this.
+This means you can't even use logger calls outside of `Temporalio::Workflow.logger` because they use mutexes which may
+be hit during periods of high-contention, but they are not completely disabled since users may do quick debugging with
+them. See the [Advanced Workflow Safety and Escaping](#advanced-workflow-safety-and-escaping) section if needing to work
+around this.
 
 #### Workflow Testing
 
@@ -928,24 +932,22 @@ See the `WorkflowReplayer` API documentation for more details.
 
 #### Advanced Workflow Safety and Escaping
 
-Workflows use a custom fiber scheduler to make things like certain blocking calls and timeouts durable. There is also
-call tracing to prevent accidentally making illegal workflow calls. But sometimes in advanced situations, workarounds
-may be needed. This section describes advanced situations working with the workflow Fiber scheduler and illegal call
-tracer.
+Workflows use a custom fiber scheduler to make fibers durable. There is also call tracing to prevent accidentally making
+illegal workflow calls. But sometimes in advanced situations, workarounds may be needed. This section describes advanced
+situations working with the workflow Fiber scheduler and illegal call tracer.
 
 ##### Durable Fiber Scheduler
 
-The custom fiber scheduler that powers workflows makes otherwise-local, blocking things durable. This is why `sleep` and
-`Timeout.timeout` and `Queue` and other things work durably. However, there are cases where it may be desired for these
-to work locally inside a workflow such as for logging or `puts` or other side-effecting, known-non-deterministic
-aspects.
+By default, Temporal considers `Logger`, `sleep`, `Timeout.timeout`, `Queue`, etc illegal. However, there are cases
+where it may be desired for these to work locally inside a workflow such as for logging or other side-effecting,
+known-non-deterministic aspects.
 
 Users can pass a block to `Temporalio::Workflow::Unsafe.durable_scheduler_disabled` to not use the durable scheduler.
 This should be used any time the scheduler needs to be bypassed, e.g. for local stdout. Not doing this can cause
-workflows to get hung in high contention situations. For instance, if there is a `puts` or a logger (that isn't the
-safe-to-use `Temporalio::Workflow.logger`) in a workflow, _technically_ Ruby surrounds the IO writes with a mutex and
-in extreme high contention that mutex may durably block and then the workflow task may complete causing hung workflows
-because no event comes to wake the mutex.
+workflows to get hung in high contention situations. For instance, if there is a logger (that isn't the safe-to-use
+`Temporalio::Workflow.logger`) in a workflow, _technically_ Ruby surrounds the IO writes with a mutex and in extreme
+high contention that mutex may durably block and then the workflow task may complete causing hung workflows because no
+event comes to wake the mutex.
 
 Also, by default anything that relies on IO wait that is not inside `durable_scheduler_disabled` will fail. It is
 recommended to put things that need this in `durable_scheduler_disabled`, but if the durable scheduler is still needed
@@ -957,9 +959,9 @@ Note `durable_scheduler_disabled` implies `illegal_call_tracing_disabled` (see n
 
 ##### Illegal Call Tracing
 
-Ruby workflow threads employ a `TracePoint` to catch illegal calls such as `Time.now` or `Thread.new`. The set of
-illegal calls can be configured via the `illegal_workflow_calls` parameter when creating a worker. The default set is at
-`Temporalio::Worker.default_illegal_workflow_calls`.
+Ruby workflow threads employ a `TracePoint` to catch illegal calls such as `sleep` or `Time.now` or `Thread.new`. The
+set of illegal calls can be configured via the `illegal_workflow_calls` parameter when creating a worker. The default
+set is at `Temporalio::Worker.default_illegal_workflow_calls`.
 
 When an illegal call is encountered, an exception is thrown. In advanced cases there may be a need to allow an illegal
 call that is known to be used deterministically. This code can be in a block passed to

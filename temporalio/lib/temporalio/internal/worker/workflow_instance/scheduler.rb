@@ -106,7 +106,7 @@ module Temporalio
             # We just yield because unblock will resume this. We will just wrap in timeout if needed.
             if timeout
               begin
-                Timeout.timeout(timeout) { Fiber.yield }
+                Workflow.timeout(timeout) { Fiber.yield }
                 true
               rescue Timeout::Error
                 false

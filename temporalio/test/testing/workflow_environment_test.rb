@@ -17,7 +17,7 @@ module Testing
       TWO_DAYS = 2 * 24 * 60 * 60
 
       def execute
-        sleep(TWO_DAYS)
+        Temporalio::Workflow.sleep(TWO_DAYS)
         'all done'
       end
 
