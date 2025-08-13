@@ -1,8 +1,6 @@
 module github.com/cretz/temporal-sdk-ruby-poc/temporalio/test/golangworker
 
-go 1.22.0
-
-toolchain go1.22.4
+go 1.23.0
 
 require go.temporal.io/sdk v1.29.1
 
@@ -22,10 +20,10 @@ require (
 	github.com/stretchr/testify v1.9.0 // indirect
 	go.temporal.io/api v1.39.0 // indirect
 	golang.org/x/exp v0.0.0-20241009180824-f66d83c29e7c // indirect
-	golang.org/x/net v0.30.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.26.0 // indirect
-	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241015192408-796eee8c2d53 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
