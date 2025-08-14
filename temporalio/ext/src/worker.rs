@@ -597,14 +597,13 @@ fn build_tuner_resource_options<SK: SlotKind>(
         .target_cpu_usage(options.member(id!("target_cpu_usage"))?)
         .build()
         .map_err(|err| error!("Failed building resource slot options: {}", err))?;
-    if let Some(prev_slots_options) = prev_slots_options {
-        if slots_options.target_cpu_usage != prev_slots_options.target_cpu_usage
-            || slots_options.target_mem_usage != prev_slots_options.target_mem_usage
-        {
-            return Err(error!(
-                "All resource-based slot suppliers must have the same resource-based tuner options"
-            ));
-        }
+    if let Some(prev_slots_options) = prev_slots_options
+        && (slots_options.target_cpu_usage != prev_slots_options.target_cpu_usage
+            || slots_options.target_mem_usage != prev_slots_options.target_mem_usage)
+    {
+        return Err(error!(
+            "All resource-based slot suppliers must have the same resource-based tuner options"
+        ));
     }
     Ok((
         SlotSupplierOptions::ResourceBased(ResourceSlotOptions::new(
