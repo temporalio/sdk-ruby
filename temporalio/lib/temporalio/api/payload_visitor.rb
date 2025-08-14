@@ -1493,7 +1493,7 @@ module Temporalio
       
       def coresdk_workflow_activation_resolve_nexus_operation_start(value)
         @on_enter&.call(value)
-        api_failure_v1_failure(value.cancelled_before_start) if value.has_cancelled_before_start?
+        api_failure_v1_failure(value.failed) if value.has_failed?
         @on_exit&.call(value)
       end
       
