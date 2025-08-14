@@ -17,7 +17,7 @@ module Temporalio
 
     # @see Logger.add
     def add(severity, message = nil, progname = nil)
-      return true if (severity || Logger::Unknown) < level
+      return true if (severity || Logger::UNKNOWN) < level
       return super if scoped_values_getter.nil? || @disable_scoped_values
 
       scoped_values = scoped_values_getter.call
