@@ -78,7 +78,7 @@ class WorkerWorkflowChildTest < Test
       when :cancel_wait
         cancellation, cancel_proc = Temporalio::Cancellation.new
         handle = Temporalio::Workflow.start_child_workflow(CancelChildWorkflow, cancellation:)
-        sleep(0.1)
+        Temporalio::Workflow.sleep(0.1)
         cancel_proc.call
         handle.result
       when :cancel_try
@@ -88,7 +88,7 @@ class WorkerWorkflowChildTest < Test
           cancellation:,
           cancellation_type: Temporalio::Workflow::ChildWorkflowCancellationType::TRY_CANCEL
         )
-        sleep(0.1)
+        Temporalio::Workflow.sleep(0.1)
         cancel_proc.call
         handle.result
       else

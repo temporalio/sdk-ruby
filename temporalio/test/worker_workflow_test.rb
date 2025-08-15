@@ -20,6 +20,8 @@ class WorkerWorkflowTest < Test
     assert_equal 'Hello, Temporal!', execute_workflow(SimpleWorkflow, 'Temporal')
   end
 
+  IGNORED_LOGGER = Logger.new($stdout) # rubocop:disable Layout/ClassStructure
+
   class IllegalCallsWorkflow < Temporalio::Workflow::Definition
     def execute(scenario)
       case scenario.to_sym
@@ -53,6 +55,24 @@ class WorkerWorkflowTest < Test
         Time.now
       when :time_iso8601
         Time.iso8601('2011-10-05T22:26:12-04:00')
+      when :stdlib_logger_write
+        IGNORED_LOGGER.info('test')
+      when :workflow_logger_write
+        Temporalio::Workflow.logger.info('test')
+      when :sleep
+        sleep(0.1)
+      when :timeout
+        Timeout.timeout(0.1) { 'test' }
+      when :queue
+        Queue.new
+      when :sized_queue
+        SizedQueue.new
+      when :mutex
+        Mutex.new
+      when :condvar
+        ConditionVariable.new
+      when :monitor
+        Monitor.new.synchronize { 'test' }
       else
         raise NotImplementedError
       end
@@ -85,6 +105,15 @@ class WorkerWorkflowTest < Test
     exec.call(:time_new_explicit, nil) # This call is ok
     exec.call(:time_now, 'Time now')
     exec.call(:time_iso8601, nil) # This call is ok
+    exec.call(:stdlib_logger_write, 'Logger info')
+    exec.call(:workflow_logger_write, nil) # This call is ok
+    exec.call(:sleep, 'Kernel sleep')
+    exec.call(:timeout, 'Timeout timeout')
+    exec.call(:queue, 'Thread::Queue initialize')
+    exec.call(:sized_queue, 'Thread::SizedQueue initialize')
+    exec.call(:mutex, 'Thread::Mutex initialize')
+    exec.call(:condvar, 'Thread::ConditionVariable initialize')
+    exec.call(:monitor, 'Monitor synchronize')
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition
@@ -202,7 +231,7 @@ class WorkerWorkflowTest < Test
     def execute
       # Start 30 10ms timers and wait on them all
       Temporalio::Workflow::Future.all_of(
-        *30.times.map { Temporalio::Workflow::Future.new { sleep(0.1) } }
+        *30.times.map { Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.1) } }
       ).wait
 
       [
@@ -251,13 +280,13 @@ class WorkerWorkflowTest < Test
         @waiting = true
         Temporalio::Workflow.wait_condition { false }
       when :timeout
-        Timeout.timeout(0.1) do
+        Temporalio::Workflow.timeout(0.1) do
           Temporalio::Workflow.wait_condition { false }
         end
       when :manual_cancel
         my_cancel, my_cancel_proc = Temporalio::Cancellation.new
         Temporalio::Workflow::Future.new do
-          sleep(0.1)
+          Temporalio::Workflow.sleep(0.1)
           my_cancel_proc.call(reason: 'my cancel reason')
         end
         Temporalio::Workflow.wait_condition(cancellation: my_cancel) { false }
@@ -305,18 +334,14 @@ class WorkerWorkflowTest < Test
 
     def execute(scenario)
       case scenario.to_sym
-      when :sleep_stdlib
-        sleep(0.11)
       when :sleep_workflow
         Temporalio::Workflow.sleep(0.12, summary: 'my summary')
-      when :sleep_stdlib_workflow_cancel
-        sleep(1000)
       when :sleep_workflow_cancel
         Temporalio::Workflow.sleep(1000)
       when :sleep_explicit_cancel
         my_cancel, my_cancel_proc = Temporalio::Cancellation.new
         Temporalio::Workflow::Future.new do
-          sleep(0.1)
+          Temporalio::Workflow.sleep(0.1)
           my_cancel_proc.call(reason: 'my cancel reason')
         end
         Temporalio::Workflow.sleep(1000, cancellation: my_cancel)
@@ -324,10 +349,6 @@ class WorkerWorkflowTest < Test
         my_cancel, my_cancel_proc = Temporalio::Cancellation.new
         my_cancel_proc.call(reason: 'my cancel reason')
         Temporalio::Workflow.sleep(1000, cancellation: my_cancel)
-      when :timeout_stdlib
-        Timeout.timeout(0.16) do
-          Temporalio::Workflow.wait_condition { false }
-        end
       when :timeout_workflow
         Temporalio::Workflow.timeout(0.17) do
           Temporalio::Workflow.wait_condition { false }
@@ -346,11 +367,11 @@ class WorkerWorkflowTest < Test
           Temporalio::Workflow.wait_condition { false }
         end
       when :timeout_workflow_cancel
-        Timeout.timeout(1000) do
+        Temporalio::Workflow.timeout(1000) do
           Temporalio::Workflow.wait_condition { false }
         end
       when :timeout_not_reached
-        Timeout.timeout(1000) do
+        Temporalio::Workflow.timeout(1000) do
           Temporalio::Workflow.wait_condition { @return_value }
         end
         @waiting = true
@@ -373,25 +394,12 @@ class WorkerWorkflowTest < Test
   end
 
   def test_timer
-    event = execute_workflow(TimerWorkflow, :sleep_stdlib) do |handle|
-      handle.result
-      handle.fetch_history_events.find(&:timer_started_event_attributes)
-    end
-    assert_equal 0.11, event.timer_started_event_attributes.start_to_fire_timeout.to_f
-
     event = execute_workflow(TimerWorkflow, :sleep_workflow) do |handle|
       handle.result
       handle.fetch_history_events.find(&:timer_started_event_attributes)
     end
     assert_equal 0.12, event.timer_started_event_attributes.start_to_fire_timeout.to_f
     # TODO(cretz): Assert summary
-
-    execute_workflow(TimerWorkflow, :sleep_stdlib_workflow_cancel) do |handle|
-      assert_eventually { assert handle.fetch_history_events.any?(&:timer_started_event_attributes) }
-      handle.cancel
-      err = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
-      assert_instance_of Temporalio::Error::CanceledError, err.cause
-    end
 
     execute_workflow(TimerWorkflow, :sleep_workflow_cancel) do |handle|
       assert_eventually { assert handle.fetch_history_events.any?(&:timer_started_event_attributes) }
@@ -413,11 +421,6 @@ class WorkerWorkflowTest < Test
     assert_equal 'Workflow execution failed', err.message
     assert_instance_of Temporalio::Error::CanceledError, err.cause
     assert_equal 'my cancel reason', err.cause.message
-
-    err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_stdlib) }
-    assert_instance_of Temporalio::Error::ApplicationError, err.cause
-    assert_equal 'execution expired', err.cause.message
-    assert_equal 'Error', err.cause.type
 
     err = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_workflow(TimerWorkflow, :timeout_workflow) }
     assert_instance_of Temporalio::Error::ApplicationError, err.cause
@@ -600,7 +603,7 @@ class WorkerWorkflowTest < Test
 
       # Inside a coroutine and timeout, execute an activity forever
       Temporalio::Workflow::Future.new do
-        Timeout.timeout(nil) do
+        Temporalio::Workflow.timeout(nil) do
           @expected_traces << ["#{__FILE__}:#{__LINE__ + 1}", "#{__FILE__}:#{__LINE__ - 1}"]
           Temporalio::Workflow.execute_activity('does-not-exist',
                                                 task_queue: 'does-not-exist',
@@ -734,7 +737,7 @@ class WorkerWorkflowTest < Test
 
     def execute
       # Do a timer only on non-replay
-      sleep(0.01) unless Temporalio::Workflow::Unsafe.replaying?
+      Temporalio::Workflow.sleep(0.01) unless Temporalio::Workflow::Unsafe.replaying?
       Temporalio::Workflow.wait_condition { @finish }
     end
 
@@ -801,7 +804,7 @@ class WorkerWorkflowTest < Test
 
   class LoggerWorkflow < Temporalio::Workflow::Definition
     def initialize
-      @bad_logger = Logger.new($stdout)
+      @bad_logger = Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled { Logger.new($stdout) }
     end
 
     def execute
@@ -812,7 +815,7 @@ class WorkerWorkflowTest < Test
     def update
       Temporalio::Workflow.logger.info('some-log-1')
       Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled { @bad_logger.info('some-log-2') }
-      sleep(0.01)
+      Temporalio::Workflow.sleep(0.01)
     end
 
     workflow_signal
@@ -886,7 +889,7 @@ class WorkerWorkflowTest < Test
       when :any_of
         # Basic any of
         result = Temporalio::Workflow::Future.any_of(
-          Temporalio::Workflow::Future.new { sleep(0.01) },
+          Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.01) },
           Temporalio::Workflow::Future.new { 'done' }
         ).wait
         raise unless result == 'done'
@@ -894,7 +897,7 @@ class WorkerWorkflowTest < Test
         # Any of with exception
         begin
           Temporalio::Workflow::Future.any_of(
-            Temporalio::Workflow::Future.new { sleep(0.01) },
+            Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.01) },
             Temporalio::Workflow::Future.new { raise FutureWorkflowError }
           ).wait
           raise
@@ -904,14 +907,14 @@ class WorkerWorkflowTest < Test
 
         # Try any of
         result = Temporalio::Workflow::Future.try_any_of(
-          Temporalio::Workflow::Future.new { sleep(0.01) },
+          Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.01) },
           Temporalio::Workflow::Future.new { 'done' }
         ).wait.wait
         raise unless result == 'done'
 
         # Try any of with exception
         try_any_of = Temporalio::Workflow::Future.try_any_of(
-          Temporalio::Workflow::Future.new { sleep(0.01) },
+          Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.01) },
           Temporalio::Workflow::Future.new { raise FutureWorkflowError }
         ).wait
         begin
@@ -1346,7 +1349,7 @@ class WorkerWorkflowTest < Test
 
   class QueueWorkflow < Temporalio::Workflow::Definition
     def initialize
-      @queue = Queue.new
+      @queue = Temporalio::Workflow::Queue.new
     end
 
     def execute(timeout = nil)
@@ -1416,6 +1419,36 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class SizedQueueWorkflow < Temporalio::Workflow::Definition
+    def initialize
+      @queue = Temporalio::Workflow::SizedQueue.new(1)
+    end
+
+    def execute(timeout = nil)
+      queue = Temporalio::Workflow::SizedQueue.new(1)
+      queue.push('some-value')
+      # Timeout only works on 3.2+
+      raise 'Expected nil' if timeout && !queue.push('some-other-value', timeout:).nil?
+
+      queue.pop
+    end
+  end
+
+  def test_sized_queue
+    assert_equal 'some-value', execute_workflow(SizedQueueWorkflow)
+
+    # Timeout not added until 3.2, so can stop test here before then
+    major, minor = RUBY_VERSION.split('.').take(2).map(&:to_i)
+    return if major.nil? || major != 3 || minor.nil? || minor < 2
+
+    execute_workflow(SizedQueueWorkflow, 0.1) do |handle|
+      assert_equal 'some-value', handle.result
+      # Make sure a timer event is in there
+      evt = handle.fetch_history_events.find(&:timer_started_event_attributes)
+      assert_equal 0.1, evt&.timer_started_event_attributes&.start_to_fire_timeout&.to_f # rubocop:disable Style/SafeNavigationChainLength
+    end
+  end
+
   class MutexActivity < Temporalio::Activity::Definition
     def initialize(queue)
       @queue = queue
@@ -1430,7 +1463,7 @@ class WorkerWorkflowTest < Test
     workflow_query_attr_reader :results
 
     def initialize
-      @mutex = Mutex.new
+      @mutex = Temporalio::Workflow::Mutex.new
       @results = []
     end
 
@@ -1463,6 +1496,23 @@ class WorkerWorkflowTest < Test
       queue << 'three'
       assert_eventually { assert_equal %w[one two three], handle.query(MutexWorkflow.results) }
     end
+  end
+
+  class MutexSleepWorkflow < Temporalio::Workflow::Definition
+    def initialize
+      @mutex = Temporalio::Workflow::Mutex.new
+    end
+
+    def execute
+      @mutex.synchronize do
+        @mutex.sleep(0.5)
+        'done'
+      end
+    end
+  end
+
+  def test_mutex_sleep
+    assert_equal 'done', execute_workflow(MutexSleepWorkflow)
   end
 
   class UtilitiesWorkflow < Temporalio::Workflow::Definition
@@ -2531,10 +2581,10 @@ class WorkerWorkflowTest < Test
 
   class NonDurableTimerWorkfow < Temporalio::Workflow::Definition
     def execute
-      sleep(0.1)
+      Temporalio::Workflow.sleep(0.1)
       Temporalio::Workflow::Unsafe.durable_scheduler_disabled { sleep(0.2) }
       begin
-        Timeout.timeout(0.3) { Queue.new.pop }
+        Temporalio::Workflow.timeout(0.3) { Temporalio::Workflow::Queue.new.pop }
         raise 'Expected timeout'
       rescue Timeout::Error
         # Ignore

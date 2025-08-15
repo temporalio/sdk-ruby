@@ -14,6 +14,7 @@ module Temporalio
       end
 
       def self.default_time_validators: -> Array[IllegalWorkflowCallValidator]
+      def self.known_safe_mutex_validator: -> IllegalWorkflowCallValidator
 
       attr_reader method_name: Symbol?
       attr_reader block: ^(CallInfo) -> void

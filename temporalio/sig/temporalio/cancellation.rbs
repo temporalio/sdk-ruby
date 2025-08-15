@@ -9,11 +9,12 @@ module Temporalio
     def check!: (?Exception err) -> void
     def to_ary: -> [Cancellation, Proc]
     def wait: -> void
-    def shield: [T] { (?) -> untyped } -> T
+    def shield: [T] { (?) -> T } -> T
     def add_cancel_callback: { -> untyped } -> Object
     def remove_cancel_callback: (Object key) -> void
 
     private def on_cancel: (reason: Object?) -> void
     private def prepare_cancel: (reason: Object?) -> Array[Proc]?
+    private def canceled_mutex_synchronize: [T] { (?) -> T } -> T
   end
 end
