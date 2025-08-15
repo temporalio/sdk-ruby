@@ -40,10 +40,15 @@ module Temporalio
               cond_fiber = nil
               cond_result = nil
               @wait_conditions.each do |seq, cond|
+                # Evaluate condition or skip if not true
                 next unless (cond_result = cond.first.call)
 
-                cond_fiber = cond[1]
-                @wait_conditions.delete(seq)
+                # There have been reports of this fiber being completed already, so we make sure not to process if it
+                # has, but we still delete it
+                deleted_cond = @wait_conditions.delete(seq)
+                next unless deleted_cond&.last&.alive?
+
+                cond_fiber = deleted_cond.last
                 break
               end
               return unless cond_fiber
