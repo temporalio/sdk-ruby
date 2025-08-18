@@ -43,9 +43,8 @@ module Temporalio
       #   but let others through for certain situations.
       def self.known_safe_mutex_validator
         @known_safe_mutex_validator ||= IllegalWorkflowCallValidator.new do
-          # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location label starts with
-          # 'Google::Protobuf'
-          raise 'disallowed' unless caller_locations&.any? { |loc| loc.label&.start_with?('Google::Protobuf') }
+          # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location path has protobuf
+          raise 'disallowed' unless caller_locations&.any? { |loc| loc.path&.include?('google/protobuf/') }
         end
       end
 
