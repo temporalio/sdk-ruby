@@ -18,7 +18,7 @@ module Temporalio
     def initialize(*parents)
       @canceled = false
       @canceled_reason = nil
-      @canceled_mutex = Mutex.new
+      @canceled_mutex = Workflow::Unsafe.illegal_call_tracing_disabled { Mutex.new }
       @canceled_cond_var = nil
       @cancel_callbacks = {} # Keyed by sentinel value, but value iteration still is deterministic
       @shield_depth = 0
@@ -28,22 +28,22 @@ module Temporalio
 
     # @return [Boolean] Whether this cancellation is canceled.
     def canceled?
-      @canceled_mutex.synchronize { @canceled }
+      canceled_mutex_synchronize { @canceled }
     end
 
     # @return [String, nil] Reason for cancellation. Can be nil if not canceled or no reason provided.
     def canceled_reason
-      @canceled_mutex.synchronize { @canceled_reason }
+      canceled_mutex_synchronize { @canceled_reason }
     end
 
     # @return [Boolean] Whether a cancel is pending but currently shielded.
     def pending_canceled?
-      @canceled_mutex.synchronize { !@shield_pending_cancel.nil? }
+      canceled_mutex_synchronize { !@shield_pending_cancel.nil? }
     end
 
     # @return [String, nil] Reason for pending cancellation. Can be nil if not pending canceled or no reason provided.
     def pending_canceled_reason
-      @canceled_mutex.synchronize { @shield_pending_cancel&.first }
+      canceled_mutex_synchronize { @shield_pending_cancel&.first }
     end
 
     # Raise an error if this cancellation is canceled.
@@ -71,13 +71,13 @@ module Temporalio
         return
       end
 
-      @canceled_mutex.synchronize do
+      canceled_mutex_synchronize do
         break if @canceled
 
         # Add cond var if not present
         if @canceled_cond_var.nil?
           @canceled_cond_var = ConditionVariable.new
-          @cancel_callbacks[Object.new] = proc { @canceled_mutex.synchronize { @canceled_cond_var.broadcast } }
+          @cancel_callbacks[Object.new] = proc { canceled_mutex_synchronize { @canceled_cond_var.broadcast } }
         end
 
         # Wait on it
@@ -94,10 +94,10 @@ module Temporalio
     def shield
       raise ArgumentError, 'Block required' unless block_given?
 
-      @canceled_mutex.synchronize { @shield_depth += 1 }
+      canceled_mutex_synchronize { @shield_depth += 1 }
       yield
     ensure
-      callbacks_to_run = @canceled_mutex.synchronize do
+      callbacks_to_run = canceled_mutex_synchronize do
         @shield_depth -= 1
         if @shield_depth.zero? && @shield_pending_cancel
           reason = @shield_pending_cancel.first
@@ -120,7 +120,7 @@ module Temporalio
     def add_cancel_callback(&block)
       raise ArgumentError, 'Must provide block' unless block_given?
 
-      callback_to_run_immediately, key = @canceled_mutex.synchronize do
+      callback_to_run_immediately, key = canceled_mutex_synchronize do
         break [block, nil] if @canceled
 
         key = Object.new
@@ -135,7 +135,7 @@ module Temporalio
     #
     # @param key [Object] Key returned from {add_cancel_callback}.
     def remove_cancel_callback(key)
-      @canceled_mutex.synchronize do
+      canceled_mutex_synchronize do
         @cancel_callbacks.delete(key)
       end
       nil
@@ -144,7 +144,7 @@ module Temporalio
     private
 
     def on_cancel(reason:)
-      callbacks_to_run = @canceled_mutex.synchronize do
+      callbacks_to_run = canceled_mutex_synchronize do
         # If we're shielding, set as pending and return nil
         if @shield_depth.positive?
           @shield_pending_cancel = [reason]
@@ -165,6 +165,10 @@ module Temporalio
       to_return = @cancel_callbacks.dup
       @cancel_callbacks.clear
       to_return.values
+    end
+
+    def canceled_mutex_synchronize(&)
+      Workflow::Unsafe.illegal_call_tracing_disabled { @canceled_mutex.synchronize(&) }
     end
   end
 end

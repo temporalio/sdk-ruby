@@ -267,7 +267,11 @@ module Temporalio
             #:write
           ],
           'Kernel' => %i[abort at_exit autoload autoload? eval exec exit fork gets load open rand readline readlines
-                         spawn srand system test trap],
+                         sleep spawn srand system test trap],
+          # Loggers use mutexes in ways that can hang workflows, so users need to disable the durable scheduler to use
+          # them
+          'Logger' => :all,
+          'Monitor' => :all,
           'Net::HTTP' => :all,
           'Pathname' => :all,
           # TODO(cretz): Investigate why clock_gettime called from Timeout thread affects this code at all. Stack trace
@@ -282,9 +286,14 @@ module Temporalio
           'Signal' => :all,
           'Socket' => :all,
           'Tempfile' => :all,
+          'Timeout' => :all,
           'Thread' => %i[abort_on_exception= exit fork handle_interrupt ignore_deadlock= kill new pass
                          pending_interrupt? report_on_exception= start stop initialize join name= priority= raise run
                          terminate thread_variable_set wakeup],
+          'Thread::ConditionVariable' => :all,
+          'Thread::Mutex' => IllegalWorkflowCallValidator.known_safe_mutex_validator,
+          'Thread::SizedQueue' => :all,
+          'Thread::Queue' => :all,
           'Time' => IllegalWorkflowCallValidator.default_time_validators
         } #: Hash[String, :all | Array[Symbol]]
         hash.each_value(&:freeze)

@@ -155,6 +155,8 @@ module Temporalio
       def self.io_enabled: [T] { -> T } -> T
 
       def self.durable_scheduler_disabled: [T] { -> T } -> T
+
+      def self._wrap_ruby_class_as_legal: (Class target_class) -> Class
     end
 
     class ContinueAsNewError < Error
@@ -186,6 +188,13 @@ module Temporalio
     class InvalidWorkflowStateError < Error
     end
     class NondeterminismError < Error
+    end
+
+    class Mutex < ::Mutex
+    end
+    class Queue < ::Queue
+    end
+    class SizedQueue < ::SizedQueue
     end
   end
 end

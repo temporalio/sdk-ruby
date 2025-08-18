@@ -39,6 +39,15 @@ module Temporalio
         ]
       end
 
+      # @return [IllegalWorkflowCallValidator] Workflow call validator that is tailored to disallow most Mutex calls,
+      #   but let others through for certain situations.
+      def self.known_safe_mutex_validator
+        @known_safe_mutex_validator ||= IllegalWorkflowCallValidator.new do
+          # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location path has protobuf
+          raise 'disallowed' unless caller_locations&.any? { |loc| loc.path&.include?('google/protobuf/') }
+        end
+      end
+
       # @return [String, nil] Method name if this validator is specific to a method.
       attr_reader :method_name
 

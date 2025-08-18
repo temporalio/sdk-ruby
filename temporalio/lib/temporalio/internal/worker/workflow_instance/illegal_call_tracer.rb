@@ -16,7 +16,7 @@ module Temporalio
               # @type var fixed_val: :all | Worker::IllegalWorkflowCallValidator | Hash[Symbol, TrueClass | Worker::IllegalWorkflowCallValidator] # rubocop:disable Layout/LineLength
               fixed_val = case val
                           when Temporalio::Worker::IllegalWorkflowCallValidator
-                            if sub_val.method_name
+                            if val.method_name
                               raise ArgumentError,
                                     'Top level IllegalWorkflowCallValidator instances cannot have method name'
                             end

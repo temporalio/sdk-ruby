@@ -163,7 +163,7 @@ class WorkerWorkflowActivityTest < Test
         Temporalio::Workflow.execute_local_activity(CancellationSleepActivity, 0.1,
                                                     schedule_to_close_timeout: 10)
       else
-        sleep(0.1)
+        Temporalio::Workflow.sleep(0.1)
       end
       cancel_proc.call
 
