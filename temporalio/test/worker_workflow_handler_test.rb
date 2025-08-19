@@ -946,4 +946,34 @@ class WorkerWorkflowHandlerTest < Test
       assert_equal 'my-details', desc.static_details
     end
   end
+
+  class HandlerNameReuseWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.wait_condition { @signal }
+    end
+
+    workflow_signal name: :foo
+    def foo_signal(value)
+      @signal = value
+    end
+
+    workflow_query name: :foo
+    def foo_query
+      'query-done'
+    end
+
+    workflow_update name: :foo
+    def foo_update
+      'update-done'
+    end
+  end
+
+  def test_handler_name_reuse
+    execute_workflow(HandlerNameReuseWorkflow) do |handle|
+      assert_equal 'query-done', handle.query(HandlerNameReuseWorkflow.foo_query)
+      assert_equal 'update-done', handle.execute_update(HandlerNameReuseWorkflow.foo_update)
+      handle.signal(HandlerNameReuseWorkflow.foo_signal, 'signal-done')
+      assert_equal 'signal-done', handle.result
+    end
+  end
 end
