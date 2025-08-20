@@ -1350,6 +1350,51 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls WorkflowService.UpdateTaskQueueConfig API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigResponse] API response.
+        def update_task_queue_config(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_task_queue_config',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.FetchWorkerConfig API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::FetchWorkerConfigRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::FetchWorkerConfigResponse] API response.
+        def fetch_worker_config(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'fetch_worker_config',
+            request_class: Temporalio::Api::WorkflowService::V1::FetchWorkerConfigRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::FetchWorkerConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UpdateWorkerConfig API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigResponse] API response.
+        def update_worker_config(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_worker_config',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end

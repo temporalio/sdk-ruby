@@ -361,6 +361,18 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def update_task_queue_config: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def fetch_worker_config: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def update_worker_config: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end
