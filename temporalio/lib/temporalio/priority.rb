@@ -72,6 +72,15 @@ module Temporalio
       @default ||= new(priority_key: nil, fairness_key: nil, fairness_weight: nil)
     end
 
+    # Initialize a new Priority instance.
+    #
+    # @param priority_key [Integer, nil] The priority key
+    # @param fairness_key [String, nil] The fairness key
+    # @param fairness_weight [Float, nil] The fairness weight
+    def initialize(priority_key:, fairness_key: nil, fairness_weight: nil)
+      super
+    end
+
     # @!visibility private
     def _to_proto
       return nil if empty?

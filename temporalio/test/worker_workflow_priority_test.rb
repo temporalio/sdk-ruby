@@ -141,5 +141,23 @@ class WorkerWorkflowPriorityTest < Test
         assert_in_delta 0.2, priority.fairness_weight, 0.001
       end
     end
+
+    # Test with only priority & no fairness
+    execute_workflow(
+      WorkflowUsingPriorities, 5, true, nil, nil,
+      activities: [ActivityWithPriority],
+      priority: Temporalio::Priority.new(priority_key: 5, fairness_key: nil, fairness_weight: nil)
+    ) do |handle|
+      assert_equal 'Done!', handle.result
+
+      handle.fetch_history_events.each do |event|
+        next unless event.workflow_execution_started_event_attributes
+
+        priority = event.workflow_execution_started_event_attributes.priority
+        assert_equal 5, priority.priority_key
+        assert_equal '', priority.fairness_key
+        assert_equal 0.0, priority.fairness_weight
+      end
+    end
   end
 end
