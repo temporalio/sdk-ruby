@@ -77,7 +77,7 @@ module Temporalio
     # @param priority_key [Integer, nil] The priority key
     # @param fairness_key [String, nil] The fairness key
     # @param fairness_weight [Float, nil] The fairness weight
-    def initialize(priority_key:, fairness_key: nil, fairness_weight: nil)
+    def initialize(priority_key: nil, fairness_key: nil, fairness_weight: nil)
       super
     end
 
