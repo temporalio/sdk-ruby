@@ -6,7 +6,7 @@ module Temporalio
   Priority = Data.define(
     :priority_key,
     :fairness_key,
-    :weight
+    :fairness_weight
   )
 
   # Priority contains metadata that controls relative ordering of task processing when tasks are
@@ -44,13 +44,13 @@ module Temporalio
   #
   #     Fairness keys are limited to 64 bytes.
   #
-  # @!attribute weight
+  # @!attribute fairness_weight
   #   @return [Float, nil] Weight for a task can come from multiple sources for
   #     flexibility. From highest to lowest precedence:
   #     1. Weights for a small set of keys can be overridden in task queue
   #        configuration with an API.
   #     2. It can be attached to the workflow/activity in this field.
-  #     3. The default weight of 1.0 will be used.
+  #     3. The default fairness_weight of 1.0 will be used.
   #
   #     Weight values are clamped to the range [0.001, 1000].
   class Priority
@@ -61,7 +61,7 @@ module Temporalio
       new(
         priority_key: priority.priority_key.zero? ? nil : priority.priority_key,
         fairness_key: priority.fairness_key.empty? ? nil : priority.fairness_key,
-        weight: priority.fairness_weight.zero? ? nil : priority.fairness_weight
+        fairness_weight: priority.fairness_weight.zero? ? nil : priority.fairness_weight
       )
     end
 
@@ -69,7 +69,7 @@ module Temporalio
     #
     # @return [Priority] The default priority
     def self.default
-      @default ||= new(priority_key: nil, fairness_key: nil, weight: nil)
+      @default ||= new(priority_key: nil, fairness_key: nil, fairness_weight: nil)
     end
 
     # @!visibility private
@@ -79,13 +79,13 @@ module Temporalio
       Temporalio::Api::Common::V1::Priority.new(
         priority_key: priority_key || 0,
         fairness_key: fairness_key || '',
-        fairness_weight: weight || 0.0
+        fairness_weight: fairness_weight || 0.0
       )
     end
 
     # @return [Boolean] True if this priority is empty/default
     def empty?
-      priority_key.nil? && fairness_key.nil? && weight.nil?
+      priority_key.nil? && fairness_key.nil? && fairness_weight.nil?
     end
   end
 end
