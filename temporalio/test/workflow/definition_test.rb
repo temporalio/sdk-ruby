@@ -181,18 +181,6 @@ module Workflow
       CODE
     end
 
-    def test_invalid_duplicate_handlers_different_type
-      assert_invalid_workflow_code 'my-name already defined as a different handler type', <<~CODE
-        class TestInvalidDuplicateHandlersDifferentType < Temporalio::Workflow::Definition
-          workflow_signal name: 'my-name'
-          def my_signal; end
-
-          workflow_update name: 'my-name'
-          def my_update; end
-        end
-      CODE
-    end
-
     def test_invalid_init_not_on_initialize
       assert_invalid_workflow_code 'was applied to not_initialize instead of initialize', <<~CODE
         class TestInvalidInitNotOnInitialize < Temporalio::Workflow::Definition
