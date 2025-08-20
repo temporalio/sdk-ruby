@@ -1,0 +1,6 @@
+class WorkerWorkflowPriorityTest < Test
+  class WorkflowUsingPriorities < Temporalio::Workflow::Definition
+    def float_matches?: (Float? expected, Float? actual, ?Float tolerance) -> bool
+    def execute: (Integer? expected_priority, bool stop_after_check, ?String? expected_fairness_key, ?Float? expected_weight) -> String
+  end
+end

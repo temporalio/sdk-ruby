@@ -1,8 +1,10 @@
 module Temporalio
   class Priority
     attr_reader priority_key: Integer?
+    attr_reader fairness_key: String?
+    attr_reader weight: Float?
 
-    def initialize: (priority_key: Integer?) -> void
+    def initialize: (priority_key: Integer?, ?fairness_key: String?, ?weight: Float?) -> void
 
     def self._from_proto: (untyped) -> Priority
 
