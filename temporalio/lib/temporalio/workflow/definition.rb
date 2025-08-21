@@ -280,7 +280,7 @@ module Temporalio
         @workflow_update_validators ||= {}
         @defined_methods ||= []
 
-        defn, hash, other_hashes =
+        defn, hash =
           case handler[:type]
           when :init
             raise "workflow_init was applied to #{method_name} instead of initialize" if method_name != :initialize
@@ -306,7 +306,7 @@ module Temporalio
               raw_args: handler[:raw_args],
               unfinished_policy: handler[:unfinished_policy],
               arg_hints: handler[:arg_hints]
-            ), @workflow_signals, [@workflow_queries, @workflow_updates]]
+            ), @workflow_signals]
           when :query
             [Query.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
@@ -315,7 +315,7 @@ module Temporalio
               raw_args: handler[:raw_args],
               arg_hints: handler[:arg_hints],
               result_hint: handler[:result_hint]
-            ), @workflow_queries, [@workflow_signals, @workflow_updates]]
+            ), @workflow_queries]
           when :update
             [Update.new(
               name: handler[:dynamic] ? nil : (handler[:name] || method_name).to_s,
@@ -325,7 +325,7 @@ module Temporalio
               unfinished_policy: handler[:unfinished_policy],
               arg_hints: handler[:arg_hints],
               result_hint: handler[:result_hint]
-            ), @workflow_updates, [@workflow_signals, @workflow_queries]]
+            ), @workflow_updates]
           when :dynamic_options
             raise 'Dynamic options method already set' if @dynamic_options_method
 
@@ -341,8 +341,6 @@ module Temporalio
         if other && other.to_invoke != method_name
           raise "Workflow #{handler[:type].name} #{defn.name || '<dynamic>'} defined on " \
                 "different methods #{other.to_invoke} and #{method_name}"
-        elsif defn.name && other_hashes.any? { |h| h.include?(defn.name) }
-          raise "Workflow signal #{defn.name} already defined as a different handler type"
         end
         hash[defn.name] = defn
 
