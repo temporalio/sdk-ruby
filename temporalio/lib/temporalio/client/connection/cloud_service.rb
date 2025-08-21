@@ -780,6 +780,81 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls CloudService.UpdateNamespaceTags API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsResponse] API response.
+        def update_namespace_tags(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_namespace_tags',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateConnectivityRule API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleResponse] API response.
+        def create_connectivity_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_connectivity_rule',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetConnectivityRule API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleResponse] API response.
+        def get_connectivity_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_connectivity_rule',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetConnectivityRules API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesResponse] API response.
+        def get_connectivity_rules(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_connectivity_rules',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteConnectivityRule API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse] API response.
+        def delete_connectivity_rule(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_connectivity_rule',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end

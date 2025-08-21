@@ -209,6 +209,26 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def update_namespace_tags: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def create_connectivity_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_connectivity_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def get_connectivity_rules: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_connectivity_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end

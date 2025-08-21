@@ -115,6 +115,9 @@ impl Client {
                     WorkflowService,
                     execute_multi_operation
                 ),
+                "fetch_worker_config" => {
+                    rpc_call!(self, callback, call, WorkflowService, fetch_worker_config)
+                }
                 "get_cluster_info" => {
                     rpc_call!(self, callback, call, WorkflowService, get_cluster_info)
                 }
@@ -480,6 +483,13 @@ impl Client {
                 "update_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, update_schedule)
                 }
+                "update_task_queue_config" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    update_task_queue_config
+                ),
                 "update_worker_build_id_compatibility" => rpc_call!(
                     self,
                     callback,
@@ -487,6 +497,9 @@ impl Client {
                     WorkflowService,
                     update_worker_build_id_compatibility
                 ),
+                "update_worker_config" => {
+                    rpc_call!(self, callback, call, WorkflowService, update_worker_config)
+                }
                 "update_worker_deployment_version_metadata" => rpc_call!(
                     self,
                     callback,
@@ -574,6 +587,9 @@ impl Client {
                     rpc_call!(self, callback, call, CloudService, add_user_group_member)
                 }
                 "create_api_key" => rpc_call!(self, callback, call, CloudService, create_api_key),
+                "create_connectivity_rule" => {
+                    rpc_call!(self, callback, call, CloudService, create_connectivity_rule)
+                }
                 "create_namespace" => {
                     rpc_call!(self, callback, call, CloudService, create_namespace)
                 }
@@ -595,6 +611,9 @@ impl Client {
                     rpc_call!(self, callback, call, CloudService, create_user_group)
                 }
                 "delete_api_key" => rpc_call!(self, callback, call, CloudService, delete_api_key),
+                "delete_connectivity_rule" => {
+                    rpc_call!(self, callback, call, CloudService, delete_connectivity_rule)
+                }
                 "delete_namespace" => {
                     rpc_call!(self, callback, call, CloudService, delete_namespace)
                 }
@@ -630,6 +649,12 @@ impl Client {
                 "get_api_keys" => rpc_call!(self, callback, call, CloudService, get_api_keys),
                 "get_async_operation" => {
                     rpc_call!(self, callback, call, CloudService, get_async_operation)
+                }
+                "get_connectivity_rule" => {
+                    rpc_call!(self, callback, call, CloudService, get_connectivity_rule)
+                }
+                "get_connectivity_rules" => {
+                    rpc_call!(self, callback, call, CloudService, get_connectivity_rules)
                 }
                 "get_namespace" => rpc_call!(self, callback, call, CloudService, get_namespace),
                 "get_namespace_export_sink" => rpc_call!(
@@ -705,6 +730,9 @@ impl Client {
                     CloudService,
                     update_namespace_export_sink
                 ),
+                "update_namespace_tags" => {
+                    rpc_call!(self, callback, call, CloudService, update_namespace_tags)
+                }
                 "update_nexus_endpoint" => {
                     rpc_call!(self, callback, call, CloudService, update_nexus_endpoint)
                 }

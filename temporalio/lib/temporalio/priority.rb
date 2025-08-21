@@ -4,7 +4,9 @@ require 'temporalio/api'
 
 module Temporalio
   Priority = Data.define(
-    :priority_key
+    :priority_key,
+    :fairness_key,
+    :fairness_weight
   )
 
   # Priority contains metadata that controls relative ordering of task processing when tasks are
@@ -29,31 +31,70 @@ module Temporalio
   #
   #     The default priority is (min+max)/2. With the default max of 5 and min of 1, that comes
   #     out to 3.
+  #
+  # @!attribute fairness_key
+  #   @return [String, nil] FairnessKey is a short string that's used as a key for a fairness
+  #     balancing mechanism. It may correspond to a tenant id, or to a fixed
+  #     string like "high" or "low". The default is the empty string.
+  #
+  #     The fairness mechanism attempts to dispatch tasks for a given key in
+  #     proportion to its weight. For example, using a thousand distinct tenant
+  #     ids, each with a weight of 1.0 (the default) will result in each tenant
+  #     getting a roughly equal share of task dispatch throughput.
+  #
+  #     Fairness keys are limited to 64 bytes.
+  #
+  # @!attribute fairness_weight
+  #   @return [Float, nil] Weight for a task can come from multiple sources for
+  #     flexibility. From highest to lowest precedence:
+  #     1. Weights for a small set of keys can be overridden in task queue
+  #        configuration with an API.
+  #     2. It can be attached to the workflow/activity in this field.
+  #     3. The default fairness_weight of 1.0 will be used.
+  #
+  #     Weight values are clamped to the range [0.001, 1000].
   class Priority
     # @!visibility private
     def self._from_proto(priority)
       return default if priority.nil?
 
-      new(priority_key: priority.priority_key.zero? ? nil : priority.priority_key)
+      new(
+        priority_key: priority.priority_key.zero? ? nil : priority.priority_key,
+        fairness_key: priority.fairness_key.empty? ? nil : priority.fairness_key,
+        fairness_weight: priority.fairness_weight.zero? ? nil : priority.fairness_weight
+      )
     end
 
     # The default priority instance.
     #
     # @return [Priority] The default priority
     def self.default
-      @default ||= new(priority_key: nil)
+      @default ||= new(priority_key: nil, fairness_key: nil, fairness_weight: nil)
+    end
+
+    # Initialize a new Priority instance.
+    #
+    # @param priority_key [Integer, nil] The priority key
+    # @param fairness_key [String, nil] The fairness key
+    # @param fairness_weight [Float, nil] The fairness weight
+    def initialize(priority_key:, fairness_key: nil, fairness_weight: nil)
+      super
     end
 
     # @!visibility private
     def _to_proto
-      return nil if priority_key.nil?
+      return nil if empty?
 
-      Temporalio::Api::Common::V1::Priority.new(priority_key: priority_key || 0)
+      Temporalio::Api::Common::V1::Priority.new(
+        priority_key: priority_key || 0,
+        fairness_key: fairness_key || '',
+        fairness_weight: fairness_weight || 0.0
+      )
     end
 
     # @return [Boolean] True if this priority is empty/default
     def empty?
-      priority_key.nil?
+      priority_key.nil? && fairness_key.nil? && fairness_weight.nil?
     end
   end
 end
