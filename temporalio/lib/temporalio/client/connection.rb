@@ -124,7 +124,8 @@ module Temporalio
       # Options for HTTP CONNECT proxy for client connections.
       #
       # @!attribute target_host
-      #   @return [String] Target host:port for the HTTP CONNECT proxy.
+      #   @return [String] Target for the HTTP CONNECT proxy. Use host:port for TCP, or unix:/path/to/unix.sock for Unix
+      #     socket (meaning it'll start with "unix:/").
       # @!attribute basic_auth_user
       #   @return [String, nil] User for HTTP basic auth for the proxy, must be combined with {basic_auth_pass}.
       # @!attribute basic_auth_pass
