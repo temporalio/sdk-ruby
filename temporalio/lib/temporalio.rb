@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
+require 'temporalio/envconfig'
 require 'temporalio/version'
 require 'temporalio/versioning_override'
-require 'temporalio/envconfig'
 
 # Temporal Ruby SDK. See the README at https://github.com/temporalio/sdk-ruby.
 module Temporalio

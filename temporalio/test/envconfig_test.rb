@@ -6,7 +6,7 @@ require 'temporalio/client'
 require 'temporalio/envconfig'
 require_relative 'test'
 
-class EnvConfigTest < Test  
+class EnvConfigTest < Test
   # A base TOML config with a default and a custom profile
   TOML_CONFIG_BASE = <<~TOML
     [profile.default]
@@ -55,7 +55,7 @@ class EnvConfigTest < Test
     [profile.default]
     address = "localhost:7233"
     namespace = "default"
-    
+
     [profile.default.grpc_meta]
     "Custom-Header" = "custom-value"
     "ANOTHER_HEADER_KEY" = "another-value"
@@ -88,7 +88,8 @@ class EnvConfigTest < Test
 
   def test_load_profile_from_file_custom
     with_temp_config_file(TOML_CONFIG_BASE) do |config_file|
-      profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file), profile: 'custom')
+      profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file),
+                                                                profile: 'custom')
       assert_equal 'custom-address', profile.address
       assert_equal 'custom-namespace', profile.namespace
       refute_nil profile.tls
@@ -204,12 +205,12 @@ class EnvConfigTest < Test
 
   def test_grpc_metadata_normalization_from_toml
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: TOML_CONFIG_GRPC_META)
-    
+
     # Keys should be normalized: uppercase -> lowercase, underscores -> hyphens
     assert_equal 'custom-value', profile.grpc_meta['custom-header']
-    assert_equal 'another-value', profile.grpc_meta['another-header-key'] 
+    assert_equal 'another-value', profile.grpc_meta['another-header-key']
     assert_equal 'mixed-value', profile.grpc_meta['mixed-case-header']
-    
+
     # Original case variations should not exist
     refute_includes profile.grpc_meta, 'Custom-Header'
     refute_includes profile.grpc_meta, 'ANOTHER_HEADER_KEY'
@@ -233,7 +234,7 @@ class EnvConfigTest < Test
       profile = Temporalio::EnvConfig::ClientConfigProfile.load(
         config_source: Pathname.new(config_file), profile: 'custom', override_env_vars: env
       )
-      
+
       # custom-header should be removed by empty env value
       refute_includes profile.grpc_meta, 'custom-header'
       # new-header should be added
@@ -456,14 +457,14 @@ class EnvConfigTest < Test
       [profile.default.tls]
       client_cert_path = "/path/to/cert"
     TOML
-    
+
     env = {
       'TEMPORAL_TLS_CLIENT_CERT_DATA' => 'cert-data-from-env'
     }
-    
+
     assert_raises(Temporalio::Internal::Bridge::Error) do
       Temporalio::EnvConfig::ClientConfigProfile.load(
-        config_source: toml_config, 
+        config_source: toml_config,
         override_env_vars: env
       )
     end
@@ -476,11 +477,11 @@ class EnvConfigTest < Test
       [profile.default.tls]
       client_cert_data = "cert-data-from-toml"
     TOML
-    
+
     env = {
       'TEMPORAL_TLS_CLIENT_CERT_PATH' => '/path/from/env'
     }
-    
+
     assert_raises(Temporalio::Internal::Bridge::Error) do
       Temporalio::EnvConfig::ClientConfigProfile.load(
         config_source: toml_config,
@@ -496,7 +497,8 @@ class EnvConfigTest < Test
   def test_load_profile_not_found
     with_temp_config_file(TOML_CONFIG_BASE) do |config_file|
       assert_raises(Temporalio::Internal::Bridge::Error) do
-        Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file), profile: 'nonexistent')
+        Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file),
+                                                        profile: 'nonexistent')
       end
     end
   end
@@ -512,7 +514,8 @@ class EnvConfigTest < Test
   def test_load_profile_strict_mode_fail
     with_temp_config_file(TOML_CONFIG_STRICT_FAIL) do |config_file|
       assert_raises(Temporalio::Internal::Bridge::Error) do
-        Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file), config_file_strict: true)
+        Temporalio::EnvConfig::ClientConfigProfile.load(config_source: Pathname.new(config_file),
+                                                        config_file_strict: true)
       end
     end
   end
@@ -645,7 +648,7 @@ class EnvConfigTest < Test
       )
       assert_equal 'default-address', connect_config[:target_host]
       assert_equal 'default-namespace', connect_config[:namespace]
-      
+
       # Test with environment overrides
       env = { 'TEMPORAL_NAMESPACE' => 'env-override-namespace' }
       connect_config_with_env = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
@@ -654,7 +657,7 @@ class EnvConfigTest < Test
       )
       assert_equal 'default-address', connect_config_with_env[:target_host]
       assert_equal 'env-override-namespace', connect_config_with_env[:namespace]
-      
+
       # Test with specific profile
       connect_config_custom = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
         profile: 'custom',
@@ -673,38 +676,38 @@ class EnvConfigTest < Test
       address = "prod.temporal.com:443"
       namespace = "production-ns"
       api_key = "prod-api-key"
-      
+
       [profile.production.tls]
       server_name = "prod.temporal.com"
       server_ca_cert_data = "prod-ca-cert"
-      
+
       [profile.production.grpc_meta]
       authorization = "Bearer prod-token"
       "x-custom-header" = "prod-value"
     TOML
-    
+
     env_overrides = {
       'TEMPORAL_GRPC_META_X_ENVIRONMENT' => 'production',
       'TEMPORAL_TLS_SERVER_NAME' => 'override.temporal.com'
     }
-    
+
     connect_config = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
       profile: 'production',
       config_source: toml_content,
       override_env_vars: env_overrides
     )
-    
+
     # Validate all configuration aspects
     assert_equal 'prod.temporal.com:443', connect_config[:target_host]
     assert_equal 'production-ns', connect_config[:namespace]
     assert_equal 'prod-api-key', connect_config[:api_key]
-    
+
     # TLS configuration (API key should auto-enable TLS)
     refute_nil connect_config[:tls]
     tls_config = connect_config[:tls]
     assert_equal 'override.temporal.com', tls_config[:domain] # Env override
     assert_equal 'prod-ca-cert', tls_config[:server_root_ca_cert]
-    
+
     # gRPC metadata with normalization and env overrides
     refute_nil connect_config[:rpc_metadata]
     rpc_metadata = connect_config[:rpc_metadata]
@@ -722,18 +725,18 @@ class EnvConfigTest < Test
       [profile.development]
       address = "localhost:7233"
       namespace = "dev-namespace"
-      
+
       [profile.development.grpc_meta]
       "x-test-source" = "envconfig-ruby-dev"
     TOML
-    
+
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(
       profile: 'development',
       config_source: toml_content
     )
-    
+
     connect_config = profile.to_client_connect_config
-    
+
     # Create actual Temporal client using envconfig
     client = Temporalio::Client.connect(
       connect_config[:target_host],
@@ -743,11 +746,11 @@ class EnvConfigTest < Test
       rpc_metadata: profile.grpc_meta,
       lazy_connect: true
     )
-    
+
     # Verify client configuration matches envconfig
-    assert_equal "localhost:7233", client.connection.target_host
-    assert_equal "dev-namespace", client.namespace
-    assert_equal "envconfig-ruby-dev", client.connection.options.rpc_metadata["x-test-source"]
+    assert_equal 'localhost:7233', client.connection.target_host
+    assert_equal 'dev-namespace', client.namespace
+    assert_equal 'envconfig-ruby-dev', client.connection.options.rpc_metadata['x-test-source']
   end
 
   def test_e2e_production_tls_api_key_client_connection
@@ -756,22 +759,22 @@ class EnvConfigTest < Test
       address = "prod.tmprl.cloud:443"
       namespace = "production-namespace"
       api_key = "prod-api-key-123"
-      
+
       [profile.production.tls]
       server_name = "prod.tmprl.cloud"
-      
+
       [profile.production.grpc_meta]
       authorization = "Bearer prod-token"
       "x-environment" = "production"
     TOML
-    
+
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(
       profile: 'production',
       config_source: toml_content
     )
-    
+
     connect_config = profile.to_client_connect_config
-    
+
     # Create TLS-enabled client with API key
     client = Temporalio::Client.connect(
       connect_config[:target_host],
@@ -781,14 +784,14 @@ class EnvConfigTest < Test
       rpc_metadata: profile.grpc_meta,
       lazy_connect: true
     )
-    
+
     # Verify production configuration
-    assert_equal "prod.tmprl.cloud:443", client.connection.target_host
-    assert_equal "production-namespace", client.namespace
-    assert_equal "prod-api-key-123", client.connection.options.api_key
+    assert_equal 'prod.tmprl.cloud:443', client.connection.target_host
+    assert_equal 'production-namespace', client.namespace
+    assert_equal 'prod-api-key-123', client.connection.options.api_key
     refute_nil client.connection.options.tls # TLS should be enabled with API key
-    assert_equal "Bearer prod-token", client.connection.options.rpc_metadata["authorization"]
-    assert_equal "production", client.connection.options.rpc_metadata["x-environment"]
+    assert_equal 'Bearer prod-token', client.connection.options.rpc_metadata['authorization']
+    assert_equal 'production', client.connection.options.rpc_metadata['x-environment']
   end
 
   def test_e2e_environment_overrides_client_connection
@@ -796,27 +799,27 @@ class EnvConfigTest < Test
       [profile.staging]
       address = "staging.temporal.com:443"
       namespace = "staging-namespace"
-      
+
       [profile.staging.grpc_meta]
       "x-deployment" = "staging"
       authorization = "Bearer staging-token"
     TOML
-    
+
     env_overrides = {
       'TEMPORAL_ADDRESS' => 'override.temporal.com:443',
       'TEMPORAL_NAMESPACE' => 'override-namespace',
       'TEMPORAL_GRPC_META_X_DEPLOYMENT' => 'canary',
       'TEMPORAL_GRPC_META_AUTHORIZATION' => 'Bearer override-token'
     }
-    
+
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(
       profile: 'staging',
       config_source: toml_content,
       override_env_vars: env_overrides
     )
-    
+
     connect_config = profile.to_client_connect_config
-    
+
     # Create client with environment overrides
     client = Temporalio::Client.connect(
       connect_config[:target_host],
@@ -824,12 +827,12 @@ class EnvConfigTest < Test
       rpc_metadata: profile.grpc_meta,
       lazy_connect: true
     )
-    
+
     # Verify environment overrides took effect
-    assert_equal "override.temporal.com:443", client.connection.target_host
-    assert_equal "override-namespace", client.namespace
-    assert_equal "canary", client.connection.options.rpc_metadata["x-deployment"]
-    assert_equal "Bearer override-token", client.connection.options.rpc_metadata["authorization"]
+    assert_equal 'override.temporal.com:443', client.connection.target_host
+    assert_equal 'override-namespace', client.namespace
+    assert_equal 'canary', client.connection.options.rpc_metadata['x-deployment']
+    assert_equal 'Bearer override-token', client.connection.options.rpc_metadata['authorization']
   end
 
   def test_e2e_multi_profile_different_client_connections
@@ -837,22 +840,22 @@ class EnvConfigTest < Test
       [profile.development]
       address = "localhost:7233"
       namespace = "dev"
-      
+
       [profile.production]
       address = "prod.tmprl.cloud:443"
       namespace = "prod"
       api_key = "prod-key"
-      
+
       [profile.production.tls]
       server_name = "prod.tmprl.cloud"
     TOML
-    
+
     # Load and create development client
     dev_profile = Temporalio::EnvConfig::ClientConfigProfile.load(
       profile: 'development',
       config_source: toml_content
     )
-    
+
     dev_config = dev_profile.to_client_connect_config
     dev_client = Temporalio::Client.connect(
       dev_config[:target_host],
@@ -861,13 +864,13 @@ class EnvConfigTest < Test
       tls: dev_config[:tls],
       lazy_connect: true
     )
-    
+
     # Load and create production client
     prod_profile = Temporalio::EnvConfig::ClientConfigProfile.load(
       profile: 'production',
       config_source: toml_content
     )
-    
+
     prod_config = prod_profile.to_client_connect_config
     prod_client = Temporalio::Client.connect(
       prod_config[:target_host],
@@ -876,16 +879,16 @@ class EnvConfigTest < Test
       tls: prod_config[:tls],
       lazy_connect: true
     )
-    
+
     # Verify different configurations for each client
-    assert_equal "localhost:7233", dev_client.connection.target_host
-    assert_equal "dev", dev_client.namespace
+    assert_equal 'localhost:7233', dev_client.connection.target_host
+    assert_equal 'dev', dev_client.namespace
     assert_nil dev_client.connection.options.api_key
     assert_nil dev_client.connection.options.tls
-    
-    assert_equal "prod.tmprl.cloud:443", prod_client.connection.target_host
-    assert_equal "prod", prod_client.namespace
-    assert_equal "prod-key", prod_client.connection.options.api_key
+
+    assert_equal 'prod.tmprl.cloud:443', prod_client.connection.target_host
+    assert_equal 'prod', prod_client.namespace
+    assert_equal 'prod-key', prod_client.connection.options.api_key
     refute_nil prod_client.connection.options.tls # TLS enabled with API key
   end
 

@@ -4,6 +4,7 @@ require 'pathname'
 require 'temporalio/internal/bridge'
 
 module Temporalio
+  # Environment and file-based configuration for Temporal clients
   module EnvConfig
     # This module provides utilities to load Temporal client configuration from TOML files
     # and environment variables.
@@ -12,7 +13,7 @@ module Temporalio
     # - Pathname: Path to a configuration file
     # - String: TOML configuration content
     # - nil: No configuration source
-    
+
     # Convert a data source to path and data parameters for the bridge
     # @param source [Pathname, String, nil] Configuration source
     # @return [Array<String?, Array<Integer>?>] Tuple of [path, data_bytes]
@@ -64,15 +65,13 @@ module Temporalio
       # @return [Pathname, String, nil] Data source
       def self.hash_to_source(hash)
         return nil if hash.nil?
-        
+
         # Always expect a hash with path or data
         if hash[:path] || hash['path']
           # Return path as string to match old behavior
           hash[:path] || hash['path']
         elsif hash[:data] || hash['data']
           hash[:data] || hash['data']
-        else
-          nil
         end
       end
 
@@ -190,7 +189,7 @@ module Temporalio
       # Load a single client profile from given sources, applying env overrides.
       #
       # @param profile [String, nil] Profile to load from the config
-      # @param config_source [Pathname, String, nil] Configuration source - 
+      # @param config_source [Pathname, String, nil] Configuration source -
       #   Pathname for file path, String for TOML content
       # @param disable_file [Boolean] If true, file loading is disabled
       # @param disable_env [Boolean] If true, environment variable loading and overriding is disabled
@@ -333,7 +332,6 @@ module Temporalio
         config_file_strict: false,
         override_env_vars: nil
       )
-
         prof = ClientConfigProfile.load(
           profile: profile,
           config_source: config_source,
