@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use magnus::{Error, RHash, Ruby, function, prelude::*, scan_args, class};
+use magnus::{Error, RHash, Ruby, class, function, prelude::*, scan_args};
 use temporal_sdk_core_api::envconfig::{
+    ClientConfig as CoreClientConfig, ClientConfigCodec,
+    ClientConfigProfile as CoreClientConfigProfile, ClientConfigTLS as CoreClientConfigTLS,
+    DataSource, LoadClientConfigOptions, LoadClientConfigProfileOptions,
     load_client_config as core_load_client_config,
     load_client_config_profile as core_load_client_config_profile,
-    ClientConfig as CoreClientConfig, ClientConfigCodec, ClientConfigProfile as CoreClientConfigProfile,
-    ClientConfigTLS as CoreClientConfigTLS, DataSource, LoadClientConfigOptions,
-    LoadClientConfigProfileOptions,
 };
 
 use crate::{ROOT_MOD, error};
@@ -16,7 +16,10 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
 
     let class = root_mod.define_class("EnvConfig", class::object())?;
     class.define_singleton_method("load_client_config", function!(load_client_config, -1))?;
-    class.define_singleton_method("load_client_connect_config", function!(load_client_connect_config, -1))?;
+    class.define_singleton_method(
+        "load_client_connect_config",
+        function!(load_client_connect_config, -1),
+    )?;
 
     Ok(())
 }
@@ -37,7 +40,7 @@ fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
 fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
     let hash = RHash::new();
     hash.aset("disabled", tls.disabled)?;
-    
+
     if let Some(v) = &tls.client_cert {
         hash.aset("client_cert", data_source_to_hash(ruby, v)?)?;
     }
@@ -51,7 +54,7 @@ fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
         hash.aset("server_name", ruby.str_new(v))?;
     }
     hash.aset("disable_host_verification", tls.disable_host_verification)?;
-    
+
     Ok(hash)
 }
 
@@ -68,7 +71,7 @@ fn codec_to_hash(ruby: &Ruby, codec: &ClientConfigCodec) -> Result<RHash, Error>
 
 fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHash, Error> {
     let hash = RHash::new();
-    
+
     if let Some(v) = &profile.address {
         hash.aset("address", ruby.str_new(v))?;
     }
@@ -91,7 +94,7 @@ fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHa
         }
         hash.aset("grpc_meta", grpc_meta_hash)?;
     }
-    
+
     Ok(hash)
 }
 
@@ -167,7 +170,9 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         (None, Some(d)) => Some(DataSource::Data(d)),
         (None, None) => None,
         (Some(_), Some(_)) => {
-            return Err(error!("Cannot specify both path and data for config source"));
+            return Err(error!(
+                "Cannot specify both path and data for config source"
+            ));
         }
     };
 
@@ -184,7 +189,14 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
 fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
     let ruby = Ruby::get().expect("Not in Ruby thread");
     let args = scan_args::scan_args::<
-        (Option<String>, Option<String>, Option<Vec<u8>>, bool, bool, bool),
+        (
+            Option<String>,
+            Option<String>,
+            Option<Vec<u8>>,
+            bool,
+            bool,
+            bool,
+        ),
         (Option<HashMap<String, String>>,),
         (),
         (),
@@ -199,7 +211,9 @@ fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         (None, Some(d)) => Some(DataSource::Data(d)),
         (None, None) => None,
         (Some(_), Some(_)) => {
-            return Err(error!("Cannot specify both path and data for config source"));
+            return Err(error!(
+                "Cannot specify both path and data for config source"
+            ));
         }
     };
 
