@@ -245,7 +245,10 @@ module Temporalio
         hash[:address] = @address if @address
         hash[:namespace] = @namespace if @namespace
         hash[:api_key] = @api_key if @api_key
-        hash[:tls] = @tls.to_hash if @tls && !@tls.to_hash.empty?
+        if @tls
+          tls_hash = @tls.to_hash # steep:ignore
+          hash[:tls] = tls_hash unless tls_hash.empty?
+        end
         hash[:grpc_meta] = @grpc_meta if @grpc_meta && !@grpc_meta.empty?
         hash
       end
@@ -257,7 +260,7 @@ module Temporalio
         config[:target_host] = @address if @address
         config[:namespace] = @namespace if @namespace
         config[:api_key] = @api_key if @api_key
-        config[:tls] = @tls.to_connect_tls_config if @tls
+        config[:tls] = @tls.to_connect_tls_config if @tls # steep:ignore
         config[:rpc_metadata] = @grpc_meta if @grpc_meta && !@grpc_meta.empty?
         config
       end

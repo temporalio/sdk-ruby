@@ -1,0 +1,87 @@
+module Temporalio
+  module EnvConfig
+    def self.source_to_path_and_data: (untyped source) -> [String?, Array[Integer]?]
+
+    class ClientConfigTLS
+      attr_reader disabled: bool
+      attr_reader server_name: String?
+      attr_reader server_root_ca_cert: (Pathname | String)?
+      attr_reader client_cert: (Pathname | String)?
+      attr_reader client_private_key: (Pathname | String)?
+
+      def self.from_hash: (Hash[untyped, untyped]? hash) -> ClientConfigTLS?
+      def self.hash_to_source: (Hash[untyped, untyped]? hash) -> (Pathname | String)?
+
+      def initialize: (
+        ?disabled: bool,
+        ?server_name: String?,
+        ?server_root_ca_cert: (Pathname | String)?,
+        ?client_cert: (Pathname | String)?,
+        ?client_private_key: (Pathname | String)?
+      ) -> void
+
+      def to_hash: -> Hash[Symbol, untyped]
+      def to_connect_tls_config: -> (Hash[Symbol, untyped] | false)
+
+      private
+
+      def source_to_hash: (untyped source) -> Hash[Symbol, String]?
+      def read_source: (untyped source) -> String?
+    end
+
+    class ClientConfigProfile
+      attr_reader address: String?
+      attr_reader namespace: String?
+      attr_reader api_key: String?
+      attr_reader tls: ClientConfigTLS?
+      attr_reader grpc_meta: Hash[untyped, untyped]
+
+      def self.from_hash: (Hash[untyped, untyped] hash) -> ClientConfigProfile
+
+      def self.load: (
+        ?profile: String?,
+        ?config_source: (Pathname | String)?,
+        ?disable_file: bool,
+        ?disable_env: bool,
+        ?config_file_strict: bool,
+        ?override_env_vars: Hash[String, String]?
+      ) -> ClientConfigProfile
+
+      def initialize: (
+        ?address: String?,
+        ?namespace: String?,
+        ?api_key: String?,
+        ?tls: ClientConfigTLS?,
+        ?grpc_meta: Hash[untyped, untyped]
+      ) -> void
+
+      def to_hash: -> Hash[Symbol, untyped]
+      def to_client_connect_config: -> Hash[Symbol, untyped]
+    end
+
+    class ClientConfig
+      attr_reader profiles: Hash[String, ClientConfigProfile]
+
+      def self.from_hash: (Hash[untyped, untyped] hash) -> ClientConfig
+
+      def self.load: (
+        ?config_source: (Pathname | String)?,
+        ?disable_file: bool,
+        ?config_file_strict: bool,
+        ?override_env_vars: Hash[String, String]?
+      ) -> ClientConfig
+
+      def self.load_client_connect_config: (
+        ?profile: String?,
+        ?config_source: (Pathname | String)?,
+        ?disable_file: bool,
+        ?disable_env: bool,
+        ?config_file_strict: bool,
+        ?override_env_vars: Hash[String, String]?
+      ) -> Hash[Symbol, untyped]
+
+      def initialize: (Hash[String, ClientConfigProfile] profiles) -> void
+      def to_hash: -> Hash[String, Hash[Symbol, untyped]]
+    end
+  end
+end 

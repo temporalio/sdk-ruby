@@ -4,6 +4,7 @@ require 'fileutils'
 require 'pathname'
 require 'temporalio/client'
 require 'temporalio/envconfig'
+require 'tmpdir'
 require_relative 'test'
 
 class EnvConfigTest < Test
@@ -93,7 +94,7 @@ class EnvConfigTest < Test
       assert_equal 'custom-address', profile.address
       assert_equal 'custom-namespace', profile.namespace
       refute_nil profile.tls
-      assert_equal 'custom-server-name', profile.tls.server_name
+      assert_equal 'custom-server-name', profile.tls.server_name # steep:ignore
       assert_equal 'custom-value', profile.grpc_meta['custom-header']
 
       config = profile.to_client_connect_config
@@ -123,7 +124,7 @@ class EnvConfigTest < Test
     assert_equal 'custom-address', profile.address
     assert_equal 'custom-namespace', profile.namespace
     refute_nil profile.tls
-    assert_equal 'custom-server-name', profile.tls.server_name
+    assert_equal 'custom-server-name', profile.tls.server_name # steep:ignore
     assert_equal 'custom-value', profile.grpc_meta['custom-header']
 
     config = profile.to_client_connect_config
@@ -166,7 +167,7 @@ class EnvConfigTest < Test
       assert_equal 'env-namespace', profile.namespace
       assert_equal 'env-api-key', profile.api_key
       refute_nil profile.tls
-      assert_equal 'env-server-name', profile.tls.server_name
+      assert_equal 'env-server-name', profile.tls.server_name # steep:ignore
 
       config = profile.to_client_connect_config
       assert_equal 'env-address', config[:target_host]
@@ -369,7 +370,7 @@ class EnvConfigTest < Test
       config_source: TOML_CONFIG_TLS_DETAILED, profile: 'tls_disabled'
     )
     refute_nil profile_disabled.tls
-    assert profile_disabled.tls.disabled
+    assert profile_disabled.tls.disabled # steep:ignore
 
     config_disabled = profile_disabled.to_client_connect_config
     assert_equal false, config_disabled[:tls]
@@ -379,13 +380,13 @@ class EnvConfigTest < Test
       config_source: TOML_CONFIG_TLS_DETAILED, profile: 'tls_with_certs'
     )
     refute_nil profile_certs.tls
-    assert_equal 'custom-server', profile_certs.tls.server_name
-    refute_nil profile_certs.tls.server_root_ca_cert
-    assert_equal 'ca-pem-data', profile_certs.tls.server_root_ca_cert
-    refute_nil profile_certs.tls.client_cert
-    assert_equal 'client-crt-data', profile_certs.tls.client_cert
-    refute_nil profile_certs.tls.client_private_key
-    assert_equal 'client-key-data', profile_certs.tls.client_private_key
+    assert_equal 'custom-server', profile_certs.tls.server_name # steep:ignore
+    refute_nil profile_certs.tls.server_root_ca_cert # steep:ignore
+    assert_equal 'ca-pem-data', profile_certs.tls.server_root_ca_cert # steep:ignore
+    refute_nil profile_certs.tls.client_cert # steep:ignore
+    assert_equal 'client-crt-data', profile_certs.tls.client_cert # steep:ignore
+    refute_nil profile_certs.tls.client_private_key # steep:ignore
+    assert_equal 'client-key-data', profile_certs.tls.client_private_key # steep:ignore
 
     config_certs = profile_certs.to_client_connect_config
     tls_config_certs = config_certs[:tls]
@@ -397,7 +398,7 @@ class EnvConfigTest < Test
   end
 
   def test_load_profile_tls_from_paths
-    Dir.mktmpdir do |tmpdir|
+    Dir.mktmpdir do |tmpdir| # steep:ignore
       # Create dummy cert files
       ca_pem_path = File.join(tmpdir, 'ca.pem')
       client_crt_path = File.join(tmpdir, 'client.crt')
@@ -419,13 +420,13 @@ class EnvConfigTest < Test
 
       profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: toml_config)
       refute_nil profile.tls
-      assert_equal 'custom-server', profile.tls.server_name
-      refute_nil profile.tls.server_root_ca_cert
-      assert_equal ca_pem_path, profile.tls.server_root_ca_cert
-      refute_nil profile.tls.client_cert
-      assert_equal client_crt_path, profile.tls.client_cert
-      refute_nil profile.tls.client_private_key
-      assert_equal client_key_path, profile.tls.client_private_key
+      assert_equal 'custom-server', profile.tls.server_name # steep:ignore
+      refute_nil profile.tls.server_root_ca_cert # steep:ignore
+      assert_equal ca_pem_path, profile.tls.server_root_ca_cert # steep:ignore
+      refute_nil profile.tls.client_cert # steep:ignore
+      assert_equal client_crt_path, profile.tls.client_cert # steep:ignore
+      refute_nil profile.tls.client_private_key # steep:ignore
+      assert_equal client_key_path, profile.tls.client_private_key # steep:ignore
 
       config = profile.to_client_connect_config
       tls_config = config[:tls]
@@ -895,7 +896,7 @@ class EnvConfigTest < Test
   private
 
   def with_temp_config_file(content)
-    Dir.mktmpdir do |tmpdir|
+    Dir.mktmpdir do |tmpdir| # steep:ignore
       config_file = File.join(tmpdir, 'config.toml')
       File.write(config_file, content)
       yield config_file
