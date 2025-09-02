@@ -58,10 +58,6 @@ module Temporalio
 
         def metric_meter: -> Temporalio::Metric::Meter
 
-        def run_in_scheduler: [T] { -> T } -> T
-
-        def activate_internal: (untyped activation) -> untyped
-
         def create_instance: -> Temporalio::Workflow::Definition
 
         def apply: (untyped job) -> void
