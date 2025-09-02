@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64_codec'
+require 'gc_utils'
 require 'net/http'
 require 'temporalio/client'
 require 'temporalio/testing'
@@ -1912,9 +1913,10 @@ class WorkerWorkflowTest < Test
   class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
     @initialized_count = 0
     @finalized_count = 0
+    @weak_instance = nil
 
     class << self
-      attr_accessor :initialized_count, :finalized_count
+      attr_accessor :initialized_count, :finalized_count, :weak_instance
 
       def create_finalizer
         proc { @finalized_count += 1 }
@@ -1923,6 +1925,7 @@ class WorkerWorkflowTest < Test
 
     def initialize
       self.class.initialized_count += 1
+      self.class.weak_instance = WeakRef.new(self)
       ObjectSpace.define_finalizer(self, self.class.create_finalizer)
     end
 
@@ -1932,6 +1935,13 @@ class WorkerWorkflowTest < Test
   end
 
   def test_confirm_garbage_collect
+    major, minor = RUBY_VERSION.split('.').take(2).map(&:to_i)
+    skip('Only Ruby 3.4+ has predictable eager GC') if major != 3 || minor < 4
+
+    # This test confirms the workflow instance is reliably GC'd when workflow/worker done. To confirm the test fails
+    # when there is still an instance, make a "strong_instance" singleton attribute and assign "self" to it in
+    # initialize and confirm this calls flunk later.
+
     execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
       # Wait until it is started
       assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
@@ -1940,10 +1950,18 @@ class WorkerWorkflowTest < Test
       assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
     end
 
-    # Now with worker shutdown, GC and confirm finalized
-    assert_eventually do
-      GC.start
-      assert_equal 1, ConfirmGarbageCollectWorkflow.finalized_count
+    # Perform a GC and confirm gone
+    GC.start
+    begin
+      # Access instance and assert that it fails when a method is called on it as expected
+      instance = ConfirmGarbageCollectWorkflow.weak_instance.__getobj__
+
+      # Print out the path still holding it
+      path, cat = GCUtils.find_retaining_path_to(instance.object_id, max_depth: 12)
+      GCUtils.print_annotated_path(path, root_category: cat)
+      flunk
+    rescue WeakRef::RefError
+      # Expected
     end
   end
 
