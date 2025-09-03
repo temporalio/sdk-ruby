@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/envconfig'
 require 'temporalio/version'
 require 'temporalio/versioning_override'
 
