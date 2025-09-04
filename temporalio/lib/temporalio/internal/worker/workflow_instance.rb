@@ -182,8 +182,7 @@ module Temporalio
             # Create instance if it doesn't already exist
             @instance ||= with_context_frozen { create_instance }
 
-            # Apply jobs without call checking
-            # illegal_call_tracing_disabled { activation.jobs.each { |job| apply(job) } }
+            # Apply jobs
             activation.jobs.each { |job| apply(job) }
 
             # Schedule primary 'execute' if not already running (i.e. this is
