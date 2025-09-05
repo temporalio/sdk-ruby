@@ -87,13 +87,14 @@ module GCUtils
       [objs, root_of[ids.first]]
     end
 
-    # Print path on stdout.
-    def print_annotated_path(path, root_category:)
-      puts "Retaining path (len=#{path.length}) from ROOT[:#{root_category}] to target:"
-      return if path.empty?
+    # Return string of annotated path
+    def annotated_path(path, root_category:)
+      lines = []
+      lines << "Retaining path (len=#{path.length}) from ROOT[:#{root_category}] to target:"
+      return lines.join("\n") if path.empty?
 
       # First is the root
-      puts "  ROOT[:#{root_category}] #{describe_obj(path.first)}"
+      lines << "  ROOT[:#{root_category}] #{describe_obj(path.first)}"
       # Then edges with labels
       (0...(path.length - 1)).each do |i|
         parent = path[i]
@@ -101,9 +102,10 @@ module GCUtils
         labels = edge_labels(parent, child)
         labels.each_with_index do |lab, j|
           arrow = (j.zero? ? '    └─' : '      •')
-          puts "#{arrow} via #{lab} → #{describe_obj(child)}"
+          lines << "#{arrow} via #{lab} → #{describe_obj(child)}"
         end
       end
+      lines.join("\n")
     end
 
     private
