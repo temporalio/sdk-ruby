@@ -547,7 +547,7 @@ class EnvConfigTest < Test
       grpc_meta: { 'some-header' => 'some-value' }
     )
 
-    profile_hash = profile.to_hash
+    profile_hash = profile.to_h
 
     # Check hash representation. Note that disabled=false is not in the hash.
     expected_hash = {
@@ -565,7 +565,7 @@ class EnvConfigTest < Test
     assert_equal expected_hash, profile_hash
 
     # Convert back to profile
-    new_profile = Temporalio::EnvConfig::ClientConfigProfile.from_hash(profile_hash)
+    new_profile = Temporalio::EnvConfig::ClientConfigProfile.from_h(profile_hash)
 
     # We expect the new profile to be the same
     assert_equal profile.address, new_profile.address
@@ -575,9 +575,9 @@ class EnvConfigTest < Test
 
     # Test with minimal profile
     profile_minimal = Temporalio::EnvConfig::ClientConfigProfile.new
-    profile_minimal_hash = profile_minimal.to_hash
+    profile_minimal_hash = profile_minimal.to_h
     assert_empty profile_minimal_hash
-    new_profile_minimal = Temporalio::EnvConfig::ClientConfigProfile.from_hash(profile_minimal_hash)
+    new_profile_minimal = Temporalio::EnvConfig::ClientConfigProfile.from_h(profile_minimal_hash)
     assert_nil profile_minimal.address
     assert_nil new_profile_minimal.address
   end
@@ -598,7 +598,7 @@ class EnvConfigTest < Test
       'custom' => profile2
     })
 
-    config_hash = config.to_hash
+    config_hash = config.to_h
 
     expected_hash = {
       'default' => {
@@ -614,14 +614,14 @@ class EnvConfigTest < Test
     assert_equal expected_hash, config_hash
 
     # Convert back to config
-    new_config = Temporalio::EnvConfig::ClientConfig.from_hash(config_hash)
+    new_config = Temporalio::EnvConfig::ClientConfig.from_h(config_hash)
     assert_equal config.profiles.keys, new_config.profiles.keys
 
     # Test empty config
     empty_config = Temporalio::EnvConfig::ClientConfig.new(profiles: {})
-    empty_config_hash = empty_config.to_hash
+    empty_config_hash = empty_config.to_h
     assert_empty empty_config_hash
-    new_empty_config = Temporalio::EnvConfig::ClientConfig.from_hash(empty_config_hash)
+    new_empty_config = Temporalio::EnvConfig::ClientConfig.from_h(empty_config_hash)
     assert_empty new_empty_config.profiles
   end
 

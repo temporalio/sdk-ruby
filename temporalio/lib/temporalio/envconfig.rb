@@ -53,7 +53,7 @@ module Temporalio
       # Create a ClientConfigTLS from a hash
       # @param hash [Hash, nil] Hash representation
       # @return [ClientConfigTLS, nil] The TLS configuration or nil if hash is nil/empty
-      def self.from_hash(hash)
+      def self.from_h(hash)
         return nil if hash.nil? || hash.empty?
 
         new(
@@ -82,7 +82,7 @@ module Temporalio
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
-      def to_hash
+      def to_h
         hash = {}
         hash[:disabled] = disabled if disabled
         hash[:server_name] = server_name if server_name
@@ -167,12 +167,12 @@ module Temporalio
       # Create a ClientConfigProfile from a hash
       # @param hash [Hash] Hash representation
       # @return [ClientConfigProfile] The client profile
-      def self.from_hash(hash)
+      def self.from_h(hash)
         new(
           address: hash[:address] || hash['address'],
           namespace: hash[:namespace] || hash['namespace'],
           api_key: hash[:api_key] || hash['api_key'],
-          tls: ClientConfigTLS.from_hash(hash[:tls] || hash['tls']),
+          tls: ClientConfigTLS.from_h(hash[:tls] || hash['tls']),
           grpc_meta: hash[:grpc_meta] || hash['grpc_meta'] || {}
         )
       end
@@ -207,19 +207,19 @@ module Temporalio
           override_env_vars || {}
         )
 
-        from_hash(raw_profile)
+        from_h(raw_profile)
       end
 
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
-      def to_hash
+      def to_h
         hash = {}
         hash[:address] = address if address
         hash[:namespace] = namespace if namespace
         hash[:api_key] = api_key if api_key
         if tls
-          tls_hash = tls.to_hash # steep:ignore
+          tls_hash = tls.to_h # steep:ignore
           hash[:tls] = tls_hash unless tls_hash.empty?
         end
         hash[:grpc_meta] = grpc_meta if grpc_meta && !grpc_meta.empty?
@@ -256,9 +256,9 @@ module Temporalio
       # Create a ClientConfig from a hash
       # @param hash [Hash] Hash representation
       # @return [ClientConfig] The client configuration
-      def self.from_hash(hash)
+      def self.from_h(hash)
         profiles = hash.transform_values do |profile_hash|
-          ClientConfigProfile.from_hash(profile_hash)
+          ClientConfigProfile.from_h(profile_hash)
         end
         new(profiles)
       end
@@ -290,7 +290,7 @@ module Temporalio
           override_env_vars || {}
         )
 
-        from_hash(loaded_profiles)
+        from_h(loaded_profiles)
       end
 
       # Load a single client profile and convert to connect config
@@ -326,8 +326,8 @@ module Temporalio
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
-      def to_hash
-        profiles.transform_values(&:to_hash)
+      def to_h
+        profiles.transform_values(&:to_h)
       end
     end
   end
