@@ -9,7 +9,7 @@ target :lib do
 
   ignore 'lib/temporalio/api', 'lib/temporalio/internal/bridge/api'
 
-  library 'uri'
+  library 'uri', 'objspace'
 
   configure_code_diagnostics do |hash|
     # TODO(cretz): Fix as more protos are generated

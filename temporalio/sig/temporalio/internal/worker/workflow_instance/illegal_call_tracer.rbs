@@ -12,7 +12,7 @@ module Temporalio
           ) -> void
 
           def enable: [T] { -> T } -> T
-          def disable: [T] { -> T } -> T
+          def disable_temporarily: [T] { -> T } -> T
         end
       end
     end
