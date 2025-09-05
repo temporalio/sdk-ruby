@@ -42,8 +42,13 @@ module Temporalio
     #   @return [Pathname, String, nil] Client certificate source
     # @!attribute [r] client_private_key
     #   @return [Pathname, String, nil] Client key source
+    ClientConfigTLS = Data.define(:disabled, :server_name, :server_root_ca_cert, :client_cert, :client_private_key)
+
     class ClientConfigTLS
-      attr_reader :disabled, :server_name, :server_root_ca_cert, :client_cert, :client_private_key
+      # Set default values
+      def initialize(disabled: false, server_name: nil, server_root_ca_cert: nil, client_cert: nil, client_private_key: nil)
+        super
+      end
 
       # Create a ClientConfigTLS from a hash
       # @param hash [Hash, nil] Hash representation
@@ -75,47 +80,28 @@ module Temporalio
         end
       end
 
-      # @param disabled [Boolean] If true, TLS is explicitly disabled
-      # @param server_name [String, nil] SNI override
-      # @param server_root_ca_cert [Pathname, String, nil] Server CA certificate source
-      # @param client_cert [Pathname, String, nil] Client certificate source
-      # @param client_private_key [Pathname, String, nil] Client key source
-      def initialize(
-        disabled: false,
-        server_name: nil,
-        server_root_ca_cert: nil,
-        client_cert: nil,
-        client_private_key: nil
-      )
-        @disabled = disabled
-        @server_name = server_name
-        @server_root_ca_cert = server_root_ca_cert
-        @client_cert = client_cert
-        @client_private_key = client_private_key
-      end
-
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_hash
         hash = {}
-        hash[:disabled] = @disabled if @disabled
-        hash[:server_name] = @server_name if @server_name
-        hash[:server_ca_cert] = source_to_hash(@server_root_ca_cert) if @server_root_ca_cert
-        hash[:client_cert] = source_to_hash(@client_cert) if @client_cert
-        hash[:client_key] = source_to_hash(@client_private_key) if @client_private_key
+        hash[:disabled] = disabled if disabled
+        hash[:server_name] = server_name if server_name
+        hash[:server_ca_cert] = source_to_hash(server_root_ca_cert) if server_root_ca_cert
+        hash[:client_cert] = source_to_hash(client_cert) if client_cert
+        hash[:client_key] = source_to_hash(client_private_key) if client_private_key
         hash
       end
 
       # Create a TLS configuration for use with connections
       # @return [Hash, false] A TLS config hash or false if disabled
       def to_connect_tls_config
-        return false if @disabled
+        return false if disabled
 
         config = {}
-        config[:domain] = @server_name if @server_name
-        config[:server_root_ca_cert] = read_source(@server_root_ca_cert) if @server_root_ca_cert
-        config[:client_cert] = read_source(@client_cert) if @client_cert
-        config[:client_private_key] = read_source(@client_private_key) if @client_private_key
+        config[:domain] = server_name if server_name
+        config[:server_root_ca_cert] = read_source(server_root_ca_cert) if server_root_ca_cert
+        config[:client_cert] = read_source(client_cert) if client_cert
+        config[:client_private_key] = read_source(client_private_key) if client_private_key
         config
       end
 
@@ -170,8 +156,13 @@ module Temporalio
     #   @return [ClientConfigTLS, nil] TLS configuration
     # @!attribute [r] grpc_meta
     #   @return [Hash] gRPC metadata
+    ClientConfigProfile = Data.define(:address, :namespace, :api_key, :tls, :grpc_meta)
+
     class ClientConfigProfile
-      attr_reader :address, :namespace, :api_key, :tls, :grpc_meta
+      # Create a ClientConfigProfile instance with defaults
+      def initialize(address: nil, namespace: nil, api_key: nil, tls: nil, grpc_meta: {})
+        super
+      end
 
       # Create a ClientConfigProfile from a hash
       # @param hash [Hash] Hash representation
@@ -219,37 +210,19 @@ module Temporalio
         from_hash(raw_profile)
       end
 
-      # @param address [String, nil] Client address
-      # @param namespace [String, nil] Client namespace
-      # @param api_key [String, nil] Client API key
-      # @param tls [ClientConfigTLS, nil] TLS configuration
-      # @param grpc_meta [Hash] gRPC metadata
-      def initialize(
-        address: nil,
-        namespace: nil,
-        api_key: nil,
-        tls: nil,
-        grpc_meta: {}
-      )
-        @address = address
-        @namespace = namespace
-        @api_key = api_key
-        @tls = tls
-        @grpc_meta = grpc_meta || {}
-      end
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_hash
         hash = {}
-        hash[:address] = @address if @address
-        hash[:namespace] = @namespace if @namespace
-        hash[:api_key] = @api_key if @api_key
-        if @tls
-          tls_hash = @tls.to_hash # steep:ignore
+        hash[:address] = address if address
+        hash[:namespace] = namespace if namespace
+        hash[:api_key] = api_key if api_key
+        if tls
+          tls_hash = tls.to_hash # steep:ignore
           hash[:tls] = tls_hash unless tls_hash.empty?
         end
-        hash[:grpc_meta] = @grpc_meta if @grpc_meta && !@grpc_meta.empty?
+        hash[:grpc_meta] = grpc_meta if grpc_meta && !grpc_meta.empty?
         hash
       end
 
@@ -257,11 +230,11 @@ module Temporalio
       # @return [Hash] Arguments that can be passed to Client.connect
       def to_client_connect_config
         config = {}
-        config[:target_host] = @address if @address
-        config[:namespace] = @namespace if @namespace
-        config[:api_key] = @api_key if @api_key
-        config[:tls] = @tls.to_connect_tls_config if @tls # steep:ignore
-        config[:rpc_metadata] = @grpc_meta if @grpc_meta && !@grpc_meta.empty?
+        config[:target_host] = address if address
+        config[:namespace] = namespace if namespace
+        config[:api_key] = api_key if api_key
+        config[:tls] = tls.to_connect_tls_config if tls # steep:ignore
+        config[:rpc_metadata] = grpc_meta if grpc_meta && !grpc_meta.empty?
         config
       end
     end
@@ -272,8 +245,13 @@ module Temporalio
     #
     # @!attribute [r] profiles
     #   @return [Hash<String, ClientConfigProfile>] Map of profile name to its corresponding ClientConfigProfile
+    ClientConfig = Data.define(:profiles)
+
     class ClientConfig
-      attr_reader :profiles
+      # Create a ClientConfig instance with defaults
+      def initialize(profiles: {})
+        super
+      end
 
       # Create a ClientConfig from a hash
       # @param hash [Hash] Hash representation
@@ -346,15 +324,10 @@ module Temporalio
         prof.to_client_connect_config
       end
 
-      # @param profiles [Hash<String, ClientConfigProfile>] Map of profile name to ClientConfigProfile
-      def initialize(profiles)
-        @profiles = profiles || {}
-      end
-
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_hash
-        @profiles.transform_values(&:to_hash)
+        profiles.transform_values(&:to_hash)
       end
     end
   end

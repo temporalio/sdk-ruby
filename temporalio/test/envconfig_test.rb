@@ -593,10 +593,10 @@ class EnvConfigTest < Test
       tls: Temporalio::EnvConfig::ClientConfigTLS.new(server_name: 'some-server-name'),
       grpc_meta: { 'some-header' => 'some-value' }
     )
-    config = Temporalio::EnvConfig::ClientConfig.new(
+    config = Temporalio::EnvConfig::ClientConfig.new(profiles: {
       'default' => profile1,
       'custom' => profile2
-    )
+    })
 
     config_hash = config.to_hash
 
@@ -618,7 +618,7 @@ class EnvConfigTest < Test
     assert_equal config.profiles.keys, new_config.profiles.keys
 
     # Test empty config
-    empty_config = Temporalio::EnvConfig::ClientConfig.new({})
+    empty_config = Temporalio::EnvConfig::ClientConfig.new(profiles: {})
     empty_config_hash = empty_config.to_hash
     assert_empty empty_config_hash
     new_empty_config = Temporalio::EnvConfig::ClientConfig.from_hash(empty_config_hash)
