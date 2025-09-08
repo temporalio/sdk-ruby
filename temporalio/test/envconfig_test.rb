@@ -100,8 +100,8 @@ class EnvConfigTest < Test
       config = profile.to_client_connect_config
       assert_equal 'custom-address', config[:target_host]
       tls_config = config[:tls]
-      assert_instance_of Hash, tls_config
-      assert_equal 'custom-server-name', tls_config[:domain]
+      assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
+      assert_equal 'custom-server-name', tls_config.domain
       rpc_metadata = config[:rpc_metadata]
       refute_nil rpc_metadata
       assert_equal 'custom-value', rpc_metadata['custom-header']
@@ -130,8 +130,8 @@ class EnvConfigTest < Test
     config = profile.to_client_connect_config
     assert_equal 'custom-address', config[:target_host]
     tls_config = config[:tls]
-    assert_instance_of Hash, tls_config
-    assert_equal 'custom-server-name', tls_config[:domain]
+    assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
+    assert_equal 'custom-server-name', tls_config.domain
     rpc_metadata = config[:rpc_metadata]
     refute_nil rpc_metadata
     assert_equal 'custom-value', rpc_metadata['custom-header']
@@ -173,8 +173,8 @@ class EnvConfigTest < Test
       assert_equal 'env-address', config[:target_host]
       assert_equal 'env-api-key', config[:api_key]
       tls_config = config[:tls]
-      assert_instance_of Hash, tls_config
-      assert_equal 'env-server-name', tls_config[:domain]
+      assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
+      assert_equal 'env-server-name', tls_config.domain
     end
   end
 
@@ -390,11 +390,11 @@ class EnvConfigTest < Test
 
     config_certs = profile_certs.to_client_connect_config
     tls_config_certs = config_certs[:tls]
-    assert_instance_of Hash, tls_config_certs
-    assert_equal 'custom-server', tls_config_certs[:domain]
-    assert_equal 'ca-pem-data', tls_config_certs[:server_root_ca_cert]
-    assert_equal 'client-crt-data', tls_config_certs[:client_cert]
-    assert_equal 'client-key-data', tls_config_certs[:client_private_key]
+    assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config_certs
+    assert_equal 'custom-server', tls_config_certs.domain
+    assert_equal 'ca-pem-data', tls_config_certs.server_root_ca_cert
+    assert_equal 'client-crt-data', tls_config_certs.client_cert
+    assert_equal 'client-key-data', tls_config_certs.client_private_key
   end
 
   def test_load_profile_tls_from_paths
@@ -430,11 +430,11 @@ class EnvConfigTest < Test
 
       config = profile.to_client_connect_config
       tls_config = config[:tls]
-      assert_instance_of Hash, tls_config
-      assert_equal 'custom-server', tls_config[:domain]
-      assert_equal 'ca-pem-data', tls_config[:server_root_ca_cert]
-      assert_equal 'client-crt-data', tls_config[:client_cert]
-      assert_equal 'client-key-data', tls_config[:client_private_key]
+      assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
+      assert_equal 'custom-server', tls_config.domain
+      assert_equal 'ca-pem-data', tls_config.server_root_ca_cert
+      assert_equal 'client-crt-data', tls_config.client_cert
+      assert_equal 'client-key-data', tls_config.client_private_key
     end
   end
 
@@ -633,8 +633,8 @@ class EnvConfigTest < Test
     )
     config = profile.to_client_connect_config
     tls_config = config[:tls]
-    assert_instance_of Hash, tls_config
-    assert_equal 'string-as-cert-content', tls_config[:client_cert]
+    assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
+    assert_equal 'string-as-cert-content', tls_config.client_cert
   end
 
   # =============================================================================
@@ -706,8 +706,8 @@ class EnvConfigTest < Test
     # TLS configuration (API key should auto-enable TLS)
     refute_nil connect_config[:tls]
     tls_config = connect_config[:tls]
-    assert_equal 'override.temporal.com', tls_config[:domain] # Env override
-    assert_equal 'prod-ca-cert', tls_config[:server_root_ca_cert]
+    assert_equal 'override.temporal.com', tls_config.domain # Env override
+    assert_equal 'prod-ca-cert', tls_config.server_root_ca_cert
 
     # gRPC metadata with normalization and env overrides
     refute_nil connect_config[:rpc_metadata]

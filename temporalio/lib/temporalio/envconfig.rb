@@ -26,7 +26,7 @@ module Temporalio
       when nil
         [nil, nil]
       else
-        raise TypeError, "config_source must be Pathname, String, or nil, got #{source.class}"
+        raise TypeError, "Must be Pathname, String, or nil, got #{source.class}"
       end
     end
 
@@ -93,16 +93,16 @@ module Temporalio
       end
 
       # Create a TLS configuration for use with connections
-      # @return [Hash, false] A TLS config hash or false if disabled
-      def to_connect_tls_config
+      # @return [Connection::TLSOptions, false] TLS options or false if disabled
+      def to_tls_options
         return false if disabled
 
-        config = {}
-        config[:domain] = server_name if server_name
-        config[:server_root_ca_cert] = read_source(server_root_ca_cert) if server_root_ca_cert
-        config[:client_cert] = read_source(client_cert) if client_cert
-        config[:client_private_key] = read_source(client_private_key) if client_private_key
-        config
+        Temporalio::Client::Connection::TLSOptions.new(
+          domain: server_name,
+          server_root_ca_cert: read_source(server_root_ca_cert),
+          client_cert: read_source(client_cert),
+          client_private_key: read_source(client_private_key)
+        )
       end
 
       private
@@ -195,9 +195,9 @@ module Temporalio
         config_file_strict: false,
         override_env_vars: nil
       )
-        path, data = Temporalio::EnvConfig.source_to_path_and_data(config_source)
+        path, data = EnvConfig.source_to_path_and_data(config_source)
 
-        raw_profile = Temporalio::Internal::Bridge::EnvConfig.load_client_connect_config(
+        raw_profile = Internal::Bridge::EnvConfig.load_client_connect_config(
           profile,
           path,
           data,
@@ -233,7 +233,7 @@ module Temporalio
         config[:target_host] = address if address
         config[:namespace] = namespace if namespace
         config[:api_key] = api_key if api_key
-        config[:tls] = tls.to_connect_tls_config if tls # steep:ignore
+        config[:tls] = tls.to_tls_options if tls # steep:ignore
         config[:rpc_metadata] = grpc_meta if grpc_meta && !grpc_meta.empty?
         config
       end
