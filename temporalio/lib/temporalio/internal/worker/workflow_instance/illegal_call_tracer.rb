@@ -84,7 +84,7 @@ module Temporalio
                 when :all
                   ''
                 when Temporalio::Worker::IllegalWorkflowCallValidator
-                  disable do
+                  disable_temporarily do
                     vals.block.call(Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo.new(
                                       class_name:, method_name: tp.callee_id, trace_point: tp
                                     ))
@@ -98,7 +98,7 @@ module Temporalio
                   when true
                     ''
                   when Temporalio::Worker::IllegalWorkflowCallValidator
-                    disable do
+                    disable_temporarily do
                       per_method.block.call(Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo.new(
                                               class_name:, method_name: tp.callee_id, trace_point: tp
                                             ))
@@ -118,8 +118,11 @@ module Temporalio
           end
 
           def enable(&block)
-            # We've seen leaking issues in Ruby 3.2 where the TracePoint inadvertently remains enabled even for threads
-            # that it was not started on. So we will check the thread ourselves.
+            # This is not reentrant and not expected to be called as such. We've seen leaking issues in Ruby 3.2 where
+            # the TracePoint inadvertently remains enabled even for threads that it was not started on. So we will check
+            # the thread ourselves. We also use the "enabled thread" concept for disabling checks too, see
+            # disable_temporarily for more details.
+
             @enabled_thread = Thread.current
             @tracepoint.enable do
               block.call
@@ -128,13 +131,17 @@ module Temporalio
             end
           end
 
-          def disable(&block)
+          def disable_temporarily(&)
+            # An earlier version of this used @tracepoint.disable, but in some versions of Ruby, the observed behavior
+            # is confusingly not reentrant or at least not predictable. Therefore, instead of calling
+            # @tracepoint.disable, we are just unsetting the enabled thread. This means the tracer is still running, but
+            # no checks are performed. This is effectively a no-op if tracing was never enabled.
+
             previous_thread = @enabled_thread
-            @tracepoint.disable do
-              block.call
-            ensure
-              @enabled_thread = previous_thread
-            end
+            @enabled_thread = nil
+            yield
+          ensure
+            @enabled_thread = previous_thread
           end
         end
       end
