@@ -83,13 +83,13 @@ module Temporalio
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_h
-        hash = {}
-        hash[:disabled] = disabled if disabled
-        hash[:server_name] = server_name if server_name
-        hash[:server_ca_cert] = source_to_hash(server_root_ca_cert) if server_root_ca_cert
-        hash[:client_cert] = source_to_hash(client_cert) if client_cert
-        hash[:client_key] = source_to_hash(client_private_key) if client_private_key
-        hash
+        {
+          disabled: disabled ? disabled : nil,
+          server_name: server_name,
+          server_ca_cert: server_root_ca_cert ? source_to_hash(server_root_ca_cert) : nil,
+          client_cert: client_cert ? source_to_hash(client_cert) : nil,
+          client_key: client_private_key ? source_to_hash(client_private_key) : nil
+        }.compact
       end
 
       # Create a TLS configuration for use with connections
@@ -214,28 +214,25 @@ module Temporalio
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_h
-        hash = {}
-        hash[:address] = address if address
-        hash[:namespace] = namespace if namespace
-        hash[:api_key] = api_key if api_key
-        if tls
-          tls_hash = tls.to_h # steep:ignore
-          hash[:tls] = tls_hash unless tls_hash.empty?
-        end
-        hash[:grpc_meta] = grpc_meta if grpc_meta && !grpc_meta.empty?
-        hash
+        {
+          address: address,
+          namespace: namespace,
+          api_key: api_key,
+          tls: tls&.to_h&.then { |tls_hash| tls_hash.empty? ? nil : tls_hash }, # steep:ignore
+          grpc_meta: grpc_meta&.empty? ? nil : grpc_meta
+        }.compact
       end
 
       # Create a client connect config from this profile
       # @return [Hash] Arguments that can be passed to Client.connect
       def to_client_connect_config
-        config = {}
-        config[:target_host] = address if address
-        config[:namespace] = namespace if namespace
-        config[:api_key] = api_key if api_key
-        config[:tls] = tls.to_tls_options if tls # steep:ignore
-        config[:rpc_metadata] = grpc_meta if grpc_meta && !grpc_meta.empty?
-        config
+        {
+          target_host: address,
+          namespace: namespace,
+          api_key: api_key,
+          tls: tls&.to_tls_options,
+          rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?)
+        }.compact
       end
     end
 
