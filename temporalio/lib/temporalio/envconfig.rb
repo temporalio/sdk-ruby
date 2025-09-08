@@ -144,7 +144,7 @@ module Temporalio
     # Represents a client configuration profile.
     #
     # This class holds the configuration as loaded from a file or environment.
-    # See #to_client_connect_config to transform the profile to a connect config hash.
+    # See #to_client_connect_options to transform the profile to a connect config hash.
     #
     # @!attribute [r] address
     #   @return [String, nil] Client address
@@ -224,15 +224,16 @@ module Temporalio
       end
 
       # Create a client connect config from this profile
-      # @return [Hash] Arguments that can be passed to Client.connect
-      def to_client_connect_config
-        {
-          target_host: address,
-          namespace: namespace,
+      # @return [Array] Tuple of [positional_args, keyword_args] that can be splatted to Client.connect
+      def to_client_connect_options
+        positional_args = [address, namespace].compact
+        keyword_args = {
           api_key: api_key,
           tls: tls&.to_tls_options,
           rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?)
         }.compact
+        
+        [positional_args, keyword_args]
       end
     end
 
@@ -318,7 +319,7 @@ module Temporalio
           config_file_strict: config_file_strict,
           override_env_vars: override_env_vars
         )
-        prof.to_client_connect_config
+        prof.to_client_connect_options
       end
 
       # Convert to a hash that can be used for TOML serialization

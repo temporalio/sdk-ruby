@@ -56,7 +56,7 @@ module Temporalio
       ) -> void
 
       def to_hash: -> Hash[Symbol, untyped]
-      def to_client_connect_config: -> Hash[Symbol, untyped]
+      def to_client_connect_options: -> Hash[Symbol, untyped]
     end
 
     class ClientConfig
