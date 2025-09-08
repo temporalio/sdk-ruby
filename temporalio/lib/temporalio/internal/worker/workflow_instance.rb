@@ -162,86 +162,9 @@ module Temporalio
         end
 
         def activate(activation)
-          # Run inside of scheduler
-          run_in_scheduler { activate_internal(activation) }
-        end
-
-        def add_command(command)
-          raise Workflow::InvalidWorkflowStateError, 'Cannot add commands in this context' if @context_frozen
-
-          @commands << command
-        end
-
-        def instance
-          @instance or raise 'Instance accessed before created'
-        end
-
-        def search_attributes
-          # Lazy on first access
-          @search_attributes ||= SearchAttributes._from_proto(
-            @init_job.search_attributes, disable_mutations: true, never_nil: true
-          ) || raise
-        end
-
-        def memo
-          # Lazy on first access
-          @memo ||= ExternallyImmutableHash.new(ProtoUtils.memo_from_proto(@init_job.memo, payload_converter) || {})
-        end
-
-        def now
-          # Create each time
-          ProtoUtils.timestamp_to_time(@now_timestamp) or raise 'Time unexpectedly not present'
-        end
-
-        def illegal_call_tracing_disabled(&)
-          @tracer.disable(&)
-        end
-
-        def patch(patch_id:, deprecated:)
-          # Use memoized result if present. If this is being deprecated, we can still use memoized result and skip the
-          # command.
-          patch_id = patch_id.to_s
-          @patches_memoized ||= {}
-          @patches_memoized.fetch(patch_id) do
-            patched = !replaying || @patches_notified.include?(patch_id)
-            @patches_memoized[patch_id] = patched
-            if patched
-              add_command(
-                Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                  set_patch_marker: Bridge::Api::WorkflowCommands::SetPatchMarker.new(patch_id:, deprecated:)
-                )
-              )
-            end
-            patched
-          end
-        end
-
-        def metric_meter
-          @metric_meter ||= ReplaySafeMetric::Meter.new(
-            @runtime_metric_meter.with_additional_attributes(
-              {
-                namespace: info.namespace,
-                task_queue: info.task_queue,
-                workflow_type: info.workflow_type
-              }
-            )
-          )
-        end
-
-        private
-
-        def run_in_scheduler(&)
+          # Run inside of scheduler (removed on ensure)
           Fiber.set_scheduler(@scheduler)
-          if @tracer
-            @tracer.enable(&)
-          else
-            yield
-          end
-        ensure
-          Fiber.set_scheduler(nil)
-        end
 
-        def activate_internal(activation)
           # Reset some activation state
           @commands = []
           @current_activation_error = nil
@@ -266,8 +189,12 @@ module Temporalio
             # the first activation)
             @primary_fiber ||= schedule(top_level: true) { run_workflow }
 
-            # Run the event loop
-            @scheduler.run_until_all_yielded
+            # Run the event loop in the tracer if it exists
+            if @tracer
+              @tracer.enable { @scheduler.run_until_all_yielded }
+            else
+              @scheduler.run_until_all_yielded
+            end
           rescue Exception => e # rubocop:disable Lint/RescueException
             on_top_level_exception(e)
           end
@@ -306,7 +233,76 @@ module Temporalio
         ensure
           @commands = nil
           @current_activation_error = nil
+          Fiber.set_scheduler(nil)
         end
+
+        def add_command(command)
+          raise Workflow::InvalidWorkflowStateError, 'Cannot add commands in this context' if @context_frozen
+
+          @commands << command
+        end
+
+        def instance
+          @instance or raise 'Instance accessed before created'
+        end
+
+        def search_attributes
+          # Lazy on first access
+          @search_attributes ||= SearchAttributes._from_proto(
+            @init_job.search_attributes, disable_mutations: true, never_nil: true
+          ) || raise
+        end
+
+        def memo
+          # Lazy on first access
+          @memo ||= ExternallyImmutableHash.new(ProtoUtils.memo_from_proto(@init_job.memo, payload_converter) || {})
+        end
+
+        def now
+          # Create each time
+          ProtoUtils.timestamp_to_time(@now_timestamp) or raise 'Time unexpectedly not present'
+        end
+
+        def illegal_call_tracing_disabled(&)
+          if @tracer
+            @tracer.disable_temporarily(&)
+          else
+            yield
+          end
+        end
+
+        def patch(patch_id:, deprecated:)
+          # Use memoized result if present. If this is being deprecated, we can still use memoized result and skip the
+          # command.
+          patch_id = patch_id.to_s
+          @patches_memoized ||= {}
+          @patches_memoized.fetch(patch_id) do
+            patched = !replaying || @patches_notified.include?(patch_id)
+            @patches_memoized[patch_id] = patched
+            if patched
+              add_command(
+                Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                  set_patch_marker: Bridge::Api::WorkflowCommands::SetPatchMarker.new(patch_id:, deprecated:)
+                )
+              )
+            end
+            patched
+          end
+        end
+
+        def metric_meter
+          @metric_meter ||= ReplaySafeMetric::Meter.new(
+            @runtime_metric_meter.with_additional_attributes(
+              {
+                namespace: info.namespace,
+                task_queue: info.task_queue,
+                workflow_type: info.workflow_type
+              }
+            )
+          )
+        end
+
+        private
 
         def create_instance
           # Convert workflow arguments

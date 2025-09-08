@@ -276,4 +276,65 @@ class WorkerWorkflowChildTest < Test
     )
     assert_equal({ ATTR_KEY_TEXT.name => 'changed-text', ATTR_KEY_KEYWORD.name => 'some-keyword' }, results)
   end
+
+  class ManyChildrenActivity < Temporalio::Activity::Definition
+    def execute(name)
+      "Hello #{name}"
+    end
+  end
+
+  class ManyChildrenChildWorkflow < Temporalio::Workflow::Definition
+    def execute(name)
+      Temporalio::Workflow.execute_activity(
+        ManyChildrenActivity,
+        name,
+        start_to_close_timeout: 30
+      )
+    end
+  end
+
+  class ManyChildrenWorkflow < Temporalio::Workflow::Definition
+    COUNT = 500
+
+    def execute
+      futures = ManyChildrenWorkflow::COUNT.times.map do |i|
+        Temporalio::Workflow::Future.new do
+          Temporalio::Workflow.execute_child_workflow(ManyChildrenChildWorkflow, "Test #{i}")
+        end
+      end
+
+      Temporalio::Workflow::Future.all_of(*futures).wait
+
+      'done'
+    end
+  end
+
+  def test_many_children
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      activities: [ManyChildrenActivity],
+      workflows: [ManyChildrenWorkflow, ManyChildrenChildWorkflow],
+      # This is a slow test, so we need to beef up the tuner and pollers
+      tuner: Temporalio::Worker::Tuner.create_fixed(
+        workflow_slots: ManyChildrenWorkflow::COUNT + 1,
+        activity_slots: ManyChildrenWorkflow::COUNT
+      ),
+      max_concurrent_workflow_task_polls: 60,
+      max_concurrent_activity_task_polls: 60
+    )
+    worker.run do
+      handle = env.client.start_workflow(
+        ManyChildrenWorkflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      assert_equal('done', handle.result)
+      # Confirm there are expected number of child completions
+      assert_equal(
+        ManyChildrenWorkflow::COUNT,
+        handle.fetch_history_events.count(&:child_workflow_execution_completed_event_attributes)
+      )
+    end
+  end
 end

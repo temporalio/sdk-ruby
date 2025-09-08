@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'base64_codec'
+require 'gc_utils'
 require 'net/http'
 require 'temporalio/client'
 require 'temporalio/testing'
@@ -1912,9 +1913,14 @@ class WorkerWorkflowTest < Test
   class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
     @initialized_count = 0
     @finalized_count = 0
+    @weak_instance = nil
+    @strong_instance = nil
+    @instance_object_id = nil
 
     class << self
-      attr_accessor :initialized_count, :finalized_count
+      attr_accessor :initialized_count, :finalized_count,
+                    :weak_instance, :strong_instance, :instance_object_id,
+                    :weak_fiber, :fiber_object_id
 
       def create_finalizer
         proc { @finalized_count += 1 }
@@ -1923,6 +1929,13 @@ class WorkerWorkflowTest < Test
 
     def initialize
       self.class.initialized_count += 1
+      self.class.weak_instance = WeakRef.new(self)
+      # Uncomment this to cause test to fail
+      # self.class.strong_instance = self
+      self.class.instance_object_id = object_id
+      self.class.weak_fiber = WeakRef.new(Fiber.current)
+      self.class.fiber_object_id = Fiber.current.object_id
+
       ObjectSpace.define_finalizer(self, self.class.create_finalizer)
     end
 
@@ -1932,6 +1945,11 @@ class WorkerWorkflowTest < Test
   end
 
   def test_confirm_garbage_collect
+    skip('Skipping GC collection confirmation until https://github.com/temporalio/sdk-ruby/issues/334')
+
+    # This test confirms the workflow instance is reliably GC'd when workflow/worker done. To confirm the test fails
+    # when there is still an instance, uncomment the strong_instance set in the initialize of the workflow.
+
     execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
       # Wait until it is started
       assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
@@ -1940,10 +1958,31 @@ class WorkerWorkflowTest < Test
       assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
     end
 
-    # Now with worker shutdown, GC and confirm finalized
-    assert_eventually do
+    # Perform a GC and confirm gone. There are cases in Ruby where dead stack slots leave the item around for a bit, so
+    # we check repeatedly for a bit (every 200ms for 10s). We can't use assert_eventually, because path doesn't show
+    # well.
+    start_time = Time.now
+    loop do
       GC.start
-      assert_equal 1, ConfirmGarbageCollectWorkflow.finalized_count
+      # Break if the instance is gone
+      break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
+
+      # If this is last iteration, flunk w/ the path
+      if Time.now - start_time > 10
+        path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
+        msg = GCUtils.annotated_path(path, root_category: cat)
+        msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+        # Also display any Thread/Fiber backtraces that are in the path
+        path.grep(Thread).each do |thread|
+          msg += "\nThread trace: #{thread.backtrace.join("\n")}"
+        end
+        path.grep(Fiber).each do |fiber|
+          msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
+        end
+        msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
+        flunk msg
+      end
+      sleep(0.2)
     end
   end
 

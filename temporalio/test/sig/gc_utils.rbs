@@ -1,0 +1,14 @@
+module GCUtils
+  def self.find_retaining_path_to: (
+    Integer target_id,
+    ?max_depth: Integer,
+    ?max_visits: Integer,
+    ?category_whitelist: Array[String]?
+  ) -> [Array[untyped], String]
+
+  def self.print_annotated_path: (Array[untyped] path, root_category: String) -> void
+
+  def self.edge_labels: (untyped parent, untyped child) -> Array[String]
+
+  def self.describe_obj: (untyped obj) -> String
+end
