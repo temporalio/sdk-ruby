@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'pathname'
 require 'temporalio/client'
-require 'temporalio/envconfig'
+require 'temporalio/env_config'
 require 'tmpdir'
 require_relative 'test'
 

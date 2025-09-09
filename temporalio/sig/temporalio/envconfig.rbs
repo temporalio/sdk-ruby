@@ -21,7 +21,7 @@ module Temporalio
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
-      def to_tls_options: -> (untyped | false)
+      def to_client_tls_options: -> (untyped | false)
 
       private
 

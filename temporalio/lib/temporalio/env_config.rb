@@ -82,7 +82,7 @@ module Temporalio
 
       # Create a TLS configuration for use with connections
       # @return [Connection::TLSOptions, false] TLS options or false if disabled
-      def to_tls_options
+      def to_client_tls_options
         return false if disabled
 
         Client::Connection::TLSOptions.new(
@@ -232,7 +232,7 @@ module Temporalio
         positional_args = [address, namespace].compact
         keyword_args = {
           api_key: api_key,
-          tls: tls&.to_tls_options,
+          tls: tls&.to_client_tls_options,
           rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?)
         }.compact
 
