@@ -431,11 +431,11 @@ class EnvConfigTest < Test
       refute_nil profile.tls
       assert_equal 'custom-server', profile.tls.server_name # steep:ignore
       refute_nil profile.tls.server_root_ca_cert # steep:ignore
-      assert_equal ca_pem_path, profile.tls.server_root_ca_cert # steep:ignore
+      assert_equal Pathname.new(ca_pem_path), profile.tls.server_root_ca_cert # steep:ignore
       refute_nil profile.tls.client_cert # steep:ignore
-      assert_equal client_crt_path, profile.tls.client_cert # steep:ignore
+      assert_equal Pathname.new(client_crt_path), profile.tls.client_cert # steep:ignore
       refute_nil profile.tls.client_private_key # steep:ignore
-      assert_equal client_key_path, profile.tls.client_private_key # steep:ignore
+      assert_equal Pathname.new(client_key_path), profile.tls.client_private_key # steep:ignore
 
       args, kwargs = profile.to_client_connect_options
       tls_config = kwargs[:tls]

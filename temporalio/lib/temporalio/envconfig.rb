@@ -98,8 +98,7 @@ module Temporalio
 
         # Always expect a hash with path or data
         if hash[:path] || hash['path']
-          # Return path as string to match old behavior
-          hash[:path] || hash['path']
+          Pathname.new(hash[:path] || hash['path'])
         elsif hash[:data] || hash['data']
           hash[:data] || hash['data']
         end
@@ -124,13 +123,8 @@ module Temporalio
         when Pathname
           File.read(source.to_s)
         when String
-          # If it's a string path (from TOML), read the file
-          # Otherwise return as content
-          if File.exist?(source)
-            File.read(source)
-          else
-            source
-          end
+          # String is always treated as raw data content
+          source
         when nil
           nil
         else
