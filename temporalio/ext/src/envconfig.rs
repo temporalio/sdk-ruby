@@ -48,12 +48,18 @@ fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
         hash.aset(ruby.sym_new("client_key"), data_source_to_hash(ruby, v)?)?;
     }
     if let Some(v) = &tls.server_ca_cert {
-        hash.aset(ruby.sym_new("server_ca_cert"), data_source_to_hash(ruby, v)?)?;
+        hash.aset(
+            ruby.sym_new("server_ca_cert"),
+            data_source_to_hash(ruby, v)?,
+        )?;
     }
     if let Some(v) = &tls.server_name {
         hash.aset(ruby.sym_new("server_name"), ruby.str_new(v))?;
     }
-    hash.aset(ruby.sym_new("disable_host_verification"), tls.disable_host_verification)?;
+    hash.aset(
+        ruby.sym_new("disable_host_verification"),
+        tls.disable_host_verification,
+    )?;
 
     Ok(hash)
 }
@@ -170,7 +176,7 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         (None, Some(d)) => {
             let bytes = unsafe { d.as_slice().to_vec() };
             Some(DataSource::Data(bytes))
-        },
+        }
         (None, None) => None,
         (Some(_), Some(_)) => {
             return Err(error!(
@@ -214,7 +220,7 @@ fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         (None, Some(d)) => {
             let bytes = unsafe { d.as_slice().to_vec() };
             Some(DataSource::Data(bytes))
-        },
+        }
         (None, None) => None,
         (Some(_), Some(_)) => {
             return Err(error!(
