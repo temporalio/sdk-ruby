@@ -65,20 +65,6 @@ module Temporalio
         )
       end
 
-      # Convert a hash representation to a data source
-      # @param hash [Hash, nil] Hash with :path or :data key
-      # @return [Pathname, String, nil] Data source
-      def self.hash_to_source(hash)
-        return nil if hash.nil?
-
-        # Always expect a hash with path or data
-        if hash[:path] || hash['path']
-          # Return path as string to match old behavior
-          hash[:path] || hash['path']
-        elsif hash[:data] || hash['data']
-          hash[:data] || hash['data']
-        end
-      end
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
@@ -106,6 +92,18 @@ module Temporalio
       end
 
       private
+
+      def self.hash_to_source(hash)
+        return nil if hash.nil?
+
+        # Always expect a hash with path or data
+        if hash[:path] || hash['path']
+          # Return path as string to match old behavior
+          hash[:path] || hash['path']
+        elsif hash[:data] || hash['data']
+          hash[:data] || hash['data']
+        end
+      end
 
       def source_to_hash(source)
         case source
