@@ -14,10 +14,8 @@ module Temporalio
     # - String: TOML configuration content
     # - nil: No configuration source
 
-    # Convert a data source to path and data parameters for the bridge
-    # @param source [Pathname, String, nil] Configuration source
-    # @return [Array<String?, Array<Integer>?>] Tuple of [path, data_bytes]
-    def self.source_to_path_and_data(source)
+    # @!visibility private
+    def self._source_to_path_and_data(source)
       case source
       when Pathname
         [source.to_s, nil]
@@ -64,7 +62,6 @@ module Temporalio
           client_private_key: hash_to_source(hash[:client_key])
         )
       end
-
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
@@ -187,7 +184,7 @@ module Temporalio
         config_file_strict: false,
         override_env_vars: nil
       )
-        path, data = EnvConfig.source_to_path_and_data(config_source)
+        path, data = EnvConfig._source_to_path_and_data(config_source)
 
         raw_profile = Internal::Bridge::EnvConfig.load_client_connect_config(
           profile,
@@ -201,7 +198,6 @@ module Temporalio
 
         from_h(raw_profile)
       end
-
 
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
@@ -224,7 +220,7 @@ module Temporalio
           tls: tls&.to_tls_options,
           rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?)
         }.compact
-        
+
         [positional_args, keyword_args]
       end
     end
@@ -270,7 +266,7 @@ module Temporalio
         config_file_strict: false,
         override_env_vars: nil
       )
-        path, data = source_to_path_and_data(config_source)
+        path, data = EnvConfig._source_to_path_and_data(config_source)
 
         loaded_profiles = Internal::Bridge::EnvConfig.load_client_config(
           path,
