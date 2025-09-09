@@ -57,11 +57,11 @@ module Temporalio
         return nil if hash.nil? || hash.empty?
 
         new(
-          disabled: hash[:disabled] || hash['disabled'] || false,
-          server_name: hash[:server_name] || hash['server_name'],
-          server_root_ca_cert: hash_to_source(hash[:server_ca_cert] || hash['server_ca_cert']),
-          client_cert: hash_to_source(hash[:client_cert] || hash['client_cert']),
-          client_private_key: hash_to_source(hash[:client_key] || hash['client_key'])
+          disabled: hash[:disabled] || false,
+          server_name: hash[:server_name],
+          server_root_ca_cert: hash_to_source(hash[:server_ca_cert]),
+          client_cert: hash_to_source(hash[:client_cert]),
+          client_private_key: hash_to_source(hash[:client_key])
         )
       end
 
@@ -97,10 +97,10 @@ module Temporalio
         return nil if hash.nil?
 
         # Always expect a hash with path or data
-        if hash[:path] || hash['path']
-          Pathname.new(hash[:path] || hash['path'])
-        elsif hash[:data] || hash['data']
-          hash[:data] || hash['data']
+        if hash[:path]
+          Pathname.new(hash[:path])
+        elsif hash[:data]
+          hash[:data]
         end
       end
 
@@ -161,11 +161,11 @@ module Temporalio
       # @return [ClientConfigProfile] The client profile
       def self.from_h(hash)
         new(
-          address: hash[:address] || hash['address'],
-          namespace: hash[:namespace] || hash['namespace'],
-          api_key: hash[:api_key] || hash['api_key'],
-          tls: ClientConfigTLS.from_h(hash[:tls] || hash['tls']),
-          grpc_meta: hash[:grpc_meta] || hash['grpc_meta'] || {}
+          address: hash[:address],
+          namespace: hash[:namespace],
+          api_key: hash[:api_key],
+          tls: ClientConfigTLS.from_h(hash[:tls]),
+          grpc_meta: hash[:grpc_meta] || {}
         )
       end
 

@@ -28,10 +28,10 @@ fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
     let hash = RHash::new();
     match ds {
         DataSource::Path(p) => {
-            hash.aset("path", ruby.str_new(p))?;
+            hash.aset(ruby.sym_new("path"), ruby.str_new(p))?;
         }
         DataSource::Data(d) => {
-            hash.aset("data", ruby.str_from_slice(d))?;
+            hash.aset(ruby.sym_new("data"), ruby.str_from_slice(d))?;
         }
     }
     Ok(hash)
@@ -39,21 +39,21 @@ fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
 
 fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
     let hash = RHash::new();
-    hash.aset("disabled", tls.disabled)?;
+    hash.aset(ruby.sym_new("disabled"), tls.disabled)?;
 
     if let Some(v) = &tls.client_cert {
-        hash.aset("client_cert", data_source_to_hash(ruby, v)?)?;
+        hash.aset(ruby.sym_new("client_cert"), data_source_to_hash(ruby, v)?)?;
     }
     if let Some(v) = &tls.client_key {
-        hash.aset("client_key", data_source_to_hash(ruby, v)?)?;
+        hash.aset(ruby.sym_new("client_key"), data_source_to_hash(ruby, v)?)?;
     }
     if let Some(v) = &tls.server_ca_cert {
-        hash.aset("server_ca_cert", data_source_to_hash(ruby, v)?)?;
+        hash.aset(ruby.sym_new("server_ca_cert"), data_source_to_hash(ruby, v)?)?;
     }
     if let Some(v) = &tls.server_name {
-        hash.aset("server_name", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("server_name"), ruby.str_new(v))?;
     }
-    hash.aset("disable_host_verification", tls.disable_host_verification)?;
+    hash.aset(ruby.sym_new("disable_host_verification"), tls.disable_host_verification)?;
 
     Ok(hash)
 }
@@ -61,10 +61,10 @@ fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
 fn codec_to_hash(ruby: &Ruby, codec: &ClientConfigCodec) -> Result<RHash, Error> {
     let hash = RHash::new();
     if let Some(v) = &codec.endpoint {
-        hash.aset("endpoint", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("endpoint"), ruby.str_new(v))?;
     }
     if let Some(v) = &codec.auth {
-        hash.aset("auth", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("auth"), ruby.str_new(v))?;
     }
     Ok(hash)
 }
@@ -73,26 +73,26 @@ fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHa
     let hash = RHash::new();
 
     if let Some(v) = &profile.address {
-        hash.aset("address", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("address"), ruby.str_new(v))?;
     }
     if let Some(v) = &profile.namespace {
-        hash.aset("namespace", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("namespace"), ruby.str_new(v))?;
     }
     if let Some(v) = &profile.api_key {
-        hash.aset("api_key", ruby.str_new(v))?;
+        hash.aset(ruby.sym_new("api_key"), ruby.str_new(v))?;
     }
     if let Some(tls) = &profile.tls {
-        hash.aset("tls", tls_to_hash(ruby, tls)?)?;
+        hash.aset(ruby.sym_new("tls"), tls_to_hash(ruby, tls)?)?;
     }
     if let Some(codec) = &profile.codec {
-        hash.aset("codec", codec_to_hash(ruby, codec)?)?;
+        hash.aset(ruby.sym_new("codec"), codec_to_hash(ruby, codec)?)?;
     }
     if !profile.grpc_meta.is_empty() {
         let grpc_meta_hash = RHash::new();
         for (k, v) in &profile.grpc_meta {
             grpc_meta_hash.aset(ruby.str_new(k), ruby.str_new(v))?;
         }
-        hash.aset("grpc_meta", grpc_meta_hash)?;
+        hash.aset(ruby.sym_new("grpc_meta"), grpc_meta_hash)?;
     }
 
     Ok(hash)
