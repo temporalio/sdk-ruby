@@ -261,7 +261,7 @@ module Temporalio
         profiles = hash.transform_values do |profile_hash|
           ClientConfigProfile.from_h(profile_hash)
         end
-        new(profiles)
+        new(profiles: profiles)
       end
 
       # Load all client profiles from given sources.
