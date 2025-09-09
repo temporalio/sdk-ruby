@@ -71,7 +71,7 @@ module Temporalio
         ?override_env_vars: Hash[String, String]?
       ) -> ClientConfig
 
-      def self.load_client_connect_config: (
+      def self.load_client_connect_options: (
         ?profile: String?,
         ?config_source: (Pathname | String)?,
         ?disable_file: bool,

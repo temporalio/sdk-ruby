@@ -305,8 +305,8 @@ module Temporalio
       # @param disable_env [Boolean] If true, environment variable loading and overriding is disabled
       # @param config_file_strict [Boolean] If true, will error on unrecognized keys
       # @param override_env_vars [Hash, nil] Environment variables to use for loading and overrides
-      # @return [Hash] Hash of keyword arguments for Client.connect
-      def self.load_client_connect_config(
+      # @return [Array] Tuple of [positional_args, keyword_args] that can be splatted to Client.connect
+      def self.load_client_connect_options(
         profile: nil,
         config_source: nil,
         disable_file: false,

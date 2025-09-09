@@ -648,10 +648,10 @@ class EnvConfigTest < Test
   # INTEGRATION/E2E TESTS (2 tests)
   # =============================================================================
 
-  def test_load_client_connect_config_convenience_api
+  def test_load_client_connect_options_convenience_api
     with_temp_config_file(TOML_CONFIG_BASE) do |config_file|
       # Test default profile with file
-      args, = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+      args, = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
         config_source: Pathname.new(config_file)
       )
       assert_equal 'default-address', args[0]
@@ -659,7 +659,7 @@ class EnvConfigTest < Test
 
       # Test with environment overrides
       env = { 'TEMPORAL_NAMESPACE' => 'env-override-namespace' }
-      args_with_env, = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+      args_with_env, = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
         config_source: Pathname.new(config_file),
         override_env_vars: env
       )
@@ -667,7 +667,7 @@ class EnvConfigTest < Test
       assert_equal 'env-override-namespace', args_with_env[1]
 
       # Test with specific profile
-      args_custom, kwargs_custom = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+      args_custom, kwargs_custom = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
         profile: 'custom',
         config_source: Pathname.new(config_file)
       )
@@ -677,7 +677,7 @@ class EnvConfigTest < Test
     end
   end
 
-  def test_load_client_connect_config_e2e_validation
+  def test_load_client_connect_options_e2e_validation
     # Test comprehensive end-to-end configuration loading with all features
     toml_content = <<~TOML
       [profile.production]
@@ -699,7 +699,7 @@ class EnvConfigTest < Test
       'TEMPORAL_TLS_SERVER_NAME' => 'override.temporal.com'
     }
 
-    args, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+    args, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
       profile: 'production',
       config_source: toml_content,
       override_env_vars: env_overrides
