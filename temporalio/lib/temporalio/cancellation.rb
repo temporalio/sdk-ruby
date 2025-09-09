@@ -167,8 +167,8 @@ module Temporalio
       to_return.values
     end
 
-    def canceled_mutex_synchronize(&block)
-      Workflow::Unsafe.illegal_call_tracing_disabled { @canceled_mutex.synchronize(&block) }
+    def canceled_mutex_synchronize(&)
+      Workflow::Unsafe.illegal_call_tracing_disabled { @canceled_mutex.synchronize(&) }
     end
   end
 end
