@@ -152,7 +152,7 @@ class EnvConfigTest < Test
     assert_equal 'env-address', profile.address
     assert_equal 'env-namespace', profile.namespace
 
-    args, kwargs = profile.to_client_connect_options
+    args, = profile.to_client_connect_options
     assert_equal 'env-address', args[0]
     assert_equal 'env-namespace', args[1]
   end
@@ -202,7 +202,7 @@ class EnvConfigTest < Test
       assert_equal 'env-value', profile.grpc_meta['custom-header']
       assert_equal 'another-value', profile.grpc_meta['another-header']
 
-      args, kwargs = profile.to_client_connect_options
+      _, kwargs = profile.to_client_connect_options
       rpc_metadata = kwargs[:rpc_metadata]
       refute_nil rpc_metadata
       assert_equal 'env-value', rpc_metadata['custom-header']
@@ -223,7 +223,7 @@ class EnvConfigTest < Test
     refute_includes profile.grpc_meta, 'ANOTHER_HEADER_KEY'
     refute_includes profile.grpc_meta, 'mixed_Case-header'
 
-    args, kwargs = profile.to_client_connect_options
+    _, kwargs = profile.to_client_connect_options
     rpc_metadata = kwargs[:rpc_metadata]
     refute_nil rpc_metadata
     assert_equal 'custom-value', rpc_metadata['custom-header']
@@ -247,7 +247,7 @@ class EnvConfigTest < Test
       # new-header should be added
       assert_equal 'new-value', profile.grpc_meta['new-header']
 
-      args, kwargs = profile.to_client_connect_options
+      _, kwargs = profile.to_client_connect_options
       rpc_metadata = kwargs[:rpc_metadata]
       if rpc_metadata && !rpc_metadata.empty?
         refute_includes rpc_metadata, 'custom-header'
@@ -264,7 +264,7 @@ class EnvConfigTest < Test
       )
       assert_equal 'default-address', profile.address
 
-      args, kwargs = profile.to_client_connect_options
+      args, = profile.to_client_connect_options
       assert_equal 'default-address', args[0]
     end
   end
@@ -278,7 +278,7 @@ class EnvConfigTest < Test
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(disable_file: true, override_env_vars: env)
     assert_equal 'env-address', profile.address
 
-    args, kwargs = profile.to_client_connect_options
+    args, = profile.to_client_connect_options
     assert_equal 'env-address', args[0]
   end
 
@@ -289,8 +289,7 @@ class EnvConfigTest < Test
         'TEMPORAL_ADDRESS' => 'env-address' # This should be ignored for profiles loading
       }
       client_config = Temporalio::EnvConfig::ClientConfig.load(override_env_vars: env)
-      args, kwargs = client_config.profiles['default'].to_client_connect_options
-      connect_config = { target_host: args[0], namespace: args[1] }.compact.merge(kwargs)
+      args, = client_config.profiles['default'].to_client_connect_options
       assert_equal 'default-address', args[0]
     end
   end
@@ -312,8 +311,7 @@ class EnvConfigTest < Test
       assert_includes client_config.profiles, 'default'
       assert_includes client_config.profiles, 'custom'
       # Check that we can convert to a connect config
-      args, kwargs = client_config.profiles['default'].to_client_connect_options
-      connect_config = { target_host: args[0], namespace: args[1] }.compact.merge(kwargs)
+      args, = client_config.profiles['default'].to_client_connect_options
       assert_equal 'default-address', args[0]
     end
   end
@@ -321,9 +319,8 @@ class EnvConfigTest < Test
   def test_load_profiles_from_data_all
     client_config = Temporalio::EnvConfig::ClientConfig.load(config_source: TOML_CONFIG_BASE)
     assert_equal 2, client_config.profiles.size
-    args, kwargs = client_config.profiles['custom'].to_client_connect_options
-    connect_config = { target_host: args[0], namespace: args[1] }.compact.merge(kwargs)
-    assert_equal 'custom-address', connect_config[:target_host]
+    args, = client_config.profiles['custom'].to_client_connect_options
+    assert_equal 'custom-address', args[0]
   end
 
   def test_load_profiles_no_config_file
@@ -368,7 +365,7 @@ class EnvConfigTest < Test
     assert_equal 'my-key', profile.api_key
     refute_nil profile.tls
 
-    args, kwargs = profile.to_client_connect_options
+    _, kwargs = profile.to_client_connect_options
     refute_nil kwargs[:tls]
     assert_equal 'my-key', kwargs[:api_key]
   end
@@ -381,7 +378,7 @@ class EnvConfigTest < Test
     refute_nil profile_disabled.tls
     assert profile_disabled.tls.disabled # steep:ignore
 
-    args_disabled, kwargs_disabled = profile_disabled.to_client_connect_options
+    _, kwargs_disabled = profile_disabled.to_client_connect_options
     assert_equal false, kwargs_disabled[:tls]
 
     # Test with TLS certs
@@ -397,7 +394,7 @@ class EnvConfigTest < Test
     refute_nil profile_certs.tls.client_private_key # steep:ignore
     assert_equal 'client-key-data', profile_certs.tls.client_private_key # steep:ignore
 
-    args_certs, kwargs_certs = profile_certs.to_client_connect_options
+    _, kwargs_certs = profile_certs.to_client_connect_options
     tls_config_certs = kwargs_certs[:tls]
     assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config_certs
     assert_equal 'custom-server', tls_config_certs.domain
@@ -437,7 +434,7 @@ class EnvConfigTest < Test
       refute_nil profile.tls.client_private_key # steep:ignore
       assert_equal Pathname.new(client_key_path), profile.tls.client_private_key # steep:ignore
 
-      args, kwargs = profile.to_client_connect_options
+      _, kwargs = profile.to_client_connect_options
       tls_config = kwargs[:tls]
       assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
       assert_equal 'custom-server', tls_config.domain
@@ -604,9 +601,9 @@ class EnvConfigTest < Test
       grpc_meta: { 'some-header' => 'some-value' }
     )
     config = Temporalio::EnvConfig::ClientConfig.new(profiles: {
-      'default' => profile1,
-      'custom' => profile2
-    })
+                                                       'default' => profile1,
+                                                       'custom' => profile2
+                                                     })
 
     config_hash = config.to_h
 
@@ -641,7 +638,7 @@ class EnvConfigTest < Test
       address: 'localhost:1234',
       tls: Temporalio::EnvConfig::ClientConfigTLS.new(client_cert: 'string-as-cert-content')
     )
-    args, kwargs = profile.to_client_connect_options
+    _, kwargs = profile.to_client_connect_options
     tls_config = kwargs[:tls]
     assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
     assert_equal 'string-as-cert-content', tls_config.client_cert
@@ -654,7 +651,7 @@ class EnvConfigTest < Test
   def test_load_client_connect_config_convenience_api
     with_temp_config_file(TOML_CONFIG_BASE) do |config_file|
       # Test default profile with file
-      args, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+      args, = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
         config_source: Pathname.new(config_file)
       )
       assert_equal 'default-address', args[0]
@@ -662,7 +659,7 @@ class EnvConfigTest < Test
 
       # Test with environment overrides
       env = { 'TEMPORAL_NAMESPACE' => 'env-override-namespace' }
-      args_with_env, kwargs_with_env = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
+      args_with_env, = Temporalio::EnvConfig::ClientConfig.load_client_connect_config(
         config_source: Pathname.new(config_file),
         override_env_vars: env
       )
@@ -829,7 +826,7 @@ class EnvConfigTest < Test
       override_env_vars: env_overrides
     )
 
-    args, kwargs = profile.to_client_connect_options
+    args, = profile.to_client_connect_options
 
     # Create client with environment overrides
     client = Temporalio::Client.connect(

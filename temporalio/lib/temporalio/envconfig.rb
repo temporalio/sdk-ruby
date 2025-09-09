@@ -42,12 +42,11 @@ module Temporalio
     #   @return [Pathname, String, nil] Client key source
     ClientConfigTLS = Data.define(:disabled, :server_name, :server_root_ca_cert, :client_cert, :client_private_key)
 
+    # TLS configuration for Temporal client connections.
+    #
+    # This class provides methods for creating, serializing, and converting
+    # TLS configuration objects used by Temporal clients.
     class ClientConfigTLS
-      # Set default values
-      def initialize(disabled: nil, server_name: nil, server_root_ca_cert: nil, client_cert: nil, client_private_key: nil)
-        super
-      end
-
       # Create a ClientConfigTLS from a hash
       # @param hash [Hash, nil] Hash representation
       # @return [ClientConfigTLS, nil] The TLS configuration or nil if hash is nil/empty
@@ -61,6 +60,12 @@ module Temporalio
           client_cert: hash_to_source(hash[:client_cert]),
           client_private_key: hash_to_source(hash[:client_key])
         )
+      end
+
+      # Set default values
+      def initialize(disabled: nil, server_name: nil, server_root_ca_cert: nil, client_cert: nil,
+                     client_private_key: nil)
+        super
       end
 
       # Convert to a hash that can be used for TOML serialization
@@ -90,14 +95,19 @@ module Temporalio
 
       private
 
-      def self.hash_to_source(hash)
-        return nil if hash.nil?
+      class << self
+        private
 
-        # Always expect a hash with path or data
-        if hash[:path]
-          Pathname.new(hash[:path])
-        elsif hash[:data]
-          hash[:data]
+        # Convert hash to source object (Pathname or String)
+        def hash_to_source(hash)
+          return nil if hash.nil?
+
+          # Always expect a hash with path or data
+          if hash[:path]
+            Pathname.new(hash[:path])
+          elsif hash[:data]
+            hash[:data]
+          end
         end
       end
 
@@ -147,12 +157,12 @@ module Temporalio
     #   @return [Hash] gRPC metadata
     ClientConfigProfile = Data.define(:address, :namespace, :api_key, :tls, :grpc_meta)
 
+    # A client configuration profile loaded from environment and files.
+    #
+    # This class represents a complete client configuration profile that can be
+    # loaded from TOML files and environment variables, and converted to client
+    # connection options.
     class ClientConfigProfile
-      # Create a ClientConfigProfile instance with defaults
-      def initialize(address: nil, namespace: nil, api_key: nil, tls: nil, grpc_meta: {})
-        super
-      end
-
       # Create a ClientConfigProfile from a hash
       # @param hash [Hash] Hash representation
       # @return [ClientConfigProfile] The client profile
@@ -199,6 +209,11 @@ module Temporalio
         from_h(raw_profile)
       end
 
+      # Create a ClientConfigProfile instance with defaults
+      def initialize(address: nil, namespace: nil, api_key: nil, tls: nil, grpc_meta: {})
+        super
+      end
+
       # Convert to a hash that can be used for TOML serialization
       # @return [Hash] Dictionary representation
       def to_h
@@ -207,7 +222,7 @@ module Temporalio
           namespace: namespace,
           api_key: api_key,
           tls: tls&.to_h&.then { |tls_hash| tls_hash.empty? ? nil : tls_hash }, # steep:ignore
-          grpc_meta: grpc_meta&.empty? ? nil : grpc_meta
+          grpc_meta: grpc_meta && grpc_meta.empty? ? nil : grpc_meta
         }.compact
       end
 
@@ -233,12 +248,12 @@ module Temporalio
     #   @return [Hash<String, ClientConfigProfile>] Map of profile name to its corresponding ClientConfigProfile
     ClientConfig = Data.define(:profiles)
 
+    # Container for multiple client configuration profiles.
+    #
+    # This class holds a collection of named client profiles loaded from
+    # configuration sources and provides methods for profile management
+    # and client connection configuration.
     class ClientConfig
-      # Create a ClientConfig instance with defaults
-      def initialize(profiles: {})
-        super
-      end
-
       # Create a ClientConfig from a hash
       # @param hash [Hash] Hash representation
       # @return [ClientConfig] The client configuration
@@ -308,6 +323,11 @@ module Temporalio
           override_env_vars: override_env_vars
         )
         prof.to_client_connect_options
+      end
+
+      # Create a ClientConfig instance with defaults
+      def initialize(profiles: {})
+        super
       end
 
       # Convert to a hash that can be used for TOML serialization
