@@ -1,6 +1,6 @@
 module Temporalio
   module EnvConfig
-    def self._source_to_path_and_data: (untyped source) -> [String?, Array[Integer]?]
+    def self._source_to_path_and_data: (untyped source) -> [String?, String?]
 
     class ClientConfigTLS
       attr_reader disabled: bool?

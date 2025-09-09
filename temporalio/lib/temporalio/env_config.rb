@@ -20,7 +20,7 @@ module Temporalio
       when Pathname
         [source.to_s, nil]
       when String
-        [nil, source.encode('UTF-8').bytes]
+        [nil, source]
       when nil
         [nil, nil]
       else

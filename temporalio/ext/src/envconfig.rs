@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use magnus::{Error, RHash, Ruby, class, function, prelude::*, scan_args};
+use magnus::{Error, RHash, RString, Ruby, class, function, prelude::*, scan_args};
 use temporal_sdk_core_api::envconfig::{
     ClientConfig as CoreClientConfig, ClientConfigCodec,
     ClientConfigProfile as CoreClientConfigProfile, ClientConfigTLS as CoreClientConfigTLS,
@@ -155,7 +155,7 @@ fn load_client_connect_config_inner(
 fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
     let ruby = Ruby::get().expect("Not in Ruby thread");
     let args = scan_args::scan_args::<
-        (Option<String>, Option<Vec<u8>>, bool, bool),
+        (Option<String>, Option<RString>, bool, bool),
         (Option<HashMap<String, String>>,),
         (),
         (),
@@ -167,7 +167,10 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
 
     let config_source = match (path, data) {
         (Some(p), None) => Some(DataSource::Path(p)),
-        (None, Some(d)) => Some(DataSource::Data(d)),
+        (None, Some(d)) => {
+            let bytes = unsafe { d.as_slice().to_vec() };
+            Some(DataSource::Data(bytes))
+        },
         (None, None) => None,
         (Some(_), Some(_)) => {
             return Err(error!(
@@ -192,7 +195,7 @@ fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         (
             Option<String>,
             Option<String>,
-            Option<Vec<u8>>,
+            Option<RString>,
             bool,
             bool,
             bool,
@@ -208,7 +211,10 @@ fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
 
     let config_source = match (path, data) {
         (Some(p), None) => Some(DataSource::Path(p)),
-        (None, Some(d)) => Some(DataSource::Data(d)),
+        (None, Some(d)) => {
+            let bytes = unsafe { d.as_slice().to_vec() };
+            Some(DataSource::Data(bytes))
+        },
         (None, None) => None,
         (Some(_), Some(_)) => {
             return Err(error!(
