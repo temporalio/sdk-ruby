@@ -671,6 +671,11 @@ module Temporalio
     # task failures to workflow failures.
     class NondeterminismError < Error; end
 
+    # Error raised internally when a workflow is being evicted. This extends exception because it should not be caught.
+    # During eviction, all suspended fibers raise this exception and any commands or side-effecting workflow calls are
+    # ignored.
+    class BeingEvictedError < Exception; end # rubocop:disable Lint/InheritException
+
     # Mutex is a workflow-safe wrapper around {::Mutex}.
     #
     # As of this writing, all methods on Mutex are safe for workflow use and are implicitly made deterministic by the

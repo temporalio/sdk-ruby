@@ -62,6 +62,7 @@ module Temporalio
 
         def initialize(details)
           # Initialize general state
+          @evicting = false
           @context = Context.new(self)
           if details.illegal_calls && !details.illegal_calls.empty?
             @tracer = IllegalCallTracer.new(details.illegal_calls)
@@ -161,6 +162,7 @@ module Temporalio
           end
         end
 
+        # This can run forever, callers are expected to perform timeout
         def activate(activation)
           # Run inside of scheduler (removed on ensure)
           Fiber.set_scheduler(@scheduler)
@@ -236,7 +238,20 @@ module Temporalio
           Fiber.set_scheduler(nil)
         end
 
+        # This can run forever, callers are expected to perform timeout
+        def evict
+          # Run inside of scheduler (removed on ensure)
+          Fiber.set_scheduler(@scheduler)
+
+          @evicting = true
+          @replaying = true
+          @scheduler.evict_and_drain_all_fibers
+        ensure
+          Fiber.set_scheduler(nil)
+        end
+
         def add_command(command)
+          raise Workflow::BeingEvictedError if @evicting
           raise Workflow::InvalidWorkflowStateError, 'Cannot add commands in this context' if @context_frozen
 
           @commands << command
@@ -465,6 +480,8 @@ module Temporalio
               )
             )
           rescue Exception => e # rubocop:disable Lint/RescueException
+            raise if @evicting
+
             add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 respond_to_query: Bridge::Api::WorkflowCommands::QueryResult.new(
@@ -553,6 +570,7 @@ module Temporalio
               )
             )
           rescue Exception => e # rubocop:disable Lint/RescueException
+            raise if @evicting
             # Re-raise to cause task failure if this is accepted but this is not a failure exception
             raise if accepted && !failure_exception?(e)
 
@@ -593,6 +611,8 @@ module Temporalio
           Fiber.schedule do
             yield
           rescue Exception => e # rubocop:disable Lint/RescueException
+            raise if @evicting
+
             if top_level
               on_top_level_exception(e)
             else
@@ -604,6 +624,9 @@ module Temporalio
         end
 
         def on_top_level_exception(err)
+          # Nothing to do here if evicting
+          return if @evicting
+
           if err.is_a?(Workflow::ContinueAsNewError)
             @logger.debug('Workflow requested continue as new')
             workflow_type, defn_arg_hints, =

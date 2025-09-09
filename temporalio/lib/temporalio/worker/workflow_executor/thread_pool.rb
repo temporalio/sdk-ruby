@@ -132,20 +132,6 @@ module Temporalio
           def activate(activation, worker_state, &)
             worker_state.logger.debug("Received workflow activation: #{activation}") if LOG_ACTIVATIONS
 
-            # Check whether it has eviction
-            cache_remove_job = activation.jobs.find { |j| !j.remove_from_cache.nil? }&.remove_from_cache
-
-            # If it's eviction only, just evict inline and do nothing else
-            if cache_remove_job && activation.jobs.size == 1
-              evict(worker_state, activation.run_id, cache_remove_job)
-              worker_state.logger.debug('Sending empty workflow completion') if LOG_ACTIVATIONS
-              yield Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
-                run_id: activation.run_id,
-                successful: Internal::Bridge::Api::WorkflowCompletion::Success.new
-              )
-              return
-            end
-
             completion = Timeout.timeout(
               worker_state.deadlock_timeout,
               DeadlockError,
@@ -154,13 +140,35 @@ module Temporalio
               "[TMPRL1101] Potential deadlock detected: workflow didn't yield " \
               "within #{worker_state.deadlock_timeout} second(s)."
             ) do
-              # Get or create workflow
+              # Check whether it's a cache remove job. Core only sends cache removal on its own these days, but we don't
+              # assume that here in code.
+              cache_remove_job = activation.jobs.find { |j| !j.remove_from_cache.nil? }&.remove_from_cache
+              only_cache_remove_job = cache_remove_job && activation.jobs.size == 1
+
+              # Get or create workflow (unless only a cache remove job)
               instance = worker_state.get_or_create_running_workflow(activation.run_id) do
-                create_instance(activation, worker_state)
+                create_instance(activation, worker_state) unless only_cache_remove_job
               end
 
-              # Activate. We expect most errors in here to have been captured inside.
-              instance.activate(activation)
+              # Activate unless only cache remove job. We expect most errors in here to have been captured inside.
+              completion =
+                if instance && !only_cache_remove_job
+                  instance.activate(activation)
+                else
+                  Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
+                    run_id: activation.run_id,
+                    successful: Internal::Bridge::Api::WorkflowCompletion::Success.new
+                  )
+                end
+
+              # Evict if cache remove job
+              if cache_remove_job
+                instance&.evict
+                worker_state.evict_running_workflow(activation.run_id, cache_remove_job)
+                @executor._remove_workflow(worker_state, activation.run_id)
+                Fiber.new {}.resume # rubocop:disable Lint/EmptyBlock
+              end
+              completion
             rescue Exception => e # rubocop:disable Lint/RescueException
               worker_state.logger.error("Failed activation on workflow run ID: #{activation.run_id}")
               worker_state.logger.error(e)
@@ -171,9 +179,6 @@ module Temporalio
                 payload_converter: worker_state.data_converter.payload_converter
               )
             end
-
-            # Go ahead and evict if there is an eviction job
-            evict(worker_state, activation.run_id, cache_remove_job) if cache_remove_job
 
             # Complete the activation
             worker_state.logger.debug("Sending workflow completion: #{completion}") if LOG_ACTIVATIONS
@@ -218,11 +223,6 @@ module Temporalio
                 assert_valid_local_activity: worker_state.assert_valid_local_activity
               )
             )
-          end
-
-          def evict(worker_state, run_id, cache_remove_job)
-            worker_state.evict_running_workflow(run_id, cache_remove_job)
-            @executor._remove_workflow(worker_state, run_id)
           end
         end
 

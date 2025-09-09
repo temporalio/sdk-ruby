@@ -234,6 +234,10 @@ module Temporalio
             instance
           end
 
+          def get_running_workflow(run_id)
+            @running_workflows_mutex.synchronize { @running_workflows[run_id] }
+          end
+
           def evict_running_workflow(run_id, cache_remove_job)
             @running_workflows_mutex.synchronize { @running_workflows.delete(run_id) }
             @on_eviction&.call(run_id, cache_remove_job)

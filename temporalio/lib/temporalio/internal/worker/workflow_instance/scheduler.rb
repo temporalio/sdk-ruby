@@ -57,6 +57,47 @@ module Temporalio
             end
           end
 
+          def evict_and_drain_all_fibers
+            # Clear wait conditions
+            @wait_conditions.clear
+
+            # Just run forever, we expect the caller to deadlock timeout
+            ex = Workflow::BeingEvictedError.new
+            until @fibers.empty?
+              # Raise a being-evicted error into every fiber. We dupe the array since it can technically be mutated
+              # elsewhere.
+              @fibers.dup.each do |fiber|
+                next unless fiber.alive?
+
+                fiber.raise(ex)
+                fiber.resume
+              rescue SystemExit, Interrupt
+                # Ignore these specifically, not concerned with cleaning up fibers in this situation
+                raise
+              rescue Exception # rubocop:disable Lint/RescueException
+                # Ignore all other exceptions
+              ensure
+                @fibers.delete(fiber) unless fiber.alive?
+              end
+
+              # Go over ready fibers and resume them too
+              while (fiber = @ready.shift)
+                begin
+                  next unless fiber.alive?
+
+                  fiber.resume
+                rescue SystemExit, Interrupt
+                  # Ignore these specifically, not concerned with cleaning up fibers in this situation
+                  raise
+                rescue Exception # rubocop:disable Lint/RescueException
+                  # Ignore all other exceptions
+                ensure
+                  @fibers.delete(fiber) unless fiber.alive?
+                end
+              end
+            end
+          end
+
           def wait_condition(cancellation:, &block)
             raise Workflow::InvalidWorkflowStateError, 'Cannot wait in this context' if @instance.context_frozen
 

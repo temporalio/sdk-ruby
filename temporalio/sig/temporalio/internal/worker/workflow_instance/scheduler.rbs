@@ -9,6 +9,8 @@ module Temporalio
 
           def run_until_all_yielded: -> void
 
+          def evict_and_drain_all_fibers: -> void
+
           def wait_condition: [T] (cancellation: Cancellation?) { -> T } -> T
 
           def stack_trace: -> String

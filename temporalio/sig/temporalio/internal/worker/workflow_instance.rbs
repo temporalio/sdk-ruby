@@ -42,6 +42,8 @@ module Temporalio
 
         def activate: (untyped activation) -> untyped
 
+        def evict: -> void
+
         def add_command: (untyped command) -> void
 
         def instance: -> Temporalio::Workflow::Definition

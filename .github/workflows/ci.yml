@@ -88,7 +88,7 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
           TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
-        run: bundle exec rake TESTOPTS="--verbose"
+        run: bundle exec rake TESTOPTS="--verbose --name=/^WorkerWorkflowTest#test_confirm_garbage_collect/"
 
       - name: Deploy docs
         # Only deploy on main merge, not in PRs

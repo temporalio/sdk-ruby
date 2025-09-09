@@ -1911,67 +1911,64 @@ class WorkerWorkflowTest < Test
   end
 
   class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
-    @initialized_count = 0
-    @finalized_count = 0
-    @weak_instance = nil
-    @strong_instance = nil
-    @instance_object_id = nil
+    # Each is a hash of fiber_id, weak_fiber, instance_id, weak_instance, scenario
+    @weak_refs = []
 
     class << self
-      attr_accessor :initialized_count, :finalized_count,
-                    :weak_instance, :strong_instance, :instance_object_id,
-                    :weak_fiber, :fiber_object_id
+      attr_accessor :weak_refs
+    end
 
-      def create_finalizer
-        proc { @finalized_count += 1 }
+    def execute(scenario)
+      # Track the instance and fiber
+      self.class.weak_refs << {
+        fiber_id: Fiber.current.object_id,
+        weak_fiber: WeakRef.new(Fiber.current),
+        instance_id: object_id,
+        weak_instance: WeakRef.new(self),
+        scenario:
+      }
+
+      # Run blocking/suspending scenario
+      case scenario.to_sym
+      when :wait_condition
+        Temporalio::Workflow.wait_condition { false }
+      when :activity
+        # Unknown activity will retry forever
+        Temporalio::Workflow.execute_activity('does-not-exist', start_to_close_timeout: 5)
+      when :timer
+        # @@temp = Fiber.current
+        Temporalio::Workflow.sleep(100_000)
+      when :future
+        Temporalio::Workflow::Future.new { Temporalio::Workflow.wait_condition { false } }.wait
+      else
+        raise NotImplementedError
       end
-    end
-
-    def initialize
-      self.class.initialized_count += 1
-      self.class.weak_instance = WeakRef.new(self)
-      # Uncomment this to cause test to fail
-      # self.class.strong_instance = self
-      self.class.instance_object_id = object_id
-      self.class.weak_fiber = WeakRef.new(Fiber.current)
-      self.class.fiber_object_id = Fiber.current.object_id
-
-      ObjectSpace.define_finalizer(self, self.class.create_finalizer)
-    end
-
-    def execute
-      Temporalio::Workflow.wait_condition { false }
     end
   end
 
   def test_confirm_garbage_collect
-    skip('Skipping GC collection confirmation until https://github.com/temporalio/sdk-ruby/issues/334')
-
-    # This test confirms the workflow instance is reliably GC'd when workflow/worker done. To confirm the test fails
-    # when there is still an instance, uncomment the strong_instance set in the initialize of the workflow.
-
-    execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
-      # Wait until it is started
-      assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
-      # Confirm initialized but not finalized
-      assert_equal 1, ConfirmGarbageCollectWorkflow.initialized_count
-      assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
+    ConfirmGarbageCollectWorkflow.weak_refs.clear
+    %i[wait_condition activity timer future].each do |scenario|
+      execute_workflow(ConfirmGarbageCollectWorkflow, scenario, max_cached_workflows: 0) do |handle|
+        assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+      end
     end
 
-    # Perform a GC and confirm gone. There are cases in Ruby where dead stack slots leave the item around for a bit, so
-    # we check repeatedly for a bit (every 200ms for 10s). We can't use assert_eventually, because path doesn't show
-    # well.
-    start_time = Time.now
-    loop do
+    # Check references
+    assert_eventually do
       GC.start
-      # Break if the instance is gone
-      break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
+      assert_equal 4, ConfirmGarbageCollectWorkflow.weak_refs.size
+      weak_refs = ConfirmGarbageCollectWorkflow.weak_refs.select { |ref| ref[:weak_fiber].weakref_alive? }
+      assert_empty(weak_refs, weak_refs.map do |ref|
+        # Get all objects directly referring to the fiber
+        strong_references = ObjectSpace.each_object
+          .select { |obj| ObjectSpace.reachable_objects_from(obj).any? { |child| child.__id__ == ref[:fiber_id] } }
+          .map(&:class)
+        msg = "Strong references for scenario: '#{ref[:scenario]}': #{strong_references}"
 
-      # If this is last iteration, flunk w/ the path
-      if Time.now - start_time > 10
-        path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
-        msg = GCUtils.annotated_path(path, root_category: cat)
-        msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+        path, cat = GCUtils.find_retaining_path_to(ref[:fiber_id], max_depth: 12)
+        msg += "\nPath for scenario '#{ref[:scenario]}': #{GCUtils.annotated_path(path, root_category: cat)}"
+        msg += "\nItems for scenario '#{ref[:scenario]}':\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
         # Also display any Thread/Fiber backtraces that are in the path
         path.grep(Thread).each do |thread|
           msg += "\nThread trace: #{thread.backtrace.join("\n")}"
@@ -1979,12 +1976,88 @@ class WorkerWorkflowTest < Test
         path.grep(Fiber).each do |fiber|
           msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
         end
-        msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
-        flunk msg
-      end
-      sleep(0.2)
+        msg += "\nOrig fiber trace: #{ref[:weak_fiber].backtrace.join("\n")}"
+        msg
+      end.join("\n"))
     end
+
+    # Deletion situations to take account of:
+    # * Activation errors - DONE
+    # * Warn if fibers remain after deletion - TODO
+    # * Update errors - DONE
+    # * Set is_replaying when deleting - DONE
+    # * Top-level exceptions - DONE
+    # * Assert read only should fail with is-being-evicted error - DONE
+    # * Don't instantiate instance object - N/A
+    # * Raising activation error out of scheduler loop only if not deleting - N/A
+
+    # skip('Skipping GC collection confirmation until https://github.com/temporalio/sdk-ruby/issues/334')
+
+    # # This test confirms the workflow instance and its fibers are reliably GC'd when workflow/worker done. To confirm
+    # # the test fails when there is still an instance, uncomment the strong_instance set in the initialize of the
+    # # workflow.
+
+    # execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
+    #   # Wait until it is started
+    #   assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+    #   # Confirm initialized but not finalized
+    #   assert_equal 1, ConfirmGarbageCollectWorkflow.initialized_count
+    #   assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
+    # end
+
+    # # Perform a GC and confirm gone. There are cases in Ruby where dead stack slots leave the item around for a bit,so
+    # # we check repeatedly for a bit (every 200ms for 10s). We can't use assert_eventually, because path doesn't show
+    # # well.
+    # start_time = Time.now
+    # loop do
+    #   GC.start
+    #   # Break if the instance is gone
+    #   break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
+
+    #   # If this is last iteration, flunk w/ the path
+    #   if Time.now - start_time > 10
+    #     path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
+    #     msg = GCUtils.annotated_path(path, root_category: cat)
+    #     msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+    #     # Also display any Thread/Fiber backtraces that are in the path
+    #     path.grep(Thread).each do |thread|
+    #       msg += "\nThread trace: #{thread.backtrace.join("\n")}"
+    #     end
+    #     path.grep(Fiber).each do |fiber|
+    #       msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
+    #     end
+    #     msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
+    #     flunk msg
+    #   end
+    #   sleep(0.2)
+    # end
   end
+
+  # def test_confirm_garbage_collect_two
+  #   ConfirmGarbageCollectWorkflow.weak_instances.clear
+  #   ConfirmGarbageCollectWorkflow.weak_fibers.clear
+  #   # Run each scenario until we see first task completed. Since each one completes its worker, there should be no
+  #   cache
+  #   # left around.
+  #   %i[wait_condition activity timer future].each do |scenario|
+  #     # %i[wait_condition].each do |scenario|
+  #     # This time with cache
+  #     execute_workflow(ConfirmGarbageCollectWorkflow, scenario) do |handle|
+  #       assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+  #     end
+  #   end
+
+  #   # Check references
+  #   GC.start
+  #   assert_equal 4, ConfirmGarbageCollectWorkflow.weak_instances.size
+  #   ConfirmGarbageCollectWorkflow.weak_instances.each do |instance|
+  #     refute instance[:weak_ref].weakref_alive?, "Instance still alive for #{instance[:scenario]}"
+  #   end
+  #   assert_equal 4, ConfirmGarbageCollectWorkflow.weak_fibers.size
+  #   ConfirmGarbageCollectWorkflow.weak_fibers.each do |fiber|
+  #     refute fiber[:weak_ref].weakref_alive?, "Fiber still alive for #{fiber[:scenario]}"
+  #   end
+  # end
 
   class ContextInstanceInterceptor
     include Temporalio::Worker::Interceptor::Workflow
