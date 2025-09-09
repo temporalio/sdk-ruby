@@ -83,7 +83,7 @@ module Temporalio
       def to_tls_options
         return false if disabled
 
-        Temporalio::Client::Connection::TLSOptions.new(
+        Client::Connection::TLSOptions.new(
           domain: server_name,
           server_root_ca_cert: read_source(server_root_ca_cert),
           client_cert: read_source(client_cert),
@@ -270,9 +270,9 @@ module Temporalio
         config_file_strict: false,
         override_env_vars: nil
       )
-        path, data = Temporalio::EnvConfig.source_to_path_and_data(config_source)
+        path, data = source_to_path_and_data(config_source)
 
-        loaded_profiles = Temporalio::Internal::Bridge::EnvConfig.load_client_config(
+        loaded_profiles = Internal::Bridge::EnvConfig.load_client_config(
           path,
           data,
           disable_file,
