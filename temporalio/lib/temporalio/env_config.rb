@@ -8,25 +8,6 @@ module Temporalio
   module EnvConfig
     # This module provides utilities to load Temporal client configuration from TOML files
     # and environment variables.
-    #
-    # DataSource types:
-    # - Pathname: Path to a configuration file
-    # - String: TOML configuration content
-    # - nil: No configuration source
-
-    # @!visibility private
-    def self._source_to_path_and_data(source)
-      case source
-      when Pathname
-        [source.to_s, nil]
-      when String
-        [nil, source]
-      when nil
-        [nil, nil]
-      else
-        raise TypeError, "Must be Pathname, String, or nil, got #{source.class}"
-      end
-    end
 
     # TLS configuration as specified as part of client configuration
     #
@@ -72,8 +53,8 @@ module Temporalio
       # @return [Hash] Dictionary representation
       def to_h
         {
-          disabled: disabled,
-          server_name: server_name,
+          disabled:,
+          server_name:,
           server_ca_cert: server_root_ca_cert ? source_to_hash(server_root_ca_cert) : nil,
           client_cert: client_cert ? source_to_hash(client_cert) : nil,
           client_key: client_private_key ? source_to_hash(client_private_key) : nil
@@ -334,6 +315,22 @@ module Temporalio
       # @return [Hash] Dictionary representation
       def to_h
         profiles.transform_values(&:to_h)
+      end
+    end
+
+    # @param source [Pathname, String, nil] Configuration source
+    # @return [Array<String?, String?>] Tuple of [path, data]
+    # @!visibility private
+    def self._source_to_path_and_data(source)
+      case source
+      when Pathname
+        [source.to_s, nil]
+      when String
+        [nil, source]
+      when nil
+        [nil, nil]
+      else
+        raise TypeError, "Must be Pathname, String, or nil, got #{source.class}"
       end
     end
   end
