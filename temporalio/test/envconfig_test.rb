@@ -558,12 +558,13 @@ class EnvConfigTest < Test
 
     profile_hash = profile.to_h
 
-    # Check hash representation. Note that disabled=false is not in the hash.
+    # Check hash representation. disabled=false is now included since it was explicitly set.
     expected_hash = {
       address: 'some-address',
       namespace: 'some-namespace',
       api_key: 'some-api-key',
       tls: {
+        disabled: false,
         server_name: 'some-server-name',
         server_ca_cert: { data: 'ca-cert-data' },
         client_cert: { path: '/path/to/client.crt' },

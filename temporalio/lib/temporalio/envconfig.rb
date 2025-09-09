@@ -31,7 +31,7 @@ module Temporalio
     # TLS configuration as specified as part of client configuration
     #
     # @!attribute [r] disabled
-    #   @return [Boolean] If true, TLS is explicitly disabled
+    #   @return [Boolean, nil] If true, TLS is explicitly disabled; if nil, not specified
     # @!attribute [r] server_name
     #   @return [String, nil] SNI override
     # @!attribute [r] server_root_ca_cert
@@ -44,7 +44,7 @@ module Temporalio
 
     class ClientConfigTLS
       # Set default values
-      def initialize(disabled: false, server_name: nil, server_root_ca_cert: nil, client_cert: nil, client_private_key: nil)
+      def initialize(disabled: nil, server_name: nil, server_root_ca_cert: nil, client_cert: nil, client_private_key: nil)
         super
       end
 
@@ -55,7 +55,7 @@ module Temporalio
         return nil if hash.nil? || hash.empty?
 
         new(
-          disabled: hash[:disabled] || false,
+          disabled: hash[:disabled],
           server_name: hash[:server_name],
           server_root_ca_cert: hash_to_source(hash[:server_ca_cert]),
           client_cert: hash_to_source(hash[:client_cert]),
@@ -67,7 +67,7 @@ module Temporalio
       # @return [Hash] Dictionary representation
       def to_h
         {
-          disabled: disabled ? disabled : nil,
+          disabled: disabled,
           server_name: server_name,
           server_ca_cert: server_root_ca_cert ? source_to_hash(server_root_ca_cert) : nil,
           client_cert: client_cert ? source_to_hash(client_cert) : nil,
