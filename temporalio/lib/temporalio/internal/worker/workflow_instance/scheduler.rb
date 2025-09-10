@@ -13,6 +13,8 @@ module Temporalio
       class WorkflowInstance
         # Deterministic {::Fiber::Scheduler} implementation.
         class Scheduler
+          attr_reader :instance
+
           def initialize(instance)
             @instance = instance
             @fibers = []

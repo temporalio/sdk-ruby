@@ -4,11 +4,10 @@ require 'objspace'
 
 module GCUtils
   class << self
-    # Find all retaining paths from any GC root to the object with target_id.
+    # Find one path from any GC root to the object with target_id.
     #
-    # @return [Array<[Array<Object>, Symbol]>]
-    #   Each element is [path, root_category]
-    def find_retaining_paths_to(target_id, max_depth: 12, max_visits: 250_000, category_whitelist: nil)
+    # @return [Array<Object>, String] First value is array of path objects, second is root category.
+    def find_retaining_path_to(target_id, max_depth: 12, max_visits: 250_000, category_whitelist: nil)
       roots = ObjectSpace.reachable_objects_from_root # {category_sym => [objs]}
       queue   = []
       seen    = {}
@@ -34,7 +33,7 @@ module GCUtils
       level_remaining = queue.length
       next_level = 0
 
-      found_ids = []
+      found_leaf = nil
 
       while !queue.empty? && visits < max_visits && depth <= max_depth
         cur = queue.shift
@@ -42,7 +41,10 @@ module GCUtils
         visits += 1
 
         cid = cur.__id__
-        found_ids << cid if cid == target_id
+        if cid == target_id
+          found_leaf = cid
+          break
+        end
 
         children = begin
           ObjectSpace.reachable_objects_from(cur)
@@ -68,25 +70,21 @@ module GCUtils
         next_level = 0
       end
 
-      return [] if found_ids.empty?
+      return [[], ''] unless found_leaf
 
-      # Reconstruct path(s) for each found_id
-      paths = found_ids.map do |fid|
-        ids = []
-        i = fid
-        while i
-          ids << i
-          i = parent[i]
-        end
-        objs = ids.reverse.map do |id|
-          ObjectSpace._id2ref(id)
-        rescue StandardError
-          id
-        end
-        [objs, root_of[ids.first]]
+      # Reconstruct path
+      ids = []
+      i = found_leaf
+      while i
+        ids << i
+        i = parent[i]
       end
-
-      paths.uniq
+      objs = ids.reverse.map do |id|
+        ObjectSpace._id2ref(id)
+      rescue StandardError
+        id
+      end
+      [objs, root_of[ids.first]]
     end
 
     # Return string of annotated path

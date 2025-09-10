@@ -239,7 +239,9 @@ module Temporalio
           end
 
           def evict_running_workflow(run_id, cache_remove_job)
+            puts "!!! DEL WF, pre-count: #{@running_workflows.size}"
             @running_workflows_mutex.synchronize { @running_workflows.delete(run_id) }
+            puts "!!! DEL WF, post-count: #{@running_workflows.size}"
             @on_eviction&.call(run_id, cache_remove_job)
           end
 

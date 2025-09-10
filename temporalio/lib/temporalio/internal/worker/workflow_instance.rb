@@ -240,14 +240,14 @@ module Temporalio
 
         # This can run forever, callers are expected to perform timeout
         def evict
-          # Run inside of scheduler (removed on ensure)
-          Fiber.set_scheduler(@scheduler)
+          #   # Run inside of scheduler (removed on ensure)
+          #   Fiber.set_scheduler(@scheduler)
 
-          @evicting = true
-          @replaying = true
-          @scheduler.evict_and_drain_all_fibers
-        ensure
-          Fiber.set_scheduler(nil)
+          #   @evicting = true
+          #   @replaying = true
+          #   @scheduler.evict_and_drain_all_fibers
+          # ensure
+          #   Fiber.set_scheduler(nil)
         end
 
         def add_command(command)

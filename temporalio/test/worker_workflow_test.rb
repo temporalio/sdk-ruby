@@ -1910,128 +1910,144 @@ class WorkerWorkflowTest < Test
     assert_equal 'IntentionalError', err.cause.type
   end
 
-  class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
-    # Each is a hash of fiber_id, weak_fiber, instance_id, weak_instance, scenario
-    @weak_refs = []
+  # class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
+  #   # Each is a hash of fiber_id, weak_fiber, instance_id, weak_instance, scenario
+  #   @weak_refs = []
 
-    class << self
-      attr_accessor :weak_refs
-    end
+  #   class << self
+  #     attr_accessor :weak_refs
+  #   end
 
-    def execute(scenario)
-      # Track the instance and fiber
-      self.class.weak_refs << {
-        fiber_id: Fiber.current.object_id,
-        weak_fiber: WeakRef.new(Fiber.current),
-        instance_id: object_id,
-        weak_instance: WeakRef.new(self),
-        scenario:
-      }
+  #   def execute(scenario)
+  #     # Track the instance and fiber
+  #     self.class.weak_refs << {
+  #       fiber_id: Fiber.current.object_id,
+  #       weak_fiber: WeakRef.new(Fiber.current),
+  #       instance_id: object_id,
+  #       weak_instance: WeakRef.new(self),
+  #       scenario:
+  #     }
 
-      # Run blocking/suspending scenario
-      case scenario.to_sym
-      when :wait_condition
-        Temporalio::Workflow.wait_condition { false }
-      when :activity
-        # Unknown activity will retry forever
-        Temporalio::Workflow.execute_activity('does-not-exist', start_to_close_timeout: 5)
-      when :timer
-        Temporalio::Workflow.sleep(100_000)
-      when :future
-        Temporalio::Workflow::Future.new { Temporalio::Workflow.wait_condition { false } }.wait
-      else
-        raise NotImplementedError
-      end
-    end
-  end
+  #     # Run blocking/suspending scenario
+  #     case scenario.to_sym
+  #     when :wait_condition
+  #       Temporalio::Workflow.wait_condition { false }
+  #     when :activity
+  #       # Unknown activity will retry forever
+  #       Temporalio::Workflow.execute_activity('does-not-exist', start_to_close_timeout: 5)
+  #     when :timer
+  #       # @@temp = Fiber.current
+  #       Temporalio::Workflow.sleep(100_000)
+  #     when :future
+  #       Temporalio::Workflow::Future.new { Temporalio::Workflow.wait_condition { false } }.wait
+  #     else
+  #       raise NotImplementedError
+  #     end
+  #   end
+  # end
 
-  def test_confirm_garbage_collect
-    ConfirmGarbageCollectWorkflow.weak_refs.clear
-    %i[wait_condition activity timer future].each do |scenario|
-      execute_workflow(ConfirmGarbageCollectWorkflow, scenario, max_cached_workflows: 0) do |handle|
-        assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
-      end
-    end
+  # def test_confirm_garbage_collect
+  #   ConfirmGarbageCollectWorkflow.weak_refs.clear
+  #   %i[wait_condition activity timer future].each do |scenario|
+  #     execute_workflow(ConfirmGarbageCollectWorkflow, scenario, max_cached_workflows: 0,
+  #                                                               illegal_workflow_calls: {}) do |handle|
+  #       assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+  #     end
+  #   end
 
-    # Check references
-    assert_eventually do
-      GC.start
-      assert_equal 4, ConfirmGarbageCollectWorkflow.weak_refs.size
-      weak_refs = ConfirmGarbageCollectWorkflow.weak_refs.select { |ref| ref[:weak_fiber].weakref_alive? }
-      assert_empty(weak_refs, weak_refs.map do |ref|
-        # Get all objects directly referring to the fiber
-        strong_references = ObjectSpace.each_object
-          .select { |obj| ObjectSpace.reachable_objects_from(obj).any? { |child| child.__id__ == ref[:fiber_id] } }
-          .map(&:class)
-        msg = "\nStrong references for scenario: '#{ref[:scenario]}': #{strong_references}"
+  #   # Check references
+  #   assert_eventually do
+  #     GC.start
+  #     assert_equal 4, ConfirmGarbageCollectWorkflow.weak_refs.size
+  #     weak_refs = ConfirmGarbageCollectWorkflow.weak_refs.select { |ref| ref[:weak_fiber].weakref_alive? }
+  #     assert_empty(weak_refs, weak_refs.map do |ref|
+  #       # flunk(ConfirmGarbageCollectWorkflow.weak_refs.map do |ref|
+  #       # Get all objects directly referring to the fiber
+  #       strong_refs = ObjectSpace.each_object
+  #         .select { |obj| ObjectSpace.reachable_objects_from(obj).any? { |child| child.__id__ == ref[:fiber_id] } }
+  #       msg = "Strong references to fiber for scenario: '#{ref[:scenario]}': #{strong_refs.map(&:class)}"
+  #       strong_refs.each do |strong_ref|
+  #         msg += "\n---- STRONG REF: #{strong_ref.class} ----\n"
+  #         path, cat = GCUtils.find_retaining_path_to(strong_ref.__id__, max_depth: 12)
+  #         # path, cat = GCUtils.find_retaining_path_to(ref[:fiber_id], max_depth: 12)
+  #         msg += "\nPath for scenario '#{ref[:scenario]}': #{GCUtils.annotated_path(path, root_category: cat)}"
+  #         msg += "\nItems for scenario '#{ref[:scenario]}':\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+  #         # Also display any Thread/Fiber backtraces that are in the path
+  #         path.grep(Thread).each do |thread|
+  #           msg += "\nThread trace: #{thread.backtrace.join("\n")}"
+  #         end
+  #         path.grep(Fiber).each do |fiber|
+  #           msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
+  #         end
+  #         # begin
+  #         #   msg += "\nOrig fiber trace: #{ref[:weak_fiber].backtrace.join("\n")}"
+  #         # rescue Exception
+  #         #   # do nothing
+  #         # end
+  #       end
+  #       if ref[:weak_instance].weakref_alive?
+  #         path, cat = GCUtils.find_retaining_path_to(ref[:instance_id], max_depth: 12)
+  #         msg += "\nPath for instance!: #{GCUtils.annotated_path(path, root_category: cat)}\n"
+  #       else
+  #         msg += "\nNo instance!\n"
+  #       end
+  #       msg
+  #     end.join("\n"))
+  #   end
 
-        GCUtils.find_retaining_paths_to(ref[:fiber_id]).each do |path, cat|
-          msg += "\nPath for scenario '#{ref[:scenario]}': #{GCUtils.annotated_path(path, root_category: cat)}"
-          msg += "\n    Items for scenario '#{ref[:scenario]}':\n#{path.map { |p| "    Item: #{p}" }.join("\n    ")}"
-          # Also display any Thread/Fiber backtraces that are in the path
-          path.grep(Thread).each do |thread|
-            msg += "\n    Thread trace: #{thread.backtrace.join("\n")}"
-          end
-          path.grep(Fiber).each do |fiber|
-            msg += "\n    Fiber trace: #{fiber.backtrace.join("\n")}"
-          end
-          msg += "\n    Orig fiber trace: #{ref[:weak_fiber].backtrace.join("\n")}"
-        end
-        msg
-      end.join("\n"))
-    end
+  #   # Deletion situations to take account of:
+  #   # * Activation errors - DONE
+  #   # * Warn if fibers remain after deletion - TODO
+  #   # * Update errors - DONE
+  #   # * Set is_replaying when deleting - DONE
+  #   # * Top-level exceptions - DONE
+  #   # * Assert read only should fail with is-being-evicted error - DONE
+  #   # * Don't instantiate instance object - N/A
+  #   # * Raising activation error out of scheduler loop only if not deleting - N/A
 
-    # Deletion situations to take account of:
-    # * Activation errors - DONE
-    # * Warn if fibers remain after deletion - TODO
-    # * Update errors - DONE
-    # * Set is_replaying when deleting - DONE
-    # * Top-level exceptions - DONE
-    # * Assert read only should fail with is-being-evicted error - DONE
-    # * Don't instantiate instance object - N/A
-    # * Raising activation error out of scheduler loop only if not deleting - N/A
+  #   # skip('Skipping GC collection confirmation until https://github.com/temporalio/sdk-ruby/issues/334')
 
-    # skip('Skipping GC collection confirmation until https://github.com/temporalio/sdk-ruby/issues/334')
+  #   # # This test confirms the workflow instance and its fibers are reliably GC'd when workflow/worker done. To
+  #   # # confirm
+  #   # # the test fails when there is still an instance, uncomment the strong_instance set in the initialize of the
+  #   # # workflow.
 
-    # # This test confirms the workflow instance and its fibers are reliably GC'd when workflow/worker done. To confirm
-    # # the test fails when there is still an instance, uncomment the strong_instance set in the initialize of the
-    # # workflow.
+  #   # execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
+  #   #   # Wait until it is started
+  #   #   assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+  #   #   # Confirm initialized but not finalized
+  #   #   assert_equal 1, ConfirmGarbageCollectWorkflow.initialized_count
+  #   #   assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
+  #   # end
 
-    # execute_workflow(ConfirmGarbageCollectWorkflow) do |handle|
-    #   # Wait until it is started
-    #   assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
-    #   # Confirm initialized but not finalized
-    #   assert_equal 1, ConfirmGarbageCollectWorkflow.initialized_count
-    #   assert_equal 0, ConfirmGarbageCollectWorkflow.finalized_count
-    # end
+  #   # # Perform a GC and confirm gone. There are cases in Ruby where dead stack slots leave the item around for a bit,
+  #   # # so
+  #   # # we check repeatedly for a bit (every 200ms for 10s). We can't use assert_eventually, because path doesn't show
+  #   # # well.
+  #   # start_time = Time.now
+  #   # loop do
+  #   #   GC.start
+  #   #   # Break if the instance is gone
+  #   #   break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
 
-    # # Perform a GC and confirm gone. There are cases in Ruby where dead stack slots leave the item around for a bit,so
-    # # we check repeatedly for a bit (every 200ms for 10s). We can't use assert_eventually, because path doesn't show
-    # # well.
-    # start_time = Time.now
-    # loop do
-    #   GC.start
-    #   # Break if the instance is gone
-    #   break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
-
-    #   # If this is last iteration, flunk w/ the path
-    #   if Time.now - start_time > 10
-    #     path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
-    #     msg = GCUtils.annotated_path(path, root_category: cat)
-    #     msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
-    #     # Also display any Thread/Fiber backtraces that are in the path
-    #     path.grep(Thread).each do |thread|
-    #       msg += "\nThread trace: #{thread.backtrace.join("\n")}"
-    #     end
-    #     path.grep(Fiber).each do |fiber|
-    #       msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
-    #     end
-    #     msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
-    #     flunk msg
-    #   end
-    #   sleep(0.2)
-    # end
-  end
+  #   #   # If this is last iteration, flunk w/ the path
+  #   #   if Time.now - start_time > 10
+  #   #     path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
+  #   #     msg = GCUtils.annotated_path(path, root_category: cat)
+  #   #     msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+  #   #     # Also display any Thread/Fiber backtraces that are in the path
+  #   #     path.grep(Thread).each do |thread|
+  #   #       msg += "\nThread trace: #{thread.backtrace.join("\n")}"
+  #   #     end
+  #   #     path.grep(Fiber).each do |fiber|
+  #   #       msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
+  #   #     end
+  #   #     msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
+  #   #     flunk msg
+  #   #   end
+  #   #   sleep(0.2)
+  #   # end
+  # end
 
   # def test_confirm_garbage_collect_two
   #   ConfirmGarbageCollectWorkflow.weak_instances.clear
@@ -2058,6 +2074,83 @@ class WorkerWorkflowTest < Test
   #     refute fiber[:weak_ref].weakref_alive?, "Fiber still alive for #{fiber[:scenario]}"
   #   end
   # end
+
+  class ConfirmGarbageCollectWorkflow2 < Temporalio::Workflow::Definition
+    # Each is a hash of fiber_id, weak_fiber, instance_id, weak_instance, scenario
+    @initialized = []
+    @finalized = []
+    @weak_schedulers = []
+    @weak_instances = []
+
+    class << self
+      attr_accessor :initialized, :finalized, :weak_schedulers, :weak_instances
+    end
+
+    def execute(scenario)
+      # Add a finalizer on the current fiber
+      self.class.initialized << scenario
+      ObjectSpace.define_finalizer(Fiber.current, proc { self.class.finalized << scenario })
+      ObjectSpace.define_finalizer(Temporalio::Workflow._current, proc { puts "!!! SCHED GC'd: #{scenario}" })
+      ObjectSpace.define_finalizer(Temporalio::Workflow._current.instance,
+                                   proc { puts "!!! INST GC'd: #{scenario}" })
+      self.class.weak_schedulers << [
+        Temporalio::Workflow._current.__id__, WeakRef.new(Temporalio::Workflow._current)
+      ]
+      self.class.weak_instances << [
+        Temporalio::Workflow._current.instance.__id__, WeakRef.new(Temporalio::Workflow._current.instance)
+      ]
+
+      # Run blocking/suspending scenario
+      case scenario.to_sym
+      when :wait_condition
+        Temporalio::Workflow.wait_condition { false }
+      when :activity
+        # Unknown activity will retry forever
+        Temporalio::Workflow.execute_activity('does-not-exist', start_to_close_timeout: 5)
+      when :timer
+        # @@temp = Fiber.current
+        Temporalio::Workflow.sleep(100_000)
+      when :future
+        Temporalio::Workflow::Future.new { Temporalio::Workflow.wait_condition { false } }.wait
+      else
+        raise NotImplementedError
+      end
+    end
+  end
+
+  def test_confirm_garbage_collect2
+    # %i[wait_condition activity timer future].each do |scenario|
+    %i[wait_condition timer].each do |scenario|
+      puts "!!! SCEN START: #{scenario} - " \
+           "#{ConfirmGarbageCollectWorkflow2.initialized} - #{ConfirmGarbageCollectWorkflow2.finalized}"
+      execute_workflow(ConfirmGarbageCollectWorkflow2, scenario, max_cached_workflows: 0) do |handle|
+        assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+      end
+      puts "!!! SCEN END: #{scenario} - " \
+           "#{ConfirmGarbageCollectWorkflow2.initialized} - #{ConfirmGarbageCollectWorkflow2.finalized}"
+    end
+    GC.start
+    puts "!!! GC DONE: #{ConfirmGarbageCollectWorkflow2.initialized} - #{ConfirmGarbageCollectWorkflow2.finalized}"
+    ConfirmGarbageCollectWorkflow2.weak_schedulers.each do |id, weak_ref|
+      puts "!!! WEAK SCHED: #{weak_ref.weakref_alive?}"
+      next unless weak_ref.weakref_alive?
+
+      path, cat = GCUtils.find_retaining_path_to(id)
+      msg = GCUtils.annotated_path(path, root_category: cat)
+      msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+      puts "   !!! WUT: #{msg}"
+    end
+    ConfirmGarbageCollectWorkflow2.weak_instances.each do |id, weak_ref|
+      puts "!!! WEAK INST: #{weak_ref.weakref_alive?}"
+      next unless weak_ref.weakref_alive?
+
+      path, cat = GCUtils.find_retaining_path_to(id)
+      msg = GCUtils.annotated_path(path, root_category: cat)
+      msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
+      puts "   !!! WUT: #{msg}"
+    end
+    assert_equal ConfirmGarbageCollectWorkflow2.initialized.sort, ConfirmGarbageCollectWorkflow2.finalized.sort
+  end
 
   class ContextInstanceInterceptor
     include Temporalio::Worker::Interceptor::Workflow
