@@ -5,6 +5,8 @@ require 'temporalio/internal/bridge'
 
 module Temporalio
   # Environment and file-based configuration for Temporal clients
+  #
+  # WARNING: Experimental API.
   module EnvConfig
     # This module provides utilities to load Temporal client configuration from TOML files
     # and environment variables.
