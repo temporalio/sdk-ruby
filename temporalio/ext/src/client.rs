@@ -237,8 +237,11 @@ impl Client {
         self.invoke_rpc(service, callback, call)
     }
 
-    pub fn update_metadata(&self, headers: HashMap<String, String>) {
-        self.core.get_client().set_headers(headers);
+    pub fn update_metadata(&self, headers: HashMap<String, String>) -> Result<(), Error> {
+        self.core
+            .get_client()
+            .set_headers(headers)
+            .map_err(|err| error!("Invalid headers: {}", err))
     }
 
     pub fn update_api_key(&self, api_key: Option<String>) {
