@@ -1936,7 +1936,6 @@ class WorkerWorkflowTest < Test
         # Unknown activity will retry forever
         Temporalio::Workflow.execute_activity('does-not-exist', start_to_close_timeout: 5)
       when :timer
-        # @@temp = Fiber.current
         Temporalio::Workflow.sleep(100_000)
       when :future
         Temporalio::Workflow::Future.new { Temporalio::Workflow.wait_condition { false } }.wait
@@ -1964,19 +1963,20 @@ class WorkerWorkflowTest < Test
         strong_references = ObjectSpace.each_object
           .select { |obj| ObjectSpace.reachable_objects_from(obj).any? { |child| child.__id__ == ref[:fiber_id] } }
           .map(&:class)
-        msg = "Strong references for scenario: '#{ref[:scenario]}': #{strong_references}"
+        msg = "\nStrong references for scenario: '#{ref[:scenario]}': #{strong_references}"
 
-        path, cat = GCUtils.find_retaining_path_to(ref[:fiber_id], max_depth: 12)
-        msg += "\nPath for scenario '#{ref[:scenario]}': #{GCUtils.annotated_path(path, root_category: cat)}"
-        msg += "\nItems for scenario '#{ref[:scenario]}':\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
-        # Also display any Thread/Fiber backtraces that are in the path
-        path.grep(Thread).each do |thread|
-          msg += "\nThread trace: #{thread.backtrace.join("\n")}"
+        GCUtils.find_retaining_paths_to(ref[:fiber_id]).each do |path, cat|
+          msg += "\nPath for scenario '#{ref[:scenario]}': #{GCUtils.annotated_path(path, root_category: cat)}"
+          msg += "\n    Items for scenario '#{ref[:scenario]}':\n#{path.map { |p| "    Item: #{p}" }.join("\n    ")}"
+          # Also display any Thread/Fiber backtraces that are in the path
+          path.grep(Thread).each do |thread|
+            msg += "\n    Thread trace: #{thread.backtrace.join("\n")}"
+          end
+          path.grep(Fiber).each do |fiber|
+            msg += "\n    Fiber trace: #{fiber.backtrace.join("\n")}"
+          end
+          msg += "\n    Orig fiber trace: #{ref[:weak_fiber].backtrace.join("\n")}"
         end
-        path.grep(Fiber).each do |fiber|
-          msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
-        end
-        msg += "\nOrig fiber trace: #{ref[:weak_fiber].backtrace.join("\n")}"
         msg
       end.join("\n"))
     end
