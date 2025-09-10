@@ -17,7 +17,7 @@ prost = "0.13"
 rb-sys = "0.9"
 temporal-client = { version = "0.1.0", path = "./sdk-core/client" }
 temporal-sdk-core = { version = "0.1.0", path = "./sdk-core/core", features = ["ephemeral-server"] }
-temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api" }
+temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api", features = ["envconfig"] }
 temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
 tokio = "1.37"
 tokio-stream = "0.1"

@@ -121,7 +121,7 @@ module Temporalio
             end
           end
 
-          def execute_activity_with_local_backoffs(local:, cancellation:, result_hint:, &)
+          def execute_activity_with_local_backoffs(local:, cancellation:, result_hint:, &block)
             # We do not even want to schedule if the cancellation is already cancelled. We choose to use canceled
             # failure instead of wrapping in activity failure which is similar to what other SDKs do, with the accepted
             # tradeoff that it makes rescue more difficult (hence the presence of Error.canceled? helper).
@@ -130,7 +130,7 @@ module Temporalio
             # This has to be done in a loop for local activity backoff
             last_local_backoff = nil
             loop do
-              result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &)
+              result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &block)
               return result unless result.is_a?(Bridge::Api::ActivityResult::DoBackoff)
 
               # @type var result: untyped
@@ -142,9 +142,9 @@ module Temporalio
           end
 
           # If this doesn't raise, it returns success | DoBackoff
-          def execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &)
+          def execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &block)
             # Add to pending activities (removed by the resolver)
-            seq = yield last_local_backoff
+            seq = block.call(last_local_backoff)
             @instance.pending_activities[seq] = Fiber.current
 
             # Add cancellation hook
