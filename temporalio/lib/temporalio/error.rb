@@ -97,9 +97,13 @@ module Temporalio
 
     # Error that occurs when an async activity handle tries to heartbeat and the activity is marked as canceled.
     class AsyncActivityCanceledError < Error
+      # @return [Activity::CancellationDetails]
+      attr_reader :details
+
       # @!visibility private
-      def initialize
+      def initialize(details)
         super('Activity canceled')
+        @details = details
       end
     end
 

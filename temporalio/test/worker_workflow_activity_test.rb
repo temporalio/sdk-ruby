@@ -277,7 +277,7 @@ class WorkerWorkflowActivityTest < Test
       raise unless swallow
 
       det = Temporalio::Activity::Context.current.cancellation_details
-      "canceled - paused: #{det&.paused?}, requested: #{det&.cancel_requested?}"
+      "canceled - paused: #{det&.paused?}, requested: #{det&.cancel_requested?}, reset: #{det&.reset?}"
     end
   end
 
@@ -312,7 +312,7 @@ class WorkerWorkflowActivityTest < Test
         reason: 'my reason'
       )
       env.client.workflow_service.pause_activity(req)
-      assert_equal 'canceled - paused: true, requested: false', handle.result
+      assert_equal 'canceled - paused: true, requested: false, reset: false', handle.result
     end
 
     # Re-raise
@@ -342,6 +342,30 @@ class WorkerWorkflowActivityTest < Test
         assert acts.first.paused
         assert_equal '"final-heartbeat"', acts.first.heartbeat_details&.payloads&.first&.data # rubocop:disable Style/SafeNavigationChainLength
       end
+    end
+  end
+
+  def test_cancellation_reset
+    queue = Queue.new
+    execute_workflow(
+      CancellationDetailsWorkflow, true,
+      activities: [CancellationDetailsActivity.new(queue)]
+    ) do |handle|
+      # Wait for activity to start
+      activity_id = queue.pop(timeout: 10)
+      assert activity_id
+      # Send reset, and confirm we get what we expect
+      req = Temporalio::Api::WorkflowService::V1::ResetActivityRequest.new(
+        namespace: env.client.namespace,
+        execution: Temporalio::Api::Common::V1::WorkflowExecution.new(
+          workflow_id: handle.id,
+          run_id: handle.result_run_id
+        ),
+        identity: env.client.connection.options.identity,
+        id: activity_id
+      )
+      env.client.workflow_service.reset_activity(req)
+      assert_equal 'canceled - paused: false, requested: false, reset: true', handle.result
     end
   end
 end
