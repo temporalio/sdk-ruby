@@ -562,15 +562,26 @@ class WorkerActivityTest < Test
   class AsyncCompletionActivity < Temporalio::Activity::Definition
     def initialize
       @task_token = Queue.new
+      @id_ref = Queue.new
     end
 
     def execute
-      @task_token.push(Temporalio::Activity::Context.current.info.task_token)
+      info = Temporalio::Activity::Context.current.info
+      @task_token.push(info.task_token)
+      @id_ref.push(Temporalio::Client::ActivityIDReference.new(
+                     workflow_id: info.workflow_id,
+                     run_id: info.workflow_run_id,
+                     activity_id: info.activity_id
+                   ))
       raise Temporalio::Activity::CompleteAsyncError
     end
 
     def wait_task_token
       @task_token.pop
+    end
+
+    def wait_id_ref
+      @id_ref.pop
     end
   end
 
@@ -626,6 +637,70 @@ class WorkerActivityTest < Test
       env.client.async_activity_handle(task_token).report_cancellation
       error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
       assert_kind_of Temporalio::Error::CanceledError, error.cause
+    end
+  end
+
+  def test_async_completion_cancel_details
+    # Cancel
+    act = AsyncCompletionActivity.new
+    execute_activity(act, wait_for_cancellation: true) do |handle|
+      task_token = act.wait_task_token
+      handle.cancel
+      assert_eventually do
+        err = assert_raises(Temporalio::Error::AsyncActivityCanceledError) do
+          env.client.async_activity_handle(task_token).heartbeat
+        end
+        assert err.details.cancel_requested?
+        refute err.details.paused?
+        refute err.details.reset?
+      end
+    end
+
+    # Pause
+    act = AsyncCompletionActivity.new
+    execute_activity(act, wait_for_cancellation: true) do
+      id_ref = act.wait_id_ref
+      env.client.workflow_service.pause_activity(Temporalio::Api::WorkflowService::V1::PauseActivityRequest.new(
+                                                   namespace: env.client.namespace,
+                                                   execution: Temporalio::Api::Common::V1::WorkflowExecution.new(
+                                                     workflow_id: id_ref.workflow_id,
+                                                     run_id: id_ref.run_id
+                                                   ),
+                                                   identity: env.client.connection.options.identity,
+                                                   id: id_ref.activity_id,
+                                                   reason: 'my reason'
+                                                 ))
+      assert_eventually do
+        err = assert_raises(Temporalio::Error::AsyncActivityCanceledError) do
+          env.client.async_activity_handle(id_ref).heartbeat
+        end
+        refute err.details.cancel_requested?
+        assert err.details.paused?
+        refute err.details.reset?
+      end
+    end
+
+    # Reset
+    act = AsyncCompletionActivity.new
+    execute_activity(act, wait_for_cancellation: true) do
+      id_ref = act.wait_id_ref
+      env.client.workflow_service.reset_activity(Temporalio::Api::WorkflowService::V1::ResetActivityRequest.new(
+                                                   namespace: env.client.namespace,
+                                                   execution: Temporalio::Api::Common::V1::WorkflowExecution.new(
+                                                     workflow_id: id_ref.workflow_id,
+                                                     run_id: id_ref.run_id
+                                                   ),
+                                                   identity: env.client.connection.options.identity,
+                                                   id: id_ref.activity_id
+                                                 ))
+      assert_eventually do
+        err = assert_raises(Temporalio::Error::AsyncActivityCanceledError) do
+          env.client.async_activity_handle(id_ref).heartbeat
+        end
+        refute err.details.cancel_requested?
+        refute err.details.paused?
+        assert err.details.reset?
+      end
     end
   end
 

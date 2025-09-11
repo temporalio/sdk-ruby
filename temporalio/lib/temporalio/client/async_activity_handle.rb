@@ -29,6 +29,7 @@ module Temporalio
       # @param details [Array<Object>] Details of the heartbeat.
       # @param detail_hints [Array<Object>, nil] Converter hints for the details.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      # @raise [Error::AsyncActivityCanceledError] If the activity was canceled, paused, and/or reset.
       def heartbeat(*details, detail_hints: nil, rpc_options: nil)
         @client._impl.heartbeat_async_activity(Interceptor::HeartbeatAsyncActivityInput.new(
                                                  task_token_or_id_reference:,

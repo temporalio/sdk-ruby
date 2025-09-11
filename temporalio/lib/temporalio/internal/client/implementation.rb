@@ -2,6 +2,7 @@
 
 require 'google/protobuf/well_known_types'
 require 'securerandom'
+require 'temporalio/activity'
 require 'temporalio/api'
 require 'temporalio/client/activity_id_reference'
 require 'temporalio/client/async_activity_handle'
@@ -829,9 +830,13 @@ module Temporalio
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
                  end
-          raise Error::AsyncActivityCanceledError if resp.cancel_requested
+          return unless resp.cancel_requested || resp.activity_paused || resp.activity_reset
 
-          nil
+          raise Error::AsyncActivityCanceledError, Activity::CancellationDetails.new(
+            cancel_requested: resp.cancel_requested,
+            paused: resp.activity_paused,
+            reset: resp.activity_reset
+          )
         end
 
         def complete_async_activity(input)

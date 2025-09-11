@@ -35,6 +35,16 @@ module Temporalio
       def initialize: -> void
     end
 
+    class ScheduleAlreadyRunningError < Error
+      def initialize: -> void
+    end
+
+    class AsyncActivityCanceledError < Error
+      attr_reader details: Activity::CancellationDetails
+
+      def initialize: (Activity::CancellationDetails details) -> void
+    end
+
     class RPCError < Error
       attr_reader code: Code::enum
 
