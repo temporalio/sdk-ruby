@@ -4,6 +4,7 @@ require 'base64_codec'
 require 'gc_utils'
 require 'net/http'
 require 'temporalio/client'
+require 'temporalio/error'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
@@ -542,6 +543,10 @@ class WorkerWorkflowTest < Test
       return past_run_ids if past_run_ids.size == 5
 
       past_run_ids << Temporalio::Workflow.info.continued_run_id if Temporalio::Workflow.info.continued_run_id
+      if !past_run_ids.empty? && Temporalio::Workflow.info.first_execution_run_id != past_run_ids.first
+        raise Temporalio::Error::ApplicationError.new('wrong first_execution_run_id', non_retryable: true)
+      end
+
       raise Temporalio::Workflow::ContinueAsNewError.new(
         past_run_ids,
         memo: { past_run_id_count: past_run_ids.size },
