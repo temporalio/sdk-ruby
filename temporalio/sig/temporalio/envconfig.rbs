@@ -66,7 +66,6 @@ module Temporalio
 
       def self.load: (
         ?config_source: (Pathname | String)?,
-        ?disable_file: bool,
         ?config_file_strict: bool,
         ?override_env_vars: Hash[String, String]?
       ) -> ClientConfig

@@ -336,12 +336,6 @@ class EnvConfigTest < Test
     end
   end
 
-  def test_load_profiles_disable_file
-    # With no env vars, should be empty
-    client_config = Temporalio::EnvConfig::ClientConfig.load(disable_file: true, override_env_vars: {})
-    assert_empty client_config.profiles
-  end
-
   def test_default_profile_not_found_returns_empty_profile
     toml = <<~TOML
       [profile.existing]

@@ -254,13 +254,11 @@ module Temporalio
       # (TEMPORAL_CONFIG_FILE).
       #
       # @param config_source [Pathname, String, nil] Configuration source
-      # @param disable_file [Boolean] If true, file loading is disabled
       # @param config_file_strict [Boolean] If true, will error on unrecognized keys
       # @param override_env_vars [Hash, nil] Environment variables to use
       # @return [ClientConfig] The client configuration
       def self.load(
         config_source: nil,
-        disable_file: false,
         config_file_strict: false,
         override_env_vars: nil
       )
@@ -269,7 +267,6 @@ module Temporalio
         loaded_profiles = Internal::Bridge::EnvConfig.load_client_config(
           path,
           data,
-          disable_file,
           config_file_strict,
           override_env_vars || {}
         )

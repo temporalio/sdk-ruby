@@ -117,19 +117,14 @@ fn load_client_config_inner(
     ruby: &Ruby,
     config_source: Option<DataSource>,
     config_file_strict: bool,
-    disable_file: bool,
     env_vars: Option<HashMap<String, String>>,
 ) -> Result<RHash, Error> {
-    let core_config = if disable_file {
-        CoreClientConfig::default()
-    } else {
-        let options = LoadClientConfigOptions {
-            config_source,
-            config_file_strict,
-        };
-        core_load_client_config(options, env_vars.as_ref())
-            .map_err(|e| error!("EnvConfig error: {}", e))?
+    let options = LoadClientConfigOptions {
+        config_source,
+        config_file_strict,
     };
+    let core_config = core_load_client_config(options, env_vars.as_ref())
+        .map_err(|e| error!("EnvConfig error: {}", e))?;
 
     core_config_to_hash(ruby, &core_config)
 }
@@ -157,18 +152,18 @@ fn load_client_connect_config_inner(
     profile_to_hash(ruby, &profile)
 }
 
-// load_client_config(path: String|nil, data: String|nil, disable_file: bool, config_file_strict: bool, env_vars: Hash|nil)
+// load_client_config(path: String|nil, data: String|nil, config_file_strict: bool, env_vars: Hash|nil)
 fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
     let ruby = Ruby::get().expect("Not in Ruby thread");
     let args = scan_args::scan_args::<
-        (Option<String>, Option<RString>, bool, bool),
+        (Option<String>, Option<RString>, bool),
         (Option<HashMap<String, String>>,),
         (),
         (),
         (),
         (),
     >(args)?;
-    let (path, data, disable_file, config_file_strict) = args.required;
+    let (path, data, config_file_strict) = args.required;
     let (env_vars,) = args.optional;
 
     let config_source = match (path, data) {
@@ -189,7 +184,6 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         &ruby,
         config_source,
         config_file_strict,
-        disable_file,
         env_vars,
     )
 }
