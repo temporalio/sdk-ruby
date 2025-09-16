@@ -63,10 +63,12 @@ module Temporalio
         class TunerSlotSupplierOptions
           attr_accessor fixed_size: Integer?
           attr_accessor resource_based: TunerResourceBasedSlotSupplierOptions?
+          attr_accessor custom: CustomSlotSupplier?
 
           def initialize: (
             fixed_size: Integer?,
-            resource_based: TunerResourceBasedSlotSupplierOptions?
+            resource_based: TunerResourceBasedSlotSupplierOptions?,
+            custom: CustomSlotSupplier?
           ) -> void
         end
 
@@ -93,6 +95,32 @@ module Temporalio
         def complete_activity_task: (untyped proto) -> void
 
         def complete_activity_task_in_background: (untyped proto) -> void
+
+        class CustomSlotSupplier
+          def initialize: (
+            slot_supplier: Temporalio::Worker::Tuner::SlotSupplier::Custom,
+            thread_pool: Temporalio::Worker::ThreadPool?
+          ) -> void
+
+          def reserve_slot: (
+            Temporalio::Worker::Tuner::SlotSupplier::Custom::ReserveContext context,
+            Temporalio::Cancellation cancellation
+          ) { (untyped) -> void } -> void
+
+          def try_reserve_slot: (
+            Temporalio::Worker::Tuner::SlotSupplier::Custom::ReserveContext context
+          ) { (untyped) -> void } -> void
+
+          def mark_slot_used: (
+            Temporalio::Worker::Tuner::SlotSupplier::Custom::MarkUsedContext context
+          ) { (untyped) -> void } -> void
+
+          def release_slot: (
+            Temporalio::Worker::Tuner::SlotSupplier::Custom::ReleaseContext context
+          ) { (untyped) -> void } -> void
+
+          def run_user_code: [T] { -> T } -> T
+        end
 
         # Defined in Rust
 

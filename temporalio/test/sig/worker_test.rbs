@@ -1,0 +1,7 @@
+class WorkerTest < Test
+  class TrackingSlotSupplier < Temporalio::Worker::Tuner::SlotSupplier::Custom
+    attr_reader events: Array[[Symbol, untyped]]
+
+    def add_event: (Symbol method, untyped context) -> void
+  end
+end

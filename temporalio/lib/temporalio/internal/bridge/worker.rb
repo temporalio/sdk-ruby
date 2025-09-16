@@ -40,6 +40,7 @@ module Temporalio
         TunerSlotSupplierOptions = Struct.new(
           :fixed_size,
           :resource_based,
+          :custom,
           keyword_init: true
         )
 
@@ -102,6 +103,55 @@ module Temporalio
           queue = Queue.new
           # TODO(cretz): Log error on this somehow?
           async_complete_activity_task(proto.to_proto, queue)
+        end
+
+        class CustomSlotSupplier
+          def initialize(slot_supplier:, thread_pool:)
+            @slot_supplier = slot_supplier
+            @thread_pool = thread_pool
+          end
+
+          def reserve_slot(context, cancellation, &block)
+            run_user_code do
+              @slot_supplier.reserve_slot(context, cancellation) { |v| block.call(v) }
+            rescue Exception => e # rubocop:disable Lint/RescueException
+              block.call(e)
+            end
+          end
+
+          def try_reserve_slot(context, &block)
+            run_user_code do
+              block.call(@slot_supplier.try_reserve_slot(context))
+            rescue Exception => e # rubocop:disable Lint/RescueException
+              block.call(e)
+            end
+          end
+
+          def mark_slot_used(context, &block)
+            run_user_code do
+              block.call(@slot_supplier.mark_slot_used(context))
+            rescue Exception => e # rubocop:disable Lint/RescueException
+              block.call(e)
+            end
+          end
+
+          def release_slot(context, &block)
+            run_user_code do
+              block.call(@slot_supplier.release_slot(context))
+            rescue Exception => e # rubocop:disable Lint/RescueException
+              block.call(e)
+            end
+          end
+
+          private
+
+          def run_user_code(&)
+            if @thread_pool
+              @thread_pool.execute(&)
+            else
+              yield
+            end
+          end
         end
       end
     end

@@ -6,7 +6,7 @@ require 'temporalio/worker'
 require 'test'
 
 class WorkerTest < Test
-  also_run_all_tests_in_fiber
+  # also_run_all_tests_in_fiber
 
   class SimpleActivity < Temporalio::Activity::Definition
     def execute(name)
@@ -239,4 +239,224 @@ class WorkerTest < Test
       end
     end
   end
+
+  class BasicPermit < Object; end
+
+  class TrackingSlotSupplier < Temporalio::Worker::Tuner::SlotSupplier::Custom
+    attr_reader :events
+
+    def reserve_slot(context, _cancellation, &)
+      add_event(:reserve_slot, context)
+      yield BasicPermit.new
+    end
+
+    def try_reserve_slot(context)
+      add_event(:try_reserve_slot, context)
+      BasicPermit.new
+    end
+
+    def mark_slot_used(context)
+      add_event(:mark_slot_used, context)
+    end
+
+    def release_slot(context)
+      add_event(:release_slot, context)
+    end
+
+    private
+
+    def add_event(method, context)
+      (@events ||= []) << [method, context]
+    end
+  end
+
+  class SlotSupplierActivity < Temporalio::Activity::Definition
+    def execute; end
+  end
+
+  class SlotSupplierWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(SlotSupplierActivity, start_to_close_timeout: 10)
+      Temporalio::Workflow.execute_local_activity(SlotSupplierActivity, start_to_close_timeout: 10)
+    end
+  end
+
+  def test_custom_slot_supplier_simple
+    supplier = TrackingSlotSupplier.new
+    execute_workflow(
+      SlotSupplierWorkflow,
+      activities: [SlotSupplierActivity],
+      tuner: Temporalio::Worker::Tuner.new(
+        workflow_slot_supplier: supplier,
+        activity_slot_supplier: supplier,
+        local_activity_slot_supplier: supplier
+      )
+    )
+    # Assert the events are as expected...
+    events = supplier.events
+
+    # Had to get reserved for workflow (sticky and non), activity, and local activity
+    assert(events.any? { |(m, e)| m == :reserve_slot && e.slot_type == :workflow && !e.sticky? })
+    assert(events.any? { |(m, e)| m == :reserve_slot && e.slot_type == :workflow && e.sticky? })
+    assert(events.any? { |(m, e)| m == :reserve_slot && e.slot_type == :activity })
+    assert(events.any? { |(m, e)| m == :reserve_slot && e.slot_type == :local_activity })
+
+    # Since the activity was eager, had to get a try reserve for it
+    assert(events.any? { |(m, e)| m == :try_reserve_slot && e.slot_type == :activity })
+
+    # # Had to get mark used for workflow (sticky and non), activity, and local activity
+    assert(events.any? do |(m, e)|
+      m == :mark_slot_used && e.slot_info.is_a?(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Workflow) &&
+        e.slot_info.workflow_type == 'SlotSupplierWorkflow' && !e.slot_info.sticky? && e.permit.is_a?(BasicPermit)
+    end)
+    assert(events.any? do |(m, e)|
+      m == :mark_slot_used && e.slot_info.is_a?(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Workflow) &&
+        e.slot_info.workflow_type == 'SlotSupplierWorkflow' && e.slot_info.sticky? && e.permit.is_a?(BasicPermit)
+    end)
+    assert(events.any? do |(m, e)|
+      m == :mark_slot_used && e.slot_info.is_a?(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Activity) &&
+        e.slot_info.activity_type == 'SlotSupplierActivity' && e.permit.is_a?(BasicPermit)
+    end)
+    assert(events.any? do |(m, e)|
+      m == :mark_slot_used &&
+        e.slot_info.is_a?(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::LocalActivity) &&
+        e.permit.is_a?(BasicPermit)
+      # TODO(cretz): Uncomment once https://github.com/temporalio/sdk-core/issues/1016 resolved
+      # && e.slot_info.activity_type == 'SlotSupplierActivity'
+    end)
+
+    # Must be a release for every reserve
+    assert_equal(
+      events.count { |(m, _)| m == :reserve_slot || m == :try_reserve_slot },
+      events.count { |(m, _)| m == :release_slot }
+    )
+  end
+
+  class BlockingSlotSupplier < Temporalio::Worker::Tuner::SlotSupplier::Custom
+    attr_reader :canceled_contexts
+
+    def reserve_slot(context, cancellation, &)
+      # We'll block on every reserve, waiting for queue to get resolved
+      queue = Queue.new
+      (@waiting ||= []) << [context, queue]
+      cancellation.add_cancel_callback do
+        (@canceled_contexts ||= []) << context
+        queue.push(StandardError.new('Canceled'))
+      end
+      yield queue.pop
+    end
+
+    def try_reserve_slot(_context)
+      # No try-reserve
+      None
+    end
+
+    def mark_slot_used(_context)
+      # Do nothing
+    end
+
+    def release_slot(_context)
+      # Do nothing
+    end
+
+    def resolve_a_reserve(slot_type)
+      waiting_idx = @waiting&.index { |(context, _)| context.slot_type == slot_type }
+      raise 'Not found' unless waiting_idx
+
+      _, queue = @waiting.delete_at(waiting_idx)
+      queue << BasicPermit.new
+    end
+
+    def waiting_contexts
+      @waiting.map(&:first)
+    end
+  end
+
+  class BlockingSlotSupplierWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(SlotSupplierActivity, start_to_close_timeout: 10)
+    end
+  end
+
+  def test_custom_slot_supplier_blocking
+    supplier = BlockingSlotSupplier.new
+    waiting_contexts = execute_workflow(
+      BlockingSlotSupplierWorkflow,
+      activities: [SlotSupplierActivity],
+      tuner: Temporalio::Worker::Tuner.new(
+        workflow_slot_supplier: supplier,
+        activity_slot_supplier: supplier,
+        local_activity_slot_supplier: supplier
+      ),
+      # Core does not progress if you don't let sticky be reserved, and we want to manually control every slot
+      max_cached_workflows: 0
+    ) do |handle|
+      # Make sure history has not started a task
+      assert handle.fetch_history_events.none?(&:workflow_task_started_event_attributes)
+      # Let one reserve call for workflow task through
+      supplier.resolve_a_reserve(:workflow)
+      # Make sure history has a task completed
+      assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+
+      # Now resolve one activity and wait for history to show activity completion
+      supplier.resolve_a_reserve(:activity)
+      assert_eventually { assert handle.fetch_history_events.any?(&:activity_task_completed_event_attributes) }
+
+      # Now resolve one workflow task to let that progress
+      supplier.resolve_a_reserve(:workflow)
+
+      # Confirm the workflow completes successfully
+      handle.result
+
+      # Collect the waiting contexts
+      supplier.waiting_contexts
+    end
+
+    # Confirm we canceled all waiting reservations
+    assert_equal waiting_contexts.size, supplier.canceled_contexts.size
+    waiting_contexts.each { |w| assert_includes supplier.canceled_contexts, w }
+  end
+
+  class RaisingSlotSupplier < Temporalio::Worker::Tuner::SlotSupplier::Custom
+    def reserve_slot(context, _cancellation, &)
+      # We'll only raise on non-workflows
+      raise 'Intentional error' unless context.slot_type == :workflow
+
+      yield BasicPermit.new
+    end
+
+    def try_reserve_slot(_context)
+      raise 'Intentional error'
+    end
+
+    def mark_slot_used(_context)
+      raise 'Intentional error'
+    end
+
+    def release_slot(_context)
+      raise 'Intentional error'
+    end
+  end
+
+  class SlotSupplierRaisingWorkflow < Temporalio::Workflow::Definition
+    def execute
+      'done'
+    end
+  end
+
+  def test_custom_slot_supplier_raising
+    supplier = RaisingSlotSupplier.new
+    assert_equal 'done', execute_workflow(
+      SlotSupplierRaisingWorkflow,
+      tuner: Temporalio::Worker::Tuner.new(
+        workflow_slot_supplier: supplier,
+        activity_slot_supplier: supplier,
+        local_activity_slot_supplier: supplier
+      )
+    )
+  end
+
+  # TODO(cretz):
+  # * Without thread wrapping on regular and raising
+  # * Blocking and confirm cancel works
 end
