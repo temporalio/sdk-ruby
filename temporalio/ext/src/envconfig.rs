@@ -180,12 +180,7 @@ fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
         }
     };
 
-    load_client_config_inner(
-        &ruby,
-        config_source,
-        config_file_strict,
-        env_vars,
-    )
+    load_client_config_inner(&ruby, config_source, config_file_strict, env_vars)
 }
 
 // load_client_connect_config(profile: String|nil, path: String|nil, data: String|nil, disable_file: bool, disable_env: bool, config_file_strict: bool, env_vars: Hash|nil)
