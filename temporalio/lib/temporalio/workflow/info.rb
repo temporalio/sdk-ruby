@@ -7,6 +7,7 @@ module Temporalio
       :continued_run_id,
       :cron_schedule,
       :execution_timeout,
+      :first_execution_run_id,
       :headers,
       :last_failure,
       :last_result,
@@ -35,6 +36,8 @@ module Temporalio
     #   @return [String, nil] Cron schedule if applicable.
     # @!attribute execution_timeout
     #   @return [Float, nil] Execution timeout for the workflow.
+    # @!attribute first_execution_run_id
+    #   @return [String] The very first run ID the workflow ever had, following continuation chains.
     # @!attribute headers
     #   @return [Hash<String, Api::Common::V1::Payload>] Headers.
     # @!attribute last_failure
