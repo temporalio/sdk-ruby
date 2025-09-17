@@ -357,10 +357,13 @@ class EnvConfigTest < Test
     config_toml = "[profile.default]\naddress = 'some-host:1234'\napi_key = 'my-key'"
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: config_toml)
     assert_equal 'my-key', profile.api_key
-    refute_nil profile.tls
+    # No TLS object should have been created
+    assert_nil profile.tls
 
     _, kwargs = profile.to_client_connect_options
-    refute_nil kwargs[:tls]
+    # Expect to_client_connect_config call to set TLS to True
+    # due to presence of api key.
+    assert_equal true, kwargs[:tls]
     assert_equal 'my-key', kwargs[:api_key]
   end
 
