@@ -143,7 +143,8 @@ class Test < Minitest::Test
 
     def initialize
       # Start workflow env for an existing server if env vars present
-      if ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST'].blank?
+      target_host = ENV['TEMPORAL_TEST_CLIENT_TARGET_HOST']
+      if target_host.nil? || target_host.empty?
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
           dev_server_extra_args: [
@@ -162,7 +163,7 @@ class Test < Minitest::Test
         end
       else
         client = Temporalio::Client.connect(
-          ENV.fetch('TEMPORAL_TEST_CLIENT_TARGET_HOST'),
+          target_host,
           ENV['TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE'] || 'default',
           logger: Logger.new($stdout)
         )

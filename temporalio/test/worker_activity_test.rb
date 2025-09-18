@@ -264,9 +264,9 @@ class WorkerActivityTest < Test
     assert_equal 1, info.attempt
     refute_nil info.current_attempt_scheduled_time
     assert_equal false, info.local?
+    refute_nil info.retry_policy
     refute_nil info.schedule_to_close_timeout
     refute_nil info.scheduled_time
-    refute_nil info.current_attempt_scheduled_time
     refute_nil info.start_to_close_timeout
     refute_nil info.started_time
     refute_nil info.task_queue

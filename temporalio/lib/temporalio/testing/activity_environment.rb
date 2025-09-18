@@ -25,6 +25,7 @@ module Temporalio
           local?: false,
           priority: Temporalio::Priority.default,
           raw_heartbeat_details: [],
+          retry_policy: RetryPolicy.new,
           schedule_to_close_timeout: 1.0,
           scheduled_time: Time.at(0),
           start_to_close_timeout: 1.0,
