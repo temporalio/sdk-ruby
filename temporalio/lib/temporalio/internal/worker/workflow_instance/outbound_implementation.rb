@@ -114,7 +114,8 @@ module Temporalio
                     local_retry_threshold: ProtoUtils.seconds_to_duration(input.local_retry_threshold),
                     attempt: do_backoff&.attempt || 0,
                     original_schedule_time: do_backoff&.original_schedule_time
-                  )
+                  ),
+                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
                 )
               )
               seq

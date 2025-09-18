@@ -130,6 +130,7 @@ module Temporalio
           def execute_local_activity(
             activity,
             *args,
+            summary:,
             schedule_to_close_timeout:,
             schedule_to_start_timeout:,
             start_to_close_timeout:,
@@ -157,6 +158,7 @@ module Temporalio
               Temporalio::Worker::Interceptor::Workflow::ExecuteLocalActivityInput.new(
                 activity:,
                 args:,
+                summary:,
                 schedule_to_close_timeout:,
                 schedule_to_start_timeout:,
                 start_to_close_timeout:,
