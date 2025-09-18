@@ -213,7 +213,7 @@ module Temporalio
       # @return [Array] Tuple of [positional_args, keyword_args] that can be splatted to Client.connect
       def to_client_connect_options
         positional_args = [address, namespace].compact
-        tls_value = nil
+        tls_value = false
         if tls
           tls_value = tls.to_client_tls_options
         elsif api_key

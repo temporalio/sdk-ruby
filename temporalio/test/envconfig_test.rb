@@ -78,7 +78,7 @@ class EnvConfigTest < Test
       args, kwargs = profile.to_client_connect_options
       assert_equal 'default-address', args[0]
       assert_equal 'default-namespace', args[1]
-      assert_nil kwargs[:tls]
+      assert_equal false, kwargs[:tls]
       rpc_meta = kwargs[:rpc_metadata]
       if rpc_meta.nil?
         assert_nil rpc_meta
@@ -119,7 +119,7 @@ class EnvConfigTest < Test
     args, kwargs = profile.to_client_connect_options
     assert_equal 'default-address', args[0]
     assert_equal 'default-namespace', args[1]
-    assert_nil kwargs[:tls]
+    assert_equal false, kwargs[:tls]
   end
 
   def test_load_profile_from_data_custom
@@ -889,7 +889,7 @@ class EnvConfigTest < Test
     assert_equal 'localhost:7233', dev_client.connection.target_host
     assert_equal 'dev', dev_client.namespace
     assert_nil dev_client.connection.options.api_key
-    assert_nil dev_client.connection.options.tls
+    assert_equal false, dev_client.connection.options.tls
 
     assert_equal 'prod.tmprl.cloud:443', prod_client.connection.target_host
     assert_equal 'prod', prod_client.namespace
