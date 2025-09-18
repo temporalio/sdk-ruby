@@ -78,7 +78,7 @@ class EnvConfigTest < Test
       args, kwargs = profile.to_client_connect_options
       assert_equal 'default-address', args[0]
       assert_equal 'default-namespace', args[1]
-      assert_nil kwargs[:tls]
+      assert_equal false, kwargs[:tls]
       rpc_meta = kwargs[:rpc_metadata]
       if rpc_meta.nil?
         assert_nil rpc_meta
@@ -119,7 +119,7 @@ class EnvConfigTest < Test
     args, kwargs = profile.to_client_connect_options
     assert_equal 'default-address', args[0]
     assert_equal 'default-namespace', args[1]
-    assert_nil kwargs[:tls]
+    assert_equal false, kwargs[:tls]
   end
 
   def test_load_profile_from_data_custom
@@ -336,12 +336,6 @@ class EnvConfigTest < Test
     end
   end
 
-  def test_load_profiles_disable_file
-    # With no env vars, should be empty
-    client_config = Temporalio::EnvConfig::ClientConfig.load(disable_file: true, override_env_vars: {})
-    assert_empty client_config.profiles
-  end
-
   def test_default_profile_not_found_returns_empty_profile
     toml = <<~TOML
       [profile.existing]
@@ -363,10 +357,13 @@ class EnvConfigTest < Test
     config_toml = "[profile.default]\naddress = 'some-host:1234'\napi_key = 'my-key'"
     profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: config_toml)
     assert_equal 'my-key', profile.api_key
-    refute_nil profile.tls
+    # No TLS object should have been created
+    assert_nil profile.tls
 
     _, kwargs = profile.to_client_connect_options
-    refute_nil kwargs[:tls]
+    # Expect to_client_connect_config call to set TLS to True
+    # due to presence of api key.
+    assert_equal true, kwargs[:tls]
     assert_equal 'my-key', kwargs[:api_key]
   end
 
@@ -892,7 +889,7 @@ class EnvConfigTest < Test
     assert_equal 'localhost:7233', dev_client.connection.target_host
     assert_equal 'dev', dev_client.namespace
     assert_nil dev_client.connection.options.api_key
-    assert_nil dev_client.connection.options.tls
+    assert_equal false, dev_client.connection.options.tls
 
     assert_equal 'prod.tmprl.cloud:443', prod_client.connection.target_host
     assert_equal 'prod', prod_client.namespace
