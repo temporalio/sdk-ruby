@@ -228,6 +228,7 @@ module Temporalio
         ExecuteLocalActivityInput = Data.define(
           :activity,
           :args,
+          :summary,
           :schedule_to_close_timeout,
           :schedule_to_start_timeout,
           :start_to_close_timeout,

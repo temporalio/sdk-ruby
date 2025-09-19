@@ -175,6 +175,7 @@ module Temporalio
         class ExecuteLocalActivityInput
           attr_reader activity: String
           attr_reader args: Array[Object?]
+          attr_reader summary: String?
           attr_reader schedule_to_close_timeout: duration?
           attr_reader schedule_to_start_timeout: duration?
           attr_reader start_to_close_timeout: duration?
@@ -190,6 +191,7 @@ module Temporalio
           def initialize: (
             activity: String,
             args: Array[Object?],
+            summary: String?,
             schedule_to_close_timeout: duration?,
             schedule_to_start_timeout: duration?,
             start_to_close_timeout: duration?,

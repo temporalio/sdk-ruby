@@ -62,6 +62,7 @@ module Temporalio
     def self.execute_local_activity: (
       singleton(Activity::Definition) | Symbol | String activity,
       *Object? args,
+      ?summary: String?,
       ?schedule_to_close_timeout: duration?,
       ?schedule_to_start_timeout: duration?,
       ?start_to_close_timeout: duration?,

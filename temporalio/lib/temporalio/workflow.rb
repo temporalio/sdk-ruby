@@ -208,14 +208,16 @@ module Temporalio
     #
     # @param activity [Class<Activity::Definition>, Symbol, String] Activity definition class or name.
     # @param args [Array<Object>] Arguments to the activity.
+    # @param summary [String, nil] Single-line summary for this activity that may appear in CLI/UI. This can be in
+    #   single-line Temporal markdown format. This is currently experimental.
     # @param schedule_to_close_timeout [Float, nil] Max amount of time the activity can take from first being scheduled
     #   to being completed before it times out. This is inclusive of all retries.
     # @param schedule_to_start_timeout [Float, nil] Max amount of time the activity can take to be started from first
     #   being scheduled.
     # @param start_to_close_timeout [Float, nil] Max amount of time a single activity run can take from when it starts
     #   to when it completes. This is per retry.
-    # @param retry_policy [RetryPolicy] How an activity is retried on failure. If unset, a server-defined default is
-    #   used. Set maximum attempts to 1 to disable retries.
+    # @param retry_policy [RetryPolicy, nil] How an activity is retried on failure. If unset, a default policy is used.
+    #   Set maximum attempts to 1 to disable retries.
     # @param local_retry_threshold [Float, nil] If the activity is retrying and backoff would exceed this value, a timer
     #   is scheduled and the activity is retried after. Otherwise, backoff will happen internally within the task.
     #   Defaults to 1 minute.
@@ -238,6 +240,7 @@ module Temporalio
     def self.execute_local_activity(
       activity,
       *args,
+      summary: nil,
       schedule_to_close_timeout: nil,
       schedule_to_start_timeout: nil,
       start_to_close_timeout: nil,
@@ -251,7 +254,7 @@ module Temporalio
     )
       _current.execute_local_activity(
         activity, *args,
-        schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
+        summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         retry_policy:, local_retry_threshold:, cancellation:, cancellation_type:,
         activity_id:, arg_hints:, result_hint:
       )
