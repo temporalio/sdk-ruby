@@ -455,8 +455,4 @@ class WorkerTest < Test
       )
     )
   end
-
-  # TODO(cretz):
-  # * Without thread wrapping on regular and raising
-  # * Blocking and confirm cancel works
 end
