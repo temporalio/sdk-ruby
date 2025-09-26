@@ -6,7 +6,7 @@ require 'temporalio/worker'
 require 'test'
 
 class WorkerTest < Test
-  # also_run_all_tests_in_fiber
+  also_run_all_tests_in_fiber
 
   class SimpleActivity < Temporalio::Activity::Definition
     def execute(name)

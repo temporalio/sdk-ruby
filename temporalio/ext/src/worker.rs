@@ -700,7 +700,7 @@ impl<SK: SlotKind + Send + Sync> SlotSupplier for CustomSlotSupplier<SK> {
                     return SlotSupplierPermit::with_user_data(Arc::new(permit));
                 }
                 Err(err) => {
-                    log::error!("Reserve failed: {err}");
+                    log::error!("Slot reserve failed: {err}");
                     tokio::time::sleep(std::time::Duration::from_secs(1)).await
                 }
             }
@@ -722,7 +722,7 @@ impl<SK: SlotKind + Send + Sync> SlotSupplier for CustomSlotSupplier<SK> {
         match res {
             Ok(v) => v.map(|v| SlotSupplierPermit::with_user_data(Arc::new(v))),
             Err(err) => {
-                log::error!("Try reserve failed: {err}");
+                log::error!("Slot try-reserve failed: {err}");
                 None
             }
         }
@@ -842,7 +842,7 @@ impl<SK: SlotKind> CustomSlotSupplier<SK> {
         // and block this thread, but we have told users they should not block on these sync calls.
         result_rx
             .recv()
-            .map_err(|_| "Call canceled".to_string())
+            .map_err(|err| format!("Call canceled: {err}"))
             .flatten()
     }
 
