@@ -294,6 +294,29 @@ impl RuntimeHandle {
         });
     }
 
+    /// Same as spawn, but does not spawn in a background Tokio task and does not provide a
+    /// non-GVL awaitable. This simply submits the callback to the Ruby thread inline and
+    /// returns.
+    pub(crate) fn spawn_sync_inline<F>(&self, with_gvl: F)
+    where
+        F: FnOnce(Ruby) -> Result<(), Error> + Send + 'static,
+    {
+        // Ignore fail to send in rare case that the runtime/handle is
+        // dropped before this Tokio future runs
+        let _ = self
+            .async_command_tx
+            .clone()
+            .send(AsyncCommand::RunCallback(Box::new(
+                move || match Ruby::get() {
+                    Ok(ruby) => with_gvl(ruby),
+                    Err(err) => {
+                        log_error!("Unable to get Ruby instance in async callback: {}", err);
+                        Ok(())
+                    }
+                },
+            )));
+    }
+
     pub(crate) fn fork_check(&self, action: &'static str) -> Result<(), Error> {
         if self.pid != std::process::id() {
             Err(error!(

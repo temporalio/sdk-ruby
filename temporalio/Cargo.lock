@@ -3205,7 +3205,9 @@ dependencies = [
 name = "temporalio_bridge"
 version = "0.1.0"
 dependencies = [
+ "async-trait",
  "futures",
+ "log",
  "magnus",
  "parking_lot",
  "prost",

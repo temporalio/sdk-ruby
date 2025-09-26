@@ -32,7 +32,8 @@ module WorkflowUtils
     on_worker_run: nil,
     unsafe_workflow_io_enabled: false,
     priority: Temporalio::Priority.default,
-    start_workflow_client: client
+    start_workflow_client: client,
+    tuner: Temporalio::Worker::Tuner.create_fixed
   )
     worker = Temporalio::Worker.new(
       client:,
@@ -45,7 +46,8 @@ module WorkflowUtils
       workflow_payload_codec_thread_pool:,
       max_heartbeat_throttle_interval:,
       interceptors:,
-      unsafe_workflow_io_enabled:
+      unsafe_workflow_io_enabled:,
+      tuner:
     )
     worker.run do
       on_worker_run&.call

@@ -18,12 +18,58 @@ module Temporalio
           ) -> void
         end
 
-        def _to_bridge_options: -> Internal::Bridge::Worker::TunerSlotSupplierOptions
+        class Custom < SlotSupplier
+          def reserve_slot: (ReserveContext context, Cancellation cancellation) { (untyped) -> void } -> void
+
+          def try_reserve_slot: (ReserveContext context) -> untyped
+
+          def mark_slot_used: (MarkUsedContext context) -> void
+
+          def release_slot: (ReleaseContext context) -> void
+
+          class ReserveContext
+            attr_reader slot_type: :workflow | :activity | :local_activity | :nexus
+            attr_reader task_queue: String
+            attr_reader worker_identity: String
+            attr_reader worker_deployment_name: String
+            attr_reader worker_build_id: String
+            attr_reader sticky?: bool
+          end
+
+          class MarkUsedContext
+            attr_reader slot_info: SlotInfo::Workflow | SlotInfo::Activity | SlotInfo::LocalActivity | SlotInfo::Nexus
+            attr_reader permit: untyped
+          end
+
+          class ReleaseContext
+            attr_reader slot_info: SlotInfo::Workflow | SlotInfo::Activity | SlotInfo::LocalActivity | SlotInfo::Nexus | nil
+            attr_reader permit: untyped
+          end
+
+          module SlotInfo
+            class Workflow
+              attr_reader workflow_type: String
+              attr_reader sticky?: bool
+            end
+            class Activity
+              attr_reader activity_type: String
+            end
+            class LocalActivity
+              attr_reader activity_type: String
+            end
+            class Nexus
+              attr_reader service: String
+              attr_reader operation: String
+            end
+          end
+        end
+
+        def _to_bridge_options: (Tuner tuner) -> Internal::Bridge::Worker::TunerSlotSupplierOptions
       end
 
       class ResourceBasedTunerOptions
-        attr_accessor target_memory_usage: Float
-        attr_accessor target_cpu_usage: Float
+        attr_reader target_memory_usage: Float
+        attr_reader target_cpu_usage: Float
 
         def initialize: (
           target_memory_usage: Float,
@@ -32,9 +78,9 @@ module Temporalio
       end
 
       class ResourceBasedSlotOptions
-        attr_accessor min_slots: Integer?
-        attr_accessor max_slots: Integer?
-        attr_accessor ramp_throttle: Float?
+        attr_reader min_slots: Integer?
+        attr_reader max_slots: Integer?
+        attr_reader ramp_throttle: Float?
 
         def initialize: (
           min_slots: Integer?,
@@ -60,11 +106,13 @@ module Temporalio
       attr_reader workflow_slot_supplier: SlotSupplier
       attr_reader activity_slot_supplier: SlotSupplier
       attr_reader local_activity_slot_supplier: SlotSupplier
+      attr_reader custom_slot_supplier_thread_pool: ThreadPool?
 
       def initialize: (
         workflow_slot_supplier: SlotSupplier,
         activity_slot_supplier: SlotSupplier,
-        local_activity_slot_supplier: SlotSupplier
+        local_activity_slot_supplier: SlotSupplier,
+        ?custom_slot_supplier_thread_pool: ThreadPool?
       ) -> void
 
       def _to_bridge_options: -> Internal::Bridge::Worker::TunerOptions
