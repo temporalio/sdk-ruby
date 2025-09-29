@@ -906,6 +906,8 @@ fn start_supplier_call_in_ruby(
             }
         } else if let Some(on_success) = on_success.take() {
             on_success(ruby, result);
+        } else {
+            log::error!("Custom slot supplier callback unexpectedly invoked multiple times");
         }
     });
 

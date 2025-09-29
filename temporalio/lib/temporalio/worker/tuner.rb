@@ -118,8 +118,8 @@ module Temporalio
 
           # Reserve a slot.
           #
-          # This can/should block and must provide the permit to the block. The permit is any object (including nil)
-          # that will be given on the context for mark_slot_used and release_slot.
+          # This can/should block and must provide the permit to the (code) block. The permit is any object (including
+          # nil) that will be given on the context for mark_slot_used and release_slot.
           #
           # Just returning from this call is not enough to reserve the slot, a permit must be provided to the block
           # (e.g. via yield or block.call). If the call completes, the system will still wait on the block (so this can
