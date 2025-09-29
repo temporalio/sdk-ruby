@@ -391,6 +391,12 @@ class WorkerTest < Test
     ) do |handle|
       # Make sure history has not started a task
       assert handle.fetch_history_events.none?(&:workflow_task_started_event_attributes)
+      # Some slower test runners don't start asking for reserve until after we've reached here, so we will wait until
+      # we see reservation requests for workflow and activity
+      assert_eventually do
+        assert(supplier.waiting_contexts.any? { |ctx| ctx.slot_type == :workflow })
+        assert(supplier.waiting_contexts.any? { |ctx| ctx.slot_type == :activity })
+      end
       # Let one reserve call for workflow task through
       supplier.resolve_a_reserve(:workflow)
       # Make sure history has a task completed
