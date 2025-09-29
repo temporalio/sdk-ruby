@@ -46,6 +46,14 @@ macro_rules! id {
     }};
 }
 
+#[macro_export]
+macro_rules! lazy_id {
+    ($str:expr) => {{
+        static VAL: magnus::value::LazyId = magnus::value::LazyId::new($str);
+        &VAL
+    }};
+}
+
 #[magnus::init]
 fn init(ruby: &Ruby) -> Result<(), Error> {
     Lazy::force(&ROOT_ERR, ruby);
