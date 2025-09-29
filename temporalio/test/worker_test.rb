@@ -320,9 +320,7 @@ class WorkerTest < Test
     assert(events.any? do |(m, e)|
       m == :mark_slot_used &&
         e.slot_info.is_a?(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::LocalActivity) &&
-        e.permit.is_a?(BasicPermit)
-      # TODO(cretz): Uncomment once https://github.com/temporalio/sdk-core/issues/1016 resolved
-      # && e.slot_info.activity_type == 'SlotSupplierActivity'
+        e.slot_info.activity_type == 'SlotSupplierActivity' && e.permit.is_a?(BasicPermit)
     end)
 
     # Must be a release for every reserve
