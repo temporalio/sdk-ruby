@@ -185,6 +185,7 @@ module Temporalio
               payloads = codec.decode(payloads) if codec
               payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
             end,
+            retry_policy: (RetryPolicy._from_proto(start.retry_policy) if start.retry_policy),
             schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.schedule_to_close_timeout),
             scheduled_time: Internal::ProtoUtils.timestamp_to_time(start.scheduled_time) || raise, # Never nil
             start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(start.start_to_close_timeout),

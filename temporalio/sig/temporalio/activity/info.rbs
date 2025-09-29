@@ -9,6 +9,7 @@ module Temporalio
       attr_reader local?: bool
       attr_reader priority: Temporalio::Priority
       attr_reader raw_heartbeat_details: Array[Converters::RawValue]
+      attr_reader retry_policy: RetryPolicy?
       attr_reader schedule_to_close_timeout: Float?
       attr_reader scheduled_time: Time
       attr_reader start_to_close_timeout: Float?
@@ -29,6 +30,7 @@ module Temporalio
         local?: bool,
         priority: Temporalio::Priority?,
         raw_heartbeat_details: Array[Converters::RawValue],
+        retry_policy: RetryPolicy?,
         schedule_to_close_timeout: Float?,
         scheduled_time: Time,
         start_to_close_timeout: Float?,

@@ -135,7 +135,7 @@ module Temporalio
     # @!attribute [r] api_key
     #   @return [String, nil] Client API key
     # @!attribute [r] tls
-    #   @return [ClientConfigTLS, nil] TLS configuration
+    #   @return [Boolean, ClientConfigTLS, nil] TLS configuration
     # @!attribute [r] grpc_meta
     #   @return [Hash] gRPC metadata
     ClientConfigProfile = Data.define(:address, :namespace, :api_key, :tls, :grpc_meta)
@@ -213,10 +213,17 @@ module Temporalio
       # @return [Array] Tuple of [positional_args, keyword_args] that can be splatted to Client.connect
       def to_client_connect_options
         positional_args = [address, namespace].compact
+        tls_value = false
+        if tls
+          tls_value = tls.to_client_tls_options
+        elsif api_key
+          tls_value = true
+        end
+
         keyword_args = {
           api_key: api_key,
-          tls: tls&.to_client_tls_options,
-          rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?)
+          rpc_metadata: (grpc_meta if grpc_meta && !grpc_meta.empty?),
+          tls: tls_value
         }.compact
 
         [positional_args, keyword_args]
@@ -254,13 +261,11 @@ module Temporalio
       # (TEMPORAL_CONFIG_FILE).
       #
       # @param config_source [Pathname, String, nil] Configuration source
-      # @param disable_file [Boolean] If true, file loading is disabled
       # @param config_file_strict [Boolean] If true, will error on unrecognized keys
       # @param override_env_vars [Hash, nil] Environment variables to use
       # @return [ClientConfig] The client configuration
       def self.load(
         config_source: nil,
-        disable_file: false,
         config_file_strict: false,
         override_env_vars: nil
       )
@@ -269,7 +274,6 @@ module Temporalio
         loaded_profiles = Internal::Bridge::EnvConfig.load_client_config(
           path,
           data,
-          disable_file,
           config_file_strict,
           override_env_vars || {}
         )

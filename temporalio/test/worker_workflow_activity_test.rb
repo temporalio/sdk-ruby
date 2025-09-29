@@ -2,6 +2,7 @@
 
 require 'securerandom'
 require 'temporalio/client'
+require 'temporalio/converters/data_converter'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
@@ -29,6 +30,12 @@ class WorkerWorkflowActivityTest < Test
         Temporalio::Workflow.execute_local_activity(:SimpleActivity, 'local', start_to_close_timeout: 10)
       when :local_string_name
         Temporalio::Workflow.execute_local_activity('SimpleActivity', 'local', start_to_close_timeout: 10)
+      when :remote_with_summary
+        Temporalio::Workflow.execute_activity(SimpleActivity, 'remote',
+                                              start_to_close_timeout: 10, summary: 'remote summary')
+      when :local_with_summary
+        Temporalio::Workflow.execute_local_activity(SimpleActivity, 'local',
+                                                    start_to_close_timeout: 10, summary: 'local summary')
       else
         raise NotImplementedError
       end
@@ -366,6 +373,33 @@ class WorkerWorkflowActivityTest < Test
       )
       env.client.workflow_service.reset_activity(req)
       assert_equal 'canceled - paused: false, requested: false, reset: true', handle.result
+    end
+  end
+
+  def test_activity_summary
+    data_converter = Temporalio::Converters::DataConverter.default
+    execute_workflow(SimpleWorkflow, :remote_with_summary, activities: [SimpleActivity]) do |handle|
+      handle.result
+      activity_events = handle.fetch_history.events
+                              .select { |e| e.event_type == :EVENT_TYPE_ACTIVITY_TASK_SCHEDULED }
+      assert_equal 1, activity_events.size
+      assert_equal 'remote summary', data_converter.from_payload(activity_events.first.user_metadata.summary)
+      assert_nil activity_events.first.user_metadata.details
+    end
+  end
+
+  def test_local_activity_summary
+    data_converter = Temporalio::Converters::DataConverter.default
+    execute_workflow(SimpleWorkflow, :local_with_summary, activities: [SimpleActivity]) do |handle|
+      handle.result
+      print handle.fetch_history.events
+      activity_events = handle.fetch_history.events.select do |e|
+        e.event_type == :EVENT_TYPE_MARKER_RECORDED &&
+          e.marker_recorded_event_attributes.marker_name == 'core_local_activity'
+      end
+      assert_equal 1, activity_events.size
+      assert_equal 'local summary', data_converter.from_payload(activity_events.first.user_metadata.summary)
+      assert_nil activity_events.first.user_metadata.details
     end
   end
 end
