@@ -13,6 +13,7 @@ module Temporalio
       :heartbeat_timeout,
       :local?,
       :priority,
+      :retry_policy,
       :raw_heartbeat_details,
       :schedule_to_close_timeout,
       :scheduled_time,
@@ -42,6 +43,10 @@ module Temporalio
     #   @return [Boolean] Whether the activity is a local activity or not.
     # @!attribute priority
     #   @return [Priority] The priority of this activity.
+    # @!attribute retry_policy
+    #   @return [RetryPolicy, nil] Retry policy for the activity. Note that the server may have set a different policy
+    #     than the one provided when scheduling the activity. If the value is None, it means the server didn't send
+    #     information about retry policy (e.g. due to old server version), but it may still be defined server-side.
     # @!attribute raw_heartbeat_details
     #   @return [Array<Converter::RawValue>] Raw details from the last heartbeat of the last attempt. Can use
     #     {heartbeat_details} to get lazily-converted values.

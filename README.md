@@ -1237,8 +1237,8 @@ when an activity class is referenced in a workflow before it has been explicitly
 > Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled block.
 
 This comes from `bootsnap` via `zeitwork` because it is lazily loading a class/module at workflow runtime. It is not
-good to lazily load code durnig a workflow run because it can be side effecting. Workflows and the classes they
-reference should not be eagerly loaded.
+good to lazily load code during a workflow run because it can be side effecting. Workflows and the classes they
+reference should be eagerly loaded.
 
 To resolve this, either always eagerly load (e.g. `config.eager_load = true`) or explicitly `require` what is used by a
 workflow at the top of the file.

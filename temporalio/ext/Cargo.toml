@@ -10,7 +10,9 @@ publish = false
 crate-type = ["cdylib"]
 
 [dependencies]
+async-trait = "0.1"
 futures = "0.3"
+log = "0.4"
 magnus = "0.7"
 parking_lot = "0.12"
 prost = "0.13"
