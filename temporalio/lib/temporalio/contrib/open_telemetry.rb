@@ -86,10 +86,24 @@ module Temporalio
           attributes: nil,
           outbound_input: nil
         )
-          tracer.in_span(name, attributes:, kind:) do
+          # We cannot use tracer.in_span because it always assumes we want to set the status as error on exception, but
+          # we do not want to do that for benign exceptions. This is effectively a copy of the source of in_span with
+          # that change.
+          span = nil
+          span = tracer.start_span(name, attributes:, kind:)
+          ::OpenTelemetry::Trace.with_span(span) do
             _apply_context_to_headers(outbound_input.headers) if outbound_input
             yield
           end
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          span&.record_exception(e)
+          # Only set the status if it is not a benign application error
+          unless e.is_a?(Error::ApplicationError) && e.category == Error::ApplicationError::Category::BENIGN
+            span&.status = ::OpenTelemetry::Trace::Status.error("Unhandled exception of type: #{e.class}")
+          end
+          raise e
+        ensure
+          span&.finish
         end
 
         # @!visibility private
@@ -458,8 +472,15 @@ module Temporalio
           # don't want to use durable timers.
           Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
             span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
-            # Record exception if present
-            span.record_exception(exception) if exception
+            # Record exception and set status if present
+            if exception
+              span.record_exception(exception)
+              # Only set the status if it is not a benign application error
+              unless exception.is_a?(Error::ApplicationError) &&
+                     exception.category == Error::ApplicationError::Category::BENIGN
+                span.status = ::OpenTelemetry::Trace::Status.error("Unhandled exception of type: #{exception.class}")
+              end
+            end
             # Finish the span (returns self)
             span.finish(end_timestamp: time)
           end

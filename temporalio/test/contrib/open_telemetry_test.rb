@@ -17,6 +17,12 @@ module Contrib
           raise 'Intentional activity failure' if Temporalio::Activity::Context.current.info.attempt == 1
 
           @tracer.in_span('custom-activity-span') { 'activity-done' }
+        when :fail_benign
+          raise Temporalio::Error::ApplicationError.new(
+            'Intentional benign activity failure',
+            non_retryable: true,
+            category: Temporalio::Error::ApplicationError::Category::BENIGN
+          )
         else
           raise NotImplementedError
         end
@@ -30,6 +36,10 @@ module Contrib
           'workflow-done'
         when :fail
           raise Temporalio::Error::ApplicationError, 'Intentional workflow failure'
+        when :fail_benign
+          raise Temporalio::Error::ApplicationError.new(
+            'Intentional benign workflow failure', category: Temporalio::Error::ApplicationError::Category::BENIGN
+          )
         when :fail_task
           raise 'Intentional workflow task failure'
         when :wait_on_signal
@@ -39,6 +49,8 @@ module Contrib
           Temporalio::Contrib::OpenTelemetry::Workflow.with_completed_span('custom-can-span') do
             raise Temporalio::Workflow::ContinueAsNewError, :complete
           end
+        when :activity_fail_benign
+          Temporalio::Workflow.execute_activity(TestActivity, :fail_benign, start_to_close_timeout: 30)
         else
           raise NotImplementedError
         end
@@ -527,7 +539,55 @@ module Contrib
       assert_equal exp_root.children.first&.to_s_indented, act.to_s_indented
     end
 
-    ExpectedSpan = Data.define(:name, :children, :attributes, :links, :exception_message) # rubocop:disable Layout/ClassStructure
+    def test_benign_workflow_exception
+      exp_root = ExpectedSpan.new(name: 'root')
+      act_root = trace_workflow(:fail_benign) do |handle|
+        exp_cl_attrs = { 'temporalWorkflowID' => handle.id }
+        exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
+        exp_start_wf = exp_root.add_child(name: 'StartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
+        exp_run_wf = exp_start_wf.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_run_attrs)
+
+        assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+        exp_run_wf.add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_run_attrs,
+                             exception_message: 'Intentional benign workflow failure',
+                             status_ok: true)
+      end
+      assert_equal exp_root.to_s_indented, act_root.to_s_indented
+    end
+
+    def test_benign_activity_exception
+      exp_root = ExpectedSpan.new(name: 'root')
+      act_root = trace_workflow(:activity_fail_benign) do |handle|
+        exp_cl_attrs = { 'temporalWorkflowID' => handle.id }
+        exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
+        exp_start_wf = exp_root.add_child(name: 'StartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
+        exp_run_wf = exp_start_wf.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_run_attrs)
+
+        # Activity
+        exp_run_wf
+          .add_child(name: 'StartActivity:TestActivity', attributes: exp_run_attrs)
+          .add_child(
+            name: 'RunActivity:TestActivity',
+            attributes: exp_run_attrs.merge({ 'temporalActivityID' => '1' }),
+            exception_message: 'Intentional benign activity failure',
+            status_ok: true
+          )
+
+        assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+        exp_run_wf.add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_run_attrs,
+                             exception_message: 'Activity task failed')
+      end
+      assert_equal exp_root.to_s_indented, act_root.to_s_indented
+    end
+
+    ExpectedSpan = Data.define( # rubocop:disable Layout/ClassStructure
+      :name,
+      :children,
+      :attributes,
+      :links,
+      :exception_message,
+      :status_ok
+    )
 
     class ExpectedSpan
       # Only returns unparented
@@ -540,7 +600,8 @@ module Contrib
               ExpectedSpan.new(
                 name: span.name,
                 attributes: span.attributes,
-                exception_message: span.events&.find { |e| e.name == 'exception' }&.attributes&.[]('exception.message')
+                exception_message: span.events&.find { |e| e.name == 'exception' }&.attributes&.[]('exception.message'),
+                status_ok: span.status.ok?
               ),
               span
             ]
@@ -561,12 +622,26 @@ module Contrib
         end.compact
       end
 
-      def initialize(name:, children: [], attributes: {}, links: [], exception_message: nil)
+      def initialize(
+        name:,
+        children: [],
+        attributes: {},
+        links: [],
+        exception_message: nil,
+        status_ok: exception_message.nil?
+      )
         super
       end
 
-      def add_child(name:, attributes: {}, links: [], exception_message: nil, insert_at: nil)
-        span = ExpectedSpan.new(name:, attributes:, links:, exception_message:)
+      def add_child(
+        name:,
+        attributes: {},
+        links: [],
+        exception_message: nil,
+        status_ok: exception_message.nil?,
+        insert_at: nil
+      )
+        span = ExpectedSpan.new(name:, attributes:, links:, exception_message:, status_ok:)
         if insert_at.nil?
           children << span
         else
@@ -579,6 +654,7 @@ module Contrib
         ret = "#{name} (attrs: #{attributes}"
         ret += ", links: [#{links.map(&:name).join(', ')}]" unless links.empty?
         ret += ", exception: '#{exception_message}'" if exception_message
+        ret += ", ok: #{status_ok}"
         ret += ')'
         indent += '  '
         children.each do |child|
