@@ -24,13 +24,15 @@ module Contrib
       attr_reader attributes: Hash[untyped, untyped]
       attr_reader links: Array[ExpectedSpan]
       attr_reader exception_message: String?
+      attr_reader status_ok: bool
 
       def initialize: (
         name: String,
         ?children: Array[ExpectedSpan],
         ?attributes: Hash[untyped, untyped],
         ?links: Array[ExpectedSpan],
-        ?exception_message: String?
+        ?exception_message: String?,
+        ?status_ok: bool
       ) -> void
 
       def add_child: (
@@ -38,6 +40,7 @@ module Contrib
         ?attributes: Hash[untyped, untyped],
         ?links: Array[ExpectedSpan],
         ?exception_message: String?,
+        ?status_ok: bool,
         ?insert_at: Integer?
       ) -> ExpectedSpan
 
