@@ -22,7 +22,7 @@ module Temporalio
 
           Api::Common::V1::Payload.new(
             metadata: { 'encoding' => ENCODING, 'messageType' => value.class.descriptor.name },
-            data: value.to_json
+            data: value.to_json.b
           )
         end
 

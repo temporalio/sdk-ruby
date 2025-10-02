@@ -72,6 +72,17 @@ module Converters
       # outside of Ruby)
       require 'json/add/time'
       assert_payload time, 'json/plain', time.to_json
+
+      # Proto payloads with multi-byte UTF-8 characters (em-dash U+2014) are serialized correctly
+      proto_with_multibyte = Temporalio::Api::Common::V1::WorkflowExecution.new(workflow_id: 'test — emdash')
+      payload = assert_payload(
+        proto_with_multibyte,
+        'json/protobuf',
+        # The .b method converts UTF-8 to ASCII-8BIT/binary encoding, which is required by the Payload data field.
+        # The multi-byte em-dash character (U+2014) becomes the byte sequence \xE2\x80\x94 in UTF-8.
+        "{\"workflowId\":\"test \xE2\x80\x94 emdash\"}".b
+      )
+      assert_equal 'temporal.api.common.v1.WorkflowExecution', payload.metadata['messageType']
     end
 
     def test_binary_proto
