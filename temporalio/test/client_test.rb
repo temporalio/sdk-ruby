@@ -234,4 +234,37 @@ class ClientTest < Test
     assert status.success?
     assert_equal 'started workflow', reader.read.strip
   end
+
+  def test_binary_metadata
+    orig_metadata = env.client.connection.rpc_metadata
+
+    # Connect a new client with some bad metadata
+    err = assert_raises(ArgumentError) do
+      Temporalio::Client.connect(
+        env.client.connection.target_host,
+        env.client.namespace,
+        rpc_metadata: { 'connect-bin' => 'not-allowed' }
+      )
+    end
+    assert_equal 'Value for metadata key connect-bin must be ASCII-8BIT', err.message
+
+    # Update a client with some bad metadata
+    err = assert_raises(ArgumentError) do
+      env.client.connection.rpc_metadata = { 'update-bin' => 'not-allowed' }
+    end
+    assert_equal 'Value for metadata key update-bin must be ASCII-8BIT', err.message
+
+    # Make an RPC call with some bad metadata
+    err = assert_raises(ArgumentError) do
+      env.client.start_workflow(
+        :MyWorkflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue: "tq-#{SecureRandom.uuid}",
+        rpc_options: Temporalio::Client::RPCOptions.new(metadata: { 'rpc-bin' => 'not-allowed' })
+      )
+    end
+    assert_equal 'Value for metadata key rpc-bin must be ASCII-8BIT', err.message
+  ensure
+    env.client.connection.rpc_metadata = orig_metadata
+  end
 end
