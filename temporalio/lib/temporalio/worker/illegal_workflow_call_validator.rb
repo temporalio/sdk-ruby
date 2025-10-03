@@ -44,7 +44,10 @@ module Temporalio
       def self.known_safe_mutex_validator
         @known_safe_mutex_validator ||= IllegalWorkflowCallValidator.new do
           # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location path has protobuf
-          raise 'disallowed' unless caller_locations&.any? { |loc| loc.path&.include?('google/protobuf/') }
+          # Also allow Mutex for RSpec mocks
+          raise 'disallowed' if caller_locations&.none? do |loc|
+            loc.path&.match?(%r{google/protobuf/|rspec/})
+          end
         end
       end
 
