@@ -281,7 +281,7 @@ fn partition_grpc_headers(ruby: &Ruby, hash: RHash) -> Result<GrpcHeaders, Error
                     format!("Value for metadata key {key} must be ASCII-8BIT"),
                 ));
             }
-            binary_headers.insert(key, unsafe { value.as_slice() }.to_vec());
+            binary_headers.insert(key, unsafe { value.as_slice().to_vec() });
         } else {
             let value = value.to_string().map_err(|err| {
                 Error::new(
