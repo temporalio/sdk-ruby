@@ -32,8 +32,6 @@ module Temporalio
         end
 
         # A slot supplier that will dynamically adjust the number of slots based on resource usage.
-        #
-        # @note WARNING: This API is experimental.
         class ResourceBased < SlotSupplier
           attr_reader :tuner_options, :slot_options
 
@@ -66,8 +64,6 @@ module Temporalio
         #
         # Users should be cautious when implementing this and make sure it is heavily tested and the documentation for
         # every method is well understood.
-        #
-        # @note WARNING: This API is experimental.
         class Custom < SlotSupplier
           # Context provided for slot reservation on custom slot supplier.
           #
