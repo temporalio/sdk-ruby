@@ -2391,11 +2391,11 @@ class WorkerWorkflowTest < Test
 
     # Allowed when enabled narrowly inside workflow
     res = execute_workflow(UnsafeIOWorkflow, true)
-    assert_includes res, '<html>'
+    assert_includes res, '</html>'
 
     # Allowed when enabled at worker level
     res = execute_workflow(UnsafeIOWorkflow, false, unsafe_workflow_io_enabled: true)
-    assert_includes res, '<html>'
+    assert_includes res, '</html>'
   end
 
   class MissingLocalActivityWorkflow < Temporalio::Workflow::Definition
