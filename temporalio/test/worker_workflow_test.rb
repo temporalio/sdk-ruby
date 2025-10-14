@@ -206,6 +206,7 @@ class WorkerWorkflowTest < Test
       assert_nil info.fetch('execution_timeout')
       assert_nil info.fetch('last_failure')
       assert_nil info.fetch('last_result')
+      assert_equal false, info.fetch('has_last_result?')
       assert_equal env.client.namespace, info['namespace']
       assert_nil info.fetch('parent')
       assert_nil info.fetch('retry_policy')
@@ -2651,6 +2652,35 @@ class WorkerWorkflowTest < Test
                                      .map(&:timer_started_event_attributes)
                                      .compact
                                      .map { |a| a.start_to_fire_timeout.to_f })
+    end
+  end
+
+  class LastFailureWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :failure
+
+    def execute
+      info = Temporalio::Workflow.info
+
+      @failure = info.last_failure
+
+      return 'Done' if info.attempt != 1
+
+      raise Temporalio::Error::ApplicationError.new('Intentional failure', category: Temporalio::Error::ApplicationError::Category::BENIGN)
+    end
+  end
+
+  def test_last_failure
+    execute_workflow(LastFailureWorkflow, retry_policy:
+      Temporalio::RetryPolicy.new(
+        initial_interval: 0,
+        max_attempts: 2
+      )) do |handle|
+      result = handle.result
+
+      assert_equal 'Done', result
+
+      previous_failure = handle.query(:failure)
+      assert_equal 'Intentional failure', previous_failure
     end
   end
 end

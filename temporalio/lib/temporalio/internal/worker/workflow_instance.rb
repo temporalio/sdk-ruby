@@ -133,6 +133,7 @@ module Temporalio
               last_result: if @init_job.last_completion_result
                              @payload_converter.from_payloads(@init_job.last_completion_result).first
                            end,
+              has_last_result?: !@init_job.last_completion_result.nil?,
               namespace: details.namespace,
               parent: if @init_job.parent_workflow_info
                         Workflow::Info::ParentInfo.new(
