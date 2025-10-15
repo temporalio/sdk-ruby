@@ -11,6 +11,7 @@ module Temporalio
       :headers,
       :last_failure,
       :last_result,
+      :has_last_result?,
       :namespace,
       :parent,
       :priority,
@@ -44,6 +45,9 @@ module Temporalio
     #   @return [Exception, nil] Failure if this workflow run is a continuation of a failure.
     # @!attribute last_result
     #   @return [Object, nil] Successful result if this workflow is a continuation of a success.
+    # @!attribute has_last_result?
+    #   @return [Boolean] Successful result if this workflow is a continuation of a success.
+
     # @!attribute namespace
     #   @return [String] Namespace for the workflow.
     # @!attribute parent
