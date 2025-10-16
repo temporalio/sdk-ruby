@@ -267,4 +267,90 @@ class ClientTest < Test
   ensure
     env.client.connection.rpc_metadata = orig_metadata
   end
+
+  class ScheduleResult
+    def initialize(client, handle)
+      @handle = handle
+      @client = client
+    end
+
+    def result
+      desc = @handle.describe
+      # oldest first
+      workflow_id = desc.info.recent_actions.last&.action&.workflow_id
+      return nil if workflow_id.nil?
+
+      workflow_handle = @client.workflow_handle(workflow_id)
+      workflow_handle.result
+    end
+  end
+
+  class LastResultWorkflow < Temporalio::Workflow::Definition
+    def execute
+      last_result = Temporalio::Workflow.info.last_result
+      return "The last result was #{last_result}" unless last_result.nil?
+
+      'First result'
+    end
+  end
+
+  def test_last_completion_result
+    id = "wf-#{SecureRandom.uuid}"
+    task_queue = "tq-#{SecureRandom.uuid}"
+    handle = env.client.create_schedule(
+      'last-result-workflow',
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          LastResultWorkflow,
+          id:, task_queue:
+        ),
+        spec: Temporalio::Client::Schedule::Spec.new
+      )
+    )
+
+    schedule = ScheduleResult.new(env.client, handle)
+
+    Temporalio::Worker.new(client: env.client, task_queue:, workflows: [LastResultWorkflow]).run do
+      handle.trigger
+      assert_equal 'First result', schedule.result
+
+      handle.trigger
+      assert_equal 'The last result was First result', schedule.result
+    end
+
+    handle.delete
+  end
+
+  class HasLastResultWorkflow < Temporalio::Workflow::Definition
+    def execute # rubocop:disable Naming/PredicateMethod
+      Temporalio::Workflow.info.has_last_result?
+    end
+  end
+
+  def test_has_last_completion_result
+    id = "wf-#{SecureRandom.uuid}"
+    task_queue = "tq-#{SecureRandom.uuid}"
+    handle = env.client.create_schedule(
+      'has-last-result-workflow',
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          HasLastResultWorkflow,
+          id:, task_queue:
+        ),
+        spec: Temporalio::Client::Schedule::Spec.new
+      )
+    )
+
+    schedule = ScheduleResult.new(env.client, handle)
+
+    Temporalio::Worker.new(client: env.client, task_queue:, workflows: [HasLastResultWorkflow]).run do
+      handle.trigger
+      assert_equal false, schedule.result
+
+      handle.trigger
+      assert_equal true, schedule.result
+    end
+
+    handle.delete
+  end
 end
