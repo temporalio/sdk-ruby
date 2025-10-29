@@ -12,6 +12,9 @@ group :development do
   gem 'grpc', '~> 1.69'
   gem 'grpc-tools', '~> 1.69'
   gem 'minitest'
+  # Have to explicitly depend on openssl for macos issue in GH CI described at
+  # https://github.com/rails/rails/issues/55886 until 3.4.8 is released
+  gem 'openssl'
   # We are intentionally not pinning OTel versions here so that CI tests the latest. This also means that the OTel
   # contrib library also does not require specific versions, we are relying on the compatibility rigor of OTel.
   gem 'opentelemetry-api'
