@@ -5,6 +5,10 @@ on:
       - main
       - "releases/*"
 
+permissions:
+  contents: read
+  actions: write
+
 jobs:
   build-platform-gems:
     runs-on: ubuntu-latest

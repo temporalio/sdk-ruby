@@ -3,6 +3,9 @@ on:
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   run-bench:
     runs-on: ubuntu-latest-4-cores
