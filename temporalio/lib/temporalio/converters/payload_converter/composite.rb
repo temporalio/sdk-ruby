@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'temporalio/api'
+require 'temporalio/error'
 require 'temporalio/converters/payload_converter'
 require 'temporalio/converters/raw_value'
 
