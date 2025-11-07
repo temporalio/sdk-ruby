@@ -111,7 +111,7 @@ class Test < Minitest::Test
   end
 
   def find_free_port
-    socket = TCPServer.new('127.0.0.1', 0)
+    socket = TCPServer.new('127.0.0.1', 0) # steep:ignore
     port = socket.addr[1]
     socket.close
     port

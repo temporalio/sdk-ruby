@@ -35,6 +35,16 @@ jobs:
         with:
           submodules: recursive
 
+      # This is a temporary fix until Ruby 3.4.8 comes out.
+      #
+      # Per https://github.com/ruby/openssl/issues/949 (by way of
+      # https://github.com/rails/rails/issues/55886), newer Ruby + OpenSSL has an
+      # issue on macOS. This works around it until next Ruby release.
+      - name: Fixate OpenSSL (macos + 3.4 only)
+        if: ${{ matrix.os == 'macos-latest' && matrix.rubyVersion == '3.4' }}
+        shell: bash
+        run: echo "RUBY_CONFIGURE_OPTS=--with-openssl-dir=$(brew --prefix openssl@3.5)" >> $GITHUB_ENV
+
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
