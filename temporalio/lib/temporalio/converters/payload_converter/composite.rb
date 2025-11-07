@@ -3,6 +3,7 @@
 require 'temporalio/api'
 require 'temporalio/converters/payload_converter'
 require 'temporalio/converters/raw_value'
+require 'temporalio/error'
 
 module Temporalio
   module Converters
