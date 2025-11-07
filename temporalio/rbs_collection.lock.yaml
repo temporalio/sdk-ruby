@@ -37,10 +37,6 @@ gems:
   version: '0'
   source:
     type: stdlib
-- name: benchmark
-  version: '0'
-  source:
-    type: stdlib
 - name: bigdecimal
   version: '0'
   source:
@@ -117,6 +113,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: openssl
+  version: '0'
+  source:
+    type: stdlib
 - name: optparse
   version: '0'
   source:
@@ -142,6 +142,10 @@ gems:
   source:
     type: stdlib
 - name: singleton
+  version: '0'
+  source:
+    type: stdlib
+- name: socket
   version: '0'
   source:
     type: stdlib
