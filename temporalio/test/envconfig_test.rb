@@ -64,7 +64,7 @@ class EnvConfigTest < Test
   TOML
 
   # =============================================================================
-  # PROFILE LOADING TESTS (6 tests)
+  # PROFILE LOADING TESTS (7 tests)
   # =============================================================================
 
   def test_load_profile_from_file_default
@@ -182,6 +182,36 @@ class EnvConfigTest < Test
       assert_instance_of Temporalio::Client::Connection::TLSOptions, tls_config
       assert_equal 'env-server-name', tls_config.domain
     end
+  end
+
+  def test_to_client_connect_options_preserves_nil_values
+    # Test that nil values in address/namespace are preserved in positional_args
+    profile_no_address = Temporalio::EnvConfig::ClientConfigProfile.new(
+      address: nil,
+      namespace: 'my-namespace'
+    )
+    args, = profile_no_address.to_client_connect_options
+    assert_equal 2, args.length, 'positional_args should always have exactly 2 elements'
+    assert_nil args[0], 'address should be nil in first position (not removed)'
+    assert_equal 'my-namespace', args[1], 'namespace should be in second position'
+
+    profile_both_nil = Temporalio::EnvConfig::ClientConfigProfile.new(
+      address: nil,
+      namespace: nil
+    )
+    args, = profile_both_nil.to_client_connect_options
+    assert_equal 2, args.length, 'positional_args should always have exactly 2 elements'
+    assert_nil args[0], 'address should be nil in first position'
+    assert_nil args[1], 'namespace should be nil in second position'
+
+    profile_both_present = Temporalio::EnvConfig::ClientConfigProfile.new(
+      address: 'my-address:7233',
+      namespace: 'my-namespace'
+    )
+    args, = profile_both_present.to_client_connect_options
+    assert_equal 2, args.length, 'positional_args should always have exactly 2 elements'
+    assert_equal 'my-address:7233', args[0], 'address should be in first position'
+    assert_equal 'my-namespace', args[1], 'namespace should be in second position'
   end
 
   # =============================================================================
