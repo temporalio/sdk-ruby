@@ -217,5 +217,43 @@ module Testing
         assert_equal attrs, handle.describe.search_attributes
       end
     end
+
+    class SimpleWorkflow < Temporalio::Workflow::Definition
+      def execute(input)
+        Temporalio::Workflow.wait_condition { @complete }
+        input
+      end
+
+      workflow_signal
+      def complete
+        @complete = true
+      end
+    end
+
+    def test_multiple_local_servers
+      # Start 20 local servers
+      envs = 20.times.map { Temporalio::Testing::WorkflowEnvironment.start_local }
+
+      # Run workers for each
+      tq_prefix = "tq-#{SecureRandom.uuid}-"
+      workers = envs.map.with_index do |env, i|
+        Temporalio::Worker.new(client: env.client, task_queue: "#{tq_prefix}#{i}", workflows: [SimpleWorkflow])
+      end
+      Temporalio::Worker.run_all(*workers) do
+        # Start all workflows
+        handles = envs.map.with_index do |env, i|
+          env.client.start_workflow(
+            SimpleWorkflow, "input-#{i}",
+            id: "wf-#{SecureRandom.uuid}", task_queue: "#{tq_prefix}#{i}"
+          )
+        end
+        # Signal all workflows
+        handles.each { |h| h.signal(SimpleWorkflow.complete) }
+        # Confirm results
+        assert_equal envs.map.with_index { |_, i| "input-#{i}" }, handles.map(&:result)
+      end
+    ensure
+      envs.each(&:shutdown)
+    end
   end
 end
