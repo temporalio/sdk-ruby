@@ -580,6 +580,34 @@ module Contrib
       assert_equal exp_root.to_s_indented, act_root.to_s_indented
     end
 
+    module ContextCurrentPatch
+      def current(*args, **kwargs, &)
+        Mutex.new if ContextCurrentPatch.do_illegal_thing
+        super
+      end
+
+      class << self
+        attr_accessor :do_illegal_thing
+      end
+    end
+
+    ::OpenTelemetry::Context.singleton_class.prepend(ContextCurrentPatch) # rubocop:disable Layout/ClassStructure
+
+    def test_illegal_calls_on_context
+      # Some libraries (DataDog) sadly patch OTel's Context.current, so we need to make anything referencing OTel
+      # disable durable scheduler. This test used to fail before we adjusted the interceptor.
+
+      # Make the "current" call for a context do something bad
+      ContextCurrentPatch.do_illegal_thing = true
+
+      act_root = trace_workflow(:complete, &:result)
+      assert_equal 'StartWorkflow:TestWorkflow', act_root.children.first.name
+      assert_equal 'RunWorkflow:TestWorkflow', act_root.children.first.children.first.name
+      assert_equal 'CompleteWorkflow:TestWorkflow', act_root.children.first.children.first.children.first.name
+    ensure
+      ContextCurrentPatch.do_illegal_thing = false
+    end
+
     ExpectedSpan = Data.define( # rubocop:disable Layout/ClassStructure
       :name,
       :children,

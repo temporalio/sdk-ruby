@@ -231,7 +231,7 @@ module Temporalio
 
           # @!visibility private
           def execute(input)
-            @root._attach_context(Temporalio::Workflow.info.headers)
+            _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span("RunWorkflow:#{Temporalio::Workflow.info.workflow_type}", kind: :server) do
               super
             ensure
@@ -245,7 +245,7 @@ module Temporalio
 
           # @!visibility private
           def handle_signal(input)
-            @root._attach_context(Temporalio::Workflow.info.headers)
+            _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleSignal:#{input.signal}",
               links: _links_from_headers(input.headers),
@@ -260,7 +260,7 @@ module Temporalio
 
           # @!visibility private
           def handle_query(input)
-            @root._attach_context(Temporalio::Workflow.info.headers)
+            _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleQuery:#{input.query}",
               links: _links_from_headers(input.headers),
@@ -281,7 +281,7 @@ module Temporalio
 
           # @!visibility private
           def validate_update(input)
-            @root._attach_context(Temporalio::Workflow.info.headers)
+            _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "ValidateUpdate:#{input.update}",
               attributes: { 'temporalUpdateID' => input.id },
@@ -304,7 +304,7 @@ module Temporalio
 
           # @!visibility private
           def handle_update(input)
-            @root._attach_context(Temporalio::Workflow.info.headers)
+            _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleUpdate:#{input.update}",
               attributes: { 'temporalUpdateID' => input.id },
@@ -324,13 +324,29 @@ module Temporalio
           end
 
           # @!visibility private
+          def _attach_context(headers)
+            # We have to disable the durable scheduler _even_ for something simple like attach context. For most OTel
+            # implementations, such a procedure is completely deterministic, but unfortunately some implementations like
+            # DataDog monkey patch OpenTelemetry (see
+            # https://github.com/DataDog/dd-trace-rb/blob/f88393d0571806b9980bb2cf5066eba60cfea177/lib/datadog/opentelemetry/api/context.rb#L184)
+            # to make even OpenTelemetry::Context.current non-deterministic because it uses mutexes. And a simple text
+            # map propagation extraction accesses Context.current.
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              @root._attach_context(headers)
+            end
+          end
+
+          # @!visibility private
           def _links_from_headers(headers)
-            context = @root._context_from_headers(headers)
-            span = ::OpenTelemetry::Trace.current_span(context) if context
-            if span && span != ::OpenTelemetry::Trace::Span::INVALID
-              [::OpenTelemetry::Trace::Link.new(span.context)]
-            else
-              []
+            # See _attach_context above for why we have to disable scheduler even for these simple operations
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              context = @root._context_from_headers(headers)
+              span = ::OpenTelemetry::Trace.current_span(context) if context
+              if span && span != ::OpenTelemetry::Trace::Span::INVALID
+                [::OpenTelemetry::Trace::Link.new(span.context)]
+              else
+                []
+              end
             end
           end
         end
@@ -359,7 +375,9 @@ module Temporalio
           # @!visibility private
           def initialize_continue_as_new_error(input)
             # Just apply the current context to headers
-            @root._apply_context_to_headers(input.error.headers)
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              @root._apply_context_to_headers(input.error.headers)
+            end
             super
           end
 
@@ -386,7 +404,11 @@ module Temporalio
 
           # @!visibility private
           def _apply_span_to_headers(headers, span)
-            @root._apply_context_to_headers(headers, context: ::OpenTelemetry::Trace.context_with_span(span)) if span
+            # See WorkflowInbound#_attach_context comments for why we have to disable scheduler even for these simple
+            # operations
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              @root._apply_context_to_headers(headers, context: ::OpenTelemetry::Trace.context_with_span(span)) if span
+            end
           end
         end
 
@@ -419,9 +441,19 @@ module Temporalio
         )
           span = completed_span(name, attributes:, links:, kind:, exception:, even_during_replay:)
           if span
-            ::OpenTelemetry::Trace.with_span(span) do # rubocop:disable Style/ExplicitBlockArgument
+            # We cannot use ::OpenTelemetry::Trace.with_span here unfortunately. We need to disable the durable
+            # scheduler for just the span attach/detach but leave it enabled for the user code (see
+            # WorkflowInbound#_attach_current for why we have to disable scheduler even for these simple operations).
+            token = Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              ::OpenTelemetry::Context.attach(::OpenTelemetry::Trace.context_with_span(span))
+            end
+            begin
               # Yield with no parameters
               yield
+            ensure
+              Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+                ::OpenTelemetry::Context.detach(token)
+              end
             end
           else
             yield
@@ -455,22 +487,22 @@ module Temporalio
           # Do nothing if replaying and not wanted during replay
           return nil if !even_during_replay && Temporalio::Workflow::Unsafe.replaying?
 
-          # If there is no span on the context and the user hasn't opted in to always creating, do not create. This
-          # prevents orphans if there was no span originally created from the client start-workflow call.
-          if ::OpenTelemetry::Trace.current_span == ::OpenTelemetry::Trace::Span::INVALID &&
-             !root._always_create_workflow_spans
-            return nil
-          end
-
           # Create attributes, adding user-defined ones
           attributes = { 'temporalWorkflowID' => Temporalio::Workflow.info.workflow_id,
                          'temporalRunID' => Temporalio::Workflow.info.run_id }.merge(attributes)
 
           time = Temporalio::Workflow.now.dup
           # Disable durable scheduler because 1) synchronous/non-batch span processors in OTel use network (though could
-          # have just used Unafe.io_enabled for this if not for the next point) and 2) OTel uses Ruby Timeout which we
+          # have just used Unsafe.io_enabled for this if not for the next point) and 2) OTel uses Ruby Timeout which we
           # don't want to use durable timers.
           Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+            # If there is no span on the context and the user hasn't opted in to always creating, do not create. This
+            # prevents orphans if there was no span originally created from the client start-workflow call.
+            if ::OpenTelemetry::Trace.current_span == ::OpenTelemetry::Trace::Span::INVALID &&
+               !root._always_create_workflow_spans
+              return nil
+            end
+
             span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
             # Record exception and set status if present
             if exception
