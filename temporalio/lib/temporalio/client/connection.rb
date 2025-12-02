@@ -173,7 +173,7 @@ module Temporalio
       def initialize(
         target_host:,
         api_key: nil,
-        tls: false,
+        tls: nil,
         rpc_metadata: {},
         rpc_retry: RPCRetryOptions.new,
         identity: "#{Process.pid}@#{Socket.gethostname}",
@@ -182,6 +182,9 @@ module Temporalio
         runtime: Runtime.default,
         lazy_connect: false
       )
+        # Auto-enable TLS when API key provided and tls not explicitly set
+        tls = true if tls.nil? && !api_key.nil?
+
         @options = Options.new(
           target_host:,
           api_key:,

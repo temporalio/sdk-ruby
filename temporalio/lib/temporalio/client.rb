@@ -99,7 +99,7 @@ module Temporalio
       target_host,
       namespace,
       api_key: nil,
-      tls: false,
+      tls: nil,
       data_converter: Converters::DataConverter.default,
       interceptors: [],
       logger: Logger.new($stdout, level: Logger::WARN),
