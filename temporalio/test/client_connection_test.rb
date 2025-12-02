@@ -29,17 +29,6 @@ class ClientConnectionTest < Test
     assert_equal false, connection.options.tls
   end
 
-  def test_connection_tls_disabled_by_default_without_api_key
-    # Test that TLS is disabled by default when no API key is provided
-    connection = Temporalio::Client::Connection.new(
-      target_host: 'localhost:7233',
-      lazy_connect: true
-    )
-
-    # TLS should remain nil (falsy) when no api_key is provided
-    refute connection.options.tls
-  end
-
   def test_connection_explicit_tls_config_preserved_with_api_key
     # Test that explicit TLS configuration is preserved regardless of API key
     tls_options = Temporalio::Client::Connection::TLSOptions.new(

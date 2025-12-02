@@ -183,7 +183,8 @@ module Temporalio
         lazy_connect: false
       )
         # Auto-enable TLS when API key provided and tls not explicitly set
-        tls = true if tls.nil? && !api_key.nil?
+        # Convert nil to appropriate boolean: true if API key provided, false otherwise
+        tls = !api_key.nil? if tls.nil?
 
         @options = Options.new(
           target_host:,
