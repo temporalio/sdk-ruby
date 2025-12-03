@@ -36,7 +36,7 @@ module Temporalio
       String target_host,
       String namespace,
       ?api_key: String?,
-      ?tls: bool | Connection::TLSOptions,
+      ?tls: bool | Connection::TLSOptions | nil,
       ?data_converter: Converters::DataConverter,
       ?interceptors: Array[Interceptor],
       ?logger: Logger,

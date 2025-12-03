@@ -4,7 +4,7 @@ module Temporalio
       class Options
         attr_reader target_host: String
         attr_reader api_key: String?
-        attr_reader tls: bool | Connection::TLSOptions
+        attr_reader tls: bool | Connection::TLSOptions | nil
         attr_reader rpc_metadata: Hash[String, String]
         attr_reader rpc_retry: RPCRetryOptions
         attr_reader identity: String
@@ -16,7 +16,7 @@ module Temporalio
         def initialize: (
           target_host: String,
           api_key: String?,
-          tls: bool | Connection::TLSOptions,
+          tls: bool | Connection::TLSOptions | nil,
           rpc_metadata: Hash[String, String],
           rpc_retry: RPCRetryOptions,
           identity: String,
@@ -98,7 +98,7 @@ module Temporalio
       def initialize: (
         target_host: String,
         ?api_key: String?,
-        ?tls: bool | Connection::TLSOptions,
+        ?tls: bool | Connection::TLSOptions | nil,
         ?rpc_metadata: Hash[String, String],
         ?rpc_retry: RPCRetryOptions,
         ?identity: String,
