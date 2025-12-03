@@ -28,6 +28,8 @@ class ClientCloudTest < Test
   end
 
   def test_api_key
+    # This test validates the auto-TLS feature: TLS is auto-enabled when api_key is provided
+    # and tls is not explicitly set.
     api_key = ENV.fetch('TEMPORAL_CLOUD_API_KEY_TEST_API_KEY', '')
     skip('No cloud API key') if api_key.empty?
 
@@ -35,7 +37,6 @@ class ClientCloudTest < Test
       ENV.fetch('TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST'),
       ENV.fetch('TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE'),
       api_key:,
-      tls: true,
       rpc_metadata: { 'temporal-namespace' => ENV.fetch('TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE') }
     )
     # Run workflow
@@ -52,14 +53,14 @@ class ClientCloudTest < Test
   end
 
   def test_cloud_ops
+    # This test also validates auto-TLS: TLS is auto-enabled when api_key is provided.
     api_key = ENV.fetch('TEMPORAL_CLOUD_OPS_TEST_API_KEY', '')
     skip('No cloud API key') if api_key.empty?
 
-    # Create connection
+    # Create connection (tls not set, auto-enabled due to api_key)
     conn = Temporalio::Client::Connection.new(
       target_host: ENV.fetch('TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST'),
       api_key:,
-      tls: true,
       rpc_metadata: { 'temporal-cloud-api-version' => ENV.fetch('TEMPORAL_CLOUD_OPS_TEST_API_VERSION') }
     )
 
