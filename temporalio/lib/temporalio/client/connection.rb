@@ -154,8 +154,9 @@ module Temporalio
       #   +localhost:7233+.
       # @param api_key [String, nil] API key for Temporal. This becomes the +Authorization+ HTTP header with +"Bearer "+
       #   prepended. This is only set if RPC metadata doesn't already have an +authorization+ key.
-      # @param tls [Boolean, TLSOptions] If false, do not use TLS. If true, use system default TLS options. If TLS
-      #   options are present, those TLS options will be used.
+      # @param tls [Boolean, TLSOptions, nil] If false, do not use TLS. If true, use system default TLS options. If TLS
+      #   options are present, those TLS options will be used. If nil (the default), TLS will be auto-enabled if
+      #   api_key is provided.
       # @param rpc_metadata [Hash<String, String>] Headers to use for all calls to the server. Keys here can be
       #   overriden by per-call RPC metadata keys.
       # @param rpc_retry [RPCRetryOptions] Retry options for direct service calls (when opted in) or all high-level
@@ -173,7 +174,7 @@ module Temporalio
       def initialize(
         target_host:,
         api_key: nil,
-        tls: false,
+        tls: nil,
         rpc_metadata: {},
         rpc_retry: RPCRetryOptions.new,
         identity: "#{Process.pid}@#{Socket.gethostname}",
@@ -285,13 +286,17 @@ module Temporalio
           ),
           identity: @options.identity || "#{Process.pid}@#{Socket.gethostname}"
         )
-        if @options.tls
-          options.tls = if @options.tls.is_a?(TLSOptions)
+        # Auto-enable TLS when API key is provided and tls not explicitly set
+        tls = @options.tls
+        tls = true if tls.nil? && @options.api_key
+
+        if tls
+          options.tls = if tls.is_a?(TLSOptions)
                           Internal::Bridge::Client::TLSOptions.new(
-                            client_cert: @options.tls.client_cert, # steep:ignore
-                            client_private_key: @options.tls.client_private_key, # steep:ignore
-                            server_root_ca_cert: @options.tls.server_root_ca_cert, # steep:ignore
-                            domain: @options.tls.domain # steep:ignore
+                            client_cert: tls.client_cert, # steep:ignore
+                            client_private_key: tls.client_private_key, # steep:ignore
+                            server_root_ca_cert: tls.server_root_ca_cert, # steep:ignore
+                            domain: tls.domain # steep:ignore
                           )
                         else
                           Internal::Bridge::Client::TLSOptions.new
