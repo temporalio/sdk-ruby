@@ -277,6 +277,10 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def set_worker_deployment_manager: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def update_workflow_execution: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -370,6 +374,10 @@ module Temporalio
           ?rpc_options: RPCOptions?
         ) -> untyped
         def update_worker_config: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def describe_worker: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped

@@ -329,12 +329,24 @@ module Temporalio
     # pool, this also consumes a Ruby thread for its lifetime.
     #
     # @param telemetry [TelemetryOptions] Telemetry options to set.
-    def initialize(telemetry: TelemetryOptions.new)
+    # @param worker_heartbeat_interval [Float, nil] Interval for worker heartbeats in seconds. Can be nil to disable
+    #   heartbeating. Interval must be between 1s and 60s.
+    def initialize(
+      telemetry: TelemetryOptions.new,
+      worker_heartbeat_interval: 60
+    )
+      if !worker_heartbeat_interval.nil? && !worker_heartbeat_interval.positive?
+        raise 'Worker heartbeat interval must be positive'
+      end
+
       # Set runtime on the buffer which will fail if the buffer is used on another runtime
       telemetry.metrics&.buffer&._set_runtime(self)
 
       @core_runtime = Internal::Bridge::Runtime.new(
-        Internal::Bridge::Runtime::Options.new(telemetry: telemetry._to_bridge)
+        Internal::Bridge::Runtime::Options.new(
+          telemetry: telemetry._to_bridge,
+          worker_heartbeat_interval:
+        )
       )
       @metric_meter = Internal::Metric::Meter.create_from_runtime(self) || Metric::Meter.null
       # We need a thread to run the command loop

@@ -4,8 +4,12 @@ module Temporalio
       class Runtime
         class Options
           attr_accessor telemetry: TelemetryOptions
+          attr_accessor worker_heartbeat_interval: Float?
 
-          def initialize: (telemetry: TelemetryOptions) -> void
+          def initialize: (
+            telemetry: TelemetryOptions,
+            worker_heartbeat_interval: Float?
+          ) -> void
         end
 
         class TelemetryOptions

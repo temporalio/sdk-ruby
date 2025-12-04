@@ -263,6 +263,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_set_service_account_namespace_access_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_set_user_group_namespace_access_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?

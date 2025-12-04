@@ -6,6 +6,7 @@ module Temporalio
       class Runtime
         Options = Struct.new(
           :telemetry,
+          :worker_heartbeat_interval,
           keyword_init: true
         )
 

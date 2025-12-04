@@ -5,9 +5,10 @@
 require 'google/protobuf'
 
 require 'temporalio/api/cloud/resource/v1/message'
+require 'temporalio/api/cloud/sink/v1/message'
 
 
-descriptor_data = "\n+temporal/api/cloud/account/v1/message.proto\x12\x1dtemporal.api.cloud.account.v1\x1a,temporal/api/cloud/resource/v1/message.proto\")\n\x0bMetricsSpec\x12\x1a\n\x12\x61\x63\x63\x65pted_client_ca\x18\x02 \x01(\x0c\"J\n\x0b\x41\x63\x63ountSpec\x12;\n\x07metrics\x18\x01 \x01(\x0b\x32*.temporal.api.cloud.account.v1.MetricsSpec\"\x16\n\x07Metrics\x12\x0b\n\x03uri\x18\x01 \x01(\t\"\xfc\x01\n\x07\x41\x63\x63ount\x12\n\n\x02id\x18\x01 \x01(\t\x12\x38\n\x04spec\x18\x02 \x01(\x0b\x32*.temporal.api.cloud.account.v1.AccountSpec\x12\x18\n\x10resource_version\x18\x03 \x01(\t\x12<\n\x05state\x18\x04 \x01(\x0e\x32-.temporal.api.cloud.resource.v1.ResourceState\x12\x1a\n\x12\x61sync_operation_id\x18\x05 \x01(\t\x12\x37\n\x07metrics\x18\x06 \x01(\x0b\x32&.temporal.api.cloud.account.v1.MetricsB\xa7\x01\n io.temporal.api.cloud.account.v1B\x0cMessageProtoP\x01Z+go.temporal.io/api/cloud/account/v1;account\xaa\x02\x1fTemporalio.Api.Cloud.Account.V1\xea\x02#Temporalio::Api::Cloud::Account::V1b\x06proto3"
+descriptor_data = "\n+temporal/api/cloud/account/v1/message.proto\x12\x1dtemporal.api.cloud.account.v1\x1a,temporal/api/cloud/resource/v1/message.proto\x1a(temporal/api/cloud/sink/v1/message.proto\")\n\x0bMetricsSpec\x12\x1a\n\x12\x61\x63\x63\x65pted_client_ca\x18\x02 \x01(\x0c\"J\n\x0b\x41\x63\x63ountSpec\x12;\n\x07metrics\x18\x01 \x01(\x0b\x32*.temporal.api.cloud.account.v1.MetricsSpec\"\x16\n\x07Metrics\x12\x0b\n\x03uri\x18\x01 \x01(\t\"\xfc\x01\n\x07\x41\x63\x63ount\x12\n\n\x02id\x18\x01 \x01(\t\x12\x38\n\x04spec\x18\x02 \x01(\x0b\x32*.temporal.api.cloud.account.v1.AccountSpec\x12\x18\n\x10resource_version\x18\x03 \x01(\t\x12<\n\x05state\x18\x04 \x01(\x0e\x32-.temporal.api.cloud.resource.v1.ResourceState\x12\x1a\n\x12\x61sync_operation_id\x18\x05 \x01(\t\x12\x37\n\x07metrics\x18\x06 \x01(\x0b\x32&.temporal.api.cloud.account.v1.Metrics\"\xbf\x01\n\x10\x41uditLogSinkSpec\x12\x0c\n\x04name\x18\x01 \x01(\t\x12?\n\x0ckinesis_sink\x18\x02 \x01(\x0b\x32\'.temporal.api.cloud.sink.v1.KinesisSpecH\x00\x12>\n\x0cpub_sub_sink\x18\x03 \x01(\x0b\x32&.temporal.api.cloud.sink.v1.PubSubSpecH\x00\x12\x0f\n\x07\x65nabled\x18\x04 \x01(\x08\x42\x0b\n\tsink_typeB\xa7\x01\n io.temporal.api.cloud.account.v1B\x0cMessageProtoP\x01Z+go.temporal.io/api/cloud/account/v1;account\xaa\x02\x1fTemporalio.Api.Cloud.Account.V1\xea\x02#Temporalio::Api::Cloud::Account::V1b\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
@@ -21,6 +22,7 @@ module Temporalio
           AccountSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.account.v1.AccountSpec").msgclass
           Metrics = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.account.v1.Metrics").msgclass
           Account = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.account.v1.Account").msgclass
+          AuditLogSinkSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.account.v1.AuditLogSinkSpec").msgclass
         end
       end
     end

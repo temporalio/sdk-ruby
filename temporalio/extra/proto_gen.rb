@@ -9,11 +9,11 @@ class ProtoGen
   def run
     FileUtils.rm_rf('lib/temporalio/api')
 
-    generate_api_protos(Dir.glob('ext/sdk-core/sdk-core-protos/protos/api_upstream/**/*.proto').reject do |proto|
+    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_upstream/**/*.proto').reject do |proto|
       proto.include?('google')
     end)
-    generate_api_protos(Dir.glob('ext/sdk-core/sdk-core-protos/protos/api_cloud_upstream/**/*.proto'))
-    generate_api_protos(Dir.glob('ext/sdk-core/sdk-core-protos/protos/testsrv_upstream/**/*.proto'))
+    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'))
+    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/testsrv_upstream/**/*.proto'))
     generate_api_protos(Dir.glob('ext/additional_protos/**/*.proto'))
     generate_import_helper_files
     generate_service_files
@@ -32,9 +32,9 @@ class ProtoGen
       'bundle',
       'exec',
       'grpc_tools_ruby_protoc',
-      '--proto_path=ext/sdk-core/sdk-core-protos/protos/api_upstream',
-      '--proto_path=ext/sdk-core/sdk-core-protos/protos/api_cloud_upstream',
-      '--proto_path=ext/sdk-core/sdk-core-protos/protos/testsrv_upstream',
+      '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
+      '--proto_path=ext/sdk-core/crates/common/protos/api_cloud_upstream',
+      '--proto_path=ext/sdk-core/crates/common/protos/testsrv_upstream',
       '--proto_path=ext/additional_protos',
       '--ruby_out=tmp-proto',
       *api_protos,
@@ -234,7 +234,7 @@ class ProtoGen
         // Generated code.  DO NOT EDIT!
 
         use magnus::{Error, Ruby};
-        use temporal_client::{CloudService, OperatorService, TestService, WorkflowService};
+        use temporalio_client::{CloudService, OperatorService, TestService, WorkflowService};
 
         use super::{error, rpc_call};
         use crate::{
@@ -309,10 +309,10 @@ class ProtoGen
       'bundle',
       'exec',
       'grpc_tools_ruby_protoc',
-      '--proto_path=ext/sdk-core/sdk-core-protos/protos/api_upstream',
-      '--proto_path=ext/sdk-core/sdk-core-protos/protos/local',
+      '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
+      '--proto_path=ext/sdk-core/crates/common/protos/local',
       '--ruby_out=tmp-proto',
-      *Dir.glob('ext/sdk-core/sdk-core-protos/protos/local/**/*.proto'),
+      *Dir.glob('ext/sdk-core/crates/common/protos/local/**/*.proto'),
       exception: true
     )
     # Walk all generated Ruby files and cleanup content and filename

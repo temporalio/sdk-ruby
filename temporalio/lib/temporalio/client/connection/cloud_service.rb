@@ -631,6 +631,21 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.SetServiceAccountNamespaceAccess API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessResponse] API response.
+        def set_service_account_namespace_access(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_service_account_namespace_access',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.DeleteServiceAccount API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountRequest] API request.
@@ -851,6 +866,21 @@ module Temporalio
             rpc: 'delete_connectivity_rule',
             request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest,
             response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.ValidateAccountAuditLogSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse] API response.
+        def validate_account_audit_log_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'validate_account_audit_log_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse,
             request:,
             rpc_options:
           )

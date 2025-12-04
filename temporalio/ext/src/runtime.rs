@@ -10,15 +10,15 @@ use std::str::FromStr;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
-use temporal_sdk_core::telemetry::{
-    MetricsCallBuffer, build_otlp_metric_exporter, start_prometheus_metric_exporter,
-};
-use temporal_sdk_core::{CoreRuntime, TokioRuntimeBuilder};
-use temporal_sdk_core_api::telemetry::HistogramBucketOverrides;
-use temporal_sdk_core_api::telemetry::{
+use temporalio_common::telemetry::HistogramBucketOverrides;
+use temporalio_common::telemetry::{
     Logger, MetricTemporality, OtelCollectorOptionsBuilder, OtlpProtocol,
     PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder, metrics::MetricCallBufferer,
 };
+use temporalio_sdk_core::telemetry::{
+    MetricsCallBuffer, build_otlp_metric_exporter, start_prometheus_metric_exporter,
+};
+use temporalio_sdk_core::{CoreRuntime, RuntimeOptionsBuilder, TokioRuntimeBuilder};
 use tracing::error as log_error;
 use url::Url;
 
@@ -55,7 +55,7 @@ pub(crate) struct RuntimeHandle {
 macro_rules! enter_sync {
     ($runtime:expr) => {
         if let Some(subscriber) = $runtime.core.telemetry().trace_subscriber() {
-            temporal_sdk_core::telemetry::set_trace_subscriber_for_current_thread(subscriber);
+            temporalio_sdk_core::telemetry::set_trace_subscriber_for_current_thread(subscriber);
         }
         let _guard = $runtime.core.tokio_handle().enter();
     };
@@ -71,12 +71,12 @@ pub(crate) enum AsyncCommand {
 impl Runtime {
     pub fn new(options: Struct) -> Result<Self, Error> {
         // Build options
-        let mut opts_build = TelemetryOptionsBuilder::default();
+        let mut telemetry_opts_build = TelemetryOptionsBuilder::default();
         let telemetry = options
             .child(id!("telemetry"))?
             .ok_or_else(|| error!("Missing telemetry options"))?;
         if let Some(logging) = telemetry.child(id!("logging"))? {
-            opts_build.logging(
+            telemetry_opts_build.logging(
                 if let Some(_forward_to) = logging.member::<Option<Value>>(id!("forward_to"))? {
                     // TODO(cretz): This
                     return Err(error!("Forwarding not yet supported"));
@@ -90,14 +90,24 @@ impl Runtime {
         // Set some metrics options now, but the metrics instance is late-bound
         // after CoreRuntime created since it needs Tokio runtime
         if let Some(metrics) = telemetry.child(id!("metrics"))? {
-            opts_build.attach_service_name(metrics.member(id!("attach_service_name"))?);
+            telemetry_opts_build.attach_service_name(metrics.member(id!("attach_service_name"))?);
             if let Some(prefix) = metrics.member::<Option<String>>(id!("metric_prefix"))? {
-                opts_build.metric_prefix(prefix);
+                telemetry_opts_build.metric_prefix(prefix);
             }
         }
-        let opts = opts_build
+        let opts = RuntimeOptionsBuilder::default()
+            .telemetry_options(
+                telemetry_opts_build
+                    .build()
+                    .map_err(|err| error!("Invalid telemetry options: {}", err))?,
+            )
+            .heartbeat_interval(
+                options
+                    .member::<Option<f64>>(id!("worker_heartbeat_interval"))?
+                    .map(Duration::from_secs_f64),
+            )
             .build()
-            .map_err(|err| error!("Invalid telemetry options: {}", err))?;
+            .map_err(|err| error!("Invalid runtime options: {}", err))?;
 
         // Create core runtime
         let mut core = CoreRuntime::new(opts, TokioRuntimeBuilder::default())

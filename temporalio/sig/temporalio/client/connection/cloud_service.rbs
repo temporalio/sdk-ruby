@@ -169,6 +169,10 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def set_service_account_namespace_access: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def delete_service_account: (
           untyped request,
           ?rpc_options: RPCOptions?
@@ -226,6 +230,10 @@ module Temporalio
           ?rpc_options: RPCOptions?
         ) -> untyped
         def delete_connectivity_rule: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def validate_account_audit_log_sink: (
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped

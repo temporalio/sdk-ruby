@@ -25,12 +25,12 @@ use magnus::{
     value::{Lazy, LazyId},
 };
 use prost::Message;
-use temporal_sdk_core::{
-    ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
-    SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
-    replay::{HistoryForReplay, ReplayWorkerInput},
+use temporalio_common::protos::coresdk::{
+    ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
+    NexusSlotInfo, WorkflowSlotInfo,
 };
-use temporal_sdk_core_api::{
+use temporalio_common::protos::temporal::api::history::v1::History;
+use temporalio_common::{
     errors::{PollError, WorkflowErrorType},
     worker::{
         PollerBehavior, SlotInfo, SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext,
@@ -38,12 +38,14 @@ use temporal_sdk_core_api::{
         WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerVersioningStrategy,
     },
 };
-use temporal_sdk_core_protos::coresdk::workflow_completion::WorkflowActivationCompletion;
-use temporal_sdk_core_protos::coresdk::{
-    ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
-    NexusSlotInfo, WorkflowSlotInfo,
+use temporalio_common::{
+    protos::coresdk::workflow_completion::WorkflowActivationCompletion, worker::WorkerTaskTypes,
 };
-use temporal_sdk_core_protos::temporal::api::history::v1::History;
+use temporalio_sdk_core::{
+    ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
+    SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
+    replay::{HistoryForReplay, ReplayWorkerInput},
+};
 use tokio::sync::mpsc::{Sender, UnboundedSender, channel, unbounded_channel};
 use tokio_stream::wrappers::ReceiverStream;
 
@@ -86,7 +88,7 @@ pub struct Worker {
     // This needs to be a RefCell of an Option of an Arc because we need to
     // mutably take it out of the option at finalize time but we don't have
     // a mutable reference of self at that time.
-    core: RefCell<Option<Arc<temporal_sdk_core::Worker>>>,
+    core: RefCell<Option<Arc<temporalio_sdk_core::Worker>>>,
     runtime_handle: RuntimeHandle,
     activity: bool,
     workflow: bool,
@@ -110,12 +112,14 @@ impl Worker {
 
         enter_sync!(client.runtime_handle);
 
-        let activity = options.member::<bool>(id!("activity"))?;
-        let workflow = options.member::<bool>(id!("workflow"))?;
+        let config = build_config(options, &client.runtime_handle)?;
+        let activity =
+            config.task_types.enable_local_activities || config.task_types.enable_remote_activities;
+        let workflow = config.task_types.enable_workflows;
 
-        let worker = temporal_sdk_core::init_worker(
+        let worker = temporalio_sdk_core::init_worker(
             &client.runtime_handle.core,
-            build_config(options, &client.runtime_handle)?,
+            config,
             client.core.clone().into_inner(),
         )
         .map_err(|err| error!("Failed creating worker: {}", err))?;
@@ -130,7 +134,7 @@ impl Worker {
 
     // Helper that turns a worker + type into a poll stream
     fn stream_poll<'a>(
-        worker: Arc<temporal_sdk_core::Worker>,
+        worker: Arc<temporalio_sdk_core::Worker>,
         worker_index: usize,
         worker_type: WorkerType,
     ) -> BoxStream<'a, PollResult> {
@@ -140,16 +144,14 @@ impl Worker {
             if let Some(worker) = worker {
                 let result = match worker_type {
                     WorkerType::Activity => {
-                        match temporal_sdk_core_api::Worker::poll_activity_task(&*worker).await {
+                        match temporalio_common::Worker::poll_activity_task(&*worker).await {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
                             Err(PollError::ShutDown) => Ok(None),
                             Err(err) => Err(format!("Poll error: {err}")),
                         }
                     }
                     WorkerType::Workflow => {
-                        match temporal_sdk_core_api::Worker::poll_workflow_activation(&*worker)
-                            .await
-                        {
+                        match temporalio_common::Worker::poll_workflow_activation(&*worker).await {
                             Ok(res) => Ok(Some(res.encode_to_vec())),
                             Err(PollError::ShutDown) => Ok(None),
                             Err(err) => Err(format!("Poll error: {err}")),
@@ -287,7 +289,7 @@ impl Worker {
                             format!("Expected 1 reference but got {}", Arc::strong_count(&arc))
                         })
                     })?;
-                Ok(temporal_sdk_core_api::Worker::finalize_shutdown(worker))
+                Ok(temporalio_common::Worker::finalize_shutdown(worker))
             })
             .filter_map(|fut_or_err| match fut_or_err {
                 Ok(fut) => Some(fut),
@@ -328,7 +330,7 @@ impl Worker {
         let callback = AsyncCallback::from_queue(queue);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         self.runtime_handle.spawn(
-            async move { temporal_sdk_core_api::Worker::validate(&*worker).await },
+            async move { temporalio_common::Worker::validate(&*worker).await },
             move |ruby, result| match result {
                 Ok(()) => callback.push(&ruby, ruby.qnil()),
                 Err(err) => callback.push(&ruby, new_error!("Failed validating worker: {}", err)),
@@ -344,7 +346,7 @@ impl Worker {
             .map_err(|err| error!("Invalid proto: {}", err))?;
         self.runtime_handle.spawn(
             async move {
-                temporal_sdk_core_api::Worker::complete_activity_task(&*worker, completion).await
+                temporalio_common::Worker::complete_activity_task(&*worker, completion).await
             },
             move |ruby, result| match result {
                 Ok(()) => callback.push(&ruby, (ruby.qnil(),)),
@@ -359,7 +361,7 @@ impl Worker {
         let heartbeat = ActivityHeartbeat::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        temporal_sdk_core_api::Worker::record_activity_heartbeat(&*worker, heartbeat);
+        temporalio_common::Worker::record_activity_heartbeat(&*worker, heartbeat);
         Ok(())
     }
 
@@ -375,8 +377,7 @@ impl Worker {
             .map_err(|err| error!("Invalid proto: {}", err))?;
         self.runtime_handle.spawn(
             async move {
-                temporal_sdk_core_api::Worker::complete_workflow_activation(&*worker, completion)
-                    .await
+                temporalio_common::Worker::complete_workflow_activation(&*worker, completion).await
             },
             move |ruby, result| {
                 callback.push(
@@ -400,14 +401,15 @@ impl Worker {
     pub fn replace_client(&self, client: &Client) -> Result<(), Error> {
         enter_sync!(self.runtime_handle);
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        worker.replace_client(client.core.clone().into_inner());
-        Ok(())
+        worker
+            .replace_client(client.core.clone().into_inner())
+            .map_err(|err| error!("Failed replacing client: {}", err))
     }
 
     pub fn initiate_shutdown(&self) -> Result<(), Error> {
         enter_sync!(self.runtime_handle);
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        temporal_sdk_core_api::Worker::initiate_shutdown(&*worker);
+        temporalio_common::Worker::initiate_shutdown(&*worker);
         Ok(())
     }
 }
@@ -428,7 +430,7 @@ impl WorkflowReplayer {
 
         let (tx, rx) = channel(1);
 
-        let core_worker = temporal_sdk_core::init_replay_worker(ReplayWorkerInput::new(
+        let core_worker = temporalio_sdk_core::init_replay_worker(ReplayWorkerInput::new(
             build_config(options, &runtime.handle)?,
             ReceiverStream::new(rx),
         ))
@@ -509,7 +511,12 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 .ok_or_else(|| error!("Worker options must have activity_task_poller_behavior"))?;
             extract_poller_behavior(poller_behavior)?
         })
-        .no_remote_activities(options.member::<bool>(id!("no_remote_activities"))?)
+        .task_types(WorkerTaskTypes {
+            enable_workflows: options.member(id!("enable_workflows"))?,
+            enable_local_activities: options.member(id!("enable_local_activities"))?,
+            enable_remote_activities: options.member(id!("enable_remote_activities"))?,
+            enable_nexus: options.member(id!("enable_nexus"))?,
+        })
         .sticky_queue_schedule_to_start_timeout(Duration::from_secs_f64(
             options.member(id!("sticky_queue_schedule_to_start_timeout"))?,
         ))

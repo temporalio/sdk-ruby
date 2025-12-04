@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use magnus::{Error, RHash, RString, Ruby, class, function, prelude::*, scan_args};
-use temporal_sdk_core_api::envconfig::{
+use temporalio_common::envconfig::{
     ClientConfig as CoreClientConfig, ClientConfigCodec,
     ClientConfigProfile as CoreClientConfigProfile, ClientConfigTLS as CoreClientConfigTLS,
     DataSource, LoadClientConfigOptions, LoadClientConfigProfileOptions,

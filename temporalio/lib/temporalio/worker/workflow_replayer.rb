@@ -197,8 +197,6 @@ module Temporalio
           @bridge_replayer, @bridge_worker = Internal::Bridge::Worker::WorkflowReplayer.new(
             options.runtime._core_runtime,
             Internal::Bridge::Worker::Options.new(
-              activity: false,
-              workflow: true,
               namespace: options.namespace,
               task_queue: options.task_queue,
               tuner: Tuner.create_fixed(
@@ -211,7 +209,10 @@ module Temporalio
               nonsticky_to_sticky_poll_ratio: 1.0,
               activity_task_poller_behavior:
                 Temporalio::Worker::PollerBehavior::SimpleMaximum.new(1)._to_bridge_options,
-              no_remote_activities: true,
+              enable_workflows: true,
+              enable_local_activities: false,
+              enable_remote_activities: false,
+              enable_nexus: false,
               sticky_queue_schedule_to_start_timeout: 1.0,
               max_heartbeat_throttle_interval: 1.0,
               default_heartbeat_throttle_interval: 1.0,
