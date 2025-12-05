@@ -465,8 +465,6 @@ module Temporalio
       @bridge_worker = Internal::Bridge::Worker.new(
         client.connection._core_client,
         Internal::Bridge::Worker::Options.new(
-          activity: !activities.empty?,
-          workflow: !workflows.empty?,
           namespace: client.namespace,
           task_queue:,
           tuner: tuner._to_bridge_options,
@@ -475,9 +473,10 @@ module Temporalio
           workflow_task_poller_behavior: workflow_task_poller_behavior._to_bridge_options,
           nonsticky_to_sticky_poll_ratio:,
           activity_task_poller_behavior: activity_task_poller_behavior._to_bridge_options,
-          # For shutdown to work properly, we must disable remote activities
-          # ourselves if there are no activities
-          no_remote_activities: no_remote_activities || activities.empty?,
+          enable_workflows: !workflows.empty?,
+          enable_local_activities: !workflows.empty? && !activities.empty?,
+          enable_remote_activities: !activities.empty? && !no_remote_activities,
+          enable_nexus: false,
           sticky_queue_schedule_to_start_timeout:,
           max_heartbeat_throttle_interval:,
           default_heartbeat_throttle_interval:,

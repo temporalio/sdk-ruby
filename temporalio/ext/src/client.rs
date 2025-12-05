@@ -1,9 +1,8 @@
 use std::{collections::HashMap, future::Future, marker::PhantomData, time::Duration};
 
-use temporal_client::{
-    ClientInitError, ClientKeepAliveConfig, ClientOptionsBuilder, ClientTlsConfig,
-    ConfiguredClient, HttpConnectProxyOptions, RetryClient, RetryConfig,
-    TemporalServiceClientWithMetrics, TlsConfig,
+use temporalio_client::{
+    ClientInitError, ClientKeepAliveOptions, ClientOptions, ClientTlsOptions, ConfiguredClient,
+    HttpConnectProxyOptions, RetryClient, RetryOptions, TemporalServiceClient, TlsOptions,
 };
 
 use magnus::{
@@ -52,7 +51,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-type CoreClient = RetryClient<ConfiguredClient<TemporalServiceClientWithMetrics>>;
+type CoreClient = RetryClient<ConfiguredClient<TemporalServiceClient>>;
 
 #[derive(DataTypeFunctions, TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Client", free_immediately)]
@@ -86,10 +85,12 @@ impl Client {
         runtime.handle.fork_check("create client")?;
         let ruby = Ruby::get().expect("Ruby not available");
         // Build options
-        let mut opts_build = ClientOptionsBuilder::default();
-        let tls = options.child(id!("tls"))?;
         let headers = partition_grpc_headers(&ruby, options.member(id!("rpc_metadata"))?)?;
-        opts_build
+        let rpc_retry = options
+            .child(id!("rpc_retry"))?
+            .ok_or_else(|| error!("Missing rpc_retry"))?;
+        let tls = options.child(id!("tls"))?;
+        let opts = ClientOptions::builder()
             .target_url(
                 Url::parse(
                     format!(
@@ -103,71 +104,82 @@ impl Client {
             )
             .client_name(options.member::<String>(id!("client_name"))?)
             .client_version(options.member::<String>(id!("client_version"))?)
-            .headers(Some(headers.headers))
-            .binary_headers(Some(headers.binary_headers))
-            .api_key(options.member(id!("api_key"))?)
-            .identity(options.member::<String>(id!("identity"))?);
-        if let Some(tls) = tls {
-            opts_build.tls_cfg(TlsConfig {
-                client_tls_config: match (
-                    tls.member::<Option<RString>>(id!("client_cert"))?,
-                    tls.member::<Option<RString>>(id!("client_private_key"))?,
-                ) {
-                    (None, None) => None,
-                    (Some(client_cert), Some(client_private_key)) => Some(ClientTlsConfig {
-                        // These are unsafe because of lifetime issues, but we copy right away
-                        client_cert: unsafe { client_cert.as_slice().to_vec() },
-                        client_private_key: unsafe { client_private_key.as_slice().to_vec() },
-                    }),
-                    _ => {
-                        return Err(error!(
-                            "Must have both client cert and private key or neither"
-                        ));
-                    }
+            .headers(headers.headers)
+            .binary_headers(headers.binary_headers)
+            .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
+            .identity(options.member::<String>(id!("identity"))?)
+            .maybe_tls_options(if let Some(tls) = tls {
+                Some(TlsOptions {
+                    client_tls_options: match (
+                        tls.member::<Option<RString>>(id!("client_cert"))?,
+                        tls.member::<Option<RString>>(id!("client_private_key"))?,
+                    ) {
+                        (None, None) => None,
+                        (Some(client_cert), Some(client_private_key)) => Some(ClientTlsOptions {
+                            // These are unsafe because of lifetime issues, but we copy right away
+                            client_cert: unsafe { client_cert.as_slice().to_vec() },
+                            client_private_key: unsafe { client_private_key.as_slice().to_vec() },
+                        }),
+                        _ => {
+                            return Err(error!(
+                                "Must have both client cert and private key or neither"
+                            ));
+                        }
+                    },
+                    server_root_ca_cert: tls
+                        .member::<Option<RString>>(id!("server_root_ca_cert"))?
+                        .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
+                    domain: tls.member(id!("domain"))?,
+                })
+            } else {
+                None
+            })
+            .retry_options(RetryOptions {
+                initial_interval: Duration::from_secs_f64(
+                    rpc_retry.member(id!("initial_interval"))?,
+                ),
+                randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
+                multiplier: rpc_retry.member(id!("multiplier"))?,
+                max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
+                max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
+                    // 0 means none
+                    0.0 => None,
+                    val => Some(Duration::from_secs_f64(val)),
                 },
-                server_root_ca_cert: tls
-                    .member::<Option<RString>>(id!("server_root_ca_cert"))?
-                    .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
-                domain: tls.member(id!("domain"))?,
-            });
-        }
-        let rpc_retry = options
-            .child(id!("rpc_retry"))?
-            .ok_or_else(|| error!("Missing rpc_retry"))?;
-        opts_build.retry_config(RetryConfig {
-            initial_interval: Duration::from_secs_f64(rpc_retry.member(id!("initial_interval"))?),
-            randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
-            multiplier: rpc_retry.member(id!("multiplier"))?,
-            max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
-            max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
-                // 0 means none
-                0.0 => None,
-                val => Some(Duration::from_secs_f64(val)),
-            },
-            max_retries: rpc_retry.member(id!("max_retries"))?,
-        });
-        if let Some(keep_alive) = options.child(id!("keep_alive"))? {
-            opts_build.keep_alive(Some(ClientKeepAliveConfig {
-                interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
-                timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
-            }));
-        }
-        if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
-            opts_build.http_connect_proxy(Some(HttpConnectProxyOptions {
-                target_addr: proxy.member(id!("target_host"))?,
-                basic_auth: match (
-                    proxy.member::<Option<String>>(id!("basic_auth_user"))?,
-                    proxy.member::<Option<String>>(id!("basic_auth_user"))?,
-                ) {
-                    (None, None) => None,
-                    (Some(user), Some(pass)) => Some((user, pass)),
-                    _ => return Err(error!("Must have both basic auth and pass or neither")),
+                max_retries: rpc_retry.member(id!("max_retries"))?,
+            })
+            .keep_alive(
+                if let Some(keep_alive) = options.child(id!("keep_alive"))? {
+                    Some(ClientKeepAliveOptions {
+                        interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
+                        timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
+                    })
+                } else {
+                    None
                 },
-            }));
-        }
-        let opts = opts_build
-            .build()
-            .map_err(|err| error!("Invalid client options: {}", err))?;
+            )
+            .maybe_http_connect_proxy(
+                if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
+                    Some(HttpConnectProxyOptions {
+                        target_addr: proxy.member(id!("target_host"))?,
+                        basic_auth: match (
+                            proxy.member::<Option<String>>(id!("basic_auth_user"))?,
+                            proxy.member::<Option<String>>(id!("basic_auth_pass"))?,
+                        ) {
+                            (None, None) => None,
+                            (Some(user), Some(pass)) => Some((user, pass)),
+                            _ => {
+                                return Err(error!(
+                                    "Must have both basic auth and pass or neither"
+                                ));
+                            }
+                        },
+                    })
+                } else {
+                    None
+                },
+            )
+            .build();
 
         // Create client
         let callback = AsyncCallback::from_queue(queue);

@@ -3,8 +3,6 @@ module Temporalio
     module Bridge
       class Worker
         class Options
-          attr_accessor activity: bool
-          attr_accessor workflow: bool
           attr_accessor namespace: String
           attr_accessor task_queue: String
           attr_accessor tuner: TunerOptions
@@ -13,7 +11,10 @@ module Temporalio
           attr_accessor workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
           attr_accessor nonsticky_to_sticky_poll_ratio: Float
           attr_accessor activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
-          attr_accessor no_remote_activities: bool
+          attr_accessor enable_workflows: bool
+          attr_accessor enable_local_activities: bool
+          attr_accessor enable_remote_activities: bool
+          attr_accessor enable_nexus: bool
           attr_accessor sticky_queue_schedule_to_start_timeout: Float
           attr_accessor max_heartbeat_throttle_interval: Float
           attr_accessor default_heartbeat_throttle_interval: Float
@@ -25,8 +26,6 @@ module Temporalio
           attr_accessor deployment_options: DeploymentOptions?
 
           def initialize: (
-            activity: bool,
-            workflow: bool,
             namespace: String,
             task_queue: String,
             tuner: TunerOptions,
@@ -35,7 +34,10 @@ module Temporalio
             workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
             nonsticky_to_sticky_poll_ratio: Float,
             activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
-            no_remote_activities: bool,
+            enable_workflows: bool,
+            enable_local_activities: bool,
+            enable_remote_activities: bool,
+            enable_nexus: bool,
             sticky_queue_schedule_to_start_timeout: Float,
             max_heartbeat_throttle_interval: Float,
             default_heartbeat_throttle_interval: Float,

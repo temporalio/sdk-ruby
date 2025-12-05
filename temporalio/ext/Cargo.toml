@@ -15,15 +15,14 @@ futures = "0.3"
 log = "0.4"
 magnus = "0.7"
 parking_lot = "0.12"
-prost = "0.13"
+prost = { workspace = true }
 rb-sys = "0.9"
-temporal-client = { version = "0.1.0", path = "./sdk-core/client" }
-temporal-sdk-core = { version = "0.1.0", path = "./sdk-core/core", features = ["ephemeral-server"] }
-temporal-sdk-core-api = { version = "0.1.0", path = "./sdk-core/core-api", features = ["envconfig"] }
-temporal-sdk-core-protos = { version = "0.1.0", path = "./sdk-core/sdk-core-protos" }
-tokio = "1.37"
+temporalio-client = { version = "0.1.0", path = "./sdk-core/crates/client" }
+temporalio-common = { version = "0.1.0", path = "./sdk-core/crates/common", features = ["envconfig"] }
+temporalio-sdk-core = { version = "0.1.0", path = "./sdk-core/crates/sdk-core", features = ["ephemeral-server"] }
+tokio = "1.47"
 tokio-stream = "0.1"
 tokio-util = "0.7"
-tonic = "0.13"
+tonic = { workspace = true }
 tracing = "0.1"
-url = "2.2"
+url = "2.5"

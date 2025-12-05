@@ -1,7 +1,7 @@
 // Generated code.  DO NOT EDIT!
 
 use magnus::{Error, Ruby};
-use temporal_client::{CloudService, OperatorService, TestService, WorkflowService};
+use temporalio_client::{CloudService, OperatorService, TestService, WorkflowService};
 
 use super::{error, rpc_call};
 use crate::{
@@ -79,6 +79,9 @@ impl Client {
                 }
                 "describe_task_queue" => {
                     rpc_call!(self, callback, call, WorkflowService, describe_task_queue)
+                }
+                "describe_worker" => {
+                    rpc_call!(self, callback, call, WorkflowService, describe_worker)
                 }
                 "describe_worker_deployment" => rpc_call!(
                     self,
@@ -420,6 +423,13 @@ impl Client {
                     WorkflowService,
                     set_worker_deployment_current_version
                 ),
+                "set_worker_deployment_manager" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    set_worker_deployment_manager
+                ),
                 "set_worker_deployment_ramping_version" => rpc_call!(
                     self,
                     callback,
@@ -704,6 +714,13 @@ impl Client {
                     CloudService,
                     rename_custom_search_attribute
                 ),
+                "set_service_account_namespace_access" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    set_service_account_namespace_access
+                ),
                 "set_user_group_namespace_access" => rpc_call!(
                     self,
                     callback,
@@ -743,6 +760,13 @@ impl Client {
                 "update_user_group" => {
                     rpc_call!(self, callback, call, CloudService, update_user_group)
                 }
+                "validate_account_audit_log_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    validate_account_audit_log_sink
+                ),
                 "validate_namespace_export_sink" => rpc_call!(
                     self,
                     callback,

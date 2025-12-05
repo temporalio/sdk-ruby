@@ -5,7 +5,7 @@
 require 'google/protobuf'
 
 
-descriptor_data = "\n(temporal/api/cloud/sink/v1/message.proto\x12\x1atemporal.api.cloud.sink.v1\"i\n\x06S3Spec\x12\x11\n\trole_name\x18\x01 \x01(\t\x12\x13\n\x0b\x62ucket_name\x18\x02 \x01(\t\x12\x0e\n\x06region\x18\x03 \x01(\t\x12\x0f\n\x07kms_arn\x18\x04 \x01(\t\x12\x16\n\x0e\x61ws_account_id\x18\x05 \x01(\t\"U\n\x07GCSSpec\x12\r\n\x05sa_id\x18\x01 \x01(\t\x12\x13\n\x0b\x62ucket_name\x18\x02 \x01(\t\x12\x16\n\x0egcp_project_id\x18\x03 \x01(\t\x12\x0e\n\x06region\x18\x04 \x01(\tB\x98\x01\n\x1dio.temporal.api.cloud.sink.v1B\x0cMessageProtoP\x01Z%go.temporal.io/api/cloud/sink/v1;sink\xaa\x02\x1cTemporalio.Api.Cloud.Sink.V1\xea\x02 Temporalio::Api::Cloud::Sink::V1b\x06proto3"
+descriptor_data = "\n(temporal/api/cloud/sink/v1/message.proto\x12\x1atemporal.api.cloud.sink.v1\"i\n\x06S3Spec\x12\x11\n\trole_name\x18\x01 \x01(\t\x12\x13\n\x0b\x62ucket_name\x18\x02 \x01(\t\x12\x0e\n\x06region\x18\x03 \x01(\t\x12\x0f\n\x07kms_arn\x18\x04 \x01(\t\x12\x16\n\x0e\x61ws_account_id\x18\x05 \x01(\t\"U\n\x07GCSSpec\x12\r\n\x05sa_id\x18\x01 \x01(\t\x12\x13\n\x0b\x62ucket_name\x18\x02 \x01(\t\x12\x16\n\x0egcp_project_id\x18\x03 \x01(\t\x12\x0e\n\x06region\x18\x04 \x01(\t\"I\n\x0bKinesisSpec\x12\x11\n\trole_name\x18\x01 \x01(\t\x12\x17\n\x0f\x64\x65stination_uri\x18\x02 \x01(\t\x12\x0e\n\x06region\x18\x03 \x01(\t\"T\n\nPubSubSpec\x12\x1a\n\x12service_account_id\x18\x01 \x01(\t\x12\x12\n\ntopic_name\x18\x02 \x01(\t\x12\x16\n\x0egcp_project_id\x18\x03 \x01(\tB\x98\x01\n\x1dio.temporal.api.cloud.sink.v1B\x0cMessageProtoP\x01Z%go.temporal.io/api/cloud/sink/v1;sink\xaa\x02\x1cTemporalio.Api.Cloud.Sink.V1\xea\x02 Temporalio::Api::Cloud::Sink::V1b\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
@@ -17,6 +17,8 @@ module Temporalio
         module V1
           S3Spec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.sink.v1.S3Spec").msgclass
           GCSSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.sink.v1.GCSSpec").msgclass
+          KinesisSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.sink.v1.KinesisSpec").msgclass
+          PubSubSpec = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.cloud.sink.v1.PubSubSpec").msgclass
         end
       end
     end

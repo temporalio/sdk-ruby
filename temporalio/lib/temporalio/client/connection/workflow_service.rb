@@ -1036,6 +1036,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.SetWorkerDeploymentManager API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerResponse] API response.
+        def set_worker_deployment_manager(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_worker_deployment_manager',
+            request_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.UpdateWorkflowExecution API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest] API request.
@@ -1391,6 +1406,21 @@ module Temporalio
             rpc: 'update_worker_config',
             request_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigRequest,
             response_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DescribeWorker API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeWorkerRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse] API response.
+        def describe_worker(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_worker',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse,
             request:,
             rpc_options:
           )

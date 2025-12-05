@@ -7,8 +7,6 @@ module Temporalio
     module Bridge
       class Worker
         Options = Struct.new(
-          :activity,
-          :workflow,
           :namespace,
           :task_queue,
           :tuner,
@@ -17,7 +15,10 @@ module Temporalio
           :workflow_task_poller_behavior,
           :nonsticky_to_sticky_poll_ratio,
           :activity_task_poller_behavior,
-          :no_remote_activities,
+          :enable_workflows,
+          :enable_local_activities,
+          :enable_remote_activities,
+          :enable_nexus,
           :sticky_queue_schedule_to_start_timeout,
           :max_heartbeat_throttle_interval,
           :default_heartbeat_throttle_interval,

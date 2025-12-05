@@ -4,7 +4,7 @@ use magnus::{
     DataTypeFunctions, Error, Ruby, TypedData, Value, class, function, method, prelude::*,
 };
 use parking_lot::Mutex;
-use temporal_sdk_core::ephemeral_server::{
+use temporalio_sdk_core::ephemeral_server::{
     self, EphemeralExe, EphemeralExeVersion, TemporalDevServerConfigBuilder,
     TestServerConfigBuilder,
 };

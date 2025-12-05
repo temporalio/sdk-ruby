@@ -9,7 +9,7 @@ use magnus::{
     r_hash::ForEach,
     value::{IntoId, Lazy, Qfalse, Qtrue},
 };
-use temporal_sdk_core_api::telemetry::metrics::{
+use temporalio_common::telemetry::metrics::{
     self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
 };
 
