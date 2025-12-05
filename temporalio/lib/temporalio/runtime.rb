@@ -101,7 +101,8 @@ module Temporalio
       # @!visibility private
       def _to_bridge
         # @type self: LoggingFilterOptions
-        "#{other_level},temporal_sdk_core=#{core_level},temporal_client=#{core_level},temporal_sdk=#{core_level}"
+        "#{other_level},temporalio_sdk_core=#{core_level},temporalio_client=#{core_level}," \
+          "temporalio_sdk=#{core_level},temporalio_bridge=#{core_level}"
       end
     end
 
