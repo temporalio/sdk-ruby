@@ -169,6 +169,9 @@ module Temporalio
       # @param lazy_connect [Boolean] If true, there is no connection until the first call is attempted or a worker
       #   is created with it. Clients from lazy connections cannot be used for workers if they have not performed a
       #   connection.
+      # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block is a
+      #   must be yielded to only once with the options. The block does not return a meaningful value, nor should
+      #   around_connect.
       #
       # @see Client.connect
       def initialize(
@@ -181,7 +184,8 @@ module Temporalio
         keep_alive: KeepAliveOptions.new,
         http_connect_proxy: nil,
         runtime: Runtime.default,
-        lazy_connect: false
+        lazy_connect: false,
+        around_connect: nil
       )
         @options = Options.new(
           target_host:,
@@ -195,9 +199,19 @@ module Temporalio
           runtime:,
           lazy_connect:
         ).freeze
-        # Create core client now if not lazy
         @core_client_mutex = Mutex.new
-        _core_client unless lazy_connect
+        # Create core client now if not lazy, applying around_connect if present
+        if around_connect
+          # Technically around_connect can never run the block for whatever reason (i.e. plugin returning a mock
+          # connection), so we don't enforce it
+          around_connect.call(@options) do |options|
+            @options = options
+            _core_client unless lazy_connect
+            nil
+          end
+        else
+          _core_client unless lazy_connect
+        end
         # Create service instances
         @workflow_service = WorkflowService.new(self)
         @operator_service = OperatorService.new(self)

@@ -15,6 +15,7 @@ require 'temporalio/worker/activity_executor'
 require 'temporalio/worker/deployment_options'
 require 'temporalio/worker/illegal_workflow_call_validator'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/plugin'
 require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
@@ -35,6 +36,7 @@ module Temporalio
       :tuner,
       :activity_executors,
       :workflow_executor,
+      :plugins,
       :interceptors,
       :identity,
       :logger,
@@ -121,6 +123,42 @@ module Temporalio
       shutdown_signals: [],
       raise_in_block_on_shutdown: Error::CanceledError.new('Workers finished'),
       wait_block_complete: true,
+      &block
+    )
+      # We have to apply plugins. However, every plugin has a different worker. So we provide them the worker along with
+      # other options, but we disregard any mutation of the worker on the next call.
+      run_worker = proc do |options|
+        # @type var options: Plugin::RunWorkerOptions
+        _run_all_root(*workers,
+                      cancellation: options.cancellation,
+                      shutdown_signals: options.shutdown_signals,
+                      raise_in_block_on_shutdown: options.raise_in_block_on_shutdown,
+                      wait_block_complete:, &block)
+      end
+      plugins_with_workers = workers.flat_map { |w| w._plugins.map { |p| [p, w] } }
+      run_worker = plugins_with_workers.reverse_each.reduce(run_worker) do |next_call, plugin_with_worker|
+        plugin, worker = plugin_with_worker
+        proc do |options|
+          plugin.run_worker(options.with(worker:), next_call) # steep:ignore
+        end
+      end
+
+      run_worker.call(Plugin::RunWorkerOptions.new(
+        # Intentionally violating typing here because we set this on each call
+        worker: nil, # steep:ignore
+        cancellation:,
+        shutdown_signals:,
+        raise_in_block_on_shutdown:
+      ))
+    end
+
+    # @!visibility private
+    def self._run_all_root(
+      *workers,
+      cancellation:,
+      shutdown_signals:,
+      raise_in_block_on_shutdown:,
+      wait_block_complete:,
       &block
     )
       # Confirm there is at least one and they are all workers
@@ -301,6 +339,19 @@ module Temporalio
       end
     end
 
+    # @!visibility private
+    def self._validate_plugins!(plugins)
+      plugins.each do |plugin|
+        raise ArgumentError, "#{plugin.class} does not implement Worker::Plugin" unless plugin.is_a?(Plugin)
+
+        # Validate plugin has implemented expected methods
+        missing = Plugin.instance_methods(false).select { |m| plugin.method(m).owner == Plugin }
+        unless missing.empty?
+          raise ArgumentError, "#{plugin.class} missing the following worker plugin method(s): #{missing.join(', ')}"
+        end
+      end
+    end
+
     # @return [Options] Options for this worker which has the same attributes as {initialize}.
     attr_reader :options
 
@@ -315,6 +366,9 @@ module Temporalio
     # @param activity_executors [Hash<Symbol, Worker::ActivityExecutor>] Executors that activities can run within.
     # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within. This must be a
     #   {WorkflowExecutor::ThreadPool} currently.
+    # @param plugins [Array<Plugin>] Plugins to use for configuring workers and intercepting the running of workers. Any
+    #   plugins that were set on the client that include {Plugin} will automatically be applied to the worker and
+    #   should not be configured explicitly via this option. WARNING: Plugins are experimental.
     # @param interceptors [Array<Interceptor::Activity, Interceptor::Workflow>] Interceptors specific to this worker.
     #   Note, interceptors set on the client that include the {Interceptor::Activity} or {Interceptor::Workflow} module
     #   are automatically included here, so no need to specify them again.
@@ -387,6 +441,7 @@ module Temporalio
       tuner: Tuner.create_fixed,
       activity_executors: ActivityExecutor.defaults,
       workflow_executor: WorkflowExecutor::ThreadPool.default,
+      plugins: [],
       interceptors: [],
       identity: nil,
       logger: client.options.logger,
@@ -411,8 +466,6 @@ module Temporalio
       activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
     )
-      raise ArgumentError, 'Must have at least one activity or workflow' if activities.empty? && workflows.empty?
-
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
       @options = Options.new(
@@ -423,6 +476,7 @@ module Temporalio
         tuner:,
         activity_executors:,
         workflow_executor:,
+        plugins:,
         interceptors:,
         identity:,
         logger:,
@@ -447,53 +501,68 @@ module Temporalio
         activity_task_poller_behavior:,
         debug_mode:
       ).freeze
+      # Collect applicable client plugins and worker plugins, then validate and apply to options
+      @plugins = client.options.plugins.grep(Plugin) + plugins
+      Worker._validate_plugins!(@plugins)
+      @options = @plugins.reduce(@options) { |options, plugin| plugin.configure_worker(options) }
+      # Initialize the worker for the given options
+      _initialize_from_options
+    end
+
+    # @!visibility private
+    def _initialize_from_options
+      if @options.activities.empty? && @options.workflows.empty?
+        raise ArgumentError, 'Must have at least one activity or workflow'
+      end
 
       should_enforce_versioning_behavior =
-        deployment_options.use_worker_versioning &&
-        deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
+        @options.deployment_options.use_worker_versioning &&
+        @options.deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
       # Preload workflow definitions and some workflow settings for the bridge
       workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
-        workflows,
-        should_enforce_versioning_behavior: should_enforce_versioning_behavior
+        @options.workflows,
+        should_enforce_versioning_behavior:
       )
       nondeterminism_as_workflow_fail, nondeterminism_as_workflow_fail_for_types =
         Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
-          workflow_failure_exception_types:, workflow_definitions:
+          workflow_failure_exception_types: @options.workflow_failure_exception_types,
+          workflow_definitions:
         )
 
       # Create the bridge worker
       @bridge_worker = Internal::Bridge::Worker.new(
-        client.connection._core_client,
+        @options.client.connection._core_client,
         Internal::Bridge::Worker::Options.new(
-          namespace: client.namespace,
-          task_queue:,
-          tuner: tuner._to_bridge_options,
-          identity_override: identity,
-          max_cached_workflows:,
-          workflow_task_poller_behavior: workflow_task_poller_behavior._to_bridge_options,
-          nonsticky_to_sticky_poll_ratio:,
-          activity_task_poller_behavior: activity_task_poller_behavior._to_bridge_options,
-          enable_workflows: !workflows.empty?,
-          enable_local_activities: !workflows.empty? && !activities.empty?,
-          enable_remote_activities: !activities.empty? && !no_remote_activities,
+          namespace: @options.client.namespace,
+          task_queue: @options.task_queue,
+          tuner: @options.tuner._to_bridge_options,
+          identity_override: @options.identity,
+          max_cached_workflows: @options.max_cached_workflows,
+          workflow_task_poller_behavior: @options.workflow_task_poller_behavior._to_bridge_options,
+          nonsticky_to_sticky_poll_ratio: @options.nonsticky_to_sticky_poll_ratio,
+          activity_task_poller_behavior: @options.activity_task_poller_behavior._to_bridge_options,
+          enable_workflows: !@options.workflows.empty?,
+          enable_local_activities: !@options.workflows.empty? && !@options.activities.empty?,
+          enable_remote_activities: !@options.activities.empty? && !@options.no_remote_activities,
           enable_nexus: false,
-          sticky_queue_schedule_to_start_timeout:,
-          max_heartbeat_throttle_interval:,
-          default_heartbeat_throttle_interval:,
-          max_worker_activities_per_second: max_activities_per_second,
-          max_task_queue_activities_per_second:,
-          graceful_shutdown_period:,
+          sticky_queue_schedule_to_start_timeout: @options.sticky_queue_schedule_to_start_timeout,
+          max_heartbeat_throttle_interval: @options.max_heartbeat_throttle_interval,
+          default_heartbeat_throttle_interval: @options.default_heartbeat_throttle_interval,
+          max_worker_activities_per_second: @options.max_activities_per_second,
+          max_task_queue_activities_per_second: @options.max_task_queue_activities_per_second,
+          graceful_shutdown_period: @options.graceful_shutdown_period,
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
-          deployment_options: deployment_options._to_bridge_options
+          deployment_options: @options.deployment_options._to_bridge_options,
+          plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort
         )
       )
 
       # Collect interceptors from client and params
-      @activity_interceptors = (client.options.interceptors + interceptors).select do |i|
+      @activity_interceptors = (@options.client.options.interceptors + @options.interceptors).select do |i|
         i.is_a?(Interceptor::Activity)
       end
-      @workflow_interceptors = (client.options.interceptors + interceptors).select do |i|
+      @workflow_interceptors = (@options.client.options.interceptors + @options.interceptors).select do |i|
         i.is_a?(Interceptor::Workflow)
       end
 
@@ -501,27 +570,27 @@ module Temporalio
       @worker_shutdown_cancellation = Cancellation.new
 
       # Create workers
-      unless activities.empty?
+      unless @options.activities.empty?
         @activity_worker = Internal::Worker::ActivityWorker.new(worker: self,
                                                                 bridge_worker: @bridge_worker)
       end
-      unless workflows.empty?
+      unless @options.workflows.empty?
         @workflow_worker = Internal::Worker::WorkflowWorker.new(
           bridge_worker: @bridge_worker,
-          namespace: client.namespace,
-          task_queue:,
+          namespace: @options.client.namespace,
+          task_queue: @options.task_queue,
           workflow_definitions:,
-          workflow_executor:,
-          logger:,
-          data_converter: client.data_converter,
-          metric_meter: client.connection.options.runtime.metric_meter,
+          workflow_executor: @options.workflow_executor,
+          logger: @options.logger,
+          data_converter: @options.client.data_converter,
+          metric_meter: @options.client.connection.options.runtime.metric_meter,
           workflow_interceptors: @workflow_interceptors,
-          disable_eager_activity_execution:,
-          illegal_workflow_calls:,
-          workflow_failure_exception_types:,
-          workflow_payload_codec_thread_pool:,
-          unsafe_workflow_io_enabled:,
-          debug_mode:,
+          disable_eager_activity_execution: @options.disable_eager_activity_execution,
+          illegal_workflow_calls: @options.illegal_workflow_calls,
+          workflow_failure_exception_types: @options.workflow_failure_exception_types,
+          workflow_payload_codec_thread_pool: @options.workflow_payload_codec_thread_pool,
+          unsafe_workflow_io_enabled: @options.unsafe_workflow_io_enabled,
+          debug_mode: @options.debug_mode,
           assert_valid_local_activity: ->(activity) { _assert_valid_local_activity(activity) }
         )
       end
@@ -642,6 +711,11 @@ module Temporalio
       raise ArgumentError,
             "Activity #{activity} " \
             'is not registered on this worker, no available activities.'
+    end
+
+    # @!visibility private
+    def _plugins
+      @plugins
     end
   end
 end

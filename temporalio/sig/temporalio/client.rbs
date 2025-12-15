@@ -4,6 +4,7 @@ module Temporalio
       attr_reader connection: Connection
       attr_reader namespace: String
       attr_reader data_converter: Converters::DataConverter
+      attr_reader plugins: Array[Plugin]
       attr_reader interceptors: Array[Interceptor]
       attr_reader logger: Logger
       attr_reader default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
@@ -12,6 +13,7 @@ module Temporalio
         connection: Connection,
         namespace: String,
         data_converter: Converters::DataConverter,
+        plugins: Array[Plugin],
         interceptors: Array[Interceptor],
         logger: Logger,
         default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?
@@ -38,6 +40,7 @@ module Temporalio
       ?api_key: String?,
       ?tls: bool | Connection::TLSOptions | nil,
       ?data_converter: Converters::DataConverter,
+      ?plugins: Array[Plugin],
       ?interceptors: Array[Interceptor],
       ?logger: Logger,
       ?default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?,
@@ -50,12 +53,15 @@ module Temporalio
       ?lazy_connect: bool
     ) -> Client
 
+    def self._validate_plugins!: (Array[Plugin] plugins) -> void
+
     attr_reader options: Options
 
     def initialize: (
       connection: Connection,
       namespace: String,
       ?data_converter: Converters::DataConverter,
+      ?plugins: Array[Plugin],
       ?interceptors: Array[Interceptor],
       ?logger: Logger,
       ?default_workflow_query_reject_condition: WorkflowQueryRejectCondition::enum?

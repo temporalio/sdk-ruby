@@ -1,0 +1,65 @@
+module Temporalio
+  class SimplePlugin
+    include Client::Plugin
+    include Worker::Plugin
+
+    type option[T] = nil | T | ^(T) -> T
+
+    class Options
+      attr_reader name: String
+      attr_reader data_converter: option[Converters::DataConverter]
+      attr_reader client_interceptors: option[Array[Client::Interceptor]]
+      attr_reader activities: option[Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]]
+      attr_reader workflows: option[Array[singleton(Workflow::Definition) | Workflow::Definition::Info]]
+      attr_reader worker_interceptors: option[Array[Worker::Interceptor::Activity | Worker::Interceptor::Workflow]]
+      attr_reader workflow_failure_exception_types: option[Array[String]]
+      attr_reader run_context: nil | ^(
+        Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+        ^(Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+      ) -> untyped
+
+      def initialize: (
+        name: String,
+        data_converter: option[Converters::DataConverter],
+        client_interceptors: option[Array[Client::Interceptor]],
+        activities: option[Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]],
+        workflows: option[Array[singleton(Workflow::Definition) | Workflow::Definition::Info]],
+        worker_interceptors: option[Array[Worker::Interceptor::Activity | Worker::Interceptor::Workflow]],
+        workflow_failure_exception_types: option[Array[String]],
+        run_context: nil | ^(
+          Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+          ^(Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+        ) -> untyped
+      ) -> void
+    end
+
+    attr_reader options: Options
+
+    def initialize: (
+      name: String,
+      ?data_converter: option[Converters::DataConverter],
+      ?client_interceptors: option[Array[Client::Interceptor]],
+      ?activities: option[Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]],
+      ?workflows: option[Array[singleton(Workflow::Definition) | Workflow::Definition::Info]],
+      ?worker_interceptors: option[Array[Worker::Interceptor::Activity | Worker::Interceptor::Workflow]],
+      ?workflow_failure_exception_types: option[Array[String]],
+      ?run_context: nil | ^(
+        Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+        ^(Worker::Plugin::RunWorkerOptions | Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+      ) -> untyped
+    ) -> void
+
+    def _single_option: [T < ::Object] (
+      new: option[T],
+      existing: T,
+      type: Class,
+      name: String
+    ) -> T?
+
+    def _array_option: [T < ::Object] (
+      new: option[T],
+      existing: T,
+      name: String
+    ) -> T?
+  end
+end

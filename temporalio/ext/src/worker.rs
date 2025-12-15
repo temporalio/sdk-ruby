@@ -30,6 +30,7 @@ use temporalio_common::protos::coresdk::{
     NexusSlotInfo, WorkflowSlotInfo,
 };
 use temporalio_common::protos::temporal::api::history::v1::History;
+use temporalio_common::protos::temporal::api::worker::v1::PluginInfo;
 use temporalio_common::{
     errors::{PollError, WorkflowErrorType},
     worker::{
@@ -554,6 +555,16 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 .into_iter()
                 .map(|s| (s, HashSet::from([WorkflowErrorType::Nondeterminism])))
                 .collect::<HashMap<String, HashSet<WorkflowErrorType>>>(),
+        )
+        .plugins(
+            options
+                .member::<Vec<String>>(id!("plugins"))?
+                .into_iter()
+                .map(|name| PluginInfo {
+                    name,
+                    version: String::new(),
+                })
+                .collect::<Vec<PluginInfo>>(),
         )
         .build()
         .map_err(|err| error!("Invalid worker options: {}", err))

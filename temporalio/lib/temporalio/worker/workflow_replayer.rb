@@ -7,6 +7,7 @@ require 'temporalio/internal/bridge/worker'
 require 'temporalio/internal/worker/multi_runner'
 require 'temporalio/internal/worker/workflow_worker'
 require 'temporalio/worker/interceptor'
+require 'temporalio/worker/plugin'
 require 'temporalio/worker/poller_behavior'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/tuner'
@@ -24,6 +25,7 @@ module Temporalio
         :task_queue,
         :data_converter,
         :workflow_executor,
+        :plugins,
         :interceptors,
         :identity,
         :logger,
@@ -50,6 +52,8 @@ module Temporalio
       #   payloads.
       # @param workflow_executor [WorkflowExecutor] Workflow executor that workflow tasks run within. This must be a
       #   {WorkflowExecutor::ThreadPool} currently.
+      # @param plugins [Array<Plugin>] Plugins to use for configuring replayer and intercepting replay. WARNING: Plugins
+      #   are experimental.
       # @param interceptors [Array<Interceptor::Workflow>] Workflow interceptors.
       # @param identity [String, nil] Override the identity for this replater.
       # @param logger [Logger] Logger to use. Defaults to stdout with warn level. Callers setting this logger are
@@ -83,6 +87,7 @@ module Temporalio
         task_queue: 'ReplayTaskQueue',
         data_converter: Converters::DataConverter.default,
         workflow_executor: WorkflowExecutor::ThreadPool.default,
+        plugins: [],
         interceptors: [],
         identity: nil,
         logger: Logger.new($stdout, level: Logger::WARN),
@@ -100,6 +105,7 @@ module Temporalio
           task_queue:,
           data_converter:,
           workflow_executor:,
+          plugins:,
           interceptors:,
           identity:,
           logger:,
@@ -110,13 +116,18 @@ module Temporalio
           debug_mode:,
           runtime:
         ).freeze
+        # Apply plugins
+        Worker._validate_plugins!(plugins)
+        @options = plugins.reduce(@options) { |options, plugin| plugin.configure_workflow_replayer(options) }
+
         # Preload definitions and other settings
         @workflow_definitions = Internal::Worker::WorkflowWorker.workflow_definitions(
-          workflows, should_enforce_versioning_behavior: false
+          @options.workflows, should_enforce_versioning_behavior: false
         )
         @nondeterminism_as_workflow_fail, @nondeterminism_as_workflow_fail_for_types =
           Internal::Worker::WorkflowWorker.bridge_workflow_failure_exception_type_options(
-            workflow_failure_exception_types:, workflow_definitions: @workflow_definitions
+            workflow_failure_exception_types: @options.workflow_failure_exception_types,
+            workflow_definitions: @workflow_definitions
           )
         # If there is a block, we'll go ahead and assume it's for with_replay_worker
         with_replay_worker(&) if block_given? # steep:ignore
@@ -154,7 +165,18 @@ module Temporalio
       # @yield Block of code to run with a replay worker.
       # @yieldparam [ReplayWorker] Worker to run replays on. Note, only one workflow can replay at a time.
       # @yieldreturn [Object] Result of the block.
-      def with_replay_worker(&)
+      def with_replay_worker(&block)
+        # Apply plugins
+        run_block = proc do |options|
+          # @type var options: Plugin::WithWorkflowReplayWorkerOptions
+          block.call(options.worker)
+        end
+        run_block = options.plugins.reverse_each.reduce(run_block) do |next_call, plugin|
+          proc do |options|
+            plugin.with_workflow_replay_worker(options, next_call) # steep:ignore
+          end
+        end
+
         worker = ReplayWorker.new(
           options:,
           workflow_definitions: @workflow_definitions,
@@ -162,7 +184,7 @@ module Temporalio
           nondeterminism_as_workflow_fail_for_types: @nondeterminism_as_workflow_fail_for_types
         )
         begin
-          yield worker
+          run_block.call(Plugin::WithWorkflowReplayWorkerOptions.new(worker:))
         ensure
           worker._shutdown
         end
@@ -221,7 +243,8 @@ module Temporalio
               graceful_shutdown_period: 0.0,
               nondeterminism_as_workflow_fail:,
               nondeterminism_as_workflow_fail_for_types:,
-              deployment_options: Worker.default_deployment_options._to_bridge_options
+              deployment_options: Worker.default_deployment_options._to_bridge_options,
+              plugins: options.plugins.map(&:name).uniq.sort
             )
           )
 

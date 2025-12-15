@@ -6,6 +6,7 @@ require 'temporalio/api'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
+require 'temporalio/client/plugin'
 require 'temporalio/client/schedule'
 require 'temporalio/client/schedule_handle'
 require 'temporalio/client/with_start_workflow_operation'
@@ -42,6 +43,7 @@ module Temporalio
       :connection,
       :namespace,
       :data_converter,
+      :plugins,
       :interceptors,
       :logger,
       :default_workflow_query_reject_condition
@@ -70,6 +72,9 @@ module Temporalio
     # @param tls [Boolean, Connection::TLSOptions] If false, do not use TLS. If true, use system default TLS options. If
     #   TLS options are present, those TLS options will be used.
     # @param data_converter [Converters::DataConverter] Data converter to use for all data conversions to/from payloads.
+    # @param plugins [Array<Plugin>] Plugins to use for configuring clients and intercepting connection. Any plugins
+    #   that also include {Worker::Plugin} will automatically be applied to the worker and should not be configured
+    #   explicitly on the worker. WARNING: Plugins are experimental.
     # @param interceptors [Array<Interceptor>] Set of interceptors that are chained together to allow intercepting of
     #   client calls. The earlier interceptors wrap the later ones. Any interceptors that also implement worker
     #   interceptor will be used as worker interceptors too so they should not be given separately when creating a
@@ -101,6 +106,7 @@ module Temporalio
       api_key: nil,
       tls: nil,
       data_converter: Converters::DataConverter.default,
+      plugins: [],
       interceptors: [],
       logger: Logger.new($stdout, level: Logger::WARN),
       default_workflow_query_reject_condition: nil,
@@ -112,25 +118,76 @@ module Temporalio
       runtime: Runtime.default,
       lazy_connect: false
     )
+      # Prepare connection. The connection var is needed here so it can be used in callback for plugin.
+      base_connection = nil
+      final_connection = nil
+      around_connect = if plugins.any?
+                         _validate_plugins!(plugins)
+                         # For plugins, we have to do an around_connect approach with Connection where we provide a
+                         # no-return-value proc that is invoked with the built options and yields newly built options.
+                         # The connection will have been created before, but we allow plugins to return a
+                         # different/extended connection, possibly avoiding actual connection altogether.
+                         proc do |options, &block|
+                           # Steep simply can't comprehend these advanced inline procs
+                           # steep:ignore:start
+
+                           # Root next call
+                           next_call_called = false
+                           next_call = proc do |options|
+                             raise 'next_call called more than once' if next_call_called
+
+                             next_call_called = true
+                             block&.call(options)
+                             base_connection
+                           end
+                           # Go backwards, building up new next_call invocations on plugins
+                           next_call = plugins.reverse_each.reduce(next_call) do |next_call, plugin|
+                             proc { |options| plugin.connect_client(options, next_call) }
+                           end
+                           # Do call
+                           final_connection = next_call.call(options)
+
+                           # steep:ignore:end
+                         end
+                       end
+      # Now create connection
+      base_connection = Connection.new(
+        target_host:,
+        api_key:,
+        tls:,
+        rpc_metadata:,
+        rpc_retry:,
+        identity:,
+        keep_alive:,
+        http_connect_proxy:,
+        runtime:,
+        lazy_connect:,
+        around_connect: # steep:ignore
+      )
+
+      # Create client
       Client.new(
-        connection: Connection.new(
-          target_host:,
-          api_key:,
-          tls:,
-          rpc_metadata:,
-          rpc_retry:,
-          identity:,
-          keep_alive:,
-          http_connect_proxy:,
-          runtime:,
-          lazy_connect:
-        ),
+        connection: final_connection || base_connection,
         namespace:,
         data_converter:,
+        plugins:,
         interceptors:,
         logger:,
         default_workflow_query_reject_condition:
       )
+    end
+
+    # @!visibility private
+    def self._validate_plugins!(plugins)
+      plugins.each do |plugin|
+        raise ArgumentError, "#{plugin.class} does not implement Client::Plugin" unless plugin.is_a?(Plugin)
+
+        # Validate plugin has implemented expected methods
+        missing = Plugin.instance_methods(false).select { |m| plugin.method(m).owner == Plugin }
+        unless missing.empty?
+          raise ArgumentError, "#{plugin.class} missing the following client plugin method(s): #{missing.join(', ')}"
+        end
+      end
     end
 
     # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
@@ -143,6 +200,9 @@ module Temporalio
     # @param connection [Connection] Existing connection to create a client from.
     # @param namespace [String] Namespace to use for client calls.
     # @param data_converter [Converters::DataConverter] Data converter to use for all data conversions to/from payloads.
+    # @param plugins [Array<Plugin>] Plugins to use for configuring clients. Any plugins that also include
+    #   {Worker::Plugin} will automatically be applied to the worker and should not be configured explicitly on the
+    #   worker. WARNING: Plugins are experimental.
     # @param interceptors [Array<Interceptor>] Set of interceptors that are chained together to allow intercepting of
     #   client calls. The earlier interceptors wrap the later ones. Any interceptors that also implement worker
     #   interceptor will be used as worker interceptors too so they should not be given separately when creating a
@@ -157,6 +217,7 @@ module Temporalio
       connection:,
       namespace:,
       data_converter: DataConverter.default,
+      plugins: [],
       interceptors: [],
       logger: Logger.new($stdout, level: Logger::WARN),
       default_workflow_query_reject_condition: nil
@@ -165,12 +226,20 @@ module Temporalio
         connection:,
         namespace:,
         data_converter:,
+        plugins:,
         interceptors:,
         logger:,
         default_workflow_query_reject_condition:
       ).freeze
+
+      # Apply plugins
+      Client._validate_plugins!(plugins)
+      @options = plugins.reduce(@options) { |options, plugin| plugin.configure_client(options) }
+
       # Initialize interceptors
-      @impl = interceptors.reverse_each.reduce(Internal::Client::Implementation.new(self)) do |acc, int| # steep:ignore
+      @impl = @options.interceptors.reverse_each.reduce(
+        Internal::Client::Implementation.new(self)
+      ) do |acc, int| # steep:ignore
         int.intercept_client(acc)
       end
     end

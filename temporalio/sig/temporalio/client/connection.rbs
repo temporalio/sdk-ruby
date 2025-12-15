@@ -105,7 +105,8 @@ module Temporalio
         ?keep_alive: KeepAliveOptions,
         ?http_connect_proxy: HTTPConnectProxyOptions?,
         ?runtime: Runtime,
-        ?lazy_connect: bool
+        ?lazy_connect: bool,
+        ?around_connect: nil | ^(Options) { (Options) -> void } -> void
       ) -> void
 
       def target_host: -> String

@@ -24,6 +24,7 @@ module Temporalio
           attr_accessor nondeterminism_as_workflow_fail: bool
           attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
           attr_accessor deployment_options: DeploymentOptions?
+          attr_accessor plugins: Array[String]
 
           def initialize: (
             namespace: String,
@@ -46,7 +47,8 @@ module Temporalio
             graceful_shutdown_period: Float,
             nondeterminism_as_workflow_fail: bool,
             nondeterminism_as_workflow_fail_for_types: Array[String],
-            deployment_options: DeploymentOptions?
+            deployment_options: DeploymentOptions?,
+            plugins: Array[String]
           ) -> void
         end
 

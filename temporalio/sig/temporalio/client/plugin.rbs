@@ -1,0 +1,14 @@
+module Temporalio
+  class Client
+    module Plugin
+      def name: -> String
+
+      def configure_client: (Options options) -> Options
+
+      def connect_client: (
+        Connection::Options options,
+        ^(Connection::Options) -> Connection next_call
+      ) -> Connection
+    end
+  end
+end
