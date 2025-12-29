@@ -180,13 +180,7 @@ module Temporalio
         path, data = EnvConfig._source_to_path_and_data(config_source)
 
         raw_profile = Internal::Bridge::EnvConfig.load_client_connect_config(
-          profile,
-          path,
-          data,
-          disable_file,
-          disable_env,
-          config_file_strict,
-          *([override_env_vars] unless override_env_vars.nil?)
+          profile, path, data, disable_file, disable_env, config_file_strict, override_env_vars
         )
 
         from_h(raw_profile)
@@ -272,10 +266,7 @@ module Temporalio
         path, data = EnvConfig._source_to_path_and_data(config_source)
 
         loaded_profiles = Internal::Bridge::EnvConfig.load_client_config(
-          path,
-          data,
-          config_file_strict,
-          *([override_env_vars] unless override_env_vars.nil?)
+          path, data, config_file_strict, override_env_vars
         )
 
         from_h(loaded_profiles)
