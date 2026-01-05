@@ -156,15 +156,19 @@ fn load_client_connect_config_inner(
 fn load_client_config(args: &[magnus::Value]) -> Result<RHash, Error> {
     let ruby = Ruby::get().expect("Not in Ruby thread");
     let args = scan_args::scan_args::<
-        (Option<String>, Option<RString>, bool),
-        (Option<HashMap<String, String>>,),
+        (
+            Option<String>,
+            Option<RString>,
+            bool,
+            Option<HashMap<String, String>>,
+        ),
+        (),
         (),
         (),
         (),
         (),
     >(args)?;
-    let (path, data, config_file_strict) = args.required;
-    let (env_vars,) = args.optional;
+    let (path, data, config_file_strict, env_vars) = args.required;
 
     let config_source = match (path, data) {
         (Some(p), None) => Some(DataSource::Path(p)),
@@ -194,15 +198,16 @@ fn load_client_connect_config(args: &[magnus::Value]) -> Result<RHash, Error> {
             bool,
             bool,
             bool,
+            Option<HashMap<String, String>>,
         ),
-        (Option<HashMap<String, String>>,),
+        (),
         (),
         (),
         (),
         (),
     >(args)?;
-    let (profile, path, data, disable_file, disable_env, config_file_strict) = args.required;
-    let (env_vars,) = args.optional;
+    let (profile, path, data, disable_file, disable_env, config_file_strict, env_vars) =
+        args.required;
 
     let config_source = match (path, data) {
         (Some(p), None) => Some(DataSource::Path(p)),

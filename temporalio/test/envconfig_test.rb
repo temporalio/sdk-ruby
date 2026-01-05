@@ -312,6 +312,22 @@ class EnvConfigTest < Test
     assert_equal 'env-address', args[0]
   end
 
+  def test_load_profile_from_system_env
+    with_system_env_vars(
+      'TEMPORAL_ADDRESS' => 'system-env-address',
+      'TEMPORAL_NAMESPACE' => 'system-env-namespace'
+    ) do
+      # Load without override_env_vars - should read from system env
+      profile = Temporalio::EnvConfig::ClientConfigProfile.load(disable_file: true)
+      assert_equal 'system-env-address', profile.address
+      assert_equal 'system-env-namespace', profile.namespace
+
+      args, = profile.to_client_connect_options
+      assert_equal 'system-env-address', args[0]
+      assert_equal 'system-env-namespace', args[1]
+    end
+  end
+
   def test_load_profiles_no_env_override
     with_temp_config_file(TOML_CONFIG_BASE) do |config_file|
       env = {
@@ -935,5 +951,12 @@ class EnvConfigTest < Test
       File.write(config_file, content)
       yield config_file
     end
+  end
+
+  def with_system_env_vars(env_vars)
+    env_vars.each { |key, value| ENV[key] = value }
+    yield
+  ensure
+    env_vars.each_key { |key| ENV.delete(key) }
   end
 end
