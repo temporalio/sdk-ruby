@@ -3,8 +3,10 @@ class EnvConfigTest < Test
   TOML_CONFIG_STRICT_FAIL: String
   TOML_CONFIG_MALFORMED: String
   TOML_CONFIG_TLS_DETAILED: String
+  TOML_CONFIG_GRPC_META: String
 
   private
 
   def with_temp_config_file: [T] (String content) { (String config_file) -> T } -> T
+  def with_system_env_vars: [T] (Hash[String, String] env_vars) { () -> T } -> T
 end 
