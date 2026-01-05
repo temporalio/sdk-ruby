@@ -132,6 +132,19 @@ class PluginTest < Test
     end
   end
 
+  class SecondWorkerPluginForTest < Temporalio::SimplePlugin
+    attr_reader :saw_run_worker
+
+    def initialize
+      super(name: 'some-second-plugin')
+    end
+
+    def run_worker(options, next_call)
+      @saw_run_worker = true
+      super
+    end
+  end
+
   def test_worker_plugin
     # Fail run
     err = assert_raises do
@@ -144,7 +157,11 @@ class PluginTest < Test
 
     # Run workflow in worker, confirm interceptor hit
     plugin = WorkerPluginForTest.new
-    worker = Temporalio::Worker.new(client: env.client, task_queue: "tq-#{SecureRandom.uuid}", plugins: [plugin])
+    second_plugin = SecondWorkerPluginForTest.new
+    worker = Temporalio::Worker.new(client: env.client,
+                                    task_queue: "tq-#{SecureRandom.uuid}",
+                                    plugins: [plugin, second_plugin])
+    refute second_plugin.saw_run_worker
     handle = worker.run do
       refute plugin.execute_workflow_called
       env.client.start_workflow(SimpleWorkflow, 'some-name',
@@ -153,6 +170,7 @@ class PluginTest < Test
         assert plugin.execute_workflow_called
       end
     end
+    assert second_plugin.saw_run_worker
 
     # Run replayer with a new version of the plugin
     plugin = WorkerPluginForTest.new

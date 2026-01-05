@@ -169,8 +169,8 @@ module Temporalio
       # @param lazy_connect [Boolean] If true, there is no connection until the first call is attempted or a worker
       #   is created with it. Clients from lazy connections cannot be used for workers if they have not performed a
       #   connection.
-      # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block is a
-      #   must be yielded to only once with the options. The block does not return a meaningful value, nor should
+      # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block must
+      #   be yielded to only once with the options. The block does not return a meaningful value, nor should
       #   around_connect.
       #
       # @see Client.connect
