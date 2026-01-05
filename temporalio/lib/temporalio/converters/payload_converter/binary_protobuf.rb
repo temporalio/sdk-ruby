@@ -22,7 +22,10 @@ module Temporalio
 
           # @type var value: Google::Protobuf::MessageExts
           Api::Common::V1::Payload.new(
-            metadata: { 'encoding' => ENCODING, 'messageType' => value.class.descriptor.name },
+            metadata: {
+              'encoding' => ENCODING,
+              'messageType' => value.class.descriptor.name # steep:ignore
+            },
             data: value.to_proto
           )
         end

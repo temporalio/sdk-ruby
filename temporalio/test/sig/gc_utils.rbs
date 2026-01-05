@@ -6,7 +6,7 @@ module GCUtils
     ?category_whitelist: Array[String]?
   ) -> [Array[untyped], String]
 
-  def self.print_annotated_path: (Array[untyped] path, root_category: String) -> void
+  def self.annotated_path: (Array[untyped] path, root_category: String) -> String
 
   def self.edge_labels: (untyped parent, untyped child) -> Array[String]
 

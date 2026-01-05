@@ -1,0 +1,11 @@
+module Converters
+  class PayloadConverterTest < Test
+    def assert_payload: (
+      untyped input,
+      String expected_encoding,
+      String expected_data,
+      ?expected_decoded_input: untyped,
+      ?converter: Temporalio::Converters::PayloadConverter
+    ) -> untyped
+  end
+end

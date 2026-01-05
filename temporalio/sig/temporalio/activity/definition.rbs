@@ -20,6 +20,15 @@ module Temporalio
   
       def execute: (*untyped) -> untyped
 
+      def _activity_definition_details: -> {
+        activity_name: String | Symbol | nil,
+        activity_executor: Symbol,
+        activity_cancel_raise: bool,
+        activity_raw_args: bool,
+        activity_arg_hints: Array[Object]?,
+        activity_result_hint: Object?
+      }
+
       class Info
         attr_reader name: String | Symbol | nil
         attr_reader instance: Object | Proc | nil

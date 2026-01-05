@@ -6,8 +6,8 @@ use temporalio_client::{
 };
 
 use magnus::{
-    DataTypeFunctions, Error, RHash, RString, Ruby, TypedData, Value, class, function, method,
-    prelude::*, scan_args,
+    DataTypeFunctions, Error, RHash, RString, Ruby, TypedData, Value, function, method, prelude::*,
+    scan_args,
 };
 use tonic::{Status, metadata::MetadataKey};
 use url::Url;
@@ -29,7 +29,7 @@ pub(crate) const SERVICE_HEALTH: u8 = 5;
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
 
-    let class = root_mod.define_class("Client", class::object())?;
+    let class = root_mod.define_class("Client", ruby.class_object())?;
     class.const_set("SERVICE_WORKFLOW", SERVICE_WORKFLOW)?;
     class.const_set("SERVICE_OPERATOR", SERVICE_OPERATOR)?;
     class.const_set("SERVICE_CLOUD", SERVICE_CLOUD)?;
@@ -45,7 +45,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     inner_class.define_method("message", method!(RpcFailure::message, 0))?;
     inner_class.define_method("details", method!(RpcFailure::details, 0))?;
 
-    let inner_class = class.define_class("CancellationToken", class::object())?;
+    let inner_class = class.define_class("CancellationToken", ruby.class_object())?;
     inner_class.define_singleton_method("new", function!(CancellationToken::new, 0))?;
     inner_class.define_method("cancel", method!(CancellationToken::cancel, 0))?;
     Ok(())
@@ -333,7 +333,11 @@ impl RpcFailure {
         if self.status.details().is_empty() {
             None
         } else {
-            Some(RString::from_slice(self.status.details()))
+            Some(
+                Ruby::get()
+                    .expect("Ruby missing")
+                    .str_from_slice(self.status.details()),
+            )
         }
     }
 }
@@ -407,7 +411,7 @@ where
             match result {
                 // TODO(cretz): Any reasonable way to prevent byte copy that is just going to get decoded into proto
                 // object?
-                Ok(val) => callback.push(&ruby, RString::from_slice(&val)),
+                Ok(val) => callback.push(&ruby, ruby.str_from_slice(&val)),
                 Err(status) => callback.push(&ruby, RpcFailure { status }),
             }
         },

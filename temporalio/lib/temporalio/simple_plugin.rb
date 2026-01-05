@@ -163,7 +163,7 @@ module Temporalio
       when nil
         nil
       when Proc
-        new.call(existing).tap do |val|
+        new.call(existing).tap do |val| # steep:ignore
           raise "Instance of #{name} required" unless val.is_a?(type)
         end
       when type
@@ -179,7 +179,7 @@ module Temporalio
       when nil
         nil
       when Proc
-        new.call(existing).tap do |conv|
+        new.call(existing).tap do |conv| # steep:ignore
           raise "Array for #{name} required" unless conv.is_a?(Array)
         end
       when Array

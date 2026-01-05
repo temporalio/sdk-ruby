@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use magnus::{Error, RHash, RString, Ruby, class, function, prelude::*, scan_args};
+use magnus::{Error, RHash, RString, Ruby, function, prelude::*, scan_args};
 use temporalio_common::envconfig::{
     ClientConfig as CoreClientConfig, ClientConfigCodec,
     ClientConfigProfile as CoreClientConfigProfile, ClientConfigTLS as CoreClientConfigTLS,
@@ -14,7 +14,7 @@ use crate::{ROOT_MOD, error};
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
 
-    let class = root_mod.define_class("EnvConfig", class::object())?;
+    let class = root_mod.define_class("EnvConfig", ruby.class_object())?;
     class.define_singleton_method("load_client_config", function!(load_client_config, -1))?;
     class.define_singleton_method(
         "load_client_connect_config",
@@ -25,7 +25,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
 }
 
 fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
-    let hash = RHash::new();
+    let hash = ruby.hash_new();
     match ds {
         DataSource::Path(p) => {
             hash.aset(ruby.sym_new("path"), ruby.str_new(p))?;
@@ -38,7 +38,7 @@ fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
 }
 
 fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
-    let hash = RHash::new();
+    let hash = ruby.hash_new();
     hash.aset(ruby.sym_new("disabled"), tls.disabled)?;
 
     if let Some(v) = &tls.client_cert {
@@ -65,7 +65,7 @@ fn tls_to_hash(ruby: &Ruby, tls: &CoreClientConfigTLS) -> Result<RHash, Error> {
 }
 
 fn codec_to_hash(ruby: &Ruby, codec: &ClientConfigCodec) -> Result<RHash, Error> {
-    let hash = RHash::new();
+    let hash = ruby.hash_new();
     if let Some(v) = &codec.endpoint {
         hash.aset(ruby.sym_new("endpoint"), ruby.str_new(v))?;
     }
@@ -76,7 +76,7 @@ fn codec_to_hash(ruby: &Ruby, codec: &ClientConfigCodec) -> Result<RHash, Error>
 }
 
 fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHash, Error> {
-    let hash = RHash::new();
+    let hash = ruby.hash_new();
 
     if let Some(v) = &profile.address {
         hash.aset(ruby.sym_new("address"), ruby.str_new(v))?;
@@ -94,7 +94,7 @@ fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHa
         hash.aset(ruby.sym_new("codec"), codec_to_hash(ruby, codec)?)?;
     }
     if !profile.grpc_meta.is_empty() {
-        let grpc_meta_hash = RHash::new();
+        let grpc_meta_hash = ruby.hash_new();
         for (k, v) in &profile.grpc_meta {
             grpc_meta_hash.aset(ruby.str_new(k), ruby.str_new(v))?;
         }
@@ -105,7 +105,7 @@ fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHa
 }
 
 fn core_config_to_hash(ruby: &Ruby, core_config: &CoreClientConfig) -> Result<RHash, Error> {
-    let profiles_hash = RHash::new();
+    let profiles_hash = ruby.hash_new();
     for (name, profile) in &core_config.profiles {
         let profile_hash = profile_to_hash(ruby, profile)?;
         profiles_hash.aset(ruby.str_new(name), profile_hash)?;

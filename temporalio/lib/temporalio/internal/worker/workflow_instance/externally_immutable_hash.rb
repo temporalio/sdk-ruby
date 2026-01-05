@@ -9,7 +9,7 @@ module Temporalio
         # Delegator to a hash that does not allow external mutations. Used for memo.
         class ExternallyImmutableHash < SimpleDelegator
           def initialize(initial_hash)
-            super(initial_hash.freeze)
+            super(initial_hash.freeze) # steep:ignore
           end
 
           def _update(&)

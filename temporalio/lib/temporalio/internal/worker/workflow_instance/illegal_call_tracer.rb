@@ -13,7 +13,7 @@ module Temporalio
             illegal_calls.to_h do |key, val|
               raise TypeError, 'Invalid illegal call map, top-level key must be a String' unless key.is_a?(String)
 
-              # @type var fixed_val: :all | Worker::IllegalWorkflowCallValidator | Hash[Symbol, TrueClass | Worker::IllegalWorkflowCallValidator] # rubocop:disable Layout/LineLength
+              # @type var fixed_val: :all | Temporalio::Worker::IllegalWorkflowCallValidator | Hash[Symbol, (true | Temporalio::Worker::IllegalWorkflowCallValidator)]
               fixed_val = case val
                           when Temporalio::Worker::IllegalWorkflowCallValidator
                             if val.method_name
@@ -86,21 +86,25 @@ module Temporalio
                 when Temporalio::Worker::IllegalWorkflowCallValidator
                   disable_temporarily do
                     vals.block.call(Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo.new(
-                                      class_name:, method_name: tp.callee_id, trace_point: tp
+                                      class_name:,
+                                      method_name: tp.callee_id || :__unknown__,
+                                      trace_point: tp
                                     ))
                     nil
                   rescue Exception => e # rubocop:disable Lint/RescueException
                     ", reason: #{e}"
                   end
                 else
-                  per_method = vals&.[](tp.callee_id)
+                  per_method = vals&.[](tp.callee_id || :__unknown__)
                   case per_method
                   when true
                     ''
                   when Temporalio::Worker::IllegalWorkflowCallValidator
                     disable_temporarily do
                       per_method.block.call(Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo.new(
-                                              class_name:, method_name: tp.callee_id, trace_point: tp
+                                              class_name:,
+                                              method_name: tp.callee_id || :__unknown__,
+                                              trace_point: tp
                                             ))
                       nil
                     rescue Exception => e # rubocop:disable Lint/RescueException

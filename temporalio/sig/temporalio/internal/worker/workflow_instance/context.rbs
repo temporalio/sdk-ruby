@@ -81,7 +81,7 @@ module Temporalio
 
           def now: -> Time
 
-          def patched: (String patch_id) -> bool
+          def patched: (Symbol | String patch_id) -> bool
 
           def payload_converter: -> Converters::PayloadConverter
 

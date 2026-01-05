@@ -19,7 +19,7 @@ use magnus::{
     DataTypeFunctions, Error, Exception, IntoValue, RArray, RClass, RModule, RString, RTypedData,
     Ruby, TypedData, Value,
     block::Proc,
-    class, function, method,
+    function, method,
     prelude::*,
     typed_data,
     value::{Lazy, LazyId},
@@ -53,7 +53,7 @@ use tokio_stream::wrappers::ReceiverStream;
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let class = ruby
         .get_inner(&ROOT_MOD)
-        .define_class("Worker", class::object())?;
+        .define_class("Worker", ruby.class_object())?;
     class.define_singleton_method("new", function!(Worker::new, 2))?;
     class.define_singleton_method("async_poll_all", function!(Worker::async_poll_all, 2))?;
     class.define_singleton_method(
@@ -76,7 +76,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("replace_client", method!(Worker::replace_client, 1))?;
     class.define_method("initiate_shutdown", method!(Worker::initiate_shutdown, 0))?;
 
-    let inner_class = class.define_class("WorkflowReplayer", class::object())?;
+    let inner_class = class.define_class("WorkflowReplayer", ruby.class_object())?;
     inner_class.define_singleton_method("new", function!(WorkflowReplayer::new, 2))?;
     inner_class.define_method("push_history", method!(WorkflowReplayer::push_history, 2))?;
 
@@ -241,15 +241,15 @@ impl Worker {
                         };
                         // Call block
                         let result: Value = match poll_result.result {
-                            Ok(Some(val)) => RString::from_slice(&val).as_value(),
+                            Ok(Some(val)) => ruby.str_from_slice(&val).as_value(),
                             Ok(None) => ruby.qnil().as_value(),
                             Err(err) => new_error!("Poll failure: {}", err).as_value(),
                         };
                         callback.push(
                             &ruby,
                             ruby.ary_new_from_values(&[
-                                poll_result.worker_index.into_value(),
-                                worker_type.into_value(),
+                                poll_result.worker_index.into_value_with(&ruby),
+                                worker_type.into_value_with(&ruby),
                                 result,
                             ]),
                         )

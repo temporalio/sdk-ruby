@@ -21,11 +21,11 @@ jobs:
         # https://github.com/temporalio/sdk-ruby/issues/172
         os: [ubuntu-latest, macos-latest]
         # Earliest and latest supported
-        rubyVersion: ["3.2", "3.4"]
+        rubyVersion: ["3.3", "4.0"]
         
         include:
           - os: ubuntu-latest
-            rubyVersion: "3.4"
+            rubyVersion: "4.0"
             checkTarget: true
             docsTarget: true
     runs-on: ${{ matrix.os }}

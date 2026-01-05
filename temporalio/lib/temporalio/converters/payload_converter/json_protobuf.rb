@@ -21,7 +21,10 @@ module Temporalio
           return nil unless value.is_a?(Google::Protobuf::MessageExts)
 
           Api::Common::V1::Payload.new(
-            metadata: { 'encoding' => ENCODING, 'messageType' => value.class.descriptor.name },
+            metadata: {
+              'encoding' => ENCODING,
+              'messageType' => value.class.descriptor.name # steep:ignore
+            },
             data: value.to_json.b
           )
         end

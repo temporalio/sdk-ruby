@@ -2,7 +2,7 @@ use super::{ROOT_MOD, error, id};
 use crate::metric::{BufferedMetricRef, convert_metric_events};
 use crate::util::{Struct, without_gvl};
 use magnus::{
-    DataTypeFunctions, Error, RArray, Ruby, TypedData, Value, class, function, method, prelude::*,
+    DataTypeFunctions, Error, RArray, Ruby, TypedData, Value, function, method, prelude::*,
 };
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -25,7 +25,7 @@ use url::Url;
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let class = ruby
         .get_inner(&ROOT_MOD)
-        .define_class("Runtime", class::object())?;
+        .define_class("Runtime", ruby.class_object())?;
     class.define_singleton_method("new", function!(Runtime::new, 1))?;
     class.define_method("run_command_loop", method!(Runtime::run_command_loop, 0))?;
     class.define_method(
