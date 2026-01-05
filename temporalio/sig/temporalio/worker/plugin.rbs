@@ -1,0 +1,47 @@
+module Temporalio
+  class Worker
+    module Plugin
+      class RunWorkerOptions
+        attr_reader worker: Worker
+        attr_reader cancellation: Cancellation
+        attr_reader shutdown_signals: Array[String | Integer]
+        attr_reader raise_in_block_on_shutdown: Exception?
+
+        def initialize: (
+          worker: Worker,
+          cancellation: Cancellation,
+          shutdown_signals: Array[String | Integer],
+          raise_in_block_on_shutdown: Exception?
+        ) -> void
+
+        def with: (**untyped) -> RunWorkerOptions
+      end
+
+      class WithWorkflowReplayWorkerOptions
+        attr_reader worker: WorkflowReplayer::ReplayWorker
+
+        def initialize: (
+          worker: WorkflowReplayer::ReplayWorker
+        ) -> void
+
+        def with: (**untyped) -> WithWorkflowReplayWorkerOptions
+      end
+
+      def name: -> String
+
+      def configure_worker: (Options options) -> Options
+
+      def run_worker: (
+        RunWorkerOptions options,
+        ^(RunWorkerOptions) -> untyped next_call
+      ) -> untyped
+
+      def configure_workflow_replayer: (WorkflowReplayer::Options options) -> WorkflowReplayer::Options
+
+      def with_workflow_replay_worker: (
+        WithWorkflowReplayWorkerOptions options,
+        ^(WithWorkflowReplayWorkerOptions) -> untyped next_call
+      ) -> untyped
+    end
+  end
+end

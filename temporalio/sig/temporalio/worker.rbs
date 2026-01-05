@@ -9,6 +9,7 @@ module Temporalio
       attr_reader tuner: Tuner
       attr_reader activity_executors: Hash[Symbol, Worker::ActivityExecutor]
       attr_reader workflow_executor: Worker::WorkflowExecutor
+      attr_reader plugins: Array[Plugin]
       attr_reader interceptors: Array[Interceptor::Activity | Interceptor::Workflow]
       attr_reader identity: String
       attr_reader logger: Logger
@@ -30,6 +31,7 @@ module Temporalio
       attr_reader unsafe_workflow_io_enabled: bool
       attr_reader workflow_task_poller_behavior: PollerBehavior
       attr_reader activity_task_poller_behavior: PollerBehavior
+      attr_reader deployment_options: Worker::DeploymentOptions
       attr_reader debug_mode: bool
 
       def initialize: (
@@ -40,6 +42,7 @@ module Temporalio
         tuner: Tuner,
         activity_executors: Hash[Symbol, Worker::ActivityExecutor],
         workflow_executor: Worker::WorkflowExecutor,
+        plugins: Array[Plugin],
         interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
         identity: String?,
         logger: Logger,
@@ -80,7 +83,17 @@ module Temporalio
       ?wait_block_complete: bool
     ) ?{ -> T } -> T
 
+    def self._run_all_root: [T] (
+      *Worker workers,
+      cancellation: Cancellation,
+      shutdown_signals: Array[String | Integer],
+      raise_in_block_on_shutdown: Exception?,
+      wait_block_complete: bool
+    ) ?{ -> T } -> T
+
     def self.default_illegal_workflow_calls: -> Hash[String, :all | Array[Symbol | IllegalWorkflowCallValidator] | IllegalWorkflowCallValidator]
+
+    def self._validate_plugins!: (Array[Plugin] plugins) -> void
 
     attr_reader options: Options
 
@@ -92,6 +105,7 @@ module Temporalio
       ?tuner: Tuner,
       ?activity_executors: Hash[Symbol, Worker::ActivityExecutor],
       ?workflow_executor: Worker::WorkflowExecutor,
+      ?plugins: Array[Plugin],
       ?interceptors: Array[Interceptor::Activity | Interceptor::Workflow],
       ?identity: String?,
       ?logger: Logger,
@@ -117,6 +131,8 @@ module Temporalio
       ?debug_mode: bool
     ) -> void
 
+    def _initialize_from_options: -> void
+
     def task_queue: -> String
 
     def client: -> Client
@@ -137,5 +153,6 @@ module Temporalio
     def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
     def _on_shutdown_complete: -> void
     def _assert_valid_local_activity: (String) -> void
+    def _plugins: -> Array[Plugin]
   end
 end
