@@ -78,7 +78,12 @@ module Temporalio
             end
 
             # This blocks until a resume is called on this fiber
-            result = Fiber.yield
+            result = begin
+              Fiber.yield
+            ensure
+              # Remove pending
+              @wait_conditions.delete(seq)
+            end
 
             # Remove cancellation callback (only needed on success)
             cancellation&.remove_cancel_callback(cancel_callback_key) if cancel_callback_key

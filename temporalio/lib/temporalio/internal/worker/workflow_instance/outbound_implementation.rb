@@ -43,7 +43,12 @@ module Temporalio
             @instance.pending_external_cancels[seq] = Fiber.current
 
             # Wait
-            resolution = Fiber.yield
+            resolution = begin
+              Fiber.yield
+            ensure
+              # Remove pending
+              @instance.pending_external_cancels.delete(seq)
+            end
 
             # Raise if resolution has failure
             return unless resolution.failure
@@ -169,10 +174,13 @@ module Temporalio
             end
 
             # Wait
-            resolution = Fiber.yield
-
-            # Remove cancellation callback
-            cancellation.remove_cancel_callback(cancel_callback_key)
+            resolution = begin
+              Fiber.yield
+            ensure
+              # Remove pending and cancel callback
+              @instance.pending_activities.delete(seq)
+              cancellation.remove_cancel_callback(cancel_callback_key)
+            end
 
             case resolution.status
             when :completed
@@ -254,10 +262,13 @@ module Temporalio
             end
 
             # Wait
-            resolution = Fiber.yield
-
-            # Remove cancellation callback
-            cancellation.remove_cancel_callback(cancel_callback_key)
+            resolution = begin
+              Fiber.yield
+            ensure
+              # Remove pending and cancel callback
+              @instance.pending_external_signals.delete(seq)
+              cancellation.remove_cancel_callback(cancel_callback_key)
+            end
 
             # Raise if resolution has failure
             return unless resolution.failure
@@ -317,7 +328,12 @@ module Temporalio
             end
 
             # Wait
-            Fiber.yield
+            begin
+              Fiber.yield
+            ensure
+              # Remove pending
+              @instance.pending_timers.delete(seq)
+            end
 
             # Remove cancellation callback (only needed on success)
             input.cancellation.remove_cancel_callback(cancel_callback_key)
@@ -374,7 +390,12 @@ module Temporalio
             end
 
             # Wait for start
-            resolution = Fiber.yield
+            resolution = begin
+              Fiber.yield
+            ensure
+              # Remove pending
+              @instance.pending_child_workflow_starts.delete(seq)
+            end
 
             case resolution.status
             when :succeeded
