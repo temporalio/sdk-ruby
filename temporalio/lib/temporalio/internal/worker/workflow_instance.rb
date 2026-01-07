@@ -345,7 +345,7 @@ module Temporalio
           when :initialize_workflow
             # Ignore
           when :fire_timer
-            pending_timers.delete(job.fire_timer.seq)&.resume
+            pending_timers[job.fire_timer.seq]&.resume
           when :update_random_seed
             @random = illegal_call_tracing_disabled { Random.new(job.update_random_seed.randomness_seed) }
           when :query_workflow
@@ -356,23 +356,23 @@ module Temporalio
           when :signal_workflow
             apply_signal(job.signal_workflow)
           when :resolve_activity
-            pending_activities.delete(job.resolve_activity.seq)&.resume(job.resolve_activity.result)
+            pending_activities[job.resolve_activity.seq]&.resume(job.resolve_activity.result)
           when :notify_has_patch
             @patches_notified << job.notify_has_patch.patch_id
           when :resolve_child_workflow_execution_start
-            pending_child_workflow_starts.delete(job.resolve_child_workflow_execution_start.seq)&.resume(
+            pending_child_workflow_starts[job.resolve_child_workflow_execution_start.seq]&.resume(
               job.resolve_child_workflow_execution_start
             )
           when :resolve_child_workflow_execution
-            pending_child_workflows.delete(job.resolve_child_workflow_execution.seq)&._resolve(
+            pending_child_workflows[job.resolve_child_workflow_execution.seq]&._resolve(
               job.resolve_child_workflow_execution.result
             )
           when :resolve_signal_external_workflow
-            pending_external_signals.delete(job.resolve_signal_external_workflow.seq)&.resume(
+            pending_external_signals[job.resolve_signal_external_workflow.seq]&.resume(
               job.resolve_signal_external_workflow
             )
           when :resolve_request_cancel_external_workflow
-            pending_external_cancels.delete(job.resolve_request_cancel_external_workflow.seq)&.resume(
+            pending_external_cancels[job.resolve_request_cancel_external_workflow.seq]&.resume(
               job.resolve_request_cancel_external_workflow
             )
           when :do_update
