@@ -7,7 +7,7 @@ module Temporalio
         # Hash for handlers that notifies when one is added. Only `[]=` and `store` can be used to mutate it.
         class HandlerHash < SimpleDelegator
           def initialize(initial_frozen_hash, definition_class, &on_new_definition)
-            super(initial_frozen_hash) # steep:ignore
+            super(initial_frozen_hash) # steep:ignore ArgumentTypeMismatch
             @definition_class = definition_class
             @on_new_definition = on_new_definition
           end

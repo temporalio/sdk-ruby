@@ -24,7 +24,7 @@ module Temporalio
           Api::Common::V1::Payload.new(
             metadata: {
               'encoding' => ENCODING,
-              'messageType' => value.class.descriptor.name # steep:ignore
+              'messageType' => value.class.descriptor.name # steep:ignore NoMethod
             },
             data: value.to_proto
           )

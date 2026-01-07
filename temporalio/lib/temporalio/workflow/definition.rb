@@ -103,7 +103,7 @@ module Temporalio
             # Just run this as if done manually
             workflow_query(description:)
             define_method(attr_name) do
-              instance_variable_get("@#{attr_name}") # steep:ignore
+              instance_variable_get("@#{attr_name}") # steep:ignore NoMethod
             end
           end
         end

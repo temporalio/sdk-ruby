@@ -121,7 +121,7 @@ module Temporalio
     # Implements {Worker::Plugin#run_worker}.
     def run_worker(options, next_call)
       if @options.run_context
-        @options.run_context.call(options, next_call) # steep:ignore
+        @options.run_context.call(options, next_call) # steep:ignore NoMethod
       else
         next_call.call(options)
       end
@@ -151,7 +151,7 @@ module Temporalio
     # Implements {Worker::Plugin#with_workflow_replay_worker}.
     def with_workflow_replay_worker(options, next_call)
       if @options.run_context
-        @options.run_context.call(options, next_call) # steep:ignore
+        @options.run_context.call(options, next_call) # steep:ignore NoMethod
       else
         next_call.call(options)
       end
@@ -163,7 +163,7 @@ module Temporalio
       when nil
         nil
       when Proc
-        new.call(existing).tap do |val| # steep:ignore
+        new.call(existing).tap do |val| # steep:ignore NoMethod
           raise "Instance of #{name} required" unless val.is_a?(type)
         end
       when type
@@ -179,11 +179,11 @@ module Temporalio
       when nil
         nil
       when Proc
-        new.call(existing).tap do |conv| # steep:ignore
+        new.call(existing).tap do |conv| # steep:ignore NoMethod
           raise "Array for #{name} required" unless conv.is_a?(Array)
         end
       when Array
-        existing + new # steep:ignore
+        existing + new # steep:ignore NoMethod
       else
         raise "Unrecognized #{name} type #{new.class}"
       end
