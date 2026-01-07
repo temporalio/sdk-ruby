@@ -97,14 +97,6 @@ gems:
     revision: 2af46cde7fec5e4130f6c84c5b691c0538af8789
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
-- name: grpc
-  version: '1.63'
-  source:
-    type: git
-    name: ruby/gem_rbs_collection
-    revision: 2af46cde7fec5e4130f6c84c5b691c0538af8789
-    remote: https://github.com/ruby/gem_rbs_collection.git
-    repo_dir: gems
 - name: i18n
   version: '1.10'
   source:

@@ -9,7 +9,7 @@ group :development do
   gem 'activerecord'
   gem 'async'
   gem 'base64'
-  gem 'grpc', '~> 1.69'
+  gem 'googleapis-common-protos-types'
   gem 'grpc-tools', '~> 1.69'
   gem 'irb'
   gem 'minitest'
