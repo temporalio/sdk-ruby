@@ -68,7 +68,7 @@ class WorkerWorkflowTest < Test
       when :queue
         Queue.new
       when :sized_queue
-        SizedQueue.new
+        SizedQueue.new(100)
       when :mutex
         Mutex.new
       when :condvar
@@ -182,9 +182,9 @@ class WorkerWorkflowTest < Test
   class InfoWorkflow < Temporalio::Workflow::Definition
     def execute
       Temporalio::Workflow.info.to_h.tap do |h|
-        h['parent'] = Temporalio::Workflow.info.parent.to_h if Temporalio::Workflow.info.parent
-        h['root'] = Temporalio::Workflow.info.root.to_h if Temporalio::Workflow.info.root
-        h['start_time'] = Temporalio::Workflow.info.start_time.to_s
+        h[:parent] = Temporalio::Workflow.info.parent.to_h if Temporalio::Workflow.info.parent
+        h[:root] = Temporalio::Workflow.info.root.to_h if Temporalio::Workflow.info.root
+        h[:start_time] = Temporalio::Workflow.info.start_time.to_s
       end
     end
   end
@@ -755,8 +755,6 @@ class WorkerWorkflowTest < Test
   end
 
   class NonDeterminismErrorSpecificAsFailureWorkflow < NonDeterminismErrorWorkflow
-    # @type module: Temporalio::Workflow::Definition.class
-
     workflow_failure_exception_type Temporalio::Workflow::NondeterminismError
   end
 
@@ -899,6 +897,7 @@ class WorkerWorkflowTest < Test
           Temporalio::Workflow::Future.new { Temporalio::Workflow.sleep(0.01) },
           Temporalio::Workflow::Future.new { 'done' }
         ).wait
+        # @type var result: String?
         raise unless result == 'done'
 
         # Any of with exception
@@ -1078,7 +1077,7 @@ class WorkerWorkflowTest < Test
     new_options = env.client.options.with(
       data_converter: Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
     )
-    client = Temporalio::Client.new(**new_options.to_h)
+    client = Temporalio::Client.new(**new_options.to_h) # steep:ignore InsufficientKeywordArguments
     assert_encoded = lambda do |payload|
       assert_equal 'test/base64', payload.metadata['encoding']
       Base64.strict_decode64(payload.data)
@@ -1132,7 +1131,7 @@ class WorkerWorkflowTest < Test
 
       # Check SA and memo on describe
       desc = handle.describe
-      assert_equal 'new-sa', desc.search_attributes[ATTR_KEY_TEXT]
+      assert_equal 'new-sa', desc.search_attributes&.[](ATTR_KEY_TEXT)
       assert_equal 'new-memo', desc.memo['some-memo-key']
     end
 
@@ -1163,7 +1162,7 @@ class WorkerWorkflowTest < Test
         payload_codec: Base64Codec.new
       )
     )
-    client = Temporalio::Client.new(**new_options.to_h)
+    client = Temporalio::Client.new(**new_options.to_h) # steep:ignore InsufficientKeywordArguments
     execute_workflow(
       PayloadCodecWorkflow, true,
       activities: [PayloadCodecActivity],
@@ -1243,7 +1242,7 @@ class WorkerWorkflowTest < Test
   class ContextFrozenWorkflow < Temporalio::Workflow::Definition
     workflow_init
     def initialize(scenario = :do_nothing)
-      do_bad_thing(scenario)
+      do_bad_thing(scenario) # steep:ignore
     end
 
     def execute(_scenario = :do_nothing)
@@ -1252,7 +1251,7 @@ class WorkerWorkflowTest < Test
 
     workflow_query
     def some_query(scenario)
-      do_bad_thing(scenario)
+      do_bad_thing(scenario) # steep:ignore
     end
 
     workflow_update
@@ -1262,7 +1261,7 @@ class WorkerWorkflowTest < Test
 
     workflow_update_validator :some_update
     def some_update_validator(scenario)
-      do_bad_thing(scenario)
+      do_bad_thing(scenario) # steep:ignore
     end
 
     def do_bad_thing(scenario)
@@ -1435,7 +1434,7 @@ class WorkerWorkflowTest < Test
       queue = Temporalio::Workflow::SizedQueue.new(1)
       queue.push('some-value')
       # Timeout only works on 3.2+
-      raise 'Expected nil' if timeout && !queue.push('some-other-value', timeout:).nil?
+      raise 'Expected nil' if timeout && !queue.push('some-other-value', timeout:).nil? # steep:ignore
 
       queue.pop
     end
@@ -1942,7 +1941,7 @@ class WorkerWorkflowTest < Test
       self.class.weak_fiber = WeakRef.new(Fiber.current)
       self.class.fiber_object_id = Fiber.current.object_id
 
-      ObjectSpace.define_finalizer(self, self.class.create_finalizer)
+      ObjectSpace.define_finalizer(self, self.class.create_finalizer) # steep:ignore
     end
 
     def execute
@@ -1971,11 +1970,14 @@ class WorkerWorkflowTest < Test
     loop do
       GC.start
       # Break if the instance is gone
-      break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive?
+      break unless ConfirmGarbageCollectWorkflow.weak_fiber.weakref_alive? # steep:ignore
 
       # If this is last iteration, flunk w/ the path
       if Time.now - start_time > 10
-        path, cat = GCUtils.find_retaining_path_to(ConfirmGarbageCollectWorkflow.fiber_object_id, max_depth: 12)
+        path, cat = GCUtils.find_retaining_path_to(
+          ConfirmGarbageCollectWorkflow.fiber_object_id || raise,
+          max_depth: 12
+        )
         msg = GCUtils.annotated_path(path, root_category: cat)
         msg += "\nPath:\n#{path.map { |p| "    Item: #{p}" }.join("\n")}"
         # Also display any Thread/Fiber backtraces that are in the path
@@ -1985,7 +1987,7 @@ class WorkerWorkflowTest < Test
         path.grep(Fiber).each do |fiber|
           msg += "\nFiber trace: #{fiber.backtrace.join("\n")}"
         end
-        msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}"
+        msg += "\nOrig fiber trace: #{ConfirmGarbageCollectWorkflow.weak_fiber.backtrace.join("\n")}" # steep:ignore
         flunk msg
       end
       sleep(0.2)
@@ -2001,7 +2003,7 @@ class WorkerWorkflowTest < Test
 
     class Inbound < Temporalio::Worker::Interceptor::Workflow::Inbound
       def execute(input)
-        Temporalio::Workflow.instance.events << 'interceptor-execute'
+        Temporalio::Workflow.instance.events << 'interceptor-execute' # steep:ignore
         super
       end
     end
@@ -2009,7 +2011,7 @@ class WorkerWorkflowTest < Test
 
   class ContextInstanceWorkflow < Temporalio::Workflow::Definition
     def execute
-      events << 'execute'
+      events << 'execute' # steep:ignore
     end
 
     workflow_query
@@ -2360,7 +2362,7 @@ class WorkerWorkflowTest < Test
       # Complete and check final details
       handle.execute_update(WorkflowMetadataWorkflow.some_update)
       handle.result
-      assert_equal 'final current details', handle.query(:__temporal_workflow_metadata).current_details
+      assert_equal 'final current details', handle.query(:__temporal_workflow_metadata).current_details # steep:ignore
     end
   end
 

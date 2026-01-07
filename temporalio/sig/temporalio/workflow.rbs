@@ -17,6 +17,8 @@ module Temporalio
 
     def self.current_update_info: -> UpdateInfo?
 
+    def self.deprecate_patch: (Symbol | String patch_id) -> void
+
     def self.execute_activity: (
       singleton(Activity::Definition) | Symbol | String activity,
       *Object? args,
@@ -91,7 +93,7 @@ module Temporalio
 
     def self.now: -> Time
 
-    def self.patched: (String patch_id) -> bool
+    def self.patched: (Symbol | String patch_id) -> bool
 
     def self.payload_converter: -> Converters::PayloadConverter
 

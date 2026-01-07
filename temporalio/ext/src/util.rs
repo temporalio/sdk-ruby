@@ -26,18 +26,23 @@ impl Struct {
     where
         T: TryConvert,
     {
+        let ruby = Ruby::get().expect("Ruby missing");
         self.inner.getmember::<_, T>(field).map_err(|err| {
             if self.field_path.is_empty() {
-                error!("Failed reading field '{}': {}", field.into_symbol(), err)
+                error!(
+                    "Failed reading field '{}': {}",
+                    field.into_symbol_with(&ruby),
+                    err
+                )
             } else {
                 error!(
                     "Failed reading field '{}.{}': {}",
                     self.field_path
                         .iter()
-                        .map(|v| v.into_symbol().to_string())
+                        .map(|v| v.into_symbol_with(&ruby).to_string())
                         .collect::<Vec<String>>()
                         .join("."),
-                    field.into_symbol(),
+                    field.into_symbol_with(&ruby),
                     err
                 )
             }

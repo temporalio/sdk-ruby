@@ -80,7 +80,7 @@ module GCUtils
         i = parent[i]
       end
       objs = ids.reverse.map do |id|
-        ObjectSpace._id2ref(id)
+        ObjectSpace._id2ref(id) # steep:ignore
       rescue StandardError
         id
       end

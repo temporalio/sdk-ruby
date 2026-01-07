@@ -1,12 +1,12 @@
 module Temporalio
   module Converters
     class PayloadConverter
-      def self.default: -> PayloadConverter
+      def self.default: -> Composite
 
       def self.new_with_defaults: (
         ?json_parse_options: Hash[Symbol, untyped],
         ?json_generate_options: Hash[Symbol, untyped]
-      ) -> PayloadConverter
+      ) -> Composite
 
       def to_payload: (Object? value, ?hint: Object?) -> untyped
       def to_payloads: (Array[Object?] values, ?hints: Array[Object]?) -> untyped

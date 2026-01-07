@@ -2,7 +2,7 @@ use std::{any::Any, sync::Arc, time::Duration};
 
 use magnus::{
     DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
-    Symbol, TryConvert, TypedData, Value, class, function,
+    Symbol, TryConvert, TypedData, Value, function,
     gc::register_mark_object,
     method,
     prelude::*,
@@ -18,18 +18,18 @@ use crate::{ROOT_MOD, error, id, runtime::Runtime, util::SendSyncBoxValue};
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
 
-    let class = root_mod.define_class("Metric", class::object())?;
+    let class = root_mod.define_class("Metric", ruby.class_object())?;
     class.define_singleton_method("new", function!(Metric::new, 6))?;
     class.define_method("record_value", method!(Metric::record_value, 2))?;
 
-    let inner_class = class.define_class("Meter", class::object())?;
+    let inner_class = class.define_class("Meter", ruby.class_object())?;
     inner_class.define_singleton_method("new", function!(MetricMeter::new, 1))?;
     inner_class.define_method(
         "default_attributes",
         method!(MetricMeter::default_attributes, 0),
     )?;
 
-    let inner_class = class.define_class("Attributes", class::object())?;
+    let inner_class = class.define_class("Attributes", ruby.class_object())?;
     inner_class.define_method(
         "with_additional",
         method!(MetricAttributes::with_additional, 1),

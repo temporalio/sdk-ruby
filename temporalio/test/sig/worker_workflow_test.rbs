@@ -1,0 +1,26 @@
+class WorkerWorkflowTest < Test
+  class NonDeterminismErrorWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> void
+    def self.finish: () -> Temporalio::Workflow::Definition::Signal
+  end
+
+  class PatchWorkflowBase < Temporalio::Workflow::Definition
+    attr_writer activity_result: untyped
+  end
+
+  class ConfirmGarbageCollectWorkflow < Temporalio::Workflow::Definition
+    attr_accessor self.initialized_count: Integer
+    attr_accessor self.finalized_count: Integer
+    attr_accessor self.weak_instance: ConfirmGarbageCollectWorkflow?
+    attr_accessor self.strong_instance: ConfirmGarbageCollectWorkflow?
+    attr_accessor self.instance_object_id: Integer?
+    attr_accessor self.weak_fiber: Fiber?
+    attr_accessor self.fiber_object_id: Integer?
+    def execute: () -> void
+  end
+
+  class UnsafeIOWorkflow < Temporalio::Workflow::Definition
+    def execute: (bool unsafe_io_enabled) -> void
+    def do_http_call: () -> void
+  end
+end

@@ -27,8 +27,8 @@ jobs:
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
-          ruby-version: "3.4"
-          bundler-cache: true
+          ruby-version: "4.0"
+          bundler-cache: false # Needed so 'bundler install' doesn't run
           cargo-cache: true
           cargo-vendor: true
           working-directory: ./temporalio
@@ -41,7 +41,8 @@ jobs:
         id: cross-gem
         working-directory: ./temporalio
         run: |
-          bundle exec rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.2,3.3,3.4" --mount-toolchains --build
+          gem install rb_sys --no-document
+          rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
           echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> $GITHUB_OUTPUT
 
       - name: Upload gem
@@ -62,7 +63,7 @@ jobs:
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@v1
         with:
-          ruby-version: "3.4"
+          ruby-version: "4.0"
           bundler-cache: true
           cargo-cache: true
           cache-version: v1-source
@@ -96,7 +97,7 @@ jobs:
         #   does not have updated certificates and it is not easy to update them, see
         #   https://github.com/temporalio/sdk-ruby/issues/306
         os: [ubuntu-latest, macos-latest]
-        rubyVersion: ["3.2", "3.3", "3.4"]
+        rubyVersion: ["3.3", "3.4", "4.0"]
         # Container defaults to empty/none, but additional container for Alpine
         # added later
         container: [""]
