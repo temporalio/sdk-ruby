@@ -2685,18 +2685,43 @@ class WorkerWorkflowTest < Test
       assert_equal 'Intentional failure', previous_failure
     end
   end
-end
 
-# TODO(cretz): To test
-# * Common
-#   * Eager workflow start
-#   * Unawaited futures that have exceptions, need to log warning like Java does
-#   * Enhanced stack trace?
-#   * Separate abstract/interface demonstration
-#   * Reset update randomness seed
-#   * Confirm thread pool does not leak, meaning thread/worker goes away after last workflow
-#   * Test workflow cancel causing other cancels at the same time but in different coroutines
-#   * 0-sleep timers vs nil timers
-#   * Interceptors
-# * Activity
-#   * Local activity cancel (currently broken)
+  class LeftoverWaitActivity < Temporalio::Activity::Definition
+    def execute
+      ctx = Temporalio::Activity::Context.current
+      ctx.client.workflow_handle(ctx.info.workflow_id).signal(LeftoverWaitWorkflow.some_signal)
+    end
+  end
+
+  class LeftoverWaitWorkflow < Temporalio::Workflow::Definition
+    def execute
+      # The issue this is testing is that a wait condition is still set as the fiber to update even after it has
+      # timed out
+
+      # First have a wait condition and raise from it on timeout
+      Temporalio::Workflow.timeout(0.001) do
+        Temporalio::Workflow.wait_condition { @got_signal }
+        raise 'Unreachable'
+      rescue Timeout::Error
+        # Do nothing
+      end
+
+      # Now execute an activity that is going to send a signal to wake up the wait condition (that was supposed to be
+      # gone) causing it to give an improper value to the activity here
+      Temporalio::Workflow.execute_activity(LeftoverWaitActivity, start_to_close_timeout: 10)
+    end
+
+    workflow_signal
+    def some_signal
+      @got_signal = true
+    end
+  end
+
+  def test_leftover_wait
+    handle = execute_workflow(LeftoverWaitWorkflow, activities: [LeftoverWaitActivity]) do |handle|
+      handle.tap(&:result)
+    end
+    # This used to fail because of a workflow task failure caused by a leftover wait condition
+    assert_nil handle.fetch_history_events.find(&:workflow_task_failed_event_attributes)
+  end
+end
