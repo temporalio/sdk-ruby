@@ -11,6 +11,7 @@ group :development do
   gem 'base64'
   gem 'grpc', '~> 1.69'
   gem 'grpc-tools', '~> 1.69'
+  gem 'irb'
   gem 'minitest'
   # Have to explicitly depend on openssl for macos issue in GH CI described at
   # https://github.com/rails/rails/issues/55886 until 3.4.8 is released
@@ -21,10 +22,11 @@ group :development do
   gem 'opentelemetry-sdk'
   gem 'rake'
   gem 'rake-compiler'
-  gem 'rbs', '~> 3.5.3'
-  gem 'rb_sys', '~> 0.9.63'
+  gem 'rbs', '~> 3.10'
+  gem 'rb_sys', '~> 0.9'
+  gem 'rdoc'
   gem 'rubocop'
   gem 'sqlite3'
-  gem 'steep', '~> 1.7.1'
+  gem 'steep', '~> 1.10'
   gem 'yard'
 end

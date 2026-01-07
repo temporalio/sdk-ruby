@@ -8,13 +8,6 @@ require 'test'
 
 module Converters
   class PayloadConverterTest < Test
-    # @type method assert_payload: (
-    #   untyped input,
-    #   String expected_encoding,
-    #   String expected_data,
-    #   ?expected_decoded_input: untyped,
-    #   ?converter: Temporalio::Converters::PayloadConverter
-    # ) -> untyped
     def assert_payload(
       input,
       expected_encoding,
@@ -98,6 +91,8 @@ module Converters
       payload = assert_payload(proto, 'binary/protobuf', proto.to_proto, converter:)
       assert_equal 'temporal.api.common.v1.WorkflowExecution', payload.metadata['messageType']
     end
+
+    # steep:ignore:start
 
     # Need this support library for active model to work
     module ActiveRecordJSONSupport
@@ -186,5 +181,7 @@ module Converters
       assert_instance_of MyActiveModelObject, new_obj
       assert_equal obj.attributes, new_obj.attributes
     end
+
+    # steep:ignore:end
   end
 end

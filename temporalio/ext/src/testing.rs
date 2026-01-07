@@ -1,8 +1,6 @@
 use std::time::Duration;
 
-use magnus::{
-    DataTypeFunctions, Error, Ruby, TypedData, Value, class, function, method, prelude::*,
-};
+use magnus::{DataTypeFunctions, Error, Ruby, TypedData, Value, function, method, prelude::*};
 use parking_lot::Mutex;
 use temporalio_sdk_core::ephemeral_server::{
     self, EphemeralExe, EphemeralExeVersion, TemporalDevServerConfigBuilder,
@@ -20,7 +18,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
 
     let module = root_mod.define_module("Testing")?;
 
-    let class = module.define_class("EphemeralServer", class::object())?;
+    let class = module.define_class("EphemeralServer", ruby.class_object())?;
     class.define_singleton_method(
         "async_start_dev_server",
         function!(EphemeralServer::async_start_dev_server, 3),

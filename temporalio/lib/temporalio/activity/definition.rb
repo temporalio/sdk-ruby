@@ -123,6 +123,11 @@ module Temporalio
         raise NotImplementedError, 'Activity did not implement "execute"'
       end
 
+      # @!visibility private
+      def _activity_definition_details
+        self.class._activity_definition_details
+      end
+
       # Definition info of an activity. Activities are usually classes/instances that extend {Definition}, but
       # definitions can also be manually created with a block via {initialize} here.
       class Info
@@ -175,7 +180,7 @@ module Temporalio
               result_hint: details[:activity_result_hint]
             ) { |*args| Context.current.instance&.execute(*args) }
           when Definition
-            details = activity.class._activity_definition_details
+            details = activity._activity_definition_details
             new(
               name: details[:activity_name],
               instance: activity,

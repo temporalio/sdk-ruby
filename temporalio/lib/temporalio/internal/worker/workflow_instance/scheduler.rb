@@ -141,6 +141,10 @@ module Temporalio
             fiber
           end
 
+          def fiber_interrupt(fiber, exception)
+            fiber.raise(exception) if fiber.alive?
+          end
+
           def io_wait(io, events, timeout)
             # Do not allow if IO disabled
             unless @instance.io_enabled

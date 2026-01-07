@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.extensions = ['ext/Cargo.toml']
   spec.metadata['rubygems_mfa_required'] = 'true'
-  spec.required_ruby_version = '>= 3.2.0'
+  spec.required_ruby_version = '>= 3.3.0'
 
   spec.add_dependency 'google-protobuf', '>= 3.25.0'
   spec.add_dependency 'logger'

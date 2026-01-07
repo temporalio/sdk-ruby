@@ -65,7 +65,7 @@ class Test < Minitest::Test
 
     original_method = instance_method(method_name)
     define_method("#{method_name}_in_fiber") do
-      Async do |_task|
+      Kernel.Async do |_task|
         original_method.bind(self).call
       end
     end
@@ -155,8 +155,7 @@ class Test < Minitest::Test
             '--dynamic-config-value', 'system.enableDeploymentVersions=true',
             # Enable activity pause
             '--dynamic-config-value', 'frontend.activityAPIsEnabled=true'
-          ],
-          dev_server_download_version: 'v1.4.1-cloud-v1-29-0-139-2.0'
+          ]
         )
         Minitest.after_run do
           @server.shutdown
