@@ -823,6 +823,12 @@ class WorkerWorkflowTest < Test
       Temporalio::Workflow.sleep(0.01)
     end
 
+    workflow_query
+    def query
+      Temporalio::Workflow.logger.info('query-log')
+      'query-result'
+    end
+
     workflow_signal
     def cause_task_failure
       raise 'Some failure'
@@ -836,6 +842,9 @@ class WorkerWorkflowTest < Test
         handle.execute_update(LoggerWorkflow.update)
         # Send signal which causes replay when cache disabled
         handle.signal(:some_signal)
+        # Query during replay - should still allow logging
+        result = handle.query(LoggerWorkflow.query)
+        assert_equal 'query-result', result
       end
     end
     lines = out.split("\n")
@@ -850,6 +859,11 @@ class WorkerWorkflowTest < Test
     bad_lines = lines.select { |l| l.include?('some-log-2') }
     assert bad_lines.size >= 2
     refute_includes bad_lines.first, '"LoggerWorkflow"'
+
+    # Confirm query logs appear (should not be suppressed)
+    query_lines = lines.select { |l| l.include?('query-log') }
+    assert query_lines.size >= 1, 'Expected at least one query log'
+    assert_includes query_lines.first, 'workflow_type'
 
     # Confirm task failure logs
     out, = safe_capture_io do

@@ -23,7 +23,8 @@ module Temporalio
           end
 
           def add(...)
-            if !@replay_safety_disabled && Temporalio::Workflow.in_workflow? && Temporalio::Workflow::Unsafe.replaying?
+            if !@replay_safety_disabled && Temporalio::Workflow.in_workflow? &&
+               Temporalio::Workflow::Unsafe.replaying_history_events?
               return true
             end
 

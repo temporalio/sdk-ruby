@@ -91,6 +91,8 @@ module Temporalio
 
           def replaying?: -> bool
 
+          def replaying_history_events?: -> bool
+
           def search_attributes: -> SearchAttributes
 
           def signal_handlers: -> HandlerHash[Workflow::Definition::Signal]

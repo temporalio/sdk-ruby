@@ -34,6 +34,7 @@ module Temporalio
         attr_reader update_handlers: Hash[String?, Workflow::Definition::Update]
         attr_reader context_frozen: bool
         attr_reader assert_valid_local_activity: ^(String) -> void
+        attr_reader in_query_or_validator: bool
 
         attr_accessor io_enabled: bool
         attr_accessor current_details: String?
@@ -76,7 +77,7 @@ module Temporalio
 
         def failure_exception?: (Exception err) -> bool
 
-        def with_context_frozen: [T] { -> T } -> T
+        def with_context_frozen: [T] (in_query_or_validator: bool) { -> T } -> T
 
         def convert_handler_args: (
           payload_array: Array[untyped],

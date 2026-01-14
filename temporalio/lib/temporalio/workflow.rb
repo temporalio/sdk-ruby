@@ -533,9 +533,16 @@ module Temporalio
     # Unsafe module contains only-in-workflow methods that are considered unsafe. These should not be used unless the
     # consequences are understood.
     module Unsafe
-      # @return [Boolean] True if the workflow is replaying, false otherwise. Most code should not check this value.
+      # @return [Boolean] True if the workflow is replaying (including during queries and update validators), false
+      #   otherwise. Most code should not check this value.
       def self.replaying?
         Workflow._current.replaying?
+      end
+
+      # @return [Boolean] True if the workflow is replaying history events (excluding queries and update validators),
+      #   false otherwise. Most code should not check this value.
+      def self.replaying_history_events?
+        Workflow._current.replaying_history_events?
       end
 
       # Run a block of code with illegal call tracing disabled. Users should be cautious about using this as it can

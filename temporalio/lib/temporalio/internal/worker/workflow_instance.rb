@@ -57,7 +57,8 @@ module Temporalio
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
-                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity
+                    :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity,
+                    :in_query_or_validator
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -91,6 +92,7 @@ module Temporalio
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
+          @in_query_or_validator = false
           @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
             details.definition.signals,
@@ -182,7 +184,7 @@ module Temporalio
           # Apply jobs and run event loop
           begin
             # Create instance if it doesn't already exist
-            @instance ||= with_context_frozen { create_instance }
+            @instance ||= with_context_frozen(in_query_or_validator: false) { create_instance }
 
             # Apply jobs
             activation.jobs.each { |job| apply(job) }
@@ -439,7 +441,7 @@ module Temporalio
                        end
                        result_hint = defn.result_hint
 
-                       with_context_frozen do
+                       with_context_frozen(in_query_or_validator: true) do
                          @inbound.handle_query(
                            Temporalio::Worker::Interceptor::Workflow::HandleQueryInput.new(
                              id: job.query_id,
@@ -502,7 +504,7 @@ module Temporalio
             # other SDKs, we are re-converting the args between validate and update to disallow user mutation in
             # validator/interceptor.
             if job.run_validator && defn.validator_to_invoke
-              with_context_frozen do
+              with_context_frozen(in_query_or_validator: true) do
                 @inbound.validate_update(
                   Temporalio::Worker::Interceptor::Workflow::HandleUpdateInput.new(
                     id: job.id,
@@ -663,11 +665,13 @@ module Temporalio
             @definition_options.failure_exception_types&.any? { |cls| err.is_a?(cls) }
         end
 
-        def with_context_frozen(&)
+        def with_context_frozen(in_query_or_validator:, &)
           @context_frozen = true
+          @in_query_or_validator = in_query_or_validator
           yield
         ensure
           @context_frozen = false
+          @in_query_or_validator = false
         end
 
         def convert_handler_args(payload_array:, defn:)
