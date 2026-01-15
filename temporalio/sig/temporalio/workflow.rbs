@@ -153,6 +153,8 @@ module Temporalio
     module Unsafe
       def self.replaying?: -> bool
 
+      def self.replaying_history_events?: -> bool
+
       def self.illegal_call_tracing_disabled: [T] { -> T } -> T
 
       def self.io_enabled: [T] { -> T } -> T

@@ -242,6 +242,10 @@ module Temporalio
             @instance.replaying
           end
 
+          def replaying_history_events?
+            @instance.replaying && !@instance.in_query_or_validator
+          end
+
           def search_attributes
             @instance.search_attributes
           end

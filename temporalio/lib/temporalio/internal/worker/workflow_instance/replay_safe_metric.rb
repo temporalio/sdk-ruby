@@ -9,7 +9,8 @@ module Temporalio
         # Wrapper for a metric that does not log on replay.
         class ReplaySafeMetric < SimpleDelegator
           def record(value, additional_attributes: nil)
-            return if Temporalio::Workflow.in_workflow? && Temporalio::Workflow::Unsafe.replaying?
+            return if Temporalio::Workflow.in_workflow? &&
+                      Temporalio::Workflow::Unsafe.replaying_history_events?
 
             super
           end
