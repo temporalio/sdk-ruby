@@ -3,12 +3,11 @@ use std::time::Duration;
 use magnus::{DataTypeFunctions, Error, Ruby, TypedData, Value, function, method, prelude::*};
 use parking_lot::Mutex;
 use temporalio_sdk_core::ephemeral_server::{
-    self, EphemeralExe, EphemeralExeVersion, TemporalDevServerConfigBuilder,
-    TestServerConfigBuilder,
+    self, EphemeralExe, EphemeralExeVersion, TemporalDevServerConfig, TestServerConfig,
 };
 
 use crate::{
-    ROOT_MOD, error, id, new_error,
+    ROOT_MOD, id, new_error,
     runtime::{Runtime, RuntimeHandle},
     util::{AsyncCallback, Struct},
 };
@@ -53,23 +52,20 @@ impl EphemeralServer {
         queue: Value,
     ) -> Result<(), Error> {
         // Build options
-        let mut opts_build = TemporalDevServerConfigBuilder::default();
-        opts_build
+        let opts = TemporalDevServerConfig::builder()
             .exe(EphemeralServer::exe_from_options(&options)?)
             .namespace(options.member::<String>(id!("namespace"))?)
             .ip(options.member::<String>(id!("ip"))?)
-            .port(options.member::<Option<u16>>(id!("port"))?)
-            .db_filename(options.member::<Option<String>>(id!("database_filename"))?)
+            .maybe_port(options.member::<Option<u16>>(id!("port"))?)
+            .maybe_db_filename(options.member::<Option<String>>(id!("database_filename"))?)
             .ui(options.member(id!("ui"))?)
-            .ui_port(options.member::<Option<u16>>(id!("ui_port"))?)
+            .maybe_ui_port(options.member::<Option<u16>>(id!("ui_port"))?)
             .log((
                 options.member::<String>(id!("log_format"))?,
                 options.member::<String>(id!("log_level"))?,
             ))
-            .extra_args(options.member(id!("extra_args"))?);
-        let opts = opts_build
-            .build()
-            .map_err(|err| error!("Invalid dev server config: {}", err))?;
+            .extra_args(options.member(id!("extra_args"))?)
+            .build();
 
         // Start
         let callback = AsyncCallback::from_queue(queue);
@@ -97,14 +93,11 @@ impl EphemeralServer {
         queue: Value,
     ) -> Result<(), Error> {
         // Build options
-        let mut opts_build = TestServerConfigBuilder::default();
-        opts_build
+        let opts = TestServerConfig::builder()
             .exe(EphemeralServer::exe_from_options(&options)?)
-            .port(options.member::<Option<u16>>(id!("port"))?)
-            .extra_args(options.member(id!("extra_args"))?);
-        let opts = opts_build
-            .build()
-            .map_err(|err| error!("Invalid test server config: {}", err))?;
+            .maybe_port(options.member::<Option<u16>>(id!("port"))?)
+            .extra_args(options.member(id!("extra_args"))?)
+            .build();
 
         // Start
         let callback = AsyncCallback::from_queue(queue);

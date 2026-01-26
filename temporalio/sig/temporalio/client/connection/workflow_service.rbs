@@ -381,6 +381,46 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def pause_workflow_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def unpause_workflow_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def start_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def describe_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def poll_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def list_activity_executions: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def count_activity_executions: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def request_cancel_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def terminate_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
+        def delete_activity_execution: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
       end
     end
   end

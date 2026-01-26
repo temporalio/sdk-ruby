@@ -88,6 +88,29 @@ module Temporalio
 
       ### Generated method bodies below ###
 
+      def api_activity_v1_activity_execution_info(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.heartbeat_details) if value.has_heartbeat_details?
+        api_failure_v1_failure(value.last_failure) if value.has_last_failure?
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        api_common_v1_header(value.header) if value.has_header?
+        api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        @on_exit&.call(value)
+      end
+      
+      def api_activity_v1_activity_execution_list_info(value)
+        @on_enter&.call(value)
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
+      def api_activity_v1_activity_execution_outcome(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.result) if value.has_result?
+        api_failure_v1_failure(value.failure) if value.has_failure?
+        @on_exit&.call(value)
+      end
+      
       def api_batch_v1_batch_operation_reset(value)
         @on_enter&.call(value)
         value.post_reset_operations.each { |v| api_workflow_v1_post_reset_operation(v) }
@@ -1025,6 +1048,18 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_count_activity_executions_response(value)
+        @on_enter&.call(value)
+        value.groups.each { |v| api_workflowservice_v1_count_activity_executions_response_aggregation_group(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_count_activity_executions_response_aggregation_group(value)
+        @on_enter&.call(value)
+        api_common_v1_payload_repeated(value.group_values) unless value.group_values.empty?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_count_workflow_executions_response(value)
         @on_enter&.call(value)
         value.groups.each { |v| api_workflowservice_v1_count_workflow_executions_response_aggregation_group(v) }
@@ -1042,6 +1077,14 @@ module Temporalio
         api_schedule_v1_schedule(value.schedule) if value.has_schedule?
         api_common_v1_memo(value.memo) if value.has_memo?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_describe_activity_execution_response(value)
+        @on_enter&.call(value)
+        api_activity_v1_activity_execution_info(value.info) if value.has_info?
+        api_common_v1_payloads(value.input) if value.has_input?
+        api_activity_v1_activity_execution_outcome(value.outcome) if value.has_outcome?
         @on_exit&.call(value)
       end
       
@@ -1125,6 +1168,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_list_activity_executions_response(value)
+        @on_enter&.call(value)
+        value.executions.each { |v| api_activity_v1_activity_execution_list_info(v) }
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_list_archived_workflow_executions_response(value)
         @on_enter&.call(value)
         value.executions.each { |v| api_workflow_v1_workflow_execution_info(v) }
@@ -1152,6 +1201,12 @@ module Temporalio
       def api_workflowservice_v1_list_workflow_executions_response(value)
         @on_enter&.call(value)
         value.executions.each { |v| api_workflow_v1_workflow_execution_info(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_poll_activity_execution_response(value)
+        @on_enter&.call(value)
+        api_activity_v1_activity_execution_outcome(value.outcome) if value.has_outcome?
         @on_exit&.call(value)
       end
       
@@ -1333,6 +1388,15 @@ module Temporalio
         @on_enter&.call(value)
         api_common_v1_payloads(value.input) if value.has_input?
         api_common_v1_header(value.header) if value.has_header?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_start_activity_execution_request(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.input) if value.has_input?
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        api_common_v1_header(value.header) if value.has_header?
+        api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
         @on_exit&.call(value)
       end
       

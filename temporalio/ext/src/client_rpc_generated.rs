@@ -18,6 +18,13 @@ impl Client {
     ) -> Result<(), Error> {
         match service {
             SERVICE_WORKFLOW => match call.rpc.as_str() {
+                "count_activity_executions" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    count_activity_executions
+                ),
                 "count_workflow_executions" => rpc_call!(
                     self,
                     callback,
@@ -31,6 +38,13 @@ impl Client {
                 "create_workflow_rule" => {
                     rpc_call!(self, callback, call, WorkflowService, create_workflow_rule)
                 }
+                "delete_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    delete_activity_execution
+                ),
                 "delete_schedule" => {
                     rpc_call!(self, callback, call, WorkflowService, delete_schedule)
                 }
@@ -61,6 +75,13 @@ impl Client {
                 "deprecate_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, deprecate_namespace)
                 }
+                "describe_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    describe_activity_execution
+                ),
                 "describe_batch_operation" => rpc_call!(
                     self,
                     callback,
@@ -179,6 +200,13 @@ impl Client {
                     WorkflowService,
                     get_workflow_execution_history_reverse
                 ),
+                "list_activity_executions" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    list_activity_executions
+                ),
                 "list_archived_workflow_executions" => rpc_call!(
                     self,
                     callback,
@@ -250,6 +278,20 @@ impl Client {
                 "pause_activity" => {
                     rpc_call!(self, callback, call, WorkflowService, pause_activity)
                 }
+                "pause_workflow_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    pause_workflow_execution
+                ),
+                "poll_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    poll_activity_execution
+                ),
                 "poll_activity_task_queue" => rpc_call!(
                     self,
                     callback,
@@ -301,6 +343,13 @@ impl Client {
                 "register_namespace" => {
                     rpc_call!(self, callback, call, WorkflowService, register_namespace)
                 }
+                "request_cancel_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    request_cancel_activity_execution
+                ),
                 "request_cancel_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -454,6 +503,13 @@ impl Client {
                     WorkflowService,
                     signal_workflow_execution
                 ),
+                "start_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    start_activity_execution
+                ),
                 "start_batch_operation" => {
                     rpc_call!(self, callback, call, WorkflowService, start_batch_operation)
                 }
@@ -467,6 +523,13 @@ impl Client {
                 "stop_batch_operation" => {
                     rpc_call!(self, callback, call, WorkflowService, stop_batch_operation)
                 }
+                "terminate_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    terminate_activity_execution
+                ),
                 "terminate_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -480,6 +543,13 @@ impl Client {
                 "unpause_activity" => {
                     rpc_call!(self, callback, call, WorkflowService, unpause_activity)
                 }
+                "unpause_workflow_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    unpause_workflow_execution
+                ),
                 "update_activity_options" => rpc_call!(
                     self,
                     callback,
