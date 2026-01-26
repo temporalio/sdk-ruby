@@ -43,8 +43,8 @@ use temporalio_common::{
     protos::coresdk::workflow_completion::WorkflowActivationCompletion, worker::WorkerTaskTypes,
 };
 use temporalio_sdk_core::{
-    ResourceBasedSlotsOptions, ResourceBasedSlotsOptionsBuilder, ResourceSlotOptions,
-    SlotSupplierOptions, TunerHolder, TunerHolderOptionsBuilder, WorkerConfig, WorkerConfigBuilder,
+    ResourceBasedSlotsOptions, ResourceSlotOptions, SlotSupplierOptions, TunerHolder,
+    TunerHolderOptions, WorkerConfig,
     replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use tokio::sync::mpsc::{Sender, UnboundedSender, channel, unbounded_channel};
@@ -333,7 +333,7 @@ impl Worker {
         self.runtime_handle.spawn(
             async move { temporalio_common::Worker::validate(&*worker).await },
             move |ruby, result| match result {
-                Ok(()) => callback.push(&ruby, ruby.qnil()),
+                Ok(_namespace_info) => callback.push(&ruby, ruby.qnil()),
                 Err(err) => callback.push(&ruby, new_error!("Failed validating worker: {}", err)),
             },
         );
@@ -464,7 +464,7 @@ impl WorkflowReplayer {
 }
 
 fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<WorkerConfig, Error> {
-    WorkerConfigBuilder::default()
+    WorkerConfig::builder()
         .namespace(options.member::<String>(id!("namespace"))?)
         .task_queue(options.member::<String>(id!("task_queue"))?)
         .versioning_strategy({
@@ -495,7 +495,7 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 return Err(error!("SDK must set Worker deployment_options"));
             }
         })
-        .client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
+        .maybe_client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
         .max_cached_workflows(options.member::<usize>(id!("max_cached_workflows"))?)
         .workflow_task_poller_behavior({
             let poller_behavior = options
@@ -527,10 +527,10 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         .default_heartbeat_throttle_interval(Duration::from_secs_f64(
             options.member(id!("default_heartbeat_throttle_interval"))?,
         ))
-        .max_worker_activities_per_second(
+        .maybe_max_worker_activities_per_second(
             options.member::<Option<f64>>(id!("max_worker_activities_per_second"))?,
         )
-        .max_task_queue_activities_per_second(
+        .maybe_max_task_queue_activities_per_second(
             options.member::<Option<f64>>(id!("max_task_queue_activities_per_second"))?,
         )
         .graceful_shutdown_period(Duration::from_secs_f64(
@@ -564,7 +564,7 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                     name,
                     version: String::new(),
                 })
-                .collect::<Vec<PluginInfo>>(),
+                .collect::<HashSet<_>>(),
         )
         .build()
         .map_err(|err| error!("Invalid worker options: {}", err))
@@ -605,11 +605,8 @@ fn build_tuner(options: Struct, runtime_handle: &RuntimeHandle) -> Result<TunerH
         runtime_handle,
     )?;
 
-    let mut opts_build = TunerHolderOptionsBuilder::default();
-    if let Some(resource_slot_options) = resource_slot_options {
-        opts_build.resource_based_options(resource_slot_options);
-    }
-    opts_build
+    TunerHolderOptions::builder()
+        .maybe_resource_based_options(resource_slot_options)
         .workflow_slot_options(workflow_slot_options)
         .activity_slot_options(activity_slot_options)
         .local_activity_slot_options(local_activity_slot_options)
@@ -641,11 +638,10 @@ fn build_tuner_resource_options<SK: SlotKind>(
     options: Struct,
     prev_slots_options: Option<ResourceBasedSlotsOptions>,
 ) -> Result<(SlotSupplierOptions<SK>, Option<ResourceBasedSlotsOptions>), Error> {
-    let slots_options = ResourceBasedSlotsOptionsBuilder::default()
+    let slots_options = ResourceBasedSlotsOptions::builder()
         .target_mem_usage(options.member(id!("target_mem_usage"))?)
         .target_cpu_usage(options.member(id!("target_cpu_usage"))?)
-        .build()
-        .map_err(|err| error!("Failed building resource slot options: {}", err))?;
+        .build();
     if let Some(prev_slots_options) = prev_slots_options
         && (slots_options.target_cpu_usage != prev_slots_options.target_cpu_usage
             || slots_options.target_mem_usage != prev_slots_options.target_mem_usage)

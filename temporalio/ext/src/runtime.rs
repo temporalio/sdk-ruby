@@ -10,15 +10,16 @@ use std::str::FromStr;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
-use temporalio_common::telemetry::HistogramBucketOverrides;
 use temporalio_common::telemetry::{
-    Logger, MetricTemporality, OtelCollectorOptionsBuilder, OtlpProtocol,
-    PrometheusExporterOptionsBuilder, TelemetryOptionsBuilder, metrics::MetricCallBufferer,
+    HistogramBucketOverrides, OtelCollectorOptions, PrometheusExporterOptions, TelemetryOptions,
+};
+use temporalio_common::telemetry::{
+    Logger, MetricTemporality, OtlpProtocol, metrics::MetricCallBufferer,
 };
 use temporalio_sdk_core::telemetry::{
     MetricsCallBuffer, build_otlp_metric_exporter, start_prometheus_metric_exporter,
 };
-use temporalio_sdk_core::{CoreRuntime, RuntimeOptionsBuilder, TokioRuntimeBuilder};
+use temporalio_sdk_core::{CoreRuntime, RuntimeOptions, TokioRuntimeBuilder};
 use tracing::error as log_error;
 use url::Url;
 
@@ -71,36 +72,42 @@ pub(crate) enum AsyncCommand {
 impl Runtime {
     pub fn new(options: Struct) -> Result<Self, Error> {
         // Build options
-        let mut telemetry_opts_build = TelemetryOptionsBuilder::default();
         let telemetry = options
             .child(id!("telemetry"))?
             .ok_or_else(|| error!("Missing telemetry options"))?;
-        if let Some(logging) = telemetry.child(id!("logging"))? {
-            telemetry_opts_build.logging(
+        let logging = match telemetry.child(id!("logging"))? {
+            Some(logging) => {
                 if let Some(_forward_to) = logging.member::<Option<Value>>(id!("forward_to"))? {
                     // TODO(cretz): This
                     return Err(error!("Forwarding not yet supported"));
                 } else {
-                    Logger::Console {
+                    Some(Logger::Console {
                         filter: logging.member(id!("log_filter"))?,
-                    }
-                },
-            );
-        }
+                    })
+                }
+            }
+            None => None,
+        };
+        let (service_name, metric_prefix) =
+            if let Some(metrics) = telemetry.child(id!("metrics"))? {
+                (
+                    metrics.member(id!("attach_service_name"))?,
+                    metrics.member::<Option<String>>(id!("metric_prefix"))?,
+                )
+            } else {
+                (None, None)
+            };
+        let telemetry_opts = TelemetryOptions::builder()
+            .maybe_logging(logging)
+            .maybe_attach_service_name(service_name)
+            .maybe_metric_prefix(metric_prefix)
+            .build();
+
         // Set some metrics options now, but the metrics instance is late-bound
         // after CoreRuntime created since it needs Tokio runtime
-        if let Some(metrics) = telemetry.child(id!("metrics"))? {
-            telemetry_opts_build.attach_service_name(metrics.member(id!("attach_service_name"))?);
-            if let Some(prefix) = metrics.member::<Option<String>>(id!("metric_prefix"))? {
-                telemetry_opts_build.metric_prefix(prefix);
-            }
-        }
-        let opts = RuntimeOptionsBuilder::default()
-            .telemetry_options(
-                telemetry_opts_build
-                    .build()
-                    .map_err(|err| error!("Invalid telemetry options: {}", err))?,
-            )
+
+        let opts = RuntimeOptions::builder()
+            .telemetry_options(telemetry_opts)
             .heartbeat_interval(
                 options
                     .member::<Option<f64>>(id!("worker_heartbeat_interval"))?
@@ -124,47 +131,45 @@ impl Runtime {
             ) {
                 // Build OTel
                 (Some(opentelemetry), None, None) => {
-                    let mut opts_build = OtelCollectorOptionsBuilder::default();
-                    opts_build
+                    let opts = OtelCollectorOptions::builder()
                         .url(
                             Url::parse(&opentelemetry.member::<String>(id!("url"))?)
                                 .map_err(|err| error!("Invalid OTel URL: {}", err))?,
                         )
                         .use_seconds_for_durations(
                             opentelemetry.member(id!("durations_as_seconds"))?,
-                        );
-                    if let Some(headers) =
-                        opentelemetry.member::<Option<HashMap<String, String>>>(id!("headers"))?
-                    {
-                        opts_build.headers(headers);
-                    }
-                    if let Some(period) =
-                        opentelemetry.member::<Option<f64>>(id!("metric_periodicity"))?
-                    {
-                        opts_build.metric_periodicity(Duration::from_secs_f64(period));
-                    }
-                    if opentelemetry.member::<bool>(id!("metric_temporality_delta"))? {
-                        opts_build.metric_temporality(MetricTemporality::Delta);
-                    }
-                    if let Some(global_tags) =
-                        metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))?
-                    {
-                        opts_build.global_tags(global_tags);
-                    }
-                    if opentelemetry.member::<bool>(id!("http"))? {
-                        opts_build.protocol(OtlpProtocol::Http);
-                    }
-                    if let Some(overrides) = opentelemetry
-                        .member::<Option<HashMap<String, Vec<f64>>>>(id!(
-                            "histogram_bucket_overrides"
-                        ))?
-                    {
-                        opts_build
-                            .histogram_bucket_overrides(HistogramBucketOverrides { overrides });
-                    }
-                    let opts = opts_build
-                        .build()
-                        .map_err(|err| error!("Invalid OpenTelemetry options: {}", err))?;
+                        )
+                        .maybe_headers(
+                            opentelemetry
+                                .member::<Option<HashMap<String, String>>>(id!("headers"))?,
+                        )
+                        .maybe_metric_periodicity(
+                            opentelemetry
+                                .member::<Option<f64>>(id!("metric_periodicity"))?
+                                .map(Duration::from_secs_f64),
+                        )
+                        .maybe_global_tags(
+                            metrics
+                                .member::<Option<HashMap<String, String>>>(id!("global_tags"))?,
+                        )
+                        .maybe_histogram_bucket_overrides(
+                            opentelemetry
+                                .member::<Option<HashMap<String, Vec<f64>>>>(id!(
+                                    "histogram_bucket_overrides"
+                                ))?
+                                .map(|overrides| HistogramBucketOverrides { overrides }),
+                        )
+                        .maybe_metric_temporality(
+                            opentelemetry
+                                .member::<bool>(id!("metric_temporality_delta"))?
+                                .then_some(MetricTemporality::Delta),
+                        )
+                        .maybe_protocol(
+                            opentelemetry
+                                .member::<bool>(id!("http"))?
+                                .then_some(OtlpProtocol::Http),
+                        )
+                        .build();
                     core.telemetry_mut().attach_late_init_metrics(Arc::new(
                         build_otlp_metric_exporter(opts).map_err(|err| {
                             error!("Failed building OpenTelemetry exporter: {}", err)
@@ -172,29 +177,26 @@ impl Runtime {
                     ));
                 }
                 (None, Some(prom), None) => {
-                    let mut opts_build = PrometheusExporterOptionsBuilder::default();
-                    opts_build
+                    let opts = PrometheusExporterOptions::builder()
                         .socket_addr(
                             SocketAddr::from_str(&prom.member::<String>(id!("bind_address"))?)
                                 .map_err(|err| error!("Invalid Prometheus address: {}", err))?,
                         )
                         .counters_total_suffix(prom.member(id!("counters_total_suffix"))?)
                         .unit_suffix(prom.member(id!("unit_suffix"))?)
-                        .use_seconds_for_durations(prom.member(id!("durations_as_seconds"))?);
-                    if let Some(global_tags) =
-                        metrics.member::<Option<HashMap<String, String>>>(id!("global_tags"))?
-                    {
-                        opts_build.global_tags(global_tags);
-                    }
-                    if let Some(overrides) = prom.member::<Option<HashMap<String, Vec<f64>>>>(
-                        id!("histogram_bucket_overrides"),
-                    )? {
-                        opts_build
-                            .histogram_bucket_overrides(HistogramBucketOverrides { overrides });
-                    }
-                    let opts = opts_build
-                        .build()
-                        .map_err(|err| error!("Invalid Prometheus options: {}", err))?;
+                        .use_seconds_for_durations(prom.member(id!("durations_as_seconds"))?)
+                        .maybe_global_tags(
+                            metrics
+                                .member::<Option<HashMap<String, String>>>(id!("global_tags"))?,
+                        )
+                        .maybe_histogram_bucket_overrides(
+                            prom.member::<Option<HashMap<String, Vec<f64>>>>(id!(
+                                "histogram_bucket_overrides"
+                            ))?
+                            .map(|overrides| HistogramBucketOverrides { overrides }),
+                        )
+                        .build();
+
                     core.telemetry_mut().attach_late_init_metrics(
                         start_prometheus_metric_exporter(opts)
                             .map_err(|err| {
