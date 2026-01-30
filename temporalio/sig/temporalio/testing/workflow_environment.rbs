@@ -104,6 +104,10 @@ module Temporalio
 
       def current_time: -> Time
 
+      def create_nexus_endpoint: (name: String, task_queue: String) -> untyped
+
+      def delete_nexus_endpoint: (untyped endpoint) -> nil
+
       def auto_time_skipping_disabled: [T] { -> T } -> T
 
       class Ephemeral < WorkflowEnvironment

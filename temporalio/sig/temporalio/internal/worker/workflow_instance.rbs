@@ -18,6 +18,8 @@ module Temporalio
         attr_reader pending_timers: Hash[Integer, Fiber]
         attr_reader pending_child_workflow_starts: Hash[Integer, Fiber]
         attr_reader pending_child_workflows: Hash[Integer, ChildWorkflowHandle]
+        attr_reader pending_nexus_operation_starts: Hash[Integer, Fiber]
+        attr_reader pending_nexus_operations: Hash[Integer, NexusOperationHandle]
         attr_reader pending_external_signals: Hash[Integer, Fiber]
         attr_reader pending_external_cancels: Hash[Integer, Fiber]
         attr_reader in_progress_handlers: Array[HandlerExecution]

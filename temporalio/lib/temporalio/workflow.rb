@@ -12,6 +12,9 @@ require 'temporalio/workflow/external_workflow_handle'
 require 'temporalio/workflow/future'
 require 'temporalio/workflow/handler_unfinished_policy'
 require 'temporalio/workflow/info'
+require 'temporalio/workflow/nexus_client'
+require 'temporalio/workflow/nexus_operation_cancellation_type'
+require 'temporalio/workflow/nexus_operation_handle'
 require 'temporalio/workflow/parent_close_policy'
 require 'temporalio/workflow/update_info'
 require 'timeout'
@@ -38,6 +41,17 @@ module Temporalio
     #   suggested is based on server-side configuration.
     def self.continue_as_new_suggested
       _current.continue_as_new_suggested
+    end
+
+    # Create a Nexus client for executing operations.
+    #
+    # WARNING: Nexus support is experimental.
+    #
+    # @param endpoint [Symbol, String] Endpoint name.
+    # @param service [Symbol, String] Service name.
+    # @return [NexusClient] Client for executing Nexus operations.
+    def self.create_nexus_client(endpoint:, service:)
+      _current.create_nexus_client(endpoint:, service:)
     end
 
     # Get current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value

@@ -175,7 +175,14 @@ class Test < Minitest::Test
       @server.client
     end
 
-    def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}")
+    def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}", nexus: false)
+      # Create Nexus endpoint for the task queue if requested
+      endpoint = nil
+      if nexus
+        endpoint_name = "nexus-endpoint-#{task_queue}"
+        endpoint = @server.create_nexus_endpoint(name: endpoint_name, task_queue: task_queue)
+      end
+
       # Run the golangworker
       pid = spawn(
         kitchen_sink_exe,
@@ -187,6 +194,7 @@ class Test < Minitest::Test
       ensure
         Process.kill('KILL', pid)
         Timeout.timeout(5) { Process.wait(pid) }
+        @server.delete_nexus_endpoint(endpoint) if endpoint
       end
     end
 

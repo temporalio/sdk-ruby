@@ -84,6 +84,18 @@ module Temporalio
             started_event_id: error.started_event_id,
             retry_state: error.retry_state
           )
+        when Error::NexusOperationError
+          failure.nexus_operation_execution_failure_info = Api::Failure::V1::NexusOperationFailureInfo.new(
+            endpoint: error.endpoint,
+            service: error.service,
+            operation: error.operation,
+            operation_token: error.operation_token || ''
+          )
+        when Error::NexusHandlerError
+          failure.nexus_handler_failure_info = Api::Failure::V1::NexusHandlerFailureInfo.new(
+            type: error.error_type.to_s,
+            retry_behavior: error.retry_behavior
+          )
         else
           failure.application_failure_info = Api::Failure::V1::ApplicationFailureInfo.new(
             type: error.class.name.to_s.split('::').last
@@ -188,6 +200,24 @@ module Temporalio
                       Api::Enums::V1::RetryState,
                       failure.child_workflow_execution_failure_info.retry_state,
                       zero_means_nil: true
+                    )
+                  )
+                elsif failure.nexus_operation_execution_failure_info
+                  token = failure.nexus_operation_execution_failure_info.operation_token
+                  Error::NexusOperationError.new(
+                    Internal::ProtoUtils.string_or(failure.message, 'Nexus operation error'),
+                    endpoint: failure.nexus_operation_execution_failure_info.endpoint,
+                    service: failure.nexus_operation_execution_failure_info.service,
+                    operation: failure.nexus_operation_execution_failure_info.operation,
+                    operation_token: token.empty? ? nil : token
+                  )
+                elsif failure.nexus_handler_failure_info
+                  Error::NexusHandlerError.new(
+                    Internal::ProtoUtils.string_or(failure.message, 'Nexus handler error'),
+                    error_type: failure.nexus_handler_failure_info.type,
+                    retry_behavior: Internal::ProtoUtils.enum_to_int(
+                      Api::Enums::V1::NexusHandlerErrorRetryBehavior,
+                      failure.nexus_handler_failure_info.retry_behavior
                     )
                   )
                 else

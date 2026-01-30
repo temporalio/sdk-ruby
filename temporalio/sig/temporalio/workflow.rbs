@@ -6,6 +6,8 @@ module Temporalio
 
     def self.continue_as_new_suggested: -> bool
 
+    def self.create_nexus_client: (endpoint: Symbol | String, service: Symbol | String) -> NexusClient
+
     def self.current_details: -> String
     def self.current_details=: (String? details) -> void
 
