@@ -1,0 +1,30 @@
+module Temporalio
+  module Workflow
+    class NexusClient
+      def endpoint: -> String
+      def service: -> String
+
+      def start_operation: (
+        Symbol | String operation,
+        Object? arg,
+        ?schedule_to_close_timeout: duration?,
+        ?cancellation_type: NexusOperationCancellationType::enum,
+        ?summary: String?,
+        ?cancellation: Cancellation,
+        ?arg_hint: Object?,
+        ?result_hint: Object?
+      ) -> NexusOperationHandle
+
+      def execute_operation: (
+        Symbol | String operation,
+        Object? arg,
+        ?schedule_to_close_timeout: duration?,
+        ?cancellation_type: NexusOperationCancellationType::enum,
+        ?summary: String?,
+        ?cancellation: Cancellation,
+        ?arg_hint: Object?,
+        ?result_hint: Object?
+      ) -> Object?
+    end
+  end
+end

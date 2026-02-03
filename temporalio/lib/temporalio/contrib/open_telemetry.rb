@@ -68,6 +68,11 @@ module Temporalio
         end
 
         # @!visibility private
+        def _propagator
+          @propagator
+        end
+
+        # @!visibility private
         def _attach_context(headers)
           context = _context_from_headers(headers)
           ::OpenTelemetry::Context.attach(context) if context
@@ -399,6 +404,22 @@ module Temporalio
           def start_child_workflow(input)
             _apply_span_to_headers(input.headers,
                                    Workflow.completed_span("StartChildWorkflow:#{input.workflow}", kind: :client))
+            super
+          end
+
+          # @!visibility private
+          def start_nexus_operation(input)
+            # Nexus headers are string-to-string maps (not payload-based like activity/workflow headers)
+            # so we inject the tracing context directly into the headers instead of nesting under a key
+            span = Workflow.completed_span("StartNexusOperation:#{input.service}/#{input.operation}", kind: :client)
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              if span
+                @root._propagator.inject(
+                  input.headers,
+                  context: ::OpenTelemetry::Trace.context_with_span(span)
+                )
+              end
+            end
             super
           end
 

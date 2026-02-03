@@ -6,6 +6,7 @@ require 'temporalio/error'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/internal/worker/workflow_instance'
+require 'temporalio/internal/worker/workflow_instance/nexus_operation_handle'
 require 'temporalio/worker/interceptor'
 require 'temporalio/workflow'
 require 'temporalio/workflow/child_workflow_handle'
@@ -22,6 +23,7 @@ module Temporalio
             @activity_counter = 0
             @timer_counter = 0
             @child_counter = 0
+            @nexus_operation_counter = 0
             @external_signal_counter = 0
             @external_cancel_counter = 0
           end
@@ -428,6 +430,72 @@ module Temporalio
             else
               raise "Unknown resolution status: #{resolution.status}"
             end
+          end
+
+          def start_nexus_operation(input)
+            raise Error::CanceledError, 'Nexus operation canceled before scheduled' if input.cancellation.canceled?
+
+            # Add the command
+            seq = (@nexus_operation_counter += 1)
+            @instance.add_command(
+              Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                schedule_nexus_operation: Bridge::Api::WorkflowCommands::ScheduleNexusOperation.new(
+                  seq:,
+                  endpoint: input.endpoint,
+                  service: input.service,
+                  operation: input.operation,
+                  input: @instance.payload_converter.to_payload(input.arg, hint: input.arg_hint),
+                  schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
+                  nexus_header: input.headers,
+                  cancellation_type: input.cancellation_type
+                ),
+                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
+              )
+            )
+
+            # Set as pending start
+            @instance.pending_nexus_operation_starts[seq] = Fiber.current
+
+            # Register cancel callback
+            cancel_callback_key = input.cancellation.add_cancel_callback do
+              # Send cancel if in start or pending
+              if @instance.pending_nexus_operation_starts.include?(seq) ||
+                 @instance.pending_nexus_operations.include?(seq)
+                @instance.add_command(
+                  Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                    request_cancel_nexus_operation: Bridge::Api::WorkflowCommands::RequestCancelNexusOperation.new(
+                      seq:
+                    )
+                  )
+                )
+              end
+            end
+
+            # Wait for start resolution
+            resolution = begin
+              Fiber.yield
+            ensure
+              # Remove pending start
+              @instance.pending_nexus_operation_starts.delete(seq)
+            end
+
+            # Handle start failure
+            if resolution.failed
+              input.cancellation.remove_cancel_callback(cancel_callback_key)
+              raise @instance.failure_converter.from_failure(resolution.failed, @instance.payload_converter)
+            end
+
+            # Create handle and add to pending operations (result will come via resolve_nexus_operation)
+            handle = NexusOperationHandle.new(
+              operation_token: resolution.operation_token,
+              instance: @instance,
+              cancellation: input.cancellation,
+              cancel_callback_key:,
+              result_hint: input.result_hint
+            )
+            @instance.pending_nexus_operations[seq] = handle
+
+            handle
           end
         end
       end

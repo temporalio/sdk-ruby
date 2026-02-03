@@ -1,0 +1,12 @@
+module Temporalio
+  module Workflow
+    module NexusOperationCancellationType
+      type enum = Integer
+
+      WAIT_CANCELLATION_COMPLETED: enum
+      ABANDON: enum
+      TRY_CANCEL: enum
+      WAIT_CANCELLATION_REQUESTED: enum
+    end
+  end
+end

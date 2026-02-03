@@ -54,6 +54,7 @@ module Temporalio
 
         attr_reader :context, :logger, :info, :scheduler, :disable_eager_activity_execution, :pending_activities,
                     :pending_timers, :pending_child_workflow_starts, :pending_child_workflows,
+                    :pending_nexus_operation_starts, :pending_nexus_operations,
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
                     :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
@@ -79,6 +80,8 @@ module Temporalio
           @pending_timers = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_child_workflow_starts = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_child_workflows = {} # Keyed by sequence, value is ChildWorkflowHandle to resolve with proto result
+          @pending_nexus_operation_starts = {} # Keyed by sequence, value is fiber to resume with proto result
+          @pending_nexus_operations = {} # Keyed by sequence, value is NexusOperationHandle to resolve with proto result
           @pending_external_signals = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_external_cancels = {} # Keyed by sequence, value is fiber to resume with proto result
           @buffered_signals = {} # Keyed by signal name, value is array of signal jobs
@@ -368,6 +371,14 @@ module Temporalio
           when :resolve_child_workflow_execution
             pending_child_workflows[job.resolve_child_workflow_execution.seq]&._resolve(
               job.resolve_child_workflow_execution.result
+            )
+          when :resolve_nexus_operation_start
+            pending_nexus_operation_starts[job.resolve_nexus_operation_start.seq]&.resume(
+              job.resolve_nexus_operation_start
+            )
+          when :resolve_nexus_operation
+            pending_nexus_operations[job.resolve_nexus_operation.seq]&._resolve(
+              job.resolve_nexus_operation.result
             )
           when :resolve_signal_external_workflow
             pending_external_signals[job.resolve_signal_external_workflow.seq]&.resume(

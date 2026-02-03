@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,15 +10,66 @@ import (
 	"os"
 	"time"
 
+	"github.com/nexus-rpc/sdk-go/nexus"
 	"go.temporal.io/sdk/client"
 	sdklog "go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/temporal"
+	"go.temporal.io/sdk/temporalnexus"
 	"go.temporal.io/sdk/worker"
 	"go.temporal.io/sdk/workflow"
 )
 
 func init() {
 	slog.SetLogLoggerLevel(slog.LevelWarn)
+}
+
+// Nexus operation definitions
+var syncOp = nexus.NewSyncOperation("echo", func(ctx context.Context, input string, options nexus.StartOperationOptions) (string, error) {
+	switch input {
+	case "success":
+		return input, nil
+	case "fail":
+		return "", nexus.HandlerErrorf(nexus.HandlerErrorTypeBadRequest, "operation failed")
+	case "operation-error":
+		return "", fmt.Errorf("operation error")
+	default:
+		return input, nil
+	}
+})
+
+type NexusHandlerInput struct {
+	Action string `json:"action"`
+}
+
+type NexusHandlerOutput struct {
+	Result string `json:"result"`
+}
+
+var asyncOp = temporalnexus.NewWorkflowRunOperation(
+	"workflow-operation",
+	NexusHandlerWorkflow,
+	func(ctx context.Context, input NexusHandlerInput, options nexus.StartOperationOptions) (client.StartWorkflowOptions, error) {
+		return client.StartWorkflowOptions{
+			ID: fmt.Sprintf("nexus-handler-%d", time.Now().UnixNano()),
+		}, nil
+	},
+)
+
+func NexusHandlerWorkflow(ctx workflow.Context, input NexusHandlerInput) (NexusHandlerOutput, error) {
+	switch input.Action {
+	case "success":
+		return NexusHandlerOutput{Result: "success"}, nil
+	case "fail":
+		return NexusHandlerOutput{}, temporal.NewApplicationError("workflow failed", "TestError")
+	case "wait-for-cancel":
+		// Block forever, waiting for cancellation
+		if err := workflow.Await(ctx, func() bool { return false }); err != nil {
+			return NexusHandlerOutput{}, err
+		}
+		return NexusHandlerOutput{Result: "cancelled"}, nil
+	default:
+		return NexusHandlerOutput{Result: input.Action}, nil
+	}
 }
 
 func main() {
@@ -44,6 +96,18 @@ func run(endpoint, namespace, taskQueue string) error {
 	slog.Info("Creating worker")
 	w := worker.New(cl, taskQueue, worker.Options{})
 	w.RegisterWorkflowWithOptions(KitchenSinkWorkflow, workflow.RegisterOptions{Name: "kitchen_sink"})
+	w.RegisterWorkflowWithOptions(NexusHandlerWorkflow, workflow.RegisterOptions{Name: "nexus_handler"})
+
+	// Register Nexus service
+	nexusService := nexus.NewService("test-service")
+	if err := nexusService.Register(syncOp); err != nil {
+		return fmt.Errorf("failed to register sync operation: %w", err)
+	}
+	if err := nexusService.Register(asyncOp); err != nil {
+		return fmt.Errorf("failed to register async operation: %w", err)
+	}
+	w.RegisterNexusService(nexusService)
+
 	defer slog.Info("Stopping worker")
 	return w.Run(worker.InterruptCh())
 }
