@@ -298,7 +298,6 @@ module Temporalio
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
-    #   This is currently experimental.
     # @param priority [Priority] Priority of the workflow. This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
@@ -392,7 +391,6 @@ module Temporalio
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
-    #   This is currently experimental.
     # @param priority [Priority] Priority for the workflow. This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
