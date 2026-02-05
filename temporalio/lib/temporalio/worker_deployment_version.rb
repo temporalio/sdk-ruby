@@ -9,8 +9,6 @@ module Temporalio
   )
 
   # Represents the version of a specific worker deployment.
-  #
-  # WARNING: Experimental API.
   class WorkerDeploymentVersion
     # Parse a version from a canonical string, which must be in the format
     # `<deployment_name>.<build_id>`. Deployment name must not have a `.` in it.

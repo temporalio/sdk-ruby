@@ -110,8 +110,6 @@ module Temporalio
 
         # Set the versioning behavior of this workflow.
         #
-        # WARNING: This method is experimental and may change in future versions.
-        #
         # @param behavior [VersioningBehavior] The versioning behavior.
         def workflow_versioning_behavior(behavior)
           @versioning_behavior = behavior
@@ -732,7 +730,6 @@ module Temporalio
     # @!attribute versioning_behavior
     #   Dynamic equivalent of {Definition.workflow_versioning_behavior}.
     #   Will override any behavior set there if set.
-    #   WARNING: Deployment-based versioning is experimental and APIs may change.
     #   @return [VersioningBehavior, nil] The versioning behavior
     #
     # @return [VersioningBehavior, nil] The versioning behavior
