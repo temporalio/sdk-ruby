@@ -88,21 +88,29 @@ where
     where
         U: FnMut(),
     {
-        let mut func: U = unsafe { *Box::from_raw(data as _) };
-
+        // Borrow rather than take ownership — the caller frees after
+        // rb_thread_call_without_gvl returns. This avoids leaking the
+        // unblock closure when Ruby never invokes it (the common case).
+        let func: &mut U = unsafe { &mut *(data as *mut U) };
         func();
     }
 
     let boxed_func = Box::new(func);
     let boxed_unblock = Box::new(unblock);
+    let unblock_ptr = Box::into_raw(boxed_unblock);
 
     unsafe {
         let result = rb_sys::rb_thread_call_without_gvl(
             Some(anon_func::<F, R>),
             Box::into_raw(boxed_func) as *mut _,
             Some(anon_unblock::<U>),
-            Box::into_raw(boxed_unblock) as *mut _,
+            unblock_ptr as *mut _,
         );
+
+        // Free the unblock closure. By the time rb_thread_call_without_gvl
+        // returns, anon_unblock (if called at all) has already completed,
+        // so this is safe.
+        drop(Box::from_raw(unblock_ptr));
 
         *Box::from_raw(result as _)
     }
