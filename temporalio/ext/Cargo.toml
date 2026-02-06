@@ -26,3 +26,7 @@ tokio-util = "0.7"
 tonic = { workspace = true }
 tracing = "0.1"
 url = "2.5"
+dhat = { version = "0.3", optional = true }
+
+[features]
+dhat-heap = ["dhat"]
