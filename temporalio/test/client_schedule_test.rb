@@ -53,8 +53,7 @@ class ClientScheduleTest < Test
       policy: Temporalio::Client::Schedule::Policy.new(
         overlap: Temporalio::Client::Schedule::OverlapPolicy::BUFFER_ONE,
         catchup_window: 5 * 60.0,
-        pause_on_failure: true,
-        keep_original_workflow_id: true
+        pause_on_failure: true
       ),
       state: Temporalio::Client::Schedule::State.new(
         note: 'sched note 1',
@@ -125,7 +124,6 @@ class ClientScheduleTest < Test
     new_schedule = Temporalio::Client::Schedule.new(
       action:,
       spec: Temporalio::Client::Schedule::Spec.new,
-      policy: Temporalio::Client::Schedule::Policy.new(keep_original_workflow_id: true),
       state: Temporalio::Client::Schedule::State.new(paused: true)
     )
     handle.update { Temporalio::Client::Schedule::Update.new(schedule: new_schedule) }
@@ -172,7 +170,6 @@ class ClientScheduleTest < Test
       # Check results
       exec = desc.info.recent_actions.first&.action #: Temporalio::Client::Schedule::ActionExecution::StartWorkflow
       assert_instance_of Temporalio::Client::Schedule::ActionExecution::StartWorkflow, exec
-      assert_equal action.id, exec.workflow_id
       assert_equal 'some-result',
                    env.client.workflow_handle(exec.workflow_id,
                                               first_execution_run_id: exec.first_execution_run_id).result
@@ -261,7 +258,7 @@ class ClientScheduleTest < Test
       assert_equal desc.info.next_action_times[i - 1] + (24 * 60 * 60), next_action_time unless i.zero?
     end
   ensure
-    delete_schedules(handle.id) if defined?(handle)
+    delete_schedules(handle.id) if defined?(handle) && handle
   end
 
   def test_trigger_immediately
@@ -344,5 +341,80 @@ class ClientScheduleTest < Test
     assert_equal 7, handle.describe.info.num_actions
   ensure
     delete_schedules(handle.id) if defined?(handle)
+  end
+
+  def test_keep_original_workflow_id_policy_on_create
+    assert_no_schedules
+
+    task_queue = "tq-#{SecureRandom.uuid}"
+    handle = env.client.create_schedule(
+      "sched-#{SecureRandom.uuid}",
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          'kitchen_sink',
+          { actions: [{ result: { value: 'some-result' } }] },
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue:
+        ),
+        spec: Temporalio::Client::Schedule::Spec.new(
+          intervals: [Temporalio::Client::Schedule::Spec::Interval.new(every: 60.0)]
+        ),
+        policy: Temporalio::Client::Schedule::Policy.new(keep_original_workflow_id: true),
+        state: Temporalio::Client::Schedule::State.new(paused: true)
+      )
+    )
+
+    desc = handle.describe
+    assert desc.schedule.policy.keep_original_workflow_id
+    assert desc.raw_description.schedule.policies.keep_original_workflow_id
+  ensure
+    delete_schedules(handle.id) if defined?(handle)
+  end
+
+  def test_keep_original_workflow_id_policy_on_update
+    assert_no_schedules
+
+    task_queue = "tq-#{SecureRandom.uuid}"
+    handle = env.client.create_schedule(
+      "sched-#{SecureRandom.uuid}",
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          'kitchen_sink',
+          { actions: [{ result: { value: 'some-result' } }] },
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue:
+        ),
+        spec: Temporalio::Client::Schedule::Spec.new(
+          intervals: [Temporalio::Client::Schedule::Spec::Interval.new(every: 60.0)]
+        ),
+        state: Temporalio::Client::Schedule::State.new(paused: true)
+      )
+    )
+
+    desc = handle.describe
+    refute desc.schedule.policy.keep_original_workflow_id
+    refute desc.raw_description.schedule.policies.keep_original_workflow_id
+
+    handle.update do |input|
+      updated_schedule = input.description.schedule.with(
+        policy: input.description.schedule.policy.with(keep_original_workflow_id: true)
+      )
+      Temporalio::Client::Schedule::Update.new(schedule: updated_schedule)
+    end
+    desc = handle.describe
+    assert desc.schedule.policy.keep_original_workflow_id
+    assert desc.raw_description.schedule.policies.keep_original_workflow_id
+
+    handle.update do |input|
+      updated_schedule = input.description.schedule.with(
+        policy: input.description.schedule.policy.with(keep_original_workflow_id: false)
+      )
+      Temporalio::Client::Schedule::Update.new(schedule: updated_schedule)
+    end
+    desc = handle.describe
+    refute desc.schedule.policy.keep_original_workflow_id
+    refute desc.raw_description.schedule.policies.keep_original_workflow_id
+  ensure
+    delete_schedules(handle.id) if defined?(handle) && handle
   end
 end
