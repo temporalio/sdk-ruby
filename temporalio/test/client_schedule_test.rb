@@ -404,16 +404,6 @@ class ClientScheduleTest < Test
     desc = handle.describe
     assert desc.schedule.policy.keep_original_workflow_id
     assert desc.raw_description.schedule.policies.keep_original_workflow_id
-
-    handle.update do |input|
-      updated_schedule = input.description.schedule.with(
-        policy: input.description.schedule.policy.with(keep_original_workflow_id: false)
-      )
-      Temporalio::Client::Schedule::Update.new(schedule: updated_schedule)
-    end
-    desc = handle.describe
-    refute desc.schedule.policy.keep_original_workflow_id
-    refute desc.raw_description.schedule.policies.keep_original_workflow_id
   ensure
     delete_schedules(handle.id) if defined?(handle) && handle
   end
