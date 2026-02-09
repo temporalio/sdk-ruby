@@ -53,7 +53,8 @@ class ClientScheduleTest < Test
       policy: Temporalio::Client::Schedule::Policy.new(
         overlap: Temporalio::Client::Schedule::OverlapPolicy::BUFFER_ONE,
         catchup_window: 5 * 60.0,
-        pause_on_failure: true
+        pause_on_failure: true,
+        keep_original_workflow_id: true
       ),
       state: Temporalio::Client::Schedule::State.new(
         note: 'sched note 1',
@@ -124,6 +125,7 @@ class ClientScheduleTest < Test
     new_schedule = Temporalio::Client::Schedule.new(
       action:,
       spec: Temporalio::Client::Schedule::Spec.new,
+      policy: Temporalio::Client::Schedule::Policy.new(keep_original_workflow_id: true),
       state: Temporalio::Client::Schedule::State.new(paused: true)
     )
     handle.update { Temporalio::Client::Schedule::Update.new(schedule: new_schedule) }
@@ -170,6 +172,7 @@ class ClientScheduleTest < Test
       # Check results
       exec = desc.info.recent_actions.first&.action #: Temporalio::Client::Schedule::ActionExecution::StartWorkflow
       assert_instance_of Temporalio::Client::Schedule::ActionExecution::StartWorkflow, exec
+      assert_equal action.id, exec.workflow_id
       assert_equal 'some-result',
                    env.client.workflow_handle(exec.workflow_id,
                                               first_execution_run_id: exec.first_execution_run_id).result

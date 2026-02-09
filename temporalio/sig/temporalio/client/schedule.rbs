@@ -239,13 +239,15 @@ module Temporalio
         attr_reader overlap: OverlapPolicy::enum
         attr_reader catchup_window: duration
         attr_reader pause_on_failure: bool
+        attr_reader keep_original_workflow_id: bool
 
         def self._from_proto: (untyped raw_policies) -> Policy
 
         def initialize: (
           ?overlap: OverlapPolicy::enum,
           ?catchup_window: duration,
-          ?pause_on_failure: bool
+          ?pause_on_failure: bool,
+          ?keep_original_workflow_id: bool
         ) -> void
 
         def _to_proto: -> untyped

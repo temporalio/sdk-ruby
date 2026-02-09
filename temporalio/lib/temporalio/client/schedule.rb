@@ -716,7 +716,8 @@ module Temporalio
       Policy = Data.define(
         :overlap,
         :catchup_window,
-        :pause_on_failure
+        :pause_on_failure,
+        :keep_original_workflow_id
       )
 
       # Policies of a schedule.
@@ -728,6 +729,8 @@ module Temporalio
       # @!attribute pause_on_failure
       #   @return [Boolean] Whether to pause the schedule if an action fails or times out. Note: For workflows, this
       #     only applies after all retries have been exhausted.
+      # @!attribute keep_original_workflow_id
+      #   @return [Boolean] Whether to keep the original workflow ID without appending a timestamp for uniqueness.
       class Policy
         # @!visibility private
         def self._from_proto(raw_policies)
@@ -736,7 +739,8 @@ module Temporalio
                                                       raw_policies.overlap_policy,
                                                       zero_means_nil: true),
             catchup_window: Internal::ProtoUtils.duration_to_seconds(raw_policies.catchup_window) || raise, # Never nil
-            pause_on_failure: raw_policies.pause_on_failure
+            pause_on_failure: raw_policies.pause_on_failure,
+            keep_original_workflow_id: raw_policies.keep_original_workflow_id
           )
         end
 
@@ -747,10 +751,13 @@ module Temporalio
         #   missed actions.
         # @param pause_on_failure [Boolean] Whether to pause the schedule if an action fails or times out. Note: For
         #   workflows, this only applies after all retries have been exhausted.
+        # @param keep_original_workflow_id [Boolean] Whether to keep the original workflow ID without appending a
+        #   timestamp for uniqueness.
         def initialize(
           overlap: OverlapPolicy::SKIP,
           catchup_window: 365 * 24 * 60 * 60.0,
-          pause_on_failure: false
+          pause_on_failure: false,
+          keep_original_workflow_id: false
         )
           super
         end
@@ -760,7 +767,8 @@ module Temporalio
           Api::Schedule::V1::SchedulePolicies.new(
             overlap_policy: overlap,
             catchup_window: Internal::ProtoUtils.seconds_to_duration(catchup_window),
-            pause_on_failure:
+            pause_on_failure:,
+            keep_original_workflow_id:
           )
         end
       end
