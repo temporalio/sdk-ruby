@@ -13,8 +13,6 @@ module Temporalio
 
     # Options for configuring the Worker Versioning feature.
     #
-    # WARNING: Deployment-based versioning is experimental and APIs may change.
-    #
     # @!attribute version
     #   @return [WorkerDeploymentVersion] The worker deployment version.
     # @!attribute use_worker_versioning

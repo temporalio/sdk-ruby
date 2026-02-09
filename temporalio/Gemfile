@@ -25,7 +25,8 @@ group :development do
   gem 'rbs', '~> 3.10'
   gem 'rb_sys', '~> 0.9'
   gem 'rdoc'
-  gem 'rubocop'
+  # TODO: Unpin when https://github.com/rubocop/rubocop/pull/14838 is released
+  gem 'rubocop', '1.84.0'
   gem 'sqlite3'
   gem 'steep', '~> 1.10'
   gem 'yard'

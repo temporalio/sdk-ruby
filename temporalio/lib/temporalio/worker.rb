@@ -425,7 +425,6 @@ module Temporalio
     #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
     #   with a block for narrower enabling of IO.
     # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
-    #   WARNING: This is an experimental feature and may change in the future.
     # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
     #   polling. Defaults to a 5-poller maximum.
     # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task

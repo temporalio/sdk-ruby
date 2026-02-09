@@ -5,8 +5,6 @@ require 'temporalio/worker_deployment_version'
 module Temporalio
   # Base class for version overrides that can be provided in start workflow options.
   # Used to control the versioning behavior of workflows started with this override.
-  #
-  # WARNING: Experimental API.
   class VersioningOverride
     # @!visibility private
     def _to_proto

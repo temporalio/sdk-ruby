@@ -40,8 +40,6 @@ module Temporalio
   end
 
   # Specifies when a workflow might move from a worker of one Build Id to another.
-  #
-  # WARNING: Experimental API.
   module VersioningBehavior
     # Unspecified versioning behavior. By default, workers opting into worker versioning will
     # be required to specify a behavior.
