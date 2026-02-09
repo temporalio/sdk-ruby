@@ -396,8 +396,14 @@ class ClientScheduleTest < Test
     refute desc.raw_description.schedule.policies.keep_original_workflow_id
 
     handle.update do |input|
+      current_policy = input.description.schedule.policy
       updated_schedule = input.description.schedule.with(
-        policy: input.description.schedule.policy.with(keep_original_workflow_id: true)
+        policy: Temporalio::Client::Schedule::Policy.new(
+          overlap: current_policy.overlap,
+          catchup_window: current_policy.catchup_window,
+          pause_on_failure: current_policy.pause_on_failure,
+          keep_original_workflow_id: true
+        )
       )
       Temporalio::Client::Schedule::Update.new(schedule: updated_schedule)
     end
