@@ -3239,6 +3239,7 @@ dependencies = [
  "anyhow",
  "assert_matches",
  "async-trait",
+ "backoff",
  "bimap",
  "bon",
  "bytes",
