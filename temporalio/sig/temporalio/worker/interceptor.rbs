@@ -312,6 +312,34 @@ module Temporalio
           ) -> void
         end
 
+        class StartNexusOperationInput
+          attr_reader endpoint: String
+          attr_reader service: String
+          attr_reader operation: String
+          attr_reader arg: Object?
+          attr_reader schedule_to_close_timeout: duration?
+          attr_reader cancellation_type: Temporalio::Workflow::NexusOperationCancellationType::enum
+          attr_reader summary: String?
+          attr_reader cancellation: Cancellation
+          attr_reader arg_hint: Object?
+          attr_reader result_hint: Object?
+          attr_reader headers: Hash[String, String]
+
+          def initialize: (
+            endpoint: String,
+            service: String,
+            operation: String,
+            arg: Object?,
+            schedule_to_close_timeout: duration?,
+            cancellation_type: Temporalio::Workflow::NexusOperationCancellationType::enum,
+            summary: String?,
+            cancellation: Cancellation,
+            arg_hint: Object?,
+            result_hint: Object?,
+            headers: Hash[String, String]
+          ) -> void
+        end
+
         class Outbound
           attr_reader next_interceptor: Outbound
 
@@ -332,6 +360,8 @@ module Temporalio
           def sleep: (SleepInput input) -> void
 
           def start_child_workflow: (StartChildWorkflowInput input) -> Temporalio::Workflow::ChildWorkflowHandle
+
+          def start_nexus_operation: (StartNexusOperationInput input) -> Temporalio::Workflow::NexusOperationHandle
         end
       end
     end

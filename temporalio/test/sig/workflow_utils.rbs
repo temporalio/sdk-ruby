@@ -23,7 +23,7 @@ module WorkflowUtils
     ?priority: Temporalio::Priority,
     ?start_workflow_client: Temporalio::Client,
     ?tuner: Temporalio::Worker::Tuner
-  ) -> Object? |
+  ) -> untyped |
   [T] (
     singleton(Temporalio::Workflow::Definition) workflow,
     *Object? args,

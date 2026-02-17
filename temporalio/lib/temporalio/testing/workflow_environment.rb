@@ -2,6 +2,7 @@
 
 require 'delegate'
 require 'temporalio/api'
+require 'temporalio/api/operatorservice/v1/request_response'
 require 'temporalio/api/testservice/v1/request_response'
 require 'temporalio/client'
 require 'temporalio/client/connection/test_service'
@@ -262,6 +263,45 @@ module Temporalio
       # @return [Time] Current time.
       def current_time
         Time.now
+      end
+
+      # Create Nexus endpoint on this test environment.
+      #
+      # WARNING: Nexus support is experimental.
+      #
+      # @param name [String] Endpoint name.
+      # @param task_queue [String] Task queue for the endpoint.
+      # @return [Temporalio::Api::Nexus::V1::Endpoint] Created endpoint.
+      def create_nexus_endpoint(name:, task_queue:)
+        resp = client.connection.operator_service.create_nexus_endpoint(
+          Temporalio::Api::OperatorService::V1::CreateNexusEndpointRequest.new(
+            spec: Temporalio::Api::Nexus::V1::EndpointSpec.new(
+              name:,
+              target: Temporalio::Api::Nexus::V1::EndpointTarget.new(
+                worker: Temporalio::Api::Nexus::V1::EndpointTarget::Worker.new(
+                  namespace: client.namespace,
+                  task_queue:
+                )
+              )
+            )
+          )
+        )
+        resp.endpoint
+      end
+
+      # Delete Nexus endpoint on this test environment.
+      #
+      # WARNING: Nexus support is experimental.
+      #
+      # @param endpoint [Temporalio::Api::Nexus::V1::Endpoint] Endpoint to delete.
+      def delete_nexus_endpoint(endpoint)
+        client.connection.operator_service.delete_nexus_endpoint(
+          Temporalio::Api::OperatorService::V1::DeleteNexusEndpointRequest.new(
+            id: endpoint.id,
+            version: endpoint.version
+          )
+        )
+        nil
       end
 
       # Run a block with automatic time skipping disabled. This just runs the block for environments that don't support

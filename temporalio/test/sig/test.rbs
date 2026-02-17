@@ -37,7 +37,8 @@ class Test < Minitest::Test
 
     def with_kitchen_sink_worker: [T] (
       ?Temporalio::Client worker_client,
-      ?task_queue: String
+      ?task_queue: String,
+      ?nexus: bool
     ) { (String task_queue) -> T } -> T
 
     def kitchen_sink_exe: -> String

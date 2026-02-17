@@ -1,0 +1,10 @@
+module Temporalio
+  module Workflow
+    class NexusOperationHandle
+      def operation_token: -> String?
+      def result_hint: -> Object?
+
+      def result: (?result_hint: Object?) -> Object?
+    end
+  end
+end

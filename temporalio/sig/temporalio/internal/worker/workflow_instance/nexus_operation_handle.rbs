@@ -1,0 +1,19 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class NexusOperationHandle < Workflow::NexusOperationHandle
+          def initialize: (
+            operation_token: String?,
+            instance: WorkflowInstance,
+            cancellation: Cancellation,
+            cancel_callback_key: Object,
+            result_hint: Object?
+          ) -> void
+
+          def _resolve: (untyped resolution) -> void
+        end
+      end
+    end
+  end
+end

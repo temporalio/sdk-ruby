@@ -11,6 +11,8 @@ module Temporalio
 
           def continue_as_new_suggested: -> bool
 
+          def create_nexus_client: (endpoint: Symbol | String, service: Symbol | String) -> Workflow::NexusClient
+
           def current_details: -> String
           def current_details=: (String? details) -> void
 

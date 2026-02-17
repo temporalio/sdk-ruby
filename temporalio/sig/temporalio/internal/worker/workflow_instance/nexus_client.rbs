@@ -1,0 +1,25 @@
+module Temporalio
+  module Internal
+    module Worker
+      class WorkflowInstance
+        class NexusClient < Workflow::NexusClient
+          attr_reader endpoint: String
+          attr_reader service: String
+
+          def initialize: (endpoint: Symbol | String, service: Symbol | String, outbound: untyped) -> void
+
+          def start_operation: (
+            Symbol | String operation,
+            Object? arg,
+            ?schedule_to_close_timeout: duration?,
+            ?cancellation_type: Workflow::NexusOperationCancellationType::enum,
+            ?summary: String?,
+            ?cancellation: Cancellation,
+            ?arg_hint: Object?,
+            ?result_hint: Object?
+          ) -> Workflow::NexusOperationHandle
+        end
+      end
+    end
+  end
+end

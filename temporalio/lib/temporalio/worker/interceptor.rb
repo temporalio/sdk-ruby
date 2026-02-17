@@ -300,6 +300,23 @@ module Temporalio
           :headers
         )
 
+        # Input for {Outbound.start_nexus_operation}.
+        #
+        # WARNING: Nexus support is experimental.
+        StartNexusOperationInput = Data.define(
+          :endpoint,
+          :service,
+          :operation,
+          :arg,
+          :schedule_to_close_timeout,
+          :cancellation_type,
+          :summary,
+          :cancellation,
+          :arg_hint,
+          :result_hint,
+          :headers
+        )
+
         # Outbound interceptor for intercepting outbound workflow calls. This should be extended by users needing to
         # intercept workflow calls.
         class Outbound
@@ -370,6 +387,16 @@ module Temporalio
           # @return [Workflow::ChildWorkflowHandle] Child workflow handle.
           def start_child_workflow(input)
             @next_interceptor.start_child_workflow(input)
+          end
+
+          # Start Nexus operation.
+          #
+          # WARNING: Nexus support is experimental.
+          #
+          # @param input [StartNexusOperationInput] Input.
+          # @return [Workflow::NexusOperationHandle] Nexus operation handle.
+          def start_nexus_operation(input)
+            @next_interceptor.start_nexus_operation(input)
           end
         end
       end

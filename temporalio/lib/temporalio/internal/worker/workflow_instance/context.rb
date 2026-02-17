@@ -6,6 +6,7 @@ require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/internal/worker/workflow_instance/external_workflow_handle'
+require 'temporalio/internal/worker/workflow_instance/nexus_client'
 require 'temporalio/worker/interceptor'
 require 'temporalio/workflow'
 
@@ -30,6 +31,10 @@ module Temporalio
 
           def continue_as_new_suggested
             @instance.continue_as_new_suggested
+          end
+
+          def create_nexus_client(endpoint:, service:)
+            NexusClient.new(endpoint:, service:, outbound: @outbound)
           end
 
           def current_details
