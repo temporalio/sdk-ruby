@@ -49,12 +49,7 @@ class WorkerWorkflowNexusTest < Test
   class NexusAsyncOperationSuccessWorkflow < Temporalio::Workflow::Definition
     def execute(endpoint)
       client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
-      handle = client.start_operation('workflow-operation', { 'action' => 'success' })
-
-      # For async operations, operation_token should be present
-      Temporalio::Workflow.logger.info("Operation started with token: #{handle.operation_token}")
-
-      handle.result
+      client.execute_operation('workflow-operation', { 'action' => 'success' })
     end
   end
 
@@ -70,12 +65,7 @@ class WorkerWorkflowNexusTest < Test
   class NexusAsyncOperationFailureWorkflow < Temporalio::Workflow::Definition
     def execute(endpoint)
       client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
-      handle = client.start_operation('workflow-operation', { 'action' => 'fail' })
-
-      # For async operations, operation_token should be present
-      Temporalio::Workflow.logger.info("Operation started with token: #{handle.operation_token}")
-
-      handle.result
+      client.execute_operation('workflow-operation', { 'action' => 'fail' })
     end
   end
 
