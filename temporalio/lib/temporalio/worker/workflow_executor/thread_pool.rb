@@ -49,7 +49,7 @@ module Temporalio
               # If not found, get a new one either by creating if not enough or find the one with the fewest.
               new_worker = if @workers.size < @max_threads
                              created_worker = Worker.new(self)
-                             @workers << Worker.new(self)
+                             @workers << created_worker
                              created_worker
                            else
                              @workers.min_by(&:workflow_count)
