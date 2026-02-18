@@ -68,6 +68,9 @@ jobs:
           cargo-cache: true
           cache-version: v1-source
 
+      - name: Fix gem directory permissions
+        run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true
+
       - name: Install bundle
         working-directory: ./temporalio
         run: bundle install
