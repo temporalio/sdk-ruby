@@ -446,6 +446,8 @@ module Temporalio
                   operation: input.operation,
                   input: @instance.payload_converter.to_payload(input.arg, hint: input.arg_hint),
                   schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
+                  schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
+                  start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
                   nexus_header: input.headers,
                   cancellation_type: input.cancellation_type
                 ),

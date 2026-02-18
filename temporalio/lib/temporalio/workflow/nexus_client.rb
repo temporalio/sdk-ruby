@@ -28,6 +28,10 @@ module Temporalio
       # @param operation [Symbol, String] Operation name.
       # @param arg [Object] Argument for the operation.
       # @param schedule_to_close_timeout [Float, nil] Total timeout for the operation in seconds.
+      # @param schedule_to_start_timeout [Float, nil] Timeout in seconds for the operation to start executing. If the
+      #   operation has not started within this window, a SCHEDULE_TO_START timeout error is raised.
+      # @param start_to_close_timeout [Float, nil] Timeout in seconds for an async operation to complete after it has
+      #   started. If the operation does not complete within this window, a START_TO_CLOSE timeout error is raised.
       # @param cancellation_type [NexusOperationCancellationType] How the operation will react to cancellation.
       # @param summary [String, nil] Optional summary for the operation (appears in UI/CLI).
       # @param cancellation [Cancellation] Cancellation for the operation.
@@ -38,6 +42,8 @@ module Temporalio
         operation,
         arg,
         schedule_to_close_timeout: nil,
+        schedule_to_start_timeout: nil,
+        start_to_close_timeout: nil,
         cancellation_type: NexusOperationCancellationType::WAIT_CANCELLATION_COMPLETED,
         summary: nil,
         cancellation: Workflow.cancellation,
@@ -54,6 +60,10 @@ module Temporalio
       # @param operation [Symbol, String] Operation name.
       # @param arg [Object] Argument for the operation.
       # @param schedule_to_close_timeout [Float, nil] Total timeout for the operation in seconds.
+      # @param schedule_to_start_timeout [Float, nil] Timeout in seconds for the operation to start executing. If the
+      #   operation has not started within this window, a SCHEDULE_TO_START timeout error is raised.
+      # @param start_to_close_timeout [Float, nil] Timeout in seconds for an async operation to complete after it has
+      #   started. If the operation does not complete within this window, a START_TO_CLOSE timeout error is raised.
       # @param cancellation_type [NexusOperationCancellationType] How the operation will react to cancellation.
       # @param summary [String, nil] Optional summary for the operation (appears in UI/CLI).
       # @param cancellation [Cancellation] Cancellation for the operation.
@@ -65,6 +75,8 @@ module Temporalio
         operation,
         arg,
         schedule_to_close_timeout: nil,
+        schedule_to_start_timeout: nil,
+        start_to_close_timeout: nil,
         cancellation_type: NexusOperationCancellationType::WAIT_CANCELLATION_COMPLETED,
         summary: nil,
         cancellation: Workflow.cancellation,
@@ -72,8 +84,8 @@ module Temporalio
         result_hint: nil
       )
         start_operation(
-          operation, arg, schedule_to_close_timeout:, cancellation_type:, summary:, cancellation:,
-                          arg_hint:, result_hint:
+          operation, arg, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
+                          cancellation_type:, summary:, cancellation:, arg_hint:, result_hint:
         ).result
       end
     end

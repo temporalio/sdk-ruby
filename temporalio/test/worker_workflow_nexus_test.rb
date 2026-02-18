@@ -426,6 +426,65 @@ class WorkerWorkflowNexusTest < Test
     end
   end
 
+  # Test schedule_to_start_timeout: operation never picked up, times out before starting
+  class NexusScheduleToStartTimeoutWorkflow < Temporalio::Workflow::Definition
+    def execute(endpoint)
+      client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
+      client.execute_operation(
+        'workflow-operation',
+        { 'action' => 'wait-for-cancel' },
+        schedule_to_start_timeout: 0.1
+      )
+    end
+  end
+
+  def test_nexus_schedule_to_start_timeout
+    # Create a nexus endpoint pointing to a task queue with no worker so no one
+    # picks up the nexus task, triggering a SCHEDULE_TO_START timeout.
+    nexus_task_queue = "tq-#{SecureRandom.uuid}"
+    endpoint_name = "nexus-endpoint-#{nexus_task_queue}"
+    endpoint = env.server.create_nexus_endpoint(name: endpoint_name, task_queue: nexus_task_queue)
+
+    begin
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
+        execute_workflow(NexusScheduleToStartTimeoutWorkflow, endpoint_name)
+      end
+
+      assert_instance_of Temporalio::Error::NexusOperationError, err.cause
+      assert_instance_of Temporalio::Error::TimeoutError, err.cause.cause
+      assert_equal Temporalio::Error::TimeoutError::TimeoutType::SCHEDULE_TO_START, err.cause.cause.type
+    ensure
+      env.server.delete_nexus_endpoint(endpoint)
+    end
+  end
+
+  # Test start_to_close_timeout: operation starts (async token returned) but never completes
+  class NexusStartToCloseTimeoutWorkflow < Temporalio::Workflow::Definition
+    def execute(endpoint)
+      client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
+      handle = client.start_operation(
+        'workflow-operation',
+        { 'action' => 'wait-for-cancel' },
+        start_to_close_timeout: 0.1
+      )
+      handle.result
+    end
+  end
+
+  def test_nexus_start_to_close_timeout
+    env.with_kitchen_sink_worker(nexus: true) do |task_queue|
+      endpoint = "nexus-endpoint-#{task_queue}"
+
+      err = assert_raises(Temporalio::Error::WorkflowFailedError) do
+        execute_workflow(NexusStartToCloseTimeoutWorkflow, endpoint)
+      end
+
+      assert_instance_of Temporalio::Error::NexusOperationError, err.cause
+      assert_instance_of Temporalio::Error::TimeoutError, err.cause.cause
+      assert_equal Temporalio::Error::TimeoutError::TimeoutType::START_TO_CLOSE, err.cause.cause.type
+    end
+  end
+
   class NexusOperationTracingWorkflow < Temporalio::Workflow::Definition
     def execute(endpoint)
       client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')

@@ -101,6 +101,9 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
           TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
+
+          # Pin the dev server version used for local testing
+          TEMPORAL_DEV_SERVER_VERSION: v1.6.1-server-1.31.0-150.0
         run: bundle exec rake TESTOPTS="--verbose"
 
       - name: Deploy docs
