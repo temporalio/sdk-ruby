@@ -318,6 +318,8 @@ module Temporalio
           attr_reader operation: String
           attr_reader arg: Object?
           attr_reader schedule_to_close_timeout: duration?
+          attr_reader schedule_to_start_timeout: duration?
+          attr_reader start_to_close_timeout: duration?
           attr_reader cancellation_type: Temporalio::Workflow::NexusOperationCancellationType::enum
           attr_reader summary: String?
           attr_reader cancellation: Cancellation
@@ -331,6 +333,8 @@ module Temporalio
             operation: String,
             arg: Object?,
             schedule_to_close_timeout: duration?,
+            schedule_to_start_timeout: duration?,
+            start_to_close_timeout: duration?,
             cancellation_type: Temporalio::Workflow::NexusOperationCancellationType::enum,
             summary: String?,
             cancellation: Cancellation,
