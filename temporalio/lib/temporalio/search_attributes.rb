@@ -350,7 +350,17 @@ module Temporalio
       }.freeze
 
       # @!visibility private
-      PROTO_VALUES = PROTO_NAMES.invert.freeze
+      # The type metadata is usually in PascalCase (e.g. "KeywordList") but in
+      # rare cases may be in SCREAMING_SNAKE_CASE (e.g. "INDEXED_VALUE_TYPE_KEYWORD_LIST").
+      PROTO_VALUES = PROTO_NAMES.invert.merge(
+        'INDEXED_VALUE_TYPE_TEXT' => TEXT,
+        'INDEXED_VALUE_TYPE_KEYWORD' => KEYWORD,
+        'INDEXED_VALUE_TYPE_INT' => INTEGER,
+        'INDEXED_VALUE_TYPE_DOUBLE' => FLOAT,
+        'INDEXED_VALUE_TYPE_BOOL' => BOOLEAN,
+        'INDEXED_VALUE_TYPE_DATETIME' => TIME,
+        'INDEXED_VALUE_TYPE_KEYWORD_LIST' => KEYWORD_LIST
+      ).freeze
     end
   end
 end
