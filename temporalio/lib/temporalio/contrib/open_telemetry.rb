@@ -79,6 +79,11 @@ module Temporalio
         end
 
         # @!visibility private
+        def _detach_context(context_token)
+          ::OpenTelemetry::Context.detach(context_token) if context_token
+        end
+
+        # @!visibility private
         def _context_from_headers(headers)
           carrier = headers[@header_key]
           @propagator.extract(carrier) if carrier.is_a?(Hash) && !carrier.empty?
@@ -206,7 +211,7 @@ module Temporalio
 
           # @!visibility private
           def execute(input)
-            @root._attach_context(input.headers)
+            token = @root._attach_context(input.headers)
             info = Activity::Context.current.info
             @root._with_started_span(
               name: "RunActivity:#{info.activity_type}",
@@ -217,6 +222,8 @@ module Temporalio
                 'temporalActivityID' => info.activity_id
               }
             ) { super }
+          ensure
+            @root._detach_context(token)
           end
         end
 
@@ -236,7 +243,7 @@ module Temporalio
 
           # @!visibility private
           def execute(input)
-            _attach_context(Temporalio::Workflow.info.headers)
+            token = _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span("RunWorkflow:#{Temporalio::Workflow.info.workflow_type}", kind: :server) do
               super
             ensure
@@ -246,11 +253,13 @@ module Temporalio
                 exception: $ERROR_INFO # steep:ignore
               )
             end
+          ensure
+            _detach_context(token)
           end
 
           # @!visibility private
           def handle_signal(input)
-            _attach_context(Temporalio::Workflow.info.headers)
+            token = _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleSignal:#{input.signal}",
               links: _links_from_headers(input.headers),
@@ -261,11 +270,13 @@ module Temporalio
               Workflow.completed_span("FailHandleSignal:#{input.signal}", kind: :internal, exception: e)
               raise
             end
+          ensure
+            _detach_context(token)
           end
 
           # @!visibility private
           def handle_query(input)
-            _attach_context(Temporalio::Workflow.info.headers)
+            token = _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleQuery:#{input.query}",
               links: _links_from_headers(input.headers),
@@ -282,11 +293,13 @@ module Temporalio
               )
               raise
             end
+          ensure
+            _detach_context(token)
           end
 
           # @!visibility private
           def validate_update(input)
-            _attach_context(Temporalio::Workflow.info.headers)
+            token = _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "ValidateUpdate:#{input.update}",
               attributes: { 'temporalUpdateID' => input.id },
@@ -305,11 +318,13 @@ module Temporalio
               )
               raise
             end
+          ensure
+            _detach_context(token)
           end
 
           # @!visibility private
           def handle_update(input)
-            _attach_context(Temporalio::Workflow.info.headers)
+            token = _attach_context(Temporalio::Workflow.info.headers)
             Workflow.with_completed_span(
               "HandleUpdate:#{input.update}",
               attributes: { 'temporalUpdateID' => input.id },
@@ -326,6 +341,8 @@ module Temporalio
               )
               raise
             end
+          ensure
+            _detach_context(token)
           end
 
           # @!visibility private
@@ -338,6 +355,14 @@ module Temporalio
             # map propagation extraction accesses Context.current.
             Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
               @root._attach_context(headers)
+            end
+          end
+
+          # @!visibility private
+          def _detach_context(context_token)
+            # See _attach_context above for why we have to disable scheduler even for these simple operations
+            Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
+              @root._detach_context(context_token)
             end
           end
 
