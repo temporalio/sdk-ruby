@@ -1,8 +1,8 @@
 use std::{any::Any, sync::Arc, time::Duration};
 
 use magnus::{
-    DataTypeFunctions, Error, Float, Integer, RClass, RHash, RModule, RString, Ruby, StaticSymbol,
-    Symbol, TryConvert, TypedData, Value, function,
+    DataTypeFunctions, Error, Float, Integer, RArray, RClass, RHash, RModule, RString, Ruby,
+    StaticSymbol, Symbol, TryConvert, TypedData, Value, function,
     gc::register_mark_object,
     method,
     prelude::*,
@@ -13,7 +13,7 @@ use temporalio_common::telemetry::metrics::{
     self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
 };
 
-use crate::{ROOT_MOD, error, id, runtime::Runtime, util::SendSyncBoxValue};
+use crate::{ROOT_MOD, error, id, runtime::Runtime, util::ThreadSafeBoxValue};
 
 pub fn init(ruby: &Ruby) -> Result<(), Error> {
     let root_mod = ruby.get_inner(&ROOT_MOD);
@@ -269,14 +269,14 @@ fn metric_key_value(k: Value, v: Value) -> Result<metrics::MetricKeyValue, Error
 
 #[derive(Clone, Debug)]
 pub struct BufferedMetricRef {
-    value: Arc<SendSyncBoxValue<Value>>,
+    value: Arc<ThreadSafeBoxValue<Value>>,
 }
 
 impl BufferInstrumentRef for BufferedMetricRef {}
 
 #[derive(Debug)]
 struct BufferedMetricAttributes {
-    value: SendSyncBoxValue<RHash>,
+    value: ThreadSafeBoxValue<RHash>,
 }
 
 impl CustomMetricAttributes for BufferedMetricAttributes {
@@ -325,12 +325,21 @@ pub fn convert_metric_events(
     ruby: &Ruby,
     events: Vec<MetricEvent<BufferedMetricRef>>,
     durations_as_seconds: bool,
-) -> Result<Vec<Value>, Error> {
-    let temp: Result<Vec<Option<Value>>, Error> = events
-        .into_iter()
-        .map(|e| convert_metric_event(ruby, e, durations_as_seconds))
-        .collect();
-    Ok(temp?.into_iter().flatten().collect())
+) -> Result<RArray, Error> {
+    // We must use an RArray (not Vec<Value>) to hold intermediate results.
+    // Ruby's GC scans the native stack but not the Rust heap. A Vec<Value>'s
+    // backing buffer lives on the Rust heap, so GC cannot see the VALUEs stored
+    // there. If a subsequent funcall triggers GC while we're still iterating,
+    // previously created Update objects in the Vec could be collected, leaving
+    // dangling VALUE pointers that cause a segfault. Pushing into an RArray
+    // immediately makes each object reachable from a GC-visible root.
+    let result = ruby.ary_new_capa(events.len());
+    for event in events {
+        if let Some(val) = convert_metric_event(ruby, event, durations_as_seconds)? {
+            result.push(val)?;
+        }
+    }
+    Ok(result)
 }
 
 fn convert_metric_event(
@@ -386,7 +395,7 @@ fn convert_metric_event(
             // Put on lazy ref
             populate_into
                 .set(Arc::new(BufferedMetricRef {
-                    value: Arc::new(SendSyncBoxValue::new(val)),
+                    value: Arc::new(ThreadSafeBoxValue::new(val)),
                 }))
                 .map_err(|_| error!("Failed setting metric ref"))?;
             Ok(None)
@@ -427,7 +436,7 @@ fn convert_metric_event(
             // Put on lazy ref
             populate_into
                 .set(Arc::new(BufferedMetricAttributes {
-                    value: SendSyncBoxValue::new(hash),
+                    value: ThreadSafeBoxValue::new(hash),
                 }))
                 .map_err(|_| error!("Failed setting metric attrs"))?;
             Ok(None)
