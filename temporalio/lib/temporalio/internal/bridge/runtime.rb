@@ -11,12 +11,12 @@ module Temporalio
 
         TelemetryOptions = Struct.new(
           :logging, # Optional
-          :metrics
+          :metrics # Optional
         )
 
         LoggingOptions = Struct.new(
           :log_filter,
-          :forward_to
+          :forward_to # Optional
         )
 
         MetricsOptions = Struct.new(
@@ -25,7 +25,7 @@ module Temporalio
           :buffered_with_size, # Optional
           :attach_service_name,
           :global_tags, # Optional
-          :metric_prefix
+          :metric_prefix # Optional
         )
 
         OpenTelemetryMetricsOptions = Struct.new(
@@ -35,7 +35,7 @@ module Temporalio
           :metric_temporality_delta,
           :durations_as_seconds,
           :http,
-          :histogram_bucket_overrides
+          :histogram_bucket_overrides # Optional
         )
 
         PrometheusMetricsOptions = Struct.new(
@@ -43,7 +43,7 @@ module Temporalio
           :counters_total_suffix,
           :unit_suffix,
           :durations_as_seconds,
-          :histogram_bucket_overrides
+          :histogram_bucket_overrides # Optional
         )
       end
     end
