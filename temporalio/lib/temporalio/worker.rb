@@ -163,7 +163,7 @@ module Temporalio
     )
       # Confirm there is at least one and they are all workers
       raise ArgumentError, 'At least one worker required' if workers.empty?
-      raise ArgumentError, 'Not all parameters are workers' unless workers.all? { |w| w.is_a?(Worker) }
+      raise ArgumentError, 'Not all parameters are workers' unless workers.all?(Worker)
 
       Internal::Bridge.assert_fiber_compatibility!
 
@@ -558,12 +558,8 @@ module Temporalio
       )
 
       # Collect interceptors from client and params
-      @activity_interceptors = (@options.client.options.interceptors + @options.interceptors).select do |i|
-        i.is_a?(Interceptor::Activity)
-      end
-      @workflow_interceptors = (@options.client.options.interceptors + @options.interceptors).select do |i|
-        i.is_a?(Interceptor::Workflow)
-      end
+      @activity_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Activity)
+      @workflow_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Workflow)
 
       # Cancellation for the whole worker
       @worker_shutdown_cancellation = Cancellation.new

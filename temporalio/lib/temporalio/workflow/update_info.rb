@@ -13,8 +13,7 @@ module Temporalio
     #   class or it may break in incompatible ways.
     UpdateInfo = Struct.new(
       :id,
-      :name,
-      keyword_init: true
+      :name
     )
   end
 end
