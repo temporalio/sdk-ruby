@@ -23,8 +23,7 @@ module Temporalio
       :task_queue,
       :task_timeout,
       :workflow_id,
-      :workflow_type,
-      keyword_init: true
+      :workflow_type
     )
 
     # Information about the running workflow. This is immutable for the life of the workflow run.
@@ -91,8 +90,7 @@ module Temporalio
       ParentInfo = Struct.new(
         :namespace,
         :run_id,
-        :workflow_id,
-        keyword_init: true
+        :workflow_id
       )
 
       # Information about a root of a workflow.
@@ -106,8 +104,7 @@ module Temporalio
       #   this class or it may break in incompatible ways.
       RootInfo = Struct.new(
         :run_id,
-        :workflow_id,
-        keyword_init: true
+        :workflow_id
       )
     end
   end

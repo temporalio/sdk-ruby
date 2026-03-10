@@ -28,22 +28,19 @@ module Temporalio
           :nondeterminism_as_workflow_fail,
           :nondeterminism_as_workflow_fail_for_types,
           :deployment_options,
-          :plugins,
-          keyword_init: true
+          :plugins
         )
 
         TunerOptions = Struct.new(
           :workflow_slot_supplier,
           :activity_slot_supplier,
-          :local_activity_slot_supplier,
-          keyword_init: true
+          :local_activity_slot_supplier
         )
 
         TunerSlotSupplierOptions = Struct.new(
           :fixed_size,
           :resource_based,
-          :custom,
-          keyword_init: true
+          :custom
         )
 
         TunerResourceBasedSlotSupplierOptions = Struct.new(
@@ -51,33 +48,28 @@ module Temporalio
           :target_cpu_usage,
           :min_slots,
           :max_slots,
-          :ramp_throttle,
-          keyword_init: true
+          :ramp_throttle
         )
 
         WorkerDeploymentVersion = Struct.new(
           :deployment_name,
-          :build_id,
-          keyword_init: true
+          :build_id
         )
 
         DeploymentOptions = Struct.new(
           :version,
           :use_worker_versioning,
-          :default_versioning_behavior,
-          keyword_init: true
+          :default_versioning_behavior
         )
 
         PollerBehaviorSimpleMaximum = Struct.new(
-          :simple_maximum,
-          keyword_init: true
+          :simple_maximum
         )
 
         PollerBehaviorAutoscaling = Struct.new(
           :minimum,
           :maximum,
-          :initial,
-          keyword_init: true
+          :initial
         )
 
         def self.finalize_shutdown_all(workers)
