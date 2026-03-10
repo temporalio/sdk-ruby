@@ -6,20 +6,17 @@ module Temporalio
       class Runtime
         Options = Struct.new(
           :telemetry,
-          :worker_heartbeat_interval,
-          keyword_init: true
+          :worker_heartbeat_interval
         )
 
         TelemetryOptions = Struct.new(
           :logging, # Optional
-          :metrics, # Optional
-          keyword_init: true
+          :metrics # Optional
         )
 
         LoggingOptions = Struct.new(
           :log_filter,
-          :forward_to, # Optional
-          keyword_init: true
+          :forward_to # Optional
         )
 
         MetricsOptions = Struct.new(
@@ -28,8 +25,7 @@ module Temporalio
           :buffered_with_size, # Optional
           :attach_service_name,
           :global_tags, # Optional
-          :metric_prefix, # Optional
-          keyword_init: true
+          :metric_prefix # Optional
         )
 
         OpenTelemetryMetricsOptions = Struct.new(
@@ -39,8 +35,7 @@ module Temporalio
           :metric_temporality_delta,
           :durations_as_seconds,
           :http,
-          :histogram_bucket_overrides, # Optional
-          keyword_init: true
+          :histogram_bucket_overrides # Optional
         )
 
         PrometheusMetricsOptions = Struct.new(
@@ -48,8 +43,7 @@ module Temporalio
           :counters_total_suffix,
           :unit_suffix,
           :durations_as_seconds,
-          :histogram_bucket_overrides, # Optional
-          keyword_init: true
+          :histogram_bucket_overrides # Optional
         )
       end
     end

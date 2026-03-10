@@ -1201,7 +1201,7 @@ class WorkerWorkflowTest < Test
     workflow_raw_args
 
     def execute(*raw_args)
-      raise 'Bad arg' unless raw_args.all? { |v| v.is_a?(Temporalio::Converters::RawValue) }
+      raise 'Bad arg' unless raw_args.all?(Temporalio::Converters::RawValue)
 
       res = raw_args.map { |v| Temporalio::Workflow.payload_converter.from_payload(v.payload) }.join(' -- ')
       res = "#{Temporalio::Workflow.info.workflow_type} - #{res}"

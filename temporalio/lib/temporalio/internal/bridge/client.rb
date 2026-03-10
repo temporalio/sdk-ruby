@@ -16,16 +16,14 @@ module Temporalio
           :tls, # Optional
           :rpc_retry,
           :keep_alive, # Optional
-          :http_connect_proxy, # Optional
-          keyword_init: true
+          :http_connect_proxy # Optional
         )
 
         TLSOptions = Struct.new(
           :client_cert, # Optional
           :client_private_key, # Optional
           :server_root_ca_cert, # Optional
-          :domain, # Optional
-          keyword_init: true
+          :domain # Optional
         )
 
         RPCRetryOptions = Struct.new(
@@ -34,21 +32,18 @@ module Temporalio
           :multiplier,
           :max_interval,
           :max_elapsed_time, # Can use 0 for none
-          :max_retries,
-          keyword_init: true
+          :max_retries
         )
 
         KeepAliveOptions = Struct.new(
           :interval,
-          :timeout,
-          keyword_init: true
+          :timeout
         )
 
         HTTPConnectProxyOptions = Struct.new(
           :target_host,
           :basic_auth_user, # Optional
-          :basic_auth_pass, # Optional,
-          keyword_init: true
+          :basic_auth_pass # Optional
         )
 
         def self.new(runtime, options)

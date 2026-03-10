@@ -258,9 +258,7 @@ module Temporalio
             logger: options.logger,
             data_converter: options.data_converter,
             metric_meter: options.runtime.metric_meter,
-            workflow_interceptors: options.interceptors.select do |i|
-              i.is_a?(Interceptor::Workflow)
-            end,
+            workflow_interceptors: options.interceptors.grep(Interceptor::Workflow),
             disable_eager_activity_execution: false,
             illegal_workflow_calls: options.illegal_workflow_calls,
             workflow_failure_exception_types: options.workflow_failure_exception_types,
