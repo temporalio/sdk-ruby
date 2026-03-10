@@ -58,7 +58,7 @@ module Temporalio
         when IndexedValueType::TIME
           raise TypeError, 'Value of TIME key must be a Time' unless value.is_a?(Time)
         when IndexedValueType::KEYWORD_LIST
-          unless value.is_a?(Array) && value.all? { |v| v.is_a?(String) }
+          unless value.is_a?(Array) && value.all?(String)
             raise TypeError, 'Value of KEYWORD_LIST key must be an Array of String'
           end
         else
