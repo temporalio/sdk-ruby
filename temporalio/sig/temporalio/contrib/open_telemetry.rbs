@@ -30,8 +30,8 @@ module Temporalio
         class WorkflowInbound < Worker::Interceptor::Workflow::Inbound
           def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Inbound next_interceptor) -> void
 
-          def _attach_context: (Hash[String, untyped] headers) -> Object
-          def _detach_context: (Object token) -> void
+          def _attach_context: (Hash[String, untyped] headers) -> Object?
+          def _detach_context: (Object? token) -> void
           def _links_from_headers: (Hash[String, untyped] headers) -> Array[untyped]
         end
 
