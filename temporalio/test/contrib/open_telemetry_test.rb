@@ -13,6 +13,8 @@ module Contrib
 
       def execute(scenario)
         case scenario.to_sym
+        when :success_return_trace_id
+          OpenTelemetry::Trace.current_span.context.hex_trace_id
         when :fail_first_attempt
           raise 'Intentional activity failure' if Temporalio::Activity::Context.current.info.attempt == 1
 
@@ -49,6 +51,8 @@ module Contrib
           Temporalio::Contrib::OpenTelemetry::Workflow.with_completed_span('custom-can-span') do
             raise Temporalio::Workflow::ContinueAsNewError, :complete
           end
+        when :activity_success_return_trace_id
+          Temporalio::Workflow.execute_activity(TestActivity, :success_return_trace_id, start_to_close_timeout: 30)
         when :activity_fail_benign
           Temporalio::Workflow.execute_activity(TestActivity, :fail_benign, start_to_close_timeout: 30)
         else
@@ -606,6 +610,26 @@ module Contrib
       assert_equal 'CompleteWorkflow:TestWorkflow', act_root.children.first.children.first.children.first.name
     ensure
       ContextCurrentPatch.do_illegal_thing = false
+    end
+
+    def test_otel_context_cleared
+      traced_wf_trace_id = nil
+      traced_act = trace_workflow(:activity_success_return_trace_id) do |handle|
+        traced_wf_trace_id = handle.result
+      end
+      assert !traced_act.children.empty?
+
+      untraced_wf_trace_id = nil
+      untraced_span = trace_workflow(
+        :activity_success_return_trace_id,
+        start_with_untraced_client: true,
+        check_root: false
+      ) do |handle|
+        untraced_wf_trace_id = handle.result
+      end
+      assert_empty untraced_span.children
+
+      assert traced_wf_trace_id != untraced_wf_trace_id
     end
 
     ExpectedSpan = Data.define( # rubocop:disable Layout/ClassStructure
