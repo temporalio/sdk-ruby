@@ -187,7 +187,9 @@ impl<T: ReprValue> Drop for ThreadSafeBoxValue<T> {
     fn drop(&mut self) {
         if Ruby::get().is_ok() {
             // On a Ruby thread: safe to call rb_gc_unregister_address
-            unsafe { ManuallyDrop::drop(&mut self.0); }
+            unsafe { 
+                ManuallyDrop::drop(&mut self.0);
+            }
         }
         // On a non-Ruby thread: intentionally leak the BoxValue to avoid
         // calling rb_gc_unregister_address from a thread unknown to Ruby's VM
