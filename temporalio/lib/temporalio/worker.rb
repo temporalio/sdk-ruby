@@ -514,6 +514,12 @@ module Temporalio
         raise ArgumentError, 'Must have at least one activity or workflow'
       end
 
+      if !@options.deployment_options.use_worker_versioning &&
+         @options.deployment_options.default_versioning_behavior != VersioningBehavior::UNSPECIFIED
+        raise ArgumentError,
+              'default_versioning_behavior must be UNSPECIFIED when use_worker_versioning is false'
+      end
+
       should_enforce_versioning_behavior =
         @options.deployment_options.use_worker_versioning &&
         @options.deployment_options.default_versioning_behavior == VersioningBehavior::UNSPECIFIED
