@@ -16,7 +16,8 @@ module Temporalio
         ) -> void
 
         def _apply_context_to_headers: (Hash[String, untyped] headers, ?context: untyped) -> void
-        def _attach_context: (Hash[String, untyped] headers) -> void
+        def _attach_context: (Hash[String, untyped] headers) -> Object?
+        def _detach_context: (Object? token) -> void
         def _context_from_headers: (Hash[String, untyped] headers) -> untyped
         def _with_started_span: [T] (
           name: String,
@@ -29,7 +30,8 @@ module Temporalio
         class WorkflowInbound < Worker::Interceptor::Workflow::Inbound
           def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Inbound next_interceptor) -> void
 
-          def _attach_context: (Hash[String, untyped] headers) -> void
+          def _attach_context: (Hash[String, untyped] headers) -> Object?
+          def _detach_context: (Object? token) -> void
           def _links_from_headers: (Hash[String, untyped] headers) -> Array[untyped]
         end
 
