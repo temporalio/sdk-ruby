@@ -267,8 +267,7 @@ impl Runtime {
             .metrics_call_buffer
             .clone()
             .expect("Attempting to retrieve buffered metrics without buffer");
-        let updates = convert_metric_events(&ruby, buff.retrieve(), durations_as_seconds)?;
-        Ok(ruby.ary_new_from_values(&updates))
+        convert_metric_events(&ruby, buff.retrieve(), durations_as_seconds)
     }
 }
 
