@@ -1,4 +1,5 @@
 use std::ffi::c_void;
+use std::mem::ManuallyDrop;
 
 use magnus::symbol::IntoSymbol;
 use magnus::value::{BoxValue, OpaqueId, ReprValue};
@@ -155,5 +156,48 @@ impl<T: ReprValue> SendSyncBoxValue<T> {
 
     pub fn value(&self, _: &Ruby) -> T {
         *self.0
+    }
+}
+
+/// Like SendSyncBoxValue but safe to drop from any thread. When dropped on a
+/// non-Ruby thread (e.g. a Tokio worker), the BoxValue and its GC registration
+/// are intentionally leaked instead of calling rb_gc_unregister_address (which
+/// would corrupt Ruby's GC data structures). On a Ruby thread, cleanup proceeds
+/// normally.
+///
+/// Use this for metric buffer objects (instruments, attribute sets) where:
+/// - The Rust Core SDK may drop Arc references on Tokio threads
+/// - The number of unique objects is bounded (small, acceptable leak)
+pub(crate) struct ThreadSafeBoxValue<T: ReprValue>(ManuallyDrop<BoxValue<T>>);
+
+unsafe impl<T: ReprValue> Send for ThreadSafeBoxValue<T> {}
+unsafe impl<T: ReprValue> Sync for ThreadSafeBoxValue<T> {}
+
+impl<T: ReprValue> ThreadSafeBoxValue<T> {
+    pub fn new(val: T) -> Self {
+        Self(ManuallyDrop::new(BoxValue::new(val)))
+    }
+
+    pub fn value(&self, _: &Ruby) -> T {
+        **self.0
+    }
+}
+
+impl<T: ReprValue> Drop for ThreadSafeBoxValue<T> {
+    fn drop(&mut self) {
+        if Ruby::get().is_ok() {
+            // On a Ruby thread: safe to call rb_gc_unregister_address
+            unsafe {
+                ManuallyDrop::drop(&mut self.0);
+            }
+        }
+        // On a non-Ruby thread: intentionally leak the BoxValue to avoid
+        // calling rb_gc_unregister_address from a thread unknown to Ruby's VM
+    }
+}
+
+impl<T: ReprValue> std::fmt::Debug for ThreadSafeBoxValue<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ThreadSafeBoxValue").finish()
     }
 }
