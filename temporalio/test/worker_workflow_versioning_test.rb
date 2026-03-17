@@ -480,6 +480,57 @@ class WorkerWorkflowVersioningTest < Test
     end
   end
 
+  def test_deployment_options_without_versioning
+    build_id = 'my-custom-build-id-1.0'
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [NoVersioningAnnotationWorkflow],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: Temporalio::WorkerDeploymentVersion.new(
+          deployment_name: "deployment-#{SecureRandom.uuid}",
+          build_id: build_id
+        ),
+        use_worker_versioning: false
+      )
+    )
+
+    worker.run do
+      handle = env.client.start_workflow(
+        NoVersioningAnnotationWorkflow,
+        id: "no-versioning-build-id-#{SecureRandom.uuid}",
+        task_queue: worker.task_queue
+      )
+      handle.result
+
+      events = handle.fetch_history.events
+      has_build_id = events.any? do |event|
+        event.workflow_task_completed_event_attributes &&
+          event.workflow_task_completed_event_attributes.worker_version&.build_id == build_id
+      end
+      assert has_build_id, 'Expected custom build ID to appear in workflow history'
+    end
+  end
+
+  def test_rejects_versioning_behavior_when_versioning_off
+    err = assert_raises(ArgumentError) do
+      Temporalio::Worker.new(
+        client: env.client,
+        task_queue: "tq-#{SecureRandom.uuid}",
+        workflows: [NoVersioningAnnotationWorkflow],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(
+          version: Temporalio::WorkerDeploymentVersion.new(
+            deployment_name: "deployment-#{SecureRandom.uuid}",
+            build_id: '1.0'
+          ),
+          use_worker_versioning: false,
+          default_versioning_behavior: Temporalio::VersioningBehavior::AUTO_UPGRADE
+        )
+      )
+    end
+    assert_includes err.message, 'default_versioning_behavior must be UNSPECIFIED'
+  end
+
   def wait_until_worker_deployment_visible(client, version)
     assert_eventually do
       res = client.workflow_service.describe_worker_deployment(
