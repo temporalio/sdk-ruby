@@ -75,7 +75,7 @@ module Temporalio
       def self.headers_from_proto_map(headers, converter)
         return nil if headers.nil? || headers.size.zero? # rubocop:disable Style/ZeroLengthPredicate -- Google Maps don't have empty
 
-        headers.transform_values { |val| converter.from_payload(val) }
+        headers.to_h.transform_values { |val| converter.from_payload(val) }
       end
 
       def self.string_or(str, default = nil)

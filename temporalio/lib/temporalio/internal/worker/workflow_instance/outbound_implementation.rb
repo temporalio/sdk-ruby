@@ -365,7 +365,7 @@ module Temporalio
                   cron_schedule: input.cron_schedule,
                   headers: ProtoUtils.headers_to_proto_hash(input.headers, @instance.payload_converter),
                   memo: ProtoUtils.memo_to_proto_hash(input.memo, @instance.payload_converter),
-                  search_attributes: input.search_attributes&._to_proto_hash,
+                  search_attributes: input.search_attributes&._to_proto,
                   cancellation_type: input.cancellation_type,
                   priority: input.priority._to_proto
                 ),
