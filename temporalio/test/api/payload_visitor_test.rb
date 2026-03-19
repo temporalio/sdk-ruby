@@ -48,7 +48,9 @@ module Api
           Temporalio::Internal::Bridge::Api::WorkflowCommands::WorkflowCommand.new(
             upsert_workflow_search_attributes:
             Temporalio::Internal::Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes.new(
-              search_attributes: { 'sakey' => Temporalio::Api::Common::V1::Payload.new(data: 'samap') }
+              search_attributes: Temporalio::Api::Common::V1::SearchAttributes.new(
+                indexed_fields: { 'sakey' => Temporalio::Api::Common::V1::Payload.new(data: 'samap') }
+              )
             )
           )
         ]
@@ -78,8 +80,8 @@ module Api
       assert_equal 'obj1-obj2-repeated', mutated_init.last_completion_result.payloads.first.data
       assert_equal 'saobj-single', mutated_init.search_attributes.indexed_fields['sakey'].data
       assert_equal 'single-single', mutated_succ.commands.first.complete_workflow_execution.result.data
-      assert_equal 'samap-single',
-                   mutated_succ.commands.last.upsert_workflow_search_attributes.search_attributes['sakey'].data
+      upsert_sa = mutated_succ.commands.last.upsert_workflow_search_attributes.search_attributes
+      assert_equal 'samap-single', upsert_sa.indexed_fields['sakey'].data
 
       # Skip search attributes
       visitor = Temporalio::Api::PayloadVisitor.new(skip_search_attributes: true, &mutator)
@@ -91,7 +93,8 @@ module Api
       assert_equal 'map-single', mutated_init.headers['header'].data
       assert_equal 'saobj', mutated_init.search_attributes.indexed_fields['sakey'].data
       assert_equal 'single-single', mutated_succ.commands.first.complete_workflow_execution.result.data
-      assert_equal 'samap', mutated_succ.commands.last.upsert_workflow_search_attributes.search_attributes['sakey'].data
+      upsert_sa = mutated_succ.commands.last.upsert_workflow_search_attributes.search_attributes
+      assert_equal 'samap', upsert_sa.indexed_fields['sakey'].data
 
       # On enter/exit
       entered = []
