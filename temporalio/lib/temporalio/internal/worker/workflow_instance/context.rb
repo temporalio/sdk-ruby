@@ -379,7 +379,9 @@ module Temporalio
             @instance.add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 upsert_workflow_search_attributes: Bridge::Api::WorkflowCommands::UpsertWorkflowSearchAttributes.new(
-                  search_attributes: Api::Common::V1::SearchAttributes.new(indexed_fields: updates.to_h(&:_to_proto_pair))
+                  search_attributes: Api::Common::V1::SearchAttributes.new(
+                    indexed_fields: updates.to_h(&:_to_proto_pair)
+                  )
                 )
               )
             )
