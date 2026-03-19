@@ -17,9 +17,9 @@ magnus = "0.8"
 parking_lot = "0.12"
 prost = { workspace = true }
 rb-sys = "0.9"
-temporalio-client = { version = "0.1.0", path = "./sdk-core/crates/client" }
-temporalio-common = { version = "0.1.0", path = "./sdk-core/crates/common", features = ["envconfig"] }
-temporalio-sdk-core = { version = "0.1.0", path = "./sdk-core/crates/sdk-core", features = ["ephemeral-server"] }
+temporalio-client = { version = "0.2.0", path = "./sdk-core/crates/client" }
+temporalio-common = { version = "0.2.0", path = "./sdk-core/crates/common", features = ["envconfig"] }
+temporalio-sdk-core = { version = "0.2.0", path = "./sdk-core/crates/sdk-core", features = ["ephemeral-server", "otel"] }
 tokio = "1.47"
 tokio-stream = "0.1"
 tokio-util = "0.7"

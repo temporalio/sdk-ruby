@@ -1,8 +1,8 @@
 use std::{collections::HashMap, future::Future, marker::PhantomData, time::Duration};
 
 use temporalio_client::{
-    ClientInitError, ClientKeepAliveOptions, ClientOptions, ClientTlsOptions, ConfiguredClient,
-    HttpConnectProxyOptions, RetryClient, RetryOptions, TemporalServiceClient, TlsOptions,
+    ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
+    HttpConnectProxyOptions, RetryOptions, TlsOptions, errors::ClientConnectError,
 };
 
 use magnus::{
@@ -51,30 +51,28 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-type CoreClient = RetryClient<ConfiguredClient<TemporalServiceClient>>;
-
 #[derive(DataTypeFunctions, TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Client", free_immediately)]
 pub struct Client {
-    pub(crate) core: CoreClient,
+    pub(crate) core: Connection,
     pub(crate) runtime_handle: RuntimeHandle,
 }
 
 #[macro_export]
 macro_rules! rpc_call {
-    ($client:ident, $callback:ident, $call:ident, $trait:tt, $call_name:ident) => {{
+    ($client:ident, $callback:ident, $call:ident, $trait:tt, $service_method:ident, $call_name:ident) => {{
         let cancel_token = $call.cancel_token.clone();
         if $call.retry {
-            let mut core_client = $client.core.clone();
+            let mut connection = $client.core.clone();
             let req = $call.into_request()?;
             $crate::client::rpc_resp($client, $callback, cancel_token, async move {
-                $trait::$call_name(&mut core_client, req).await
+                $trait::$call_name(&mut connection, req).await
             })
         } else {
-            let mut core_client = $client.core.clone().into_inner();
+            let connection = $client.core.clone();
             let req = $call.into_request()?;
             $crate::client::rpc_resp($client, $callback, cancel_token, async move {
-                $trait::$call_name(&mut core_client, req).await
+                connection.$service_method().$call_name(req).await
             })
         }
     }};
@@ -90,109 +88,103 @@ impl Client {
             .child(id!("rpc_retry"))?
             .ok_or_else(|| error!("Missing rpc_retry"))?;
         let tls = options.child(id!("tls"))?;
-        let opts = ClientOptions::builder()
-            .target_url(
-                Url::parse(
-                    format!(
-                        "{}://{}",
-                        if tls.is_some() { "https" } else { "http" },
-                        options.member::<String>(id!("target_host"))?
-                    )
-                    .as_str(),
+        let metrics_meter = runtime.handle.core.telemetry().get_temporal_metric_meter();
+        let opts = ConnectionOptions::new(
+            Url::parse(
+                format!(
+                    "{}://{}",
+                    if tls.is_some() { "https" } else { "http" },
+                    options.member::<String>(id!("target_host"))?
                 )
-                .map_err(|err| error!("Failed parsing host: {}", err))?,
+                .as_str(),
             )
-            .client_name(options.member::<String>(id!("client_name"))?)
-            .client_version(options.member::<String>(id!("client_version"))?)
-            .headers(headers.headers)
-            .binary_headers(headers.binary_headers)
-            .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
-            .identity(options.member::<String>(id!("identity"))?)
-            .maybe_tls_options(if let Some(tls) = tls {
-                Some(TlsOptions {
-                    client_tls_options: match (
-                        tls.member::<Option<RString>>(id!("client_cert"))?,
-                        tls.member::<Option<RString>>(id!("client_private_key"))?,
-                    ) {
-                        (None, None) => None,
-                        (Some(client_cert), Some(client_private_key)) => Some(ClientTlsOptions {
-                            // These are unsafe because of lifetime issues, but we copy right away
-                            client_cert: unsafe { client_cert.as_slice().to_vec() },
-                            client_private_key: unsafe { client_private_key.as_slice().to_vec() },
-                        }),
-                        _ => {
-                            return Err(error!(
-                                "Must have both client cert and private key or neither"
-                            ));
-                        }
-                    },
-                    server_root_ca_cert: tls
-                        .member::<Option<RString>>(id!("server_root_ca_cert"))?
-                        .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
-                    domain: tls.member(id!("domain"))?,
+            .map_err(|err| error!("Failed parsing host: {}", err))?,
+        )
+        .client_name(options.member::<String>(id!("client_name"))?)
+        .client_version(options.member::<String>(id!("client_version"))?)
+        .headers(headers.headers)
+        .binary_headers(headers.binary_headers)
+        .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
+        .identity(options.member::<String>(id!("identity"))?)
+        .maybe_tls_options(if let Some(tls) = tls {
+            Some(TlsOptions {
+                client_tls_options: match (
+                    tls.member::<Option<RString>>(id!("client_cert"))?,
+                    tls.member::<Option<RString>>(id!("client_private_key"))?,
+                ) {
+                    (None, None) => None,
+                    (Some(client_cert), Some(client_private_key)) => Some(ClientTlsOptions {
+                        // These are unsafe because of lifetime issues, but we copy right away
+                        client_cert: unsafe { client_cert.as_slice().to_vec() },
+                        client_private_key: unsafe { client_private_key.as_slice().to_vec() },
+                    }),
+                    _ => {
+                        return Err(error!(
+                            "Must have both client cert and private key or neither"
+                        ));
+                    }
+                },
+                server_root_ca_cert: tls
+                    .member::<Option<RString>>(id!("server_root_ca_cert"))?
+                    .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
+                domain: tls.member(id!("domain"))?,
+            })
+        } else {
+            None
+        })
+        .retry_options(RetryOptions {
+            initial_interval: Duration::from_secs_f64(rpc_retry.member(id!("initial_interval"))?),
+            randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
+            multiplier: rpc_retry.member(id!("multiplier"))?,
+            max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
+            max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
+                // 0 means none
+                0.0 => None,
+                val => Some(Duration::from_secs_f64(val)),
+            },
+            max_retries: rpc_retry.member(id!("max_retries"))?,
+        })
+        .keep_alive(
+            if let Some(keep_alive) = options.child(id!("keep_alive"))? {
+                Some(ClientKeepAliveOptions {
+                    interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
+                    timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
                 })
             } else {
                 None
-            })
-            .retry_options(RetryOptions {
-                initial_interval: Duration::from_secs_f64(
-                    rpc_retry.member(id!("initial_interval"))?,
-                ),
-                randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
-                multiplier: rpc_retry.member(id!("multiplier"))?,
-                max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
-                max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
-                    // 0 means none
-                    0.0 => None,
-                    val => Some(Duration::from_secs_f64(val)),
-                },
-                max_retries: rpc_retry.member(id!("max_retries"))?,
-            })
-            .keep_alive(
-                if let Some(keep_alive) = options.child(id!("keep_alive"))? {
-                    Some(ClientKeepAliveOptions {
-                        interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
-                        timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
-                    })
-                } else {
-                    None
-                },
-            )
-            .maybe_http_connect_proxy(
-                if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
-                    Some(HttpConnectProxyOptions {
-                        target_addr: proxy.member(id!("target_host"))?,
-                        basic_auth: match (
-                            proxy.member::<Option<String>>(id!("basic_auth_user"))?,
-                            proxy.member::<Option<String>>(id!("basic_auth_pass"))?,
-                        ) {
-                            (None, None) => None,
-                            (Some(user), Some(pass)) => Some((user, pass)),
-                            _ => {
-                                return Err(error!(
-                                    "Must have both basic auth and pass or neither"
-                                ));
-                            }
-                        },
-                    })
-                } else {
-                    None
-                },
-            )
-            .build();
+            },
+        )
+        .maybe_http_connect_proxy(
+            if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
+                Some(HttpConnectProxyOptions {
+                    target_addr: proxy.member(id!("target_host"))?,
+                    basic_auth: match (
+                        proxy.member::<Option<String>>(id!("basic_auth_user"))?,
+                        proxy.member::<Option<String>>(id!("basic_auth_pass"))?,
+                    ) {
+                        (None, None) => None,
+                        (Some(user), Some(pass)) => Some((user, pass)),
+                        _ => {
+                            return Err(error!("Must have both basic auth and pass or neither"));
+                        }
+                    },
+                })
+            } else {
+                None
+            },
+        )
+        .maybe_metrics_meter(metrics_meter)
+        .build();
 
         // Create client
         let callback = AsyncCallback::from_queue(queue);
-        let core_runtime = runtime.handle.core.clone();
         let runtime_handle = runtime.handle.clone();
         runtime.handle.spawn(
             async move {
-                let core = opts
-                    .connect_no_namespace(core_runtime.telemetry().get_temporal_metric_meter())
-                    .await?;
+                let core = Connection::connect(opts).await?;
                 Ok(core)
             },
-            move |ruby, result: Result<CoreClient, ClientInitError>| match result {
+            move |ruby, result: Result<Connection, ClientConnectError>| match result {
                 Ok(core) => callback.push(
                     &ruby,
                     Client {
@@ -262,18 +254,16 @@ impl Client {
         let ruby = Ruby::get().expect("Ruby not available");
         let headers = partition_grpc_headers(&ruby, headers)?;
         self.core
-            .get_client()
             .set_headers(headers.headers)
             .map_err(|err| error!("Invalid headers: {}", err))?;
         self.core
-            .get_client()
             .set_binary_headers(headers.binary_headers)
             .map_err(|err| error!("Invalid headers: {}", err))?;
         Ok(())
     }
 
     pub fn update_api_key(&self, api_key: Option<String>) {
-        self.core.get_client().set_api_key(api_key);
+        self.core.set_api_key(api_key);
     }
 }
 
