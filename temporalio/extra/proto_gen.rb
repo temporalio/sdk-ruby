@@ -234,7 +234,7 @@ class ProtoGen
         // Generated code.  DO NOT EDIT!
 
         use magnus::{Error, Ruby};
-        use temporalio_client::{CloudService, OperatorService, TestService, WorkflowService};
+        use temporalio_client::grpc::{CloudService, OperatorService, TestService, WorkflowService};
 
         use super::{error, rpc_call};
         use crate::{
@@ -250,25 +250,29 @@ class ProtoGen
         file:,
         qualified_service_name: 'temporal.api.workflowservice.v1.WorkflowService',
         service_enum: 'SERVICE_WORKFLOW',
-        trait: 'WorkflowService'
+        trait: 'WorkflowService',
+        service_method: 'workflow_service'
       )
       generate_rust_match_arm(
         file:,
         qualified_service_name: 'temporal.api.operatorservice.v1.OperatorService',
         service_enum: 'SERVICE_OPERATOR',
-        trait: 'OperatorService'
+        trait: 'OperatorService',
+        service_method: 'operator_service'
       )
       generate_rust_match_arm(
         file:,
         qualified_service_name: 'temporal.api.cloud.cloudservice.v1.CloudService',
         service_enum: 'SERVICE_CLOUD',
-        trait: 'CloudService'
+        trait: 'CloudService',
+        service_method: 'cloud_service'
       )
       generate_rust_match_arm(
         file:,
         qualified_service_name: 'temporal.api.testservice.v1.TestService',
         service_enum: 'SERVICE_TEST',
-        trait: 'TestService'
+        trait: 'TestService',
+        service_method: 'test_service'
       )
       file.puts <<~TEXT
                     _ => Err(error!("Unknown service")),
@@ -280,7 +284,7 @@ class ProtoGen
     system('cargo', 'fmt', '--', 'ext/src/client_rpc_generated.rs', exception: true)
   end
 
-  def generate_rust_match_arm(file:, qualified_service_name:, service_enum:, trait:)
+  def generate_rust_match_arm(file:, qualified_service_name:, service_enum:, trait:, service_method:)
     # Do service lookup
     desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(qualified_service_name)
     file.puts <<~TEXT
@@ -291,7 +295,7 @@ class ProtoGen
       # Camel case to snake case
       rpc = method.name.gsub(/([A-Z])/, '_\1').downcase.delete_prefix('_')
       file.puts <<~TEXT
-        "#{rpc}" => rpc_call!(self, callback, call, #{trait}, #{rpc}),
+        "#{rpc}" => rpc_call!(self, callback, call, #{trait}, #{service_method}, #{rpc}),
       TEXT
     end
     file.puts <<~TEXT

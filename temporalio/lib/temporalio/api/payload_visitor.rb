@@ -875,6 +875,7 @@ module Temporalio
       def api_nexus_v1_start_operation_response(value)
         @on_enter&.call(value)
         api_nexus_v1_start_operation_response_sync(value.sync_success) if value.has_sync_success?
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -1055,6 +1056,18 @@ module Temporalio
       end
       
       def api_workflowservice_v1_count_activity_executions_response_aggregation_group(value)
+        @on_enter&.call(value)
+        api_common_v1_payload_repeated(value.group_values) unless value.group_values.empty?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_count_schedules_response(value)
+        @on_enter&.call(value)
+        value.groups.each { |v| api_workflowservice_v1_count_schedules_response_aggregation_group(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_count_schedules_response_aggregation_group(value)
         @on_enter&.call(value)
         api_common_v1_payload_repeated(value.group_values) unless value.group_values.empty?
         @on_exit&.call(value)
@@ -1322,6 +1335,12 @@ module Temporalio
       def api_workflowservice_v1_respond_nexus_task_completed_request(value)
         @on_enter&.call(value)
         api_nexus_v1_response(value.response) if value.has_response?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_respond_nexus_task_failed_request(value)
+        @on_enter&.call(value)
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -1637,7 +1656,7 @@ module Temporalio
         api_common_v1_payload_repeated(value.arguments) unless value.arguments.empty?
         value.memo.values.each { |v| api_common_v1_payload(v) }
         value.headers.values.each { |v| api_common_v1_payload(v) }
-        value.search_attributes.values.each { |v| api_common_v1_payload(v) } unless @skip_search_attributes
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         @on_exit&.call(value)
       end
       
@@ -1698,7 +1717,7 @@ module Temporalio
         api_common_v1_payload_repeated(value.input) unless value.input.empty?
         value.headers.values.each { |v| api_common_v1_payload(v) }
         value.memo.values.each { |v| api_common_v1_payload(v) }
-        value.search_attributes.values.each { |v| api_common_v1_payload(v) } unless @skip_search_attributes
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         @on_exit&.call(value)
       end
       
@@ -1711,7 +1730,7 @@ module Temporalio
       
       def coresdk_workflow_commands_upsert_workflow_search_attributes(value)
         @on_enter&.call(value)
-        value.search_attributes.values.each { |v| api_common_v1_payload(v) } unless @skip_search_attributes
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         @on_exit&.call(value)
       end
       

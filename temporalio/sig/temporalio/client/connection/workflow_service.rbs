@@ -205,6 +205,10 @@ module Temporalio
           untyped request,
           ?rpc_options: RPCOptions?
         ) -> untyped
+        def count_schedules: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def update_worker_build_id_compatibility: (
           untyped request,
           ?rpc_options: RPCOptions?

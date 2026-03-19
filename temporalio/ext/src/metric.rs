@@ -10,7 +10,8 @@ use magnus::{
     value::{IntoId, Lazy, Qfalse, Qtrue},
 };
 use temporalio_common::telemetry::metrics::{
-    self, BufferInstrumentRef, CustomMetricAttributes, MetricEvent,
+    self,
+    core::{BufferInstrumentRef, CustomMetricAttributes, MetricEvent},
 };
 
 use crate::{ROOT_MOD, error, id, runtime::Runtime, util::ThreadSafeBoxValue};
@@ -70,14 +71,14 @@ impl Metric {
                     "Unrecognized value type for counter, must be :integer"
                 ));
             }
-            Arc::new(meter.core.inner.counter(params))
+            Arc::new(meter.core.counter(params))
         } else if metric_type == histogram {
             if value_type == integer {
-                Arc::new(meter.core.inner.histogram(params))
+                Arc::new(meter.core.histogram(params))
             } else if value_type == float {
-                Arc::new(meter.core.inner.histogram_f64(params))
+                Arc::new(meter.core.histogram_f64(params))
             } else if value_type == duration {
-                Arc::new(meter.core.inner.histogram_duration(params))
+                Arc::new(meter.core.histogram_duration(params))
             } else {
                 return Err(error!(
                     "Unrecognized value type for histogram, must be :integer, :float, or :duration"
@@ -85,9 +86,9 @@ impl Metric {
             }
         } else if metric_type == gauge {
             if value_type == integer {
-                Arc::new(meter.core.inner.gauge(params))
+                Arc::new(meter.core.gauge(params))
             } else if value_type == float {
-                Arc::new(meter.core.inner.gauge_f64(params))
+                Arc::new(meter.core.gauge_f64(params))
             } else {
                 return Err(error!(
                     "Unrecognized value type for gauge, must be :integer or :float"
@@ -124,7 +125,7 @@ impl MetricMeter {
             .telemetry()
             .get_metric_meter()
             .map(|core| {
-                let default_attributes = core.inner.new_attributes(core.default_attribs.clone());
+                let default_attributes = core.get_default_attributes().clone();
                 MetricMeter {
                     core,
                     default_attributes,
@@ -155,7 +156,6 @@ impl MetricAttributes {
         let attributes = metric_key_values(attrs)?;
         let core = self
             .core_meter
-            .inner
             .extend_attributes(self.core.clone(), metrics::NewAttributes { attributes });
         Ok(MetricAttributes {
             core,
@@ -365,7 +365,7 @@ fn convert_metric_event(
                         .filter(|s| !s.is_empty())
                         .map(|s| s.to_string()),
                     // Unit
-                    if matches!(kind, metrics::MetricKind::HistogramDuration)
+                    if matches!(kind, metrics::core::MetricKind::HistogramDuration)
                         && params.unit == "duration"
                     {
                         if durations_as_seconds {
@@ -380,13 +380,13 @@ fn convert_metric_event(
                     },
                     // Kind
                     match kind {
-                        metrics::MetricKind::Counter => ruby.get_inner(&METRIC_KIND_COUNTER),
-                        metrics::MetricKind::Gauge | metrics::MetricKind::GaugeF64 => {
+                        metrics::core::MetricKind::Counter => ruby.get_inner(&METRIC_KIND_COUNTER),
+                        metrics::core::MetricKind::Gauge | metrics::core::MetricKind::GaugeF64 => {
                             ruby.get_inner(&METRIC_KIND_GAUGE)
                         }
-                        metrics::MetricKind::Histogram
-                        | metrics::MetricKind::HistogramF64
-                        | metrics::MetricKind::HistogramDuration => {
+                        metrics::core::MetricKind::Histogram
+                        | metrics::core::MetricKind::HistogramF64
+                        | metrics::core::MetricKind::HistogramDuration => {
                             ruby.get_inner(&METRIC_KIND_HISTOGRAM)
                         }
                     },
@@ -456,10 +456,10 @@ fn convert_metric_event(
                         instrument.get().clone().value.clone().value(ruby),
                         // Value
                         match update {
-                            metrics::MetricUpdateVal::Duration(v) if durations_as_seconds => {
+                            metrics::core::MetricUpdateVal::Duration(v) if durations_as_seconds => {
                                 ruby.into_value(v.as_secs_f64())
                             }
-                            metrics::MetricUpdateVal::Duration(v) => {
+                            metrics::core::MetricUpdateVal::Duration(v) => {
                                 // As of this writing, https://github.com/matsadler/magnus/pull/136 not released, so we will do
                                 // the logic ourselves
                                 let val = v.as_millis();
@@ -471,10 +471,10 @@ fn convert_metric_event(
                                         .unwrap()
                                 }
                             }
-                            metrics::MetricUpdateVal::Delta(v) => ruby.into_value(v),
-                            metrics::MetricUpdateVal::DeltaF64(v) => ruby.into_value(v),
-                            metrics::MetricUpdateVal::Value(v) => ruby.into_value(v),
-                            metrics::MetricUpdateVal::ValueF64(v) => ruby.into_value(v),
+                            metrics::core::MetricUpdateVal::Delta(v) => ruby.into_value(v),
+                            metrics::core::MetricUpdateVal::DeltaF64(v) => ruby.into_value(v),
+                            metrics::core::MetricUpdateVal::Value(v) => ruby.into_value(v),
+                            metrics::core::MetricUpdateVal::ValueF64(v) => ruby.into_value(v),
                         },
                         // Attributes
                         attributes

@@ -32,19 +32,14 @@ use temporalio_common::protos::coresdk::{
 use temporalio_common::protos::temporal::api::history::v1::History;
 use temporalio_common::protos::temporal::api::worker::v1::PluginInfo;
 use temporalio_common::{
-    errors::{PollError, WorkflowErrorType},
-    worker::{
-        PollerBehavior, SlotInfo, SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext,
-        SlotReleaseContext, SlotReservationContext, SlotSupplier, SlotSupplierPermit,
-        WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerVersioningStrategy,
-    },
-};
-use temporalio_common::{
-    protos::coresdk::workflow_completion::WorkflowActivationCompletion, worker::WorkerTaskTypes,
+    protos::coresdk::workflow_completion::WorkflowActivationCompletion,
+    worker::{WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerTaskTypes},
 };
 use temporalio_sdk_core::{
-    ResourceBasedSlotsOptions, ResourceSlotOptions, SlotSupplierOptions, TunerHolder,
-    TunerHolderOptions, WorkerConfig,
+    PollError, PollerBehavior, ResourceBasedSlotsOptions, ResourceSlotOptions, SlotInfo,
+    SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext, SlotReleaseContext,
+    SlotReservationContext, SlotSupplier, SlotSupplierOptions, SlotSupplierPermit, TunerHolder,
+    TunerHolderOptions, WorkerConfig, WorkerVersioningStrategy, WorkflowErrorType,
     replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use tokio::sync::mpsc::{Sender, UnboundedSender, channel, unbounded_channel};
@@ -121,7 +116,7 @@ impl Worker {
         let worker = temporalio_sdk_core::init_worker(
             &client.runtime_handle.core,
             config,
-            client.core.clone().into_inner(),
+            client.core.clone(),
         )
         .map_err(|err| error!("Failed creating worker: {}", err))?;
 
@@ -144,20 +139,16 @@ impl Worker {
             // the stream with a None
             if let Some(worker) = worker {
                 let result = match worker_type {
-                    WorkerType::Activity => {
-                        match temporalio_common::Worker::poll_activity_task(&*worker).await {
-                            Ok(res) => Ok(Some(res.encode_to_vec())),
-                            Err(PollError::ShutDown) => Ok(None),
-                            Err(err) => Err(format!("Poll error: {err}")),
-                        }
-                    }
-                    WorkerType::Workflow => {
-                        match temporalio_common::Worker::poll_workflow_activation(&*worker).await {
-                            Ok(res) => Ok(Some(res.encode_to_vec())),
-                            Err(PollError::ShutDown) => Ok(None),
-                            Err(err) => Err(format!("Poll error: {err}")),
-                        }
-                    }
+                    WorkerType::Activity => match worker.poll_activity_task().await {
+                        Ok(res) => Ok(Some(res.encode_to_vec())),
+                        Err(PollError::ShutDown) => Ok(None),
+                        Err(err) => Err(format!("Poll error: {err}")),
+                    },
+                    WorkerType::Workflow => match worker.poll_workflow_activation().await {
+                        Ok(res) => Ok(Some(res.encode_to_vec())),
+                        Err(PollError::ShutDown) => Ok(None),
+                        Err(err) => Err(format!("Poll error: {err}")),
+                    },
                 };
                 let shutdown_next = matches!(result, Ok(None));
                 Some((
@@ -290,7 +281,7 @@ impl Worker {
                             format!("Expected 1 reference but got {}", Arc::strong_count(&arc))
                         })
                     })?;
-                Ok(temporalio_common::Worker::finalize_shutdown(worker))
+                Ok(worker.finalize_shutdown())
             })
             .filter_map(|fut_or_err| match fut_or_err {
                 Ok(fut) => Some(fut),
@@ -331,7 +322,7 @@ impl Worker {
         let callback = AsyncCallback::from_queue(queue);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         self.runtime_handle.spawn(
-            async move { temporalio_common::Worker::validate(&*worker).await },
+            async move { worker.validate().await },
             move |ruby, result| match result {
                 Ok(_namespace_info) => callback.push(&ruby, ruby.qnil()),
                 Err(err) => callback.push(&ruby, new_error!("Failed validating worker: {}", err)),
@@ -346,9 +337,7 @@ impl Worker {
         let completion = ActivityTaskCompletion::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
         self.runtime_handle.spawn(
-            async move {
-                temporalio_common::Worker::complete_activity_task(&*worker, completion).await
-            },
+            async move { worker.complete_activity_task(completion).await },
             move |ruby, result| match result {
                 Ok(()) => callback.push(&ruby, (ruby.qnil(),)),
                 Err(err) => callback.push(&ruby, (new_error!("Completion failure: {}", err),)),
@@ -362,7 +351,7 @@ impl Worker {
         let heartbeat = ActivityHeartbeat::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        temporalio_common::Worker::record_activity_heartbeat(&*worker, heartbeat);
+        worker.record_activity_heartbeat(heartbeat);
         Ok(())
     }
 
@@ -377,9 +366,7 @@ impl Worker {
         let completion = WorkflowActivationCompletion::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
         self.runtime_handle.spawn(
-            async move {
-                temporalio_common::Worker::complete_workflow_activation(&*worker, completion).await
-            },
+            async move { worker.complete_workflow_activation(completion).await },
             move |ruby, result| {
                 callback.push(
                     &ruby,
@@ -403,14 +390,14 @@ impl Worker {
         enter_sync!(self.runtime_handle);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         worker
-            .replace_client(client.core.clone().into_inner())
+            .replace_client(client.core.clone())
             .map_err(|err| error!("Failed replacing client: {}", err))
     }
 
     pub fn initiate_shutdown(&self) -> Result<(), Error> {
         enter_sync!(self.runtime_handle);
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        temporalio_common::Worker::initiate_shutdown(&*worker);
+        worker.initiate_shutdown();
         Ok(())
     }
 }

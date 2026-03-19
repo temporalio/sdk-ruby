@@ -766,6 +766,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.CountSchedules API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CountSchedulesRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CountSchedulesResponse] API response.
+        def count_schedules(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'count_schedules',
+            request_class: Temporalio::Api::WorkflowService::V1::CountSchedulesRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CountSchedulesResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.UpdateWorkerBuildIdCompatibility API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkerBuildIdCompatibilityRequest] API request.

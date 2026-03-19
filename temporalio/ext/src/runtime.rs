@@ -10,15 +10,13 @@ use std::str::FromStr;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
+use temporalio_common::telemetry::metrics::core::MetricCallBufferer;
 use temporalio_common::telemetry::{
-    HistogramBucketOverrides, OtelCollectorOptions, PrometheusExporterOptions, TelemetryOptions,
+    HistogramBucketOverrides, Logger, MetricTemporality, OtelCollectorOptions, OtlpProtocol,
+    PrometheusExporterOptions, TelemetryOptions, build_otlp_metric_exporter,
+    start_prometheus_metric_exporter,
 };
-use temporalio_common::telemetry::{
-    Logger, MetricTemporality, OtlpProtocol, metrics::MetricCallBufferer,
-};
-use temporalio_sdk_core::telemetry::{
-    MetricsCallBuffer, build_otlp_metric_exporter, start_prometheus_metric_exporter,
-};
+use temporalio_sdk_core::telemetry::MetricsCallBuffer;
 use temporalio_sdk_core::{CoreRuntime, RuntimeOptions, TokioRuntimeBuilder};
 use tracing::error as log_error;
 use url::Url;
@@ -56,7 +54,7 @@ pub(crate) struct RuntimeHandle {
 macro_rules! enter_sync {
     ($runtime:expr) => {
         if let Some(subscriber) = $runtime.core.telemetry().trace_subscriber() {
-            temporalio_sdk_core::telemetry::set_trace_subscriber_for_current_thread(subscriber);
+            temporalio_common::telemetry::set_trace_subscriber_for_current_thread(subscriber);
         }
         let _guard = $runtime.core.tokio_handle().enter();
     };
