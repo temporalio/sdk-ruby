@@ -17,6 +17,22 @@ module Temporalio
     TERMINATE_EXISTING: enum
   end
 
+  module ContinueAsNewVersioningBehavior
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    AUTO_UPGRADE: enum
+  end
+
+  module SuggestContinueAsNewReason
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    HISTORY_SIZE_TOO_LARGE: enum
+    TOO_MANY_HISTORY_EVENTS: enum
+    TOO_MANY_UPDATES: enum
+  end
+
   module VersioningBehavior
     type enum = Integer
 

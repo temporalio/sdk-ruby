@@ -618,4 +618,145 @@ class WorkerWorkflowVersioningTest < Test
       assert(execution_started_event.workflow_execution_started_event_attributes.versioning_override)
     end
   end
+
+  # V1: Pinned. Loops with timer, checking target_worker_deployment_version_changed?.
+  # When detected, CAN with AUTO_UPGRADE. Guard: if attempt > 0, return "v1.0".
+  class CanVersionUpgradeWorkflowV1 < Temporalio::Workflow::Definition
+    workflow_name :ContinueAsNewWithVersionUpgrade
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def execute(attempt)
+      return 'v1.0' if attempt.positive?
+
+      loop do
+        Temporalio::Workflow.sleep(0.01)
+        next unless Temporalio::Workflow.target_worker_deployment_version_changed?
+
+        raise Temporalio::Workflow::ContinueAsNewError.new(
+          attempt + 1,
+          initial_versioning_behavior: Temporalio::ContinueAsNewVersioningBehavior::AUTO_UPGRADE
+        )
+      end
+    end
+  end
+
+  # V2: Pinned. Just returns "v2.0".
+  class CanVersionUpgradeWorkflowV2 < Temporalio::Workflow::Definition
+    workflow_name :ContinueAsNewWithVersionUpgrade
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def execute(_attempt)
+      'v2.0'
+    end
+  end
+
+  def test_continue_as_new_with_version_upgrade
+    deployment_name = "deployment-can-upgrade-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
+    worker_v2 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '2.0'
+    )
+
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    worker1 = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      workflows: [CanVersionUpgradeWorkflowV1],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v1,
+        use_worker_versioning: true
+      )
+    )
+
+    worker2 = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      workflows: [CanVersionUpgradeWorkflowV2],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v2,
+        use_worker_versioning: true
+      )
+    )
+
+    Temporalio::Worker.run_all(worker1, worker2) do
+      # Wait for v1 deployment to be visible and set as current
+      describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
+      resp2 = set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+
+      # Wait for routing config propagation
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
+
+      # Start workflow on v1
+      handle = env.client.start_workflow(
+        'ContinueAsNewWithVersionUpgrade',
+        0,
+        id: "test-can-version-upgrade-#{SecureRandom.uuid}",
+        task_queue: task_queue
+      )
+
+      # Wait for workflow to be running on v1
+      wait_for_workflow_running_on_version(handle, worker_v1.build_id)
+
+      # Wait for v2 deployment to be visible
+      wait_until_worker_deployment_visible(env.client, worker_v2)
+
+      # Set v2 as current
+      set_current_deployment_version(env.client, resp2.conflict_token, worker_v2)
+
+      # Wait for routing config propagation
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v2.build_id)
+
+      # Expect workflow to CAN onto v2 and return "v2.0"
+      result = handle.result
+      assert_equal 'v2.0', result
+    end
+  end
+
+  def wait_for_workflow_running_on_version(handle, expected_build_id)
+    assert_eventually do
+      desc = handle.describe
+      assert_equal Temporalio::Client::WorkflowExecutionStatus::RUNNING, desc.status,
+                   "workflow not yet running (status: #{desc.status})"
+
+      versioning_info = desc.raw_description.workflow_execution_info&.versioning_info
+      assert versioning_info.respond_to?(:deployment_version),
+             'versioning_info does not have deployment_version'
+
+      assert_equal expected_build_id, versioning_info.deployment_version&.build_id
+    end
+  end
+
+  def wait_for_worker_deployment_routing_config_propagation(
+    client, deployment_name, expected_current_build_id, expected_ramping_build_id = ''
+  )
+    assert_eventually do
+      res = client.workflow_service.describe_worker_deployment(
+        Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest.new(
+          namespace: client.namespace,
+          deployment_name: deployment_name
+        )
+      )
+      info = res.worker_deployment_info
+      routing_config = info&.routing_config
+      assert routing_config, 'routing config not yet available'
+
+      assert_equal expected_current_build_id,
+                   routing_config.current_deployment_version&.build_id.to_s
+
+      assert_equal expected_ramping_build_id,
+                   routing_config.ramping_deployment_version&.build_id.to_s
+
+      state = info.routing_config_update_state
+      assert(
+        state == :ROUTING_CONFIG_UPDATE_STATE_COMPLETED ||
+          state == :ROUTING_CONFIG_UPDATE_STATE_UNSPECIFIED,
+        "routing config propagation not complete (state: #{state})"
+      )
+    rescue Temporalio::Error::RPCError
+      assert false, 'RPC error during routing config check'
+    end
+  end
 end

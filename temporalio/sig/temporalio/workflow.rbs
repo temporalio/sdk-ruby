@@ -8,6 +8,10 @@ module Temporalio
 
     def self.create_nexus_client: (endpoint: Symbol | String, service: Symbol | String) -> NexusClient
 
+    def self.suggest_continue_as_new_reasons: -> Array[SuggestContinueAsNewReason::enum]
+
+    def self.target_worker_deployment_version_changed?: -> bool
+
     def self.current_details: -> String
     def self.current_details=: (String? details) -> void
 
@@ -177,6 +181,7 @@ module Temporalio
       attr_accessor search_attributes: SearchAttributes?
       attr_accessor arg_hints: Array[Object]?
       attr_accessor headers: Hash[String, Object?]
+      attr_accessor initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?
 
       def initialize: (
         *Object? args,
@@ -188,7 +193,8 @@ module Temporalio
         ?memo: Hash[String | Symbol, Object?]?,
         ?search_attributes: SearchAttributes?,
         ?arg_hints: Array[Object]?,
-        ?headers: Hash[String, Object?]
+        ?headers: Hash[String, Object?],
+        ?initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?
       ) -> void
     end
 

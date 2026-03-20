@@ -54,6 +54,18 @@ module Temporalio
       _current.create_nexus_client(endpoint:, service:)
     end
 
+    # @return [Array<SuggestContinueAsNewReason::enum>] Reasons the server suggests continue-as-new. Empty if no
+    #   suggestion. This is currently experimental.
+    def self.suggest_continue_as_new_reasons
+      _current.suggest_continue_as_new_reasons
+    end
+
+    # @return [Boolean] Whether the target worker deployment version has changed from the one this workflow is running
+    #   on. This is currently experimental.
+    def self.target_worker_deployment_version_changed?
+      _current.target_worker_deployment_version_changed?
+    end
+
     # Get current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value
     # can be updated throughout the life of the workflow. This can be in Temporal markdown format and can span multiple
     # lines. This is currently experimental.
@@ -634,7 +646,8 @@ module Temporalio
     # Error that is raised by a workflow out of the primary workflow method to issue a continue-as-new.
     class ContinueAsNewError < Error
       attr_accessor :args, :workflow, :task_queue, :run_timeout, :task_timeout,
-                    :retry_policy, :memo, :search_attributes, :arg_hints, :headers
+                    :retry_policy, :memo, :search_attributes, :arg_hints, :headers,
+                    :initial_versioning_behavior
 
       # Create a continue as new error.
       #
@@ -657,6 +670,9 @@ module Temporalio
       #   workflow definition has arg hints, those are used by default.
       # @param headers [Hash<String, Object>] Headers for the workflow. The default is _not_ carried over from the
       #   current workflow.
+      # @param initial_versioning_behavior [ContinueAsNewVersioningBehavior::enum, nil] Versioning behavior for the
+      #   first task of the new run. Set to {ContinueAsNewVersioningBehavior::AUTO_UPGRADE} to upgrade a pinned workflow
+      #   to the latest version on continue-as-new. This is currently experimental.
       def initialize(
         *args,
         workflow: nil,
@@ -667,7 +683,8 @@ module Temporalio
         memo: nil,
         search_attributes: nil,
         arg_hints: nil,
-        headers: {}
+        headers: {},
+        initial_versioning_behavior: nil
       )
         super('Continue as new')
         @args = args
@@ -680,6 +697,7 @@ module Temporalio
         @search_attributes = search_attributes
         @arg_hints = arg_hints
         @headers = headers
+        @initial_versioning_behavior = initial_versioning_behavior
         Workflow._current.initialize_continue_as_new_error(self)
       end
     end

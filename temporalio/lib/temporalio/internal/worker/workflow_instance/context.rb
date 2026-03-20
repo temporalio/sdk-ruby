@@ -37,6 +37,14 @@ module Temporalio
             NexusClient.new(endpoint:, service:, outbound: @outbound)
           end
 
+          def suggest_continue_as_new_reasons
+            @instance.suggest_continue_as_new_reasons
+          end
+
+          def target_worker_deployment_version_changed?
+            @instance.target_worker_deployment_version_changed
+          end
+
           def current_details
             @instance.current_details || ''
           end

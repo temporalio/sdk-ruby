@@ -39,6 +39,35 @@ module Temporalio
     TERMINATE_EXISTING = Api::Enums::V1::WorkflowIdConflictPolicy::WORKFLOW_ID_CONFLICT_POLICY_TERMINATE_EXISTING
   end
 
+  # Specifies the versioning behavior for the first task of a new run after continue-as-new. This is currently
+  # experimental.
+  module ContinueAsNewVersioningBehavior
+    # Unspecified. Follow existing continue-as-new inheritance semantics.
+    UNSPECIFIED =
+      Api::Enums::V1::ContinueAsNewVersioningBehavior::CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_UNSPECIFIED
+    # Start the new run with AutoUpgrade behavior. Use the Target Version of the workflow's task queue at start-time.
+    # After the first workflow task completes, use whatever Versioning Behavior the workflow is annotated with in the
+    # workflow code.
+    AUTO_UPGRADE =
+      Api::Enums::V1::ContinueAsNewVersioningBehavior::CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_AUTO_UPGRADE
+  end
+
+  # Specifies why the server suggests continue-as-new. This is currently experimental.
+  module SuggestContinueAsNewReason
+    # Unspecified.
+    UNSPECIFIED =
+      Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_UNSPECIFIED
+    # Workflow History size is getting too large.
+    HISTORY_SIZE_TOO_LARGE =
+      Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_HISTORY_SIZE_TOO_LARGE
+    # Workflow History event count is getting too large.
+    TOO_MANY_HISTORY_EVENTS =
+      Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_TOO_MANY_HISTORY_EVENTS
+    # Workflow's count of completed plus in-flight updates is too large.
+    TOO_MANY_UPDATES =
+      Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_TOO_MANY_UPDATES
+  end
+
   # Specifies when a workflow might move from a worker of one Build Id to another.
   module VersioningBehavior
     # Unspecified versioning behavior. By default, workers opting into worker versioning will

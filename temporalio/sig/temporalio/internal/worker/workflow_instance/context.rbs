@@ -13,6 +13,10 @@ module Temporalio
 
           def create_nexus_client: (endpoint: Symbol | String, service: Symbol | String) -> Workflow::NexusClient
 
+          def suggest_continue_as_new_reasons: -> Array[SuggestContinueAsNewReason::enum]
+
+          def target_worker_deployment_version_changed?: -> bool
+
           def current_details: -> String
           def current_details=: (String? details) -> void
 
