@@ -27,6 +27,8 @@ module Temporalio
         attr_reader failure_converter: Converters::FailureConverter
         attr_reader cancellation: Cancellation
         attr_reader continue_as_new_suggested: bool
+        attr_reader suggest_continue_as_new_reasons: Array[SuggestContinueAsNewReason::enum]
+        attr_reader target_worker_deployment_version_changed: bool
         attr_reader current_history_length: Integer
         attr_reader current_history_size: Integer
         attr_reader replaying: bool

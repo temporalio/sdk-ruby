@@ -56,7 +56,9 @@ module Temporalio
                     :pending_timers, :pending_child_workflow_starts, :pending_child_workflows,
                     :pending_nexus_operation_starts, :pending_nexus_operations,
                     :pending_external_signals, :pending_external_cancels, :in_progress_handlers, :payload_converter,
-                    :failure_converter, :cancellation, :continue_as_new_suggested, :current_deployment_version,
+                    :failure_converter, :cancellation, :continue_as_new_suggested,
+                    :suggest_continue_as_new_reasons, :target_worker_deployment_version_changed,
+                    :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
                     :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity,
                     :in_query_or_validator
@@ -92,6 +94,8 @@ module Temporalio
           @interceptors = details.interceptors
           @cancellation, @cancellation_proc = Cancellation.new
           @continue_as_new_suggested = false
+          @suggest_continue_as_new_reasons = []
+          @target_worker_deployment_version_changed = false
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
@@ -176,6 +180,8 @@ module Temporalio
           @commands = []
           @current_activation_error = nil
           @continue_as_new_suggested = activation.continue_as_new_suggested
+          @suggest_continue_as_new_reasons = activation.suggest_continue_as_new_reasons.map(&:to_i)
+          @target_worker_deployment_version_changed = activation.target_worker_deployment_version_changed
           @current_deployment_version = WorkerDeploymentVersion._from_bridge(
             activation.deployment_version_for_current_task
           )
@@ -639,7 +645,8 @@ module Temporalio
                   memo: ProtoUtils.memo_to_proto_hash(err.memo, payload_converter),
                   headers: ProtoUtils.headers_to_proto_hash(err.headers, payload_converter),
                   search_attributes: err.search_attributes&._to_proto,
-                  retry_policy: err.retry_policy&._to_proto
+                  retry_policy: err.retry_policy&._to_proto,
+                  initial_versioning_behavior: err.initial_versioning_behavior || 0
                 )
               )
             )
