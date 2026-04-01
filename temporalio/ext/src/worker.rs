@@ -78,7 +78,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(DataTypeFunctions, TypedData)]
+#[derive(TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Worker", free_immediately)]
 pub struct Worker {
     // This needs to be a RefCell of an Option of an Arc because we need to
@@ -88,6 +88,14 @@ pub struct Worker {
     runtime_handle: RuntimeHandle,
     activity: bool,
     workflow: bool,
+}
+
+impl DataTypeFunctions for Worker {
+    fn free(self: Box<Self>) {
+        if self.runtime_handle.pid != std::process::id() {
+            std::mem::forget(self);
+        }
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -402,7 +410,7 @@ impl Worker {
     }
 }
 
-#[derive(DataTypeFunctions, TypedData)]
+#[derive(TypedData)]
 #[magnus(
     class = "Temporalio::Internal::Bridge::Worker::WorkflowReplayer",
     free_immediately
@@ -410,6 +418,14 @@ impl Worker {
 pub struct WorkflowReplayer {
     tx: Sender<HistoryForReplay>,
     runtime_handle: RuntimeHandle,
+}
+
+impl DataTypeFunctions for WorkflowReplayer {
+    fn free(self: Box<Self>) {
+        if self.runtime_handle.pid != std::process::id() {
+            std::mem::forget(self);
+        }
+    }
 }
 
 impl WorkflowReplayer {
