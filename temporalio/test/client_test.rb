@@ -235,6 +235,41 @@ class ClientTest < Test
     assert_equal 'started workflow', reader.read.strip
   end
 
+  def test_fork_with_runtime_gc
+    # When a process forks after a Temporal runtime is created, the child
+    # inherits the Tokio runtime's kqueue/epoll FDs.
+    # If the Runtime's Rust struct is freed (via GC or process exit), the
+    # CoreRuntime Drop tries to shut down Tokio, which wakes the I/O driver
+    # using the inherited (now invalid) FDs — causing a panic:
+    # "failed to wake I/O driver: Bad file descriptor".
+    #
+    # We throw errors explaining Temporal objects cannot be used across forks,
+    # but this would be obscured by the panic on fork exit.
+    #
+    # We create a standalone runtime, fork, null the reference in the child,
+    # and force GC to trigger extern_free on the inherited object.
+    pre_fork_runtime = Temporalio::Runtime.new
+
+    reader, writer = IO.pipe
+    pid = fork do
+      reader.close
+      # Drop the only reference and force GC to free the inherited Runtime.
+      # Without the fork-safe free, this triggers a Tokio panic.
+      pre_fork_runtime = nil
+      GC.start
+      writer.puts('child-ok')
+      exit! 0
+    rescue StandardError => e
+      writer.puts("child-error: #{e.message}")
+      exit! 1
+    end
+    _, status = Process.wait2(pid)
+    writer.close
+    result = reader.read.strip
+    refute status.signaled?, "Child killed by signal #{status.termsig} (likely Tokio I/O driver panic)"
+    assert_equal 'child-ok', result
+  end
+
   def test_binary_metadata
     orig_metadata = env.client.connection.rpc_metadata
 
