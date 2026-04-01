@@ -51,11 +51,19 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(DataTypeFunctions, TypedData)]
+#[derive(TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Client", free_immediately)]
 pub struct Client {
     pub(crate) core: Connection,
     pub(crate) runtime_handle: RuntimeHandle,
+}
+
+impl DataTypeFunctions for Client {
+    fn free(self: Box<Self>) {
+        if self.runtime_handle.pid != std::process::id() {
+            std::mem::forget(self);
+        }
+    }
 }
 
 #[macro_export]

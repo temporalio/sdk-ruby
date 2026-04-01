@@ -34,7 +34,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(DataTypeFunctions, TypedData)]
+#[derive(TypedData)]
 #[magnus(
     class = "Temporalio::Internal::Bridge::Testing::EphemeralServer",
     free_immediately
@@ -43,6 +43,14 @@ pub struct EphemeralServer {
     core: Mutex<Option<ephemeral_server::EphemeralServer>>,
     target: String,
     runtime_handle: RuntimeHandle,
+}
+
+impl DataTypeFunctions for EphemeralServer {
+    fn free(self: Box<Self>) {
+        if self.runtime_handle.pid != std::process::id() {
+            std::mem::forget(self);
+        }
+    }
 }
 
 impl EphemeralServer {

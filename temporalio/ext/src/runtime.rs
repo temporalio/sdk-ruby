@@ -34,13 +34,23 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     Ok(())
 }
 
-#[derive(DataTypeFunctions, TypedData)]
+#[derive(TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Runtime", free_immediately)]
 pub struct Runtime {
     /// Separate cloneable handle that can be referenced in other Rust objects.
     pub(crate) handle: RuntimeHandle,
     async_command_rx: Receiver<AsyncCommand>,
     metrics_call_buffer: Option<Arc<MetricsCallBuffer<BufferedMetricRef>>>,
+}
+
+impl DataTypeFunctions for Runtime {
+    fn free(self: Box<Self>) {
+        if self.handle.pid != std::process::id() {
+            // In a forked child, leak the entire struct to prevent Tokio's I/O
+            // driver from panicking with "Bad file descriptor" during shutdown.
+            std::mem::forget(self);
+        }
+    }
 }
 
 #[derive(Clone)]
