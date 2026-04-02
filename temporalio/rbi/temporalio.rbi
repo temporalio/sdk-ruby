@@ -785,7 +785,7 @@ end
 
 # Error raised by a client for a general RPC failure.
 class Temporalio::Error::RPCError < ::Temporalio::Error
-  sig { params(message: String, code: Integer, raw_grpc_status: T.nilable(T.untyped)).void }
+  sig { params(message: String, code: Integer, raw_grpc_status: T.untyped).void }
   def initialize(message, code:, raw_grpc_status:); end
 
   # @return [Code] Status code for the error.
@@ -1658,8 +1658,8 @@ class Temporalio::Client
   sig do
     params(
       query: T.nilable(String),
-      next_page_token: T.nilable(String),
       page_size: T.nilable(Integer),
+      next_page_token: T.nilable(String),
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
     ).returns(Temporalio::Client::ListWorkflowPage)
   end
@@ -2896,7 +2896,7 @@ class Temporalio::Client::WorkflowUpdateHandle
       id: String,
       workflow_id: String,
       workflow_run_id: T.nilable(String),
-      known_outcome: T.nilable(T.untyped),
+      known_outcome: T.untyped,
       result_hint: T.nilable(Object)
     ).void
   end
@@ -4898,11 +4898,11 @@ class Temporalio::Worker
       task_queue: String,
       activities: T::Array[T.any(Temporalio::Activity::Definition, T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition::Info)],
       workflows: T::Array[T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info)],
-      tuner: Tuner,
-      activity_executors: T::Hash[Symbol, Worker::ActivityExecutor],
-      workflow_executor: Worker::WorkflowExecutor,
-      plugins: T::Array[Plugin],
-      interceptors: T::Array[T.any(Interceptor::Activity, Interceptor::Workflow)],
+      tuner: Temporalio::Worker::Tuner,
+      activity_executors: T::Hash[Symbol, Temporalio::Worker::ActivityExecutor],
+      workflow_executor: Temporalio::Worker::WorkflowExecutor,
+      plugins: T::Array[Temporalio::Worker::Plugin],
+      interceptors: T::Array[T.any(Temporalio::Worker::Interceptor::Activity, Temporalio::Worker::Interceptor::Workflow)],
       identity: T.nilable(String),
       logger: Logger,
       max_cached_workflows: Integer,
@@ -4917,13 +4917,13 @@ class Temporalio::Worker
       max_task_queue_activities_per_second: T.nilable(Float),
       graceful_shutdown_period: Float,
       disable_eager_activity_execution: T::Boolean,
-      illegal_workflow_calls: T::Hash[String, T.any(Symbol, T::Array[T.any(Symbol, IllegalWorkflowCallValidator)], IllegalWorkflowCallValidator)],
+      illegal_workflow_calls: T::Hash[String, T.any(Symbol, T::Array[T.any(Symbol, Temporalio::Worker::IllegalWorkflowCallValidator)], Temporalio::Worker::IllegalWorkflowCallValidator)],
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
-      workflow_payload_codec_thread_pool: T.nilable(ThreadPool),
+      workflow_payload_codec_thread_pool: T.nilable(Temporalio::Worker::ThreadPool),
       unsafe_workflow_io_enabled: T::Boolean,
-      workflow_task_poller_behavior: PollerBehavior,
-      activity_task_poller_behavior: PollerBehavior,
-      deployment_options: Worker::DeploymentOptions,
+      workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior,
+      activity_task_poller_behavior: Temporalio::Worker::PollerBehavior,
+      deployment_options: Temporalio::Worker::DeploymentOptions,
       debug_mode: T::Boolean
     ).void
   end
@@ -4994,13 +4994,13 @@ class Temporalio::Worker
     sig { returns(String) }
     def default_build_id; end
 
-    sig { returns(Worker::DeploymentOptions) }
+    sig { returns(Temporalio::Worker::DeploymentOptions) }
     def default_deployment_options; end
 
     sig do
       type_parameters(:T)
         .params(
-          workers: Worker,
+          workers: Temporalio::Worker,
           cancellation: Temporalio::Cancellation,
           shutdown_signals: T::Array[T.any(String, Integer)],
           raise_in_block_on_shutdown: T.nilable(Exception),
@@ -7048,7 +7048,7 @@ end
 class Temporalio::Workflow::Future
   extend T::Sig
 
-  Elem = type_member(:out)
+  Elem = type_member
 
   sig { returns(T.nilable(Elem)) }
   def result; end
@@ -7764,7 +7764,7 @@ class Temporalio::Converters::PayloadConverter::Encoding
   sig { returns(String) }
   def encoding; end
 
-  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.nilable(T.untyped)) }
+  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.untyped) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
   sig { params(payload: T.untyped, hint: T.nilable(Object)).returns(T.nilable(Object)) }
