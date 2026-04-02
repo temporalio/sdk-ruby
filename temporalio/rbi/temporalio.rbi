@@ -120,7 +120,7 @@ class Temporalio::Activity::Context
   #
   # @param details [Array<Object>] Details to record with the heartbeat.
   # @param detail_hints [Array<Object>, nil] Hints to pass to converter.
-  sig { params(details: T.untyped, detail_hints: T.nilable(T::Array[Object])).void }
+  sig { params(details: T.nilable(Object), detail_hints: T.nilable(T::Array[Object])).void }
   def heartbeat(*details, detail_hints: nil); end
 
   # @return [Cancellation] Cancellation that is canceled when the activity is canceled.
@@ -1939,15 +1939,15 @@ class Temporalio::Client::Connection
   def options; end
 
   # @return [WorkflowService] Raw gRPC workflow service.
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Client::Connection::WorkflowService) }
   def workflow_service; end
 
   # @return [OperatorService] Raw gRPC operator service.
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Client::Connection::OperatorService) }
   def operator_service; end
 
   # @return [CloudService] Raw gRPC cloud service.
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Client::Connection::CloudService) }
   def cloud_service; end
 
   # @return [String] Target host this connection is connected to.
