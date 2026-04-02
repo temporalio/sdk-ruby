@@ -8,6 +8,44 @@ module Temporalio
   VERSION = T.let(T.unsafe(nil), String)
 end
 
+# Protobuf API types. Only commonly-referenced types are included here.
+# The full set of protobuf types is available via the google-protobuf gem.
+module Temporalio::Api; end
+module Temporalio::Api::Common; end
+module Temporalio::Api::Common::V1; end
+class Temporalio::Api::Common::V1::Payload
+  extend T::Sig
+
+  sig { params(kwargs: T.untyped).void }
+  def initialize(**kwargs); end
+
+  sig { returns(T::Hash[String, String]) }
+  def metadata; end
+
+  sig { returns(String) }
+  def data; end
+
+  sig { returns(String) }
+  def to_proto; end
+
+  class << self
+    extend T::Sig
+
+    sig { params(data: String).returns(Temporalio::Api::Common::V1::Payload) }
+    def decode(data); end
+  end
+end
+
+class Temporalio::Api::Common::V1::Payloads
+  extend T::Sig
+
+  sig { params(kwargs: T.untyped).void }
+  def initialize(**kwargs); end
+
+  sig { returns(T::Array[Temporalio::Api::Common::V1::Payload]) }
+  def payloads; end
+end
+
 # All activity related classes.
 module Temporalio::Activity; end
 
