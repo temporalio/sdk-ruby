@@ -1411,6 +1411,43 @@ Now can run `steep`:
 
     bundle exec rake steep
 
+### Maintaining Type Signatures
+
+The SDK ships two sets of type signatures:
+
+* **RBS** (`sig/`) -- Source-of-truth types validated by Steep in CI. Update these whenever a public API changes.
+* **RBI** (`rbi/temporalio.rbi`) -- Enriched Sorbet types derived from the RBS signatures. Must be updated manually
+  when the RBS changes (see below).
+
+The RBI file is validated in CI by running `srb tc` against `extra/sorbet_check/check_types.rb`. If a public API
+signature changes and the RBI is not updated, this check will fail.
+
+**When adding or changing a public method:**
+
+1. Update the RBS file in `sig/` as usual. Verify with `bundle exec rake steep`.
+2. Update `rbi/temporalio.rbi` to match. Apply the following type mappings:
+
+   | RBS | RBI (Sorbet) |
+   |-----|-------------|
+   | `String?` | `T.nilable(String)` |
+   | `Integer \| Float` / `duration` | `T.any(Integer, Float)` |
+   | `singleton(Foo)` | `T.class_of(Foo)` |
+   | `bool` | `T::Boolean` |
+   | `untyped` | `T.untyped` |
+   | `Array[X]` | `T::Array[X]` |
+   | `Hash[K, V]` | `T::Hash[K, V]` |
+   | `X \| Y` | `T.any(X, Y)` |
+   | Enum `::enum` | `Integer` |
+
+3. If the new method is important for users, add a usage example to `extra/sorbet_check/check_types.rb`.
+4. Run the Sorbet check: `cd extra/sorbet_check && bundle exec srb tc`.
+
+**What NOT to include in the RBI:**
+* `Temporalio::Internal::*` types (excluded entirely)
+* Methods prefixed with `_` (internal use only)
+* `Temporalio::Api::*` protobuf types (except `Api::Common::V1::Payload` and `Payloads` which users reference in
+  custom codecs)
+
 ### Proto Generation
 
 Run:
