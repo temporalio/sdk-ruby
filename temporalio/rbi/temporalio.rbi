@@ -8,8 +8,6 @@ module Temporalio
   VERSION = T.let(T.unsafe(nil), String)
 end
 
-# Protobuf API types. Only commonly-referenced types are included here.
-# The full set of protobuf types is available via the google-protobuf gem.
 module Temporalio::Api; end
 module Temporalio::Api::Common; end
 module Temporalio::Api::Common::V1; end
@@ -46,11 +44,8 @@ class Temporalio::Api::Common::V1::Payloads
   def payloads; end
 end
 
-# All activity related classes.
 module Temporalio::Activity; end
 
-# Details that are set when an activity is cancelled. This is only valid at the time the cancel was received, the
-# state may change on the server after it is received.
 class Temporalio::Activity::CancellationDetails
   sig do
     params(
@@ -64,160 +59,99 @@ class Temporalio::Activity::CancellationDetails
   end
   def initialize(gone_from_server: false, cancel_requested: false, timed_out: false, worker_shutdown: false, paused: false, reset: false); end
 
-  # @return [Boolean] Whether the activity no longer exists on the server (may already be completed or its workflow
-  #   may be completed).
   sig { returns(T::Boolean) }
   def gone_from_server?; end
 
-  # @return [Boolean] Whether the activity was explicitly cancelled.
   sig { returns(T::Boolean) }
   def cancel_requested?; end
 
-  # @return [Boolean] Whether the activity timeout caused activity to be marked cancelled.
   sig { returns(T::Boolean) }
   def timed_out?; end
 
-  # @return [Boolean] Whether the worker the activity is running on is shutting down.
   sig { returns(T::Boolean) }
   def worker_shutdown?; end
 
-  # @return [Boolean] Whether the activity was explicitly paused.
   sig { returns(T::Boolean) }
   def paused?; end
 
-  # @return [Boolean] Whether the activity was explicitly reset.
   sig { returns(T::Boolean) }
   def reset?; end
 end
 
-# Error raised inside an activity to mark that the activity will be completed asynchronously.
 class Temporalio::Activity::CompleteAsyncError < ::Temporalio::Error; end
 
-# Context accessible only within an activity. Use {current} to get the current context. Contexts are fiber or thread
-# local so may not be available in a newly started thread from an activity and may have to be propagated manually.
 class Temporalio::Activity::Context
-  # @return [Context] The current context, or raises an error if not in activity fiber/thread.
   sig { returns(Temporalio::Activity::Context) }
   def self.current; end
 
-  # @return [Context, nil] The current context or nil if not in activity fiber/thread.
   sig { returns(T.nilable(Temporalio::Activity::Context)) }
   def self.current_or_nil; end
 
-  # @return [Boolean] Whether there is a current context available.
   sig { returns(T::Boolean) }
   def self.exist?; end
 
-  # @return [Info] Activity info for this activity.
   sig { returns(Temporalio::Activity::Info) }
   def info; end
 
-  # @return [Object, nil] Activity class instance.
   sig { returns(T.nilable(Temporalio::Activity::Definition)) }
   def instance; end
 
-  # Record a heartbeat on the activity.
-  #
-  # @param details [Array<Object>] Details to record with the heartbeat.
-  # @param detail_hints [Array<Object>, nil] Hints to pass to converter.
   sig { params(details: T.nilable(Object), detail_hints: T.nilable(T::Array[Object])).void }
   def heartbeat(*details, detail_hints: nil); end
 
-  # @return [Cancellation] Cancellation that is canceled when the activity is canceled.
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
 
-  # @return [CancellationDetails, nil] Cancellation details if canceled.
   sig { returns(T.nilable(Temporalio::Activity::CancellationDetails)) }
   def cancellation_details; end
 
-  # @return [Cancellation] Cancellation that is canceled when the worker is shutting down.
   sig { returns(Temporalio::Cancellation) }
   def worker_shutdown_cancellation; end
 
-  # @return [Converters::PayloadConverter] Payload converter associated with this activity.
   sig { returns(Temporalio::Converters::PayloadConverter) }
   def payload_converter; end
 
-  # @return [ScopedLogger] Logger for this activity.
   sig { returns(Temporalio::ScopedLogger) }
   def logger; end
 
-  # @return [Metric::Meter] Metric meter to create metrics on, with some activity-specific attributes already set.
   sig { returns(Temporalio::Metric::Meter) }
   def metric_meter; end
 
-  # @return [Client] Temporal client this activity worker is running in.
   sig { returns(Temporalio::Client) }
   def client; end
 end
 
-# Base class for all activities.
-#
-# Activities can be given to a worker as instances of this class, which will call execute on the same instance for
-# each execution, or given to the worker as the class itself which instantiates the activity for each execution.
 class Temporalio::Activity::Definition
-  # Implementation of the activity.
   sig { params(args: T.untyped).returns(T.untyped) }
   def execute(*args); end
 
   class << self
     protected
 
-    # Override the activity name which is defaulted to the unqualified class name.
-    #
-    # @param name [String, Symbol] Name to use.
     sig { params(name: T.any(String, Symbol)).void }
     def activity_name(name); end
 
-    # Override the activity executor which is defaulted to `:default`.
-    #
-    # @param executor_name [Symbol] Executor to use.
     sig { params(executor_name: Symbol).void }
     def activity_executor(executor_name); end
 
-    # Override whether the activity uses Thread/Fiber raise for cancellation which is defaulted to true.
-    #
-    # @param cancel_raise [Boolean] Whether to raise.
     sig { params(cancel_raise: T::Boolean).void }
     def activity_cancel_raise(cancel_raise); end
 
-    # Set an activity as dynamic.
-    #
-    # @param value [Boolean] Whether the activity is dynamic.
     sig { params(value: T::Boolean).void }
     def activity_dynamic(value = true); end
 
-    # Have activity arguments delivered to `execute` as {Converters::RawValue}s.
-    #
-    # @param value [Boolean] Whether the activity accepts raw arguments.
     sig { params(value: T::Boolean).void }
     def activity_raw_args(value = true); end
 
-    # Add activity hints to be passed to converter for activity args.
-    #
-    # @param hints [Array<Object>] Hints to add.
     sig { params(hints: Object).void }
     def activity_arg_hint(*hints); end
 
-    # Set activity result hint to be passed to converter for activity result.
-    #
-    # @param hint [Object] Hint to set.
     sig { params(hint: T.nilable(Object)).void }
     def activity_result_hint(hint); end
   end
 end
 
-# Definition info of an activity. Activities are usually classes/instances that extend {Definition}, but
-# definitions can also be manually created with a block via {initialize} here.
 class Temporalio::Activity::Definition::Info
-  # @param name [String, Symbol, nil] Name of the activity or nil for dynamic activity.
-  # @param instance [Object, Proc, nil] The pre-created instance or the proc to create/return it.
-  # @param executor [Symbol] Name of the executor.
-  # @param cancel_raise [Boolean] Whether to raise in thread/fiber on cancellation.
-  # @param raw_args [Boolean] Whether to use {Converters::RawValue}s as arguments.
-  # @param arg_hints [Array<Object>, nil] Argument hints.
-  # @param result_hint [Object, nil] Result hint.
   sig do
     params(
       name: T.nilable(T.any(String, Symbol)),
@@ -232,50 +166,34 @@ class Temporalio::Activity::Definition::Info
   end
   def initialize(name:, instance: nil, executor: :default, cancel_raise: true, raw_args: false, arg_hints: nil, result_hint: nil, &block); end
 
-  # Obtain definition info representing the given activity.
-  #
-  # @param activity [Definition, Class<Definition>, Info] Activity to get info for.
-  # @return [Info] Obtained definition info.
   sig { params(activity: T.any(Temporalio::Activity::Definition, T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition::Info)).returns(Temporalio::Activity::Definition::Info) }
   def self.from_activity(activity); end
 
-  # @return [String, Symbol, nil] Name of the activity, or nil if the activity is dynamic.
   sig { returns(T.nilable(T.any(String, Symbol))) }
   def name; end
 
-  # @return [Object, Proc, nil] The pre-created instance or the proc to create/return it.
   sig { returns(T.nilable(T.any(Object, Proc))) }
   def instance; end
 
-  # @return [Proc] Proc for the activity.
   sig { returns(Proc) }
   def proc; end
 
-  # @return [Symbol] Name of the executor. Default is `:default`.
   sig { returns(Symbol) }
   def executor; end
 
-  # @return [Boolean] Whether to raise in thread/fiber on cancellation. Default is `true`.
   sig { returns(T::Boolean) }
   def cancel_raise; end
 
-  # @return [Boolean] Whether to use {Converters::RawValue}s as arguments.
   sig { returns(T::Boolean) }
   def raw_args; end
 
-  # @return [Array<Object>, nil] Argument hints.
   sig { returns(T.nilable(T::Array[Object])) }
   def arg_hints; end
 
-  # @return [Object, nil] Result hint.
   sig { returns(T.nilable(Object)) }
   def result_hint; end
 end
 
-# Information about an activity.
-#
-# @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate this
-#   class or it may break in incompatible ways.
 class Temporalio::Activity::Info < ::Data
   sig do
     params(
@@ -302,86 +220,63 @@ class Temporalio::Activity::Info < ::Data
   end
   def initialize(activity_id:, activity_type:, attempt:, current_attempt_scheduled_time:, heartbeat_timeout:, local:, priority:, raw_heartbeat_details:, retry_policy:, schedule_to_close_timeout:, scheduled_time:, start_to_close_timeout:, started_time:, task_queue:, task_token:, workflow_id:, workflow_namespace:, workflow_run_id:, workflow_type:); end
 
-  # @return [String] ID for the activity.
   sig { returns(String) }
   def activity_id; end
 
-  # @return [String] Type name for the activity.
   sig { returns(String) }
   def activity_type; end
 
-  # @return [Integer] Attempt the activity is on.
   sig { returns(Integer) }
   def attempt; end
 
-  # @return [Time] When the current attempt was scheduled.
   sig { returns(Time) }
   def current_attempt_scheduled_time; end
 
-  # Convert raw heartbeat details into Ruby types.
-  #
-  # @param hints [Array<Object>, nil] Hints, if any, to assist conversion.
-  # @return [Array<Object>] Converted details.
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: nil); end
 
-  # @return [Float, nil] Heartbeat timeout set by the caller.
   sig { returns(T.nilable(Float)) }
   def heartbeat_timeout; end
 
-  # @return [Boolean] Whether the activity is a local activity or not.
   sig { returns(T::Boolean) }
   def local?; end
 
-  # @return [Priority] The priority of this activity.
   sig { returns(Temporalio::Priority) }
   def priority; end
 
-  # @return [Array<Converter::RawValue>] Raw details from the last heartbeat of the last attempt.
   sig { returns(T::Array[Temporalio::Converters::RawValue]) }
   def raw_heartbeat_details; end
 
-  # @return [RetryPolicy, nil] Retry policy for the activity.
   sig { returns(T.nilable(Temporalio::RetryPolicy)) }
   def retry_policy; end
 
-  # @return [Float, nil] Schedule to close timeout set by the caller.
   sig { returns(T.nilable(Float)) }
   def schedule_to_close_timeout; end
 
-  # @return [Time] When the activity was scheduled.
   sig { returns(Time) }
   def scheduled_time; end
 
-  # @return [Float, nil] Start to close timeout set by the caller.
   sig { returns(T.nilable(Float)) }
   def start_to_close_timeout; end
 
-  # @return [Time] When the activity started.
   sig { returns(Time) }
   def started_time; end
 
-  # @return [String] Task queue this activity is on.
   sig { returns(String) }
   def task_queue; end
 
-  # @return [String] Task token uniquely identifying this activity.
   sig { returns(String) }
   def task_token; end
 
-  # @return [String] Workflow ID that started this activity.
   sig { returns(String) }
   def workflow_id; end
 
-  # @return [String] Namespace this activity is on.
   sig { returns(String) }
   def workflow_namespace; end
 
-  # @return [String] Workflow run ID that started this activity.
   sig { returns(String) }
   def workflow_run_id; end
 
-  # @return [String] Workflow type name that started this activity.
   sig { returns(String) }
   def workflow_type; end
 
@@ -397,48 +292,31 @@ class Temporalio::Activity::Info < ::Data
   end
 end
 
-# Cancellation token/signal. Can be used to cancel operations and wait for cancellation.
 class Temporalio::Cancellation
-  # Create a new cancellation.
-  #
-  # This is usually created and destructured into a tuple with the second value being the proc to invoke to cancel.
-  # For example: `cancel, cancel_proc = Temporalio::Cancellation.new`.
-  #
-  # @param parents [Array<Cancellation>] Parent cancellations to link this one to.
   sig { params(parents: Temporalio::Cancellation).void }
   def initialize(*parents); end
 
-  # @return [Boolean] Whether this cancellation is canceled.
   sig { returns(T::Boolean) }
   def canceled?; end
 
-  # @return [String, nil] Reason for cancellation. Can be nil if not canceled or no reason provided.
   sig { returns(T.nilable(String)) }
   def canceled_reason; end
 
-  # @return [Boolean] Whether a cancel is pending but currently shielded.
   sig { returns(T::Boolean) }
   def pending_canceled?; end
 
-  # @return [String, nil] Reason for pending cancellation. Can be nil if not pending canceled or no reason provided.
   sig { returns(T.nilable(String)) }
   def pending_canceled_reason; end
 
-  # Raise an error if this cancellation is canceled.
-  #
-  # @param err [Exception] Error to raise.
   sig { params(err: Exception).void }
   def check!(err = T.unsafe(nil)); end
 
-  # @return [Array(Cancellation, Proc)] Self and a proc to call to cancel.
   sig { returns([Temporalio::Cancellation, Proc]) }
   def to_ary; end
 
-  # Wait on this to be canceled.
   sig { void }
   def wait; end
 
-  # Shield the given block from cancellation.
   sig do
     type_parameters(:T)
       .params(blk: T.proc.returns(T.type_parameter(:T)))
@@ -446,59 +324,35 @@ class Temporalio::Cancellation
   end
   def shield(&blk); end
 
-  # Advanced call to invoke a block on cancel.
-  #
-  # @note WARNING: This is advanced API, users should use {wait} or similar.
-  # @return [Object] Key that can be used with {remove_cancel_callback} or nil if run immediately.
   sig { params(block: T.proc.void).returns(Object) }
   def add_cancel_callback(&block); end
 
-  # Remove a cancel callback using the key returned from {add_cancel_callback}.
-  #
-  # @param key [Object] Key returned from {add_cancel_callback}.
   sig { params(key: Object).void }
   def remove_cancel_callback(key); end
 end
 
-# Base error class for all Temporal errors.
 class Temporalio::Error < ::StandardError
-  # Whether the error represents some form of cancellation from an activity or workflow.
-  #
-  # @param error [Exception] Error to check.
-  # @return [Boolean] True if some form of canceled, false otherwise.
   sig { params(error: Exception).returns(T::Boolean) }
   def self.canceled?(error); end
 end
 
-# Base class for all Temporal serializable failures.
 class Temporalio::Error::Failure < ::Temporalio::Error; end
 
-# Error raised by a client or workflow when a workflow execution has already started.
 class Temporalio::Error::WorkflowAlreadyStartedError < ::Temporalio::Error::Failure
   sig { params(workflow_id: String, workflow_type: String, run_id: T.nilable(String)).void }
   def initialize(workflow_id:, workflow_type:, run_id:); end
 
-  # @return [String] ID of the already-started workflow.
   sig { returns(String) }
   def workflow_id; end
 
-  # @return [String] Workflow type name of the already-started workflow.
   sig { returns(String) }
   def workflow_type; end
 
-  # @return [String, nil] Run ID of the already-started workflow if this was raised by the client.
   sig { returns(T.nilable(String)) }
   def run_id; end
 end
 
-# Error raised during workflow/activity execution.
 class Temporalio::Error::ApplicationError < ::Temporalio::Error::Failure
-  # @param message [String] Error message.
-  # @param details [Array<Object, nil>] Error details.
-  # @param type [String, nil] Error type.
-  # @param non_retryable [Boolean] Whether this error should be considered non-retryable.
-  # @param next_retry_delay [Float, nil] Specific amount of time to delay before next retry.
-  # @param category [Category] Error category.
   sig do
     params(
       message: String,
@@ -511,58 +365,46 @@ class Temporalio::Error::ApplicationError < ::Temporalio::Error::Failure
   end
   def initialize(message, *details, type: nil, non_retryable: false, next_retry_delay: nil, category: T.unsafe(nil)); end
 
-  # @return [Array<Object, nil>] User-defined details on the error.
   sig { returns(T::Array[T.nilable(Object)]) }
   def details; end
 
-  # @return [String, nil] General error type.
   sig { returns(T.nilable(String)) }
   def type; end
 
-  # @return [Boolean] Whether the error was set as non-retryable when created.
   sig { returns(T::Boolean) }
   def non_retryable; end
 
-  # @return [Float, nil] Delay in seconds before the next activity retry attempt.
   sig { returns(T.nilable(T.any(Integer, Float))) }
   def next_retry_delay; end
 
-  # @return [Category] Error category.
   sig { returns(Integer) }
   def category; end
 
-  # @return [Boolean] Inverse of {non_retryable}.
   sig { returns(T::Boolean) }
   def retryable?; end
 end
 
-# Error category.
 module Temporalio::Error::ApplicationError::Category
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
   BENIGN = T.let(T.unsafe(nil), Integer)
 end
 
-# Error raised on workflow/activity cancellation.
 class Temporalio::Error::CanceledError < ::Temporalio::Error::Failure
   sig { params(message: String, details: T::Array[T.nilable(Object)]).void }
   def initialize(message, details: []); end
 
-  # @return [Array<Object?>] User-defined details on the error.
   sig { returns(T::Array[T.nilable(Object)]) }
   def details; end
 end
 
-# Error raised on workflow termination.
 class Temporalio::Error::TerminatedError < ::Temporalio::Error::Failure
   sig { params(message: String, details: T::Array[T.nilable(Object)]).void }
   def initialize(message, details:); end
 
-  # @return [Array<Object?>] User-defined details on the error.
   sig { returns(T::Array[T.nilable(Object)]) }
   def details; end
 end
 
-# Error raised on workflow/activity timeout.
 class Temporalio::Error::TimeoutError < ::Temporalio::Error::Failure
   sig do
     params(
@@ -573,16 +415,13 @@ class Temporalio::Error::TimeoutError < ::Temporalio::Error::Failure
   end
   def initialize(message, type:, last_heartbeat_details:); end
 
-  # @return [TimeoutType] Type of timeout error.
   sig { returns(Integer) }
   def type; end
 
-  # @return [Array<Object>] Last heartbeat details if this is for an activity heartbeat.
   sig { returns(T::Array[T.nilable(Object)]) }
   def last_heartbeat_details; end
 end
 
-# Type of timeout error.
 module Temporalio::Error::TimeoutError::TimeoutType
   START_TO_CLOSE = T.let(T.unsafe(nil), Integer)
   SCHEDULE_TO_START = T.let(T.unsafe(nil), Integer)
@@ -590,21 +429,17 @@ module Temporalio::Error::TimeoutError::TimeoutType
   HEARTBEAT = T.let(T.unsafe(nil), Integer)
 end
 
-# Error originating in the Temporal server.
 class Temporalio::Error::ServerError < ::Temporalio::Error::Failure
   sig { params(message: String, non_retryable: T::Boolean).void }
   def initialize(message, non_retryable:); end
 
-  # @return [Boolean] Whether this error is non-retryable.
   sig { returns(T::Boolean) }
   def non_retryable; end
 
-  # @return [Boolean] Inverse of {non_retryable}.
   sig { returns(T::Boolean) }
   def retryable?; end
 end
 
-# Current retry state of the workflow/activity during error.
 module Temporalio::Error::RetryState
   IN_PROGRESS = T.let(T.unsafe(nil), Integer)
   NON_RETRYABLE_FAILURE = T.let(T.unsafe(nil), Integer)
@@ -615,7 +450,6 @@ module Temporalio::Error::RetryState
   CANCEL_REQUESTED = T.let(T.unsafe(nil), Integer)
 end
 
-# Error raised on activity failure.
 class Temporalio::Error::ActivityError < ::Temporalio::Error::Failure
   sig do
     params(
@@ -630,32 +464,25 @@ class Temporalio::Error::ActivityError < ::Temporalio::Error::Failure
   end
   def initialize(message, scheduled_event_id:, started_event_id:, identity:, activity_type:, activity_id:, retry_state:); end
 
-  # @return [Integer] Scheduled event ID for this activity.
   sig { returns(Integer) }
   def scheduled_event_id; end
 
-  # @return [Integer] Started event ID for this activity.
   sig { returns(Integer) }
   def started_event_id; end
 
-  # @return [String] Client/worker identity.
   sig { returns(String) }
   def identity; end
 
-  # @return [String] Activity type name.
   sig { returns(String) }
   def activity_type; end
 
-  # @return [String] Activity ID.
   sig { returns(String) }
   def activity_id; end
 
-  # @return [RetryState, nil] Retry state.
   sig { returns(T.nilable(Integer)) }
   def retry_state; end
 end
 
-# Error raised on child workflow failure.
 class Temporalio::Error::ChildWorkflowError < ::Temporalio::Error::Failure
   sig do
     params(
@@ -671,38 +498,28 @@ class Temporalio::Error::ChildWorkflowError < ::Temporalio::Error::Failure
   end
   def initialize(message, namespace:, workflow_id:, run_id:, workflow_type:, initiated_event_id:, started_event_id:, retry_state:); end
 
-  # @return [String] Child workflow namespace.
   sig { returns(String) }
   def namespace; end
 
-  # @return [String] Child workflow ID.
   sig { returns(String) }
   def workflow_id; end
 
-  # @return [String] Child workflow run ID.
   sig { returns(String) }
   def run_id; end
 
-  # @return [String] Child workflow type name.
   sig { returns(String) }
   def workflow_type; end
 
-  # @return [Integer] Child workflow initiated event ID.
   sig { returns(Integer) }
   def initiated_event_id; end
 
-  # @return [Integer] Child workflow started event ID.
   sig { returns(Integer) }
   def started_event_id; end
 
-  # @return [RetryState, nil] Retry state.
   sig { returns(T.nilable(Integer)) }
   def retry_state; end
 end
 
-# Error raised on Nexus operation failure.
-#
-# WARNING: Nexus support is experimental.
 class Temporalio::Error::NexusOperationError < ::Temporalio::Error::Failure
   sig do
     params(
@@ -715,26 +532,19 @@ class Temporalio::Error::NexusOperationError < ::Temporalio::Error::Failure
   end
   def initialize(message, endpoint:, service:, operation:, operation_token:); end
 
-  # @return [String] Nexus endpoint.
   sig { returns(String) }
   def endpoint; end
 
-  # @return [String] Nexus service.
   sig { returns(String) }
   def service; end
 
-  # @return [String] Nexus operation.
   sig { returns(String) }
   def operation; end
 
-  # @return [String, nil] Operation token for async operations.
   sig { returns(T.nilable(String)) }
   def operation_token; end
 end
 
-# Error raised from a Nexus handler.
-#
-# WARNING: Nexus support is experimental.
 class Temporalio::Error::NexusHandlerError < ::Temporalio::Error::Failure
   sig do
     params(
@@ -745,97 +555,76 @@ class Temporalio::Error::NexusHandlerError < ::Temporalio::Error::Failure
   end
   def initialize(message, error_type:, retry_behavior:); end
 
-  # @return [Symbol] Error type from the handler.
   sig { returns(Symbol) }
   def error_type; end
 
-  # @return [RetryBehavior] Retry behavior for the error.
   sig { returns(Integer) }
   def retry_behavior; end
 end
 
-# Nexus handler error retry behavior.
 module Temporalio::Error::NexusHandlerError::RetryBehavior
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
   RETRYABLE = T.let(T.unsafe(nil), Integer)
   NON_RETRYABLE = T.let(T.unsafe(nil), Integer)
 end
 
-# Error that occurs when an async activity handle tries to heartbeat and the activity is marked as canceled.
 class Temporalio::Error::AsyncActivityCanceledError < ::Temporalio::Error
   sig { params(details: Temporalio::Activity::CancellationDetails).void }
   def initialize(details); end
 
-  # @return [Activity::CancellationDetails]
   sig { returns(Temporalio::Activity::CancellationDetails) }
   def details; end
 end
 
-# Error that is returned when a workflow is unsuccessful.
 class Temporalio::Error::WorkflowFailedError < ::Temporalio::Error
   sig { params(message: T.nilable(String)).void }
   def initialize(message = nil); end
 end
 
-# Error that occurs when a workflow was continued as new.
 class Temporalio::Error::WorkflowContinuedAsNewError < ::Temporalio::Error
   sig { params(new_run_id: String).void }
   def initialize(new_run_id:); end
 
-  # @return [String] New execution run ID the workflow continued to.
   sig { returns(String) }
   def new_run_id; end
 end
 
-# Error that occurs when a query fails.
 class Temporalio::Error::WorkflowQueryFailedError < ::Temporalio::Error; end
 
-# Error that occurs when a query was rejected.
 class Temporalio::Error::WorkflowQueryRejectedError < ::Temporalio::Error
   sig { params(status: Integer).void }
   def initialize(status:); end
 
-  # @return [Client::WorkflowExecutionStatus] Workflow execution status causing rejection.
   sig { returns(Integer) }
   def status; end
 end
 
-# Error that occurs when an update fails.
 class Temporalio::Error::WorkflowUpdateFailedError < ::Temporalio::Error
   sig { void }
   def initialize; end
 end
 
-# Error that occurs when update RPC call times out or is canceled.
-#
-# @note This is not related to any general concept of timing out or cancelling a running update, this is only
-#   related to the client call itself.
 class Temporalio::Error::WorkflowUpdateRPCTimeoutOrCanceledError < ::Temporalio::Error
   sig { void }
   def initialize; end
 end
 
-# Error when a schedule is already running.
 class Temporalio::Error::ScheduleAlreadyRunningError < ::Temporalio::Error
   sig { void }
   def initialize; end
 end
 
-# Error raised by a client for a general RPC failure.
 class Temporalio::Error::RPCError < ::Temporalio::Error
   sig { params(message: String, code: Integer, raw_grpc_status: T.untyped).void }
   def initialize(message, code:, raw_grpc_status:); end
 
-  # @return [Code] Status code for the error.
   sig { returns(Integer) }
   def code; end
 
-  # @return [Api::Common::V1::GrpcStatus] Status of the gRPC call with details.
   sig { returns(T.untyped) }
   def grpc_status; end
 end
 
-# Status code for RPC errors. These are gRPC status codes.
 module Temporalio::Error::RPCError::Code
   OK = T.let(T.unsafe(nil), Integer)
   CANCELED = T.let(T.unsafe(nil), Integer)
@@ -856,12 +645,7 @@ module Temporalio::Error::RPCError::Code
   UNAUTHENTICATED = T.let(T.unsafe(nil), Integer)
 end
 
-# Priority contains metadata that controls relative ordering of task processing when tasks are
-# backlogged in a queue.
 class Temporalio::Priority < ::Data
-  # @param priority_key [Integer, nil] The priority key.
-  # @param fairness_key [String, nil] The fairness key.
-  # @param fairness_weight [Float, nil] The fairness weight.
   sig do
     params(
       priority_key: T.nilable(Integer),
@@ -871,25 +655,18 @@ class Temporalio::Priority < ::Data
   end
   def initialize(priority_key: nil, fairness_key: nil, fairness_weight: nil); end
 
-  # The default priority instance.
-  #
-  # @return [Priority] The default priority.
   sig { returns(Temporalio::Priority) }
   def self.default; end
 
-  # @return [Integer, nil] The priority key.
   sig { returns(T.nilable(Integer)) }
   def priority_key; end
 
-  # @return [String, nil] The fairness key.
   sig { returns(T.nilable(String)) }
   def fairness_key; end
 
-  # @return [Float, nil] The fairness weight.
   sig { returns(T.nilable(Float)) }
   def fairness_weight; end
 
-  # @return [Boolean] True if this priority is empty/default.
   sig { returns(T::Boolean) }
   def empty?; end
 
@@ -905,15 +682,7 @@ class Temporalio::Priority < ::Data
   end
 end
 
-# Options for retrying workflows and activities.
 class Temporalio::RetryPolicy < ::Data
-  # @param initial_interval [Float] Backoff interval in seconds for the first retry. Default 1.0.
-  # @param backoff_coefficient [Float] Coefficient to multiply previous backoff interval by to get new interval.
-  #   Default 2.0.
-  # @param max_interval [Float, nil] Maximum backoff interval in seconds between retries. Default 100x
-  #   `initial_interval`.
-  # @param max_attempts [Integer] Maximum number of attempts. If `0`, the default, there is no maximum.
-  # @param non_retryable_error_types [Array<String>, nil] List of error types that are not retryable.
   sig do
     params(
       initial_interval: T.any(Integer, Float),
@@ -925,23 +694,18 @@ class Temporalio::RetryPolicy < ::Data
   end
   def initialize(initial_interval: 1.0, backoff_coefficient: 2.0, max_interval: nil, max_attempts: 0, non_retryable_error_types: nil); end
 
-  # @return [Float] Backoff interval in seconds for the first retry. Default 1.0.
   sig { returns(T.any(Integer, Float)) }
   def initial_interval; end
 
-  # @return [Float] Coefficient to multiply previous backoff interval by to get new interval. Default 2.0.
   sig { returns(T.any(Integer, Float)) }
   def backoff_coefficient; end
 
-  # @return [Float, nil] Maximum backoff interval in seconds between retries. Default 100x `initial_interval`.
   sig { returns(T.nilable(T.any(Integer, Float))) }
   def max_interval; end
 
-  # @return [Integer] Maximum number of attempts. If `0`, the default, there is no maximum.
   sig { returns(Integer) }
   def max_attempts; end
 
-  # @return [Array<String>, nil] List of error types that are not retryable.
   sig { returns(T.nilable(T::Array[String])) }
   def non_retryable_error_types; end
 
@@ -957,143 +721,87 @@ class Temporalio::RetryPolicy < ::Data
   end
 end
 
-# Collection of typed search attributes.
-#
-# This is represented as a mapping of {SearchAttributes::Key} to object values.
 class Temporalio::SearchAttributes
-  # Create a search attribute collection.
-  #
-  # @param existing [SearchAttributes, Hash<Key, Object>, nil] Existing collection.
   sig { params(existing: T.nilable(T.any(Temporalio::SearchAttributes, T::Hash[Temporalio::SearchAttributes::Key, Object]))).void }
   def initialize(existing = nil); end
 
-  # Set a search attribute value for a key.
-  #
-  # @param key [Key] A key to set.
-  # @param value [Object, nil] The value to set. If `nil`, the key is removed.
   sig { params(key: T.any(Temporalio::SearchAttributes::Key, String, Symbol), value: T.nilable(Object)).void }
   def []=(key, value); end
 
-  # Get a search attribute value for a key.
-  #
-  # @param key [Key] The key to find.
-  # @return [Object, nil] Value if found or `nil` if not.
   sig { params(key: Temporalio::SearchAttributes::Key).returns(T.nilable(Object)) }
   def [](key); end
 
-  # Delete a search attribute key.
-  #
-  # @param key [Key, String, Symbol] The key to delete.
   sig { params(key: T.any(Temporalio::SearchAttributes::Key, String, Symbol)).void }
   def delete(key); end
 
-  # Like {::Hash#each}.
   sig { params(block: T.proc.params(key: Temporalio::SearchAttributes::Key, value: Object).void).returns(Temporalio::SearchAttributes) }
   def each(&block); end
 
-  # @return [Hash<Key, Object>] Copy of the search attributes as a hash.
   sig { returns(T::Hash[Temporalio::SearchAttributes::Key, Object]) }
   def to_h; end
 
-  # @return [SearchAttributes] Copy of the search attributes.
   sig { returns(Temporalio::SearchAttributes) }
   def dup; end
 
-  # @return [Boolean] Whether the set of attributes is empty.
   sig { returns(T::Boolean) }
   def empty?; end
 
-  # @return [Integer] Number of attributes.
   sig { returns(Integer) }
   def length; end
 
-  # @return [Integer] Number of attributes.
   sig { returns(Integer) }
   def size; end
 
-  # Return a new search attributes collection with updates applied.
-  #
-  # @param updates [Update] Updates created via {Key#value_set} or {Key#value_unset}.
-  # @return [SearchAttributes] New collection.
   sig { params(updates: Temporalio::SearchAttributes::Update).returns(Temporalio::SearchAttributes) }
   def update(*updates); end
 
-  # Update this search attribute collection with given updates.
-  #
-  # @param updates [Update] Updates created via {Key#value_set} or {Key#value_unset}.
   sig { params(updates: Temporalio::SearchAttributes::Update).void }
   def update!(*updates); end
 
-  # Check equality.
-  #
-  # @param other [SearchAttributes] To compare.
-  # @return [Boolean] Whether equal.
   sig { params(other: Temporalio::SearchAttributes).returns(T::Boolean) }
   def ==(other); end
 end
 
-# Key for a search attribute.
 class Temporalio::SearchAttributes::Key
-  # @param name [String] Name of the search attribute.
-  # @param type [Integer] Type of the search attribute (from {IndexedValueType}).
   sig { params(name: String, type: Integer).void }
   def initialize(name, type); end
 
-  # @return [String] Name of the search attribute.
   sig { returns(String) }
   def name; end
 
-  # @return [IndexedValueType] Type of the search attribute.
   sig { returns(Integer) }
   def type; end
 
-  # Validate that the given value matches the expected {#type}.
   sig { params(value: Object).void }
   def validate_value(value); end
 
-  # Create an update that sets the given value for this key.
-  #
-  # @param value [Object] Value to update.
-  # @return [Update] Created update.
   sig { params(value: Object).returns(Temporalio::SearchAttributes::Update) }
   def value_set(value); end
 
-  # Create an update that unsets the key.
-  #
-  # @return [Update] Created update.
   sig { returns(Temporalio::SearchAttributes::Update) }
   def value_unset; end
 
-  # @return [Boolean] Check equality.
   sig { params(other: T.untyped).returns(T::Boolean) }
   def ==(other); end
 
-  # @return [Boolean] Check equality.
   sig { params(other: T.untyped).returns(T::Boolean) }
   def eql?(other); end
 
-  # @return [Integer] Hash.
   sig { returns(Integer) }
   def hash; end
 end
 
-# Search attribute update that can be separately applied.
 class Temporalio::SearchAttributes::Update
-  # @param key [Key] Key to update.
-  # @param value [Object, nil] Value to update to or nil to remove the value.
   sig { params(key: Temporalio::SearchAttributes::Key, value: T.nilable(Object)).void }
   def initialize(key, value); end
 
-  # @return [Key] Key this update applies to.
   sig { returns(Temporalio::SearchAttributes::Key) }
   def key; end
 
-  # @return [Object, nil] Value to update or `nil` to remove the key.
   sig { returns(T.nilable(Object)) }
   def value; end
 end
 
-# Type for a search attribute key/value.
 module Temporalio::SearchAttributes::IndexedValueType
   TEXT = T.let(T.unsafe(nil), Integer)
   KEYWORD = T.let(T.unsafe(nil), Integer)
@@ -1106,49 +814,31 @@ module Temporalio::SearchAttributes::IndexedValueType
   PROTO_VALUES = T.let(T.unsafe(nil), T::Hash[String, Integer])
 end
 
-# Base class for version overrides that can be provided in start workflow options.
 class Temporalio::VersioningOverride; end
 
-# Represents a versioning override to pin a workflow to a specific version.
 class Temporalio::VersioningOverride::Pinned < ::Temporalio::VersioningOverride
-  # @param version [WorkerDeploymentVersion] The worker deployment version to pin to.
   sig { params(version: Temporalio::WorkerDeploymentVersion).void }
   def initialize(version); end
 
-  # @return [WorkerDeploymentVersion] The worker deployment version to pin to.
   sig { returns(Temporalio::WorkerDeploymentVersion) }
   def version; end
 end
 
-# Represents a versioning override to auto-upgrade a workflow.
 class Temporalio::VersioningOverride::AutoUpgrade < ::Temporalio::VersioningOverride; end
 
-# A worker deployment version, consisting of a deployment name and a build ID.
 class Temporalio::WorkerDeploymentVersion < ::Data
-  # @param deployment_name [String] The name of the deployment.
-  # @param build_id [String] The build identifier specific to this worker build.
   sig { params(deployment_name: String, build_id: String).void }
   def initialize(deployment_name:, build_id:); end
 
-  # Parse a version from a canonical string, which must be in the format
-  # `<deployment_name>.<build_id>`.
-  #
-  # @param canonical [String] The canonical string representation of the version.
-  # @return [WorkerDeploymentVersion] The parsed version.
   sig { params(canonical: String).returns(Temporalio::WorkerDeploymentVersion) }
   def self.from_canonical_string(canonical); end
 
-  # @return [String] The name of the deployment.
   sig { returns(String) }
   def deployment_name; end
 
-  # @return [String] The build identifier specific to this worker build.
   sig { returns(String) }
   def build_id; end
 
-  # Returns the canonical string representation of the version.
-  #
-  # @return [String]
   sig { returns(String) }
   def to_canonical_string; end
 
@@ -1164,47 +854,27 @@ class Temporalio::WorkerDeploymentVersion < ::Data
   end
 end
 
-# Workflow history for replay or conversion.
 class Temporalio::WorkflowHistory
-  # @param events [Array] History events for the workflow.
   sig { params(events: T::Array[T.untyped]).void }
   def initialize(events); end
 
-  # Convert a JSON string to workflow history.
-  #
-  # @param json [String] JSON string.
-  # @return [WorkflowHistory] Converted history.
   sig { params(json: String).returns(Temporalio::WorkflowHistory) }
   def self.from_history_json(json); end
 
-  # @return [Array<Api::History::V1::HistoryEvent>] History events for the workflow.
   sig { returns(T::Array[T.untyped]) }
   def events; end
 
-  # @return [String] ID of the workflow, extracted from the first event.
   sig { returns(String) }
   def workflow_id; end
 
-  # Convert to history JSON.
-  #
-  # @return [String] JSON string.
   sig { returns(String) }
   def to_history_json; end
 
-  # Compare history.
-  #
-  # @param other [WorkflowHistory] Other history.
-  # @return [Boolean] True if equal.
   sig { params(other: Temporalio::WorkflowHistory).returns(T::Boolean) }
   def ==(other); end
 end
 
-# Metric for recording values. This class is effectively abstract.
 class Temporalio::Metric
-  # Record a value for the metric.
-  #
-  # @param value [Numeric] Value to record.
-  # @param additional_attributes [Hash{String, Symbol => String, Integer, Float, Boolean}, nil] Additional attributes.
   sig do
     params(
       value: Numeric,
@@ -1213,10 +883,6 @@ class Temporalio::Metric
   end
   def record(value, additional_attributes: nil); end
 
-  # Create a copy of this metric but with the given additional attributes.
-  #
-  # @param additional_attributes [Hash{String, Symbol => String, Integer, Float, Boolean}] Attributes to set.
-  # @return [Metric] Copy of this metric with the additional attributes.
   sig do
     params(
       additional_attributes: T::Hash[T.any(String, Symbol), T.any(String, Integer, Float, T::Boolean)]
@@ -1224,41 +890,26 @@ class Temporalio::Metric
   end
   def with_additional_attributes(additional_attributes); end
 
-  # @return [:counter, :histogram, :gauge] Metric type.
   sig { returns(Symbol) }
   def metric_type; end
 
-  # @return [String] Metric name.
   sig { returns(String) }
   def name; end
 
-  # @return [String, nil] Metric description.
   sig { returns(T.nilable(String)) }
   def description; end
 
-  # @return [String, nil] Metric unit.
   sig { returns(T.nilable(String)) }
   def unit; end
 
-  # @return [:integer, :float, :duration] Metric value type.
   sig { returns(Symbol) }
   def value_type; end
 end
 
-# Meter for creating metrics to record values on.
 class Temporalio::Metric::Meter
-  # @return [Meter] A no-op instance of {Meter}.
   sig { returns(Temporalio::Metric::Meter) }
   def self.null; end
 
-  # Create a new metric.
-  #
-  # @param metric_type [:counter, :histogram, :gauge] Metric type.
-  # @param name [String] Metric name.
-  # @param description [String, nil] Metric description.
-  # @param unit [String, nil] Metric unit.
-  # @param value_type [:integer, :float, :duration] Metric value type.
-  # @return [Metric] Created metric.
   sig do
     params(
       metric_type: Symbol,
@@ -1270,10 +921,6 @@ class Temporalio::Metric::Meter
   end
   def create_metric(metric_type, name, description: nil, unit: nil, value_type: :integer); end
 
-  # Create a copy of this meter but with the given additional attributes.
-  #
-  # @param additional_attributes [Hash{String, Symbol => String, Integer, Float, Boolean}] Attributes to set.
-  # @return [Meter] Copy of this meter with the additional attributes.
   sig do
     params(
       additional_attributes: T::Hash[T.any(String, Symbol), T.any(String, Integer, Float, T::Boolean)]
@@ -1282,24 +929,19 @@ class Temporalio::Metric::Meter
   def with_additional_attributes(additional_attributes); end
 end
 
-# Logger that appends scoped values to log messages.
 class Temporalio::ScopedLogger < ::SimpleDelegator
   sig { params(logger: ::Logger).void }
   def initialize(logger); end
 
-  # @return [Proc, nil] Getter for scoped values.
   sig { returns(T.nilable(Proc)) }
   def scoped_values_getter; end
 
-  # @param value [Proc, nil] Setter for scoped values getter.
   sig { params(value: T.nilable(Proc)).void }
   def scoped_values_getter=(value); end
 
-  # @return [Boolean] Whether the scoped value appending is disabled.
   sig { returns(T::Boolean) }
   def disable_scoped_values; end
 
-  # @param value [Boolean] Whether to disable scoped value appending.
   sig { params(value: T::Boolean).void }
   def disable_scoped_values=(value); end
 
@@ -1328,103 +970,65 @@ class Temporalio::ScopedLogger < ::SimpleDelegator
   def unknown(progname = nil, &blk); end
 end
 
-# Scoped log message wrapping original log message.
 class Temporalio::ScopedLogger::LogMessage
   sig { params(message: Object, scoped_values: Object).void }
   def initialize(message, scoped_values); end
 
-  # @return [Object] Original log message.
   sig { returns(Object) }
   def message; end
 
-  # @return [Object] Scoped values.
   sig { returns(Object) }
   def scoped_values; end
 
-  # @return [String] Message with scoped values appended.
   sig { returns(String) }
   def inspect; end
 end
 
-# How already-in-use workflow IDs are handled on start.
 module Temporalio::WorkflowIDReusePolicy
-  # Allow starting a workflow execution using the same workflow ID.
   ALLOW_DUPLICATE = T.let(T.unsafe(nil), Integer)
 
-  # Allow starting a workflow execution using the same workflow ID, only when the last execution's final state is one
-  # of terminated, canceled, timed out, or failed.
   ALLOW_DUPLICATE_FAILED_ONLY = T.let(T.unsafe(nil), Integer)
 
-  # Do not permit re-use of the workflow ID for this workflow.
   REJECT_DUPLICATE = T.let(T.unsafe(nil), Integer)
 
-  # @deprecated Use {WorkflowIDConflictPolicy::TERMINATE_EXISTING} instead.
   TERMINATE_IF_RUNNING = T.let(T.unsafe(nil), Integer)
 end
 
-# How already-running workflows of the same ID are handled on start.
 module Temporalio::WorkflowIDConflictPolicy
-  # Unset.
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
 
-  # Don't start a new workflow, instead fail with already-started error.
   FAIL = T.let(T.unsafe(nil), Integer)
 
-  # Don't start a new workflow, instead return a workflow handle for the running workflow.
   USE_EXISTING = T.let(T.unsafe(nil), Integer)
 
-  # Terminate the running workflow before starting a new one.
   TERMINATE_EXISTING = T.let(T.unsafe(nil), Integer)
 end
 
-# Versioning behavior for continue-as-new.
 module Temporalio::ContinueAsNewVersioningBehavior
-  # Unspecified. Follow existing continue-as-new inheritance semantics.
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
 
-  # Start the new run with AutoUpgrade behavior.
   AUTO_UPGRADE = T.let(T.unsafe(nil), Integer)
 end
 
-# Specifies why the server suggests continue-as-new.
 module Temporalio::SuggestContinueAsNewReason
-  # Unspecified.
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
 
-  # Workflow History size is getting too large.
   HISTORY_SIZE_TOO_LARGE = T.let(T.unsafe(nil), Integer)
 
-  # Workflow History event count is getting too large.
   TOO_MANY_HISTORY_EVENTS = T.let(T.unsafe(nil), Integer)
 
-  # Workflow's count of completed plus in-flight updates is too large.
   TOO_MANY_UPDATES = T.let(T.unsafe(nil), Integer)
 end
 
-# Specifies when a workflow might move from a worker of one Build Id to another.
 module Temporalio::VersioningBehavior
-  # Unspecified versioning behavior.
   UNSPECIFIED = T.let(T.unsafe(nil), Integer)
 
-  # The workflow will be pinned to the current Build ID unless manually moved.
   PINNED = T.let(T.unsafe(nil), Integer)
 
-  # The workflow will automatically move to the latest version when the next task is dispatched.
   AUTO_UPGRADE = T.let(T.unsafe(nil), Integer)
 end
 
 class Temporalio::Client
-  # Create a client from an existing connection. Most users will prefer {connect} instead.
-  #
-  # @param connection [Connection] Existing connection to create a client from.
-  # @param namespace [String] Namespace to use for client calls.
-  # @param data_converter [Converters::DataConverter] Data converter to use for all data conversions to/from payloads.
-  # @param plugins [Array<Plugin>] Plugins to use for configuring clients.
-  # @param interceptors [Array<Interceptor>] Set of interceptors that are chained together to allow intercepting of
-  #   client calls.
-  # @param logger [Logger] Logger to use for this client and any workers made from this client.
-  # @param default_workflow_query_reject_condition [WorkflowQueryRejectCondition, nil] Default rejection condition for
-  #   workflow queries if not set during query.
   sig do
     params(
       connection: Temporalio::Client::Connection,
@@ -1446,55 +1050,24 @@ class Temporalio::Client
     default_workflow_query_reject_condition: T.unsafe(nil)
   ); end
 
-  # @return [Options] Frozen options for this client which has the same attributes as {initialize}.
   sig { returns(Temporalio::Client::Options) }
   def options; end
 
-  # @return [Connection] Underlying connection for this client.
   sig { returns(Temporalio::Client::Connection) }
   def connection; end
 
-  # @return [String] Namespace used in calls by this client.
   sig { returns(String) }
   def namespace; end
 
-  # @return [DataConverter] Data converter used by this client.
   sig { returns(Temporalio::Converters::DataConverter) }
   def data_converter; end
 
-  # @return [Connection::WorkflowService] Raw gRPC workflow service.
   sig { returns(Temporalio::Client::Connection::WorkflowService) }
   def workflow_service; end
 
-  # @return [Connection::OperatorService] Raw gRPC operator service.
   sig { returns(Temporalio::Client::Connection::OperatorService) }
   def operator_service; end
 
-  # Start a workflow and return its handle.
-  #
-  # @param workflow [Class<Workflow::Definition>, Symbol, String] Workflow definition class or workflow name.
-  # @param args [Array<Object>] Arguments to the workflow.
-  # @param id [String] Unique identifier for the workflow execution.
-  # @param task_queue [String] Task queue to run the workflow on.
-  # @param static_summary [String, nil] Fixed single-line summary for this workflow execution.
-  # @param static_details [String, nil] Fixed details for this workflow execution.
-  # @param execution_timeout [Float, Integer, nil] Total workflow execution timeout including retries and continue as new.
-  # @param run_timeout [Float, Integer, nil] Timeout of a single workflow run.
-  # @param task_timeout [Float, Integer, nil] Timeout of a single workflow task.
-  # @param id_reuse_policy [WorkflowIDReusePolicy] How already-existing IDs are treated.
-  # @param id_conflict_policy [WorkflowIDConflictPolicy] How already-running workflows of the same ID are treated.
-  # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
-  # @param cron_schedule [String, nil] Cron schedule.
-  # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
-  # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
-  # @param start_delay [Float, Integer, nil] Amount of time to wait before starting the workflow.
-  # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow.
-  # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
-  # @param priority [Priority] Priority for the workflow.
-  # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments.
-  # @param result_hint [Object, nil] Overrides converter hint for result.
-  # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-  # @return [WorkflowHandle] A workflow handle to the started workflow.
   sig do
     params(
       workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol, String),
@@ -1546,7 +1119,6 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Start a workflow and wait for its result. This is a shortcut for {start_workflow} + {WorkflowHandle.result}.
   sig do
     params(
       workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol, String),
@@ -1598,13 +1170,6 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Get a workflow handle to an existing workflow by its ID.
-  #
-  # @param workflow_id [String] Workflow ID to get a handle to.
-  # @param run_id [String, nil] Run ID that will be used for all calls.
-  # @param first_execution_run_id [String, nil] First execution run ID used for some calls.
-  # @param result_hint [Object, nil] Converter hint for the workflow's result.
-  # @return [WorkflowHandle] The workflow handle.
   sig do
     params(
       workflow_id: String,
@@ -1615,7 +1180,6 @@ class Temporalio::Client
   end
   def workflow_handle(workflow_id, run_id: T.unsafe(nil), first_execution_run_id: T.unsafe(nil), result_hint: T.unsafe(nil)); end
 
-  # Start an update, possibly starting the workflow at the same time.
   sig do
     params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
@@ -1639,7 +1203,6 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Start an update with start workflow and wait for update result.
   sig do
     params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
@@ -1661,7 +1224,6 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Send a signal, possibly starting the workflow at the same time.
   sig do
     params(
       signal: T.any(Temporalio::Workflow::Definition::Signal, Symbol, String),
@@ -1679,11 +1241,6 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # List workflows.
-  #
-  # @param query [String, nil] A Temporal visibility list filter.
-  # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-  # @return [Enumerator<WorkflowExecution>] Enumerable workflow executions.
   sig do
     params(
       query: T.nilable(String),
@@ -1692,7 +1249,6 @@ class Temporalio::Client
   end
   def list_workflows(query = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # List workflows one page at a time.
   sig do
     params(
       query: T.nilable(String),
@@ -1703,7 +1259,6 @@ class Temporalio::Client
   end
   def list_workflow_page(query = T.unsafe(nil), page_size: T.unsafe(nil), next_page_token: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Count workflows.
   sig do
     params(
       query: T.nilable(String),
@@ -1712,7 +1267,6 @@ class Temporalio::Client
   end
   def count_workflows(query = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Create a schedule and return its handle.
   sig do
     params(
       id: String,
@@ -1734,11 +1288,9 @@ class Temporalio::Client
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Get a schedule handle to an existing schedule for the given ID.
   sig { params(id: String).returns(Temporalio::Client::ScheduleHandle) }
   def schedule_handle(id); end
 
-  # List schedules.
   sig do
     params(
       query: T.nilable(String),
@@ -1747,7 +1299,6 @@ class Temporalio::Client
   end
   def list_schedules(query = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Get an async activity handle.
   sig do
     params(
       task_token_or_id_reference: T.any(String, Temporalio::Client::ActivityIDReference)
@@ -1756,7 +1307,6 @@ class Temporalio::Client
   def async_activity_handle(task_token_or_id_reference); end
 
   class << self
-    # Connect to Temporal server.
     sig do
       params(
         target_host: String,
@@ -1798,7 +1348,6 @@ class Temporalio::Client
   end
 end
 
-# Options as returned from {Client#options}.
 class Temporalio::Client::Options < ::Data
   sig { returns(Temporalio::Client::Connection) }
   def connection; end
@@ -1839,13 +1388,10 @@ class Temporalio::Client::Options < ::Data
   end
 end
 
-# A page of workflow executions returned by {Client#list_workflow_page}.
 class Temporalio::Client::ListWorkflowPage < ::Data
-  # @return [Array<WorkflowExecution>] List of workflow executions in this page.
   sig { returns(T::Array[Temporalio::Client::WorkflowExecution]) }
   def executions; end
 
-  # @return [String, nil] Token for the next page of results.
   sig { returns(T.nilable(String)) }
   def next_page_token; end
 
@@ -1861,7 +1407,6 @@ class Temporalio::Client::ListWorkflowPage < ::Data
   end
 end
 
-# Set of RPC options for RPC calls.
 class Temporalio::Client::RPCOptions
   sig do
     params(
@@ -1873,28 +1418,24 @@ class Temporalio::Client::RPCOptions
   end
   def initialize(metadata: T.unsafe(nil), timeout: T.unsafe(nil), cancellation: T.unsafe(nil), override_retry: T.unsafe(nil)); end
 
-  # @return [Hash<String, String>, nil] Headers to include on the RPC call.
   sig { returns(T.nilable(T::Hash[String, String])) }
   def metadata; end
 
   sig { params(value: T.nilable(T::Hash[String, String])).void }
   def metadata=(value); end
 
-  # @return [Float, nil] Number of seconds before timeout of the RPC call.
   sig { returns(T.nilable(Float)) }
   def timeout; end
 
   sig { params(value: T.nilable(Float)).void }
   def timeout=(value); end
 
-  # @return [Cancellation, nil] Cancellation to use to potentially cancel the call.
   sig { returns(T.nilable(Temporalio::Cancellation)) }
   def cancellation; end
 
   sig { params(value: T.nilable(Temporalio::Cancellation)).void }
   def cancellation=(value); end
 
-  # @return [Boolean, nil] Whether to override the default retry option.
   sig { returns(T.nilable(T::Boolean)) }
   def override_retry; end
 
@@ -1902,9 +1443,7 @@ class Temporalio::Client::RPCOptions
   def override_retry=(value); end
 end
 
-# Connection to Temporal server that is not namespace specific.
 class Temporalio::Client::Connection
-  # Connect to Temporal server.
   sig do
     params(
       target_host: String,
@@ -1934,52 +1473,40 @@ class Temporalio::Client::Connection
     around_connect: T.unsafe(nil)
   ); end
 
-  # @return [Options] Frozen options for this client.
   sig { returns(Temporalio::Client::Connection::Options) }
   def options; end
 
-  # @return [WorkflowService] Raw gRPC workflow service.
   sig { returns(Temporalio::Client::Connection::WorkflowService) }
   def workflow_service; end
 
-  # @return [OperatorService] Raw gRPC operator service.
   sig { returns(Temporalio::Client::Connection::OperatorService) }
   def operator_service; end
 
-  # @return [CloudService] Raw gRPC cloud service.
   sig { returns(Temporalio::Client::Connection::CloudService) }
   def cloud_service; end
 
-  # @return [String] Target host this connection is connected to.
   sig { returns(String) }
   def target_host; end
 
-  # @return [String] Client identity.
   sig { returns(String) }
   def identity; end
 
-  # @return [Boolean] Whether this connection is connected.
   sig { returns(T::Boolean) }
   def connected?; end
 
-  # @return [String, nil] API key.
   sig { returns(T.nilable(String)) }
   def api_key; end
 
-  # Set the API key for all future calls.
   sig { params(new_key: T.nilable(String)).void }
   def api_key=(new_key); end
 
-  # @return [Hash<String, String>] RPC metadata (aka HTTP headers).
   sig { returns(T::Hash[String, String]) }
   def rpc_metadata; end
 
-  # Set the RPC metadata (aka HTTP headers) for all future calls.
   sig { params(rpc_metadata: T::Hash[String, String]).void }
   def rpc_metadata=(rpc_metadata); end
 end
 
-# Options as returned from {Connection#options}.
 class Temporalio::Client::Connection::Options < ::Data
   sig { returns(String) }
   def target_host; end
@@ -2029,7 +1556,6 @@ class Temporalio::Client::Connection::Options < ::Data
   end
 end
 
-# TLS options. All attributes are optional, and an empty options set just enables default TLS.
 class Temporalio::Client::Connection::TLSOptions < ::Data
   sig do
     params(
@@ -2041,19 +1567,15 @@ class Temporalio::Client::Connection::TLSOptions < ::Data
   end
   def initialize(client_cert: T.unsafe(nil), client_private_key: T.unsafe(nil), server_root_ca_cert: T.unsafe(nil), domain: T.unsafe(nil)); end
 
-  # @return [String, nil] Client certificate for mTLS.
   sig { returns(T.nilable(String)) }
   def client_cert; end
 
-  # @return [String, nil] Client private key for mTLS.
   sig { returns(T.nilable(String)) }
   def client_private_key; end
 
-  # @return [String, nil] Root CA certificate to validate the server certificate against.
   sig { returns(T.nilable(String)) }
   def server_root_ca_cert; end
 
-  # @return [String, nil] SNI override.
   sig { returns(T.nilable(String)) }
   def domain; end
 
@@ -2069,7 +1591,6 @@ class Temporalio::Client::Connection::TLSOptions < ::Data
   end
 end
 
-# Retry options for server calls.
 class Temporalio::Client::Connection::RPCRetryOptions < ::Data
   sig do
     params(
@@ -2090,27 +1611,21 @@ class Temporalio::Client::Connection::RPCRetryOptions < ::Data
     max_retries: T.unsafe(nil)
   ); end
 
-  # @return [Float] Initial backoff interval, default 0.1.
   sig { returns(Float) }
   def initial_interval; end
 
-  # @return [Float] Randomization jitter to add, default 0.2.
   sig { returns(Float) }
   def randomization_factor; end
 
-  # @return [Float] Backoff multiplier, default 1.5.
   sig { returns(Float) }
   def multiplier; end
 
-  # @return [Float] Maximum backoff interval, default 5.0.
   sig { returns(Float) }
   def max_interval; end
 
-  # @return [Float] Maximum total time, default 10.0. Can use 0 for no max.
   sig { returns(Float) }
   def max_elapsed_time; end
 
-  # @return [Integer] Maximum number of retries, default 10.
   sig { returns(Integer) }
   def max_retries; end
 
@@ -2126,16 +1641,13 @@ class Temporalio::Client::Connection::RPCRetryOptions < ::Data
   end
 end
 
-# Keep-alive options for client connections.
 class Temporalio::Client::Connection::KeepAliveOptions < ::Data
   sig { params(interval: Float, timeout: Float).void }
   def initialize(interval: T.unsafe(nil), timeout: T.unsafe(nil)); end
 
-  # @return [Float] Interval to send HTTP2 keep alive pings, default 30.0.
   sig { returns(Float) }
   def interval; end
 
-  # @return [Float] Timeout that the keep alive must be responded to within, default 15.0.
   sig { returns(Float) }
   def timeout; end
 
@@ -2151,17 +1663,13 @@ class Temporalio::Client::Connection::KeepAliveOptions < ::Data
   end
 end
 
-# Options for HTTP CONNECT proxy for client connections.
 class Temporalio::Client::Connection::HTTPConnectProxyOptions < ::Data
-  # @return [String] Target for the HTTP CONNECT proxy.
   sig { returns(String) }
   def target_host; end
 
-  # @return [String, nil] User for HTTP basic auth for the proxy.
   sig { returns(T.nilable(String)) }
   def basic_auth_user; end
 
-  # @return [String, nil] Pass for HTTP basic auth for the proxy.
   sig { returns(T.nilable(String)) }
   def basic_auth_pass; end
 
@@ -2177,7 +1685,6 @@ class Temporalio::Client::Connection::HTTPConnectProxyOptions < ::Data
   end
 end
 
-# Base class for raw gRPC services.
 class Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection, service: T.untyped).void }
   def initialize(connection, service); end
@@ -2196,7 +1703,6 @@ class Temporalio::Client::Connection::Service
   def invoke_rpc(rpc:, request_class:, response_class:, request:, rpc_options:); end
 end
 
-# CloudService API.
 class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
@@ -2376,7 +1882,6 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   def validate_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
 end
 
-# OperatorService API.
 class Temporalio::Client::Connection::OperatorService < ::Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
@@ -2418,7 +1923,6 @@ class Temporalio::Client::Connection::OperatorService < ::Temporalio::Client::Co
   def list_nexus_endpoints(request, rpc_options: T.unsafe(nil)); end
 end
 
-# WorkflowService API.
 class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
@@ -2739,7 +2243,6 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   def delete_activity_execution(request, rpc_options: T.unsafe(nil)); end
 end
 
-# TestService API.
 class Temporalio::Client::Connection::TestService < ::Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
@@ -2763,7 +2266,6 @@ class Temporalio::Client::Connection::TestService < ::Temporalio::Client::Connec
   def get_current_time(request, rpc_options: T.unsafe(nil)); end
 end
 
-# Handle for interacting with a workflow.
 class Temporalio::Client::WorkflowHandle
   sig do
     params(
@@ -2777,27 +2279,21 @@ class Temporalio::Client::WorkflowHandle
   end
   def initialize(client:, id:, run_id:, result_run_id:, first_execution_run_id:, result_hint:); end
 
-  # @return [String] ID for the workflow.
   sig { returns(String) }
   def id; end
 
-  # @return [String, nil] Run ID.
   sig { returns(T.nilable(String)) }
   def run_id; end
 
-  # @return [String, nil] Result run ID.
   sig { returns(T.nilable(String)) }
   def result_run_id; end
 
-  # @return [String, nil] First execution run ID.
   sig { returns(T.nilable(String)) }
   def first_execution_run_id; end
 
-  # @return [Object, nil] Result hint.
   sig { returns(T.nilable(Object)) }
   def result_hint; end
 
-  # Wait for the result of the workflow.
   sig do
     params(
       follow_runs: T::Boolean,
@@ -2807,7 +2303,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def result(follow_runs: T.unsafe(nil), result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Get workflow details.
   sig do
     params(
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
@@ -2815,7 +2310,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def describe(rpc_options: T.unsafe(nil)); end
 
-  # Get workflow history.
   sig do
     params(
       event_filter_type: Integer,
@@ -2824,7 +2318,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def fetch_history(event_filter_type: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Fetch an enumerator of history events for this workflow.
   sig do
     params(
       wait_new_event: T::Boolean,
@@ -2842,7 +2335,6 @@ class Temporalio::Client::WorkflowHandle
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Send a signal to the workflow.
   sig do
     params(
       signal: T.any(Temporalio::Workflow::Definition::Signal, Symbol, String),
@@ -2853,7 +2345,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def signal(signal, *args, arg_hints: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Query the workflow.
   sig do
     params(
       query: T.any(Temporalio::Workflow::Definition::Query, Symbol, String),
@@ -2866,7 +2357,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def query(query, *args, reject_condition: T.unsafe(nil), arg_hints: T.unsafe(nil), result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Send an update request to the workflow and return a handle to it.
   sig do
     params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
@@ -2888,7 +2378,6 @@ class Temporalio::Client::WorkflowHandle
     rpc_options: T.unsafe(nil)
   ); end
 
-  # Send an update request to the workflow and wait for it to complete.
   sig do
     params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
@@ -2901,7 +2390,6 @@ class Temporalio::Client::WorkflowHandle
   end
   def execute_update(update, *args, id: T.unsafe(nil), arg_hints: T.unsafe(nil), result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Get a handle for an update.
   sig do
     params(
       id: String,
@@ -2911,11 +2399,9 @@ class Temporalio::Client::WorkflowHandle
   end
   def update_handle(id, specific_run_id: T.unsafe(nil), result_hint: T.unsafe(nil)); end
 
-  # Cancel the workflow.
   sig { params(rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def cancel(rpc_options: T.unsafe(nil)); end
 
-  # Terminate the workflow.
   sig do
     params(
       reason: T.nilable(String),
@@ -2926,7 +2412,6 @@ class Temporalio::Client::WorkflowHandle
   def terminate(reason = T.unsafe(nil), details: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 end
 
-# Handle for a workflow update execution request.
 class Temporalio::Client::WorkflowUpdateHandle
   sig do
     params(
@@ -2940,27 +2425,21 @@ class Temporalio::Client::WorkflowUpdateHandle
   end
   def initialize(client:, id:, workflow_id:, workflow_run_id:, known_outcome:, result_hint:); end
 
-  # @return [String] ID for the workflow update.
   sig { returns(String) }
   def id; end
 
-  # @return [String] ID for the workflow.
   sig { returns(String) }
   def workflow_id; end
 
-  # @return [String, nil] Run ID for the workflow.
   sig { returns(T.nilable(String)) }
   def workflow_run_id; end
 
-  # @return [Object, nil] Result hint if one set when the handle was created.
   sig { returns(T.nilable(Object)) }
   def result_hint; end
 
-  # @return [Boolean] True if the result is already known.
   sig { returns(T::Boolean) }
   def result_obtained?; end
 
-  # Wait for and return the result of the update.
   sig do
     params(
       result_hint: T.nilable(Object),
@@ -2970,12 +2449,10 @@ class Temporalio::Client::WorkflowUpdateHandle
   def result(result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 end
 
-# Info for a single workflow execution run.
 class Temporalio::Client::WorkflowExecution
   sig { params(raw_info: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_info, data_converter); end
 
-  # @return [Api::Workflow::V1::WorkflowExecutionInfo] Underlying protobuf info.
   sig { returns(T.untyped) }
   def raw_info; end
 
@@ -3019,7 +2496,6 @@ class Temporalio::Client::WorkflowExecution
   def workflow_type; end
 end
 
-# Description for a single workflow execution run.
 class Temporalio::Client::WorkflowExecution::Description < ::Temporalio::Client::WorkflowExecution
   sig { params(raw_description: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_description, data_converter); end
@@ -3034,7 +2510,6 @@ class Temporalio::Client::WorkflowExecution::Description < ::Temporalio::Client:
   def static_details; end
 end
 
-# Representation of a count from a count workflows call.
 class Temporalio::Client::WorkflowExecutionCount
   sig { params(count: Integer, groups: T::Array[Temporalio::Client::WorkflowExecutionCount::AggregationGroup]).void }
   def initialize(count, groups); end
@@ -3046,7 +2521,6 @@ class Temporalio::Client::WorkflowExecutionCount
   def groups; end
 end
 
-# Aggregation group if the workflow count query had a group-by clause.
 class Temporalio::Client::WorkflowExecutionCount::AggregationGroup
   sig { params(count: Integer, group_values: T::Array[T.nilable(Object)]).void }
   def initialize(count, group_values); end
@@ -3058,7 +2532,6 @@ class Temporalio::Client::WorkflowExecutionCount::AggregationGroup
   def group_values; end
 end
 
-# Status of a workflow execution.
 module Temporalio::Client::WorkflowExecutionStatus
   RUNNING = T.let(T.unsafe(nil), Integer)
   COMPLETED = T.let(T.unsafe(nil), Integer)
@@ -3069,52 +2542,42 @@ module Temporalio::Client::WorkflowExecutionStatus
   TIMED_OUT = T.let(T.unsafe(nil), Integer)
 end
 
-# Whether a query should be rejected in certain conditions.
 module Temporalio::Client::WorkflowQueryRejectCondition
   NONE = T.let(T.unsafe(nil), Integer)
   NOT_OPEN = T.let(T.unsafe(nil), Integer)
   NOT_COMPLETED_CLEANLY = T.let(T.unsafe(nil), Integer)
 end
 
-# Stage to wait for workflow update to reach before returning.
 module Temporalio::Client::WorkflowUpdateWaitStage
   ADMITTED = T.let(T.unsafe(nil), Integer)
   ACCEPTED = T.let(T.unsafe(nil), Integer)
   COMPLETED = T.let(T.unsafe(nil), Integer)
 end
 
-# Reference to an existing activity by its workflow ID, run ID, and activity ID.
 class Temporalio::Client::ActivityIDReference
   sig { params(workflow_id: String, run_id: T.nilable(String), activity_id: String).void }
   def initialize(workflow_id:, run_id:, activity_id:); end
 
-  # @return [String] ID for the workflow.
   sig { returns(String) }
   def workflow_id; end
 
-  # @return [String, nil] Run ID for the workflow.
   sig { returns(T.nilable(String)) }
   def run_id; end
 
-  # @return [String] ID for the activity.
   sig { returns(String) }
   def activity_id; end
 end
 
-# Handle representing an external activity for completion and heartbeat.
 class Temporalio::Client::AsyncActivityHandle
   sig { params(client: Temporalio::Client, task_token: T.nilable(String), id_reference: T.nilable(Temporalio::Client::ActivityIDReference)).void }
   def initialize(client:, task_token:, id_reference:); end
 
-  # @return [String, nil] Task token if created with a task token.
   sig { returns(T.nilable(String)) }
   def task_token; end
 
-  # @return [ActivityIDReference, nil] Activity ID reference if created with one.
   sig { returns(T.nilable(Temporalio::Client::ActivityIDReference)) }
   def id_reference; end
 
-  # Record a heartbeat for the activity.
   sig do
     params(
       details: T.nilable(Object),
@@ -3124,7 +2587,6 @@ class Temporalio::Client::AsyncActivityHandle
   end
   def heartbeat(*details, detail_hints: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Complete the activity.
   sig do
     params(
       result: T.nilable(Object),
@@ -3134,7 +2596,6 @@ class Temporalio::Client::AsyncActivityHandle
   end
   def complete(result = T.unsafe(nil), result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Fail the activity.
   sig do
     params(
       error: Exception,
@@ -3145,7 +2606,6 @@ class Temporalio::Client::AsyncActivityHandle
   end
   def fail(error, last_heartbeat_details: T.unsafe(nil), last_heartbeat_detail_hints: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Report the activity as canceled.
   sig do
     params(
       details: T.nilable(Object),
@@ -3156,7 +2616,6 @@ class Temporalio::Client::AsyncActivityHandle
   def report_cancellation(*details, detail_hints: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 end
 
-# A schedule for periodically running an action.
 class Temporalio::Client::Schedule < ::Data
   sig do
     params(
@@ -3168,19 +2627,15 @@ class Temporalio::Client::Schedule < ::Data
   end
   def initialize(action:, spec:, policy: T.unsafe(nil), state: T.unsafe(nil)); end
 
-  # @return [Action] Action taken when scheduled.
   sig { returns(Temporalio::Client::Schedule::Action) }
   def action; end
 
-  # @return [Spec] When the action is taken.
   sig { returns(Temporalio::Client::Schedule::Spec) }
   def spec; end
 
-  # @return [Policy] Schedule policies.
   sig { returns(Temporalio::Client::Schedule::Policy) }
   def policy; end
 
-  # @return [State] State of the schedule.
   sig { returns(Temporalio::Client::Schedule::State) }
   def state; end
 
@@ -3199,10 +2654,8 @@ class Temporalio::Client::Schedule < ::Data
   end
 end
 
-# Base module mixed in by specific actions a schedule can take.
 module Temporalio::Client::Schedule::Action; end
 
-# Schedule action to start a workflow.
 class Temporalio::Client::Schedule::Action::StartWorkflow < ::Data
   include Temporalio::Client::Schedule::Action
 
@@ -3252,7 +2705,6 @@ class Temporalio::Client::Schedule::Action::StartWorkflow < ::Data
   def with(**kwargs); end
 
   class << self
-    # Create start-workflow schedule action.
     sig do
       params(
         workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol, String),
@@ -3281,7 +2733,6 @@ class Temporalio::Client::Schedule::Action::StartWorkflow < ::Data
   end
 end
 
-# Enumerate that controls what happens when a workflow would be started by a schedule but one is already running.
 module Temporalio::Client::Schedule::OverlapPolicy
   SKIP = T.let(T.unsafe(nil), Integer)
   BUFFER_ONE = T.let(T.unsafe(nil), Integer)
@@ -3291,7 +2742,6 @@ module Temporalio::Client::Schedule::OverlapPolicy
   ALLOW_ALL = T.let(T.unsafe(nil), Integer)
 end
 
-# Time period and policy for actions taken as if the time passed right now.
 class Temporalio::Client::Schedule::Backfill < ::Data
   sig { params(start_at: Time, end_at: Time, overlap: T.nilable(Integer)).void }
   def initialize(start_at:, end_at:, overlap: T.unsafe(nil)); end
@@ -3317,10 +2767,8 @@ class Temporalio::Client::Schedule::Backfill < ::Data
   end
 end
 
-# Base module mixed in by specific action executions.
 module Temporalio::Client::Schedule::ActionExecution; end
 
-# Execution of a scheduled workflow start.
 class Temporalio::Client::Schedule::ActionExecution::StartWorkflow < ::Data
   include Temporalio::Client::Schedule::ActionExecution
 
@@ -3345,7 +2793,6 @@ class Temporalio::Client::Schedule::ActionExecution::StartWorkflow < ::Data
   end
 end
 
-# Information about when an action took place.
 class Temporalio::Client::Schedule::ActionResult < ::Data
   sig { params(raw_result: T.untyped).void }
   def initialize(raw_result:); end
@@ -3371,7 +2818,6 @@ class Temporalio::Client::Schedule::ActionResult < ::Data
   end
 end
 
-# Specification of the times scheduled actions may occur.
 class Temporalio::Client::Schedule::Spec < ::Data
   sig do
     params(
@@ -3435,7 +2881,6 @@ class Temporalio::Client::Schedule::Spec < ::Data
   end
 end
 
-# Specification relative to calendar time when to run an action.
 class Temporalio::Client::Schedule::Spec::Calendar < ::Data
   sig do
     params(
@@ -3496,7 +2941,6 @@ class Temporalio::Client::Schedule::Spec::Calendar < ::Data
   end
 end
 
-# Specification for scheduling on an interval.
 class Temporalio::Client::Schedule::Spec::Interval < ::Data
   sig { params(every: T.any(Integer, Float), offset: T.nilable(T.any(Integer, Float))).void }
   def initialize(every:, offset: T.unsafe(nil)); end
@@ -3519,7 +2963,6 @@ class Temporalio::Client::Schedule::Spec::Interval < ::Data
   end
 end
 
-# Inclusive range for a schedule match value.
 class Temporalio::Client::Schedule::Range < ::Data
   sig { returns(Integer) }
   def start; end
@@ -3542,7 +2985,6 @@ class Temporalio::Client::Schedule::Range < ::Data
   end
 end
 
-# Policies of a schedule.
 class Temporalio::Client::Schedule::Policy < ::Data
   sig do
     params(
@@ -3574,7 +3016,6 @@ class Temporalio::Client::Schedule::Policy < ::Data
   end
 end
 
-# State of a schedule.
 class Temporalio::Client::Schedule::State < ::Data
   sig do
     params(
@@ -3610,7 +3051,6 @@ class Temporalio::Client::Schedule::State < ::Data
   end
 end
 
-# Description of a schedule.
 class Temporalio::Client::Schedule::Description < ::Data
   sig { params(id: String, raw_description: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(id:, raw_description:, data_converter:); end
@@ -3645,7 +3085,6 @@ class Temporalio::Client::Schedule::Description < ::Data
   end
 end
 
-# Information about a schedule.
 class Temporalio::Client::Schedule::Info < ::Data
   sig { params(raw_info: T.untyped).void }
   def initialize(raw_info:); end
@@ -3686,7 +3125,6 @@ class Temporalio::Client::Schedule::Info < ::Data
   end
 end
 
-# Result of an update callback for {ScheduleHandle.update}.
 class Temporalio::Client::Schedule::Update < ::Data
   sig { params(schedule: Temporalio::Client::Schedule, search_attributes: T.nilable(Temporalio::SearchAttributes)).void }
   def initialize(schedule:, search_attributes: T.unsafe(nil)); end
@@ -3709,7 +3147,6 @@ class Temporalio::Client::Schedule::Update < ::Data
   end
 end
 
-# Parameter for an update callback for {ScheduleHandle.update}.
 class Temporalio::Client::Schedule::Update::Input < ::Data
   sig { returns(Temporalio::Client::Schedule::Description) }
   def description; end
@@ -3730,7 +3167,6 @@ module Temporalio::Client::Schedule::List; end
 
 module Temporalio::Client::Schedule::List::Action; end
 
-# Action to start a workflow on a listed schedule.
 class Temporalio::Client::Schedule::List::Action::StartWorkflow < ::Data
   include Temporalio::Client::Schedule::List::Action
 
@@ -3749,7 +3185,6 @@ class Temporalio::Client::Schedule::List::Action::StartWorkflow < ::Data
   end
 end
 
-# Description of a listed schedule.
 class Temporalio::Client::Schedule::List::Description < ::Data
   sig { params(raw_entry: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_entry:, data_converter:); end
@@ -3784,7 +3219,6 @@ class Temporalio::Client::Schedule::List::Description < ::Data
   end
 end
 
-# Details for a listed schedule.
 class Temporalio::Client::Schedule::List::Schedule < ::Data
   sig { params(raw_info: T.untyped).void }
   def initialize(raw_info:); end
@@ -3810,7 +3244,6 @@ class Temporalio::Client::Schedule::List::Schedule < ::Data
   end
 end
 
-# Information about a listed schedule.
 class Temporalio::Client::Schedule::List::Info < ::Data
   sig { params(raw_info: T.untyped).void }
   def initialize(raw_info:); end
@@ -3833,7 +3266,6 @@ class Temporalio::Client::Schedule::List::Info < ::Data
   end
 end
 
-# State of a listed schedule.
 class Temporalio::Client::Schedule::List::State < ::Data
   sig { params(raw_info: T.untyped).void }
   def initialize(raw_info:); end
@@ -3856,16 +3288,13 @@ class Temporalio::Client::Schedule::List::State < ::Data
   end
 end
 
-# Handle for interacting with a schedule.
 class Temporalio::Client::ScheduleHandle
   sig { params(client: Temporalio::Client, id: String).void }
   def initialize(client:, id:); end
 
-  # @return [String] ID of the schedule.
   sig { returns(String) }
   def id; end
 
-  # Backfill the schedule.
   sig do
     params(
       backfills: Temporalio::Client::Schedule::Backfill,
@@ -3874,27 +3303,21 @@ class Temporalio::Client::ScheduleHandle
   end
   def backfill(*backfills, rpc_options: T.unsafe(nil)); end
 
-  # Delete this schedule.
   sig { params(rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def delete(rpc_options: T.unsafe(nil)); end
 
-  # Fetch this schedule's description.
   sig { params(rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Client::Schedule::Description) }
   def describe(rpc_options: T.unsafe(nil)); end
 
-  # Pause the schedule and set a note.
   sig { params(note: String, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def pause(note: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Trigger an action on this schedule to happen immediately.
   sig { params(overlap: T.nilable(Integer), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def trigger(overlap: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Unpause the schedule and set a note.
   sig { params(note: String, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def unpause(note: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  # Update a schedule using a callback to build the update from the description.
   sig do
     params(
       rpc_options: T.nilable(Temporalio::Client::RPCOptions),
@@ -3904,7 +3327,6 @@ class Temporalio::Client::ScheduleHandle
   def update(rpc_options: T.unsafe(nil), &updater); end
 end
 
-# Start operation used by with-start workflow calls.
 class Temporalio::Client::WithStartWorkflowOperation
   sig do
     params(
@@ -3951,19 +3373,16 @@ class Temporalio::Client::WithStartWorkflowOperation
     headers: T.unsafe(nil)
   ); end
 
-  # @return [Options] Options the operation was created with.
   sig { returns(Temporalio::Client::WithStartWorkflowOperation::Options) }
   def options; end
 
   sig { params(value: Temporalio::Client::WithStartWorkflowOperation::Options).void }
   def options=(value); end
 
-  # Get the workflow handle, possibly waiting until set.
   sig { params(wait: T::Boolean).returns(T.nilable(Temporalio::Client::WorkflowHandle)) }
   def workflow_handle(wait: T.unsafe(nil)); end
 end
 
-# Options the operation was created with.
 class Temporalio::Client::WithStartWorkflowOperation::Options < ::Data
   sig { returns(String) }
   def workflow; end
@@ -4034,14 +3453,11 @@ class Temporalio::Client::WithStartWorkflowOperation::Options < ::Data
   end
 end
 
-# Mixin for intercepting clients.
 module Temporalio::Client::Interceptor
-  # Method called when intercepting a client.
   sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).returns(Temporalio::Client::Interceptor::Outbound) }
   def intercept_client(next_interceptor); end
 end
 
-# Input for {Outbound.start_workflow}.
 class Temporalio::Client::Interceptor::StartWorkflowInput < ::Data
   sig { returns(String) }
   def workflow; end
@@ -4124,7 +3540,6 @@ class Temporalio::Client::Interceptor::StartWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.start_update_with_start_workflow}.
 class Temporalio::Client::Interceptor::StartUpdateWithStartWorkflowInput < ::Data
   sig { returns(String) }
   def update_id; end
@@ -4165,7 +3580,6 @@ class Temporalio::Client::Interceptor::StartUpdateWithStartWorkflowInput < ::Dat
   end
 end
 
-# Input for {Outbound.signal_with_start_workflow}.
 class Temporalio::Client::Interceptor::SignalWithStartWorkflowInput < ::Data
   sig { returns(String) }
   def signal; end
@@ -4194,7 +3608,6 @@ class Temporalio::Client::Interceptor::SignalWithStartWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.list_workflow_page}.
 class Temporalio::Client::Interceptor::ListWorkflowPageInput < ::Data
   sig { returns(T.nilable(String)) }
   def query; end
@@ -4220,7 +3633,6 @@ class Temporalio::Client::Interceptor::ListWorkflowPageInput < ::Data
   end
 end
 
-# Input for {Outbound.count_workflows}.
 class Temporalio::Client::Interceptor::CountWorkflowsInput < ::Data
   sig { returns(T.nilable(String)) }
   def query; end
@@ -4240,7 +3652,6 @@ class Temporalio::Client::Interceptor::CountWorkflowsInput < ::Data
   end
 end
 
-# Input for {Outbound.describe_workflow}.
 class Temporalio::Client::Interceptor::DescribeWorkflowInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4263,7 +3674,6 @@ class Temporalio::Client::Interceptor::DescribeWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.fetch_workflow_history_events}.
 class Temporalio::Client::Interceptor::FetchWorkflowHistoryEventsInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4295,7 +3705,6 @@ class Temporalio::Client::Interceptor::FetchWorkflowHistoryEventsInput < ::Data
   end
 end
 
-# Input for {Outbound.signal_workflow}.
 class Temporalio::Client::Interceptor::SignalWorkflowInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4330,7 +3739,6 @@ class Temporalio::Client::Interceptor::SignalWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.query_workflow}.
 class Temporalio::Client::Interceptor::QueryWorkflowInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4371,7 +3779,6 @@ class Temporalio::Client::Interceptor::QueryWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.start_workflow_update}.
 class Temporalio::Client::Interceptor::StartWorkflowUpdateInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4415,7 +3822,6 @@ class Temporalio::Client::Interceptor::StartWorkflowUpdateInput < ::Data
   end
 end
 
-# Input for {Outbound.poll_workflow_update}.
 class Temporalio::Client::Interceptor::PollWorkflowUpdateInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4441,7 +3847,6 @@ class Temporalio::Client::Interceptor::PollWorkflowUpdateInput < ::Data
   end
 end
 
-# Input for {Outbound.cancel_workflow}.
 class Temporalio::Client::Interceptor::CancelWorkflowInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4467,7 +3872,6 @@ class Temporalio::Client::Interceptor::CancelWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.terminate_workflow}.
 class Temporalio::Client::Interceptor::TerminateWorkflowInput < ::Data
   sig { returns(String) }
   def workflow_id; end
@@ -4499,7 +3903,6 @@ class Temporalio::Client::Interceptor::TerminateWorkflowInput < ::Data
   end
 end
 
-# Input for {Outbound.create_schedule}.
 class Temporalio::Client::Interceptor::CreateScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4534,7 +3937,6 @@ class Temporalio::Client::Interceptor::CreateScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.list_schedules}.
 class Temporalio::Client::Interceptor::ListSchedulesInput < ::Data
   sig { returns(T.nilable(String)) }
   def query; end
@@ -4554,7 +3956,6 @@ class Temporalio::Client::Interceptor::ListSchedulesInput < ::Data
   end
 end
 
-# Input for {Outbound.backfill_schedule}.
 class Temporalio::Client::Interceptor::BackfillScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4577,7 +3978,6 @@ class Temporalio::Client::Interceptor::BackfillScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.delete_schedule}.
 class Temporalio::Client::Interceptor::DeleteScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4597,7 +3997,6 @@ class Temporalio::Client::Interceptor::DeleteScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.describe_schedule}.
 class Temporalio::Client::Interceptor::DescribeScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4617,7 +4016,6 @@ class Temporalio::Client::Interceptor::DescribeScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.pause_schedule}.
 class Temporalio::Client::Interceptor::PauseScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4640,7 +4038,6 @@ class Temporalio::Client::Interceptor::PauseScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.trigger_schedule}.
 class Temporalio::Client::Interceptor::TriggerScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4663,7 +4060,6 @@ class Temporalio::Client::Interceptor::TriggerScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.unpause_schedule}.
 class Temporalio::Client::Interceptor::UnpauseScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4686,7 +4082,6 @@ class Temporalio::Client::Interceptor::UnpauseScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.update_schedule}.
 class Temporalio::Client::Interceptor::UpdateScheduleInput < ::Data
   sig { returns(String) }
   def id; end
@@ -4709,7 +4104,6 @@ class Temporalio::Client::Interceptor::UpdateScheduleInput < ::Data
   end
 end
 
-# Input for {Outbound.heartbeat_async_activity}.
 class Temporalio::Client::Interceptor::HeartbeatAsyncActivityInput < ::Data
   sig { returns(T.any(String, Temporalio::Client::ActivityIDReference)) }
   def task_token_or_id_reference; end
@@ -4735,7 +4129,6 @@ class Temporalio::Client::Interceptor::HeartbeatAsyncActivityInput < ::Data
   end
 end
 
-# Input for {Outbound.complete_async_activity}.
 class Temporalio::Client::Interceptor::CompleteAsyncActivityInput < ::Data
   sig { returns(T.any(String, Temporalio::Client::ActivityIDReference)) }
   def task_token_or_id_reference; end
@@ -4761,7 +4154,6 @@ class Temporalio::Client::Interceptor::CompleteAsyncActivityInput < ::Data
   end
 end
 
-# Input for {Outbound.fail_async_activity}.
 class Temporalio::Client::Interceptor::FailAsyncActivityInput < ::Data
   sig { returns(T.any(String, Temporalio::Client::ActivityIDReference)) }
   def task_token_or_id_reference; end
@@ -4790,7 +4182,6 @@ class Temporalio::Client::Interceptor::FailAsyncActivityInput < ::Data
   end
 end
 
-# Input for {Outbound.report_cancellation_async_activity}.
 class Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput < ::Data
   sig { returns(T.any(String, Temporalio::Client::ActivityIDReference)) }
   def task_token_or_id_reference; end
@@ -4816,12 +4207,10 @@ class Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput < ::
   end
 end
 
-# Outbound interceptor for intercepting client calls.
 class Temporalio::Client::Interceptor::Outbound
   sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).void }
   def initialize(next_interceptor); end
 
-  # @return [Outbound] Next interceptor in the chain.
   sig { returns(Temporalio::Client::Interceptor::Outbound) }
   def next_interceptor; end
 
@@ -4904,17 +4293,13 @@ class Temporalio::Client::Interceptor::Outbound
   def report_cancellation_async_activity(input); end
 end
 
-# Plugin mixin to include for configuring clients and/or intercepting connect calls.
 module Temporalio::Client::Plugin
-  # @return [String] Name of the plugin.
   sig { returns(String) }
   def name; end
 
-  # Configure a client.
   sig { params(options: Temporalio::Client::Options).returns(Temporalio::Client::Options) }
   def configure_client(options); end
 
-  # Connect a client.
   sig do
     params(
       options: Temporalio::Client::Connection::Options,
@@ -5060,10 +4445,6 @@ class Temporalio::Worker
   end
 end
 
-# ============================================================
-# Temporalio::Worker::Options
-# ============================================================
-
 class Temporalio::Worker::Options < ::Data
   extend T::Sig
 
@@ -5164,10 +4545,6 @@ class Temporalio::Worker::Options < ::Data
   def with(**kwargs); end
 end
 
-# ============================================================
-# Temporalio::Worker::ActivityExecutor
-# ============================================================
-
 class Temporalio::Worker::ActivityExecutor
   extend T::Sig
 
@@ -5187,7 +4564,6 @@ class Temporalio::Worker::ActivityExecutor
   def set_activity_context(defn, context); end
 end
 
-# Activity executor for scheduling activities as fibers.
 class Temporalio::Worker::ActivityExecutor::Fiber < Temporalio::Worker::ActivityExecutor
   extend T::Sig
 
@@ -5207,7 +4583,6 @@ class Temporalio::Worker::ActivityExecutor::Fiber < Temporalio::Worker::Activity
   def set_activity_context(defn, context); end
 end
 
-# Activity executor for scheduling activities in their own thread.
 class Temporalio::Worker::ActivityExecutor::ThreadPool < ::Temporalio::Worker::ActivityExecutor
   extend T::Sig
 
@@ -5227,10 +4602,6 @@ class Temporalio::Worker::ActivityExecutor::ThreadPool < ::Temporalio::Worker::A
   def set_activity_context(defn, context); end
 end
 
-# ============================================================
-# Temporalio::Worker::WorkflowExecutor
-# ============================================================
-
 class Temporalio::Worker::WorkflowExecutor
   extend T::Sig
 
@@ -5238,7 +4609,6 @@ class Temporalio::Worker::WorkflowExecutor
   def initialize; end
 end
 
-# Thread pool implementation of WorkflowExecutor.
 class Temporalio::Worker::WorkflowExecutor::ThreadPool < ::Temporalio::Worker::WorkflowExecutor
   extend T::Sig
 
@@ -5249,12 +4619,7 @@ class Temporalio::Worker::WorkflowExecutor::ThreadPool < ::Temporalio::Worker::W
   def initialize(max_threads: T.unsafe(nil), thread_pool: T.unsafe(nil)); end
 end
 
-# Error raised when a processing a workflow task takes more than the expected amount of time.
 class Temporalio::Worker::WorkflowExecutor::ThreadPool::DeadlockError < ::Exception; end
-
-# ============================================================
-# Temporalio::Worker::Tuner
-# ============================================================
 
 class Temporalio::Worker::Tuner
   extend T::Sig
@@ -5317,13 +4682,8 @@ class Temporalio::Worker::Tuner
   end
 end
 
-# ============================================================
-# Temporalio::Worker::Tuner::SlotSupplier
-# ============================================================
-
 class Temporalio::Worker::Tuner::SlotSupplier; end
 
-# Fixed-size slot supplier.
 class Temporalio::Worker::Tuner::SlotSupplier::Fixed < ::Temporalio::Worker::Tuner::SlotSupplier
   extend T::Sig
 
@@ -5334,7 +4694,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::Fixed < ::Temporalio::Worker::Tun
   def initialize(slots); end
 end
 
-# Resource-based slot supplier.
 class Temporalio::Worker::Tuner::SlotSupplier::ResourceBased < ::Temporalio::Worker::Tuner::SlotSupplier
   extend T::Sig
 
@@ -5353,7 +4712,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::ResourceBased < ::Temporalio::Wor
   def initialize(tuner_options:, slot_options:); end
 end
 
-# Custom slot supplier with callbacks.
 class Temporalio::Worker::Tuner::SlotSupplier::Custom < ::Temporalio::Worker::Tuner::SlotSupplier
   extend T::Sig
 
@@ -5376,7 +4734,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom < ::Temporalio::Worker::Tu
   def release_slot(context); end
 end
 
-# Context provided for slot reservation on custom slot supplier.
 class Temporalio::Worker::Tuner::SlotSupplier::Custom::ReserveContext < ::Data
   extend T::Sig
 
@@ -5399,7 +4756,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom::ReserveContext < ::Data
   def sticky?; end
 end
 
-# Context provided for marking a slot used.
 class Temporalio::Worker::Tuner::SlotSupplier::Custom::MarkUsedContext < ::Data
   extend T::Sig
 
@@ -5410,7 +4766,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom::MarkUsedContext < ::Data
   def permit; end
 end
 
-# Context provided for releasing a slot.
 class Temporalio::Worker::Tuner::SlotSupplier::Custom::ReleaseContext < ::Data
   extend T::Sig
 
@@ -5457,7 +4812,6 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Nexus < ::Data
   def operation; end
 end
 
-# Options for resource-based tuner.
 class Temporalio::Worker::Tuner::ResourceBasedTunerOptions < ::Data
   extend T::Sig
 
@@ -5471,7 +4825,6 @@ class Temporalio::Worker::Tuner::ResourceBasedTunerOptions < ::Data
   def initialize(target_memory_usage:, target_cpu_usage:); end
 end
 
-# Options for a specific slot type being used with ResourceBased.
 class Temporalio::Worker::Tuner::ResourceBasedSlotOptions < ::Data
   extend T::Sig
 
@@ -5487,10 +4840,6 @@ class Temporalio::Worker::Tuner::ResourceBasedSlotOptions < ::Data
   sig { params(min_slots: T.nilable(Integer), max_slots: T.nilable(Integer), ramp_throttle: T.nilable(Float)).void }
   def initialize(min_slots:, max_slots:, ramp_throttle:); end
 end
-
-# ============================================================
-# Temporalio::Worker::ThreadPool
-# ============================================================
 
 class Temporalio::Worker::ThreadPool
   extend T::Sig
@@ -5529,10 +4878,6 @@ class Temporalio::Worker::ThreadPool
   def kill; end
 end
 
-# ============================================================
-# Temporalio::Worker::PollerBehavior
-# ============================================================
-
 class Temporalio::Worker::PollerBehavior; end
 
 class Temporalio::Worker::PollerBehavior::SimpleMaximum < ::Temporalio::Worker::PollerBehavior
@@ -5561,10 +4906,6 @@ class Temporalio::Worker::PollerBehavior::Autoscaling < ::Temporalio::Worker::Po
   def initialize(minimum: T.unsafe(nil), maximum: T.unsafe(nil), initial: T.unsafe(nil)); end
 end
 
-# ============================================================
-# Temporalio::Worker::DeploymentOptions
-# ============================================================
-
 class Temporalio::Worker::DeploymentOptions < ::Data
   extend T::Sig
 
@@ -5586,10 +4927,6 @@ class Temporalio::Worker::DeploymentOptions < ::Data
   end
   def initialize(version:, use_worker_versioning: T.unsafe(nil), default_versioning_behavior: T.unsafe(nil)); end
 end
-
-# ============================================================
-# Temporalio::Worker::Interceptor
-# ============================================================
 
 module Temporalio::Worker::Interceptor; end
 
@@ -6079,10 +5416,6 @@ class Temporalio::Worker::Interceptor::Workflow::Outbound
   def start_nexus_operation(input); end
 end
 
-# ============================================================
-# Temporalio::Worker::Plugin
-# ============================================================
-
 module Temporalio::Worker::Plugin
   extend T::Sig
 
@@ -6130,10 +5463,6 @@ class Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions < ::Data
   sig { params(kwargs: T.untyped).returns(Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions) }
   def with(**kwargs); end
 end
-
-# ============================================================
-# Temporalio::Worker::WorkflowReplayer
-# ============================================================
 
 class Temporalio::Worker::WorkflowReplayer
   extend T::Sig
@@ -6281,10 +5610,6 @@ class Temporalio::Worker::WorkflowReplayer::ReplayWorker
   def replay_workflow(history, raise_on_replay_failure: T.unsafe(nil)); end
 end
 
-# ============================================================
-# Temporalio::Worker::IllegalWorkflowCallValidator
-# ============================================================
-
 class Temporalio::Worker::IllegalWorkflowCallValidator
   extend T::Sig
 
@@ -6316,10 +5641,6 @@ class Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo < ::Data
   sig { returns(TracePoint) }
   def trace_point; end
 end
-
-# ============================================================
-# Temporalio::Workflow (module-level methods)
-# ============================================================
 
 module Temporalio::Workflow
   class << self
@@ -6610,10 +5931,6 @@ module Temporalio::Workflow
   end
 end
 
-# ============================================================
-# Temporalio::Workflow::Unsafe
-# ============================================================
-
 module Temporalio::Workflow::Unsafe
   class << self
     extend T::Sig
@@ -6634,10 +5951,6 @@ module Temporalio::Workflow::Unsafe
     def durable_scheduler_disabled(&block); end
   end
 end
-
-# ============================================================
-# Temporalio::Workflow::Definition
-# ============================================================
 
 class Temporalio::Workflow::Definition
   extend T::Sig
@@ -6742,10 +6055,6 @@ class Temporalio::Workflow::Definition
   end
 end
 
-# ============================================================
-# Temporalio::Workflow::Definition::Info
-# ============================================================
-
 class Temporalio::Workflow::Definition::Info
   extend T::Sig
 
@@ -6828,10 +6137,6 @@ class Temporalio::Workflow::Definition::Info
   def name; end
 end
 
-# ============================================================
-# Temporalio::Workflow::Definition::Signal
-# ============================================================
-
 class Temporalio::Workflow::Definition::Signal
   extend T::Sig
 
@@ -6866,10 +6171,6 @@ class Temporalio::Workflow::Definition::Signal
   def initialize(name:, to_invoke:, description: T.unsafe(nil), raw_args: T.unsafe(nil), unfinished_policy: T.unsafe(nil), arg_hints: T.unsafe(nil)); end
 end
 
-# ============================================================
-# Temporalio::Workflow::Definition::Query
-# ============================================================
-
 class Temporalio::Workflow::Definition::Query
   extend T::Sig
 
@@ -6903,10 +6204,6 @@ class Temporalio::Workflow::Definition::Query
   end
   def initialize(name:, to_invoke:, description: T.unsafe(nil), raw_args: T.unsafe(nil), arg_hints: T.unsafe(nil), result_hint: T.unsafe(nil)); end
 end
-
-# ============================================================
-# Temporalio::Workflow::Definition::Update
-# ============================================================
 
 class Temporalio::Workflow::Definition::Update
   extend T::Sig
@@ -6958,10 +6255,6 @@ class Temporalio::Workflow::Definition::Update
     result_hint: T.unsafe(nil)
   ); end
 end
-
-# ============================================================
-# Temporalio::Workflow::Info
-# ============================================================
 
 class Temporalio::Workflow::Info < ::Struct
   extend T::Sig
@@ -7062,10 +6355,6 @@ class Temporalio::Workflow::Info::RootInfo < ::Struct
   def to_h; end
 end
 
-# ============================================================
-# Temporalio::Workflow::UpdateInfo
-# ============================================================
-
 class Temporalio::Workflow::UpdateInfo < ::Struct
   extend T::Sig
 
@@ -7078,10 +6367,6 @@ class Temporalio::Workflow::UpdateInfo < ::Struct
   sig { returns(T::Hash[Symbol, T.untyped]) }
   def to_h; end
 end
-
-# ============================================================
-# Temporalio::Workflow::Future
-# ============================================================
 
 class Temporalio::Workflow::Future
   extend T::Sig
@@ -7143,10 +6428,6 @@ class Temporalio::Workflow::Future
   end
 end
 
-# ============================================================
-# Temporalio::Workflow::ChildWorkflowHandle
-# ============================================================
-
 class Temporalio::Workflow::ChildWorkflowHandle
   extend T::Sig
 
@@ -7173,10 +6454,6 @@ class Temporalio::Workflow::ChildWorkflowHandle
   def signal(signal, *args, cancellation: T.unsafe(nil), arg_hints: T.unsafe(nil)); end
 end
 
-# ============================================================
-# Temporalio::Workflow::ExternalWorkflowHandle
-# ============================================================
-
 class Temporalio::Workflow::ExternalWorkflowHandle
   extend T::Sig
 
@@ -7199,10 +6476,6 @@ class Temporalio::Workflow::ExternalWorkflowHandle
   sig { void }
   def cancel; end
 end
-
-# ============================================================
-# Temporalio::Workflow::NexusClient
-# ============================================================
 
 class Temporalio::Workflow::NexusClient
   extend T::Sig
@@ -7268,10 +6541,6 @@ class Temporalio::Workflow::NexusClient
   ); end
 end
 
-# ============================================================
-# Temporalio::Workflow::NexusOperationHandle
-# ============================================================
-
 class Temporalio::Workflow::NexusOperationHandle
   extend T::Sig
 
@@ -7284,10 +6553,6 @@ class Temporalio::Workflow::NexusOperationHandle
   sig { params(result_hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def result(result_hint: T.unsafe(nil)); end
 end
-
-# ============================================================
-# Workflow enum modules
-# ============================================================
 
 module Temporalio::Workflow::ActivityCancellationType
   TRY_CANCEL = T.let(T.unsafe(nil), Integer)
@@ -7321,7 +6586,6 @@ module Temporalio::Workflow::NexusOperationCancellationType
   WAIT_CANCELLATION_REQUESTED = T.let(T.unsafe(nil), Integer)
 end
 
-# Workflow error types
 class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
   extend T::Sig
 
@@ -7423,10 +6687,6 @@ end
 
 class Temporalio::Workflow::InvalidWorkflowStateError < ::Temporalio::Error; end
 class Temporalio::Workflow::NondeterminismError < ::Temporalio::Error; end
-
-# ============================================================
-# Temporalio::Runtime
-# ============================================================
 
 class Temporalio::Runtime
   extend T::Sig
@@ -7612,10 +6872,6 @@ class Temporalio::Runtime::PrometheusMetricsOptions < ::Data
   ); end
 end
 
-# ============================================================
-# Temporalio::Runtime::MetricBuffer
-# ============================================================
-
 class Temporalio::Runtime::MetricBuffer
   extend T::Sig
 
@@ -7659,10 +6915,6 @@ class Temporalio::Runtime::MetricBuffer::Metric < ::Data
   sig { returns(Symbol) }
   def kind; end
 end
-
-# ============================================================
-# Temporalio::Converters::DataConverter
-# ============================================================
 
 module Temporalio::Converters; end
 
@@ -7709,10 +6961,6 @@ class Temporalio::Converters::DataConverter
   def from_failure(failure); end
 end
 
-# ============================================================
-# Temporalio::Converters::FailureConverter
-# ============================================================
-
 class Temporalio::Converters::FailureConverter
   extend T::Sig
 
@@ -7732,10 +6980,6 @@ class Temporalio::Converters::FailureConverter
   def from_failure(failure, converter); end
 end
 
-# ============================================================
-# Temporalio::Converters::PayloadCodec
-# ============================================================
-
 class Temporalio::Converters::PayloadCodec
   extend T::Sig
 
@@ -7745,10 +6989,6 @@ class Temporalio::Converters::PayloadCodec
   sig { params(payloads: T::Enumerable[T.untyped]).returns(T::Array[T.untyped]) }
   def decode(payloads); end
 end
-
-# ============================================================
-# Temporalio::Converters::PayloadConverter
-# ============================================================
 
 class Temporalio::Converters::PayloadConverter
   extend T::Sig
@@ -7844,10 +7084,6 @@ class Temporalio::Converters::RawValue
   def initialize(payload); end
 end
 
-# ============================================================
-# Temporalio::Contrib::OpenTelemetry
-# ============================================================
-
 module Temporalio::Contrib; end
 module Temporalio::Contrib::OpenTelemetry; end
 
@@ -7918,10 +7154,6 @@ module Temporalio::Contrib::OpenTelemetry::Workflow
     ); end
   end
 end
-
-# ============================================================
-# Temporalio::EnvConfig
-# ============================================================
 
 module Temporalio::EnvConfig; end
 
@@ -8078,10 +7310,6 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
   def to_h; end
 end
 
-# ============================================================
-# Temporalio::Testing
-# ============================================================
-
 module Temporalio::Testing; end
 
 class Temporalio::Testing::ActivityEnvironment
@@ -8235,10 +7463,6 @@ class Temporalio::Testing::WorkflowEnvironment
   end
 end
 
-# ============================================================
-# Temporalio::SimplePlugin
-# ============================================================
-
 class Temporalio::SimplePlugin
   include Temporalio::Client::Plugin
   include Temporalio::Worker::Plugin
@@ -8278,10 +7502,6 @@ class Temporalio::SimplePlugin::Options
   sig { returns(String) }
   def name; end
 end
-
-# ============================================================
-# Temporalio::Workflow::Mutex, Queue, SizedQueue
-# ============================================================
 
 class Temporalio::Workflow::Mutex < ::Mutex; end
 class Temporalio::Workflow::Queue < ::Queue; end
