@@ -8245,6 +8245,6 @@ end
 # Temporalio::Workflow::Mutex, Queue, SizedQueue
 # ============================================================
 
-class Temporalio::Workflow::Mutex; end
-class Temporalio::Workflow::Queue; end
-class Temporalio::Workflow::SizedQueue; end
+class Temporalio::Workflow::Mutex < ::Mutex; end
+class Temporalio::Workflow::Queue < ::Queue; end
+class Temporalio::Workflow::SizedQueue < ::SizedQueue; end
