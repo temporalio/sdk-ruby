@@ -320,6 +320,7 @@ static METRIC_BUFFER_METRIC: Lazy<RClass> = Lazy::new(|ruby| {
 static METRIC_KIND_COUNTER: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("counter"));
 static METRIC_KIND_GAUGE: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("gauge"));
 static METRIC_KIND_HISTOGRAM: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("histogram"));
+static METRIC_KIND_UP_DOWN_COUNTER: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("up_down_counter"));
 
 pub fn convert_metric_events(
     ruby: &Ruby,
@@ -388,6 +389,9 @@ fn convert_metric_event(
                         | metrics::core::MetricKind::HistogramF64
                         | metrics::core::MetricKind::HistogramDuration => {
                             ruby.get_inner(&METRIC_KIND_HISTOGRAM)
+                        }
+                        metrics::core::MetricKind::UpDownCounter => {
+                            ruby.get_inner(&METRIC_KIND_UP_DOWN_COUNTER)
                         }
                     },
                 ),
@@ -475,6 +479,7 @@ fn convert_metric_event(
                             metrics::core::MetricUpdateVal::DeltaF64(v) => ruby.into_value(v),
                             metrics::core::MetricUpdateVal::Value(v) => ruby.into_value(v),
                             metrics::core::MetricUpdateVal::ValueF64(v) => ruby.into_value(v),
+                            metrics::core::MetricUpdateVal::SignedDelta(v) => ruby.into_value(v),
                         },
                         // Attributes
                         attributes
