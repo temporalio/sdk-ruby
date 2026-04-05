@@ -320,7 +320,8 @@ static METRIC_BUFFER_METRIC: Lazy<RClass> = Lazy::new(|ruby| {
 static METRIC_KIND_COUNTER: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("counter"));
 static METRIC_KIND_GAUGE: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("gauge"));
 static METRIC_KIND_HISTOGRAM: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("histogram"));
-static METRIC_KIND_UP_DOWN_COUNTER: Lazy<StaticSymbol> = Lazy::new(|ruby| ruby.sym_new("up_down_counter"));
+static METRIC_KIND_UP_DOWN_COUNTER: Lazy<StaticSymbol> =
+    Lazy::new(|ruby| ruby.sym_new("up_down_counter"));
 
 pub fn convert_metric_events(
     ruby: &Ruby,

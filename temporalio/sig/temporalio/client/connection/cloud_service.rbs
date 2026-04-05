@@ -5,6 +5,10 @@ module Temporalio
     class Connection
       class CloudService < Service
         def initialize: (Connection) -> void
+        def get_current_identity: (
+          untyped request,
+          ?rpc_options: RPCOptions?
+        ) -> untyped
         def get_users: (
           Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest request,
           ?rpc_options: RPCOptions?

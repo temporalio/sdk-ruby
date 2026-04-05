@@ -76,7 +76,11 @@ class ProtoGen
     generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_upstream/**/*.proto').reject do |proto|
       proto.include?('google')
     end)
-    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'))
+    generate_openapiv2_protos
+    generate_api_protos(
+      Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'),
+      extra_proto_paths: ['--proto_path=ext/sdk-core/crates/common/protos']
+    )
     generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/testsrv_upstream/**/*.proto'))
     generate_api_protos(Dir.glob('ext/additional_protos/**/*.proto'))
     generate_import_helper_files
@@ -88,7 +92,7 @@ class ProtoGen
 
   private
 
-  def generate_api_protos(api_protos)
+  def generate_api_protos(api_protos, extra_proto_paths: [])
     # Generate API to temp dir and move
     FileUtils.rm_rf('tmp-proto')
     FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
@@ -99,6 +103,7 @@ class ProtoGen
       '--proto_path=ext/sdk-core/crates/common/protos/api_cloud_upstream',
       '--proto_path=ext/sdk-core/crates/common/protos/testsrv_upstream',
       '--proto_path=ext/additional_protos',
+      *extra_proto_paths,
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *api_protos,
@@ -121,6 +126,22 @@ class ProtoGen
     FileUtils.cp_r('tmp-proto/ruby/temporal/api', 'lib/temporalio')
     FileUtils.mkdir_p('sig/temporalio')
     FileUtils.cp_r('tmp-proto/rbs/temporal/api', 'sig/temporalio')
+    FileUtils.rm_rf('tmp-proto')
+  end
+
+  def generate_openapiv2_protos
+    FileUtils.rm_rf('tmp-proto')
+    FileUtils.mkdir_p('tmp-proto')
+    system(
+      'bundle',
+      'exec',
+      'grpc_tools_ruby_protoc',
+      '--proto_path=ext/sdk-core/crates/common/protos',
+      '--ruby_out=tmp-proto',
+      *Dir.glob('ext/sdk-core/crates/common/protos/protoc-gen-openapiv2/**/*.proto'),
+      exception: true
+    )
+    FileUtils.cp_r('tmp-proto/protoc-gen-openapiv2', 'lib')
     FileUtils.rm_rf('tmp-proto')
   end
 
