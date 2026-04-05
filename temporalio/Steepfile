@@ -11,6 +11,7 @@ common_diagnostics = {
 target :lib do
   signature 'sig'
   check 'lib'
+  ignore 'lib/temporalio/api', 'lib/temporalio/internal/bridge/api', 'lib/protoc-gen-openapiv2'
   library 'uri', 'objspace', 'etc'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)

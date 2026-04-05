@@ -44,7 +44,8 @@ module CustomizeYardWarnings # rubocop:disable Style/Documentation
     # We ignore if it's an API warning
     last_file = statement.last.file
     raise unless (last_file.start_with?('lib/temporalio/api/') && last_file.count('/') > 3) ||
-                 last_file.start_with?('lib/temporalio/internal/bridge/api/')
+                 last_file.start_with?('lib/temporalio/internal/bridge/api/') ||
+                 last_file.start_with?('lib/protoc-gen-openapiv2/')
   end
 end
 
