@@ -228,7 +228,7 @@ module Temporalio
                 if details
                   e = Error::WorkflowAlreadyStartedError.new(
                     workflow_id: start_options.id,
-                    workflow_type: start_req.workflow_type,
+                    workflow_type: start_req.workflow_type.name,
                     run_id: details.run_id
                   )
                 end

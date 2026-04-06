@@ -742,14 +742,16 @@ class WorkerWorkflowHandlerTest < Test
         UpdateWithStartWorkflow, 123,
         id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
       )
-      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+      err = assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         env.client.execute_update_with_start_workflow(
           UpdateWithStartWorkflow.increment_counter, 456, start_workflow_operation:
         )
       end
-      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+      assert_equal 'UpdateWithStartWorkflow', err.workflow_type
+      err = assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         start_workflow_operation.workflow_handle
       end
+      assert_equal 'UpdateWithStartWorkflow', err.workflow_type
     end
   end
 
@@ -830,15 +832,17 @@ class WorkerWorkflowHandlerTest < Test
         UpdateWithStartWorkflow, 123,
         id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
       )
-      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+      err = assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         env.client.start_update_with_start_workflow(
           UpdateWithStartWorkflow.increment_counter, 456,
           wait_for_stage: Temporalio::Client::WorkflowUpdateWaitStage::ACCEPTED, start_workflow_operation:
         )
       end
-      assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
+      assert_equal 'UpdateWithStartWorkflow', err.workflow_type
+      err = assert_raises(Temporalio::Error::WorkflowAlreadyStartedError) do
         start_workflow_operation.workflow_handle
       end
+      assert_equal 'UpdateWithStartWorkflow', err.workflow_type
     end
   end
 
