@@ -107,7 +107,10 @@ module SigApplicator
 
         return if IGNORED_ERRORS.any? { |pattern| message.include?(pattern) }
 
-        SigApplicator.record_type_error(message)
+        # Include location for debugging
+        location = opts[:location]
+        full = location ? "#{message}\n  Location: #{location}" : message
+        SigApplicator.record_type_error(full)
       end
     end
 
@@ -124,8 +127,7 @@ module SigApplicator
           unique = errors.tally
           summary = "SigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):\n"
           unique.sort_by { |_, count| -count }.each do |msg, count|
-            short = msg.lines.first&.chomp || msg
-            summary << "  [#{count}x] #{short}\n"
+            summary << "  [#{count}x] #{msg}\n"
           end
           flunk summary
         end
