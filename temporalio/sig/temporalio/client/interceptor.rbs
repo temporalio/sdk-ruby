@@ -433,9 +433,9 @@ module Temporalio
       end
 
       class Outbound
-        attr_reader next_interceptor: Outbound
+        attr_reader next_interceptor: Outbound?
 
-        def initialize: (Outbound next_interceptor) -> void
+        def initialize: (Outbound? next_interceptor) -> void
 
         def start_workflow: (StartWorkflowInput input) -> WorkflowHandle
 

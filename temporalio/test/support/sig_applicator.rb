@@ -7,6 +7,10 @@ require 'sorbet-runtime'
 # real (already-loaded) class implementations using define_method.
 # This enables sorbet-runtime to validate argument and return types at runtime
 # during test execution, catching any drift between the RBI and actual code.
+#
+# Type mismatches are collected and reported as a summary after the test run
+# rather than raising mid-execution. This avoids hanging workflows where a
+# TypeError would cause an unrecoverable task failure that retries forever.
 module SigApplicator
   RBI_PATH = File.expand_path('../../rbi/temporalio.rbi', __dir__)
 
@@ -22,8 +26,14 @@ module SigApplicator
     'Temporalio::Workflow::Future'
   ].freeze
 
+  @type_errors = []
+  @mutex = Mutex.new
+
   class << self
     def apply_all!
+      configure_error_handler!
+      register_summary_hook!
+
       tree = RBI::Parser.parse_file(RBI_PATH)
       errors = []
       skipped = 0
@@ -43,7 +53,52 @@ module SigApplicator
       errors.each { |e| warn "  #{e}" }
     end
 
+    def record_type_error(message)
+      Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
+        @mutex.synchronize { @type_errors << message }
+      end
+    end
+
+    def type_errors
+      @mutex.synchronize { @type_errors.dup }
+    end
+
     private
+
+    def configure_error_handler!
+      T::Configuration.call_validation_error_handler = lambda do |_sig, opts|
+        message = opts[:pretty_message] || opts[:message]
+        value = opts[:value]
+        type = opts[:type]
+
+        # SimpleDelegator wrappers don't pass Sorbet's is_a? checks because
+        # they inherit from Delegator, not the wrapped class. Check the
+        # delegate object against the expected type instead.
+        if value.is_a?(SimpleDelegator) && type
+          delegate = value.__getobj__
+          SigApplicator.record_type_error(message) unless type.valid?(delegate)
+          return
+        end
+
+        SigApplicator.record_type_error(message)
+      end
+    end
+
+    # Print a summary of type errors after the test suite finishes.
+    def register_summary_hook!
+      Minitest.after_run do
+        errors = SigApplicator.type_errors
+        next if errors.empty?
+
+        unique = errors.tally
+        warn "\nSigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):"
+        unique.sort_by { |_, count| -count }.each do |msg, count|
+          # Trim to first line for readability
+          short = msg.lines.first&.chomp || msg
+          warn "  [#{count}x] #{short}"
+        end
+      end
+    end
 
     def apply_scope(node, errors)
       return [0, 0] unless node.respond_to?(:nodes)

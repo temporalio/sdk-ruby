@@ -20,9 +20,9 @@ module Temporalio
         end
 
         class Inbound
-          attr_reader next_interceptor: Inbound
+          attr_reader next_interceptor: Inbound?
 
-          def initialize: (Inbound next_interceptor) -> void
+          def initialize: (Inbound? next_interceptor) -> void
 
           def init: (Outbound outbound) -> Outbound
 
@@ -37,9 +37,9 @@ module Temporalio
         end
 
         class Outbound
-          attr_reader next_interceptor: Outbound
+          attr_reader next_interceptor: Outbound?
 
-          def initialize: (Outbound next_interceptor) -> void
+          def initialize: (Outbound? next_interceptor) -> void
 
           def heartbeat: (HeartbeatInput input) -> void
         end
@@ -105,9 +105,9 @@ module Temporalio
         end
 
         class Inbound
-          attr_reader next_interceptor: Inbound
+          attr_reader next_interceptor: Inbound?
 
-          def initialize: (Inbound next_interceptor) -> void
+          def initialize: (Inbound? next_interceptor) -> void
 
           def init: (Outbound outbound) -> Outbound
 
@@ -345,9 +345,9 @@ module Temporalio
         end
 
         class Outbound
-          attr_reader next_interceptor: Outbound
+          attr_reader next_interceptor: Outbound?
 
-          def initialize: (Outbound next_interceptor) -> void
+          def initialize: (Outbound? next_interceptor) -> void
 
           def cancel_external_workflow: (CancelExternalWorkflowInput input) -> void
 
