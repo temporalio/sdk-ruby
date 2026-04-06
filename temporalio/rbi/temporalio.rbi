@@ -235,7 +235,7 @@ class Temporalio::Activity::Info < ::Data
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: nil); end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def heartbeat_timeout; end
 
   sig { returns(T::Boolean) }
@@ -250,13 +250,13 @@ class Temporalio::Activity::Info < ::Data
   sig { returns(T.nilable(Temporalio::RetryPolicy)) }
   def retry_policy; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def schedule_to_close_timeout; end
 
   sig { returns(Time) }
   def scheduled_time; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def start_to_close_timeout; end
 
   sig { returns(Time) }
@@ -664,7 +664,7 @@ class Temporalio::Priority < ::Data
   sig { returns(T.nilable(String)) }
   def fairness_key; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def fairness_weight; end
 
   sig { returns(T::Boolean) }
@@ -930,8 +930,8 @@ class Temporalio::Metric::Meter
 end
 
 class Temporalio::ScopedLogger < ::SimpleDelegator
-  sig { params(logger: ::Logger).void }
-  def initialize(logger); end
+  sig { params(obj: ::Logger).void }
+  def initialize(obj); end
 
   sig { returns(T.nilable(Proc)) }
   def scoped_values_getter; end
@@ -1424,7 +1424,7 @@ class Temporalio::Client::RPCOptions
   sig { params(value: T.nilable(T::Hash[String, String])).void }
   def metadata=(value); end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def timeout; end
 
   sig { params(value: T.nilable(Float)).void }
@@ -1529,7 +1529,7 @@ class Temporalio::Client::Connection::Options < ::Data
   sig { returns(Temporalio::Client::Connection::KeepAliveOptions) }
   def keep_alive; end
 
-  sig { returns(Temporalio::Client::Connection::HTTPConnectProxyOptions) }
+  sig { returns(T.nilable(Temporalio::Client::Connection::HTTPConnectProxyOptions)) }
   def http_connect_proxy; end
 
   sig { returns(Temporalio::Runtime) }
@@ -2313,10 +2313,11 @@ class Temporalio::Client::WorkflowHandle
   sig do
     params(
       event_filter_type: Integer,
+      skip_archival: T::Boolean,
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
     ).returns(Temporalio::WorkflowHistory)
   end
-  def fetch_history(event_filter_type: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+  def fetch_history(event_filter_type: T.unsafe(nil), skip_archival: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
   sig do
     params(
@@ -2798,7 +2799,7 @@ class Temporalio::Client::Schedule::ActionResult < ::Data
   def initialize(raw_result:); end
 
   sig { returns(Time) }
-  def schedule_at; end
+  def scheduled_at; end
 
   sig { returns(Time) }
   def started_at; end
@@ -2860,7 +2861,7 @@ class Temporalio::Client::Schedule::Spec < ::Data
   sig { returns(T.nilable(Time)) }
   def end_at; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def jitter; end
 
   sig { returns(T.nilable(String)) }
@@ -4208,10 +4209,10 @@ class Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput < ::
 end
 
 class Temporalio::Client::Interceptor::Outbound
-  sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).void }
+  sig { params(next_interceptor: T.nilable(Temporalio::Client::Interceptor::Outbound)).void }
   def initialize(next_interceptor); end
 
-  sig { returns(Temporalio::Client::Interceptor::Outbound) }
+  sig { returns(T.nilable(Temporalio::Client::Interceptor::Outbound)) }
   def next_interceptor; end
 
   sig { params(input: Temporalio::Client::Interceptor::StartWorkflowInput).returns(Temporalio::Client::WorkflowHandle) }
@@ -4330,23 +4331,23 @@ class Temporalio::Worker
       logger: Logger,
       max_cached_workflows: Integer,
       max_concurrent_workflow_task_polls: Integer,
-      nonsticky_to_sticky_poll_ratio: Float,
+      nonsticky_to_sticky_poll_ratio: Numeric,
       max_concurrent_activity_task_polls: Integer,
       no_remote_activities: T::Boolean,
-      sticky_queue_schedule_to_start_timeout: Float,
-      max_heartbeat_throttle_interval: Float,
-      default_heartbeat_throttle_interval: Float,
-      max_activities_per_second: T.nilable(Float),
-      max_task_queue_activities_per_second: T.nilable(Float),
-      graceful_shutdown_period: Float,
+      sticky_queue_schedule_to_start_timeout: Numeric,
+      max_heartbeat_throttle_interval: Numeric,
+      default_heartbeat_throttle_interval: Numeric,
+      max_activities_per_second: T.nilable(Numeric),
+      max_task_queue_activities_per_second: T.nilable(Numeric),
+      graceful_shutdown_period: Numeric,
       disable_eager_activity_execution: T::Boolean,
       illegal_workflow_calls: T::Hash[String, T.any(Symbol, T::Array[T.any(Symbol, Temporalio::Worker::IllegalWorkflowCallValidator)], Temporalio::Worker::IllegalWorkflowCallValidator)],
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       workflow_payload_codec_thread_pool: T.nilable(Temporalio::Worker::ThreadPool),
       unsafe_workflow_io_enabled: T::Boolean,
+      deployment_options: Temporalio::Worker::DeploymentOptions,
       workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior,
       activity_task_poller_behavior: Temporalio::Worker::PollerBehavior,
-      deployment_options: Temporalio::Worker::DeploymentOptions,
       debug_mode: T::Boolean
     ).void
   end
@@ -4378,9 +4379,9 @@ class Temporalio::Worker
     workflow_failure_exception_types: T.unsafe(nil),
     workflow_payload_codec_thread_pool: T.unsafe(nil),
     unsafe_workflow_io_enabled: T.unsafe(nil),
+    deployment_options: T.unsafe(nil),
     workflow_task_poller_behavior: T.unsafe(nil),
     activity_task_poller_behavior: T.unsafe(nil),
-    deployment_options: T.unsafe(nil),
     debug_mode: T.unsafe(nil)
   ); end
 
@@ -4475,7 +4476,7 @@ class Temporalio::Worker::Options < ::Data
   sig { returns(T::Array[T.any(Temporalio::Worker::Interceptor::Activity, Temporalio::Worker::Interceptor::Workflow)]) }
   def interceptors; end
 
-  sig { returns(String) }
+  sig { returns(T.nilable(String)) }
   def identity; end
 
   sig { returns(Logger) }
@@ -4487,7 +4488,7 @@ class Temporalio::Worker::Options < ::Data
   sig { returns(Integer) }
   def max_concurrent_workflow_task_polls; end
 
-  sig { returns(Float) }
+  sig { returns(Numeric) }
   def nonsticky_to_sticky_poll_ratio; end
 
   sig { returns(Integer) }
@@ -4496,22 +4497,22 @@ class Temporalio::Worker::Options < ::Data
   sig { returns(T::Boolean) }
   def no_remote_activities; end
 
-  sig { returns(Float) }
+  sig { returns(Numeric) }
   def sticky_queue_schedule_to_start_timeout; end
 
-  sig { returns(Float) }
+  sig { returns(Numeric) }
   def max_heartbeat_throttle_interval; end
 
-  sig { returns(Float) }
+  sig { returns(Numeric) }
   def default_heartbeat_throttle_interval; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def max_activities_per_second; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def max_task_queue_activities_per_second; end
 
-  sig { returns(Float) }
+  sig { returns(Numeric) }
   def graceful_shutdown_period; end
 
   sig { returns(T::Boolean) }
@@ -4834,7 +4835,7 @@ class Temporalio::Worker::Tuner::ResourceBasedSlotOptions < ::Data
   sig { returns(T.nilable(Integer)) }
   def max_slots; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def ramp_throttle; end
 
   sig { params(min_slots: T.nilable(Integer), max_slots: T.nilable(Integer), ramp_throttle: T.nilable(Float)).void }
@@ -4966,10 +4967,10 @@ end
 class Temporalio::Worker::Interceptor::Activity::Inbound
   extend T::Sig
 
-  sig { returns(Temporalio::Worker::Interceptor::Activity::Inbound) }
+  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Activity::Inbound)) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Inbound).void }
+  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Activity::Inbound)).void }
   def initialize(next_interceptor); end
 
   sig { params(outbound: Temporalio::Worker::Interceptor::Activity::Outbound).returns(Temporalio::Worker::Interceptor::Activity::Outbound) }
@@ -4982,10 +4983,10 @@ end
 class Temporalio::Worker::Interceptor::Activity::Outbound
   extend T::Sig
 
-  sig { returns(Temporalio::Worker::Interceptor::Activity::Outbound) }
+  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Outbound).void }
+  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)).void }
   def initialize(next_interceptor); end
 
   sig { params(input: Temporalio::Worker::Interceptor::Activity::HeartbeatInput).void }
@@ -5066,10 +5067,10 @@ end
 class Temporalio::Worker::Interceptor::Workflow::Inbound
   extend T::Sig
 
-  sig { returns(Temporalio::Worker::Interceptor::Workflow::Inbound) }
+  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Workflow::Inbound)) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Inbound).void }
+  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Workflow::Inbound)).void }
   def initialize(next_interceptor); end
 
   sig { params(outbound: Temporalio::Worker::Interceptor::Workflow::Outbound).returns(Temporalio::Worker::Interceptor::Workflow::Outbound) }
@@ -5134,7 +5135,7 @@ class Temporalio::Worker::Interceptor::Workflow::ExecuteActivityInput < ::Data
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def cancellation_type; end
 
   sig { returns(T.nilable(String)) }
@@ -5186,7 +5187,7 @@ class Temporalio::Worker::Interceptor::Workflow::ExecuteLocalActivityInput < ::D
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def cancellation_type; end
 
   sig { returns(T.nilable(String)) }
@@ -5293,7 +5294,7 @@ class Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput < ::Dat
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def cancellation_type; end
 
   sig { returns(Integer) }
@@ -5360,7 +5361,7 @@ class Temporalio::Worker::Interceptor::Workflow::StartNexusOperationInput < ::Da
   sig { returns(T.nilable(T.any(Integer, Float))) }
   def start_to_close_timeout; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def cancellation_type; end
 
   sig { returns(T.nilable(String)) }
@@ -5382,10 +5383,10 @@ end
 class Temporalio::Worker::Interceptor::Workflow::Outbound
   extend T::Sig
 
-  sig { returns(Temporalio::Worker::Interceptor::Workflow::Outbound) }
+  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Workflow::Outbound)) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Outbound).void }
+  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Workflow::Outbound)).void }
   def initialize(next_interceptor); end
 
   sig { params(input: Temporalio::Worker::Interceptor::Workflow::CancelExternalWorkflowInput).void }
@@ -5982,8 +5983,8 @@ class Temporalio::Workflow::Definition
     sig { params(attr_names: Symbol, description: T.nilable(String)).void }
     def workflow_query_attr_reader(*attr_names, description: T.unsafe(nil)); end
 
-    sig { params(value: Integer).void }
-    def workflow_versioning_behavior(value); end
+    sig { params(behavior: Integer).void }
+    def workflow_versioning_behavior(behavior); end
 
     sig { params(value: T::Boolean).void }
     def workflow_init(value = T.unsafe(nil)); end
@@ -6268,7 +6269,7 @@ class Temporalio::Workflow::Info < ::Struct
   sig { returns(T.nilable(String)) }
   def cron_schedule; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def execution_timeout; end
 
   sig { returns(String) }
@@ -6304,7 +6305,7 @@ class Temporalio::Workflow::Info < ::Struct
   sig { returns(String) }
   def run_id; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def run_timeout; end
 
   sig { returns(Time) }
@@ -6794,7 +6795,7 @@ class Temporalio::Runtime::OpenTelemetryMetricsOptions < ::Data
   sig { returns(T.nilable(T::Hash[String, String])) }
   def headers; end
 
-  sig { returns(T.nilable(Float)) }
+  sig { returns(T.nilable(Numeric)) }
   def metric_periodicity; end
 
   sig { returns(Integer) }

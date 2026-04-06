@@ -668,7 +668,12 @@ class WorkerWorkflowTest < Test
             line, = line.partition(':in')
             line
           end.sort
-        end.sort
+        end
+        # Sorbet runtime sig wrappers add extra stack frames that appear as
+        # empty entries after filtering. Remove them when running with runtime
+        # type checking.
+        actual_traces.reject!(&:empty?) if ENV['TEMPORAL_SORBET_RUNTIME_CHECK']
+        actual_traces.sort!
         expected_traces = handle.query(StackTraceWorkflow.expected_traces).map(&:sort).sort # steep:ignore
         assert_equal expected_traces, actual_traces
       end
