@@ -15,6 +15,18 @@ require 'temporalio/testing'
 require 'timeout'
 require 'workflow_utils'
 
+if ENV['TEMPORAL_SORBET_RUNTIME_CHECK']
+  # Load modules that are lazy-loaded so their types can be instrumented
+  require 'temporalio/worker/workflow_replayer'
+  require 'temporalio/converters/payload_codec'
+  require 'temporalio/contrib/open_telemetry'
+  require 'temporalio/env_config'
+  require 'temporalio/simple_plugin'
+
+  require 'support/sig_applicator'
+  SigApplicator.apply_all!
+end
+
 # require 'memory_profiler'
 # MemoryProfiler.start
 # Minitest.after_run do

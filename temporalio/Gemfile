@@ -6,6 +6,8 @@ gemspec
 
 group :development do
   gem 'activemodel'
+  gem 'rbi'
+  gem 'sorbet-runtime'
   gem 'activerecord'
   gem 'async'
   gem 'base64'
