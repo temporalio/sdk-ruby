@@ -9,7 +9,7 @@ module Temporalio
         attr_reader rpc_retry: RPCRetryOptions
         attr_reader identity: String
         attr_reader keep_alive: KeepAliveOptions
-        attr_reader http_connect_proxy: HTTPConnectProxyOptions?
+        attr_reader http_connect_proxy: HTTPConnectProxyOptions
         attr_reader runtime: Runtime
         attr_reader lazy_connect: bool
 

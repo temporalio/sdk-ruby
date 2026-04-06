@@ -26,10 +26,35 @@ module SigApplicator
     'Temporalio::Workflow::Future'
   ].freeze
 
+  # Specific class#method pairs to skip.
+  # Internal terminal interceptor implementations pass nil via super(nil)
+  # to these initializers, but the public API contract is non-nilable.
+  SKIP_METHODS = Set.new(
+    [
+      'Temporalio::Client::Interceptor::Outbound#initialize',
+      'Temporalio::Worker::Interceptor::Activity::Inbound#initialize',
+      'Temporalio::Worker::Interceptor::Activity::Outbound#initialize',
+      'Temporalio::Worker::Interceptor::Workflow::Inbound#initialize',
+      'Temporalio::Worker::Interceptor::Workflow::Outbound#initialize'
+    ]
+  ).freeze
+
   @type_errors = []
   @mutex = Mutex.new
 
   class << self
+    # Known type mismatches that are not RBI issues. Internal terminal
+    # interceptor implementations intentionally pass nil as next_interceptor,
+    # and some tests intentionally pass wrong types to verify error handling.
+    IGNORED_ERRORS = [
+      # WorkerActivityTest passes a non-activity class to test validation
+      # 'WorkerActivityTest::NotAnActivity',
+      # implementation.rb:231 passes proto WorkflowType object instead of .name
+      # 'Temporalio::Api::Common::V1::WorkflowType',
+      # Proto conversion edge case returning inspect string
+      # 'got type String with value "#<data Temporalio::RetryPo'
+    ].freeze
+
     def apply_all!
       configure_error_handler!
       register_summary_hook!
@@ -79,6 +104,8 @@ module SigApplicator
           SigApplicator.record_type_error(message) unless type.valid?(delegate)
           return
         end
+
+        return if IGNORED_ERRORS.any? { |pattern| message.include?(pattern) }
 
         SigApplicator.record_type_error(message)
       end
@@ -159,6 +186,8 @@ module SigApplicator
       separator = class_method || method_node.is_singleton ? '.' : '#'
       full_name = "#{class_name}#{separator}#{method_name}"
 
+      return :skipped if SKIP_METHODS.include?(full_name)
+
       missing_method = false
       original = begin
         target.instance_method(method_name)
@@ -192,7 +221,7 @@ module SigApplicator
       # (e.g., Data.define generates .new, .[], #initialize, #with with a
       # single splat) where the RBI provides typed keyword params for better
       # static checking but the runtime signature is incompatible.
-      non_block_params = actual_params.reject { |kind, _| kind == :block }
+      non_block_params = actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
       all_rest_or_unnamed = non_block_params.all? { |kind, _| kind == :rest || kind == :keyrest }
       sig_named_params = method_node.sigs.flat_map { |s| s.params.reject { |p| p.type&.include?('T.proc') } }
       return :skipped if all_rest_or_unnamed && non_block_params.any? && sig_named_params.any?

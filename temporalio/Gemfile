@@ -6,8 +6,6 @@ gemspec
 
 group :development do
   gem 'activemodel'
-  gem 'rbi'
-  gem 'sorbet-runtime'
   gem 'activerecord'
   gem 'async'
   gem 'base64'
@@ -24,10 +22,12 @@ group :development do
   gem 'opentelemetry-sdk'
   gem 'rake'
   gem 'rake-compiler'
+  gem 'rbi'
   gem 'rbs', '~> 3.10'
   gem 'rb_sys', '~> 0.9'
   gem 'rdoc'
   gem 'rubocop'
+  gem 'sorbet-runtime'
   gem 'sqlite3'
   gem 'steep', '~> 1.10'
   gem 'yard'

@@ -4209,10 +4209,10 @@ class Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput < ::
 end
 
 class Temporalio::Client::Interceptor::Outbound
-  sig { params(next_interceptor: T.nilable(Temporalio::Client::Interceptor::Outbound)).void }
+  sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).void }
   def initialize(next_interceptor); end
 
-  sig { returns(T.nilable(Temporalio::Client::Interceptor::Outbound)) }
+  sig { returns(Temporalio::Client::Interceptor::Outbound) }
   def next_interceptor; end
 
   sig { params(input: Temporalio::Client::Interceptor::StartWorkflowInput).returns(Temporalio::Client::WorkflowHandle) }
@@ -4967,10 +4967,10 @@ end
 class Temporalio::Worker::Interceptor::Activity::Inbound
   extend T::Sig
 
-  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Activity::Inbound)) }
+  sig { returns(Temporalio::Worker::Interceptor::Activity::Inbound) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Activity::Inbound)).void }
+  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Inbound).void }
   def initialize(next_interceptor); end
 
   sig { params(outbound: Temporalio::Worker::Interceptor::Activity::Outbound).returns(Temporalio::Worker::Interceptor::Activity::Outbound) }
@@ -4983,10 +4983,10 @@ end
 class Temporalio::Worker::Interceptor::Activity::Outbound
   extend T::Sig
 
-  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)) }
+  sig { returns(Temporalio::Worker::Interceptor::Activity::Outbound) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)).void }
+  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Outbound).void }
   def initialize(next_interceptor); end
 
   sig { params(input: Temporalio::Worker::Interceptor::Activity::HeartbeatInput).void }
@@ -5067,10 +5067,10 @@ end
 class Temporalio::Worker::Interceptor::Workflow::Inbound
   extend T::Sig
 
-  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Workflow::Inbound)) }
+  sig { returns(Temporalio::Worker::Interceptor::Workflow::Inbound) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Workflow::Inbound)).void }
+  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Inbound).void }
   def initialize(next_interceptor); end
 
   sig { params(outbound: Temporalio::Worker::Interceptor::Workflow::Outbound).returns(Temporalio::Worker::Interceptor::Workflow::Outbound) }
@@ -5383,10 +5383,10 @@ end
 class Temporalio::Worker::Interceptor::Workflow::Outbound
   extend T::Sig
 
-  sig { returns(T.nilable(Temporalio::Worker::Interceptor::Workflow::Outbound)) }
+  sig { returns(Temporalio::Worker::Interceptor::Workflow::Outbound) }
   def next_interceptor; end
 
-  sig { params(next_interceptor: T.nilable(Temporalio::Worker::Interceptor::Workflow::Outbound)).void }
+  sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Outbound).void }
   def initialize(next_interceptor); end
 
   sig { params(input: Temporalio::Worker::Interceptor::Workflow::CancelExternalWorkflowInput).void }
