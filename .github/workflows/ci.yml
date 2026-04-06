@@ -102,6 +102,9 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
 
+          # Enable Sorbet runtime type checking to verify RBI accuracy
+          TEMPORAL_SORBET_RUNTIME_CHECK: "1"
+
         run: bundle exec rake TESTOPTS="--verbose"
 
       - name: Check RBI types with Sorbet

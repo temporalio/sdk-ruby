@@ -84,20 +84,26 @@ module SigApplicator
       end
     end
 
-    # Print a summary of type errors after the test suite finishes.
+    # Register a Minitest test class that runs last and asserts no type
+    # errors were collected.
     def register_summary_hook!
-      Minitest.after_run do
-        errors = SigApplicator.type_errors
-        next if errors.empty?
+      # Minitest runs test classes in alphabetical order by default.
+      # "ZZZ" ensures this runs after all other tests.
+      klass = Class.new(Minitest::Test) do
+        define_method(:test_no_sorbet_runtime_type_errors) do
+          errors = SigApplicator.type_errors
+          return if errors.empty?
 
-        unique = errors.tally
-        warn "\nSigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):"
-        unique.sort_by { |_, count| -count }.each do |msg, count|
-          # Trim to first line for readability
-          short = msg.lines.first&.chomp || msg
-          warn "  [#{count}x] #{short}"
+          unique = errors.tally
+          summary = "SigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):\n"
+          unique.sort_by { |_, count| -count }.each do |msg, count|
+            short = msg.lines.first&.chomp || msg
+            summary << "  [#{count}x] #{short}\n"
+          end
+          flunk summary
         end
       end
+      Object.const_set(:ZZZSigApplicatorTest, klass)
     end
 
     def apply_scope(node, errors)
