@@ -44,6 +44,7 @@ module SigApplicator
 
   class << self
     def apply_all!
+      @mutex.synchronize { @type_errors.clear }
       configure_error_handler!
       register_summary_hook!
 
@@ -145,14 +146,12 @@ module SigApplicator
       return [0, 0] if SKIP_PREFIXES.any? { |prefix| class_name.start_with?(prefix) }
       return [0, 0] if SKIP_CLASSES.include?(class_name)
 
-      missing_name = false
-      klass = begin
-        Object.const_get(class_name)
+      begin
+        klass = Object.const_get(class_name)
       rescue NameError
         errors << "#{class_name}: class not found"
-        missing_name = true
+        return [0, 0]
       end
-      return [0, 0] if missing_name
 
       applied = 0
       skipped = 0
@@ -192,47 +191,19 @@ module SigApplicator
 
       return :skipped if SKIP_METHODS.include?(full_name)
 
-      missing_method = false
-      original = begin
-        target.instance_method(method_name)
+      begin
+        original = target.instance_method(method_name)
       rescue NameError
         errors << "#{full_name}: method not found"
-        missing_method = true
+        return false
       end
-      return false if missing_method
 
-      # Skip when there's a block param mismatch between the sig and actual
-      # method. Common causes:
-      # - Anonymous block forwarding (Ruby 3.1+ `def foo(&)`)
-      # - Methods using yield with no block param
-      # - Sigs that omit block params the method declares
-      actual_params = original.parameters
-      actual_block = actual_params.find { |kind, _| kind == :block }
-      sig_block_params = method_node.sigs.flat_map { |sig| sig.params.select { |p| p.type&.include?('T.proc') } }
-      actual_has_block = !actual_block.nil?
-      actual_block_anonymous = actual_block && (actual_block[1].nil? || actual_block[1] == :&)
-      sig_has_block = sig_block_params.any?
-      return :skipped if actual_block_anonymous && sig_has_block
-      return :skipped if actual_has_block && !sig_has_block
-      return :skipped if !actual_has_block && sig_has_block
-
-      # Skip setter methods where Ruby creates unnamed params (attr_writer)
-      has_unnamed_params = actual_params.any? { |_kind, name| name.nil? }
-      return :skipped if has_unnamed_params && method_name.end_with?('=')
-
-      # Skip when the actual method only has rest/unnamed params but the sig
-      # declares specific named params. This happens with synthetic methods
-      # (e.g., Data.define generates .new, .[], #initialize, #with with a
-      # single splat) where the RBI provides typed keyword params for better
-      # static checking but the runtime signature is incompatible.
-      non_block_params = actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
-      all_rest_or_unnamed = non_block_params.all? { |kind, _| kind == :rest || kind == :keyrest }
-      sig_named_params = method_node.sigs.flat_map { |s| s.params.reject { |p| p.type&.include?('T.proc') } }
-      return :skipped if all_rest_or_unnamed && non_block_params.any? && sig_named_params.any?
+      return :skipped if skip_method?(original, method_node, method_name)
 
       target.extend(T::Sig)
 
       method_node.sigs.each do |sig|
+        # RBI::Sig#string serializes back to valid T::Sig DSL source
         sig_source = sig.string
         begin
           target.class_eval(sig_source)
@@ -251,6 +222,36 @@ module SigApplicator
       end
 
       true
+    end
+
+    # Determines whether a method should be skipped for sig application based
+    # on parameter shape mismatches between the RBI sig and the actual method.
+    def skip_method?(original, method_node, method_name)
+      actual_params = original.parameters
+
+      # Block param mismatch: anonymous block forwarding (Ruby 3.1+ `def foo(&)`),
+      # methods using yield with no block param, or sigs that omit declared blocks.
+      actual_block = actual_params.find { |kind, _| kind == :block }
+      sig_block_params = method_node.sigs.flat_map { |sig| sig.params.select { |p| p.type&.include?('T.proc') } }
+      actual_has_block = !actual_block.nil?
+      actual_block_anonymous = actual_block && (actual_block[1].nil? || actual_block[1] == :&)
+      sig_has_block = sig_block_params.any?
+      return true if actual_block_anonymous && sig_has_block
+      return true if actual_has_block != sig_has_block
+
+      # Setter methods where Ruby creates unnamed params (attr_writer)
+      has_unnamed_params = actual_params.any? { |_kind, name| name.nil? }
+      return true if has_unnamed_params && method_name.end_with?('=')
+
+      # Synthetic methods (e.g., Data.define generates .new, .[], #initialize,
+      # #with with a single splat) where the RBI provides typed keyword params
+      # for better static checking but the runtime signature is incompatible.
+      non_block_params = actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
+      all_rest_or_unnamed = non_block_params.all? { |kind, _| kind == :rest || kind == :keyrest }
+      sig_named_params = method_node.sigs.flat_map { |s| s.params.reject { |p| p.type&.include?('T.proc') } }
+      return true if all_rest_or_unnamed && non_block_params.any? && sig_named_params.any?
+
+      false
     end
   end
 end

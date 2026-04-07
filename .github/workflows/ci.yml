@@ -108,7 +108,6 @@ jobs:
         run: bundle exec rake TESTOPTS="--verbose"
 
       - name: Check RBI types with Sorbet
-        if: ${{ matrix.checkTarget }}
         working-directory: ./temporalio
         run: |
           cd extra/sorbet_check
