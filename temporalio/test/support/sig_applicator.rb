@@ -43,18 +43,6 @@ module SigApplicator
   @mutex = Mutex.new
 
   class << self
-    # Known type mismatches that are not RBI issues. Internal terminal
-    # interceptor implementations intentionally pass nil as next_interceptor,
-    # and some tests intentionally pass wrong types to verify error handling.
-    IGNORED_ERRORS = [
-      # WorkerActivityTest passes a non-activity class to test validation
-      # 'WorkerActivityTest::NotAnActivity',
-      # implementation.rb:231 passes proto WorkflowType object instead of .name
-      # 'Temporalio::Api::Common::V1::WorkflowType',
-      # Proto conversion edge case returning inspect string
-      # 'got type String with value "#<data Temporalio::RetryPo'
-    ].freeze
-
     def apply_all!
       configure_error_handler!
       register_summary_hook!
@@ -79,13 +67,29 @@ module SigApplicator
     end
 
     def record_type_error(message)
-      Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled do
-        @mutex.synchronize { @type_errors << message }
-      end
+      return if Thread.current[:sig_applicator_suppressed]
+
+      # Avoid illegal_call_tracing_disabled here — interacting with the
+      # workflow tracer + mutex from inside error handlers can cause
+      # non-deterministic behavior. Instead, rescue the NondeterminismError
+      # that fires when accessing Mutex from within a workflow.
+      @mutex.synchronize { @type_errors << message }
+    rescue Temporalio::Workflow::NondeterminismError
+      # Best-effort: append without synchronization when inside a workflow
+      @type_errors << message
     end
 
     def type_errors
       @mutex.synchronize { @type_errors.dup }
+    end
+
+    # Suppress type error recording for the duration of a block.
+    # Use for tests that intentionally pass wrong types.
+    def suppress_errors
+      Thread.current[:sig_applicator_suppressed] = true
+      yield
+    ensure
+      Thread.current[:sig_applicator_suppressed] = false
     end
 
     private
@@ -104,8 +108,6 @@ module SigApplicator
           SigApplicator.record_type_error(message) unless type.valid?(delegate)
           return
         end
-
-        return if IGNORED_ERRORS.any? { |pattern| message.include?(pattern) }
 
         # Include location for debugging
         location = opts[:location]

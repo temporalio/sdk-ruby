@@ -153,11 +153,20 @@ class WorkerActivityTest < Test
 
   def test_not_an_activity
     error = assert_raises(ArgumentError) do
-      Temporalio::Worker.new(
-        client: env.client,
-        task_queue: "tq-#{SecureRandom.uuid}",
-        activities: [NotAnActivity]
-      )
+      # Intentionally passing a non-activity class to test validation.
+      # Suppress sorbet runtime errors since the wrong type is deliberate.
+      block = proc do
+        Temporalio::Worker.new(
+          client: env.client,
+          task_queue: "tq-#{SecureRandom.uuid}",
+          activities: [NotAnActivity]
+        )
+      end
+      if defined?(SigApplicator)
+        SigApplicator.suppress_errors(&block)
+      else
+        block.call
+      end
     end
     assert error.message.end_with?('does not extend Temporalio::Activity::Definition')
   end
