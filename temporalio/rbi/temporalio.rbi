@@ -122,7 +122,7 @@ class Temporalio::Activity::Context
 end
 
 class Temporalio::Activity::Definition
-  sig { params(args: T.untyped).returns(T.untyped) }
+  sig { params(args: Object).returns(Object) }
   def execute(*args); end
 
   class << self
@@ -161,7 +161,7 @@ class Temporalio::Activity::Definition::Info
       raw_args: T::Boolean,
       arg_hints: T.nilable(T::Array[Object]),
       result_hint: T.nilable(Object),
-      block: T.nilable(T.proc.params(arg0: T.untyped).returns(T.untyped))
+      block: T.nilable(T.proc.params(arg0: Object).returns(Object))
     ).void
   end
   def initialize(name:, instance: nil, executor: :default, cancel_raise: true, raw_args: false, arg_hints: nil, result_hint: nil, &block); end
@@ -615,13 +615,13 @@ class Temporalio::Error::ScheduleAlreadyRunningError < ::Temporalio::Error
 end
 
 class Temporalio::Error::RPCError < ::Temporalio::Error
-  sig { params(message: String, code: Integer, raw_grpc_status: T.untyped).void }
+  sig { params(message: String, code: Integer, raw_grpc_status: T.nilable(Object)).void }
   def initialize(message, code:, raw_grpc_status:); end
 
   sig { returns(Integer) }
   def code; end
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::Common::V1::GrpcStatus) }
   def grpc_status; end
 end
 
@@ -945,28 +945,28 @@ class Temporalio::ScopedLogger < ::SimpleDelegator
   sig { params(value: T::Boolean).void }
   def disable_scoped_values=(value); end
 
-  sig { params(severity: T.untyped, message: T.untyped, progname: T.untyped).void }
+  sig { params(severity: T.nilable(Integer), message: T.nilable(Object), progname: T.nilable(Object)).void }
   def add(severity, message = nil, progname = nil); end
 
-  sig { params(severity: T.untyped, message: T.untyped, progname: T.untyped).void }
+  sig { params(severity: T.nilable(Integer), message: T.nilable(Object), progname: T.nilable(Object)).void }
   def log(severity, message = nil, progname = nil); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def debug(progname = nil, &blk); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def info(progname = nil, &blk); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def warn(progname = nil, &blk); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def error(progname = nil, &blk); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def fatal(progname = nil, &blk); end
 
-  sig { params(progname: T.untyped, blk: T.untyped).void }
+  sig { params(progname: T.nilable(Object), blk: T.nilable(T.proc.returns(Object))).void }
   def unknown(progname = nil, &blk); end
 end
 
@@ -1686,7 +1686,7 @@ class Temporalio::Client::Connection::HTTPConnectProxyOptions < ::Data
 end
 
 class Temporalio::Client::Connection::Service
-  sig { params(connection: Temporalio::Client::Connection, service: T.untyped).void }
+  sig { params(connection: Temporalio::Client::Connection, service: Integer).void }
   def initialize(connection, service); end
 
   protected
@@ -1698,7 +1698,7 @@ class Temporalio::Client::Connection::Service
       response_class: T.class_of(Object),
       request: Object,
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
-    ).returns(T.untyped)
+    ).returns(Object)
   end
   def invoke_rpc(rpc:, request_class:, response_class:, request:, rpc_options:); end
 end
@@ -1707,178 +1707,178 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUsersResponse) }
   def get_users(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserResponse) }
   def get_user(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateUserRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateUserResponse) }
   def create_user(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateUserRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateUserResponse) }
   def update_user(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteUserRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteUserResponse) }
   def delete_user(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetUserNamespaceAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserNamespaceAccessResponse) }
   def set_user_namespace_access(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetAsyncOperationRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetAsyncOperationResponse) }
   def get_async_operation(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceResponse) }
   def create_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNamespacesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNamespacesResponse) }
   def get_namespaces(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNamespaceResponse) }
   def get_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceResponse) }
   def update_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::RenameCustomSearchAttributeRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::RenameCustomSearchAttributeResponse) }
   def rename_custom_search_attribute(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::DeleteNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse) }
   def delete_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::FailoverNamespaceRegionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::FailoverNamespaceRegionResponse) }
   def failover_namespace_region(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::AddNamespaceRegionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::AddNamespaceRegionResponse) }
   def add_namespace_region(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionResponse) }
   def delete_namespace_region(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetRegionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetRegionsResponse) }
   def get_regions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetRegionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetRegionResponse) }
   def get_region(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetApiKeysRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetApiKeysResponse) }
   def get_api_keys(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetApiKeyRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetApiKeyResponse) }
   def get_api_key(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateApiKeyRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateApiKeyResponse) }
   def create_api_key(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateApiKeyRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateApiKeyResponse) }
   def update_api_key(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteApiKeyRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteApiKeyResponse) }
   def delete_api_key(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsResponse) }
   def get_nexus_endpoints(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::GetNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::GetNexusEndpointResponse) }
   def get_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::CreateNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::CreateNexusEndpointResponse) }
   def create_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::UpdateNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::UpdateNexusEndpointResponse) }
   def update_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::DeleteNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DeleteNexusEndpointResponse) }
   def delete_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsResponse) }
   def get_user_groups(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupResponse) }
   def get_user_group(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateUserGroupRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateUserGroupResponse) }
   def create_user_group(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateUserGroupRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateUserGroupResponse) }
   def update_user_group(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteUserGroupRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteUserGroupResponse) }
   def delete_user_group(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessResponse) }
   def set_user_group_namespace_access(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberResponse) }
   def add_user_group_member(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberResponse) }
   def remove_user_group_member(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersResponse) }
   def get_user_group_members(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateServiceAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateServiceAccountResponse) }
   def create_service_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountResponse) }
   def get_service_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountsResponse) }
   def get_service_accounts(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateServiceAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateServiceAccountResponse) }
   def update_service_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessResponse) }
   def set_service_account_namespace_access(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountResponse) }
   def delete_service_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUsageRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUsageResponse) }
   def get_usage(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetAccountResponse) }
   def get_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateAccountResponse) }
   def update_account(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkResponse) }
   def create_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkResponse) }
   def get_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksResponse) }
   def get_namespace_export_sinks(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkResponse) }
   def update_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkResponse) }
   def delete_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse) }
   def validate_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsResponse) }
   def update_namespace_tags(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleResponse) }
   def create_connectivity_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleResponse) }
   def get_connectivity_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesResponse) }
   def get_connectivity_rules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse) }
   def delete_connectivity_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse) }
   def validate_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
 end
 
@@ -1886,40 +1886,40 @@ class Temporalio::Client::Connection::OperatorService < ::Temporalio::Client::Co
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::AddSearchAttributesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::AddSearchAttributesResponse) }
   def add_search_attributes(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::RemoveSearchAttributesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::RemoveSearchAttributesResponse) }
   def remove_search_attributes(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::ListSearchAttributesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::ListSearchAttributesResponse) }
   def list_search_attributes(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::DeleteNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse) }
   def delete_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterResponse) }
   def add_or_update_remote_cluster(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::RemoveRemoteClusterRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::RemoveRemoteClusterResponse) }
   def remove_remote_cluster(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::ListClustersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::ListClustersResponse) }
   def list_clusters(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::GetNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::GetNexusEndpointResponse) }
   def get_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::CreateNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::CreateNexusEndpointResponse) }
   def create_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::UpdateNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::UpdateNexusEndpointResponse) }
   def update_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::DeleteNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DeleteNexusEndpointResponse) }
   def delete_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::OperatorService::V1::ListNexusEndpointsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::ListNexusEndpointsResponse) }
   def list_nexus_endpoints(request, rpc_options: T.unsafe(nil)); end
 end
 
@@ -1927,319 +1927,319 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RegisterNamespaceResponse) }
   def register_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse) }
   def describe_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListNamespacesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListNamespacesResponse) }
   def list_namespaces(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceResponse) }
   def update_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeprecateNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeprecateNamespaceResponse) }
   def deprecate_namespace(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse) }
   def start_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ExecuteMultiOperationRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ExecuteMultiOperationResponse) }
   def execute_multi_operation(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse) }
   def get_workflow_execution_history(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseResponse) }
   def get_workflow_execution_history_reverse(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse) }
   def poll_workflow_task_queue(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedResponse) }
   def respond_workflow_task_completed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedResponse) }
   def respond_workflow_task_failed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse) }
   def poll_activity_task_queue(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatResponse) }
   def record_activity_task_heartbeat(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdResponse) }
   def record_activity_task_heartbeat_by_id(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedResponse) }
   def respond_activity_task_completed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdResponse) }
   def respond_activity_task_completed_by_id(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedResponse) }
   def respond_activity_task_failed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdResponse) }
   def respond_activity_task_failed_by_id(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledResponse) }
   def respond_activity_task_canceled(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdResponse) }
   def respond_activity_task_canceled_by_id(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionResponse) }
   def request_cancel_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionResponse) }
   def signal_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionResponse) }
   def signal_with_start_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionResponse) }
   def reset_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionResponse) }
   def terminate_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionResponse) }
   def delete_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsResponse) }
   def list_open_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsResponse) }
   def list_closed_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsResponse) }
   def list_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsResponse) }
   def list_archived_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsResponse) }
   def scan_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsResponse) }
   def count_workflow_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetSearchAttributesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetSearchAttributesResponse) }
   def get_search_attributes(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedResponse) }
   def respond_query_task_completed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueResponse) }
   def reset_sticky_task_queue(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ShutdownWorkerRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ShutdownWorkerResponse) }
   def shutdown_worker(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::QueryWorkflowResponse) }
   def query_workflow(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse) }
   def describe_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeTaskQueueRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeTaskQueueResponse) }
   def describe_task_queue(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetClusterInfoResponse) }
   def get_cluster_info(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetSystemInfoResponse) }
   def get_system_info(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse) }
   def list_task_queue_partitions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CreateScheduleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CreateScheduleResponse) }
   def create_schedule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeScheduleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeScheduleResponse) }
   def describe_schedule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateScheduleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateScheduleResponse) }
   def update_schedule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PatchScheduleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PatchScheduleResponse) }
   def patch_schedule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListScheduleMatchingTimesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListScheduleMatchingTimesResponse) }
   def list_schedule_matching_times(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteScheduleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteScheduleResponse) }
   def delete_schedule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListSchedulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListSchedulesResponse) }
   def list_schedules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CountSchedulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountSchedulesResponse) }
   def count_schedules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerBuildIdCompatibilityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerBuildIdCompatibilityResponse) }
   def update_worker_build_id_compatibility(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdCompatibilityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdCompatibilityResponse) }
   def get_worker_build_id_compatibility(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerVersioningRulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerVersioningRulesResponse) }
   def update_worker_versioning_rules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetWorkerVersioningRulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetWorkerVersioningRulesResponse) }
   def get_worker_versioning_rules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetWorkerTaskReachabilityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetWorkerTaskReachabilityResponse) }
   def get_worker_task_reachability(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeDeploymentResponse) }
   def describe_deployment(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionResponse) }
   def describe_worker_deployment_version(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListDeploymentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListDeploymentsResponse) }
   def list_deployments(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityResponse) }
   def get_deployment_reachability(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentResponse) }
   def get_current_deployment(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentResponse) }
   def set_current_deployment(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionResponse) }
   def set_worker_deployment_current_version(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentResponse) }
   def describe_worker_deployment(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentResponse) }
   def delete_worker_deployment(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionResponse) }
   def delete_worker_deployment_version(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionResponse) }
   def set_worker_deployment_ramping_version(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse) }
   def list_worker_deployments(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataResponse) }
   def update_worker_deployment_version_metadata(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerResponse) }
   def set_worker_deployment_manager(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse) }
   def update_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateResponse) }
   def poll_workflow_execution_update(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StartBatchOperationResponse) }
   def start_batch_operation(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::StopBatchOperationRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StopBatchOperationResponse) }
   def stop_batch_operation(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeBatchOperationRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeBatchOperationResponse) }
   def describe_batch_operation(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListBatchOperationsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListBatchOperationsResponse) }
   def list_batch_operations(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse) }
   def poll_nexus_task_queue(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondNexusTaskCompletedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondNexusTaskCompletedResponse) }
   def respond_nexus_task_completed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedResponse) }
   def respond_nexus_task_failed(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse) }
   def update_activity_options(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsResponse) }
   def update_workflow_execution_options(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PauseActivityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PauseActivityResponse) }
   def pause_activity(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse) }
   def unpause_activity(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ResetActivityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ResetActivityResponse) }
   def reset_activity(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleResponse) }
   def create_workflow_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleResponse) }
   def describe_workflow_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleResponse) }
   def delete_workflow_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkflowRulesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkflowRulesResponse) }
   def list_workflow_rules(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleResponse) }
   def trigger_workflow_rule(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatResponse) }
   def record_worker_heartbeat(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkersResponse) }
   def list_workers(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigResponse) }
   def update_task_queue_config(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::FetchWorkerConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::FetchWorkerConfigResponse) }
   def fetch_worker_config(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigResponse) }
   def update_worker_config(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeWorkerRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse) }
   def describe_worker(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PauseWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PauseWorkflowExecutionResponse) }
   def pause_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UnpauseWorkflowExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UnpauseWorkflowExecutionResponse) }
   def unpause_workflow_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse) }
   def start_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse) }
   def describe_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse) }
   def poll_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse) }
   def list_activity_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CountActivityExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountActivityExecutionsResponse) }
   def count_activity_executions(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionResponse) }
   def request_cancel_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionResponse) }
   def terminate_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse) }
   def delete_activity_execution(request, rpc_options: T.unsafe(nil)); end
 end
 
@@ -2247,22 +2247,22 @@ class Temporalio::Client::Connection::TestService < ::Temporalio::Client::Connec
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::TestService::V1::LockTimeSkippingRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::LockTimeSkippingResponse) }
   def lock_time_skipping(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::TestService::V1::UnlockTimeSkippingRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::UnlockTimeSkippingResponse) }
   def unlock_time_skipping(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::TestService::V1::SleepRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::SleepResponse) }
   def sleep(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::TestService::V1::SleepUntilRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::SleepResponse) }
   def sleep_until(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Temporalio::Api::TestService::V1::SleepRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::SleepResponse) }
   def unlock_time_skipping_with_sleep(request, rpc_options: T.unsafe(nil)); end
 
-  sig { params(request: T.untyped, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(T.untyped) }
+  sig { params(request: Google::Protobuf::Empty, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::TestService::V1::GetCurrentTimeResponse) }
   def get_current_time(request, rpc_options: T.unsafe(nil)); end
 end
 
@@ -2420,7 +2420,7 @@ class Temporalio::Client::WorkflowUpdateHandle
       id: String,
       workflow_id: String,
       workflow_run_id: T.nilable(String),
-      known_outcome: T.untyped,
+      known_outcome: T.nilable(Object),
       result_hint: T.nilable(Object)
     ).void
   end
@@ -2451,7 +2451,7 @@ class Temporalio::Client::WorkflowUpdateHandle
 end
 
 class Temporalio::Client::WorkflowExecution
-  sig { params(raw_info: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
+  sig { params(raw_info: Temporalio::Api::Workflow::V1::WorkflowExecutionInfo, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_info, data_converter); end
 
   sig { returns(T.untyped) }
@@ -2498,7 +2498,7 @@ class Temporalio::Client::WorkflowExecution
 end
 
 class Temporalio::Client::WorkflowExecution::Description < ::Temporalio::Client::WorkflowExecution
-  sig { params(raw_description: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
+  sig { params(raw_description: Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_description, data_converter); end
 
   sig { returns(T.untyped) }
@@ -2773,7 +2773,7 @@ module Temporalio::Client::Schedule::ActionExecution; end
 class Temporalio::Client::Schedule::ActionExecution::StartWorkflow < ::Data
   include Temporalio::Client::Schedule::ActionExecution
 
-  sig { params(raw_execution: T.untyped).void }
+  sig { params(raw_execution: Temporalio::Api::Common::V1::WorkflowExecution).void }
   def initialize(raw_execution:); end
 
   sig { returns(String) }
@@ -3053,7 +3053,7 @@ class Temporalio::Client::Schedule::State < ::Data
 end
 
 class Temporalio::Client::Schedule::Description < ::Data
-  sig { params(id: String, raw_description: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
+  sig { params(id: String, raw_description: Temporalio::Api::WorkflowService::V1::DescribeScheduleResponse, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(id:, raw_description:, data_converter:); end
 
   sig { returns(String) }
@@ -3087,7 +3087,7 @@ class Temporalio::Client::Schedule::Description < ::Data
 end
 
 class Temporalio::Client::Schedule::Info < ::Data
-  sig { params(raw_info: T.untyped).void }
+  sig { params(raw_info: Temporalio::Api::Schedule::V1::ScheduleInfo).void }
   def initialize(raw_info:); end
 
   sig { returns(Integer) }
@@ -3187,7 +3187,7 @@ class Temporalio::Client::Schedule::List::Action::StartWorkflow < ::Data
 end
 
 class Temporalio::Client::Schedule::List::Description < ::Data
-  sig { params(raw_entry: T.untyped, data_converter: Temporalio::Converters::DataConverter).void }
+  sig { params(raw_entry: Temporalio::Api::Schedule::V1::ScheduleListEntry, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_entry:, data_converter:); end
 
   sig { returns(String) }
@@ -3221,7 +3221,7 @@ class Temporalio::Client::Schedule::List::Description < ::Data
 end
 
 class Temporalio::Client::Schedule::List::Schedule < ::Data
-  sig { params(raw_info: T.untyped).void }
+  sig { params(raw_info: Temporalio::Api::Schedule::V1::ScheduleListInfo).void }
   def initialize(raw_info:); end
 
   sig { returns(Temporalio::Client::Schedule::List::Action) }
@@ -3246,7 +3246,7 @@ class Temporalio::Client::Schedule::List::Schedule < ::Data
 end
 
 class Temporalio::Client::Schedule::List::Info < ::Data
-  sig { params(raw_info: T.untyped).void }
+  sig { params(raw_info: Temporalio::Api::Schedule::V1::ScheduleListInfo).void }
   def initialize(raw_info:); end
 
   sig { returns(T::Array[Temporalio::Client::Schedule::ActionResult]) }
@@ -3268,7 +3268,7 @@ class Temporalio::Client::Schedule::List::Info < ::Data
 end
 
 class Temporalio::Client::Schedule::List::State < ::Data
-  sig { params(raw_info: T.untyped).void }
+  sig { params(raw_info: Temporalio::Api::Schedule::V1::ScheduleListInfo).void }
   def initialize(raw_info:); end
 
   sig { returns(T.nilable(String)) }
@@ -6275,7 +6275,7 @@ class Temporalio::Workflow::Info < ::Struct
   sig { returns(String) }
   def first_execution_run_id; end
 
-  sig { returns(T::Hash[String, T.untyped]) }
+  sig { returns(T::Hash[String, Temporalio::Api::Common::V1::Payload]) }
   def headers; end
 
   sig { returns(T.nilable(Exception)) }
@@ -6943,22 +6943,22 @@ class Temporalio::Converters::DataConverter
   end
   def initialize(payload_converter: T.unsafe(nil), failure_converter: T.unsafe(nil), payload_codec: T.unsafe(nil)); end
 
-  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.untyped) }
+  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(values: T::Array[T.nilable(Object)], hints: T.nilable(T::Array[Object])).returns(T.untyped) }
+  sig { params(values: T::Array[T.nilable(Object)], hints: T.nilable(T::Array[Object])).returns(Temporalio::Api::Common::V1::Payloads) }
   def to_payloads(values, hints: T.unsafe(nil)); end
 
-  sig { params(payload: T.untyped, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 
-  sig { params(payloads: T.untyped, hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
+  sig { params(payloads: T.nilable(Temporalio::Api::Common::V1::Payloads), hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def from_payloads(payloads, hints: T.unsafe(nil)); end
 
-  sig { params(error: Exception).returns(T.untyped) }
+  sig { params(error: Exception).returns(Temporalio::Api::Failure::V1::Failure) }
   def to_failure(error); end
 
-  sig { params(failure: T.untyped).returns(Exception) }
+  sig { params(failure: Temporalio::Api::Failure::V1::Failure).returns(Exception) }
   def from_failure(failure); end
 end
 
@@ -6974,20 +6974,20 @@ class Temporalio::Converters::FailureConverter
   sig { returns(T::Boolean) }
   def encode_common_attributes; end
 
-  sig { params(error: Exception, converter: T.any(Temporalio::Converters::DataConverter, Temporalio::Converters::PayloadConverter)).returns(T.untyped) }
+  sig { params(error: Exception, converter: T.any(Temporalio::Converters::DataConverter, Temporalio::Converters::PayloadConverter)).returns(Temporalio::Api::Failure::V1::Failure) }
   def to_failure(error, converter); end
 
-  sig { params(failure: T.untyped, converter: T.any(Temporalio::Converters::DataConverter, Temporalio::Converters::PayloadConverter)).returns(Exception) }
+  sig { params(failure: Temporalio::Api::Failure::V1::Failure, converter: T.any(Temporalio::Converters::DataConverter, Temporalio::Converters::PayloadConverter)).returns(Exception) }
   def from_failure(failure, converter); end
 end
 
 class Temporalio::Converters::PayloadCodec
   extend T::Sig
 
-  sig { params(payloads: T::Enumerable[T.untyped]).returns(T::Array[T.untyped]) }
+  sig { params(payloads: T::Enumerable[Temporalio::Api::Common::V1::Payload]).returns(T::Array[Temporalio::Api::Common::V1::Payload]) }
   def encode(payloads); end
 
-  sig { params(payloads: T::Enumerable[T.untyped]).returns(T::Array[T.untyped]) }
+  sig { params(payloads: T::Enumerable[Temporalio::Api::Common::V1::Payload]).returns(T::Array[Temporalio::Api::Common::V1::Payload]) }
   def decode(payloads); end
 end
 
@@ -6999,22 +6999,22 @@ class Temporalio::Converters::PayloadConverter
 
   sig do
     params(
-      json_parse_options: T::Hash[Symbol, T.untyped],
-      json_generate_options: T::Hash[Symbol, T.untyped]
+      json_parse_options: T::Hash[Symbol, Object],
+      json_generate_options: T::Hash[Symbol, Object]
     ).returns(Temporalio::Converters::PayloadConverter::Composite)
   end
   def self.new_with_defaults(json_parse_options: T.unsafe(nil), json_generate_options: T.unsafe(nil)); end
 
-  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.untyped) }
+  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(values: T::Array[T.nilable(Object)], hints: T.nilable(T::Array[Object])).returns(T.untyped) }
+  sig { params(values: T::Array[T.nilable(Object)], hints: T.nilable(T::Array[Object])).returns(Temporalio::Api::Common::V1::Payloads) }
   def to_payloads(values, hints: T.unsafe(nil)); end
 
-  sig { params(payload: T.untyped, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 
-  sig { params(payloads: T.untyped, hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
+  sig { params(payloads: T.nilable(Temporalio::Api::Common::V1::Payloads), hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def from_payloads(payloads, hints: T.unsafe(nil)); end
 end
 
@@ -7027,10 +7027,10 @@ class Temporalio::Converters::PayloadConverter::Composite < ::Temporalio::Conver
   sig { params(converters: Temporalio::Converters::PayloadConverter::Encoding).void }
   def initialize(*converters); end
 
-  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.untyped) }
+  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(payload: T.untyped, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 
   class ConverterNotFound < ::Temporalio::Error; end
@@ -7043,10 +7043,10 @@ class Temporalio::Converters::PayloadConverter::Encoding
   sig { returns(String) }
   def encoding; end
 
-  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.untyped) }
+  sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.nilable(Temporalio::Api::Common::V1::Payload)) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(payload: T.untyped, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 end
 
@@ -7067,7 +7067,7 @@ class Temporalio::Converters::PayloadConverter::JSONPlain < ::Temporalio::Conver
 
   ENCODING = T.let(T.unsafe(nil), String)
 
-  sig { params(parse_options: T::Hash[Symbol, T.untyped], generate_options: T::Hash[Symbol, T.untyped]).void }
+  sig { params(parse_options: T::Hash[Symbol, Object], generate_options: T::Hash[Symbol, Object]).void }
   def initialize(parse_options: T.unsafe(nil), generate_options: T.unsafe(nil)); end
 end
 
@@ -7078,10 +7078,10 @@ end
 class Temporalio::Converters::RawValue
   extend T::Sig
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::Common::V1::Payload) }
   def payload; end
 
-  sig { params(payload: T.untyped).void }
+  sig { params(payload: Temporalio::Api::Common::V1::Payload).void }
   def initialize(payload); end
 end
 
