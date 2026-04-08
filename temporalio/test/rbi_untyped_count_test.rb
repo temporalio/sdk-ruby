@@ -5,7 +5,7 @@ require 'minitest/autorun'
 class RbiUntypedCountTest < Minitest::Test
   RBI_PATH = File.expand_path('../rbi/temporalio.rbi', __dir__ || '')
   # Please do not increase this just to pass the test, properly type the new untyped methods.
-  UNTYPED_COUNT = 612
+  UNTYPED_COUNT = 167
 
   def test_untyped_count_does_not_increase
     rbi_content = File.read(RBI_PATH)

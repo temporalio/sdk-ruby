@@ -855,13 +855,13 @@ class Temporalio::WorkerDeploymentVersion < ::Data
 end
 
 class Temporalio::WorkflowHistory
-  sig { params(events: T::Array[T.untyped]).void }
+  sig { params(events: T::Array[Temporalio::Api::History::V1::HistoryEvent]).void }
   def initialize(events); end
 
   sig { params(json: String).returns(Temporalio::WorkflowHistory) }
   def self.from_history_json(json); end
 
-  sig { returns(T::Array[T.untyped]) }
+  sig { returns(T::Array[Temporalio::Api::History::V1::HistoryEvent]) }
   def events; end
 
   sig { returns(String) }
@@ -2326,7 +2326,7 @@ class Temporalio::Client::WorkflowHandle
       skip_archival: T::Boolean,
       specific_run_id: T.nilable(String),
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
-    ).returns(T::Enumerator[T.untyped])
+    ).returns(T::Enumerator[Temporalio::Api::History::V1::HistoryEvent])
   end
   def fetch_history_events(
     wait_new_event: T.unsafe(nil),
@@ -2454,7 +2454,7 @@ class Temporalio::Client::WorkflowExecution
   sig { params(raw_info: Temporalio::Api::Workflow::V1::WorkflowExecutionInfo, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_info, data_converter); end
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::Workflow::V1::WorkflowExecutionInfo) }
   def raw_info; end
 
   sig { returns(T.nilable(Time)) }
@@ -2501,7 +2501,7 @@ class Temporalio::Client::WorkflowExecution::Description < ::Temporalio::Client:
   sig { params(raw_description: Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_description, data_converter); end
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse) }
   def raw_description; end
 
   sig { returns(T.nilable(String)) }
@@ -2795,7 +2795,7 @@ class Temporalio::Client::Schedule::ActionExecution::StartWorkflow < ::Data
 end
 
 class Temporalio::Client::Schedule::ActionResult < ::Data
-  sig { params(raw_result: T.untyped).void }
+  sig { params(raw_result: Temporalio::Api::Schedule::V1::ScheduleActionResult).void }
   def initialize(raw_result:); end
 
   sig { returns(Time) }
@@ -3065,7 +3065,7 @@ class Temporalio::Client::Schedule::Description < ::Data
   sig { returns(Temporalio::Client::Schedule::Info) }
   def info; end
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::WorkflowService::V1::DescribeScheduleResponse) }
   def raw_description; end
 
   sig { returns(T.nilable(T::Hash[String, T.nilable(Object)])) }
@@ -3199,7 +3199,7 @@ class Temporalio::Client::Schedule::List::Description < ::Data
   sig { returns(Temporalio::Client::Schedule::List::Info) }
   def info; end
 
-  sig { returns(T.untyped) }
+  sig { returns(Temporalio::Api::Schedule::V1::ScheduleListEntry) }
   def raw_entry; end
 
   sig { returns(T.nilable(T::Hash[String, T.nilable(Object)])) }
@@ -4233,7 +4233,7 @@ class Temporalio::Client::Interceptor::Outbound
   sig { params(input: Temporalio::Client::Interceptor::DescribeWorkflowInput).returns(Temporalio::Client::WorkflowExecution::Description) }
   def describe_workflow(input); end
 
-  sig { params(input: Temporalio::Client::Interceptor::FetchWorkflowHistoryEventsInput).returns(T::Enumerator[T.untyped]) }
+  sig { params(input: Temporalio::Client::Interceptor::FetchWorkflowHistoryEventsInput).returns(T::Enumerator[Temporalio::Api::History::V1::HistoryEvent]) }
   def fetch_workflow_history_events(input); end
 
   sig { params(input: Temporalio::Client::Interceptor::SignalWorkflowInput).void }
@@ -4245,7 +4245,7 @@ class Temporalio::Client::Interceptor::Outbound
   sig { params(input: Temporalio::Client::Interceptor::StartWorkflowUpdateInput).returns(Temporalio::Client::WorkflowUpdateHandle) }
   def start_workflow_update(input); end
 
-  sig { params(input: Temporalio::Client::Interceptor::PollWorkflowUpdateInput).returns(T.untyped) }
+  sig { params(input: Temporalio::Client::Interceptor::PollWorkflowUpdateInput).returns(Temporalio::Api::Update::V1::Outcome) }
   def poll_workflow_update(input); end
 
   sig { params(input: Temporalio::Client::Interceptor::CancelWorkflowInput).void }
@@ -7196,10 +7196,10 @@ class Temporalio::EnvConfig::ClientConfigTLS < ::Data
   sig { returns(T::Hash[Symbol, T.untyped]) }
   def to_h; end
 
-  sig { returns(T.untyped) }
+  sig { returns(T.any(Temporalio::Client::Connection::TLSOptions, FalseClass)) }
   def to_client_tls_options; end
 
-  sig { params(hash: T.nilable(T::Hash[T.untyped, T.untyped])).returns(T.nilable(Temporalio::EnvConfig::ClientConfigTLS)) }
+  sig { params(hash: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.nilable(Temporalio::EnvConfig::ClientConfigTLS)) }
   def self.from_h(hash); end
 end
 
@@ -7218,7 +7218,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
   sig { returns(T.nilable(Temporalio::EnvConfig::ClientConfigTLS)) }
   def tls; end
 
-  sig { returns(T::Hash[T.untyped, T.untyped]) }
+  sig { returns(T::Hash[String, String]) }
   def grpc_meta; end
 
   sig do
@@ -7227,7 +7227,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
       namespace: T.nilable(String),
       api_key: T.nilable(String),
       tls: T.nilable(Temporalio::EnvConfig::ClientConfigTLS),
-      grpc_meta: T::Hash[T.untyped, T.untyped]
+      grpc_meta: T::Hash[String, String]
     ).void
   end
   def initialize(
@@ -7238,7 +7238,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
     grpc_meta: T.unsafe(nil)
   ); end
 
-  sig { params(hash: T::Hash[T.untyped, T.untyped]).returns(Temporalio::EnvConfig::ClientConfigProfile) }
+  sig { params(hash: T::Hash[Symbol, T.untyped]).returns(Temporalio::EnvConfig::ClientConfigProfile) }
   def self.from_h(hash); end
 
   sig do
@@ -7263,7 +7263,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
   sig { returns(T::Hash[Symbol, T.untyped]) }
   def to_h; end
 
-  sig { returns([T::Array[T.untyped], T::Hash[Symbol, T.untyped]]) }
+  sig { returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.untyped]]) }
   def to_client_connect_options; end
 end
 
@@ -7276,7 +7276,7 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
   sig { params(profiles: T::Hash[String, Temporalio::EnvConfig::ClientConfigProfile]).void }
   def initialize(profiles: T.unsafe(nil)); end
 
-  sig { params(hash: T::Hash[T.untyped, T.untyped]).returns(Temporalio::EnvConfig::ClientConfig) }
+  sig { params(hash: T::Hash[String, T::Hash[Symbol, T.untyped]]).returns(Temporalio::EnvConfig::ClientConfig) }
   def self.from_h(hash); end
 
   sig do
@@ -7296,7 +7296,7 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
       disable_env: T::Boolean,
       config_file_strict: T::Boolean,
       override_env_vars: T.nilable(T::Hash[String, String])
-    ).returns([T::Array[T.untyped], T::Hash[Symbol, T.untyped]])
+    ).returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.untyped]])
   end
   def self.load_client_connect_options(
     profile: T.unsafe(nil),
