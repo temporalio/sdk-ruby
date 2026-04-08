@@ -8,7 +8,7 @@ module Support
   class SigApplicatorTest < Minitest::Test
     # --- Block param mismatch skips ---
 
-    def test_skips_anonymous_block_with_sig_block
+    def test_does_not_skip_anonymous_block_with_sig_block
       klass = Class.new do
         def foo(&); end
       end
@@ -16,7 +16,7 @@ module Support
         'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
       )
       original = klass.instance_method(:foo)
-      assert skip_method?(original, method_node, :foo)
+      refute skip_method?(original, method_node, :foo)
     end
 
     def test_skips_method_with_block_but_sig_without
@@ -48,6 +48,19 @@ module Support
       )
       original = klass.instance_method(:foo)
       refute skip_method?(original, method_node, :foo)
+    end
+
+    # --- Anonymous block sig rewriting ---
+
+    def test_rewrite_block_param
+      input = 'sig { params(name: String, block: T.proc.void).void }'
+      expected = 'sig { params(name: String, "&": T.proc.void).void }'
+      assert_equal expected, rewrite_block_param(input)
+    end
+
+    def test_rewrite_block_param_no_block
+      input = 'sig { params(name: String).void }'
+      assert_equal input, rewrite_block_param(input)
     end
 
     # --- Setter / unnamed param skips ---
@@ -121,6 +134,10 @@ module Support
 
     def skip_method?(original, method_node, method_name)
       SigApplicator.send(:skip_method?, original, method_node, method_name)
+    end
+
+    def rewrite_block_param(sig_source)
+      SigApplicator.send(:rewrite_block_param, sig_source)
     end
   end
 end

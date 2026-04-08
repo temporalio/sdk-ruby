@@ -48,6 +48,10 @@ module SigApplicator
       configure_error_handler!
       register_summary_hook!
 
+      # Make T::Sig available on all modules/classes so we don't need to
+      # extend it per-target inside apply_method_sig.
+      ::Module.include(::T::Sig)
+
       tree = RBI::Parser.parse_file(RBI_PATH)
       errors = []
       skipped = 0
@@ -200,11 +204,13 @@ module SigApplicator
 
       return :skipped if skip_method?(original, method_node, method_name)
 
-      target.extend(T::Sig)
+      has_anon_block = anonymous_block?(original)
 
       method_node.sigs.each do |sig|
         # RBI::Sig#string serializes back to valid T::Sig DSL source
         sig_source = sig.string
+        # Anonymous block params (def foo(&)) need `"&":` instead of `block:`
+        sig_source = rewrite_block_param(sig_source) if has_anon_block
         begin
           target.class_eval(sig_source)
           target.send(:define_method, method_name, original)
@@ -224,19 +230,29 @@ module SigApplicator
       true
     end
 
+    def anonymous_block?(method)
+      block_param = method.parameters.find { |kind, _| kind == :block }
+      block_param && (block_param[1].nil? || block_param[1] == :&)
+    end
+
+    # Rewrites `block: <type>` to `"&": <type>` in a sig source string
+    # so sorbet-runtime matches the anonymous block parameter.
+    def rewrite_block_param(sig_source)
+      sig_source.sub(/\bblock:\s/, '"&": ')
+    end
+
     # Determines whether a method should be skipped for sig application based
     # on parameter shape mismatches between the RBI sig and the actual method.
     def skip_method?(original, method_node, method_name)
       actual_params = original.parameters
 
-      # Block param mismatch: anonymous block forwarding (Ruby 3.1+ `def foo(&)`),
-      # methods using yield with no block param, or sigs that omit declared blocks.
+      # Block param mismatch: methods using yield with no block param,
+      # or sigs that omit declared blocks. Anonymous blocks (def foo(&))
+      # are handled via sig rewriting in apply_method_sig.
       actual_block = actual_params.find { |kind, _| kind == :block }
       sig_block_params = method_node.sigs.flat_map { |sig| sig.params.select { |p| p.type&.include?('T.proc') } }
       actual_has_block = !actual_block.nil?
-      actual_block_anonymous = actual_block && (actual_block[1].nil? || actual_block[1] == :&)
       sig_has_block = sig_block_params.any?
-      return true if actual_block_anonymous && sig_has_block
       return true if actual_has_block != sig_has_block
 
       # Setter methods where Ruby creates unnamed params (attr_writer)
