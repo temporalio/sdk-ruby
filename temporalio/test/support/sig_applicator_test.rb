@@ -124,6 +124,36 @@ module Support
       refute skip_method?(original, method_node, :foo)
     end
 
+    def test_apply_all_raises_when_signature_cannot_be_instrumented
+      test_class = Class.new do
+        extend T::Sig
+
+        def self.foo(value); end
+      end
+      Support.const_set(:SigApplicatorApplyAllTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorApplyAllTest
+          sig { params(other: String).void }
+          def self.foo(value); end
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+
+      error = assert_raises(RuntimeError) { SigApplicator.apply_all! }
+      assert_includes error.message, 'SigApplicator: 1 methods could not be instrumented:'
+      assert_includes error.message, 'Support::SigApplicatorApplyAllTest.foo:'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      Support.send(:remove_const, :SigApplicatorApplyAllTest) if Support.const_defined?(:SigApplicatorApplyAllTest, false)
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
     private
 
     def parse_method(source)
