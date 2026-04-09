@@ -4,13 +4,13 @@ module Temporalio
       class Service
         def initialize: (Connection, untyped) -> void
 
-        def invoke_rpc: [REQ < Object, RESP < Object] (
+        def invoke_rpc: (
           rpc: String,
-          request_class: class REQ,
-          response_class: class RESP,
-          request: REQ,
+          request_class: untyped,
+          response_class: untyped,
+          request: ::Google::Protobuf::AbstractMessage,
           rpc_options: RPCOptions?
-        ) -> RESP
+        ) -> untyped
       end
     end
   end

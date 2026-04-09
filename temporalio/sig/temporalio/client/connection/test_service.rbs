@@ -6,29 +6,29 @@ module Temporalio
       class TestService < Service
         def initialize: (Connection) -> void
         def lock_time_skipping: (
-          untyped request,
+          Temporalio::Api::TestService::V1::LockTimeSkippingRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::LockTimeSkippingResponse
         def unlock_time_skipping: (
-          untyped request,
+          Temporalio::Api::TestService::V1::UnlockTimeSkippingRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::UnlockTimeSkippingResponse
         def sleep: (
-          untyped request,
+          Temporalio::Api::TestService::V1::SleepRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::SleepResponse
         def sleep_until: (
-          untyped request,
+          Temporalio::Api::TestService::V1::SleepUntilRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::SleepResponse
         def unlock_time_skipping_with_sleep: (
-          untyped request,
+          Temporalio::Api::TestService::V1::SleepRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::SleepResponse
         def get_current_time: (
-          untyped request,
+          Google::Protobuf::Empty request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::TestService::V1::GetCurrentTimeResponse
       end
     end
   end

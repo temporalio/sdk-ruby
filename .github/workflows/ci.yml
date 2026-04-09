@@ -59,13 +59,10 @@ jobs:
         with:
           go-version: stable
 
-      # Needed because gRPC tools does not have a macOS protoc binary
-      # currently, see https://github.com/grpc/grpc/issues/25755
-      - name: Install protoc for mac
-        if: ${{ matrix.os == 'macos-latest' }}
+      - name: Install protoc
         uses: arduino/setup-protoc@v3
         with:
-          version: "23.x"
+          version: "34.x"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install bundle
@@ -76,8 +73,7 @@ jobs:
         if: ${{ matrix.checkTarget }}
         working-directory: ./temporalio
         run: |
-          bundle exec rake proto:generate
-          [[ -z $(git status --porcelain lib/temporalio/api) ]] || (git diff lib/temporalio/api; echo "Protos changed" 1>&2; exit 1)
+          bundle exec rake proto:check_generated
 
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio

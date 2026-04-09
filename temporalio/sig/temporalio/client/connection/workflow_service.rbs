@@ -6,425 +6,425 @@ module Temporalio
       class WorkflowService < Service
         def initialize: (Connection) -> void
         def register_namespace: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RegisterNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RegisterNamespaceResponse
         def describe_namespace: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
         def list_namespaces: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListNamespacesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListNamespacesResponse
         def update_namespace: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateNamespaceResponse
         def deprecate_namespace: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeprecateNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeprecateNamespaceResponse
         def start_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse
         def execute_multi_operation: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ExecuteMultiOperationRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ExecuteMultiOperationResponse
         def get_workflow_execution_history: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse
         def get_workflow_execution_history_reverse: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryReverseResponse
         def poll_workflow_task_queue: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
         def respond_workflow_task_completed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedResponse
         def respond_workflow_task_failed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskFailedResponse
         def poll_activity_task_queue: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
         def record_activity_task_heartbeat: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatResponse
         def record_activity_task_heartbeat_by_id: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdResponse
         def respond_activity_task_completed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedResponse
         def respond_activity_task_completed_by_id: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskCompletedByIdResponse
         def respond_activity_task_failed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedResponse
         def respond_activity_task_failed_by_id: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdResponse
         def respond_activity_task_canceled: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledResponse
         def respond_activity_task_canceled_by_id: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondActivityTaskCanceledByIdResponse
         def request_cancel_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RequestCancelWorkflowExecutionResponse
         def signal_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SignalWorkflowExecutionResponse
         def signal_with_start_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionResponse
         def reset_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ResetWorkflowExecutionResponse
         def terminate_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::TerminateWorkflowExecutionResponse
         def delete_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteWorkflowExecutionResponse
         def list_open_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListOpenWorkflowExecutionsResponse
         def list_closed_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListClosedWorkflowExecutionsResponse
         def list_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListWorkflowExecutionsResponse
         def list_archived_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListArchivedWorkflowExecutionsResponse
         def scan_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ScanWorkflowExecutionsResponse
         def count_workflow_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::CountWorkflowExecutionsResponse
         def get_search_attributes: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetSearchAttributesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetSearchAttributesResponse
         def respond_query_task_completed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondQueryTaskCompletedResponse
         def reset_sticky_task_queue: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ResetStickyTaskQueueResponse
         def shutdown_worker: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ShutdownWorkerRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ShutdownWorkerResponse
         def query_workflow: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::QueryWorkflowRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::QueryWorkflowResponse
         def describe_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse
         def describe_task_queue: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeTaskQueueRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeTaskQueueResponse
         def get_cluster_info: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetClusterInfoRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetClusterInfoResponse
         def get_system_info: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetSystemInfoRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetSystemInfoResponse
         def list_task_queue_partitions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListTaskQueuePartitionsResponse
         def create_schedule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::CreateScheduleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::CreateScheduleResponse
         def describe_schedule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeScheduleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeScheduleResponse
         def update_schedule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateScheduleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateScheduleResponse
         def patch_schedule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PatchScheduleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PatchScheduleResponse
         def list_schedule_matching_times: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListScheduleMatchingTimesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListScheduleMatchingTimesResponse
         def delete_schedule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteScheduleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteScheduleResponse
         def list_schedules: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListSchedulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListSchedulesResponse
         def count_schedules: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::CountSchedulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::CountSchedulesResponse
         def update_worker_build_id_compatibility: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkerBuildIdCompatibilityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkerBuildIdCompatibilityResponse
         def get_worker_build_id_compatibility: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdCompatibilityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetWorkerBuildIdCompatibilityResponse
         def update_worker_versioning_rules: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkerVersioningRulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkerVersioningRulesResponse
         def get_worker_versioning_rules: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetWorkerVersioningRulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetWorkerVersioningRulesResponse
         def get_worker_task_reachability: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetWorkerTaskReachabilityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetWorkerTaskReachabilityResponse
         def describe_deployment: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeDeploymentRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeDeploymentResponse
         def describe_worker_deployment_version: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentVersionResponse
         def list_deployments: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListDeploymentsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListDeploymentsResponse
         def get_deployment_reachability: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetDeploymentReachabilityResponse
         def get_current_deployment: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::GetCurrentDeploymentResponse
         def set_current_deployment: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SetCurrentDeploymentResponse
         def set_worker_deployment_current_version: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentCurrentVersionResponse
         def describe_worker_deployment: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentResponse
         def delete_worker_deployment: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentResponse
         def delete_worker_deployment_version: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteWorkerDeploymentVersionResponse
         def set_worker_deployment_ramping_version: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentRampingVersionResponse
         def list_worker_deployments: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse
         def update_worker_deployment_version_metadata: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataResponse
         def set_worker_deployment_manager: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::SetWorkerDeploymentManagerResponse
         def update_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
         def poll_workflow_execution_update: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateResponse
         def start_batch_operation: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::StartBatchOperationResponse
         def stop_batch_operation: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::StopBatchOperationRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::StopBatchOperationResponse
         def describe_batch_operation: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeBatchOperationRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeBatchOperationResponse
         def list_batch_operations: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListBatchOperationsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListBatchOperationsResponse
         def poll_nexus_task_queue: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse
         def respond_nexus_task_completed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondNexusTaskCompletedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondNexusTaskCompletedResponse
         def respond_nexus_task_failed: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RespondNexusTaskFailedResponse
         def update_activity_options: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse
         def update_workflow_execution_options: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsResponse
         def pause_activity: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PauseActivityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PauseActivityResponse
         def unpause_activity: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse
         def reset_activity: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ResetActivityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ResetActivityResponse
         def create_workflow_rule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::CreateWorkflowRuleResponse
         def describe_workflow_rule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeWorkflowRuleResponse
         def delete_workflow_rule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteWorkflowRuleResponse
         def list_workflow_rules: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListWorkflowRulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListWorkflowRulesResponse
         def trigger_workflow_rule: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::TriggerWorkflowRuleResponse
         def record_worker_heartbeat: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RecordWorkerHeartbeatResponse
         def list_workers: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListWorkersRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListWorkersResponse
         def update_task_queue_config: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigResponse
         def fetch_worker_config: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::FetchWorkerConfigRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::FetchWorkerConfigResponse
         def update_worker_config: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkerConfigResponse
         def describe_worker: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeWorkerRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse
         def pause_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PauseWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PauseWorkflowExecutionResponse
         def unpause_workflow_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::UnpauseWorkflowExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::UnpauseWorkflowExecutionResponse
         def start_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse
         def describe_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse
         def poll_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::PollActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse
         def list_activity_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse
         def count_activity_executions: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::CountActivityExecutionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::CountActivityExecutionsResponse
         def request_cancel_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionResponse
         def terminate_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionResponse
         def delete_activity_execution: (
-          untyped request,
+          Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse
       end
     end
   end

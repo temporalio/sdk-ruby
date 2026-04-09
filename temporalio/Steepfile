@@ -3,9 +3,6 @@
 D = Steep::Diagnostic
 
 common_diagnostics = {
-  # TODO(cretz): Needed because lack of proto RBS, waiting on https://github.com/protocolbuffers/protobuf/pull/15633
-  D::Ruby::UnknownConstant => :information,
-
   # Steep >= 1.9 started becoming too noisy in these cases
   D::Ruby::UnannotatedEmptyCollection => :information,
   D::Ruby::UndeclaredMethodDefinition => :information
@@ -14,7 +11,6 @@ common_diagnostics = {
 target :lib do
   signature 'sig'
   check 'lib'
-  ignore 'lib/temporalio/api', 'lib/temporalio/internal/bridge/api'
   library 'uri', 'objspace', 'etc'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)
@@ -27,6 +23,7 @@ target :test do
   library 'uri', 'objspace', 'etc'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)
+    hash[D::Ruby::UnknownConstant] = :information
     # Steep cannot infer some things, so we can ignore them in tests
     hash[D::Ruby::InsufficientKeywordArguments] = :information
   end

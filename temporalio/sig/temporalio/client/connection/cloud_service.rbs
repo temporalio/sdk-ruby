@@ -6,237 +6,237 @@ module Temporalio
       class CloudService < Service
         def initialize: (Connection) -> void
         def get_users: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUsersResponse
         def get_user: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUserRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserResponse
         def create_user: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateUserRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateUserResponse
         def update_user: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateUserRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateUserResponse
         def delete_user: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteUserRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteUserResponse
         def set_user_namespace_access: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::SetUserNamespaceAccessRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetUserNamespaceAccessResponse
         def get_async_operation: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetAsyncOperationRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetAsyncOperationResponse
         def create_namespace: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceResponse
         def get_namespaces: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNamespacesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNamespacesResponse
         def get_namespace: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNamespaceResponse
         def update_namespace: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceResponse
         def rename_custom_search_attribute: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::RenameCustomSearchAttributeRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::RenameCustomSearchAttributeResponse
         def delete_namespace: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceResponse
         def failover_namespace_region: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::FailoverNamespaceRegionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::FailoverNamespaceRegionResponse
         def add_namespace_region: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::AddNamespaceRegionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::AddNamespaceRegionResponse
         def delete_namespace_region: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionResponse
         def get_regions: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetRegionsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetRegionsResponse
         def get_region: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetRegionRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetRegionResponse
         def get_api_keys: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetApiKeysRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetApiKeysResponse
         def get_api_key: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetApiKeyRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetApiKeyResponse
         def create_api_key: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateApiKeyRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateApiKeyResponse
         def update_api_key: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateApiKeyRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateApiKeyResponse
         def delete_api_key: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteApiKeyRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteApiKeyResponse
         def get_nexus_endpoints: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsResponse
         def get_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointResponse
         def create_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointResponse
         def update_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateNexusEndpointResponse
         def delete_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse
         def get_user_groups: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsResponse
         def get_user_group: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUserGroupRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserGroupResponse
         def create_user_group: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateUserGroupRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateUserGroupResponse
         def update_user_group: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateUserGroupRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateUserGroupResponse
         def delete_user_group: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteUserGroupRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteUserGroupResponse
         def set_user_group_namespace_access: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetUserGroupNamespaceAccessResponse
         def add_user_group_member: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::AddUserGroupMemberResponse
         def remove_user_group_member: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::RemoveUserGroupMemberResponse
         def get_user_group_members: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserGroupMembersResponse
         def create_service_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateServiceAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateServiceAccountResponse
         def get_service_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountResponse
         def get_service_accounts: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountsResponse
         def update_service_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateServiceAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateServiceAccountResponse
         def set_service_account_namespace_access: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountNamespaceAccessResponse
         def delete_service_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteServiceAccountResponse
         def get_usage: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetUsageRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUsageResponse
         def get_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetAccountResponse
         def update_account: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateAccountRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateAccountResponse
         def create_namespace_export_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceExportSinkResponse
         def get_namespace_export_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinkResponse
         def get_namespace_export_sinks: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNamespaceExportSinksResponse
         def update_namespace_export_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceExportSinkResponse
         def delete_namespace_export_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceExportSinkResponse
         def validate_namespace_export_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse
         def update_namespace_tags: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsResponse
         def create_connectivity_rule: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleResponse
         def get_connectivity_rule: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRuleResponse
         def get_connectivity_rules: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesResponse
         def delete_connectivity_rule: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse
         def validate_account_audit_log_sink: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse
       end
     end
   end

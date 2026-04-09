@@ -27,19 +27,6 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb']
 end
 
-def add_protoc_to_path
-  tools_spec = Gem::Specification.find_by_name('grpc-tools')
-  cpu = RbConfig::CONFIG['host_cpu']
-  cpu = 'x86_64' if cpu == 'x64'
-  os = RbConfig::CONFIG['host_os']
-  os = 'windows' if os.start_with?('mingw')
-  protoc_path = "#{tools_spec.gem_dir}/bin/#{cpu}-#{os}"
-  separator = os == 'windows' ? ';' : ':'
-  ENV['PATH'] = "#{ENV.fetch('PATH', nil)}#{separator}#{protoc_path}"
-end
-
-add_protoc_to_path
-
 require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new
@@ -74,6 +61,18 @@ namespace :proto do
   task :generate do
     require_relative 'extra/proto_gen'
     ProtoGen.new.run
+  end
+
+  desc 'Fail if checked-in generated proto files are out of date'
+  task check_generated: :generate do
+    require_relative 'extra/proto_gen'
+    proto_generated_paths = ProtoGen.generated_paths
+
+    changed_paths = IO.popen(['git', 'status', '--porcelain', '--', *proto_generated_paths], &:read)
+    next if changed_paths.empty?
+
+    sh 'git', 'diff', '--', *proto_generated_paths
+    raise 'Protos changed'
   end
 end
 

@@ -1333,6 +1333,7 @@ Prerequisites:
 
 * [Ruby](https://www.ruby-lang.org/) >= 3.2 (i.e. `ruby` and `bundle` on the `PATH`)
 * [Rust](https://www.rust-lang.org/) latest stable (i.e. `cargo` on the `PATH`)
+* [protoc](https://protobuf.dev/installation/) >= 34.0 (i.e. `protoc` on the `PATH`)
 * This repository, cloned recursively
 * Change to the `temporalio/` directory
 
@@ -1416,3 +1417,6 @@ Now can run `steep`:
 Run:
 
     bundle exec rake proto:generate
+
+`proto:generate` now requires `protoc >= 34.0` because we generate RBS alongside the generated Ruby
+protobuf files.
