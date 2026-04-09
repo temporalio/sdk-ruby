@@ -65,10 +65,7 @@ module SigApplicator
 
       warn "SigApplicator: applied #{applied} runtime type signatures (#{skipped} skipped)"
 
-      return if errors.empty?
-
-      warn "SigApplicator: #{errors.size} methods could not be instrumented:"
-      errors.each { |e| warn "  #{e}" }
+      raise_instrumentation_errors!(errors)
     end
 
     def record_type_error(message)
@@ -140,6 +137,14 @@ module SigApplicator
         end
       end
       Object.const_set(:ZZZSigApplicatorTest, klass)
+    end
+
+    def raise_instrumentation_errors!(errors)
+      return if errors.empty?
+
+      summary = +"SigApplicator: #{errors.size} methods could not be instrumented:\n"
+      errors.each { |error| summary << "  #{error}\n" }
+      raise summary.chomp
     end
 
     def apply_scope(node, errors)
