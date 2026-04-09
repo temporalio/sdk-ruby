@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = 'https://github.com/temporalio/sdk-ruby'
 
-  spec.files = Dir['lib/**/*.rb', 'sig/**/*.rbs', 'rbi/temporalio.rbi', 'LICENSE', 'README.md', 'Cargo.*',
+  spec.files = Dir['lib/**/*.rb', 'sig/**/*.rbs', 'rbi/**/*.rbi', 'LICENSE', 'README.md', 'Cargo.*',
                    'temporalio.gemspec', 'Gemfile', 'Rakefile', '.yardopts']
 
   spec.bindir = 'exe'
