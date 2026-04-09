@@ -53,14 +53,18 @@ module Support
     # --- Anonymous block sig rewriting ---
 
     def test_rewrite_block_param
-      input = 'sig { params(name: String, block: T.proc.void).void }'
+      input = 'sig { params(name: String, blk: T.proc.void).void }'
       expected = 'sig { params(name: String, "&": T.proc.void).void }'
-      assert_equal expected, rewrite_block_param(input)
+      method_node = parse_method(
+        'class X; sig { params(name: String, blk: T.proc.void).void }; def foo(name, &blk); end; end'
+      )
+      assert_equal expected, rewrite_block_param(input, method_node, method_node.sigs.first)
     end
 
     def test_rewrite_block_param_no_block
       input = 'sig { params(name: String).void }'
-      assert_equal input, rewrite_block_param(input)
+      method_node = parse_method('class X; sig { params(name: String).void }; def foo(name); end; end')
+      assert_equal input, rewrite_block_param(input, method_node, method_node.sigs.first)
     end
 
     # --- Setter / unnamed param skips ---
@@ -150,8 +154,59 @@ module Support
       assert_includes error.message, 'Support::SigApplicatorApplyAllTest.foo:'
     ensure
       parser.send(:define_method, :parse_file, original_parse_file)
-      Support.send(:remove_const, :SigApplicatorApplyAllTest) if Support.const_defined?(:SigApplicatorApplyAllTest, false)
+      if Support.const_defined?(:SigApplicatorApplyAllTest, false)
+        Support.send(:remove_const, :SigApplicatorApplyAllTest)
+      end
       Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
+    def test_apply_method_sig_supports_anonymous_block_with_named_rbi_block
+      klass = Class.new do
+        extend T::Sig
+
+        def foo(&); end
+      end
+      method_node = parse_method(
+        'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
+      )
+      errors = []
+
+      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
+      assert_empty errors
+    end
+
+    def test_apply_method_sig_resolves_singleton_sig_constants_in_class_namespace
+      klass = Class.new do
+        extend T::Sig
+
+        class << self
+          extend T::Sig
+        end
+
+        def self.foo(value); end
+      end
+      klass.const_set(:Inner, Data.define(:value))
+      Support.const_set(:SigApplicatorSingletonScopeTest, klass)
+      method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorSingletonScopeTest
+          sig { params(value: Inner).void }
+          def self.foo(value); end
+        end
+      RBI
+      errors = []
+
+      assert apply_method_sig(
+        klass.singleton_class,
+        'Support::SigApplicatorSingletonScopeTest',
+        method_node,
+        errors,
+        sig_eval_scope: klass
+      )
+      assert_empty errors
+    ensure
+      if Support.const_defined?(:SigApplicatorSingletonScopeTest, false)
+        Support.send(:remove_const, :SigApplicatorSingletonScopeTest)
+      end
     end
 
     private
@@ -166,8 +221,19 @@ module Support
       SigApplicator.send(:skip_method?, original, method_node, method_name)
     end
 
-    def rewrite_block_param(sig_source)
-      SigApplicator.send(:rewrite_block_param, sig_source)
+    def rewrite_block_param(sig_source, method_node, sig)
+      SigApplicator.send(:rewrite_block_param, sig_source, method_node, sig)
+    end
+
+    def apply_method_sig(target, class_name, method_node, errors, sig_eval_scope:)
+      SigApplicator.send(
+        :apply_method_sig,
+        target,
+        class_name,
+        method_node,
+        errors,
+        sig_eval_scope:
+      )
     end
   end
 end
