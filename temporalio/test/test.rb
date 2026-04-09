@@ -17,11 +17,14 @@ require 'workflow_utils'
 
 if ENV['TEMPORAL_SORBET_RUNTIME_CHECK']
   # Load modules that are lazy-loaded so their types can be instrumented
+  require 'temporalio/common_enums'
   require 'temporalio/contrib/open_telemetry'
   require 'temporalio/converters/payload_codec'
   require 'temporalio/env_config'
   require 'temporalio/simple_plugin'
+  require 'temporalio/worker/interceptor'
   require 'temporalio/worker/workflow_replayer'
+  require 'temporalio/workflow'
 
   require 'support/sig_applicator'
   SigApplicator.apply_all!

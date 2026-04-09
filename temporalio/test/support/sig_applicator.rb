@@ -142,7 +142,7 @@ module SigApplicator
     def raise_instrumentation_errors!(errors)
       return if errors.empty?
 
-      summary = +"SigApplicator: #{errors.size} methods could not be instrumented:\n"
+      summary = "SigApplicator: #{errors.size} methods could not be instrumented:\n"
       errors.each { |error| summary << "  #{error}\n" }
       raise summary.chomp
     end
@@ -169,7 +169,7 @@ module SigApplicator
         case child
         when RBI::Method
           target = child.is_singleton ? klass.singleton_class : klass
-          result = apply_method_sig(target, class_name, child, errors)
+          result = apply_method_sig(target, class_name, child, errors, sig_eval_scope: klass)
           if result == :skipped
             skipped += 1
           elsif result
@@ -179,7 +179,14 @@ module SigApplicator
           child.nodes.each do |scn|
             next unless scn.is_a?(RBI::Method)
 
-            result = apply_method_sig(klass.singleton_class, class_name, scn, errors, class_method: true)
+            result = apply_method_sig(
+              klass.singleton_class,
+              class_name,
+              scn,
+              errors,
+              class_method: true,
+              sig_eval_scope: klass
+            )
             if result == :skipped
               skipped += 1
             elsif result
@@ -191,11 +198,12 @@ module SigApplicator
       [applied, skipped]
     end
 
-    def apply_method_sig(target, class_name, method_node, errors, class_method: false)
+    def apply_method_sig(target, class_name, method_node, errors, class_method: false, sig_eval_scope: target)
       return false if method_node.sigs.empty?
 
       method_name = method_node.name.to_sym
-      separator = class_method || method_node.is_singleton ? '.' : '#'
+      singleton_method = class_method || method_node.is_singleton
+      separator = singleton_method ? '.' : '#'
       full_name = "#{class_name}#{separator}#{method_name}"
 
       return :skipped if SKIP_METHODS.include?(full_name)
@@ -214,10 +222,11 @@ module SigApplicator
       method_node.sigs.each do |sig|
         # RBI::Sig#string serializes back to valid T::Sig DSL source
         sig_source = sig.string
-        # Anonymous block params (def foo(&)) need `"&":` instead of `block:`
-        sig_source = rewrite_block_param(sig_source) if has_anon_block
+        # Anonymous block params (def foo(&)) need `"&":` instead of the RBI
+        # block parameter name.
+        sig_source = rewrite_block_param(sig_source, method_node, sig) if has_anon_block
         begin
-          target.class_eval(sig_source)
+          apply_sig_source(sig_eval_scope, target, sig_source, singleton_method)
           target.send(:define_method, method_name, original)
 
           # Force eager sig validation so mismatches are caught now rather than
@@ -240,10 +249,28 @@ module SigApplicator
       block_param && (block_param[1].nil? || block_param[1] == :&)
     end
 
-    # Rewrites `block: <type>` to `"&": <type>` in a sig source string
-    # so sorbet-runtime matches the anonymous block parameter.
-    def rewrite_block_param(sig_source)
-      sig_source.sub(/\bblock:\s/, '"&": ')
+    def apply_sig_source(sig_eval_scope, target, sig_source, singleton_method)
+      if singleton_method
+        sig_eval_scope.class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
+          class << self
+            #{sig_source} # #{sig_source}
+          end
+        RUBY
+      else
+        target.class_eval(sig_source)
+      end
+    end
+
+    # Rewrites the RBI block parameter name to `"&": <type>` so
+    # sorbet-runtime matches the anonymous block parameter.
+    def rewrite_block_param(sig_source, method_node, sig)
+      block_param_name =
+        method_node.params.find { |param| param.is_a?(RBI::BlockParam) }&.name ||
+        sig.params.find { |param| param.type&.include?('T.proc') }&.name
+
+      return sig_source unless block_param_name
+
+      sig_source.sub(/\b#{Regexp.escape(block_param_name)}:\s/, '"&": ')
     end
 
     # Determines whether a method should be skipped for sig application based
