@@ -612,6 +612,43 @@ module Contrib
       ContextCurrentPatch.do_illegal_thing = false
     end
 
+    def test_signal_with_start
+      exp_root = ExpectedSpan.new(name: 'root')
+      act_root = trace do |client|
+        outer_context = OpenTelemetry::Context.current
+        attach_token = nil
+        task_queue = "tq-#{SecureRandom.uuid}"
+        worker = Temporalio::Worker.new(
+          client:,
+          task_queue:,
+          workflows: [TestWorkflow]
+        )
+        worker.run do
+          attach_token = OpenTelemetry::Context.attach(outer_context)
+          id = "wf-#{SecureRandom.uuid}"
+          start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+            TestWorkflow, :wait_on_signal,
+            id:, task_queue:
+          )
+          handle = client.signal_with_start_workflow(
+            TestWorkflow.signal, :mark_finished, start_workflow_operation:
+          )
+
+          exp_cl_attrs = { 'temporalWorkflowID' => id }
+          exp_run_attrs = exp_cl_attrs.merge({ 'temporalRunID' => handle.result_run_id })
+          exp_sig_start = exp_root.add_child(name: 'SignalWithStartWorkflow:TestWorkflow', attributes: exp_cl_attrs)
+          exp_sig_start.add_child(name: 'HandleSignal:signal', attributes: exp_run_attrs, links: [exp_sig_start])
+          exp_run_wf = exp_sig_start.add_child(name: 'RunWorkflow:TestWorkflow', attributes: exp_run_attrs)
+          exp_run_wf.add_child(name: 'CompleteWorkflow:TestWorkflow', attributes: exp_run_attrs)
+
+          assert_equal 'workflow-done', handle.result
+        ensure
+          OpenTelemetry::Context.detach(attach_token) if attach_token
+        end
+      end
+      assert_equal exp_root.to_s_indented, act_root.to_s_indented
+    end
+
     def test_otel_context_cleared
       traced_wf_trace_id = nil
       traced_act = trace_workflow(:activity_success_return_trace_id) do |handle|
