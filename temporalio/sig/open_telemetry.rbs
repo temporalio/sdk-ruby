@@ -1,0 +1,47 @@
+module OpenTelemetry
+  module Context
+    def self.current: -> untyped
+    def self.attach: (untyped context) -> untyped
+    def self.detach: (untyped token) -> void
+
+    module Propagation
+      class CompositeTextMapPropagator
+        def self.compose_propagators: (Array[untyped] propagators) -> untyped
+      end
+    end
+  end
+
+  module Baggage
+    module Propagation
+      class TextMapPropagator
+        def initialize: -> void
+      end
+    end
+  end
+
+  module Trace
+    def self.with_span: [T] (untyped span) { -> T } -> T
+    def self.current_span: (?untyped context) -> untyped
+    def self.context_with_span: (untyped span) -> untyped
+
+    class Link
+      def initialize: (untyped context) -> void
+    end
+
+    module Status
+      def self.error: (String description) -> untyped
+    end
+
+    module Propagation
+      module TraceContext
+        class TextMapPropagator
+          def initialize: -> void
+        end
+      end
+    end
+
+    class Span
+      INVALID: untyped
+    end
+  end
+end

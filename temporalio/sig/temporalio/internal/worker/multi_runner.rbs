@@ -116,6 +116,9 @@ module Temporalio
 
             def initialize: (error: Exception) -> void
           end
+
+          class ShutdownSignalReceived < Event
+          end
         end
 
         class InjectEventForTesting < Temporalio::Error

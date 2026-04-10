@@ -69,7 +69,7 @@ module Api
       end
 
       # Basic check including search attributes
-      visitor = Temporalio::Api::PayloadVisitor.new(&mutator)
+      visitor = Temporalio::Api::PayloadVisitor.new(&mutator) # steep:ignore BlockTypeMismatch
       mutated_act = act.class.decode(act.class.encode(act))
       mutated_succ = succ.class.decode(succ.class.encode(succ))
       visitor.run(mutated_act)
@@ -84,6 +84,7 @@ module Api
       assert_equal 'samap-single', upsert_sa.indexed_fields['sakey'].data
 
       # Skip search attributes
+      # steep:ignore BlockTypeMismatch
       visitor = Temporalio::Api::PayloadVisitor.new(skip_search_attributes: true, &mutator)
       mutated_act = act.class.decode(act.class.encode(act))
       mutated_succ = succ.class.decode(succ.class.encode(succ))

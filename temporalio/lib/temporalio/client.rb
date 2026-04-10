@@ -216,7 +216,7 @@ module Temporalio
     def initialize(
       connection:,
       namespace:,
-      data_converter: DataConverter.default,
+      data_converter: Converters::DataConverter.default,
       plugins: [],
       interceptors: [],
       logger: Logger.new($stdout, level: Logger::WARN),
