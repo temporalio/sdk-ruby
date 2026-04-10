@@ -60,7 +60,7 @@ module Temporalio
 
       module Code
         OK: 0
-        CANCELLED: 1
+        CANCELED: 1
         UNKNOWN: 2
         INVALID_ARGUMENT: 3
         DEADLINE_EXCEEDED: 4

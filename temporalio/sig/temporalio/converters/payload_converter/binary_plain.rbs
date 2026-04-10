@@ -2,6 +2,7 @@ module Temporalio
   module Converters
     class PayloadConverter
       class BinaryPlain < Encoding
+        ENCODING: String
       end
     end
   end

@@ -165,6 +165,17 @@ module Temporalio
 
         def _with_validator_to_invoke: (Symbol | Proc | nil validator_to_invoke) -> Update
       end
+
+    end
+
+    class DefinitionOptions
+      attr_reader failure_exception_types: Array[singleton(Exception)]?
+      attr_reader versioning_behavior: VersioningBehavior::enum?
+
+      def initialize: (
+        ?failure_exception_types: Array[singleton(Exception)]?,
+        ?versioning_behavior: VersioningBehavior::enum?
+      ) -> void
     end
   end
 end

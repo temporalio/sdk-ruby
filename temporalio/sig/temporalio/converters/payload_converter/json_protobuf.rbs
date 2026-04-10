@@ -1,7 +1,8 @@
 module Temporalio
   module Converters
     class PayloadConverter
-      class JsonProtobuf < Encoding
+      class JSONProtobuf < Encoding
+        ENCODING: String
       end
     end
   end

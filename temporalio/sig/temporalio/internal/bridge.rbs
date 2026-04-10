@@ -4,6 +4,25 @@ module Temporalio
       def self.assert_fiber_compatibility!: -> void
       def self.fibers_supported: -> bool
 
+      module EnvConfig
+        def self.load_client_connect_config: (
+          String? profile,
+          String? path,
+          String? data,
+          bool disable_file,
+          bool disable_env,
+          bool config_file_strict,
+          Hash[String, String]? override_env_vars
+        ) -> Hash[Symbol, untyped]
+
+        def self.load_client_config: (
+          String? path,
+          String? data,
+          bool config_file_strict,
+          Hash[String, String]? override_env_vars
+        ) -> Hash[String, Hash[Symbol, untyped]]
+      end
+
       # Defined in Rust
 
       class Error < StandardError
