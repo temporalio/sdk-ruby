@@ -1,2 +1,3 @@
 --readme README.md
 --protected
+--exclude sig/
