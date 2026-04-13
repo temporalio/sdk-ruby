@@ -124,6 +124,69 @@ module Contrib
       assert messages.size > 2
     end
 
+    # ── AnthropicProvider is_error / handler error tests ─────────────────────────
+
+    def test_anthropic_handler_error_sets_is_error
+      require 'temporalio/contrib/tool_registry/providers/anthropic'
+
+      registry = Registry.new
+      registry.register(name: 'boom', description: 'd', input_schema: {}) do |_|
+        raise 'intentional failure'
+      end
+
+      fake_resp = Struct.new(:content, :stop_reason).new(
+        [{ 'type' => 'tool_use', 'id' => 'c1', 'name' => 'boom', 'input' => {} }],
+        'tool_use'
+      )
+      mock_messages = Object.new
+      mock_messages.define_singleton_method(:create) { |**_| fake_resp }
+      mock_client = Object.new
+      mock_client.define_singleton_method(:messages) { mock_messages }
+
+      provider = Temporalio::Contrib::ToolRegistry::Providers::AnthropicProvider.new(
+        registry, 'sys', client: mock_client
+      )
+
+      new_msgs, done = provider.run_turn([], registry.defs)
+
+      refute done
+      assert_equal 2, new_msgs.size
+
+      tool_result_msg = new_msgs[1]
+      assert_equal 'user', tool_result_msg['role']
+      tool_results = tool_result_msg['content']
+      assert_equal 1, tool_results.size
+      assert_equal 'tool_result', tool_results[0]['type']
+      assert_equal true, tool_results[0]['is_error']
+      assert_includes tool_results[0]['content'], 'intentional failure'
+    end
+
+    def test_anthropic_handler_success_no_is_error
+      require 'temporalio/contrib/tool_registry/providers/anthropic'
+
+      registry = Registry.new
+      registry.register(name: 'ok_tool', description: 'd', input_schema: {}) { |_| 'result' }
+
+      fake_resp = Struct.new(:content, :stop_reason).new(
+        [{ 'type' => 'tool_use', 'id' => 'c1', 'name' => 'ok_tool', 'input' => {} }],
+        'tool_use'
+      )
+      mock_messages = Object.new
+      mock_messages.define_singleton_method(:create) { |**_| fake_resp }
+      mock_client = Object.new
+      mock_client.define_singleton_method(:messages) { mock_messages }
+
+      provider = Temporalio::Contrib::ToolRegistry::Providers::AnthropicProvider.new(
+        registry, 'sys', client: mock_client
+      )
+
+      new_msgs, = provider.run_turn([], registry.defs)
+
+      tool_results = new_msgs[1]['content']
+      assert_equal 1, tool_results.size
+      refute tool_results[0].key?('is_error'), 'is_error should not be present on success'
+    end
+
     # ── Integration tests (skipped unless RUN_INTEGRATION_TESTS is set) ─────────
 
     def make_record_registry

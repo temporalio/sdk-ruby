@@ -26,7 +26,6 @@ module Temporalio
           # @param client [Object, nil] Pre-built Anthropic client (skips key/URL).
           def initialize(registry, system, model: DEFAULT_MODEL, api_key: nil, base_url: nil, client: nil)
             super()
-            require 'anthropic'
 
             @registry = registry
             @system = system
@@ -58,12 +57,16 @@ module Temporalio
             return [new_msgs, true] if tool_calls.empty? || stop_reason == 'end_turn'
 
             tool_results = tool_calls.map do |call|
+              is_error = false
               result = begin
                 @registry.dispatch(call['name'], call['input'])
               rescue => e # rubocop:disable Style/RescueStandardError
+                is_error = true
                 "error: #{e.message}"
               end
-              { 'type' => 'tool_result', 'tool_use_id' => call['id'], 'content' => result.to_s }
+              entry = { 'type' => 'tool_result', 'tool_use_id' => call['id'], 'content' => result.to_s }
+              entry['is_error'] = true if is_error
+              entry
             end
             new_msgs << { 'role' => 'user', 'content' => tool_results }
             [new_msgs, false]
@@ -72,6 +75,7 @@ module Temporalio
           private
 
           def build_client(api_key, base_url)
+            require 'anthropic'
             key = api_key || ENV.fetch('ANTHROPIC_API_KEY')
             opts = { api_key: key }
             opts[:base_url] = base_url if base_url
