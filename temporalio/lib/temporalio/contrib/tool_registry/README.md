@@ -102,18 +102,18 @@ it on retry.
 ```ruby
 require 'temporalio/contrib/tool_registry/session'
 
-issues = ToolRegistry::AgenticSession.run_with_session do |session|
+results = ToolRegistry::AgenticSession.run_with_session do |session|
   registry = ToolRegistry::Registry.new
   registry.register(name: 'flag', description: '...',
                     input_schema: { 'type' => 'object' }) do |input|
-    session.add_issue(input)  # use add_issue, not session.issues <<
+    session.add_result(input)  # use add_result, not session.results <<
     'ok' # this string is sent back to the LLM as the tool result
   end
 
   provider = ToolRegistry::Providers::AnthropicProvider.new(
     registry, 'your system prompt', api_key: ENV['ANTHROPIC_API_KEY'])
   session.run_tool_loop(provider, registry, prompt)
-  session.issues  # return value of block = return value of run_with_session
+  session.results  # return value of block = return value of run_with_session
 end
 ```
 
@@ -155,7 +155,7 @@ incur billing — expect a few cents per full test run.
 
 ## Storing application results
 
-`session.issues` accumulates application-level
+`session.results` accumulates application-level
 results during the tool loop. Elements are serialized to JSON inside each heartbeat
 checkpoint — they must be plain maps/dicts with JSON-serializable values. A non-serializable
 value raises a non-retryable `ApplicationError` at heartbeat time rather than silently
@@ -166,13 +166,13 @@ losing data on the next retry.
 Convert your domain type to a plain dict at the tool-call site and back after the session:
 
 ```ruby
-Issue = Struct.new(:type, :file, keyword_init: true)
+Result = Struct.new(:type, :file, keyword_init: true)
 
 # Inside tool handler:
-session.add_issue({ 'type' => 'smell', 'file' => 'foo.rb' })
+session.add_result({ 'type' => 'smell', 'file' => 'foo.rb' })
 
 # After session:
-issues = session.issues.map { |h| Issue.new(**h.transform_keys(&:to_sym)) }
+results = session.results.map { |h| Result.new(**h.transform_keys(&:to_sym)) }
 ```
 
 ## Per-turn LLM timeout
@@ -196,6 +196,22 @@ Recommended timeouts:
 |---|---|
 | Standard (Claude 3.x, GPT-4o) | 30 s |
 | Reasoning (o1, o3, extended thinking) | 300 s |
+
+### Activity-level timeout
+
+Set `schedule_to_close_timeout` on the activity options to bound the entire conversation:
+
+```ruby
+workflow.execute_activity(
+  MyActivities.long_analysis,
+  prompt,
+  schedule_to_close_timeout: 600  # seconds
+)
+```
+
+The per-turn client timeout and `schedule_to_close_timeout` are complementary:
+- Per-turn timeout fires if one LLM call hangs (protects against a single stuck turn)
+- `schedule_to_close_timeout` bounds the entire conversation including all retries (protects against runaway multi-turn loops)
 
 ## MCP integration
 

@@ -17,7 +17,7 @@ module Temporalio
         attr_reader :messages
 
         # @return [Array<Hash>] Application-level results from tool calls.
-        attr_reader :issues
+        attr_reader :results
 
         # Run +block+ with a durable, checkpointed LLM session.
         #
@@ -44,7 +44,7 @@ module Temporalio
 
         def initialize
           @messages = []
-          @issues = []
+          @results = []
         end
 
         private
@@ -65,16 +65,16 @@ module Temporalio
           end
 
           @messages = Array(checkpoint['messages'])
-          @issues = Array(checkpoint['issues'])
+          @results = Array(checkpoint['results'])
         end
 
         public
 
-        # Append an application-level issue record.
+        # Append an application-level result record.
         #
-        # @param issue_hash [Hash] JSON-serializable issue.
-        def add_issue(issue_hash)
-          @issues << issue_hash
+        # @param result_hash [Hash] JSON-serializable result.
+        def add_result(result_hash)
+          @results << result_hash
         end
 
         # Run the agentic tool-use loop to completion.
@@ -108,19 +108,19 @@ module Temporalio
         # arrives asynchronously through the next blocking call (the LLM HTTP
         # request) — no explicit check is needed after calling +checkpoint+.
         #
-        # @raise [Temporalio::Error::ApplicationError] (non-retryable) if any issue is not
+        # @raise [Temporalio::Error::ApplicationError] (non-retryable) if any result is not
         #   JSON-serializable.
         def checkpoint
-          @issues.each_with_index do |issue, i|
-            JSON.generate(issue)
+          @results.each_with_index do |result, i|
+            JSON.generate(result)
           rescue TypeError, JSON::GeneratorError => e
             raise Temporalio::Error::ApplicationError.new(
-              "AgenticSession: issues[#{i}] is not JSON-serializable: #{e}. " \
+              "AgenticSession: results[#{i}] is not JSON-serializable: #{e}. " \
               'Store only Hash values with JSON-serializable content.',
               non_retryable: true
             )
           end
-          Activity::Context.current.heartbeat('version' => 1, 'messages' => @messages, 'issues' => @issues)
+          Activity::Context.current.heartbeat('version' => 1, 'messages' => @messages, 'results' => @results)
         end
       end
     end
