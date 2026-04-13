@@ -41,6 +41,21 @@ class WorkerActivityTest < Test
     assert_equal 'Greetings, Block!', execute_activity(activity, 'Block')
   end
 
+  class SimpleFiberActivity < Temporalio::Activity::Definition
+    activity_executor :fiber
+
+    def execute(name)
+      "Hello, #{name}!"
+    end
+  end
+
+  # Unconditionally assert fiber executor works for all supported Ruby versions support fibers
+  def test_simple_fiber_activity
+    Async do
+      assert_equal 'Hello, Fiber!', execute_activity(SimpleFiberActivity, 'Fiber')
+    end
+  end
+
   class FiberActivity < Temporalio::Activity::Definition
     attr_reader :waiting_notification, :result_notification
 
