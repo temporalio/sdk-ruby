@@ -2,6 +2,8 @@ module Temporalio
   module Internal
     module Worker
       class ActivityWorker
+        LOG_TASKS: bool
+
         attr_reader worker: Temporalio::Worker
         attr_reader bridge_worker: Bridge::Worker
 

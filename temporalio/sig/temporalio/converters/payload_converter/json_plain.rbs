@@ -1,10 +1,12 @@
 module Temporalio
   module Converters
     class PayloadConverter
-      class JsonPlain < Encoding
+      class JSONPlain < Encoding
+        ENCODING: String
+
         def initialize: (
-          ?Hash[Symbol, untyped] parse_options,
-          ?Hash[Symbol, untyped] generate_options
+          ?parse_options: Hash[Symbol, untyped],
+          ?generate_options: Hash[Symbol, untyped]
         ) -> void
       end
     end

@@ -15,7 +15,7 @@ target :lib do
   signature 'sig'
   check 'lib'
   ignore 'lib/temporalio/api', 'lib/temporalio/internal/bridge/api'
-  library 'uri', 'objspace'
+  library 'uri', 'objspace', 'etc'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)
   end
@@ -24,7 +24,7 @@ end
 target :test do
   signature 'sig', 'test/sig'
   check 'test'
-  library 'uri', 'objspace'
+  library 'uri', 'objspace', 'etc'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)
     # Steep cannot infer some things, so we can ignore them in tests

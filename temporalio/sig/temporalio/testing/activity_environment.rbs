@@ -20,6 +20,33 @@ module Temporalio
         Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info activity,
         *Object? args
       ) -> untyped
+
+      class Context < Activity::Context
+        attr_reader info: Activity::Info
+        attr_reader instance: untyped
+        attr_reader cancellation: Cancellation
+        attr_reader worker_shutdown_cancellation: Cancellation
+        attr_reader payload_converter: Converters::PayloadConverter
+        attr_reader logger: Logger
+
+        def initialize: (
+          info: Activity::Info,
+          instance: untyped,
+          on_heartbeat: Proc?,
+          cancellation: Cancellation,
+          on_cancellation_details: Proc,
+          worker_shutdown_cancellation: Cancellation,
+          payload_converter: Converters::PayloadConverter,
+          logger: Logger,
+          metric_meter: Metric::Meter?,
+          client: Client?
+        ) -> void
+
+        def heartbeat: (*untyped details) -> untyped
+        def metric_meter: -> Metric::Meter
+        def client: -> Client
+        def cancellation_details: -> Activity::CancellationDetails?
+      end
     end
   end
 end

@@ -27,6 +27,14 @@ module Temporalio
         ) { () -> T } -> T
         def _always_create_workflow_spans: -> bool
 
+        class ClientOutbound < Client::Interceptor::Outbound
+          def initialize: (TracingInterceptor root, Client::Interceptor::Outbound next_interceptor) -> void
+        end
+
+        class ActivityInbound < Worker::Interceptor::Activity::Inbound
+          def initialize: (TracingInterceptor root, Worker::Interceptor::Activity::Inbound next_interceptor) -> void
+        end
+
         class WorkflowInbound < Worker::Interceptor::Workflow::Inbound
           def initialize: (TracingInterceptor root, Worker::Interceptor::Workflow::Inbound next_interceptor) -> void
 

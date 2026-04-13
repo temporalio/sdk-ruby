@@ -158,15 +158,15 @@ module Temporalio
           # @!visibility private
           def signal_with_start_workflow(input)
             @root._with_started_span(
-              name: "SignalWithStartWorkflow:#{input.workflow}",
+              name: "SignalWithStartWorkflow:#{input.start_workflow_operation.options.workflow}",
               kind: :client,
-              attributes: { 'temporalWorkflowID' => input.start_workflow_operation.options.id },
-              outbound_input: input
+              attributes: { 'temporalWorkflowID' => input.start_workflow_operation.options.id }
             ) do
-              # Also add to start headers
-              if input.headers[@header_key]
-                input.start_workflow_operation.options.headers[@header_key] = input.headers[@header_key]
-              end
+              # SignalWithStartWorkflowInput has no top-level headers field and instead uses
+              # start_workflow_operation.options.headers.
+              # So tracing context must be injected explicitly instead of relying
+              # on _with_started_span.
+              @root._apply_context_to_headers(input.start_workflow_operation.options.headers)
               super
             end
           end
