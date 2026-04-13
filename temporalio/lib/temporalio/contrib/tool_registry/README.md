@@ -41,7 +41,7 @@ require 'temporalio/contrib/tool_registry/providers/anthropic'
 include Temporalio::Contrib  # brings ToolRegistry::* into scope
 
 activity :analyze do |prompt|
-  issues = []
+  results = []
   registry = ToolRegistry::Registry.new
   registry.register(
     name: 'flag_issue',
@@ -52,7 +52,7 @@ activity :analyze do |prompt|
       'required' => ['description']
     }
   ) do |input|
-    issues << input['description']
+    results << input['description']
     'recorded' # this string is sent back to the LLM as the tool result
   end
 
@@ -63,7 +63,7 @@ activity :analyze do |prompt|
   )
 
   ToolRegistry.run_tool_loop(provider, registry, prompt)
-  issues
+  results
 end
 ```
 
