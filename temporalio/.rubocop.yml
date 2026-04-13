@@ -80,12 +80,24 @@ Style/Documentation:
   Enabled: true
   Exclude:
     - lib/temporalio/internal/**/*
+    - extra/sorbet_check/**/*
 
 # We want methods to be documented
 Style/DocumentationMethod:
   Enabled: true
   Exclude:
     - lib/temporalio/internal/**/*
+    - extra/sorbet_check/**/*
+
+# Sorbet check file uses extend T::Sig at top level
+Style/MixinUsage:
+  Exclude:
+    - extra/sorbet_check/**/*
+
+# Sorbet check file defines multiple stub classes in one file
+Style/OneClassPerFile:
+  Exclude:
+    - extra/sorbet_check/**/*
 
 # Ok to have global vars in tests
 Style/GlobalVars:

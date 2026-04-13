@@ -102,7 +102,17 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
 
+          # Enable Sorbet runtime type checking to verify RBI accuracy
+          TEMPORAL_SORBET_RUNTIME_CHECK: "1"
+
         run: bundle exec rake TESTOPTS="--verbose"
+
+      - name: Check RBI types with Sorbet
+        working-directory: ./temporalio
+        run: |
+          cd extra/sorbet_check
+          bundle install --quiet
+          bundle exec srb tc
 
       - name: Deploy docs
         # Only deploy on main merge, not in PRs

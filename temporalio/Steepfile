@@ -24,6 +24,7 @@ end
 target :test do
   signature 'sig', 'test/sig'
   check 'test'
+  ignore 'test/support'
   library 'uri', 'objspace'
   configure_code_diagnostics do |hash|
     hash.update(common_diagnostics)

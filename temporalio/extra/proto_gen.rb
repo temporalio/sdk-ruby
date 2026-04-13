@@ -226,6 +226,33 @@ class ProtoGen
         end
       TEXT
     end
+
+    # Open file to generate RBI code
+    File.open("rbi/temporalio/client/connection/#{file_name}.rbi", 'w') do |file|
+      file.puts <<~TEXT
+        # typed: false
+        # frozen_string_literal: true
+
+        # Generated code.  DO NOT EDIT!
+
+        class Temporalio::Client::Connection::#{class_name} < ::Temporalio::Client::Connection::Service
+          extend T::Sig
+
+          sig { params(connection: Temporalio::Client::Connection).void }
+          def initialize(connection); end
+      TEXT
+
+      desc.each do |method|
+        rpc = method.name.gsub(/([A-Z])/, '_\1').downcase.delete_prefix('_')
+        file.puts <<-TEXT
+
+  sig { params(request: #{method.input_type.msgclass}, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(#{method.output_type.msgclass}) }
+  def #{rpc}(request, rpc_options: T.unsafe(nil)); end
+        TEXT
+      end
+
+      file.puts 'end'
+    end
   end
 
   def generate_rust_client_file

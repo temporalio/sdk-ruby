@@ -1411,6 +1411,36 @@ Now can run `steep`:
 
     bundle exec rake steep
 
+### Maintaining Type Signatures
+
+The SDK ships two sets of type signatures:
+
+* **RBS** (`sig/`) -- Source-of-truth types validated by Steep in CI. Update these whenever a public API changes.
+* **RBI** (`rbi/temporalio.rbi`) -- Enriched Sorbet types derived from the RBS signatures. Must be updated manually
+  when the RBS changes (see below).
+
+The RBI is validated in CI two ways:
+
+* **Static** -- `srb tc` checks that `extra/sorbet_check/check_types.rb` typechecks against the RBI. This catches
+  inconsistencies within the RBI itself (missing classes, wrong param types, etc.).
+* **Runtime** -- The test suite runs with `TEMPORAL_SORBET_RUNTIME_CHECK=1`, which applies every RBI signature to the
+  real implementation at runtime via `SigApplicator`. This catches drift between the RBI and actual code (e.g. a
+  renamed parameter, a changed return type, or a missing method).
+
+**When adding or changing a public method:**
+
+1. Update the RBS file in `sig/` as usual. Verify with `bundle exec rake steep`.
+2. Update `rbi/temporalio.rbi` to match.
+3. If the new method is important for users, add a usage example to `extra/sorbet_check/check_types.rb`.
+4. Run the Sorbet check: `cd extra/sorbet_check && bundle exec srb tc`.
+5. Run tests with runtime type checking enabled `TEMPORAL_SORBET_RUNTIME_CHECK=1 bundle exec rake test`
+
+**What NOT to include in the RBI:**
+* `Temporalio::Internal::*` types (excluded entirely)
+* Methods prefixed with `_` (internal use only)
+* `Temporalio::Api::*` protobuf types (except `Api::Common::V1::Payload` and `Payloads` which users reference in
+  custom codecs)
+
 ### Proto Generation
 
 Run:

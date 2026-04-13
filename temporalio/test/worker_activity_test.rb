@@ -168,11 +168,20 @@ class WorkerActivityTest < Test
 
   def test_not_an_activity
     error = assert_raises(ArgumentError) do
-      Temporalio::Worker.new(
-        client: env.client,
-        task_queue: "tq-#{SecureRandom.uuid}",
-        activities: [NotAnActivity]
-      )
+      # Intentionally passing a non-activity class to test validation.
+      # Suppress sorbet runtime errors since the wrong type is deliberate.
+      block = proc do
+        Temporalio::Worker.new(
+          client: env.client,
+          task_queue: "tq-#{SecureRandom.uuid}",
+          activities: [NotAnActivity]
+        )
+      end
+      if defined?(SigApplicator)
+        SigApplicator.suppress_errors(&block)
+      else
+        block.call
+      end
     end
     assert error.message.end_with?('does not extend Temporalio::Activity::Definition')
   end
@@ -272,24 +281,26 @@ class WorkerActivityTest < Test
   end
 
   def test_info
+    # The hash is round-tripped through the data converter so non-primitive
+    # values (Time, RetryPolicy) are serialized to strings. Use string keys
+    # from the deserialized JSON to check values directly.
     info_hash = execute_activity(InfoActivity)
-    info = Temporalio::Activity::Info.new(**info_hash) # steep:ignore
-    refute_nil info.activity_id
-    assert_equal 'InfoActivity', info.activity_type
-    assert_equal 1, info.attempt
-    refute_nil info.current_attempt_scheduled_time
-    assert_equal false, info.local?
-    refute_nil info.retry_policy
-    refute_nil info.schedule_to_close_timeout
-    refute_nil info.scheduled_time
-    refute_nil info.start_to_close_timeout
-    refute_nil info.started_time
-    refute_nil info.task_queue
-    refute_nil info.task_token
-    refute_nil info.workflow_id
-    assert_equal env.client.namespace, info.workflow_namespace
-    refute_nil info.workflow_run_id
-    assert_equal 'kitchen_sink', info.workflow_type
+    refute_nil info_hash['activity_id']
+    assert_equal 'InfoActivity', info_hash['activity_type']
+    assert_equal 1, info_hash['attempt']
+    refute_nil info_hash['current_attempt_scheduled_time']
+    assert_equal false, info_hash['local?']
+    refute_nil info_hash['retry_policy']
+    refute_nil info_hash['schedule_to_close_timeout']
+    refute_nil info_hash['scheduled_time']
+    refute_nil info_hash['start_to_close_timeout']
+    refute_nil info_hash['started_time']
+    refute_nil info_hash['task_queue']
+    refute_nil info_hash['task_token']
+    refute_nil info_hash['workflow_id']
+    assert_equal env.client.namespace, info_hash['workflow_namespace']
+    refute_nil info_hash['workflow_run_id']
+    assert_equal 'kitchen_sink', info_hash['workflow_type']
   end
 
   class CancellationActivity < Temporalio::Activity::Definition
