@@ -194,3 +194,23 @@ Recommended timeouts:
 |---|---|
 | Standard (Claude 3.x, GPT-4o) | 30 s |
 | Reasoning (o1, o3, extended thinking) | 300 s |
+
+## MCP integration
+
+`Registry.from_mcp_tools` converts a list of MCP tool descriptors into a populated
+registry. Handlers default to no-ops that return an empty string; override them with
+`register` after construction.
+
+```ruby
+# mcp_tools is an array of objects responding to :name, :description, :input_schema.
+registry = ToolRegistry::Registry.from_mcp_tools(mcp_tools)
+
+# Override specific handlers before running the loop.
+registry.register(name: 'read_file', description: '...', input_schema: { 'type' => 'object' }) do |input|
+  read_file(input['path'])
+end
+```
+
+Each descriptor must respond to `name`, `description`, and `input_schema` (or
+`inputSchema` for camelCase MCP objects). `input_schema` should be a Hash containing
+a JSON Schema object.

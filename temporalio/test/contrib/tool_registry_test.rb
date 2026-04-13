@@ -163,6 +163,25 @@ module Contrib
       assert_includes collected, 'hello'
     end
 
+    # ── from_mcp_tools ────────────────────────────────────────────────────────
+
+    def test_from_mcp_tools
+      t1 = Struct.new(:name, :description, :input_schema).new(
+        'read_file', 'Read a file',
+        { 'type' => 'object', 'properties' => { 'path' => { 'type' => 'string' } } }
+      )
+      t2 = Struct.new(:name, :description, :input_schema).new('list_dir', nil, nil)
+
+      reg = Registry.from_mcp_tools([t1, t2])
+
+      assert_equal 2, reg.defs.size
+      assert_equal 'read_file', reg.defs[0].name
+      assert_equal 'Read a file', reg.defs[0].description
+      assert_equal 'list_dir', reg.defs[1].name
+      assert_equal 'object', reg.defs[1].input_schema['type'] # nil schema → empty object schema
+      assert_equal '', reg.dispatch('read_file', { 'path' => '/etc/hosts' })
+    end
+
     def test_integration_openai
       skip 'RUN_INTEGRATION_TESTS not set' unless ENV['RUN_INTEGRATION_TESTS']
       api_key = ENV['OPENAI_API_KEY']

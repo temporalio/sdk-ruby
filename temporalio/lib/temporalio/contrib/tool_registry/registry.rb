@@ -15,6 +15,30 @@ module Temporalio
           @handlers = {}
         end
 
+        # Build a Registry from a list of MCP tool descriptors.
+        #
+        # Each descriptor must respond to +name+, +description+, and +input_schema+
+        # (or +inputSchema+ for camelCase MCP objects). No-op handlers (returning an
+        # empty string) are registered for each tool — override them with {#register}
+        # after construction.
+        #
+        # @param tools [Array] MCP tool descriptor objects.
+        # @return [Registry]
+        def self.from_mcp_tools(tools)
+          registry = new
+          tools.each do |tool|
+            schema = (tool.respond_to?(:input_schema) ? tool.input_schema : tool.inputSchema) ||
+                     { 'type' => 'object', 'properties' => {} }
+            desc = (tool.respond_to?(:description) ? tool.description : nil) || ''
+            registry.register(
+              name: tool.name,
+              description: desc,
+              input_schema: schema
+            ) { |_input| '' }
+          end
+          registry
+        end
+
         # Register a tool with the given name, description, and JSON Schema for its input.
         # The block receives a Hash of parsed arguments and must return a String result.
         #
