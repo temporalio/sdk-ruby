@@ -21,12 +21,7 @@ class PayloadVisitorGen
   #
   # @return [String] File code.
   def gen_file_code
-    # Collect all the methods of all the classes
-    methods = {}
-    DESCRIPTORS.each do |name|
-      desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(name) or raise "Unknown name: #{name}"
-      walk_desc(desc:, methods:)
-    end
+    methods = payload_methods
 
     # Build the code for each method
     method_bodies = methods.map do |_, method_hash|
@@ -108,7 +103,7 @@ class PayloadVisitorGen
             # @param value [Google::Protobuf::Message] Message to visit.
             def run(value)
               return unless value.is_a?(Google::Protobuf::MessageExts)
-              method_name = method_name_from_proto_name(value.class.descriptor.name)
+              method_name = method_name_from_proto_name(value.class.descriptor.name) # steep:ignore NoMethod
               send(method_name, value) if respond_to?(method_name, true)
               nil
             end
@@ -158,7 +153,53 @@ class PayloadVisitorGen
     TEXT
   end
 
+  # Generate file signature.
+  #
+  # @return [String] File signature.
+  def gen_rbs_code
+    method_defs = payload_methods.filter_map do |_, method_hash|
+      next if method_hash[:fields].empty?
+
+      "def #{method_name_from_desc(method_hash[:desc])}: (untyped value) -> void"
+    end.sort
+
+    <<~TEXT
+      module Temporalio
+        module Api
+          class PayloadVisitor
+            def initialize: (
+              ?on_enter: untyped,
+              ?on_exit: untyped,
+              ?skip_search_attributes: bool,
+              ?traverse_any: bool
+            ) { (untyped) -> untyped } -> void
+            def run: (untyped value) -> nil
+            def _run_activation: (untyped value) -> void
+            def _run_activation_completion: (untyped value) -> void
+
+            private
+
+            def method_name_from_proto_name: (::String name) -> ::String
+            def api_common_v1_payload: (untyped value) -> untyped
+            def api_common_v1_payload_repeated: (untyped value) -> untyped
+            def google_protobuf_any: (untyped value) -> void
+      #{method_defs.join("\n      ")}
+          end
+        end
+      end
+    TEXT
+  end
+
   private
+
+  def payload_methods
+    methods = {}
+    DESCRIPTORS.each do |name|
+      desc = Google::Protobuf::DescriptorPool.generated_pool.lookup(name) or raise "Unknown name: #{name}"
+      walk_desc(desc:, methods:)
+    end
+    methods
+  end
 
   def walk_desc(desc:, methods:)
     case desc

@@ -6,53 +6,53 @@ module Temporalio
       class OperatorService < Service
         def initialize: (Connection) -> void
         def add_search_attributes: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::AddSearchAttributesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::AddSearchAttributesResponse
         def remove_search_attributes: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::RemoveSearchAttributesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::RemoveSearchAttributesResponse
         def list_search_attributes: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::ListSearchAttributesRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::ListSearchAttributesResponse
         def delete_namespace: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::DeleteNamespaceRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse
         def add_or_update_remote_cluster: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterResponse
         def remove_remote_cluster: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::RemoveRemoteClusterRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::RemoveRemoteClusterResponse
         def list_clusters: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::ListClustersRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::ListClustersResponse
         def get_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::GetNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::GetNexusEndpointResponse
         def create_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::CreateNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::CreateNexusEndpointResponse
         def update_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::UpdateNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::UpdateNexusEndpointResponse
         def delete_nexus_endpoint: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::DeleteNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::DeleteNexusEndpointResponse
         def list_nexus_endpoints: (
-          untyped request,
+          Temporalio::Api::OperatorService::V1::ListNexusEndpointsRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::OperatorService::V1::ListNexusEndpointsResponse
       end
     end
   end

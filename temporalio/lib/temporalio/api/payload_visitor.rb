@@ -45,7 +45,7 @@ module Temporalio
       # @param value [Google::Protobuf::Message] Message to visit.
       def run(value)
         return unless value.is_a?(Google::Protobuf::MessageExts)
-        method_name = method_name_from_proto_name(value.class.descriptor.name)
+        method_name = method_name_from_proto_name(value.class.descriptor.name) # steep:ignore NoMethod
         send(method_name, value) if respond_to?(method_name, true)
         nil
       end

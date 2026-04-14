@@ -10,7 +10,6 @@ group :development do
   gem 'async'
   gem 'base64'
   gem 'googleapis-common-protos-types'
-  gem 'grpc-tools', '~> 1.69'
   gem 'irb'
   gem 'minitest'
   # Have to explicitly depend on openssl for macos issue in GH CI described at
