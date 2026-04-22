@@ -78,6 +78,10 @@ module Converters
       assert_equal 'temporal.api.common.v1.WorkflowExecution', payload.metadata['messageType']
     end
 
+    def test_missing_payload_decodes_to_nil
+      assert_nil Temporalio::Converters::PayloadConverter.default.from_payload(nil)
+    end
+
     def test_binary_proto
       # Make a new converter with all default converters except json proto so
       # that binary proto takes precedent

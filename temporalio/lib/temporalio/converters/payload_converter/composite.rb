@@ -49,12 +49,14 @@ module Temporalio
 
         # Convert payload to Ruby value based on its +encoding+ metadata on the payload.
         #
-        # @param payload [Api::Common::V1::Payload] Payload to convert.
+        # @param payload [Api::Common::V1::Payload, nil] Payload to convert.
         # @param hint [Object, nil] Hint, if any, to assist conversion.
-        # @return [Object] Converted Ruby value.
+        # @return [Object, nil] Converted Ruby value.
         # @raise [EncodingNotSet] If encoding not set on the metadata.
         # @raise [ConverterNotFound] If no converter found for the encoding.
         def from_payload(payload, hint: nil)
+          return nil unless payload
+
           encoding = payload.metadata['encoding']
           raise EncodingNotSet, 'Missing payload encoding' unless encoding
 

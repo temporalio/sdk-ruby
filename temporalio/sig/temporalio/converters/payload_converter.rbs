@@ -8,11 +8,17 @@ module Temporalio
         ?json_generate_options: Hash[Symbol, untyped]
       ) -> Composite
 
-      def to_payload: (Object? value, ?hint: Object?) -> untyped
-      def to_payloads: (Array[Object?] values, ?hints: Array[Object]?) -> untyped
+      def to_payload: (Object? value, ?hint: Object?) -> Temporalio::Api::Common::V1::Payload
+      def to_payloads: (
+        Array[Object?] values,
+        ?hints: Array[Object]?
+      ) -> Temporalio::Api::Common::V1::Payloads
 
-      def from_payload: (untyped payload, ?hint: Object?) -> Object?
-      def from_payloads: (untyped payloads, ?hints: Array[Object]?) -> Array[Object?]
+      def from_payload: (Temporalio::Api::Common::V1::Payload? payload, ?hint: Object?) -> Object?
+      def from_payloads: (
+        Temporalio::Api::Common::V1::Payloads payloads,
+        ?hints: Array[Object]?
+      ) -> Array[Object?]
     end
   end
 end

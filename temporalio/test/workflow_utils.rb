@@ -79,4 +79,25 @@ module WorkflowUtils
       event
     end
   end
+
+  def assert_eventually_complete(handle:, timeout: 10, interval: 0.2)
+    start_time = Time.now
+    loop do
+      events = handle.fetch_history_events
+
+      task_fail_event = events.find(&:workflow_task_failed_event_attributes)
+      if task_fail_event
+        flunk(
+          'Workflow task failed instead of completing: ' \
+          "#{task_fail_event.workflow_task_failed_event_attributes.failure.message}"
+        )
+      end
+
+      return handle.result if events.any?(&:workflow_execution_completed_event_attributes)
+
+      flunk('Timed out waiting for workflow completion') if Time.now - start_time > timeout
+
+      sleep(interval)
+    end
+  end
 end

@@ -54,4 +54,10 @@ module WorkflowUtils
     handle: Temporalio::Client::WorkflowHandle,
     ?message_contains: String?
   ) -> void
+
+  def assert_eventually_complete: (
+    handle: Temporalio::Client::WorkflowHandle,
+    ?timeout: Float,
+    ?interval: Float
+  ) -> untyped
 end
