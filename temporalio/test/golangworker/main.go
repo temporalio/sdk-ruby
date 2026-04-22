@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/nexus-rpc/sdk-go/nexus"
+	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
 	sdklog "go.temporal.io/sdk/log"
 	"go.temporal.io/sdk/temporal"
@@ -72,6 +73,14 @@ func NexusHandlerWorkflow(ctx workflow.Context, input NexusHandlerInput) (NexusH
 	}
 }
 
+func NoResultWorkflow(ctx workflow.Context) error {
+	return nil
+}
+
+func NoResultActivity(context.Context) error {
+	return nil
+}
+
 func main() {
 	if len(os.Args) != 4 {
 		log.Fatalf("expected endpoint, namespace, and task queue arg, found %v args", len(os.Args)-1)
@@ -97,6 +106,8 @@ func run(endpoint, namespace, taskQueue string) error {
 	w := worker.New(cl, taskQueue, worker.Options{})
 	w.RegisterWorkflowWithOptions(KitchenSinkWorkflow, workflow.RegisterOptions{Name: "kitchen_sink"})
 	w.RegisterWorkflowWithOptions(NexusHandlerWorkflow, workflow.RegisterOptions{Name: "nexus_handler"})
+	w.RegisterWorkflowWithOptions(NoResultWorkflow, workflow.RegisterOptions{Name: "no_result"})
+	w.RegisterActivityWithOptions(NoResultActivity, activity.RegisterOptions{Name: "no_result_activity"})
 
 	// Register Nexus service
 	nexusService := nexus.NewService("test-service")

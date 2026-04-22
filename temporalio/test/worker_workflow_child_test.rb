@@ -277,6 +277,20 @@ class WorkerWorkflowChildTest < Test
     assert_equal({ ATTR_KEY_TEXT.name => 'changed-text', ATTR_KEY_KEYWORD.name => 'some-keyword' }, results)
   end
 
+  class GoNoResultParentWorkflow < Temporalio::Workflow::Definition
+    def execute(child_task_queue)
+      Temporalio::Workflow.execute_child_workflow('no_result', task_queue: child_task_queue)
+    end
+  end
+
+  def test_child_workflow_without_result_from_go_sdk
+    env.with_kitchen_sink_worker do |child_task_queue|
+      execute_workflow(GoNoResultParentWorkflow, child_task_queue) do |handle|
+        assert_nil assert_eventually_complete(handle:)
+      end
+    end
+  end
+
   class ManyChildrenActivity < Temporalio::Activity::Definition
     def execute(name)
       "Hello #{name}"

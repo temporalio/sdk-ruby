@@ -57,6 +57,24 @@ class WorkerWorkflowActivityTest < Test
                  execute_workflow(SimpleWorkflow, :local_string_name, activities: [SimpleActivity])
   end
 
+  class GoNoResultActivityWorkflow < Temporalio::Workflow::Definition
+    def execute(activity_task_queue)
+      Temporalio::Workflow.execute_activity(
+        'no_result_activity',
+        task_queue: activity_task_queue,
+        start_to_close_timeout: 10
+      )
+    end
+  end
+
+  def test_activity_without_result_from_go_sdk
+    env.with_kitchen_sink_worker do |activity_task_queue|
+      execute_workflow(GoNoResultActivityWorkflow, activity_task_queue) do |handle|
+        assert_nil assert_eventually_complete(handle:)
+      end
+    end
+  end
+
   class FailureActivity < Temporalio::Activity::Definition
     def execute
       raise Temporalio::Error::ApplicationError.new('Intentional error', 'detail1', 'detail2', non_retryable: true)
