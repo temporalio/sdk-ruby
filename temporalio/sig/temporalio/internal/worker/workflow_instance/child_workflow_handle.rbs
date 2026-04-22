@@ -12,7 +12,9 @@ module Temporalio
             result_hint: Object?
           ) -> void
 
-          def _resolve: (untyped resolution) -> void
+          def _resolve: (
+            Temporalio::Internal::Bridge::Api::ChildWorkflow::ChildWorkflowResult resolution
+          ) -> void
         end
       end
     end

@@ -25,7 +25,7 @@ module Temporalio
             def has_cancelled?: () -> bool
             def clear_cancelled: () -> void
 
-            attr_reader status(): (::Temporalio::Internal::Bridge::Api::ChildWorkflow::Success | ::Temporalio::Internal::Bridge::Api::ChildWorkflow::Failure | ::Temporalio::Internal::Bridge::Api::ChildWorkflow::Cancellation)?
+            attr_reader status(): (:completed | :failed | :cancelled)?
             def has_status?: () -> bool
             def clear_status: () -> void
 
