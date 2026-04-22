@@ -1,5 +1,6 @@
 name: Build Gems
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -34,6 +35,12 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
+      - name: Install protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        with:
+          version: "34.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
       # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
       # need --mount-toolchains to get latest Rust, see
       # https://github.com/oxidize-rb/actions/issues/61
@@ -67,6 +74,12 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           cache-version: v1-source
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        with:
+          version: "34.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fix gem directory permissions
         run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true
