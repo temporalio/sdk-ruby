@@ -14,7 +14,7 @@ module Temporalio
         ?hints: Array[Object]?
       ) -> Temporalio::Api::Common::V1::Payloads
 
-      def from_payload: (Temporalio::Api::Common::V1::Payload payload, ?hint: Object?) -> Object?
+      def from_payload: (Temporalio::Api::Common::V1::Payload? payload, ?hint: Object?) -> Object?
       def from_payloads: (
         Temporalio::Api::Common::V1::Payloads payloads,
         ?hints: Array[Object]?

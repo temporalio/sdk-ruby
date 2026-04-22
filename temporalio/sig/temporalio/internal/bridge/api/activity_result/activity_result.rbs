@@ -29,7 +29,7 @@ module Temporalio
             def has_will_complete_async?: () -> bool
             def clear_will_complete_async: () -> void
 
-            attr_reader status(): (:completed | :failed | :cancelled | :will_complete_async)?
+            attr_reader status(): (::Temporalio::Internal::Bridge::Api::ActivityResult::Success | ::Temporalio::Internal::Bridge::Api::ActivityResult::Failure | ::Temporalio::Internal::Bridge::Api::ActivityResult::Cancellation | ::Temporalio::Internal::Bridge::Api::ActivityResult::WillCompleteAsync)?
             def has_status?: () -> bool
             def clear_status: () -> void
 
@@ -79,7 +79,7 @@ module Temporalio
             def has_backoff?: () -> bool
             def clear_backoff: () -> void
 
-            attr_reader status(): (:completed | :failed | :cancelled | :backoff)?
+            attr_reader status(): (::Temporalio::Internal::Bridge::Api::ActivityResult::Success | ::Temporalio::Internal::Bridge::Api::ActivityResult::Failure | ::Temporalio::Internal::Bridge::Api::ActivityResult::Cancellation | ::Temporalio::Internal::Bridge::Api::ActivityResult::DoBackoff)?
             def has_status?: () -> bool
             def clear_status: () -> void
 
