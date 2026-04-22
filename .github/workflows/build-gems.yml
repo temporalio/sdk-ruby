@@ -41,6 +41,14 @@ jobs:
           version: "34.x"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Export protoc paths
+        shell: bash
+        run: |
+          protoc_bin="$(command -v protoc)"
+          protoc_root="$(cd "$(dirname "$protoc_bin")/.." && pwd)"
+          echo "PROTOC=$protoc_bin" >> "$GITHUB_ENV"
+          echo "PROTOC_INCLUDE=$protoc_root/include" >> "$GITHUB_ENV"
+
       # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
       # need --mount-toolchains to get latest Rust, see
       # https://github.com/oxidize-rb/actions/issues/61
@@ -80,6 +88,14 @@ jobs:
         with:
           version: "34.x"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Export protoc paths
+        shell: bash
+        run: |
+          protoc_bin="$(command -v protoc)"
+          protoc_root="$(cd "$(dirname "$protoc_bin")/.." && pwd)"
+          echo "PROTOC=$protoc_bin" >> "$GITHUB_ENV"
+          echo "PROTOC_INCLUDE=$protoc_root/include" >> "$GITHUB_ENV"
 
       - name: Fix gem directory permissions
         run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true
