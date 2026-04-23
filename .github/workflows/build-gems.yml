@@ -58,7 +58,7 @@ jobs:
         id: build-rb-sys-dock-image
         working-directory: ./temporalio
         run: |
-          rb_sys_version="$(ruby -e 'require \"rb_sys/version\"; puts RbSys::VERSION')"
+          rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
           docker build \
             --platform "${{ matrix.dockerPlatform }}" \
