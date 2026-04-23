@@ -18,7 +18,7 @@ RUN case "$TARGETARCH" in \
 FROM ${BASE_IMAGE}
 
 COPY --from=protoc /opt/protoc/bin/protoc /usr/local/bin/protoc
-COPY --from=protoc /opt/protoc/include /opt/protoc/include
+COPY --from=protoc /opt/protoc/include /usr/local/include
 
 ENV PROTOC=/usr/local/bin/protoc
-ENV PROTOC_INCLUDE=/opt/protoc/include
+ENV PROTOC_INCLUDE=/usr/local/include
