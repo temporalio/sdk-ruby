@@ -1,4 +1,4 @@
-ARG BASE_IMAGE
+ARG BASE_IMAGE=debian:bookworm-slim
 FROM --platform=$BUILDPLATFORM debian:bookworm-slim AS protoc
 
 ARG TARGETARCH

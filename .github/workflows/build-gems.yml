@@ -18,19 +18,7 @@ jobs:
       matrix:
         # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
         # https://github.com/temporalio/sdk-ruby/issues/172
-        include:
-          - rubyPlatform: aarch64-linux
-            dockerPlatform: linux/arm64/v8
-          - rubyPlatform: aarch64-linux-musl
-            dockerPlatform: linux/arm64/v8
-          - rubyPlatform: x86_64-linux
-            dockerPlatform: linux/amd64
-          - rubyPlatform: x86_64-linux-musl
-            dockerPlatform: linux/amd64
-          - rubyPlatform: arm64-darwin
-            dockerPlatform: linux/arm64/v8
-          - rubyPlatform: x86_64-darwin
-            dockerPlatform: linux/amd64
+        rubyPlatform: ["aarch64-linux", "aarch64-linux-musl", "x86_64-linux", "x86_64-linux-musl", "arm64-darwin", "x86_64-darwin"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -62,7 +50,7 @@ jobs:
           rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
           docker build \
-            --platform "${{ matrix.dockerPlatform }}" \
+            --platform linux/amd64 \
             --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
             --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
             -t "$custom_image" \
