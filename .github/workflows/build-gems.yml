@@ -18,12 +18,28 @@ jobs:
       matrix:
         # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
         # https://github.com/temporalio/sdk-ruby/issues/172
-        rubyPlatform: ["aarch64-linux", "aarch64-linux-musl", "x86_64-linux", "x86_64-linux-musl", "arm64-darwin", "x86_64-darwin"]
+        include:
+          - rubyPlatform: aarch64-linux
+            dockerPlatform: linux/arm64/v8
+          - rubyPlatform: aarch64-linux-musl
+            dockerPlatform: linux/arm64/v8
+          - rubyPlatform: x86_64-linux
+            dockerPlatform: linux/amd64
+          - rubyPlatform: x86_64-linux-musl
+            dockerPlatform: linux/amd64
+          - rubyPlatform: arm64-darwin
+            dockerPlatform: linux/arm64/v8
+          - rubyPlatform: x86_64-darwin
+            dockerPlatform: linux/amd64
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           submodules: recursive
+
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
@@ -35,19 +51,23 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
-      - name: Install protoc
-        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
-        with:
-          version: "34.x"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Export protoc paths
-        shell: bash
+      # rb-sys-dock runs the native gem build inside a Docker container and does
+      # not inherit arbitrary host tools, so we derive a pinned image with the
+      # exact protoc version baked in for release builds.
+      - name: Build rb-sys-dock image
+        id: build-rb-sys-dock-image
+        working-directory: ./temporalio
         run: |
-          protoc_bin="$(command -v protoc)"
-          protoc_root="$(cd "$(dirname "$protoc_bin")/.." && pwd)"
-          echo "PROTOC=$protoc_bin" >> "$GITHUB_ENV"
-          echo "PROTOC_INCLUDE=$protoc_root/include" >> "$GITHUB_ENV"
+          rb_sys_version="$(ruby -e 'require \"rb_sys/version\"; puts RbSys::VERSION')"
+          custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
+          docker build \
+            --platform "${{ matrix.dockerPlatform }}" \
+            --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
+            --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
+            -t "$custom_image" \
+            -f ../.github/docker/rb-sys-protoc.Dockerfile \
+            ..
+          echo "image=$custom_image" >> $GITHUB_OUTPUT
 
       # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
       # need --mount-toolchains to get latest Rust, see
@@ -57,7 +77,7 @@ jobs:
         working-directory: ./temporalio
         run: |
           gem install rb_sys --no-document
-          rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
+          RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
           echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> $GITHUB_OUTPUT
 
       - name: Upload gem
@@ -75,6 +95,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
+
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
         with:
@@ -86,16 +110,8 @@ jobs:
       - name: Install protoc
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
         with:
-          version: "34.x"
+          version: ${{ env.PROTOC_VERSION }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Export protoc paths
-        shell: bash
-        run: |
-          protoc_bin="$(command -v protoc)"
-          protoc_root="$(cd "$(dirname "$protoc_bin")/.." && pwd)"
-          echo "PROTOC=$protoc_bin" >> "$GITHUB_ENV"
-          echo "PROTOC_INCLUDE=$protoc_root/include" >> "$GITHUB_ENV"
 
       - name: Fix gem directory permissions
         run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true

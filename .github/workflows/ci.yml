@@ -35,6 +35,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
+
       # This is a temporary fix until Ruby 3.4.8 comes out.
       #
       # Per https://github.com/ruby/openssl/issues/949 (by way of
@@ -62,7 +66,7 @@ jobs:
       - name: Install protoc
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
         with:
-          version: "34.x"
+          version: ${{ env.PROTOC_VERSION }}
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install bundle
