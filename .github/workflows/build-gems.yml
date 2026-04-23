@@ -58,6 +58,7 @@ jobs:
         id: build-rb-sys-dock-image
         working-directory: ./temporalio
         run: |
+          gem install rb_sys --no-document
           rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
           docker build \
@@ -67,7 +68,7 @@ jobs:
             -t "$custom_image" \
             -f ../.github/docker/rb-sys-protoc.Dockerfile \
             ..
-          echo "image=$custom_image" >> $GITHUB_OUTPUT
+          echo "image=$custom_image" >> "$GITHUB_OUTPUT"
 
       # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
       # need --mount-toolchains to get latest Rust, see
@@ -76,9 +77,8 @@ jobs:
         id: cross-gem
         working-directory: ./temporalio
         run: |
-          gem install rb_sys --no-document
-          RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
-          echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> $GITHUB_OUTPUT
+          RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform "${{ matrix.rubyPlatform }}" --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
+          echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> "$GITHUB_OUTPUT"
 
       - name: Upload gem
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7

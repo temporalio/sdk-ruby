@@ -47,7 +47,7 @@ jobs:
       - name: Fixate OpenSSL (macos + 3.4 only)
         if: ${{ matrix.os == 'macos-latest' && matrix.rubyVersion == '3.4' }}
         shell: bash
-        run: echo "RUBY_CONFIGURE_OPTS=--with-openssl-dir=$(brew --prefix openssl@3.5)" >> $GITHUB_ENV
+        run: echo "RUBY_CONFIGURE_OPTS=--with-openssl-dir=$(brew --prefix openssl@3.5)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
