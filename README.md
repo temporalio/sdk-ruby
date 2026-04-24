@@ -1265,7 +1265,7 @@ work with Ractors.
 ### Platform Support
 
 This SDK is backed by a Ruby C extension written in Rust leveraging the
-[Temporal Rust Core](https://github.com/temporalio/sdk-core). Gems are currently published for the following platforms:
+[Temporal Rust Core](https://github.com/temporalio/sdk-rust). Gems are currently published for the following platforms:
 
 * `aarch64-linux`
 * `aarch64-linux-musl`
