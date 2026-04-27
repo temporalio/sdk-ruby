@@ -6,7 +6,8 @@ require 'open3'
 
 # Generator for the proto files.
 class ProtoGen
-  MINIMUM_PROTOC_VERSION = Gem::Version.new('34.0')
+  PROTOC_VERSION_FILE = File.expand_path('../../.protoc-version', __dir__)
+  MINIMUM_PROTOC_VERSION = Gem::Version.new(File.read(PROTOC_VERSION_FILE).strip)
   SERVICE_DEFINITIONS = [
     {
       require_path: './lib/temporalio/api/workflowservice/v1/service',

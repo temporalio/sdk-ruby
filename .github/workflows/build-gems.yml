@@ -24,6 +24,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
+
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
         with:
@@ -34,6 +38,25 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
+      # rb-sys-dock runs the native gem build inside a Docker container and does
+      # not inherit arbitrary host tools, so we derive a pinned image with the
+      # exact protoc version baked in for release builds.
+      - name: Build rb-sys-dock image
+        id: build-rb-sys-dock-image
+        working-directory: ./temporalio
+        run: |
+          gem install rb_sys --no-document
+          rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
+          custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
+          docker build \
+            --platform linux/amd64 \
+            --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
+            --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
+            -t "$custom_image" \
+            -f ../.github/docker/rb-sys-protoc.Dockerfile \
+            ..
+          echo "image=$custom_image" >> "$GITHUB_OUTPUT"
+
       # Cannot use oxidize-rb/actions/cross-gem because it has older Rust and we
       # need --mount-toolchains to get latest Rust, see
       # https://github.com/oxidize-rb/actions/issues/61
@@ -41,9 +64,8 @@ jobs:
         id: cross-gem
         working-directory: ./temporalio
         run: |
-          gem install rb_sys --no-document
-          rb-sys-dock --platform ${{ matrix.rubyPlatform }} --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
-          echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> $GITHUB_OUTPUT
+          RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform "${{ matrix.rubyPlatform }}" --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
+          echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> "$GITHUB_OUTPUT"
 
       - name: Upload gem
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
@@ -60,6 +82,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
+
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
         with:
@@ -67,6 +93,12 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           cache-version: v1-source
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fix gem directory permissions
         run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true
