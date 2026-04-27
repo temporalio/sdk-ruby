@@ -51,6 +51,7 @@ class ProtoGen
     'lib/temporalio/internal/bridge/api',
     'sig/temporalio/api',
     'sig/temporalio/internal/bridge/api',
+    'lib/protoc-gen-openapiv2',
     *SERVICE_DEFINITIONS.flat_map do |service|
       [
         "lib/temporalio/client/connection/#{service[:file_name]}.rb",
@@ -68,6 +69,7 @@ class ProtoGen
   # Run the generator
   def run
     FileUtils.rm_rf('lib/temporalio/api')
+    FileUtils.rm_rf('lib/protoc-gen-openapiv2')
     FileUtils.rm_rf('sig/temporalio/api')
     FileUtils.rm_rf('sig/temporalio/internal/bridge/api')
 
@@ -133,9 +135,8 @@ class ProtoGen
     FileUtils.rm_rf('tmp-proto')
     FileUtils.mkdir_p('tmp-proto')
     system(
-      'bundle',
-      'exec',
-      'grpc_tools_ruby_protoc',
+      protoc_command,
+      *google_proto_include_flags,
       '--proto_path=ext/sdk-core/crates/common/protos',
       '--ruby_out=tmp-proto',
       *Dir.glob('ext/sdk-core/crates/common/protos/protoc-gen-openapiv2/**/*.proto'),
@@ -446,6 +447,7 @@ class ProtoGen
     )
     # The plugin emits constructor helpers as `Type::init_map`; the runtime API exposed to callers is just `Type`.
     content.gsub!(/::Google::Protobuf::([A-Za-z]+)::init_map/, '::Google::Protobuf::\1')
+    content.gsub!(/::Google::Protobuf::Struct(?!\[)/, '::Google::Protobuf::Struct[::String, untyped]')
     content.gsub!(
       /^(\s*)def self\.lookup:\n.*?^(?=\1def self\.resolve:)/m,
       "\\1def self.lookup: (::Integer number) -> ::Symbol\n\n"

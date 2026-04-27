@@ -6,9 +6,9 @@ module Temporalio
       class CloudService < Service
         def initialize: (Connection) -> void
         def get_current_identity: (
-          untyped request,
+          Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityRequest request,
           ?rpc_options: RPCOptions?
-        ) -> untyped
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityResponse
         def get_users: (
           Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest request,
           ?rpc_options: RPCOptions?
@@ -237,10 +237,46 @@ module Temporalio
           Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse
+        def get_audit_logs: (
+          Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsResponse
         def validate_account_audit_log_sink: (
           Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse
+        def create_account_audit_log_sink: (
+          Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkResponse
+        def get_account_audit_log_sink: (
+          Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkResponse
+        def get_account_audit_log_sinks: (
+          Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksResponse
+        def update_account_audit_log_sink: (
+          Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkResponse
+        def delete_account_audit_log_sink: (
+          Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkResponse
+        def get_namespace_capacity_info: (
+          Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoResponse
+        def create_billing_report: (
+          Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportResponse
+        def get_billing_report: (
+          Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse
       end
     end
   end

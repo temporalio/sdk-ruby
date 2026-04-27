@@ -1036,6 +1036,66 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.CreateWorkerDeployment API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentResponse] API response.
+        def create_worker_deployment(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_worker_deployment',
+            request_class: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.CreateWorkerDeploymentVersion API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionResponse] API response.
+        def create_worker_deployment_version(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_worker_deployment_version',
+            request_class: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UpdateWorkerDeploymentVersionComputeConfig API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigResponse] API response.
+        def update_worker_deployment_version_compute_config(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_worker_deployment_version_compute_config',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ValidateWorkerDeploymentVersionComputeConfig API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigResponse] API response.
+        def validate_worker_deployment_version_compute_config(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'validate_worker_deployment_version_compute_config',
+            request_class: Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.UpdateWorkerDeploymentVersionMetadata API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest] API request.
@@ -1486,6 +1546,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.StartNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionResponse] API response.
+        def start_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'start_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.DescribeActivityExecution API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest] API request.
@@ -1496,6 +1571,21 @@ module Temporalio
             rpc: 'describe_activity_execution',
             request_class: Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest,
             response_class: Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DescribeNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionResponse] API response.
+        def describe_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionResponse,
             request:,
             rpc_options:
           )
@@ -1516,6 +1606,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.PollNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse] API response.
+        def poll_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'poll_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.ListActivityExecutions API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest] API request.
@@ -1526,6 +1631,21 @@ module Temporalio
             rpc: 'list_activity_executions',
             request_class: Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest,
             response_class: Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ListNexusOperationExecutions API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsResponse] API response.
+        def list_nexus_operation_executions(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'list_nexus_operation_executions',
+            request_class: Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsResponse,
             request:,
             rpc_options:
           )
@@ -1546,6 +1666,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.CountNexusOperationExecutions API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsResponse] API response.
+        def count_nexus_operation_executions(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'count_nexus_operation_executions',
+            request_class: Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.RequestCancelActivityExecution API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest] API request.
@@ -1556,6 +1691,21 @@ module Temporalio
             rpc: 'request_cancel_activity_execution',
             request_class: Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest,
             response_class: Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.RequestCancelNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionResponse] API response.
+        def request_cancel_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'request_cancel_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionResponse,
             request:,
             rpc_options:
           )
@@ -1586,6 +1736,36 @@ module Temporalio
             rpc: 'delete_activity_execution',
             request_class: Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest,
             response_class: Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.TerminateNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionResponse] API response.
+        def terminate_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'terminate_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.DeleteNexusOperationExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse] API response.
+        def delete_nexus_operation_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_nexus_operation_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse,
             request:,
             rpc_options:
           )

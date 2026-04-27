@@ -277,6 +277,22 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse
+        def create_worker_deployment: (
+          Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentResponse
+        def create_worker_deployment_version: (
+          Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionResponse
+        def update_worker_deployment_version_compute_config: (
+          Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigResponse
+        def validate_worker_deployment_version_compute_config: (
+          Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigResponse
         def update_worker_deployment_version_metadata: (
           Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest request,
           ?rpc_options: RPCOptions?
@@ -397,26 +413,50 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse
+        def start_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionResponse
         def describe_activity_execution: (
           Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse
+        def describe_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionResponse
         def poll_activity_execution: (
           Temporalio::Api::WorkflowService::V1::PollActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse
+        def poll_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse
         def list_activity_executions: (
           Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse
+        def list_nexus_operation_executions: (
+          Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsResponse
         def count_activity_executions: (
           Temporalio::Api::WorkflowService::V1::CountActivityExecutionsRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::CountActivityExecutionsResponse
+        def count_nexus_operation_executions: (
+          Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsResponse
         def request_cancel_activity_execution: (
           Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionResponse
+        def request_cancel_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionResponse
         def terminate_activity_execution: (
           Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
@@ -425,6 +465,14 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse
+        def terminate_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionResponse
+        def delete_nexus_operation_execution: (
+          Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse
       end
     end
   end

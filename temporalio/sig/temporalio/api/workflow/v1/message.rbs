@@ -149,7 +149,6 @@ module Temporalio
           def clear_versioning_info: () -> void
 
           # The name of Worker Deployment that completed the most recent workflow task.
-          # Experimental. Worker Deployments are experimental and might change in the future.
           attr_reader worker_deployment_name(): ::String
           attr_writer worker_deployment_name(): ::String | ::Symbol
           def clear_worker_deployment_name: () -> void
@@ -495,6 +494,20 @@ module Temporalio
           attr_writer revision_number(): ::Integer | ::Float
           def clear_revision_number: () -> void
 
+          # Experimental.
+          # If this workflow is the result of a continue-as-new, this field is set to the initial_versioning_behavior
+          # specified in that command.
+          # Only used for the initial task of this run and the initial task of any retries of this run.
+          # Not passed to children or to future continue-as-new.
+          # Note: In the first release of Upgrade-on-CaN, when the only ContinueAsNewVersioningBehavior was AutoUpgrade,
+          # a non-empty InheritedAutoUpgradeInfo meant that the workflow should start as AutoUpgrade. So for compatibility
+          # with ContinueAsNew history commands generated during that time, know that an UNSPECIFIED value here is equivalent
+          # to ContinueAsNewVersioningBehaviorAutoUpgrade if the behavior of the workflow is AutoUpgrade.
+          attr_reader continue_as_new_initial_versioning_behavior(): ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Integer
+          attr_writer continue_as_new_initial_versioning_behavior(): ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float
+          attr_reader continue_as_new_initial_versioning_behavior_const(): ::Integer
+          def clear_continue_as_new_initial_versioning_behavior: () -> void
+
           type init_map = {
             behavior: (::Temporalio::Api::Enums::V1::VersioningBehavior::names | ::Temporalio::Api::Enums::V1::VersioningBehavior::strings | ::Integer | ::Float)?,
             "behavior" => (::Temporalio::Api::Enums::V1::VersioningBehavior::names | ::Temporalio::Api::Enums::V1::VersioningBehavior::strings | ::Integer | ::Float)?,
@@ -512,6 +525,8 @@ module Temporalio
             "version_transition" => (::Temporalio::Api::Workflow::V1::DeploymentVersionTransition | ::Temporalio::Api::Workflow::V1::DeploymentVersionTransition::init_map)?,
             revision_number: (::Integer | ::Float)?,
             "revision_number" => (::Integer | ::Float)?,
+            continue_as_new_initial_versioning_behavior: (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
+            "continue_as_new_initial_versioning_behavior" => (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -525,6 +540,7 @@ module Temporalio
             | ("deployment_transition" name) -> ::Temporalio::Api::Workflow::V1::DeploymentTransition?
             | ("version_transition" name) -> ::Temporalio::Api::Workflow::V1::DeploymentVersionTransition?
             | ("revision_number" name) -> ::Integer
+            | ("continue_as_new_initial_versioning_behavior" name) -> (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Integer)
 
           def []=:
               ("behavior" name, (::Temporalio::Api::Enums::V1::VersioningBehavior::names | ::Temporalio::Api::Enums::V1::VersioningBehavior::strings | ::Integer | ::Float) value) -> void
@@ -535,6 +551,7 @@ module Temporalio
             | ("deployment_transition" name, ::Temporalio::Api::Workflow::V1::DeploymentTransition? value) -> void
             | ("version_transition" name, ::Temporalio::Api::Workflow::V1::DeploymentVersionTransition? value) -> void
             | ("revision_number" name, (::Integer | ::Float) value) -> void
+            | ("continue_as_new_initial_versioning_behavior" name, (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float) value) -> void
         end
 
         # Holds information about ongoing transition of a workflow execution from one deployment to another.
@@ -1571,7 +1588,9 @@ module Temporalio
           def clear_state: () -> void
 
           # The number of attempts made to deliver the start operation request.
-          # This number represents a minimum bound since the attempt is incremented after the request completes.
+          # This number is approximate, it is incremented when a task is added to the history queue.
+          # In practice, there could be more attempts if a task is executed but fails to commit, or less attempts if a task
+          # was never executed.
           attr_reader attempt(): ::Integer
           attr_writer attempt(): ::Integer | ::Float
           def clear_attempt: () -> void
@@ -1799,11 +1818,20 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Time-skipping configuration for this workflow execution.
+          # If not set, the time-skipping configuration is not updated by this request;
+          # the existing configuration is preserved.
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          def has_time_skipping_config?: () -> bool
+          def clear_time_skipping_config: () -> void
+
           type init_map = {
             versioning_override: (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
             "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1811,10 +1839,81 @@ module Temporalio
           def []:
               ("versioning_override" name) -> ::Temporalio::Api::Workflow::V1::VersioningOverride?
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
 
           def []=:
               ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+        end
+
+        # Configuration for time skipping during a workflow execution.
+        # When enabled, virtual time advances automatically whenever there is no in-flight work.
+        # In-flight work includes activities, child workflows, Nexus operations, signal/cancel external workflow operations,
+        # and possibly other features added in the future.
+        # User timers are not classified as in-flight work and will be skipped over.
+        # When time advances, it skips to the earlier of the next user timer or the configured bound, if either exists.
+        # 
+        # Propagation behavior of time skipping:
+        # The enabled flag, bound fields, and accumulated skipped duration are propagated to related executions as follows:
+        # (1) Child workflows and continue-as-new: both the configuration and the accumulated skipped duration are
+        #     inherited from the current execution. The configured bound is shared between the inherited skipped
+        #     duration and any additional duration skipped by the new run.
+        # (2) Retry and cron: the configuration and accumulated skipped duration are inherited as recorded when the
+        #     current workflow started; the accumulated skipped duration of the current run is not propagated.
+        # (3) Reset: the new run retains the time-skipping configuration of the current execution. Because reset replays
+        #     all events up to the reset point and re-applies any UpdateWorkflowExecutionOptions changes made after that
+        #     point, the resulting run ends up with the same final time-skipping configuration as the previous run.
+        class TimeSkippingConfig < ::Google::Protobuf::AbstractMessage
+
+          # Enables or disables time skipping for this workflow execution.
+          attr_accessor enabled(): bool
+          def clear_enabled: () -> void
+
+          # Maximum total virtual time that can be skipped.
+          attr_reader max_skipped_duration(): ::Google::Protobuf::Duration?
+          attr_writer max_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_max_skipped_duration?: () -> bool
+          def clear_max_skipped_duration: () -> void
+
+          # Maximum elapsed time since time skipping was enabled.
+          # This includes both skipped time and real time elapsing.
+          # (-- api-linter: core::0142::time-field-names=disabled --)
+          attr_reader max_elapsed_duration(): ::Google::Protobuf::Duration?
+          attr_writer max_elapsed_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_max_elapsed_duration?: () -> bool
+          def clear_max_elapsed_duration: () -> void
+
+          # Optional bound that limits the gap between the virtual time of this execution and wall-clock time.
+          # Once the bound is reached, time skipping is automatically disabled,
+          # but can be re-enabled by setting `enabled` to true via UpdateWorkflowExecutionOptions.
+          # This bound cannot be set to a value smaller than the execution's currently skipped duration.
+          # This is useful in testing scenarios where a workflow is expected to receive
+          # signals, updates, or other external events while timers are in progress.
+          attr_reader bound(): ::Google::Protobuf::Duration?
+          def has_bound?: () -> bool
+          def clear_bound: () -> void
+
+          type init_map = {
+            enabled: bool?,
+            "enabled" => bool?,
+            max_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "max_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            max_elapsed_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "max_elapsed_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("enabled" name) -> bool
+            | ("max_skipped_duration" name) -> ::Google::Protobuf::Duration?
+            | ("max_elapsed_duration" name) -> ::Google::Protobuf::Duration?
+
+          def []=:
+              ("enabled" name, bool value) -> void
+            | ("max_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("max_elapsed_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         # Used to override the versioning behavior (and pinned deployment version, if applicable) of a

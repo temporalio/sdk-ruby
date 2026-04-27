@@ -111,6 +111,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_activity_v1_callback_info(value)
+        @on_enter&.call(value)
+        api_callback_v1_callback_info(value.info) if value.has_info?
+        @on_exit&.call(value)
+      end
+      
       def api_batch_v1_batch_operation_reset(value)
         @on_enter&.call(value)
         value.post_reset_operations.each { |v| api_workflow_v1_post_reset_operation(v) }
@@ -127,6 +133,12 @@ module Temporalio
       def api_batch_v1_batch_operation_termination(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.details) if value.has_details?
+        @on_exit&.call(value)
+      end
+      
+      def api_callback_v1_callback_info(value)
+        @on_enter&.call(value)
+        api_failure_v1_failure(value.last_attempt_failure) if value.has_last_attempt_failure?
         @on_exit&.call(value)
       end
       
@@ -526,6 +538,37 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_compute_v1_compute_config(value)
+        @on_enter&.call(value)
+        value.scaling_groups.values.each { |v| api_compute_v1_compute_config_scaling_group(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_compute_v1_compute_config_scaling_group(value)
+        @on_enter&.call(value)
+        api_compute_v1_compute_provider(value.provider) if value.has_provider?
+        api_compute_v1_compute_scaler(value.scaler) if value.has_scaler?
+        @on_exit&.call(value)
+      end
+      
+      def api_compute_v1_compute_config_scaling_group_update(value)
+        @on_enter&.call(value)
+        api_compute_v1_compute_config_scaling_group(value.scaling_group) if value.has_scaling_group?
+        @on_exit&.call(value)
+      end
+      
+      def api_compute_v1_compute_provider(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.details) if value.has_details?
+        @on_exit&.call(value)
+      end
+      
+      def api_compute_v1_compute_scaler(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.details) if value.has_details?
+        @on_exit&.call(value)
+      end
+      
       def api_deployment_v1_deployment_info(value)
         @on_enter&.call(value)
         value.metadata.values.each { |v| api_common_v1_payload(v) }
@@ -547,6 +590,7 @@ module Temporalio
       def api_deployment_v1_worker_deployment_version_info(value)
         @on_enter&.call(value)
         api_deployment_v1_version_metadata(value.metadata) if value.has_metadata?
+        api_compute_v1_compute_config(value.compute_config) if value.has_compute_config?
         @on_exit&.call(value)
       end
       
@@ -878,6 +922,27 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_nexus_v1_nexus_operation_execution_cancellation_info(value)
+        @on_enter&.call(value)
+        api_failure_v1_failure(value.last_attempt_failure) if value.has_last_attempt_failure?
+        @on_exit&.call(value)
+      end
+      
+      def api_nexus_v1_nexus_operation_execution_info(value)
+        @on_enter&.call(value)
+        api_failure_v1_failure(value.last_attempt_failure) if value.has_last_attempt_failure?
+        api_nexus_v1_nexus_operation_execution_cancellation_info(value.cancellation_info) if value.has_cancellation_info?
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        @on_exit&.call(value)
+      end
+      
+      def api_nexus_v1_nexus_operation_execution_list_info(value)
+        @on_enter&.call(value)
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
       def api_nexus_v1_request(value)
         @on_enter&.call(value)
         api_nexus_v1_start_operation_request(value.start_operation) if value.has_start_operation?
@@ -1085,6 +1150,18 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_count_nexus_operation_executions_response(value)
+        @on_enter&.call(value)
+        value.groups.each { |v| api_workflowservice_v1_count_nexus_operation_executions_response_aggregation_group(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_count_nexus_operation_executions_response_aggregation_group(value)
+        @on_enter&.call(value)
+        api_common_v1_payload_repeated(value.group_values) unless value.group_values.empty?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_count_schedules_response(value)
         @on_enter&.call(value)
         value.groups.each { |v| api_workflowservice_v1_count_schedules_response_aggregation_group(v) }
@@ -1117,17 +1194,33 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_create_worker_deployment_version_request(value)
+        @on_enter&.call(value)
+        api_compute_v1_compute_config(value.compute_config) if value.has_compute_config?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_describe_activity_execution_response(value)
         @on_enter&.call(value)
         api_activity_v1_activity_execution_info(value.info) if value.has_info?
         api_common_v1_payloads(value.input) if value.has_input?
         api_activity_v1_activity_execution_outcome(value.outcome) if value.has_outcome?
+        value.callbacks.each { |v| api_activity_v1_callback_info(v) }
         @on_exit&.call(value)
       end
       
       def api_workflowservice_v1_describe_deployment_response(value)
         @on_enter&.call(value)
         api_deployment_v1_deployment_info(value.deployment_info) if value.has_deployment_info?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_describe_nexus_operation_execution_response(value)
+        @on_enter&.call(value)
+        api_nexus_v1_nexus_operation_execution_info(value.info) if value.has_info?
+        api_common_v1_payload(value.input) if value.has_input?
+        api_common_v1_payload(value.result) if value.has_result?
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -1223,6 +1316,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_list_nexus_operation_executions_response(value)
+        @on_enter&.call(value)
+        value.operations.each { |v| api_nexus_v1_nexus_operation_execution_list_info(v) }
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_list_open_workflow_executions_response(value)
         @on_enter&.call(value)
         value.executions.each { |v| api_workflow_v1_workflow_execution_info(v) }
@@ -1252,6 +1351,13 @@ module Temporalio
         api_common_v1_header(value.header) if value.has_header?
         api_common_v1_payloads(value.input) if value.has_input?
         api_common_v1_payloads(value.heartbeat_details) if value.has_heartbeat_details?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_poll_nexus_operation_execution_response(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.result) if value.has_result?
+        api_failure_v1_failure(value.failure) if value.has_failure?
         @on_exit&.call(value)
       end
       
@@ -1451,6 +1557,14 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_start_nexus_operation_execution_request(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.input) if value.has_input?
+        api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_start_workflow_execution_request(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.input) if value.has_input?
@@ -1479,6 +1593,13 @@ module Temporalio
         @on_enter&.call(value)
         api_schedule_v1_schedule(value.schedule) if value.has_schedule?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        api_common_v1_memo(value.memo) if value.has_memo?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_update_worker_deployment_version_compute_config_request(value)
+        @on_enter&.call(value)
+        value.compute_config_scaling_groups.values.each { |v| api_compute_v1_compute_config_scaling_group_update(v) }
         @on_exit&.call(value)
       end
       
@@ -1503,6 +1624,12 @@ module Temporalio
       def api_workflowservice_v1_update_workflow_execution_response(value)
         @on_enter&.call(value)
         api_update_v1_outcome(value.outcome) if value.has_outcome?
+        @on_exit&.call(value)
+      end
+      
+      def api_workflowservice_v1_validate_worker_deployment_version_compute_config_request(value)
+        @on_enter&.call(value)
+        value.compute_config_scaling_groups.values.each { |v| api_compute_v1_compute_config_scaling_group_update(v) }
         @on_exit&.call(value)
       end
       
