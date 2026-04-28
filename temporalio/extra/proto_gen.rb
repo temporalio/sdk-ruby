@@ -49,8 +49,10 @@ class ProtoGen
   GENERATED_PATHS = [
     'lib/temporalio/api',
     'lib/temporalio/internal/bridge/api',
+    'lib/protoc-gen-openapiv2',
     'sig/temporalio/api',
     'sig/temporalio/internal/bridge/api',
+    'sig/protoc-gen-openapiv2',
     *SERVICE_DEFINITIONS.flat_map do |service|
       [
         "lib/temporalio/client/connection/#{service[:file_name]}.rb",
@@ -68,15 +70,21 @@ class ProtoGen
   # Run the generator
   def run
     FileUtils.rm_rf('lib/temporalio/api')
+    FileUtils.rm_rf('lib/protoc-gen-openapiv2')
     FileUtils.rm_rf('sig/temporalio/api')
     FileUtils.rm_rf('sig/temporalio/internal/bridge/api')
+    FileUtils.rm_rf('sig/protoc-gen-openapiv2')
 
     verify_protoc!
 
     generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_upstream/**/*.proto').reject do |proto|
       proto.include?('google')
     end)
-    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'))
+    generate_openapiv2_protos
+    generate_api_protos(
+      Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'),
+      extra_proto_paths: ['--proto_path=ext/sdk-core/crates/common/protos']
+    )
     generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/testsrv_upstream/**/*.proto'))
     generate_api_protos(Dir.glob('ext/additional_protos/**/*.proto'))
     generate_import_helper_files
@@ -88,7 +96,7 @@ class ProtoGen
 
   private
 
-  def generate_api_protos(api_protos)
+  def generate_api_protos(api_protos, extra_proto_paths: [])
     # Generate API to temp dir and move
     FileUtils.rm_rf('tmp-proto')
     FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
@@ -99,6 +107,7 @@ class ProtoGen
       '--proto_path=ext/sdk-core/crates/common/protos/api_cloud_upstream',
       '--proto_path=ext/sdk-core/crates/common/protos/testsrv_upstream',
       '--proto_path=ext/additional_protos',
+      *extra_proto_paths,
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *api_protos,
@@ -110,6 +119,10 @@ class ProtoGen
       # Fix up the import
       content = File.read(path)
       content.gsub!(%r{^require 'temporal/(.*)_pb'$}, "require 'temporalio/\\1'")
+      content.gsub!(
+        %r{^require 'protoc-gen-openapiv2/options/(.*)_pb'$},
+        "require 'temporalio/api/protoc_gen_openapiv2/options/\\1'"
+      )
       File.write(path, content)
 
       # Remove _pb from the filename
@@ -121,6 +134,34 @@ class ProtoGen
     FileUtils.cp_r('tmp-proto/ruby/temporal/api', 'lib/temporalio')
     FileUtils.mkdir_p('sig/temporalio')
     FileUtils.cp_r('tmp-proto/rbs/temporal/api', 'sig/temporalio')
+    FileUtils.rm_rf('tmp-proto')
+  end
+
+  def generate_openapiv2_protos
+    FileUtils.rm_rf('tmp-proto')
+    FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
+    system(
+      protoc_command,
+      *google_proto_include_flags,
+      '--proto_path=ext/sdk-core/crates/common/protos',
+      '--ruby_out=tmp-proto/ruby',
+      '--rbs_out=tmp-proto/rbs',
+      *Dir.glob('ext/sdk-core/crates/common/protos/protoc-gen-openapiv2/**/*.proto'),
+      exception: true
+    )
+    Dir.glob('tmp-proto/ruby/protoc-gen-openapiv2/**/*.rb') do |path|
+      content = File.read(path)
+      content.gsub!(
+        %r{^require 'protoc-gen-openapiv2/options/(.*)_pb'$},
+        "require 'temporalio/api/protoc_gen_openapiv2/options/\\1'"
+      )
+      File.write(path, content)
+      FileUtils.mv(path, path.sub('_pb', ''))
+    end
+    Dir.glob('tmp-proto/rbs/protoc-gen-openapiv2/**/*.rbs') { |path| normalize_generated_rbs!(path) }
+    FileUtils.mkdir_p(['lib/temporalio/api', 'sig/temporalio/api'])
+    FileUtils.cp_r('tmp-proto/ruby/protoc-gen-openapiv2', 'lib/temporalio/api/protoc_gen_openapiv2')
+    FileUtils.cp_r('tmp-proto/rbs/protoc-gen-openapiv2', 'sig/temporalio/api/protoc_gen_openapiv2')
     FileUtils.rm_rf('tmp-proto')
   end
 
@@ -425,6 +466,8 @@ class ProtoGen
     )
     # The plugin emits constructor helpers as `Type::init_map`; the runtime API exposed to callers is just `Type`.
     content.gsub!(/::Google::Protobuf::([A-Za-z]+)::init_map/, '::Google::Protobuf::\1')
+    # protoc generates usage of Struct without specifying generics, we add them to match the proto file definition
+    content.gsub!(/::Google::Protobuf::Struct(?!\[)/, '::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value]')
     content.gsub!(
       /^(\s*)def self\.lookup:\n.*?^(?=\1def self\.resolve:)/m,
       "\\1def self.lookup: (::Integer number) -> ::Symbol\n\n"

@@ -194,6 +194,111 @@ module Temporalio
               | ("pub_sub_sink" name, ::Temporalio::Api::Cloud::Sink::V1::PubSubSpec? value) -> void
               | ("enabled" name, bool value) -> void
           end
+
+          # AuditLogSink is only used by Audit Log
+          class AuditLogSink < ::Google::Protobuf::AbstractMessage
+            # The health status of the audit log sink.
+            module Health
+
+              HEALTH_UNSPECIFIED: 0
+
+              # The audit log sink is healthy and functioning correctly.
+              HEALTH_OK: 1
+
+              # The audit log sink has an internal error.
+              HEALTH_ERROR_INTERNAL: 2
+
+              # The audit log sink has a configuration error.
+              HEALTH_ERROR_USER_CONFIGURATION: 3
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :HEALTH_UNSPECIFIED | :HEALTH_OK | :HEALTH_ERROR_INTERNAL | :HEALTH_ERROR_USER_CONFIGURATION
+
+              type strings = "HEALTH_UNSPECIFIED" | "HEALTH_OK" | "HEALTH_ERROR_INTERNAL" | "HEALTH_ERROR_USER_CONFIGURATION"
+
+              type numbers = 0 | 1 | 2 | 3
+            end
+
+            # Name of the sink e.g. "audit_log_01"
+            attr_reader name(): ::String
+            attr_writer name(): ::String | ::Symbol
+            def clear_name: () -> void
+
+            # The version of the audit log sink resource.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The current state of the audit log sink.
+            attr_reader state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer
+            attr_writer state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float
+            attr_reader state_const(): ::Integer
+            def clear_state: () -> void
+
+            # The specification details of the audit log sink.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The health status of the audit log sink.
+            attr_reader health(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Integer
+            attr_writer health(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::strings | ::Integer | ::Float
+            attr_reader health_const(): ::Integer
+            def clear_health: () -> void
+
+            # An error message describing any issues with the audit log sink, if applicable.
+            attr_reader error_message(): ::String
+            attr_writer error_message(): ::String | ::Symbol
+            def clear_error_message: () -> void
+
+            # The last succeeded timestamp for the internal workflow responsible for adding data to the sink.
+            attr_reader last_succeeded_time(): ::Google::Protobuf::Timestamp?
+            attr_writer last_succeeded_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_last_succeeded_time?: () -> bool
+            def clear_last_succeeded_time: () -> void
+
+            type init_map = {
+              name: (::String | ::Symbol)?,
+              "name" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              state: (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              "state" => (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              spec: (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              health: (::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::strings | ::Integer | ::Float)?,
+              "health" => (::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::strings | ::Integer | ::Float)?,
+              error_message: (::String | ::Symbol)?,
+              "error_message" => (::String | ::Symbol)?,
+              last_succeeded_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "last_succeeded_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("name" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("state" name) -> (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer)
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+              | ("health" name) -> (::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Integer)
+              | ("error_message" name) -> ::String
+              | ("last_succeeded_time" name) -> ::Google::Protobuf::Timestamp?
+
+            def []=:
+                ("name" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("state" name, (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec? value) -> void
+              | ("health" name, (::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::names | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::Health::strings | ::Integer | ::Float) value) -> void
+              | ("error_message" name, (::String | ::Symbol) value) -> void
+              | ("last_succeeded_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
         end
       end
     end

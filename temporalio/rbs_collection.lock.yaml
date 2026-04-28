@@ -61,6 +61,10 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: dbm
+  version: '0'
+  source:
+    type: stdlib
 - name: delegate
   version: '0'
   source:
@@ -149,6 +153,14 @@ gems:
   version: 1.9.0
   source:
     type: rubygems
+- name: pstore
+  version: '0'
+  source:
+    type: stdlib
+- name: psych
+  version: '0'
+  source:
+    type: stdlib
 - name: rbs
   version: 3.10.4
   source:

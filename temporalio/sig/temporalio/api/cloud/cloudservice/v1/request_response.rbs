@@ -10,6 +10,58 @@ module Temporalio
     module Cloud
       module CloudService
         module V1
+          class GetCurrentIdentityRequest < ::Google::Protobuf::AbstractMessage
+
+            type init_map = {
+            }
+
+            def initialize: (?init_map initial_value) -> void
+          end
+
+          class GetCurrentIdentityResponse < ::Google::Protobuf::AbstractMessage
+
+            # The user is a regular user
+            attr_accessor user(): ::Temporalio::Api::Cloud::Identity::V1::User?
+            def has_user?: () -> bool
+            def clear_user: () -> void
+
+            # The user is a service account
+            attr_accessor service_account(): ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount?
+            def has_service_account?: () -> bool
+            def clear_service_account: () -> void
+
+            # The API key info used to authenticate the request, if any
+            attr_accessor principal_api_key(): ::Temporalio::Api::Cloud::Identity::V1::ApiKey?
+            def has_principal_api_key?: () -> bool
+            def clear_principal_api_key: () -> void
+
+            # The authenticated principal making the request
+            attr_reader principal(): (::Temporalio::Api::Cloud::Identity::V1::User | ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount)?
+            def has_principal?: () -> bool
+            def clear_principal: () -> void
+
+            type init_map = {
+              user: (::Temporalio::Api::Cloud::Identity::V1::User | ::Temporalio::Api::Cloud::Identity::V1::User::init_map)?,
+              "user" => (::Temporalio::Api::Cloud::Identity::V1::User | ::Temporalio::Api::Cloud::Identity::V1::User::init_map)?,
+              service_account: (::Temporalio::Api::Cloud::Identity::V1::ServiceAccount | ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount::init_map)?,
+              "service_account" => (::Temporalio::Api::Cloud::Identity::V1::ServiceAccount | ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount::init_map)?,
+              principal_api_key: (::Temporalio::Api::Cloud::Identity::V1::ApiKey | ::Temporalio::Api::Cloud::Identity::V1::ApiKey::init_map)?,
+              "principal_api_key" => (::Temporalio::Api::Cloud::Identity::V1::ApiKey | ::Temporalio::Api::Cloud::Identity::V1::ApiKey::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("user" name) -> ::Temporalio::Api::Cloud::Identity::V1::User?
+              | ("service_account" name) -> ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount?
+              | ("principal_api_key" name) -> ::Temporalio::Api::Cloud::Identity::V1::ApiKey?
+
+            def []=:
+                ("user" name, ::Temporalio::Api::Cloud::Identity::V1::User? value) -> void
+              | ("service_account" name, ::Temporalio::Api::Cloud::Identity::V1::ServiceAccount? value) -> void
+              | ("principal_api_key" name, ::Temporalio::Api::Cloud::Identity::V1::ApiKey? value) -> void
+          end
+
           class GetUsersRequest < ::Google::Protobuf::AbstractMessage
 
             # The requested size of the page to retrieve - optional.
@@ -1134,6 +1186,7 @@ module Temporalio
 
             # Filter api keys by owner type - optional.
             # Possible values: user, service-account
+            # temporal:versioning:max_version=v0.3.0
             # @deprecated
             attr_reader owner_type_deprecated(): ::String
             attr_writer owner_type_deprecated(): ::String | ::Symbol
@@ -3627,6 +3680,86 @@ module Temporalio
                 ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
           end
 
+          class GetAuditLogsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            # Filter for UTC time >= (defaults to 30 days ago) - optional.
+            attr_reader start_time_inclusive(): ::Google::Protobuf::Timestamp?
+            attr_writer start_time_inclusive(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_start_time_inclusive?: () -> bool
+            def clear_start_time_inclusive: () -> void
+
+            # Filter for UTC time < (defaults to current time) - optional.
+            attr_reader end_time_exclusive(): ::Google::Protobuf::Timestamp?
+            attr_writer end_time_exclusive(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_end_time_exclusive?: () -> bool
+            def clear_end_time_exclusive: () -> void
+
+            type init_map = {
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+              start_time_inclusive: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "start_time_inclusive" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              end_time_exclusive: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "end_time_exclusive" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+              | ("start_time_inclusive" name) -> ::Google::Protobuf::Timestamp?
+              | ("end_time_exclusive" name) -> ::Google::Protobuf::Timestamp?
+
+            def []=:
+                ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+              | ("start_time_inclusive" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("end_time_exclusive" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
+
+          class GetAuditLogsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of audit logs ordered by emit time, log_id
+            attr_accessor logs(): ::Google::Protobuf::RepeatedField
+            def clear_logs: () -> void
+
+            # The next page's token.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              logs: ::Array[::Temporalio::Api::Cloud::AuditLog::V1::LogRecord]?,
+              "logs" => ::Array[::Temporalio::Api::Cloud::AuditLog::V1::LogRecord]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("logs" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("logs" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
           class ValidateAccountAuditLogSinkRequest < ::Google::Protobuf::AbstractMessage
 
             # The audit log sink spec that will be validated
@@ -3654,6 +3787,426 @@ module Temporalio
             }
 
             def initialize: (?init_map initial_value) -> void
+          end
+
+          class CreateAccountAuditLogSinkRequest < ::Google::Protobuf::AbstractMessage
+
+            # The specification for the audit log sink.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # Optional. The ID to use for this async operation.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              spec: (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("spec" name) -> ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("spec" name, ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec? value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class CreateAccountAuditLogSinkResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class GetAccountAuditLogSinkRequest < ::Google::Protobuf::AbstractMessage
+
+            # The name of the sink to retrieve.
+            attr_reader name(): ::String
+            attr_writer name(): ::String | ::Symbol
+            def clear_name: () -> void
+
+            type init_map = {
+              name: (::String | ::Symbol)?,
+              "name" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("name" name) -> ::String
+
+            def []=:
+                ("name" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetAccountAuditLogSinkResponse < ::Google::Protobuf::AbstractMessage
+
+            # The audit log sink retrieved.
+            attr_accessor sink(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSink?
+            def has_sink?: () -> bool
+            def clear_sink: () -> void
+
+            type init_map = {
+              sink: (::Temporalio::Api::Cloud::Account::V1::AuditLogSink | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::init_map)?,
+              "sink" => (::Temporalio::Api::Cloud::Account::V1::AuditLogSink | ::Temporalio::Api::Cloud::Account::V1::AuditLogSink::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("sink" name) -> ::Temporalio::Api::Cloud::Account::V1::AuditLogSink?
+
+            def []=:
+                ("sink" name, ::Temporalio::Api::Cloud::Account::V1::AuditLogSink? value) -> void
+          end
+
+          class GetAccountAuditLogSinksRequest < ::Google::Protobuf::AbstractMessage
+
+            # The requested size of the page to retrieve. Cannot exceed 1000.
+            # Defaults to 100 if not specified.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetAccountAuditLogSinksResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of audit log sinks retrieved.
+            attr_accessor sinks(): ::Google::Protobuf::RepeatedField
+            def clear_sinks: () -> void
+
+            # The next page token, set if there is another page.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              sinks: ::Array[::Temporalio::Api::Cloud::Account::V1::AuditLogSink]?,
+              "sinks" => ::Array[::Temporalio::Api::Cloud::Account::V1::AuditLogSink]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("sinks" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("sinks" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateAccountAuditLogSinkRequest < ::Google::Protobuf::AbstractMessage
+
+            # The updated audit log sink specification.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The version of the audit log sink to update. The latest version can be
+            # retrieved using the GetAuditLogSink call.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The ID to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              spec: (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec | ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("spec" name) -> ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("spec" name, ::Temporalio::Api::Cloud::Account::V1::AuditLogSinkSpec? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateAccountAuditLogSinkResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class DeleteAccountAuditLogSinkRequest < ::Google::Protobuf::AbstractMessage
+
+            # The name of the sink to delete.
+            attr_reader name(): ::String
+            attr_writer name(): ::String | ::Symbol
+            def clear_name: () -> void
+
+            # The version of the sink to delete. The latest version can be
+            # retrieved using the GetAccountAuditLogSink call.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The ID to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              name: (::String | ::Symbol)?,
+              "name" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("name" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("name" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class DeleteAccountAuditLogSinkResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class GetNamespaceCapacityInfoRequest < ::Google::Protobuf::AbstractMessage
+
+            # The namespace identifier.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetNamespaceCapacityInfoResponse < ::Google::Protobuf::AbstractMessage
+
+            # Capacity information for the namespace.
+            attr_accessor capacity_info(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo?
+            def has_capacity_info?: () -> bool
+            def clear_capacity_info: () -> void
+
+            type init_map = {
+              capacity_info: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::init_map)?,
+              "capacity_info" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("capacity_info" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo?
+
+            def []=:
+                ("capacity_info" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo? value) -> void
+          end
+
+          class CreateBillingReportRequest < ::Google::Protobuf::AbstractMessage
+
+            # The specification for the billing report.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              spec: (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::init_map)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("spec" name) -> ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec?
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("spec" name, ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec? value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class CreateBillingReportResponse < ::Google::Protobuf::AbstractMessage
+
+            # The id of the billing report created.
+            attr_reader billing_report_id(): ::String
+            attr_writer billing_report_id(): ::String | ::Symbol
+            def clear_billing_report_id: () -> void
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              billing_report_id: (::String | ::Symbol)?,
+              "billing_report_id" => (::String | ::Symbol)?,
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("billing_report_id" name) -> ::String
+              | ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("billing_report_id" name, (::String | ::Symbol) value) -> void
+              | ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class GetBillingReportRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the billing report to retrieve.
+            attr_reader billing_report_id(): ::String
+            attr_writer billing_report_id(): ::String | ::Symbol
+            def clear_billing_report_id: () -> void
+
+            type init_map = {
+              billing_report_id: (::String | ::Symbol)?,
+              "billing_report_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("billing_report_id" name) -> ::String
+
+            def []=:
+                ("billing_report_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetBillingReportResponse < ::Google::Protobuf::AbstractMessage
+
+            # The billing report retrieved.
+            attr_accessor billing_report(): ::Temporalio::Api::Cloud::Billing::V1::BillingReport?
+            def has_billing_report?: () -> bool
+            def clear_billing_report: () -> void
+
+            type init_map = {
+              billing_report: (::Temporalio::Api::Cloud::Billing::V1::BillingReport | ::Temporalio::Api::Cloud::Billing::V1::BillingReport::init_map)?,
+              "billing_report" => (::Temporalio::Api::Cloud::Billing::V1::BillingReport | ::Temporalio::Api::Cloud::Billing::V1::BillingReport::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("billing_report" name) -> ::Temporalio::Api::Cloud::Billing::V1::BillingReport?
+
+            def []=:
+                ("billing_report" name, ::Temporalio::Api::Cloud::Billing::V1::BillingReport? value) -> void
           end
         end
       end

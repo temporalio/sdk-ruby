@@ -154,6 +154,12 @@ module Temporalio
             def has_request_deadline?: () -> bool
             def clear_request_deadline: () -> void
 
+            # The endpoint this request was addressed to. Extracted from the request for convenient access.
+            # Only set when variant is `task`.
+            attr_reader endpoint(): ::String
+            attr_writer endpoint(): ::String | ::Symbol
+            def clear_endpoint: () -> void
+
             attr_reader variant(): (::Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse | ::Temporalio::Internal::Bridge::Api::Nexus::CancelNexusTask)?
             def has_variant?: () -> bool
             def clear_variant: () -> void
@@ -165,6 +171,8 @@ module Temporalio
               "cancel_task" => (::Temporalio::Internal::Bridge::Api::Nexus::CancelNexusTask | ::Temporalio::Internal::Bridge::Api::Nexus::CancelNexusTask::init_map)?,
               request_deadline: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               "request_deadline" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              endpoint: (::String | ::Symbol)?,
+              "endpoint" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -173,11 +181,13 @@ module Temporalio
                 ("task" name) -> ::Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse?
               | ("cancel_task" name) -> ::Temporalio::Internal::Bridge::Api::Nexus::CancelNexusTask?
               | ("request_deadline" name) -> ::Google::Protobuf::Timestamp?
+              | ("endpoint" name) -> ::String
 
             def []=:
                 ("task" name, ::Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse? value) -> void
               | ("cancel_task" name, ::Temporalio::Internal::Bridge::Api::Nexus::CancelNexusTask? value) -> void
               | ("request_deadline" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("endpoint" name, (::String | ::Symbol) value) -> void
           end
 
           class CancelNexusTask < ::Google::Protobuf::AbstractMessage
