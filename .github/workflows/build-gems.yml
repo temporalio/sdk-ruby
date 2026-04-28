@@ -49,14 +49,32 @@ jobs:
           gem install rb_sys --no-document
           rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
           extra_apt_packages=""
+          default_cc=""
+          default_cxx=""
+          default_ar=""
+          x86_64_unknown_linux_gnu_cc=""
+          x86_64_unknown_linux_gnu_cxx=""
+          x86_64_unknown_linux_gnu_linker=""
           if [[ "${{ matrix.rubyPlatform }}" == "x86_64-linux" ]]; then
             extra_apt_packages="gcc-10 g++-10"
+            default_cc="gcc-10"
+            default_cxx="g++-10"
+            default_ar="gcc-ar-10"
+            x86_64_unknown_linux_gnu_cc="gcc-10"
+            x86_64_unknown_linux_gnu_cxx="g++-10"
+            x86_64_unknown_linux_gnu_linker="gcc-10"
           fi
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
           docker build \
             --platform linux/amd64 \
             --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
             --build-arg EXTRA_APT_PACKAGES="${extra_apt_packages}" \
+            --build-arg DEFAULT_CC="${default_cc}" \
+            --build-arg DEFAULT_CXX="${default_cxx}" \
+            --build-arg DEFAULT_AR="${default_ar}" \
+            --build-arg X86_64_UNKNOWN_LINUX_GNU_CC="${x86_64_unknown_linux_gnu_cc}" \
+            --build-arg X86_64_UNKNOWN_LINUX_GNU_CXX="${x86_64_unknown_linux_gnu_cxx}" \
+            --build-arg X86_64_UNKNOWN_LINUX_GNU_LINKER="${x86_64_unknown_linux_gnu_linker}" \
             --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
             -t "$custom_image" \
             -f ../.github/docker/rb-sys-protoc.Dockerfile \
@@ -70,13 +88,6 @@ jobs:
         id: cross-gem
         working-directory: ./temporalio
         run: |
-          # aws-lc-sys rejects the Ubuntu 20.04 GCC 9 toolchain in the
-          # current rb-sys x86_64 Linux image, so use GCC 10 in the
-          # derived image for that target.
-          if [[ "${{ matrix.rubyPlatform }}" == "x86_64-linux" ]]; then
-            export CC_x86_64_unknown_linux_gnu=gcc-10
-            export CXX_x86_64_unknown_linux_gnu=g++-10
-          fi
           RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform "${{ matrix.rubyPlatform }}" --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
           echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> "$GITHUB_OUTPUT"
 
