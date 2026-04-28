@@ -17,6 +17,14 @@ RUN case "$TARGETARCH" in \
 
 FROM ${BASE_IMAGE}
 
+ARG EXTRA_APT_PACKAGES=""
+
+RUN if [ -n "$EXTRA_APT_PACKAGES" ]; then \
+      apt-get update && \
+      apt-get install -y --no-install-recommends $EXTRA_APT_PACKAGES && \
+      rm -rf /var/lib/apt/lists/*; \
+    fi
+
 COPY --from=protoc /opt/protoc/bin/protoc /usr/local/bin/protoc
 COPY --from=protoc /opt/protoc/include /usr/local/include
 

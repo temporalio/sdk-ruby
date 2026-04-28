@@ -48,10 +48,15 @@ jobs:
         run: |
           gem install rb_sys --no-document
           rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
+          extra_apt_packages=""
+          if [[ "${{ matrix.rubyPlatform }}" == "x86_64-linux" ]]; then
+            extra_apt_packages="gcc-10 g++-10"
+          fi
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
           docker build \
             --platform linux/amd64 \
             --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
+            --build-arg EXTRA_APT_PACKAGES="${extra_apt_packages}" \
             --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
             -t "$custom_image" \
             -f ../.github/docker/rb-sys-protoc.Dockerfile \
@@ -66,11 +71,11 @@ jobs:
         working-directory: ./temporalio
         run: |
           # aws-lc-sys rejects the Ubuntu 20.04 GCC 9 toolchain in the
-          # current rb-sys x86_64 Linux image, but clang-12 is already
-          # available there and passes the compiler self-check.
+          # current rb-sys x86_64 Linux image, so use GCC 10 in the
+          # derived image for that target.
           if [[ "${{ matrix.rubyPlatform }}" == "x86_64-linux" ]]; then
-            export CC_x86_64_unknown_linux_gnu=clang-12
-            export CXX_x86_64_unknown_linux_gnu=clang++-12
+            export CC_x86_64_unknown_linux_gnu=gcc-10
+            export CXX_x86_64_unknown_linux_gnu=g++-10
           fi
           RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform "${{ matrix.rubyPlatform }}" --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
           echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> "$GITHUB_OUTPUT"
