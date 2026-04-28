@@ -45,7 +45,7 @@ module Temporalio
             def clear_principal: () -> void
 
             # The raw details of the operation.
-            attr_accessor raw_details(): ::Google::Protobuf::Struct[::String, untyped]?
+            attr_accessor raw_details(): ::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value]?
             def has_raw_details?: () -> bool
             def clear_raw_details: () -> void
 
@@ -72,8 +72,8 @@ module Temporalio
               "log_id" => (::String | ::Symbol)?,
               principal: (::Temporalio::Api::Cloud::AuditLog::V1::Principal | ::Temporalio::Api::Cloud::AuditLog::V1::Principal::init_map)?,
               "principal" => (::Temporalio::Api::Cloud::AuditLog::V1::Principal | ::Temporalio::Api::Cloud::AuditLog::V1::Principal::init_map)?,
-              raw_details: (::Google::Protobuf::Struct[::String, untyped] | ::Google::Protobuf::Struct[::String, untyped])?,
-              "raw_details" => (::Google::Protobuf::Struct[::String, untyped] | ::Google::Protobuf::Struct[::String, untyped])?,
+              raw_details: (::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value] | ::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value])?,
+              "raw_details" => (::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value] | ::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value])?,
               x_forwarded_for: (::String | ::Symbol)?,
               "x_forwarded_for" => (::String | ::Symbol)?,
               async_operation_id: (::String | ::Symbol)?,
@@ -89,7 +89,7 @@ module Temporalio
               | ("version" name) -> ::Integer
               | ("log_id" name) -> ::String
               | ("principal" name) -> ::Temporalio::Api::Cloud::AuditLog::V1::Principal?
-              | ("raw_details" name) -> ::Google::Protobuf::Struct[::String, untyped]?
+              | ("raw_details" name) -> ::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value]?
               | ("x_forwarded_for" name) -> ::String
               | ("async_operation_id" name) -> ::String
 
@@ -100,7 +100,7 @@ module Temporalio
               | ("version" name, (::Integer | ::Float) value) -> void
               | ("log_id" name, (::String | ::Symbol) value) -> void
               | ("principal" name, ::Temporalio::Api::Cloud::AuditLog::V1::Principal? value) -> void
-              | ("raw_details" name, ::Google::Protobuf::Struct[::String, untyped]? value) -> void
+              | ("raw_details" name, ::Google::Protobuf::Struct[::String, ::Google::Protobuf::Value]? value) -> void
               | ("x_forwarded_for" name, (::String | ::Symbol) value) -> void
               | ("async_operation_id" name, (::String | ::Symbol) value) -> void
           end
