@@ -17,6 +17,24 @@ RUN case "$TARGETARCH" in \
 
 FROM ${BASE_IMAGE}
 
+ARG GCC_VERSION=""
+
+RUN if [ -n "$GCC_VERSION" ]; then \
+      apt-get update && \
+      apt-get install -y --no-install-recommends gcc-${GCC_VERSION} g++-${GCC_VERSION} && \
+      rm -rf /var/lib/apt/lists/*; \
+    fi
+
+RUN touch /etc/rubybashrc && \
+    if [ -n "$GCC_VERSION" ]; then \
+      echo "export CC=gcc-${GCC_VERSION}" >> /etc/rubybashrc; \
+      echo "export CXX=g++-${GCC_VERSION}" >> /etc/rubybashrc; \
+      echo "export AR=gcc-ar-${GCC_VERSION}" >> /etc/rubybashrc; \
+      echo "export CC_x86_64_unknown_linux_gnu=gcc-${GCC_VERSION}" >> /etc/rubybashrc; \
+      echo "export CXX_x86_64_unknown_linux_gnu=g++-${GCC_VERSION}" >> /etc/rubybashrc; \
+      echo "export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=gcc-${GCC_VERSION}" >> /etc/rubybashrc; \
+    fi
+
 COPY --from=protoc /opt/protoc/bin/protoc /usr/local/bin/protoc
 COPY --from=protoc /opt/protoc/include /usr/local/include
 

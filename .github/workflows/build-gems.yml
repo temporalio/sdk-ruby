@@ -17,7 +17,15 @@ jobs:
       matrix:
         # TODO(cretz): Enable x64-mingw-ucrt if we can figure out Windows issue, see
         # https://github.com/temporalio/sdk-ruby/issues/172
-        rubyPlatform: ["aarch64-linux", "aarch64-linux-musl", "x86_64-linux", "x86_64-linux-musl", "arm64-darwin", "x86_64-darwin"]
+        include:
+          - rubyPlatform: aarch64-linux
+          - rubyPlatform: aarch64-linux-musl
+          # aws-lc-rs refuses to use GCC version included in image due to compiler bug
+          - rubyPlatform: x86_64-linux
+            gccVersion: "10"
+          - rubyPlatform: x86_64-linux-musl
+          - rubyPlatform: arm64-darwin
+          - rubyPlatform: x86_64-darwin
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -51,6 +59,7 @@ jobs:
           docker build \
             --platform linux/amd64 \
             --build-arg BASE_IMAGE="rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}" \
+            --build-arg GCC_VERSION="${{ matrix.gccVersion || '' }}" \
             --build-arg PROTOC_VERSION="${PROTOC_VERSION}" \
             -t "$custom_image" \
             -f ../.github/docker/rb-sys-protoc.Dockerfile \
