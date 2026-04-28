@@ -1,5 +1,6 @@
 name: Build Gems
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -64,6 +65,13 @@ jobs:
         id: cross-gem
         working-directory: ./temporalio
         run: |
+          # aws-lc-sys rejects the Ubuntu 20.04 GCC 9 toolchain in the
+          # current rb-sys x86_64 Linux image, but clang-12 is already
+          # available there and passes the compiler self-check.
+          if [[ "${{ matrix.rubyPlatform }}" == "x86_64-linux" ]]; then
+            export CC_x86_64_unknown_linux_gnu=clang-12
+            export CXX_x86_64_unknown_linux_gnu=clang++-12
+          fi
           RCD_IMAGE="${{ steps.build-rb-sys-dock-image.outputs.image }}" rb-sys-dock --platform "${{ matrix.rubyPlatform }}" --ruby-versions "3.3,3.4,4.0" --mount-toolchains --build
           echo "gem-path=$(find pkg -name '*-${{ matrix.rubyPlatform }}.gem')" >> "$GITHUB_OUTPUT"
 
