@@ -20,7 +20,7 @@ jobs:
         include:
           - rubyPlatform: aarch64-linux
           - rubyPlatform: aarch64-linux-musl
-          # aws-lc-rs fails to refuses to use GCC version included in image due to compiler bug
+          # aws-lc-rs refuses to use GCC version included in image due to compiler bug
           - rubyPlatform: x86_64-linux
             gccVersion: "10"
           - rubyPlatform: x86_64-linux-musl
