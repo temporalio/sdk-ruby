@@ -102,18 +102,20 @@ it on retry.
 ```ruby
 require 'temporalio/contrib/tool_registry/session'
 
-results = ToolRegistry::AgenticSession.run_with_session do |session|
-  registry = ToolRegistry::Registry.new
-  registry.register(name: 'flag', description: '...',
-                    input_schema: { 'type' => 'object' }) do |input|
-    session.add_result(input)  # use add_result, not session.results <<
-    'ok' # this string is sent back to the LLM as the tool result
-  end
+activity :long_analysis do |prompt|
+  ToolRegistry::AgenticSession.run_with_session do |session|
+    registry = ToolRegistry::Registry.new
+    registry.register(name: 'flag', description: '...',
+                      input_schema: { 'type' => 'object' }) do |input|
+      session.add_result(input)  # use add_result, not session.results <<
+      'ok' # this string is sent back to the LLM as the tool result
+    end
 
-  provider = ToolRegistry::Providers::AnthropicProvider.new(
-    registry, 'your system prompt', api_key: ENV['ANTHROPIC_API_KEY'])
-  session.run_tool_loop(provider, registry, prompt)
-  session.results  # return value of block = return value of run_with_session
+    provider = ToolRegistry::Providers::AnthropicProvider.new(
+      registry, 'your system prompt', api_key: ENV['ANTHROPIC_API_KEY'])
+    session.run_tool_loop(provider, registry, prompt)
+    session.results  # return value of block = return value of run_with_session
+  end
 end
 ```
 
