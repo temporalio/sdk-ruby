@@ -50,6 +50,21 @@ module Temporalio
     # workflow code.
     AUTO_UPGRADE =
       Api::Enums::V1::ContinueAsNewVersioningBehavior::CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_AUTO_UPGRADE
+    # Use the Ramping Version of the workflow's task queue at start time, regardless of the workflow's
+    # Target Version (according to f(workflow_id, ramp_percentage)). After the first workflow task completes,
+    # the workflow will use whatever Versioning Behavior it is annotated with. If there is no Ramping
+    # Version by the time that the first workflow task is dispatched, it will be sent to the Current Version.
+    #
+    # It is highly discouraged to use this if the workflow is annotated with AutoUpgrade behavior, because
+    # this setting ONLY applies to the first task of the workflow. If, after the first task, the workflow
+    # is AutoUpgrade, it will behave like a normal AutoUpgrade workflow and go to the Target Version, which
+    # may be the Current Version instead of the Ramping Version.
+    #
+    # Note that if the workflow being continued has a Pinned override, that override will be inherited by the
+    # new workflow run regardless of the ContinueAsNewVersioningBehavior specified in the continue-as-new
+    # command. Versioning Override always takes precedence until it's removed manually via UpdateWorkflowExecutionOptions.
+    USE_RAMPING_VERSION =
+      Api::Enums::V1::ContinueAsNewVersioningBehavior::CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_USE_RAMPING_VERSION
   end
 
   # Specifies why the server suggests continue-as-new. This is currently experimental.
