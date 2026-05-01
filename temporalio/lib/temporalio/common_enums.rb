@@ -62,7 +62,8 @@ module Temporalio
     #
     # Note that if the workflow being continued has a Pinned override, that override will be inherited by the
     # new workflow run regardless of the ContinueAsNewVersioningBehavior specified in the continue-as-new
-    # command. Versioning Override always takes precedence until it's removed manually via UpdateWorkflowExecutionOptions.
+    # command. Versioning Override always takes precedence until it's removed manually via
+    # UpdateWorkflowExecutionOptions.
     USE_RAMPING_VERSION =
       Api::Enums::V1::ContinueAsNewVersioningBehavior::CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_USE_RAMPING_VERSION
   end
