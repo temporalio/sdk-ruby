@@ -672,7 +672,8 @@ module Temporalio
       #   current workflow.
       # @param initial_versioning_behavior [ContinueAsNewVersioningBehavior::enum, nil] Versioning behavior for the
       #   first task of the new run. Set to {ContinueAsNewVersioningBehavior::AUTO_UPGRADE} to upgrade a pinned workflow
-      #   to the latest version on continue-as-new. This is currently experimental.
+      #   to the latest version on continue-as-new or {ContinueAsNewVersioningBehavior::USE_RAMPING_VERSION} to start on
+      #   the task queue's Ramping Version. This is currently experimental.
       def initialize(
         *args,
         workflow: nil,
