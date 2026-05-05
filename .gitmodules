@@ -1,3 +1,4 @@
 [submodule "temporalio/ext/sdk-core"]
 	path = temporalio/ext/sdk-core
-	url = https://github.com/temporalio/sdk-core.git
+	url = https://github.com/temporalio/sdk-rust.git
+	branch = main
