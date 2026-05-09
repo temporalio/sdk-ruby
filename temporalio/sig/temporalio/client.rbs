@@ -24,6 +24,30 @@ module Temporalio
       def with: (**untyped) -> Options
     end
 
+    class ListNexusOperationPage
+      attr_reader operations: Array[untyped]
+      attr_reader next_page_token: String?
+
+      def initialize: (
+        operations: Array[untyped],
+        next_page_token: String?
+      ) -> void
+    end
+
+    class NexusOperationExecutionCount
+      attr_reader count: Integer
+      attr_reader groups: Array[NexusOperationExecutionCount::AggregationGroup]
+
+      def initialize: (Integer count, Array[NexusOperationExecutionCount::AggregationGroup] groups) -> void
+
+      class AggregationGroup
+        attr_reader count: Integer
+        attr_reader group_values: Array[Object?]
+
+        def initialize: (Integer count, Array[Object?] group_values) -> void
+      end
+    end
+
     class ListWorkflowPage
       attr_reader executions: Array[WorkflowExecution]
       attr_reader next_page_token: String?
@@ -192,6 +216,33 @@ module Temporalio
       ?String query,
       ?rpc_options: RPCOptions?
     ) -> Enumerator[Schedule::List::Description, Schedule::List::Description]
+
+    def create_nexus_client: (
+      String endpoint,
+      String service
+    ) -> NexusClient
+
+    def nexus_operation_handle: (
+      String operation_id,
+      ?run_id: String?
+    ) -> NexusOperationHandle
+
+    def list_nexus_operations: (
+      ?String? query,
+      ?rpc_options: RPCOptions?
+    ) -> Enumerator[untyped, untyped]
+
+    def list_nexus_operation_page: (
+      ?String? query,
+      ?next_page_token: String?,
+      ?page_size: Integer?,
+      ?rpc_options: RPCOptions?
+    ) -> ListNexusOperationPage
+
+    def count_nexus_operations: (
+      ?String? query,
+      ?rpc_options: RPCOptions?
+    ) -> NexusOperationExecutionCount
 
     def async_activity_handle: (
       String | ActivityIDReference task_token_or_id_reference

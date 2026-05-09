@@ -62,6 +62,9 @@ Also see:
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
     - [Activity Testing](#activity-testing)
+  - [Nexus](#nexus)
+    - [Nexus in Workflows](#nexus-in-workflows)
+    - [Standalone Nexus Operations](#standalone-nexus-operations)
   - [Telemetry](#telemetry)
     - [Metrics](#metrics)
     - [OpenTelemetry Tracing](#opentelemetry-tracing)
@@ -1091,6 +1094,101 @@ it will raise the error raised in the activity.
 
 The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
 activity.
+
+### Nexus
+
+[Nexus](https://docs.temporal.io/nexus) is a feature of Temporal that allows calling across namespace and cluster
+boundaries. Nexus operations can be invoked from within workflows or as standalone operations from client code.
+
+**WARNING: Nexus support is experimental.**
+
+#### Nexus in Workflows
+
+Within a workflow, a Nexus client can be created and used to start or execute operations:
+
+```ruby
+class MyWorkflow < Temporalio::Workflow::Definition
+  def execute
+    client = Temporalio::Workflow.create_nexus_client(
+      endpoint: 'my-endpoint',
+      service: 'my-service'
+    )
+
+    # Execute a synchronous operation and wait for the result
+    result = client.execute_operation('my-operation', 'some-input',
+                                     schedule_to_close_timeout: 30)
+
+    # Or start an async operation and get a handle
+    handle = client.start_operation('my-async-operation', { key: 'value' },
+                                   schedule_to_close_timeout: 60)
+    result = handle.result
+  end
+end
+```
+
+#### Standalone Nexus Operations
+
+Nexus operations can also be started directly from client code, outside of workflows. This mirrors the workflow Nexus
+API but operates via direct gRPC calls to the Temporal server.
+
+Create a standalone Nexus client:
+
+```ruby
+nexus_client = client.create_nexus_client('my-endpoint', 'my-service')
+```
+
+Start an operation and wait for the result:
+
+```ruby
+result = nexus_client.execute_operation('my-operation', 'some-input',
+                                       id: SecureRandom.uuid,
+                                       schedule_to_close_timeout: 30)
+```
+
+Or start an operation and get a handle for async interaction:
+
+```ruby
+handle = nexus_client.start_operation('my-operation', 'some-input',
+                                     id: 'my-operation-id',
+                                     schedule_to_close_timeout: 60)
+
+# Or with a generated ID
+handle = nexus_client.start_operation('my-operation', 'some-input',
+                                     id: SecureRandom.uuid,
+                                     schedule_to_close_timeout: 60)
+
+# Wait for the result
+result = handle.result
+
+# Describe the operation
+description = handle.describe
+
+# Cancel the operation
+handle.cancel(reason: 'no longer needed')
+
+# Terminate the operation
+handle.terminate(reason: 'force stop')
+```
+
+Get a handle to an existing operation by ID:
+
+```ruby
+handle = client.nexus_operation_handle('my-operation-id')
+handle.describe
+```
+
+List and count operations:
+
+```ruby
+# List all operations (auto-paginates)
+client.list_nexus_operations.each { |op| puts op }
+
+# List one page at a time
+page = client.list_nexus_operation_page(page_size: 10)
+
+# Count operations
+count = client.count_nexus_operations
+```
 
 ### Telemetry
 

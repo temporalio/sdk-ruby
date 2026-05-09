@@ -84,6 +84,36 @@ module Temporalio
       Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_TOO_MANY_UPDATES
   end
 
+  # How already-in-use Nexus operation IDs are handled on start.
+  #
+  # WARNING: Standalone Nexus operations are experimental.
+  module NexusOperationIDReusePolicy
+    # Allow starting a Nexus operation using the same operation ID.
+    ALLOW_DUPLICATE =
+      Api::Enums::V1::NexusOperationIdReusePolicy::NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE
+    # Allow starting a Nexus operation using the same operation ID, only when the last operation's final state is one
+    # of failed, canceled, terminated, or timed out.
+    ALLOW_DUPLICATE_FAILED_ONLY =
+      Api::Enums::V1::NexusOperationIdReusePolicy::NEXUS_OPERATION_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY
+    # Do not permit re-use of the operation ID.
+    REJECT_DUPLICATE =
+      Api::Enums::V1::NexusOperationIdReusePolicy::NEXUS_OPERATION_ID_REUSE_POLICY_REJECT_DUPLICATE
+  end
+
+  # How already-running Nexus operations of the same ID are handled on start.
+  #
+  # WARNING: Standalone Nexus operations are experimental.
+  module NexusOperationIDConflictPolicy
+    # Unset.
+    UNSPECIFIED =
+      Api::Enums::V1::NexusOperationIdConflictPolicy::NEXUS_OPERATION_ID_CONFLICT_POLICY_UNSPECIFIED
+    # Don't start a new operation, instead fail with already-started error.
+    FAIL = Api::Enums::V1::NexusOperationIdConflictPolicy::NEXUS_OPERATION_ID_CONFLICT_POLICY_FAIL
+    # Don't start a new operation, instead return a handle for the running operation.
+    USE_EXISTING =
+      Api::Enums::V1::NexusOperationIdConflictPolicy::NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING
+  end
+
   # Specifies when a workflow might move from a worker of one Build Id to another.
   module VersioningBehavior
     # Unspecified versioning behavior. By default, workers opting into worker versioning will

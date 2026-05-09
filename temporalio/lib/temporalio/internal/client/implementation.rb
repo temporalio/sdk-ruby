@@ -21,6 +21,7 @@ require 'temporalio/error/failure'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/runtime'
 require 'temporalio/search_attributes'
+require 'temporalio/client/nexus_operation_handle'
 require 'temporalio/workflow/definition'
 
 module Temporalio
@@ -928,6 +929,169 @@ module Temporalio
             )
           end
           nil
+        end
+
+        def start_nexus_operation(input)
+          req = Api::WorkflowService::V1::StartNexusOperationExecutionRequest.new(
+            namespace: @client.namespace,
+            identity: @client.connection.identity,
+            request_id: SecureRandom.uuid,
+            operation_id: input.operation_id,
+            endpoint: input.endpoint,
+            service: input.service,
+            operation: input.operation,
+            schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
+            schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
+            start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
+            id_reuse_policy: input.id_reuse_policy,
+            id_conflict_policy: input.id_conflict_policy,
+            search_attributes: input.search_attributes&._to_proto,
+            nexus_header: input.nexus_header,
+            user_metadata: ProtoUtils.to_user_metadata(input.static_summary, nil, @client.data_converter)
+          )
+          req.input = @client.data_converter.to_payload(input.input) unless input.input.nil?
+
+          begin
+            resp = @client.workflow_service.start_nexus_operation_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+          rescue Error::RPCError => e
+            if e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+              details = e.grpc_status.details.first.unpack(
+                Api::ErrorDetails::V1::NexusOperationExecutionAlreadyStartedFailure
+              )
+              if details
+                raise Error::NexusOperationAlreadyStartedError.new(
+                  operation_id: input.operation_id,
+                  run_id: details.run_id
+                )
+              end
+            end
+            raise
+          end
+
+          Temporalio::Client::NexusOperationHandle.new(
+            client: @client,
+            operation_id: input.operation_id,
+            run_id: resp.run_id
+          )
+        end
+
+        def describe_nexus_operation(input)
+          req = Api::WorkflowService::V1::DescribeNexusOperationExecutionRequest.new(
+            namespace: @client.namespace,
+            operation_id: input.operation_id,
+            run_id: input.run_id || ''
+          )
+          @client.workflow_service.describe_nexus_operation_execution(
+            req,
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+        end
+
+        def cancel_nexus_operation(input)
+          @client.workflow_service.request_cancel_nexus_operation_execution(
+            Api::WorkflowService::V1::RequestCancelNexusOperationExecutionRequest.new(
+              namespace: @client.namespace,
+              operation_id: input.operation_id,
+              run_id: input.run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def terminate_nexus_operation(input)
+          @client.workflow_service.terminate_nexus_operation_execution(
+            Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest.new(
+              namespace: @client.namespace,
+              operation_id: input.operation_id,
+              run_id: input.run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def list_nexus_operation_page(input)
+          req = Api::WorkflowService::V1::ListNexusOperationExecutionsRequest.new(
+            namespace: @client.namespace,
+            query: input.query || '',
+            next_page_token: input.next_page_token,
+            page_size: input.page_size
+          )
+          resp = @client.workflow_service.list_nexus_operation_executions(
+            req,
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::ListNexusOperationPage.new(
+            operations: resp.operations.to_a,
+            next_page_token: resp.next_page_token
+          )
+        end
+
+        def count_nexus_operations(input)
+          resp = @client.workflow_service.count_nexus_operation_executions(
+            Api::WorkflowService::V1::CountNexusOperationExecutionsRequest.new(
+              namespace: @client.namespace,
+              query: input.query || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::NexusOperationExecutionCount.new(
+            resp.count,
+            resp.groups.map do |group|
+              Temporalio::Client::NexusOperationExecutionCount::AggregationGroup.new(
+                group.count,
+                group.group_values.map { |payload| SearchAttributes._value_from_payload(payload) }
+              )
+            end
+          )
+        end
+
+        def poll_nexus_operation(input)
+          req = Api::WorkflowService::V1::PollNexusOperationExecutionRequest.new(
+            namespace: @client.namespace,
+            operation_id: input.operation_id,
+            run_id: input.run_id || '',
+            wait_stage: Api::Enums::V1::NexusOperationWaitStage::NEXUS_OPERATION_WAIT_STAGE_CLOSED
+          )
+
+          loop do
+            resp = @client.workflow_service.poll_nexus_operation_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+
+            # Check which outcome field is set via the oneof
+            case resp.outcome
+            when :result
+              return @client.data_converter.from_payload(resp.result)
+            when :failure
+              cause = @client.data_converter.failure_converter.from_failure(resp.failure, @client.data_converter)
+              err = Error::NexusOperationFailedError.new(
+                operation_id: input.operation_id,
+                run_id: resp.run_id
+              )
+              raise Error._with_backtrace_and_cause(err, backtrace: nil, cause: cause)
+            when nil
+              # No outcome yet, continue polling
+            else
+              raise "Unknown Nexus operation outcome: #{resp.outcome}"
+            end
+          rescue Error::RPCError => e
+            # Retry on deadline exceeded (long-poll timeout), propagate all others including cancellation
+            raise unless e.code == Error::RPCError::Code::DEADLINE_EXCEEDED
+          rescue Error::CanceledError
+            raise
+          end
         end
       end
     end
