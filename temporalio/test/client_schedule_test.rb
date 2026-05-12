@@ -22,7 +22,8 @@ class ClientScheduleTest < Test
       static_summary: 'my-summary',
       static_details: 'my-details',
       execution_timeout: 1.23,
-      memo: { 'memokey1' => 'memoval1' }
+      memo: { 'memokey1' => 'memoval1' },
+      priority: Temporalio::Priority.new(priority_key: 2, fairness_key: 'tenant-a', fairness_weight: 1.5)
     )
     schedule = Temporalio::Client::Schedule.new(
       action:,
@@ -79,6 +80,7 @@ class ClientScheduleTest < Test
     assert_equal 'my-details', desc_action.static_details
     assert_equal action.execution_timeout, desc_action.execution_timeout
     assert_equal({ 'memokey1' => 'memoval1' }, desc_action.memo)
+    assert_equal action.priority, desc_action.priority
     assert_equal({ 'memokey2' => 'memoval2' }, desc.memo)
     # We want to test the entire returned spec, policy, and state. But server
     # side spec turns the cron into a calendar, so we will replicate in our

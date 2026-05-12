@@ -4,5 +4,5 @@ class WorkerWorkflowVersioningTest < Test
   def set_current_deployment_version: (untyped client, String task_queue, Temporalio::WorkerDeploymentVersion version) -> untyped
   def set_ramping_version: (untyped client, String task_queue, Temporalio::WorkerDeploymentVersion version, Float rate) -> untyped
   def wait_for_workflow_running_on_version: (untyped handle, String expected_build_id) -> void
-  def wait_for_worker_deployment_routing_config_propagation: (untyped client, String deployment_name, String expected_current_build_id) -> void
+  def wait_for_worker_deployment_routing_config_propagation: (untyped client, String deployment_name, String expected_current_build_id, ?String expected_ramping_build_id) -> void
 end

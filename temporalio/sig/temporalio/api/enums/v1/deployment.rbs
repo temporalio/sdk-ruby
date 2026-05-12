@@ -46,7 +46,6 @@ module Temporalio
         #     aip.dev/not-precedent: Call this status because it is . --)
         # Specify the drainage status for a Worker Deployment Version so users can decide whether they
         # can safely decommission the version.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         module VersionDrainageStatus
 
           # Drainage Status is not specified.
@@ -80,7 +79,6 @@ module Temporalio
         # - Whether or not Temporal Server considers this worker's version (Build ID) when dispatching
         #   tasks to it.
         # - Whether or not the workflows processed by this worker are versioned using the worker's version.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         module WorkerVersioningMode
 
           WORKER_VERSIONING_MODE_UNSPECIFIED: 0
@@ -122,7 +120,6 @@ module Temporalio
         # (-- api-linter: core::0216::synonyms=disabled
         #     aip.dev/not-precedent: Call this status because it is . --)
         # Specify the status of a Worker Deployment Version.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         module WorkerDeploymentVersionStatus
 
           WORKER_DEPLOYMENT_VERSION_STATUS_UNSPECIFIED: 0
@@ -150,17 +147,21 @@ module Temporalio
           # workflows are closed, they should decommission the version after it has been drained for that duration.
           WORKER_DEPLOYMENT_VERSION_STATUS_DRAINED: 5
 
+          # The Worker Deployment Version is created by user (via `CreateWorkerDeploymentVersion` API)
+          # but server has not seen any poller for it yet.
+          WORKER_DEPLOYMENT_VERSION_STATUS_CREATED: 6
+
           def self.lookup: (::Integer number) -> ::Symbol
 
 
           def self.resolve: (::Symbol name) -> ::Integer
 
 
-          type names = :WORKER_DEPLOYMENT_VERSION_STATUS_UNSPECIFIED | :WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE | :WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT | :WORKER_DEPLOYMENT_VERSION_STATUS_RAMPING | :WORKER_DEPLOYMENT_VERSION_STATUS_DRAINING | :WORKER_DEPLOYMENT_VERSION_STATUS_DRAINED
+          type names = :WORKER_DEPLOYMENT_VERSION_STATUS_UNSPECIFIED | :WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE | :WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT | :WORKER_DEPLOYMENT_VERSION_STATUS_RAMPING | :WORKER_DEPLOYMENT_VERSION_STATUS_DRAINING | :WORKER_DEPLOYMENT_VERSION_STATUS_DRAINED | :WORKER_DEPLOYMENT_VERSION_STATUS_CREATED
 
-          type strings = "WORKER_DEPLOYMENT_VERSION_STATUS_UNSPECIFIED" | "WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE" | "WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT" | "WORKER_DEPLOYMENT_VERSION_STATUS_RAMPING" | "WORKER_DEPLOYMENT_VERSION_STATUS_DRAINING" | "WORKER_DEPLOYMENT_VERSION_STATUS_DRAINED"
+          type strings = "WORKER_DEPLOYMENT_VERSION_STATUS_UNSPECIFIED" | "WORKER_DEPLOYMENT_VERSION_STATUS_INACTIVE" | "WORKER_DEPLOYMENT_VERSION_STATUS_CURRENT" | "WORKER_DEPLOYMENT_VERSION_STATUS_RAMPING" | "WORKER_DEPLOYMENT_VERSION_STATUS_DRAINING" | "WORKER_DEPLOYMENT_VERSION_STATUS_DRAINED" | "WORKER_DEPLOYMENT_VERSION_STATUS_CREATED"
 
-          type numbers = 0 | 1 | 2 | 3 | 4 | 5
+          type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6
         end
       end
     end

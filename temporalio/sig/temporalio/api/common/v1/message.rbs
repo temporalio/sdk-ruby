@@ -750,6 +750,80 @@ module Temporalio
                 ("job_id" name, (::String | ::Symbol) value) -> void
           end
 
+          # A link to an activity.
+          class Activity < ::Google::Protobuf::AbstractMessage
+
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            attr_reader activity_id(): ::String
+            attr_writer activity_id(): ::String | ::Symbol
+            def clear_activity_id: () -> void
+
+            attr_reader run_id(): ::String
+            attr_writer run_id(): ::String | ::Symbol
+            def clear_run_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              activity_id: (::String | ::Symbol)?,
+              "activity_id" => (::String | ::Symbol)?,
+              run_id: (::String | ::Symbol)?,
+              "run_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("activity_id" name) -> ::String
+              | ("run_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("activity_id" name, (::String | ::Symbol) value) -> void
+              | ("run_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          # A link to a standalone Nexus operation.
+          class NexusOperation < ::Google::Protobuf::AbstractMessage
+
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            attr_reader operation_id(): ::String
+            attr_writer operation_id(): ::String | ::Symbol
+            def clear_operation_id: () -> void
+
+            attr_reader run_id(): ::String
+            attr_writer run_id(): ::String | ::Symbol
+            def clear_run_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              operation_id: (::String | ::Symbol)?,
+              "operation_id" => (::String | ::Symbol)?,
+              run_id: (::String | ::Symbol)?,
+              "run_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("operation_id" name) -> ::String
+              | ("run_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("operation_id" name, (::String | ::Symbol) value) -> void
+              | ("run_id" name, (::String | ::Symbol) value) -> void
+          end
+
           attr_accessor workflow_event(): ::Temporalio::Api::Common::V1::Link::WorkflowEvent?
           def has_workflow_event?: () -> bool
           def clear_workflow_event: () -> void
@@ -758,7 +832,15 @@ module Temporalio
           def has_batch_job?: () -> bool
           def clear_batch_job: () -> void
 
-          attr_reader variant(): (::Temporalio::Api::Common::V1::Link::WorkflowEvent | ::Temporalio::Api::Common::V1::Link::BatchJob)?
+          attr_accessor activity(): ::Temporalio::Api::Common::V1::Link::Activity?
+          def has_activity?: () -> bool
+          def clear_activity: () -> void
+
+          attr_accessor nexus_operation(): ::Temporalio::Api::Common::V1::Link::NexusOperation?
+          def has_nexus_operation?: () -> bool
+          def clear_nexus_operation: () -> void
+
+          attr_reader variant(): (::Temporalio::Api::Common::V1::Link::WorkflowEvent | ::Temporalio::Api::Common::V1::Link::BatchJob | ::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::NexusOperation)?
           def has_variant?: () -> bool
           def clear_variant: () -> void
 
@@ -767,6 +849,10 @@ module Temporalio
             "workflow_event" => (::Temporalio::Api::Common::V1::Link::WorkflowEvent | ::Temporalio::Api::Common::V1::Link::WorkflowEvent::init_map)?,
             batch_job: (::Temporalio::Api::Common::V1::Link::BatchJob | ::Temporalio::Api::Common::V1::Link::BatchJob::init_map)?,
             "batch_job" => (::Temporalio::Api::Common::V1::Link::BatchJob | ::Temporalio::Api::Common::V1::Link::BatchJob::init_map)?,
+            activity: (::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::Activity::init_map)?,
+            "activity" => (::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::Activity::init_map)?,
+            nexus_operation: (::Temporalio::Api::Common::V1::Link::NexusOperation | ::Temporalio::Api::Common::V1::Link::NexusOperation::init_map)?,
+            "nexus_operation" => (::Temporalio::Api::Common::V1::Link::NexusOperation | ::Temporalio::Api::Common::V1::Link::NexusOperation::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -774,10 +860,46 @@ module Temporalio
           def []:
               ("workflow_event" name) -> ::Temporalio::Api::Common::V1::Link::WorkflowEvent?
             | ("batch_job" name) -> ::Temporalio::Api::Common::V1::Link::BatchJob?
+            | ("activity" name) -> ::Temporalio::Api::Common::V1::Link::Activity?
+            | ("nexus_operation" name) -> ::Temporalio::Api::Common::V1::Link::NexusOperation?
 
           def []=:
               ("workflow_event" name, ::Temporalio::Api::Common::V1::Link::WorkflowEvent? value) -> void
             | ("batch_job" name, ::Temporalio::Api::Common::V1::Link::BatchJob? value) -> void
+            | ("activity" name, ::Temporalio::Api::Common::V1::Link::Activity? value) -> void
+            | ("nexus_operation" name, ::Temporalio::Api::Common::V1::Link::NexusOperation? value) -> void
+        end
+
+        # Principal is an authenticated caller identity computed by the server from trusted
+        # authentication context.
+        class Principal < ::Google::Protobuf::AbstractMessage
+
+          # Low-cardinality category of the principal (e.g., "jwt", "users").
+          attr_reader type(): ::String
+          attr_writer type(): ::String | ::Symbol
+          def clear_type: () -> void
+
+          # Identifier within that category (e.g., sub JWT claim, email address).
+          attr_reader name(): ::String
+          attr_writer name(): ::String | ::Symbol
+          def clear_name: () -> void
+
+          type init_map = {
+            type: (::String | ::Symbol)?,
+            "type" => (::String | ::Symbol)?,
+            name: (::String | ::Symbol)?,
+            "name" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("type" name) -> ::String
+            | ("name" name) -> ::String
+
+          def []=:
+              ("type" name, (::String | ::Symbol) value) -> void
+            | ("name" name, (::String | ::Symbol) value) -> void
         end
 
         # Priority contains metadata that controls relative ordering of task processing
@@ -911,6 +1033,44 @@ module Temporalio
 
           def []=:
               ("worker_instance_key" name, ((::String | ::Symbol)?) value) -> void
+        end
+
+        # When starting an execution with a conflict policy that uses an existing execution and there is already an existing
+        # running execution, OnConflictOptions defines actions to be taken on the existing running execution.
+        class OnConflictOptions < ::Google::Protobuf::AbstractMessage
+
+          # Attaches the request ID to the running execution.
+          attr_accessor attach_request_id(): bool
+          def clear_attach_request_id: () -> void
+
+          # Attaches the completion callbacks to the running execution.
+          attr_accessor attach_completion_callbacks(): bool
+          def clear_attach_completion_callbacks: () -> void
+
+          # Attaches the links to the running execution.
+          attr_accessor attach_links(): bool
+          def clear_attach_links: () -> void
+
+          type init_map = {
+            attach_request_id: bool?,
+            "attach_request_id" => bool?,
+            attach_completion_callbacks: bool?,
+            "attach_completion_callbacks" => bool?,
+            attach_links: bool?,
+            "attach_links" => bool?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("attach_request_id" name) -> bool
+            | ("attach_completion_callbacks" name) -> bool
+            | ("attach_links" name) -> bool
+
+          def []=:
+              ("attach_request_id" name, bool value) -> void
+            | ("attach_completion_callbacks" name, bool value) -> void
+            | ("attach_links" name, bool value) -> void
         end
       end
     end

@@ -325,6 +325,15 @@ module Temporalio
           attr_writer canceled_reason(): ::String | ::Symbol
           def clear_canceled_reason: () -> void
 
+          # Links to related entities, such as the entity that started this activity.
+          attr_accessor links(): ::Google::Protobuf::RepeatedField
+          def clear_links: () -> void
+
+          # Total number of heartbeats recorded across all attempts of this activity, including retries.
+          attr_reader total_heartbeat_count(): ::Integer
+          attr_writer total_heartbeat_count(): ::Integer | ::Float
+          def clear_total_heartbeat_count: () -> void
+
           type init_map = {
             activity_id: (::String | ::Symbol)?,
             "activity_id" => (::String | ::Symbol)?,
@@ -390,6 +399,10 @@ module Temporalio
             "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
             canceled_reason: (::String | ::Symbol)?,
             "canceled_reason" => (::String | ::Symbol)?,
+            links: ::Array[::Temporalio::Api::Common::V1::Link]?,
+            "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
+            total_heartbeat_count: (::Integer | ::Float)?,
+            "total_heartbeat_count" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -427,6 +440,8 @@ module Temporalio
             | ("header" name) -> ::Temporalio::Api::Common::V1::Header?
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
             | ("canceled_reason" name) -> ::String
+            | ("links" name) -> ::Google::Protobuf::RepeatedField
+            | ("total_heartbeat_count" name) -> ::Integer
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -461,6 +476,8 @@ module Temporalio
             | ("header" name, ::Temporalio::Api::Common::V1::Header? value) -> void
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
             | ("canceled_reason" name, (::String | ::Symbol) value) -> void
+            | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("total_heartbeat_count" name, (::Integer | ::Float) value) -> void
         end
 
         # Limited activity information returned in the list response.
@@ -581,6 +598,69 @@ module Temporalio
             | ("state_transition_count" name, (::Integer | ::Float) value) -> void
             | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
             | ("execution_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+        end
+
+        # CallbackInfo contains the state of an attached activity callback.
+        class CallbackInfo < ::Google::Protobuf::AbstractMessage
+          # Trigger for when the activity is closed.
+          class ActivityClosed < ::Google::Protobuf::AbstractMessage
+
+            type init_map = {
+            }
+
+            def initialize: (?init_map initial_value) -> void
+          end
+
+          class Trigger < ::Google::Protobuf::AbstractMessage
+
+            attr_accessor activity_closed(): ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed?
+            def has_activity_closed?: () -> bool
+            def clear_activity_closed: () -> void
+
+            attr_reader variant(): ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed?
+            def has_variant?: () -> bool
+            def clear_variant: () -> void
+
+            type init_map = {
+              activity_closed: (::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed | ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed::init_map)?,
+              "activity_closed" => (::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed | ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("activity_closed" name) -> ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed?
+
+            def []=:
+                ("activity_closed" name, ::Temporalio::Api::Activity::V1::CallbackInfo::ActivityClosed? value) -> void
+          end
+
+          # Trigger for this callback.
+          attr_accessor trigger(): ::Temporalio::Api::Activity::V1::CallbackInfo::Trigger?
+          def has_trigger?: () -> bool
+          def clear_trigger: () -> void
+
+          # Common callback info.
+          attr_accessor info(): ::Temporalio::Api::Callback::V1::CallbackInfo?
+          def has_info?: () -> bool
+          def clear_info: () -> void
+
+          type init_map = {
+            trigger: (::Temporalio::Api::Activity::V1::CallbackInfo::Trigger | ::Temporalio::Api::Activity::V1::CallbackInfo::Trigger::init_map)?,
+            "trigger" => (::Temporalio::Api::Activity::V1::CallbackInfo::Trigger | ::Temporalio::Api::Activity::V1::CallbackInfo::Trigger::init_map)?,
+            info: (::Temporalio::Api::Callback::V1::CallbackInfo | ::Temporalio::Api::Callback::V1::CallbackInfo::init_map)?,
+            "info" => (::Temporalio::Api::Callback::V1::CallbackInfo | ::Temporalio::Api::Callback::V1::CallbackInfo::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("trigger" name) -> ::Temporalio::Api::Activity::V1::CallbackInfo::Trigger?
+            | ("info" name) -> ::Temporalio::Api::Callback::V1::CallbackInfo?
+
+          def []=:
+              ("trigger" name, ::Temporalio::Api::Activity::V1::CallbackInfo::Trigger? value) -> void
+            | ("info" name, ::Temporalio::Api::Callback::V1::CallbackInfo? value) -> void
         end
       end
     end

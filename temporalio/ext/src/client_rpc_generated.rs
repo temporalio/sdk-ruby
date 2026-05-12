@@ -26,6 +26,14 @@ impl Client {
                     workflow_service,
                     count_activity_executions
                 ),
+                "count_nexus_operation_executions" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    count_nexus_operation_executions
+                ),
                 "count_schedules" => rpc_call!(
                     self,
                     callback,
@@ -50,6 +58,22 @@ impl Client {
                     workflow_service,
                     create_schedule
                 ),
+                "create_worker_deployment" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    create_worker_deployment
+                ),
+                "create_worker_deployment_version" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    create_worker_deployment_version
+                ),
                 "create_workflow_rule" => rpc_call!(
                     self,
                     callback,
@@ -65,6 +89,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     delete_activity_execution
+                ),
+                "delete_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    delete_nexus_operation_execution
                 ),
                 "delete_schedule" => rpc_call!(
                     self,
@@ -145,6 +177,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     describe_namespace
+                ),
+                "describe_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    describe_nexus_operation_execution
                 ),
                 "describe_schedule" => rpc_call!(
                     self,
@@ -346,6 +386,14 @@ impl Client {
                     workflow_service,
                     list_namespaces
                 ),
+                "list_nexus_operation_executions" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    list_nexus_operation_executions
+                ),
                 "list_open_workflow_executions" => rpc_call!(
                     self,
                     callback,
@@ -450,6 +498,14 @@ impl Client {
                     workflow_service,
                     poll_activity_task_queue
                 ),
+                "poll_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    poll_nexus_operation_execution
+                ),
                 "poll_nexus_task_queue" => rpc_call!(
                     self,
                     callback,
@@ -521,6 +577,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     request_cancel_activity_execution
+                ),
+                "request_cancel_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    request_cancel_nexus_operation_execution
                 ),
                 "request_cancel_workflow_execution" => rpc_call!(
                     self,
@@ -722,6 +786,14 @@ impl Client {
                     workflow_service,
                     start_batch_operation
                 ),
+                "start_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    start_nexus_operation_execution
+                ),
                 "start_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -745,6 +817,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     terminate_activity_execution
+                ),
+                "terminate_nexus_operation_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    terminate_nexus_operation_execution
                 ),
                 "terminate_workflow_execution" => rpc_call!(
                     self,
@@ -826,6 +906,14 @@ impl Client {
                     workflow_service,
                     update_worker_config
                 ),
+                "update_worker_deployment_version_compute_config" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    update_worker_deployment_version_compute_config
+                ),
                 "update_worker_deployment_version_metadata" => rpc_call!(
                     self,
                     callback,
@@ -857,6 +945,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     update_workflow_execution_options
+                ),
+                "validate_worker_deployment_version_compute_config" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    validate_worker_deployment_version_compute_config
                 ),
                 _ => Err(error!("Unknown RPC call {}", call.rpc)),
             },
@@ -976,6 +1072,14 @@ impl Client {
                     cloud_service,
                     add_user_group_member
                 ),
+                "create_account_audit_log_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    create_account_audit_log_sink
+                ),
                 "create_api_key" => rpc_call!(
                     self,
                     callback,
@@ -983,6 +1087,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     create_api_key
+                ),
+                "create_billing_report" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    create_billing_report
                 ),
                 "create_connectivity_rule" => rpc_call!(
                     self,
@@ -1039,6 +1151,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     create_user_group
+                ),
+                "delete_account_audit_log_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    delete_account_audit_log_sink
                 ),
                 "delete_api_key" => rpc_call!(
                     self,
@@ -1128,6 +1248,22 @@ impl Client {
                     cloud_service,
                     get_account
                 ),
+                "get_account_audit_log_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_account_audit_log_sink
+                ),
+                "get_account_audit_log_sinks" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_account_audit_log_sinks
+                ),
                 "get_api_key" => rpc_call!(
                     self,
                     callback,
@@ -1152,6 +1288,22 @@ impl Client {
                     cloud_service,
                     get_async_operation
                 ),
+                "get_audit_logs" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_audit_logs
+                ),
+                "get_billing_report" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_billing_report
+                ),
                 "get_connectivity_rule" => rpc_call!(
                     self,
                     callback,
@@ -1168,6 +1320,14 @@ impl Client {
                     cloud_service,
                     get_connectivity_rules
                 ),
+                "get_current_identity" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_current_identity
+                ),
                 "get_namespace" => rpc_call!(
                     self,
                     callback,
@@ -1175,6 +1335,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     get_namespace
+                ),
+                "get_namespace_capacity_info" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_namespace_capacity_info
                 ),
                 "get_namespace_export_sink" => rpc_call!(
                     self,
@@ -1328,6 +1496,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     update_account
+                ),
+                "update_account_audit_log_sink" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    update_account_audit_log_sink
                 ),
                 "update_api_key" => rpc_call!(
                     self,

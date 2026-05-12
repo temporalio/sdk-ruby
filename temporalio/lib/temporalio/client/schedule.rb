@@ -3,6 +3,7 @@
 require 'temporalio/api'
 require 'temporalio/converters'
 require 'temporalio/internal/proto_utils'
+require 'temporalio/priority'
 require 'temporalio/retry_policy'
 require 'temporalio/search_attributes'
 
@@ -175,6 +176,7 @@ module Temporalio
           :retry_policy,
           :memo,
           :search_attributes,
+          :priority,
           :arg_hints,
           :headers
         )
@@ -209,6 +211,8 @@ module Temporalio
         #   @return [Hash<String, Object>, nil] Memo for the workflow.
         # @!attribute search_attributes
         #   @return [SearchAttributes, nil] Search attributes for the workflow.
+        # @!attribute priority
+        #   @return [Priority] Priority of the workflow. This is currently experimental.
         # @!attribute arg_hints
         #   @return [Array<Object>, nil] Converter hints for workflow arguments. This is only user-set (e.g. on create)
         #     and is not persisted and therefore will not be set when describing a workflow.
@@ -239,6 +243,7 @@ module Temporalio
             # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
             # @param memo [Hash<String, Object>, nil] Memo for the workflow.
             # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
+            # @param priority [Priority] Priority of the workflow. This is currently experimental.
             # @param headers [Hash<String, Object>, nil] Headers for the workflow.
             def new(
               workflow,
@@ -253,6 +258,7 @@ module Temporalio
               retry_policy: nil,
               memo: nil,
               search_attributes: nil,
+              priority: Priority.default,
               arg_hints: nil,
               headers: nil
             )
@@ -271,6 +277,7 @@ module Temporalio
                 retry_policy:,
                 memo:,
                 search_attributes:,
+                priority:,
                 arg_hints: arg_hints || defn_arg_hints,
                 headers:
               )
@@ -293,6 +300,7 @@ module Temporalio
               retry_policy: raw_info.retry_policy ? RetryPolicy._from_proto(raw_info.retry_policy) : nil,
               memo: Internal::ProtoUtils.memo_from_proto(raw_info.memo, data_converter),
               search_attributes: SearchAttributes._from_proto(raw_info.search_attributes),
+              priority: Priority._from_proto(raw_info.priority),
               headers: Internal::ProtoUtils.headers_from_proto(raw_info.header, data_converter)
             )
           end
@@ -312,6 +320,7 @@ module Temporalio
                 memo: Internal::ProtoUtils.memo_to_proto(memo, data_converter),
                 search_attributes: search_attributes&._to_proto,
                 header: Internal::ProtoUtils.headers_to_proto(headers, data_converter),
+                priority: priority._to_proto,
                 user_metadata: Internal::ProtoUtils.to_user_metadata(static_summary, static_details, data_converter)
               )
             )

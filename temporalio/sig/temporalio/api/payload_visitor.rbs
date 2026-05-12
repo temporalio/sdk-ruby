@@ -20,12 +20,16 @@ module Temporalio
 def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_activity_v1_activity_execution_list_info: (untyped value) -> void
       def api_activity_v1_activity_execution_outcome: (untyped value) -> void
+      def api_activity_v1_callback_info: (untyped value) -> void
       def api_batch_v1_batch_operation_reset: (untyped value) -> void
       def api_batch_v1_batch_operation_signal: (untyped value) -> void
       def api_batch_v1_batch_operation_termination: (untyped value) -> void
+      def api_callback_v1_callback_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_add_namespace_region_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_add_user_group_member_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_create_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_api_key_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_create_billing_report_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_connectivity_rule_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_response: (untyped value) -> void
@@ -34,6 +38,7 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_service_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_user_group_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_user_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_delete_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_api_key_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_connectivity_rule_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_export_sink_response: (untyped value) -> void
@@ -52,6 +57,7 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_service_account_namespace_access_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_user_group_namespace_access_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_user_namespace_access_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_update_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_api_key_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_export_sink_response: (untyped value) -> void
@@ -81,6 +87,11 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_common_v1_memo: (untyped value) -> void
       def api_common_v1_payloads: (untyped value) -> void
       def api_common_v1_search_attributes: (untyped value) -> void
+      def api_compute_v1_compute_config: (untyped value) -> void
+      def api_compute_v1_compute_config_scaling_group: (untyped value) -> void
+      def api_compute_v1_compute_config_scaling_group_update: (untyped value) -> void
+      def api_compute_v1_compute_provider: (untyped value) -> void
+      def api_compute_v1_compute_scaler: (untyped value) -> void
       def api_deployment_v1_deployment_info: (untyped value) -> void
       def api_deployment_v1_update_deployment_metadata: (untyped value) -> void
       def api_deployment_v1_version_metadata: (untyped value) -> void
@@ -130,6 +141,9 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_history_v1_workflow_task_failed_event_attributes: (untyped value) -> void
       def api_nexus_v1_endpoint: (untyped value) -> void
       def api_nexus_v1_endpoint_spec: (untyped value) -> void
+      def api_nexus_v1_nexus_operation_execution_cancellation_info: (untyped value) -> void
+      def api_nexus_v1_nexus_operation_execution_info: (untyped value) -> void
+      def api_nexus_v1_nexus_operation_execution_list_info: (untyped value) -> void
       def api_nexus_v1_request: (untyped value) -> void
       def api_nexus_v1_response: (untyped value) -> void
       def api_nexus_v1_start_operation_request: (untyped value) -> void
@@ -162,13 +176,17 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_workflow_v1_workflow_execution_info: (untyped value) -> void
       def api_workflowservice_v1_count_activity_executions_response: (untyped value) -> void
       def api_workflowservice_v1_count_activity_executions_response_aggregation_group: (untyped value) -> void
+      def api_workflowservice_v1_count_nexus_operation_executions_response: (untyped value) -> void
+      def api_workflowservice_v1_count_nexus_operation_executions_response_aggregation_group: (untyped value) -> void
       def api_workflowservice_v1_count_schedules_response: (untyped value) -> void
       def api_workflowservice_v1_count_schedules_response_aggregation_group: (untyped value) -> void
       def api_workflowservice_v1_count_workflow_executions_response: (untyped value) -> void
       def api_workflowservice_v1_count_workflow_executions_response_aggregation_group: (untyped value) -> void
       def api_workflowservice_v1_create_schedule_request: (untyped value) -> void
+      def api_workflowservice_v1_create_worker_deployment_version_request: (untyped value) -> void
       def api_workflowservice_v1_describe_activity_execution_response: (untyped value) -> void
       def api_workflowservice_v1_describe_deployment_response: (untyped value) -> void
+      def api_workflowservice_v1_describe_nexus_operation_execution_response: (untyped value) -> void
       def api_workflowservice_v1_describe_schedule_response: (untyped value) -> void
       def api_workflowservice_v1_describe_worker_deployment_version_response: (untyped value) -> void
       def api_workflowservice_v1_describe_workflow_execution_response: (untyped value) -> void
@@ -183,11 +201,13 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_workflowservice_v1_list_activity_executions_response: (untyped value) -> void
       def api_workflowservice_v1_list_archived_workflow_executions_response: (untyped value) -> void
       def api_workflowservice_v1_list_closed_workflow_executions_response: (untyped value) -> void
+      def api_workflowservice_v1_list_nexus_operation_executions_response: (untyped value) -> void
       def api_workflowservice_v1_list_open_workflow_executions_response: (untyped value) -> void
       def api_workflowservice_v1_list_schedules_response: (untyped value) -> void
       def api_workflowservice_v1_list_workflow_executions_response: (untyped value) -> void
       def api_workflowservice_v1_poll_activity_execution_response: (untyped value) -> void
       def api_workflowservice_v1_poll_activity_task_queue_response: (untyped value) -> void
+      def api_workflowservice_v1_poll_nexus_operation_execution_response: (untyped value) -> void
       def api_workflowservice_v1_poll_nexus_task_queue_response: (untyped value) -> void
       def api_workflowservice_v1_poll_workflow_execution_update_response: (untyped value) -> void
       def api_workflowservice_v1_poll_workflow_task_queue_response: (untyped value) -> void
@@ -217,14 +237,17 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_workflowservice_v1_signal_workflow_execution_request: (untyped value) -> void
       def api_workflowservice_v1_start_activity_execution_request: (untyped value) -> void
       def api_workflowservice_v1_start_batch_operation_request: (untyped value) -> void
+      def api_workflowservice_v1_start_nexus_operation_execution_request: (untyped value) -> void
       def api_workflowservice_v1_start_workflow_execution_request: (untyped value) -> void
       def api_workflowservice_v1_start_workflow_execution_response: (untyped value) -> void
       def api_workflowservice_v1_terminate_workflow_execution_request: (untyped value) -> void
       def api_workflowservice_v1_update_schedule_request: (untyped value) -> void
+      def api_workflowservice_v1_update_worker_deployment_version_compute_config_request: (untyped value) -> void
       def api_workflowservice_v1_update_worker_deployment_version_metadata_request: (untyped value) -> void
       def api_workflowservice_v1_update_worker_deployment_version_metadata_response: (untyped value) -> void
       def api_workflowservice_v1_update_workflow_execution_request: (untyped value) -> void
       def api_workflowservice_v1_update_workflow_execution_response: (untyped value) -> void
+      def api_workflowservice_v1_validate_worker_deployment_version_compute_config_request: (untyped value) -> void
       def coresdk_activity_result_activity_resolution: (untyped value) -> void
       def coresdk_activity_result_cancellation: (untyped value) -> void
       def coresdk_activity_result_failure: (untyped value) -> void

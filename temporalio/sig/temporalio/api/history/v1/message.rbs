@@ -284,6 +284,22 @@ module Temporalio
           def has_declined_target_version_upgrade?: () -> bool
           def clear_declined_target_version_upgrade: () -> void
 
+          # Initial time-skipping configuration for this workflow execution, recorded at start time.
+          # This may have been set explicitly via the start workflow request, or propagated from a
+          # parent/previous execution.
+          # The configuration may be updated after start via UpdateWorkflowExecutionOptions, which
+          # will be reflected in the WorkflowExecutionOptionsUpdatedEvent.
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          def has_time_skipping_config?: () -> bool
+          def clear_time_skipping_config: () -> void
+
+          # The time skipped by the previous execution that started this workflow.
+          # It can happen in cases of child workflows and continue-as-new workflows.
+          attr_reader initial_skipped_duration(): ::Google::Protobuf::Duration?
+          attr_writer initial_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_initial_skipped_duration?: () -> bool
+          def clear_initial_skipped_duration: () -> void
+
           type init_map = {
             workflow_type: (::Temporalio::Api::Common::V1::WorkflowType | ::Temporalio::Api::Common::V1::WorkflowType::init_map)?,
             "workflow_type" => (::Temporalio::Api::Common::V1::WorkflowType | ::Temporalio::Api::Common::V1::WorkflowType::init_map)?,
@@ -363,6 +379,10 @@ module Temporalio
             "eager_execution_accepted" => bool?,
             declined_target_version_upgrade: (::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade | ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade::init_map)?,
             "declined_target_version_upgrade" => (::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade | ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            initial_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "initial_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -407,6 +427,8 @@ module Temporalio
             | ("inherited_auto_upgrade_info" name) -> ::Temporalio::Api::Deployment::V1::InheritedAutoUpgradeInfo?
             | ("eager_execution_accepted" name) -> bool
             | ("declined_target_version_upgrade" name) -> ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("initial_skipped_duration" name) -> ::Google::Protobuf::Duration?
 
           def []=:
               ("workflow_type" name, ::Temporalio::Api::Common::V1::WorkflowType? value) -> void
@@ -448,6 +470,8 @@ module Temporalio
             | ("inherited_auto_upgrade_info" name, ::Temporalio::Api::Deployment::V1::InheritedAutoUpgradeInfo? value) -> void
             | ("eager_execution_accepted" name, bool value) -> void
             | ("declined_target_version_upgrade" name, ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("initial_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         # Wrapper for a target deployment version that the SDK declined to upgrade to.
@@ -458,18 +482,30 @@ module Temporalio
           def has_deployment_version?: () -> bool
           def clear_deployment_version: () -> void
 
+          # Revision number of the task queue routing config at the time the target
+          # was declined. If an incoming target's revision is <= this value, it is
+          # not newer and is not used for deciding whether or not to suppress the
+          # upgrade signal.
+          attr_reader revision_number(): ::Integer
+          attr_writer revision_number(): ::Integer | ::Float
+          def clear_revision_number: () -> void
+
           type init_map = {
             deployment_version: (::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion | ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion::init_map)?,
             "deployment_version" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion | ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion::init_map)?,
+            revision_number: (::Integer | ::Float)?,
+            "revision_number" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
 
           def []:
               ("deployment_version" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion?
+            | ("revision_number" name) -> ::Integer
 
           def []=:
               ("deployment_version" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion? value) -> void
+            | ("revision_number" name, (::Integer | ::Float) value) -> void
         end
 
         class WorkflowExecutionCompletedEventAttributes < ::Google::Protobuf::AbstractMessage
@@ -964,7 +1000,6 @@ module Temporalio
 
           # The Worker Deployment Version that completed this task. Must be set if `versioning_behavior`
           # is set. This value updates workflow execution's `versioning_info.version`.
-          # Experimental. Worker Deployments are experimental and might significantly change in the future.
           # Deprecated. Replaced with `deployment_version`.
           # @deprecated
           attr_reader worker_deployment_version(): ::String
@@ -973,14 +1008,12 @@ module Temporalio
 
           # The name of Worker Deployment that completed this task. Must be set if `versioning_behavior`
           # is set. This value updates workflow execution's `worker_deployment_name`.
-          # Experimental. Worker Deployments are experimental and might significantly change in the future.
           attr_reader worker_deployment_name(): ::String
           attr_writer worker_deployment_name(): ::String | ::Symbol
           def clear_worker_deployment_name: () -> void
 
           # The Worker Deployment Version that completed this task. Must be set if `versioning_behavior`
           # is set. This value updates workflow execution's `versioning_info.deployment_version`.
-          # Experimental. Worker Deployments are experimental and might significantly change in the future.
           attr_accessor deployment_version(): ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion?
           def has_deployment_version?: () -> bool
           def clear_deployment_version: () -> void
@@ -1984,6 +2017,12 @@ module Temporalio
           def has_external_workflow_execution?: () -> bool
           def clear_external_workflow_execution: () -> void
 
+          # The request ID of the Signal request, used by the server to attach this to
+          # the correct Event ID when generating link.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
           type init_map = {
             signal_name: (::String | ::Symbol)?,
             "signal_name" => (::String | ::Symbol)?,
@@ -1997,6 +2036,8 @@ module Temporalio
             "skip_generate_workflow_task" => bool?,
             external_workflow_execution: (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
             "external_workflow_execution" => (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2008,6 +2049,7 @@ module Temporalio
             | ("header" name) -> ::Temporalio::Api::Common::V1::Header?
             | ("skip_generate_workflow_task" name) -> bool
             | ("external_workflow_execution" name) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+            | ("request_id" name) -> ::String
 
           def []=:
               ("signal_name" name, (::String | ::Symbol) value) -> void
@@ -2016,6 +2058,7 @@ module Temporalio
             | ("header" name, ::Temporalio::Api::Common::V1::Header? value) -> void
             | ("skip_generate_workflow_task" name, bool value) -> void
             | ("external_workflow_execution" name, ::Temporalio::Api::Common::V1::WorkflowExecution? value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
         end
 
         class WorkflowExecutionTerminatedEventAttributes < ::Google::Protobuf::AbstractMessage
@@ -2641,6 +2684,17 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # The propagated time-skipping configuration for the child workflow.
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          def has_time_skipping_config?: () -> bool
+          def clear_time_skipping_config: () -> void
+
+          # Propagate the duration skipped to the child workflow.
+          attr_reader initial_skipped_duration(): ::Google::Protobuf::Duration?
+          attr_writer initial_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_initial_skipped_duration?: () -> bool
+          def clear_initial_skipped_duration: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -2682,6 +2736,10 @@ module Temporalio
             "inherit_build_id" => bool?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            initial_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "initial_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2707,6 +2765,8 @@ module Temporalio
             | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | ("inherit_build_id" name) -> bool
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("initial_skipped_duration" name) -> ::Google::Protobuf::Duration?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -2729,6 +2789,8 @@ module Temporalio
             | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
             | ("inherit_build_id" name, bool value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("initial_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Google::Protobuf::AbstractMessage
@@ -3272,6 +3334,11 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # If set, the time-skipping configuration was changed. Contains the full updated configuration.
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          def has_time_skipping_config?: () -> bool
+          def clear_time_skipping_config: () -> void
+
           type init_map = {
             versioning_override: (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
             "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
@@ -3285,6 +3352,8 @@ module Temporalio
             "identity" => (::String | ::Symbol)?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -3296,6 +3365,7 @@ module Temporalio
             | ("attached_completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
             | ("identity" name) -> ::String
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
 
           def []=:
               ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
@@ -3304,6 +3374,7 @@ module Temporalio
             | ("attached_completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
         end
 
         # Not used anywhere. Use case is replaced by WorkflowExecutionOptionsUpdatedEventAttributes
@@ -3659,6 +3730,51 @@ module Temporalio
             | ("request_id" name, (::String | ::Symbol) value) -> void
         end
 
+        # Attributes for an event indicating that time skipping state changed for a workflow execution,
+        # either time was advanced or time skipping was disabled automatically due to a bound being reached.
+        # The worker_may_ignore field in HistoryEvent should always be set true for this event.
+        class WorkflowExecutionTimeSkippingTransitionedEventAttributes < ::Google::Protobuf::AbstractMessage
+
+          # The virtual time after time skipping was applied.
+          attr_reader target_time(): ::Google::Protobuf::Timestamp?
+          attr_writer target_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_target_time?: () -> bool
+          def clear_target_time: () -> void
+
+          # when true, time skipping was disabled automatically due to a bound being reached.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
+          attr_accessor disabled_after_bound(): bool
+          def clear_disabled_after_bound: () -> void
+
+          # The wall-clock time when the time-skipping state changed event was generated.
+          attr_reader wall_clock_time(): ::Google::Protobuf::Timestamp?
+          attr_writer wall_clock_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_wall_clock_time?: () -> bool
+          def clear_wall_clock_time: () -> void
+
+          type init_map = {
+            target_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "target_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            disabled_after_bound: bool?,
+            "disabled_after_bound" => bool?,
+            wall_clock_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "wall_clock_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("target_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("disabled_after_bound" name) -> bool
+            | ("wall_clock_time" name) -> ::Google::Protobuf::Timestamp?
+
+          def []=:
+              ("target_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("disabled_after_bound" name, bool value) -> void
+            | ("wall_clock_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        end
+
         # Event marking that an operation was scheduled by a workflow via the ScheduleNexusOperation command.
         class NexusOperationScheduledEventAttributes < ::Google::Protobuf::AbstractMessage
 
@@ -3689,6 +3805,8 @@ module Temporalio
           # Calls are retried internally by the server.
           # (-- api-linter: core::0140::prepositions=disabled
           #     aip.dev/not-precedent: "to" is used to indicate interval. --)
+          # (-- api-linter: core::0142::time-field-names=disabled
+          #     aip.dev/not-precedent: "timeout" is an acceptable suffix for duration fields in this API. --)
           attr_reader schedule_to_close_timeout(): ::Google::Protobuf::Duration?
           attr_writer schedule_to_close_timeout(): (::Google::Protobuf::Duration | ::int)?
           def has_schedule_to_close_timeout?: () -> bool
@@ -4176,9 +4294,14 @@ module Temporalio
           def has_user_metadata?: () -> bool
           def clear_user_metadata: () -> void
 
-          # Links associated with the event.
+          # Links to related entities, such as the entity that started this event's workflow.
           attr_accessor links(): ::Google::Protobuf::RepeatedField
           def clear_links: () -> void
+
+          # Server-computed authenticated caller identity associated with this event.
+          attr_accessor principal(): ::Temporalio::Api::Common::V1::Principal?
+          def has_principal?: () -> bool
+          def clear_principal: () -> void
 
           attr_accessor workflow_execution_started_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes?
           def has_workflow_execution_started_event_attributes?: () -> bool
@@ -4416,8 +4539,12 @@ module Temporalio
           def has_workflow_execution_unpaused_event_attributes?: () -> bool
           def clear_workflow_execution_unpaused_event_attributes: () -> void
 
+          attr_accessor workflow_execution_time_skipping_transitioned_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes?
+          def has_workflow_execution_time_skipping_transitioned_event_attributes?: () -> bool
+          def clear_workflow_execution_time_skipping_transitioned_event_attributes: () -> void
+
           # The event details. The type must match that in `event_type`.
-          attr_reader attributes(): (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTimedOutEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskScheduledEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskTimedOutEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskFailedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskScheduledEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskStartedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCompletedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskTimedOutEventAttributes | ::Temporalio::Api::History::V1::TimerStartedEventAttributes | ::Temporalio::Api::History::V1::TimerFiredEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCanceledEventAttributes | ::Temporalio::Api::History::V1::TimerCanceledEventAttributes | ::Temporalio::Api::History::V1::MarkerRecordedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionSignaledEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTerminatedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCanceledEventAttributes | ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes | ::Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes | ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes | ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes | ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes | ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAdmittedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationScheduledEventAttributes | ::Temporalio::Api::History::V1::NexusOperationStartedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCompletedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationFailedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCanceledEventAttributes | ::Temporalio::Api::History::V1::NexusOperationTimedOutEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestCompletedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestFailedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes)?
+          attr_reader attributes(): (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTimedOutEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskScheduledEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskTimedOutEventAttributes | ::Temporalio::Api::History::V1::WorkflowTaskFailedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskScheduledEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskStartedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCompletedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskTimedOutEventAttributes | ::Temporalio::Api::History::V1::TimerStartedEventAttributes | ::Temporalio::Api::History::V1::TimerFiredEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::ActivityTaskCanceledEventAttributes | ::Temporalio::Api::History::V1::TimerCanceledEventAttributes | ::Temporalio::Api::History::V1::MarkerRecordedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionSignaledEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTerminatedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCanceledEventAttributes | ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::RequestCancelExternalWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ExternalWorkflowExecutionCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionContinuedAsNewEventAttributes | ::Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::StartChildWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionCanceledEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionTimedOutEventAttributes | ::Temporalio::Api::History::V1::ChildWorkflowExecutionTerminatedEventAttributes | ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionInitiatedEventAttributes | ::Temporalio::Api::History::V1::SignalExternalWorkflowExecutionFailedEventAttributes | ::Temporalio::Api::History::V1::ExternalWorkflowExecutionSignaledEventAttributes | ::Temporalio::Api::History::V1::UpsertWorkflowSearchAttributesEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAcceptedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateRejectedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedExternallyEventAttributes | ::Temporalio::Api::History::V1::ActivityPropertiesModifiedExternallyEventAttributes | ::Temporalio::Api::History::V1::WorkflowPropertiesModifiedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUpdateAdmittedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationScheduledEventAttributes | ::Temporalio::Api::History::V1::NexusOperationStartedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCompletedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationFailedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCanceledEventAttributes | ::Temporalio::Api::History::V1::NexusOperationTimedOutEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestCompletedEventAttributes | ::Temporalio::Api::History::V1::NexusOperationCancelRequestFailedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes)?
           def has_attributes?: () -> bool
           def clear_attributes: () -> void
 
@@ -4438,6 +4565,8 @@ module Temporalio
             "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
             links: ::Array[::Temporalio::Api::Common::V1::Link]?,
             "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
+            principal: (::Temporalio::Api::Common::V1::Principal | ::Temporalio::Api::Common::V1::Principal::init_map)?,
+            "principal" => (::Temporalio::Api::Common::V1::Principal | ::Temporalio::Api::Common::V1::Principal::init_map)?,
             workflow_execution_started_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init_map)?,
             "workflow_execution_started_event_attributes" => (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init_map)?,
             workflow_execution_completed_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init_map)?,
@@ -4556,6 +4685,8 @@ module Temporalio
             "workflow_execution_paused_event_attributes" => (::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes::init_map)?,
             workflow_execution_unpaused_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes::init_map)?,
             "workflow_execution_unpaused_event_attributes" => (::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes::init_map)?,
+            workflow_execution_time_skipping_transitioned_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes::init_map)?,
+            "workflow_execution_time_skipping_transitioned_event_attributes" => (::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -4569,6 +4700,7 @@ module Temporalio
             | ("worker_may_ignore" name) -> bool
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
             | ("links" name) -> ::Google::Protobuf::RepeatedField
+            | ("principal" name) -> ::Temporalio::Api::Common::V1::Principal?
             | ("workflow_execution_started_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes?
             | ("workflow_execution_completed_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes?
             | ("workflow_execution_failed_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes?
@@ -4628,6 +4760,7 @@ module Temporalio
             | ("nexus_operation_cancel_request_failed_event_attributes" name) -> ::Temporalio::Api::History::V1::NexusOperationCancelRequestFailedEventAttributes?
             | ("workflow_execution_paused_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes?
             | ("workflow_execution_unpaused_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes?
+            | ("workflow_execution_time_skipping_transitioned_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes?
 
           def []=:
               ("event_id" name, (::Integer | ::Float) value) -> void
@@ -4638,6 +4771,7 @@ module Temporalio
             | ("worker_may_ignore" name, bool value) -> void
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("principal" name, ::Temporalio::Api::Common::V1::Principal? value) -> void
             | ("workflow_execution_started_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes? value) -> void
             | ("workflow_execution_completed_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes? value) -> void
             | ("workflow_execution_failed_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes? value) -> void
@@ -4697,6 +4831,7 @@ module Temporalio
             | ("nexus_operation_cancel_request_failed_event_attributes" name, ::Temporalio::Api::History::V1::NexusOperationCancelRequestFailedEventAttributes? value) -> void
             | ("workflow_execution_paused_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionPausedEventAttributes? value) -> void
             | ("workflow_execution_unpaused_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes? value) -> void
+            | ("workflow_execution_time_skipping_transitioned_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes? value) -> void
         end
 
         class History < ::Google::Protobuf::AbstractMessage

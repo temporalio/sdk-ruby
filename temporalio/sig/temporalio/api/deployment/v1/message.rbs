@@ -10,7 +10,6 @@ module Temporalio
     module Deployment
       module V1
         # Worker Deployment options set in SDK that need to be sent to server in every poll.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         class WorkerDeploymentOptions < ::Google::Protobuf::AbstractMessage
 
           # Required when `worker_versioning_mode==VERSIONED`.
@@ -257,13 +256,12 @@ module Temporalio
             | ("is_current" name, bool value) -> void
         end
 
-        # A Worker Deployment Version (Version, for short) represents all workers of the same 
-        # code and config within a Deployment. Workers of the same Version are expected to 
-        # behave exactly the same so when executions move between them there are no 
+        # A Worker Deployment Version (Version, for short) represents all workers of the same
+        # code and config within a Deployment. Workers of the same Version are expected to
+        # behave exactly the same so when executions move between them there are no
         # non-determinism issues.
-        # Worker Deployment Versions are created in Temporal server automatically when 
+        # Worker Deployment Versions are created in Temporal server automatically when
         # their first poller arrives to the server.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         class WorkerDeploymentVersionInfo < ::Google::Protobuf::AbstractMessage
           class VersionTaskQueueInfo < ::Google::Protobuf::AbstractMessage
 
@@ -311,6 +309,7 @@ module Temporalio
           def has_deployment_version?: () -> bool
           def clear_deployment_version: () -> void
 
+          # Deprecated. User deployment_version.deployment_name.
           attr_reader deployment_name(): ::String
           attr_writer deployment_name(): ::String | ::Symbol
           def clear_deployment_name: () -> void
@@ -395,6 +394,21 @@ module Temporalio
           def has_metadata?: () -> bool
           def clear_metadata: () -> void
 
+          # Optional. Contains the new worker compute configuration for the Worker
+          # Deployment. Used for worker scale management.
+          attr_accessor compute_config(): ::Temporalio::Api::Compute::V1::ComputeConfig?
+          def has_compute_config?: () -> bool
+          def clear_compute_config: () -> void
+
+          # Identity of the last client who modified the configuration of this Version.
+          # As of now, this field only covers changes through the following APIs:
+          # - `CreateWorkerDeploymentVersion`
+          # - `UpdateWorkerDeploymentVersionComputeConfig`
+          # - `UpdateWorkerDeploymentVersionMetadata`
+          attr_reader last_modifier_identity(): ::String
+          attr_writer last_modifier_identity(): ::String | ::Symbol
+          def clear_last_modifier_identity: () -> void
+
           type init_map = {
             version: (::String | ::Symbol)?,
             "version" => (::String | ::Symbol)?,
@@ -426,6 +440,10 @@ module Temporalio
             "drainage_info" => (::Temporalio::Api::Deployment::V1::VersionDrainageInfo | ::Temporalio::Api::Deployment::V1::VersionDrainageInfo::init_map)?,
             metadata: (::Temporalio::Api::Deployment::V1::VersionMetadata | ::Temporalio::Api::Deployment::V1::VersionMetadata::init_map)?,
             "metadata" => (::Temporalio::Api::Deployment::V1::VersionMetadata | ::Temporalio::Api::Deployment::V1::VersionMetadata::init_map)?,
+            compute_config: (::Temporalio::Api::Compute::V1::ComputeConfig | ::Temporalio::Api::Compute::V1::ComputeConfig::init_map)?,
+            "compute_config" => (::Temporalio::Api::Compute::V1::ComputeConfig | ::Temporalio::Api::Compute::V1::ComputeConfig::init_map)?,
+            last_modifier_identity: (::String | ::Symbol)?,
+            "last_modifier_identity" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -446,6 +464,8 @@ module Temporalio
             | ("task_queue_infos" name) -> ::Google::Protobuf::RepeatedField
             | ("drainage_info" name) -> ::Temporalio::Api::Deployment::V1::VersionDrainageInfo?
             | ("metadata" name) -> ::Temporalio::Api::Deployment::V1::VersionMetadata?
+            | ("compute_config" name) -> ::Temporalio::Api::Compute::V1::ComputeConfig?
+            | ("last_modifier_identity" name) -> ::String
 
           def []=:
               ("version" name, (::String | ::Symbol) value) -> void
@@ -463,11 +483,12 @@ module Temporalio
             | ("task_queue_infos" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("drainage_info" name, ::Temporalio::Api::Deployment::V1::VersionDrainageInfo? value) -> void
             | ("metadata" name, ::Temporalio::Api::Deployment::V1::VersionMetadata? value) -> void
+            | ("compute_config" name, ::Temporalio::Api::Compute::V1::ComputeConfig? value) -> void
+            | ("last_modifier_identity" name, (::String | ::Symbol) value) -> void
         end
 
         # Information about workflow drainage to help the user determine when it is safe
         # to decommission a Version. Not present while version is current or ramping.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         class VersionDrainageInfo < ::Google::Protobuf::AbstractMessage
 
           # Set to DRAINING when the version first stops accepting new executions (is no longer current or ramping).
@@ -511,14 +532,13 @@ module Temporalio
             | ("last_checked_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
-        # A Worker Deployment (Deployment, for short) represents all workers serving 
-        # a shared set of Task Queues. Typically, a Deployment represents one service or 
+        # A Worker Deployment (Deployment, for short) represents all workers serving
+        # a shared set of Task Queues. Typically, a Deployment represents one service or
         # application.
-        # A Deployment contains multiple Deployment Versions, each representing a different 
+        # A Deployment contains multiple Deployment Versions, each representing a different
         # version of workers. (see documentation of WorkerDeploymentVersionInfo)
         # Deployment records are created in Temporal server automatically when their
         # first poller arrives to the server.
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         class WorkerDeploymentInfo < ::Google::Protobuf::AbstractMessage
           class WorkerDeploymentVersionSummary < ::Google::Protobuf::AbstractMessage
 
@@ -598,6 +618,10 @@ module Temporalio
             def has_last_deactivation_time?: () -> bool
             def clear_last_deactivation_time: () -> void
 
+            attr_accessor compute_config(): ::Temporalio::Api::Compute::V1::ComputeConfigSummary?
+            def has_compute_config?: () -> bool
+            def clear_compute_config: () -> void
+
             type init_map = {
               version: (::String | ::Symbol)?,
               "version" => (::String | ::Symbol)?,
@@ -623,6 +647,8 @@ module Temporalio
               "last_current_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               last_deactivation_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               "last_deactivation_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              compute_config: (::Temporalio::Api::Compute::V1::ComputeConfigSummary | ::Temporalio::Api::Compute::V1::ComputeConfigSummary::init_map)?,
+              "compute_config" => (::Temporalio::Api::Compute::V1::ComputeConfigSummary | ::Temporalio::Api::Compute::V1::ComputeConfigSummary::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -640,6 +666,7 @@ module Temporalio
               | ("first_activation_time" name) -> ::Google::Protobuf::Timestamp?
               | ("last_current_time" name) -> ::Google::Protobuf::Timestamp?
               | ("last_deactivation_time" name) -> ::Google::Protobuf::Timestamp?
+              | ("compute_config" name) -> ::Temporalio::Api::Compute::V1::ComputeConfigSummary?
 
             def []=:
                 ("version" name, (::String | ::Symbol) value) -> void
@@ -654,6 +681,7 @@ module Temporalio
               | ("first_activation_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("last_current_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("last_deactivation_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("compute_config" name, ::Temporalio::Api::Compute::V1::ComputeConfigSummary? value) -> void
           end
 
           # Identifies a Worker Deployment. Must be unique within the namespace.
@@ -664,8 +692,8 @@ module Temporalio
           # Deployment Versions that are currently tracked in this Deployment. A DeploymentVersion will be
           # cleaned up automatically if all the following conditions meet:
           # - It does not receive new executions (is not current or ramping)
-          # - It has no active pollers (see WorkerDeploymentVersionInfo.pollers_status) 
-          # - It is drained (see WorkerDeploymentVersionInfo.drainage_status) 
+          # - It has no active pollers (see WorkerDeploymentVersionInfo.pollers_status)
+          # - It is drained (see WorkerDeploymentVersionInfo.drainage_status)
           attr_accessor version_summaries(): ::Google::Protobuf::RepeatedField
           def clear_version_summaries: () -> void
 
@@ -800,7 +828,7 @@ module Temporalio
 
           # Specifies which Deployment Version should receive new workflow executions and tasks of
           # existing unversioned or AutoUpgrade workflows.
-          # Nil value means no Version in this Deployment (except Ramping Version, if present) receives traffic other than tasks of previously Pinned workflows. In absence of a Current Version, remaining traffic after any ramp (if set)  goes to unversioned workers (those with `UNVERSIONED` (or unspecified) `WorkerVersioningMode`.). 
+          # Nil value means no Version in this Deployment (except Ramping Version, if present) receives traffic other than tasks of previously Pinned workflows. In absence of a Current Version, remaining traffic after any ramp (if set)  goes to unversioned workers (those with `UNVERSIONED` (or unspecified) `WorkerVersioningMode`.).
           # Note: Current Version is overridden by the Ramping Version for a portion of traffic when ramp percentage
           # is non-zero (see `ramping_deployment_version` and `ramping_version_percentage`).
           attr_accessor current_deployment_version(): ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion?
@@ -855,7 +883,7 @@ module Temporalio
           def has_ramping_version_percentage_changed_time?: () -> bool
           def clear_ramping_version_percentage_changed_time: () -> void
 
-          # Monotonically increasing value which is incremented on every mutation 
+          # Monotonically increasing value which is incremented on every mutation
           # to any field of this message to achieve eventual consistency between task queues and their partitions.
           attr_reader revision_number(): ::Integer
           attr_writer revision_number(): ::Integer | ::Float
@@ -907,8 +935,9 @@ module Temporalio
             | ("revision_number" name, (::Integer | ::Float) value) -> void
         end
 
-        # Used as part of WorkflowExecutionStartedEventAttributes to pass down the AutoUpgrade behavior and source deployment version 
+        # Used as part of WorkflowExecutionStartedEventAttributes to pass down the AutoUpgrade behavior and source deployment version
         # to a workflow execution whose parent/previous workflow has an AutoUpgrade behavior.
+        # Also used for Upgrade-on-CaN behaviors AutoUpgrade and UseRampingVersion.
         class InheritedAutoUpgradeInfo < ::Google::Protobuf::AbstractMessage
 
           # The source deployment version of the parent/previous workflow.
@@ -921,11 +950,27 @@ module Temporalio
           attr_writer source_deployment_revision_number(): ::Integer | ::Float
           def clear_source_deployment_revision_number: () -> void
 
+          # Experimental.
+          # If this workflow is the result of a continue-as-new, this field is set to the initial_versioning_behavior
+          # specified in that command.
+          # Only used for the initial task of this run and the initial task of any retries of this run.
+          # Not passed to children or to future continue-as-new.
+          # Note: In the first release of Upgrade-on-CaN, when the only ContinueAsNewVersioningBehavior was AutoUpgrade,
+          # a non-empty InheritedAutoUpgradeInfo meant that the workflow should start as AutoUpgrade. So for compatibility
+          # with history events generated during that time, know that an UNSPECIFIED value here is equivalent to AutoUpgrade
+          # value if the InheritedAutoUpgradeInfo is non-empty.
+          attr_reader continue_as_new_initial_versioning_behavior(): ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Integer
+          attr_writer continue_as_new_initial_versioning_behavior(): ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float
+          attr_reader continue_as_new_initial_versioning_behavior_const(): ::Integer
+          def clear_continue_as_new_initial_versioning_behavior: () -> void
+
           type init_map = {
             source_deployment_version: (::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion | ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion::init_map)?,
             "source_deployment_version" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion | ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion::init_map)?,
             source_deployment_revision_number: (::Integer | ::Float)?,
             "source_deployment_revision_number" => (::Integer | ::Float)?,
+            continue_as_new_initial_versioning_behavior: (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
+            "continue_as_new_initial_versioning_behavior" => (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -933,10 +978,12 @@ module Temporalio
           def []:
               ("source_deployment_version" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion?
             | ("source_deployment_revision_number" name) -> ::Integer
+            | ("continue_as_new_initial_versioning_behavior" name) -> (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Integer)
 
           def []=:
               ("source_deployment_version" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentVersion? value) -> void
             | ("source_deployment_revision_number" name, (::Integer | ::Float) value) -> void
+            | ("continue_as_new_initial_versioning_behavior" name, (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float) value) -> void
         end
       end
     end

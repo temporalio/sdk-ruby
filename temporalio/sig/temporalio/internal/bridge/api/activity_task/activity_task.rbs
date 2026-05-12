@@ -148,6 +148,11 @@ module Temporalio
             attr_accessor is_local(): bool
             def clear_is_local: () -> void
 
+            # Run ID of this activity execution. Only set for standalone activities.
+            attr_reader run_id(): ::String
+            attr_writer run_id(): ::String | ::Symbol
+            def clear_run_id: () -> void
+
             type init_map = {
               workflow_namespace: (::String | ::Symbol)?,
               "workflow_namespace" => (::String | ::Symbol)?,
@@ -185,6 +190,8 @@ module Temporalio
               "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
               is_local: bool?,
               "is_local" => bool?,
+              run_id: (::String | ::Symbol)?,
+              "run_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -208,6 +215,7 @@ module Temporalio
               | ("retry_policy" name) -> ::Temporalio::Api::Common::V1::RetryPolicy?
               | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
               | ("is_local" name) -> bool
+              | ("run_id" name) -> ::String
 
             def []=:
                 ("workflow_namespace" name, (::String | ::Symbol) value) -> void
@@ -228,6 +236,7 @@ module Temporalio
               | ("retry_policy" name, ::Temporalio::Api::Common::V1::RetryPolicy? value) -> void
               | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
               | ("is_local" name, bool value) -> void
+              | ("run_id" name, (::String | ::Symbol) value) -> void
           end
 
           # Attempt to cancel a running activity

@@ -8,6 +8,7 @@ AllCops:
   SuggestExtensions: false
   Exclude:
     - ext/**/*
+    - lib/protoc-gen-openapiv2/**/*
     - lib/temporalio/api/**/*
     - lib/temporalio/client/connection/*_service.rb
     - lib/temporalio/internal/bridge/api/**/*

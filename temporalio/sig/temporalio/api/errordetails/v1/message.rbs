@@ -487,6 +487,37 @@ module Temporalio
               ("start_request_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
         end
+
+        # An error indicating that a Nexus operation failed to start. Returned when there is an existing operation with the
+        # given operation ID, and the given ID reuse and conflict policies do not permit starting a new one or attaching to an
+        # existing one.
+        class NexusOperationExecutionAlreadyStartedFailure < ::Google::Protobuf::AbstractMessage
+
+          attr_reader start_request_id(): ::String
+          attr_writer start_request_id(): ::String | ::Symbol
+          def clear_start_request_id: () -> void
+
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          type init_map = {
+            start_request_id: (::String | ::Symbol)?,
+            "start_request_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("start_request_id" name) -> ::String
+            | ("run_id" name) -> ::String
+
+          def []=:
+              ("start_request_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+        end
       end
     end
   end

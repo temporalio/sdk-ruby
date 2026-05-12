@@ -650,6 +650,39 @@ class WorkerWorkflowVersioningTest < Test
     end
   end
 
+  class CanRampingVersionWorkflowV1 < Temporalio::Workflow::Definition
+    workflow_name :ContinueAsNewWithRampingVersion
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def initialize
+      @continue_as_new = false
+    end
+
+    def execute(attempt)
+      return 'v1.0' if attempt.positive?
+
+      Temporalio::Workflow.wait_condition { @continue_as_new }
+      raise Temporalio::Workflow::ContinueAsNewError.new(
+        attempt + 1,
+        initial_versioning_behavior: Temporalio::ContinueAsNewVersioningBehavior::USE_RAMPING_VERSION
+      )
+    end
+
+    workflow_signal
+    def do_continue_as_new
+      @continue_as_new = true
+    end
+  end
+
+  class CanRampingVersionWorkflowV2 < Temporalio::Workflow::Definition
+    workflow_name :ContinueAsNewWithRampingVersion
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def execute(_attempt)
+      'v2.0'
+    end
+  end
+
   def test_continue_as_new_with_version_upgrade
     deployment_name = "deployment-can-upgrade-#{SecureRandom.uuid}"
     worker_v1 = Temporalio::WorkerDeploymentVersion.new(
@@ -712,6 +745,64 @@ class WorkerWorkflowVersioningTest < Test
       # Expect workflow to CAN onto v2 and return "v2.0"
       result = handle.result
       assert_equal 'v2.0', result
+    end
+  end
+
+  def test_continue_as_new_with_ramping_version
+    deployment_name = "deployment-can-ramping-#{SecureRandom.uuid}"
+    worker_v1 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '1.0'
+    )
+    worker_v2 = Temporalio::WorkerDeploymentVersion.new(
+      deployment_name: deployment_name, build_id: '2.0'
+    )
+
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    worker1 = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      workflows: [CanRampingVersionWorkflowV1],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v1,
+        use_worker_versioning: true
+      )
+    )
+
+    worker2 = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      workflows: [CanRampingVersionWorkflowV2],
+      deployment_options: Temporalio::Worker::DeploymentOptions.new(
+        version: worker_v2,
+        use_worker_versioning: true
+      )
+    )
+
+    Temporalio::Worker.run_all(worker1, worker2) do
+      describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
+      current_resp = set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
+
+      handle = env.client.start_workflow(
+        'ContinueAsNewWithRampingVersion',
+        0,
+        id: "test-can-ramping-version-#{SecureRandom.uuid}",
+        task_queue: task_queue
+      )
+      wait_for_workflow_running_on_version(handle, worker_v1.build_id)
+
+      wait_until_worker_deployment_visible(env.client, worker_v2)
+      set_ramping_version(env.client, current_resp.conflict_token, worker_v2, 0.0)
+      wait_for_worker_deployment_routing_config_propagation(
+        env.client,
+        deployment_name,
+        worker_v1.build_id,
+        worker_v2.build_id
+      )
+
+      handle.signal(CanRampingVersionWorkflowV1.do_continue_as_new)
+      assert_equal 'v2.0', handle.result
     end
   end
 

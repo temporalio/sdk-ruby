@@ -101,26 +101,48 @@ module Temporalio
           def has_details?: () -> bool
           def clear_details: () -> void
 
+          # The identity of the worker or client that requested the cancellation.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
           type init_map = {
             details: (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             "details" => (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
 
           def []:
               ("details" name) -> ::Temporalio::Api::Common::V1::Payloads?
+            | ("identity" name) -> ::String
 
           def []=:
               ("details" name, ::Temporalio::Api::Common::V1::Payloads? value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
         end
 
         class TerminatedFailureInfo < ::Google::Protobuf::AbstractMessage
 
+          # The identity of the worker or client that requested the termination.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
           type init_map = {
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("identity" name) -> ::String
+
+          def []=:
+              ("identity" name, (::String | ::Symbol) value) -> void
         end
 
         class ServerFailureInfo < ::Google::Protobuf::AbstractMessage

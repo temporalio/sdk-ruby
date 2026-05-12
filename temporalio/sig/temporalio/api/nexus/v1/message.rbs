@@ -744,6 +744,498 @@ module Temporalio
               ("worker" name, ::Temporalio::Api::Nexus::V1::EndpointTarget::Worker? value) -> void
             | ("external" name, ::Temporalio::Api::Nexus::V1::EndpointTarget::External? value) -> void
         end
+
+        # NexusOperationExecutionCancellationInfo contains the state of a Nexus operation cancellation.
+        class NexusOperationExecutionCancellationInfo < ::Google::Protobuf::AbstractMessage
+
+          # The time when cancellation was requested.
+          attr_reader requested_time(): ::Google::Protobuf::Timestamp?
+          attr_writer requested_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_requested_time?: () -> bool
+          def clear_requested_time: () -> void
+
+          attr_reader state(): ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Integer
+          attr_writer state(): ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::strings | ::Integer | ::Float
+          attr_reader state_const(): ::Integer
+          def clear_state: () -> void
+
+          # The number of attempts made to deliver the cancel operation request.
+          # This number represents a minimum bound since the attempt is incremented after the request completes.
+          attr_reader attempt(): ::Integer
+          attr_writer attempt(): ::Integer | ::Float
+          def clear_attempt: () -> void
+
+          # The time when the last attempt completed.
+          attr_reader last_attempt_complete_time(): ::Google::Protobuf::Timestamp?
+          attr_writer last_attempt_complete_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_last_attempt_complete_time?: () -> bool
+          def clear_last_attempt_complete_time: () -> void
+
+          # The last attempt's failure, if any.
+          attr_accessor last_attempt_failure(): ::Temporalio::Api::Failure::V1::Failure?
+          def has_last_attempt_failure?: () -> bool
+          def clear_last_attempt_failure: () -> void
+
+          # The time when the next attempt is scheduled.
+          attr_reader next_attempt_schedule_time(): ::Google::Protobuf::Timestamp?
+          attr_writer next_attempt_schedule_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_next_attempt_schedule_time?: () -> bool
+          def clear_next_attempt_schedule_time: () -> void
+
+          # If the state is BLOCKED, blocked reason provides additional information.
+          attr_reader blocked_reason(): ::String
+          attr_writer blocked_reason(): ::String | ::Symbol
+          def clear_blocked_reason: () -> void
+
+          # A reason that may be specified in the CancelNexusOperationRequest.
+          attr_reader reason(): ::String
+          attr_writer reason(): ::String | ::Symbol
+          def clear_reason: () -> void
+
+          type init_map = {
+            requested_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "requested_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            state: (::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::strings | ::Integer | ::Float)?,
+            "state" => (::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::strings | ::Integer | ::Float)?,
+            attempt: (::Integer | ::Float)?,
+            "attempt" => (::Integer | ::Float)?,
+            last_attempt_complete_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "last_attempt_complete_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            last_attempt_failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+            "last_attempt_failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+            next_attempt_schedule_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "next_attempt_schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            blocked_reason: (::String | ::Symbol)?,
+            "blocked_reason" => (::String | ::Symbol)?,
+            reason: (::String | ::Symbol)?,
+            "reason" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("requested_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("state" name) -> (::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Integer)
+            | ("attempt" name) -> ::Integer
+            | ("last_attempt_complete_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("last_attempt_failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+            | ("next_attempt_schedule_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("blocked_reason" name) -> ::String
+            | ("reason" name) -> ::String
+
+          def []=:
+              ("requested_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("state" name, (::Temporalio::Api::Enums::V1::NexusOperationCancellationState::names | ::Temporalio::Api::Enums::V1::NexusOperationCancellationState::strings | ::Integer | ::Float) value) -> void
+            | ("attempt" name, (::Integer | ::Float) value) -> void
+            | ("last_attempt_complete_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("last_attempt_failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+            | ("next_attempt_schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("blocked_reason" name, (::String | ::Symbol) value) -> void
+            | ("reason" name, (::String | ::Symbol) value) -> void
+        end
+
+        # Full current state of a standalone Nexus operation, as of the time of the request.
+        class NexusOperationExecutionInfo < ::Google::Protobuf::AbstractMessage
+
+          # Unique identifier of this Nexus operation within its namespace along with run ID (below).
+          attr_reader operation_id(): ::String
+          attr_writer operation_id(): ::String | ::Symbol
+          def clear_operation_id: () -> void
+
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # Endpoint name, resolved to a URL via the cluster's endpoint registry.
+          attr_reader endpoint(): ::String
+          attr_writer endpoint(): ::String | ::Symbol
+          def clear_endpoint: () -> void
+
+          # Service name.
+          attr_reader service(): ::String
+          attr_writer service(): ::String | ::Symbol
+          def clear_service: () -> void
+
+          # Operation name.
+          attr_reader operation(): ::String
+          attr_writer operation(): ::String | ::Symbol
+          def clear_operation: () -> void
+
+          # A general status for this operation, indicates whether it is currently running or in one of the terminal statuses.
+          # Updated once when the operation is originally scheduled, and again when it reaches a terminal status.
+          attr_reader status(): ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Integer
+          attr_writer status(): ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float
+          attr_reader status_const(): ::Integer
+          def clear_status: () -> void
+
+          # More detailed breakdown of NEXUS_OPERATION_EXECUTION_STATUS_RUNNING.
+          attr_reader state(): ::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Integer
+          attr_writer state(): ::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Temporalio::Api::Enums::V1::PendingNexusOperationState::strings | ::Integer | ::Float
+          attr_reader state_const(): ::Integer
+          def clear_state: () -> void
+
+          # Schedule-to-close timeout for this operation.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "to" is used to indicate interval. --)
+          attr_reader schedule_to_close_timeout(): ::Google::Protobuf::Duration?
+          attr_writer schedule_to_close_timeout(): (::Google::Protobuf::Duration | ::int)?
+          def has_schedule_to_close_timeout?: () -> bool
+          def clear_schedule_to_close_timeout: () -> void
+
+          # Schedule-to-start timeout for this operation.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "to" is used to indicate interval. --)
+          attr_reader schedule_to_start_timeout(): ::Google::Protobuf::Duration?
+          attr_writer schedule_to_start_timeout(): (::Google::Protobuf::Duration | ::int)?
+          def has_schedule_to_start_timeout?: () -> bool
+          def clear_schedule_to_start_timeout: () -> void
+
+          # Start-to-close timeout for this operation.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "to" is used to indicate interval. --)
+          attr_reader start_to_close_timeout(): ::Google::Protobuf::Duration?
+          attr_writer start_to_close_timeout(): (::Google::Protobuf::Duration | ::int)?
+          def has_start_to_close_timeout?: () -> bool
+          def clear_start_to_close_timeout: () -> void
+
+          # The number of attempts made to deliver the start operation request.
+          # This number is approximate, it is incremented when a task is added to the history queue.
+          # In practice, there could be more attempts if a task is executed but fails to commit, or less attempts if a task
+          # was never executed.
+          attr_reader attempt(): ::Integer
+          attr_writer attempt(): ::Integer | ::Float
+          def clear_attempt: () -> void
+
+          # Time the operation was originally scheduled via a StartNexusOperation request.
+          attr_reader schedule_time(): ::Google::Protobuf::Timestamp?
+          attr_writer schedule_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_schedule_time?: () -> bool
+          def clear_schedule_time: () -> void
+
+          # Scheduled time + schedule to close timeout.
+          attr_reader expiration_time(): ::Google::Protobuf::Timestamp?
+          attr_writer expiration_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_expiration_time?: () -> bool
+          def clear_expiration_time: () -> void
+
+          # Time when the operation transitioned to a closed state.
+          attr_reader close_time(): ::Google::Protobuf::Timestamp?
+          attr_writer close_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_close_time?: () -> bool
+          def clear_close_time: () -> void
+
+          # The time when the last attempt completed.
+          attr_reader last_attempt_complete_time(): ::Google::Protobuf::Timestamp?
+          attr_writer last_attempt_complete_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_last_attempt_complete_time?: () -> bool
+          def clear_last_attempt_complete_time: () -> void
+
+          # The last attempt's failure, if any.
+          attr_accessor last_attempt_failure(): ::Temporalio::Api::Failure::V1::Failure?
+          def has_last_attempt_failure?: () -> bool
+          def clear_last_attempt_failure: () -> void
+
+          # The time when the next attempt is scheduled.
+          attr_reader next_attempt_schedule_time(): ::Google::Protobuf::Timestamp?
+          attr_writer next_attempt_schedule_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_next_attempt_schedule_time?: () -> bool
+          def clear_next_attempt_schedule_time: () -> void
+
+          # Elapsed time from schedule_time to now for running operations or to close_time for closed
+          # operations, including all attempts and backoff between attempts.
+          attr_reader execution_duration(): ::Google::Protobuf::Duration?
+          attr_writer execution_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_execution_duration?: () -> bool
+          def clear_execution_duration: () -> void
+
+          attr_accessor cancellation_info(): ::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo?
+          def has_cancellation_info?: () -> bool
+          def clear_cancellation_info: () -> void
+
+          # If the state is BLOCKED, blocked reason provides additional information.
+          attr_reader blocked_reason(): ::String
+          attr_writer blocked_reason(): ::String | ::Symbol
+          def clear_blocked_reason: () -> void
+
+          # Server-generated request ID used as an idempotency token when submitting start requests to
+          # the handler. Distinct from the request_id in StartNexusOperationRequest, which is the
+          # caller-side idempotency key for the StartNexusOperation RPC itself.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
+          # Operation token. Only set for asynchronous operations after a successful StartOperation call.
+          attr_reader operation_token(): ::String
+          attr_writer operation_token(): ::String | ::Symbol
+          def clear_operation_token: () -> void
+
+          # Incremented each time the operation's state is mutated in persistence.
+          attr_reader state_transition_count(): ::Integer
+          attr_writer state_transition_count(): ::Integer | ::Float
+          def clear_state_transition_count: () -> void
+
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
+          def has_search_attributes?: () -> bool
+          def clear_search_attributes: () -> void
+
+          # Header for context propagation and tracing purposes.
+          attr_accessor nexus_header(): ::Google::Protobuf::Map[::String, ::String]
+          def clear_nexus_header: () -> void
+
+          # Metadata for use by user interfaces to display the fixed as-of-start summary and details of the operation.
+          attr_accessor user_metadata(): ::Temporalio::Api::Sdk::V1::UserMetadata?
+          def has_user_metadata?: () -> bool
+          def clear_user_metadata: () -> void
+
+          # Links attached by the handler of this operation on start or completion.
+          attr_accessor links(): ::Google::Protobuf::RepeatedField
+          def clear_links: () -> void
+
+          # The identity of the client who started this operation.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
+          type init_map = {
+            operation_id: (::String | ::Symbol)?,
+            "operation_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            endpoint: (::String | ::Symbol)?,
+            "endpoint" => (::String | ::Symbol)?,
+            service: (::String | ::Symbol)?,
+            "service" => (::String | ::Symbol)?,
+            operation: (::String | ::Symbol)?,
+            "operation" => (::String | ::Symbol)?,
+            status: (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float)?,
+            "status" => (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float)?,
+            state: (::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Temporalio::Api::Enums::V1::PendingNexusOperationState::strings | ::Integer | ::Float)?,
+            "state" => (::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Temporalio::Api::Enums::V1::PendingNexusOperationState::strings | ::Integer | ::Float)?,
+            schedule_to_close_timeout: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "schedule_to_close_timeout" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            schedule_to_start_timeout: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "schedule_to_start_timeout" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            start_to_close_timeout: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "start_to_close_timeout" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            attempt: (::Integer | ::Float)?,
+            "attempt" => (::Integer | ::Float)?,
+            schedule_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            expiration_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "expiration_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            close_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "close_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            last_attempt_complete_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "last_attempt_complete_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            last_attempt_failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+            "last_attempt_failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+            next_attempt_schedule_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "next_attempt_schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            execution_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "execution_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            cancellation_info: (::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo | ::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo::init_map)?,
+            "cancellation_info" => (::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo | ::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo::init_map)?,
+            blocked_reason: (::String | ::Symbol)?,
+            "blocked_reason" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
+            operation_token: (::String | ::Symbol)?,
+            "operation_token" => (::String | ::Symbol)?,
+            state_transition_count: (::Integer | ::Float)?,
+            "state_transition_count" => (::Integer | ::Float)?,
+            search_attributes: (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
+            "search_attributes" => (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
+            nexus_header: ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+            "nexus_header" => ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+            user_metadata: (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
+            "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
+            links: ::Array[::Temporalio::Api::Common::V1::Link]?,
+            "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("operation_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("endpoint" name) -> ::String
+            | ("service" name) -> ::String
+            | ("operation" name) -> ::String
+            | ("status" name) -> (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Integer)
+            | ("state" name) -> (::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Integer)
+            | ("schedule_to_close_timeout" name) -> ::Google::Protobuf::Duration?
+            | ("schedule_to_start_timeout" name) -> ::Google::Protobuf::Duration?
+            | ("start_to_close_timeout" name) -> ::Google::Protobuf::Duration?
+            | ("attempt" name) -> ::Integer
+            | ("schedule_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("expiration_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("close_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("last_attempt_complete_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("last_attempt_failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+            | ("next_attempt_schedule_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("execution_duration" name) -> ::Google::Protobuf::Duration?
+            | ("cancellation_info" name) -> ::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo?
+            | ("blocked_reason" name) -> ::String
+            | ("request_id" name) -> ::String
+            | ("operation_token" name) -> ::String
+            | ("state_transition_count" name) -> ::Integer
+            | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+            | ("nexus_header" name) -> (::Google::Protobuf::Map[::String, ::String])
+            | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
+            | ("links" name) -> ::Google::Protobuf::RepeatedField
+            | ("identity" name) -> ::String
+
+          def []=:
+              ("operation_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("endpoint" name, (::String | ::Symbol) value) -> void
+            | ("service" name, (::String | ::Symbol) value) -> void
+            | ("operation" name, (::String | ::Symbol) value) -> void
+            | ("status" name, (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float) value) -> void
+            | ("state" name, (::Temporalio::Api::Enums::V1::PendingNexusOperationState::names | ::Temporalio::Api::Enums::V1::PendingNexusOperationState::strings | ::Integer | ::Float) value) -> void
+            | ("schedule_to_close_timeout" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("schedule_to_start_timeout" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("start_to_close_timeout" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("attempt" name, (::Integer | ::Float) value) -> void
+            | ("schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("expiration_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("close_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("last_attempt_complete_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("last_attempt_failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+            | ("next_attempt_schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("execution_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("cancellation_info" name, ::Temporalio::Api::Nexus::V1::NexusOperationExecutionCancellationInfo? value) -> void
+            | ("blocked_reason" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
+            | ("operation_token" name, (::String | ::Symbol) value) -> void
+            | ("state_transition_count" name, (::Integer | ::Float) value) -> void
+            | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
+            | ("nexus_header" name, (::Google::Protobuf::Map[::String, ::String]) value) -> void
+            | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
+            | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
+        end
+
+        # Limited Nexus operation information returned in the list response.
+        # When adding fields here, ensure that it is also present in NexusOperationExecutionInfo (note that it may already be present in
+        # NexusOperationExecutionInfo but not at the top-level).
+        class NexusOperationExecutionListInfo < ::Google::Protobuf::AbstractMessage
+
+          # A unique identifier of this operation within its namespace along with run ID (below).
+          attr_reader operation_id(): ::String
+          attr_writer operation_id(): ::String | ::Symbol
+          def clear_operation_id: () -> void
+
+          # The run ID of the standalone Nexus operation.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # Endpoint name.
+          attr_reader endpoint(): ::String
+          attr_writer endpoint(): ::String | ::Symbol
+          def clear_endpoint: () -> void
+
+          # Service name.
+          attr_reader service(): ::String
+          attr_writer service(): ::String | ::Symbol
+          def clear_service: () -> void
+
+          # Operation name.
+          attr_reader operation(): ::String
+          attr_writer operation(): ::String | ::Symbol
+          def clear_operation: () -> void
+
+          # Time the operation was originally scheduled via a StartNexusOperation request.
+          attr_reader schedule_time(): ::Google::Protobuf::Timestamp?
+          attr_writer schedule_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_schedule_time?: () -> bool
+          def clear_schedule_time: () -> void
+
+          # If the operation is in a terminal status, this field represents the time the operation transitioned to that status.
+          attr_reader close_time(): ::Google::Protobuf::Timestamp?
+          attr_writer close_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_close_time?: () -> bool
+          def clear_close_time: () -> void
+
+          # The status is updated once, when the operation is originally scheduled, and again when the operation reaches a terminal status.
+          attr_reader status(): ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Integer
+          attr_writer status(): ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float
+          attr_reader status_const(): ::Integer
+          def clear_status: () -> void
+
+          # Search attributes from the start request.
+          attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
+          def has_search_attributes?: () -> bool
+          def clear_search_attributes: () -> void
+
+          # Updated on terminal status.
+          attr_reader state_transition_count(): ::Integer
+          attr_writer state_transition_count(): ::Integer | ::Float
+          def clear_state_transition_count: () -> void
+
+          # The difference between close time and scheduled time.
+          # This field is only populated if the operation is closed.
+          attr_reader execution_duration(): ::Google::Protobuf::Duration?
+          attr_writer execution_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_execution_duration?: () -> bool
+          def clear_execution_duration: () -> void
+
+          type init_map = {
+            operation_id: (::String | ::Symbol)?,
+            "operation_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            endpoint: (::String | ::Symbol)?,
+            "endpoint" => (::String | ::Symbol)?,
+            service: (::String | ::Symbol)?,
+            "service" => (::String | ::Symbol)?,
+            operation: (::String | ::Symbol)?,
+            "operation" => (::String | ::Symbol)?,
+            schedule_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            close_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "close_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            status: (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float)?,
+            "status" => (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float)?,
+            search_attributes: (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
+            "search_attributes" => (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
+            state_transition_count: (::Integer | ::Float)?,
+            "state_transition_count" => (::Integer | ::Float)?,
+            execution_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "execution_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("operation_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("endpoint" name) -> ::String
+            | ("service" name) -> ::String
+            | ("operation" name) -> ::String
+            | ("schedule_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("close_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("status" name) -> (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Integer)
+            | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
+            | ("state_transition_count" name) -> ::Integer
+            | ("execution_duration" name) -> ::Google::Protobuf::Duration?
+
+          def []=:
+              ("operation_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("endpoint" name, (::String | ::Symbol) value) -> void
+            | ("service" name, (::String | ::Symbol) value) -> void
+            | ("operation" name, (::String | ::Symbol) value) -> void
+            | ("schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("close_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("status" name, (::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::names | ::Temporalio::Api::Enums::V1::NexusOperationExecutionStatus::strings | ::Integer | ::Float) value) -> void
+            | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
+            | ("state_transition_count" name, (::Integer | ::Float) value) -> void
+            | ("execution_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+        end
       end
     end
   end

@@ -622,6 +622,86 @@ module Temporalio
           def []=:
               ("type" name, (::String | ::Symbol) value) -> void
         end
+
+        # A command sent from the server to a worker.
+        class WorkerCommand < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor cancel_activity(): ::Temporalio::Api::Worker::V1::CancelActivityCommand?
+          def has_cancel_activity?: () -> bool
+          def clear_cancel_activity: () -> void
+
+          attr_reader type(): ::Temporalio::Api::Worker::V1::CancelActivityCommand?
+          def has_type?: () -> bool
+          def clear_type: () -> void
+
+          type init_map = {
+            cancel_activity: (::Temporalio::Api::Worker::V1::CancelActivityCommand | ::Temporalio::Api::Worker::V1::CancelActivityCommand::init_map)?,
+            "cancel_activity" => (::Temporalio::Api::Worker::V1::CancelActivityCommand | ::Temporalio::Api::Worker::V1::CancelActivityCommand::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("cancel_activity" name) -> ::Temporalio::Api::Worker::V1::CancelActivityCommand?
+
+          def []=:
+              ("cancel_activity" name, ::Temporalio::Api::Worker::V1::CancelActivityCommand? value) -> void
+        end
+
+        # Cancel an activity if it is still running. Otherwise, do nothing.
+        class CancelActivityCommand < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor task_token(): ::String
+          def clear_task_token: () -> void
+
+          type init_map = {
+            task_token: ::String?,
+            "task_token" => ::String?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("task_token" name) -> ::String
+
+          def []=:
+              ("task_token" name, ::String value) -> void
+        end
+
+        # The result of executing a WorkerCommand.
+        class WorkerCommandResult < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor cancel_activity(): ::Temporalio::Api::Worker::V1::CancelActivityResult?
+          def has_cancel_activity?: () -> bool
+          def clear_cancel_activity: () -> void
+
+          attr_reader type(): ::Temporalio::Api::Worker::V1::CancelActivityResult?
+          def has_type?: () -> bool
+          def clear_type: () -> void
+
+          type init_map = {
+            cancel_activity: (::Temporalio::Api::Worker::V1::CancelActivityResult | ::Temporalio::Api::Worker::V1::CancelActivityResult::init_map)?,
+            "cancel_activity" => (::Temporalio::Api::Worker::V1::CancelActivityResult | ::Temporalio::Api::Worker::V1::CancelActivityResult::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("cancel_activity" name) -> ::Temporalio::Api::Worker::V1::CancelActivityResult?
+
+          def []=:
+              ("cancel_activity" name, ::Temporalio::Api::Worker::V1::CancelActivityResult? value) -> void
+        end
+
+        # Result of a CancelActivityCommand.
+        # Treat both successful cancellation and no-op (activity is no longer running) as success.
+        class CancelActivityResult < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
       end
     end
   end

@@ -69,6 +69,7 @@ module Temporalio
             # (-- api-linter: core::0140::base64=disabled --)
             # Deprecated: Not supported after v0.2.0 api version. Use accepted_client_ca instead.
             # temporal:versioning:max_version=v0.2.0
+            # @deprecated
             attr_reader accepted_client_ca_deprecated(): ::String
             attr_writer accepted_client_ca_deprecated(): ::String | ::Symbol
             def clear_accepted_client_ca_deprecated: () -> void
@@ -136,6 +137,26 @@ module Temporalio
 
             def []=:
                 ("enabled" name, bool value) -> void
+          end
+
+          class LifecycleSpec < ::Google::Protobuf::AbstractMessage
+
+            # Flag to enable delete protection for the namespace.
+            attr_accessor enable_delete_protection(): bool
+            def clear_enable_delete_protection: () -> void
+
+            type init_map = {
+              enable_delete_protection: bool?,
+              "enable_delete_protection" => bool?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("enable_delete_protection" name) -> bool
+
+            def []=:
+                ("enable_delete_protection" name, bool value) -> void
           end
 
           class CodecServerSpec < ::Google::Protobuf::AbstractMessage
@@ -234,26 +255,6 @@ module Temporalio
               | ("custom_error_message" name, ::Temporalio::Api::Cloud::Namespace::V1::CodecServerSpec::CustomErrorMessage? value) -> void
           end
 
-          class LifecycleSpec < ::Google::Protobuf::AbstractMessage
-
-            # Flag to enable delete protection for the namespace.
-            attr_accessor enable_delete_protection(): bool
-            def clear_enable_delete_protection: () -> void
-
-            type init_map = {
-              enable_delete_protection: bool?,
-              "enable_delete_protection" => bool?,
-            }
-
-            def initialize: (?init_map initial_value) -> void
-
-            def []:
-                ("enable_delete_protection" name) -> bool
-
-            def []=:
-                ("enable_delete_protection" name, bool value) -> void
-          end
-
           class HighAvailabilitySpec < ::Google::Protobuf::AbstractMessage
 
             # Flag to disable managed failover for the namespace.
@@ -272,6 +273,224 @@ module Temporalio
 
             def []=:
                 ("disable_managed_failover" name, bool value) -> void
+          end
+
+          # temporal:versioning:min_version=v0.10.0
+          class CapacitySpec < ::Google::Protobuf::AbstractMessage
+            class OnDemand < ::Google::Protobuf::AbstractMessage
+
+              type init_map = {
+              }
+
+              def initialize: (?init_map initial_value) -> void
+            end
+
+            class Provisioned < ::Google::Protobuf::AbstractMessage
+
+              # The units of provisioned capacity in TRU (Temporal Resource Units).
+              # Each TRU unit assigned to the namespace will entitle it with additional APS limits as specified in the documentation.
+              attr_reader value(): ::Float
+              attr_writer value(): ::Float | ::Integer
+              def clear_value: () -> void
+
+              type init_map = {
+                value: (::Float | ::Integer)?,
+                "value" => (::Float | ::Integer)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("value" name) -> ::Float
+
+              def []=:
+                  ("value" name, (::Float | ::Integer) value) -> void
+            end
+
+            # The on-demand capacity mode configuration.
+            attr_accessor on_demand(): ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand?
+            def has_on_demand?: () -> bool
+            def clear_on_demand: () -> void
+
+            # The provisioned capacity mode configuration.
+            attr_accessor provisioned(): ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned?
+            def has_provisioned?: () -> bool
+            def clear_provisioned: () -> void
+
+            attr_reader spec(): (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned)?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            type init_map = {
+              on_demand: (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand::init_map)?,
+              "on_demand" => (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand::init_map)?,
+              provisioned: (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned::init_map)?,
+              "provisioned" => (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("on_demand" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand?
+              | ("provisioned" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned?
+
+            def []=:
+                ("on_demand" name, ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::OnDemand? value) -> void
+              | ("provisioned" name, ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::Provisioned? value) -> void
+          end
+
+          class Capacity < ::Google::Protobuf::AbstractMessage
+            class OnDemand < ::Google::Protobuf::AbstractMessage
+
+              type init_map = {
+              }
+
+              def initialize: (?init_map initial_value) -> void
+            end
+
+            class Provisioned < ::Google::Protobuf::AbstractMessage
+
+              # The current provisioned capacity for the namespace in Temporal Resource Units.
+              # Can be different from the requested capacity in latest_request if the request is still in progress.
+              attr_reader current_value(): ::Float
+              attr_writer current_value(): ::Float | ::Integer
+              def clear_current_value: () -> void
+
+              type init_map = {
+                current_value: (::Float | ::Integer)?,
+                "current_value" => (::Float | ::Integer)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("current_value" name) -> ::Float
+
+              def []=:
+                  ("current_value" name, (::Float | ::Integer) value) -> void
+            end
+
+            class Request < ::Google::Protobuf::AbstractMessage
+              module State
+
+                STATE_CAPACITY_REQUEST_UNSPECIFIED: 0
+
+                STATE_CAPACITY_REQUEST_COMPLETED: 1
+
+                STATE_CAPACITY_REQUEST_IN_PROGRESS: 2
+
+                STATE_CAPACITY_REQUEST_FAILED: 3
+
+                def self.lookup: (::Integer number) -> ::Symbol
+
+
+                def self.resolve: (::Symbol name) -> ::Integer
+
+
+                type names = :STATE_CAPACITY_REQUEST_UNSPECIFIED | :STATE_CAPACITY_REQUEST_COMPLETED | :STATE_CAPACITY_REQUEST_IN_PROGRESS | :STATE_CAPACITY_REQUEST_FAILED
+
+                type strings = "STATE_CAPACITY_REQUEST_UNSPECIFIED" | "STATE_CAPACITY_REQUEST_COMPLETED" | "STATE_CAPACITY_REQUEST_IN_PROGRESS" | "STATE_CAPACITY_REQUEST_FAILED"
+
+                type numbers = 0 | 1 | 2 | 3
+              end
+
+              # The current state of the capacity request (e.g. in-progress, completed, failed).
+              attr_reader state(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Integer
+              attr_writer state(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::strings | ::Integer | ::Float
+              attr_reader state_const(): ::Integer
+              def clear_state: () -> void
+
+              # The date and time when the capacity request was created.
+              attr_reader start_time(): ::Google::Protobuf::Timestamp?
+              attr_writer start_time(): (::Google::Protobuf::Timestamp | ::Time)?
+              def has_start_time?: () -> bool
+              def clear_start_time: () -> void
+
+              # The date and time when the capacity request was completed or failed.
+              attr_reader end_time(): ::Google::Protobuf::Timestamp?
+              attr_writer end_time(): (::Google::Protobuf::Timestamp | ::Time)?
+              def has_end_time?: () -> bool
+              def clear_end_time: () -> void
+
+              # The id of the async operation that is creating/updating/deleting the capacity, if any.
+              attr_reader async_operation_id(): ::String
+              attr_writer async_operation_id(): ::String | ::Symbol
+              def clear_async_operation_id: () -> void
+
+              # The requested capacity specification.
+              attr_accessor spec(): ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec?
+              def has_spec?: () -> bool
+              def clear_spec: () -> void
+
+              type init_map = {
+                state: (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::strings | ::Integer | ::Float)?,
+                "state" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::strings | ::Integer | ::Float)?,
+                start_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+                "start_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+                end_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+                "end_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+                async_operation_id: (::String | ::Symbol)?,
+                "async_operation_id" => (::String | ::Symbol)?,
+                spec: (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::init_map)?,
+                "spec" => (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::init_map)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("state" name) -> (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Integer)
+                | ("start_time" name) -> ::Google::Protobuf::Timestamp?
+                | ("end_time" name) -> ::Google::Protobuf::Timestamp?
+                | ("async_operation_id" name) -> ::String
+                | ("spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec?
+
+              def []=:
+                  ("state" name, (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::names | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State::strings | ::Integer | ::Float) value) -> void
+                | ("start_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+                | ("end_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+                | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+                | ("spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec? value) -> void
+            end
+
+            # The status of on-demand capacity mode.
+            attr_accessor on_demand(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand?
+            def has_on_demand?: () -> bool
+            def clear_on_demand: () -> void
+
+            # The status of provisioned capacity mode.
+            attr_accessor provisioned(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned?
+            def has_provisioned?: () -> bool
+            def clear_provisioned: () -> void
+
+            # The latest requested capacity for the namespace, if any.
+            attr_accessor latest_request(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request?
+            def has_latest_request?: () -> bool
+            def clear_latest_request: () -> void
+
+            attr_reader current_mode(): (::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned)?
+            def has_current_mode?: () -> bool
+            def clear_current_mode: () -> void
+
+            type init_map = {
+              on_demand: (::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand::init_map)?,
+              "on_demand" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand::init_map)?,
+              provisioned: (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned::init_map)?,
+              "provisioned" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned::init_map)?,
+              latest_request: (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::init_map)?,
+              "latest_request" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("on_demand" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand?
+              | ("provisioned" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned?
+              | ("latest_request" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request?
+
+            def []=:
+                ("on_demand" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity::OnDemand? value) -> void
+              | ("provisioned" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Provisioned? value) -> void
+              | ("latest_request" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity::Request? value) -> void
           end
 
           class NamespaceSpec < ::Google::Protobuf::AbstractMessage
@@ -388,6 +607,16 @@ module Temporalio
             attr_accessor connectivity_rule_ids(): ::Google::Protobuf::RepeatedField
             def clear_connectivity_rule_ids: () -> void
 
+            # The capacity configuration for the namespace.
+            # There are two capacity modes: on-demand and provisioned.
+            # On-demand capacity mode allows the namespace to scale automatically based on usage.
+            # Provisioned capacity mode allows the user to specify a fixed amount of capacity (in TRUs) for the namespace.
+            # Can be changed only when the last capacity request is not in progress.
+            # temporal:versioning:min_version=v0.10.0
+            attr_accessor capacity_spec(): ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec?
+            def has_capacity_spec?: () -> bool
+            def clear_capacity_spec: () -> void
+
             type init_map = {
               name: (::String | ::Symbol)?,
               "name" => (::String | ::Symbol)?,
@@ -411,6 +640,8 @@ module Temporalio
               "high_availability" => (::Temporalio::Api::Cloud::Namespace::V1::HighAvailabilitySpec | ::Temporalio::Api::Cloud::Namespace::V1::HighAvailabilitySpec::init_map)?,
               connectivity_rule_ids: ::Array[::String | ::Symbol]?,
               "connectivity_rule_ids" => ::Array[::String | ::Symbol]?,
+              capacity_spec: (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::init_map)?,
+              "capacity_spec" => (::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec | ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -427,6 +658,7 @@ module Temporalio
               | ("lifecycle" name) -> ::Temporalio::Api::Cloud::Namespace::V1::LifecycleSpec?
               | ("high_availability" name) -> ::Temporalio::Api::Cloud::Namespace::V1::HighAvailabilitySpec?
               | ("connectivity_rule_ids" name) -> (::Google::Protobuf::RepeatedField)
+              | ("capacity_spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec?
 
             def []=:
                 ("name" name, (::String | ::Symbol) value) -> void
@@ -440,6 +672,7 @@ module Temporalio
               | ("lifecycle" name, ::Temporalio::Api::Cloud::Namespace::V1::LifecycleSpec? value) -> void
               | ("high_availability" name, ::Temporalio::Api::Cloud::Namespace::V1::HighAvailabilitySpec? value) -> void
               | ("connectivity_rule_ids" name, (::Google::Protobuf::RepeatedField) value) -> void
+              | ("capacity_spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec? value) -> void
           end
 
           class Endpoints < ::Google::Protobuf::AbstractMessage
@@ -647,6 +880,11 @@ module Temporalio
             attr_accessor tags(): ::Google::Protobuf::Map[::String, ::String]
             def clear_tags: () -> void
 
+            # The status of namespace's capacity, if any.
+            attr_accessor capacity(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity?
+            def has_capacity?: () -> bool
+            def clear_capacity: () -> void
+
             type init_map = {
               namespace: (::String | ::Symbol)?,
               "namespace" => (::String | ::Symbol)?,
@@ -678,6 +916,8 @@ module Temporalio
               "connectivity_rules" => ::Array[::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRule]?,
               tags: ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
               "tags" => ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+              capacity: (::Temporalio::Api::Cloud::Namespace::V1::Capacity | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::init_map)?,
+              "capacity" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -698,6 +938,7 @@ module Temporalio
               | ("region_status" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceRegionStatus])
               | ("connectivity_rules" name) -> ::Google::Protobuf::RepeatedField
               | ("tags" name) -> (::Google::Protobuf::Map[::String, ::String])
+              | ("capacity" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity?
 
             def []=:
                 ("namespace" name, (::String | ::Symbol) value) -> void
@@ -715,6 +956,7 @@ module Temporalio
               | ("region_status" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceRegionStatus]) value) -> void
               | ("connectivity_rules" name, ::Google::Protobuf::RepeatedField value) -> void
               | ("tags" name, (::Google::Protobuf::Map[::String, ::String]) value) -> void
+              | ("capacity" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity? value) -> void
           end
 
           class NamespaceRegionStatus < ::Google::Protobuf::AbstractMessage
@@ -792,7 +1034,7 @@ module Temporalio
 
           class ExportSinkSpec < ::Google::Protobuf::AbstractMessage
 
-            # The unique name of the export sink, it can't be changed once set. 
+            # The unique name of the export sink, it can't be changed once set.
             attr_reader name(): ::String
             attr_writer name(): ::String | ::Symbol
             def clear_name: () -> void
@@ -806,7 +1048,8 @@ module Temporalio
             def has_s3?: () -> bool
             def clear_s3: () -> void
 
-            # The GCS configuration details when destination_type is GCS. 
+            # This is a feature under development. We will allow GCS sink support for GCP Namespaces.
+            # The GCS configuration details when destination_type is GCS.
             attr_accessor gcs(): ::Temporalio::Api::Cloud::Sink::V1::GCSSpec?
             def has_gcs?: () -> bool
             def clear_gcs: () -> void
@@ -861,7 +1104,7 @@ module Temporalio
               type numbers = 0 | 1 | 2 | 3
             end
 
-            # The unique name of the export sink.
+            # The unique name of the export sink, once set it can't be changed
             attr_reader name(): ::String
             attr_writer name(): ::String | ::Symbol
             def clear_name: () -> void
@@ -945,6 +1188,205 @@ module Temporalio
               | ("error_message" name, (::String | ::Symbol) value) -> void
               | ("latest_data_export_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("last_health_check_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
+
+          # NamespaceCapacityInfo contains detailed capacity information for a namespace.
+          class NamespaceCapacityInfo < ::Google::Protobuf::AbstractMessage
+            class CapacityModeOptions < ::Google::Protobuf::AbstractMessage
+              class Provisioned < ::Google::Protobuf::AbstractMessage
+
+                # The valid TRU (Temporal Resource Unit) values that can be set.
+                # These are the discrete capacity tiers available for selection.
+                attr_accessor valid_tru_values(): ::Google::Protobuf::RepeatedField
+                def clear_valid_tru_values: () -> void
+
+                # The maximum TRU value that can currently be set for this namespace.
+                # This may be lower than the highest value in valid_tru_values due to
+                # inventory constraints.
+                attr_reader max_available_tru_value(): ::Float
+                attr_writer max_available_tru_value(): ::Float | ::Integer
+                def clear_max_available_tru_value: () -> void
+
+                type init_map = {
+                  valid_tru_values: ::Array[::Float | ::Integer]?,
+                  "valid_tru_values" => ::Array[::Float | ::Integer]?,
+                  max_available_tru_value: (::Float | ::Integer)?,
+                  "max_available_tru_value" => (::Float | ::Integer)?,
+                }
+
+                def initialize: (?init_map initial_value) -> void
+
+                def []:
+                    ("valid_tru_values" name) -> (::Google::Protobuf::RepeatedField)
+                  | ("max_available_tru_value" name) -> ::Float
+
+                def []=:
+                    ("valid_tru_values" name, (::Google::Protobuf::RepeatedField) value) -> void
+                  | ("max_available_tru_value" name, (::Float | ::Integer) value) -> void
+              end
+
+              class OnDemand < ::Google::Protobuf::AbstractMessage
+
+                # The APS limit that would apply to this namespace in on-demand mode.
+                # See: https://docs.temporal.io/cloud/limits#actions-per-second
+                attr_reader aps_limit(): ::Float
+                attr_writer aps_limit(): ::Float | ::Integer
+                def clear_aps_limit: () -> void
+
+                type init_map = {
+                  aps_limit: (::Float | ::Integer)?,
+                  "aps_limit" => (::Float | ::Integer)?,
+                }
+
+                def initialize: (?init_map initial_value) -> void
+
+                def []:
+                    ("aps_limit" name) -> ::Float
+
+                def []=:
+                    ("aps_limit" name, (::Float | ::Integer) value) -> void
+              end
+
+              # Provisioned capacity options and entitlements.
+              attr_accessor provisioned(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned?
+              def has_provisioned?: () -> bool
+              def clear_provisioned: () -> void
+
+              # On-Demand capacity information.
+              attr_accessor on_demand(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand?
+              def has_on_demand?: () -> bool
+              def clear_on_demand: () -> void
+
+              type init_map = {
+                provisioned: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned::init_map)?,
+                "provisioned" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned::init_map)?,
+                on_demand: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand::init_map)?,
+                "on_demand" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand::init_map)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("provisioned" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned?
+                | ("on_demand" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand?
+
+              def []=:
+                  ("provisioned" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::Provisioned? value) -> void
+                | ("on_demand" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::OnDemand? value) -> void
+            end
+
+            class Stats < ::Google::Protobuf::AbstractMessage
+              class Summary < ::Google::Protobuf::AbstractMessage
+
+                attr_reader mean(): ::Float
+                attr_writer mean(): ::Float | ::Integer
+                def clear_mean: () -> void
+
+                attr_reader p90(): ::Float
+                attr_writer p90(): ::Float | ::Integer
+                def clear_p90: () -> void
+
+                attr_reader p99(): ::Float
+                attr_writer p99(): ::Float | ::Integer
+                def clear_p99: () -> void
+
+                type init_map = {
+                  mean: (::Float | ::Integer)?,
+                  "mean" => (::Float | ::Integer)?,
+                  p90: (::Float | ::Integer)?,
+                  "p90" => (::Float | ::Integer)?,
+                  p99: (::Float | ::Integer)?,
+                  "p99" => (::Float | ::Integer)?,
+                }
+
+                def initialize: (?init_map initial_value) -> void
+
+                def []:
+                    ("mean" name) -> ::Float
+                  | ("p90" name) -> ::Float
+                  | ("p99" name) -> ::Float
+
+                def []=:
+                    ("mean" name, (::Float | ::Integer) value) -> void
+                  | ("p90" name, (::Float | ::Integer) value) -> void
+                  | ("p99" name, (::Float | ::Integer) value) -> void
+              end
+
+              # Actions-per-second measurements summarized over the last 7 days.
+              attr_accessor aps(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary?
+              def has_aps?: () -> bool
+              def clear_aps: () -> void
+
+              type init_map = {
+                aps: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary::init_map)?,
+                "aps" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary::init_map)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("aps" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary?
+
+              def []=:
+                  ("aps" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::Summary? value) -> void
+            end
+
+            # The namespace identifier.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # Whether the namespace's APS limit was set by Temporal Support.
+            # When true, adjusting the namespace's capacity will reset this limit.
+            attr_accessor has_legacy_limits(): bool
+            def clear_has_legacy_limits: () -> void
+
+            # The current capacity of the namespace.
+            # Includes the current mode (on-demand or provisioned) and latest request status.
+            attr_accessor current_capacity(): ::Temporalio::Api::Cloud::Namespace::V1::Capacity?
+            def has_current_capacity?: () -> bool
+            def clear_current_capacity: () -> void
+
+            # Available capacity mode options for this namespace.
+            # Contains configuration limits for both provisioned and on-demand modes.
+            attr_accessor mode_options(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions?
+            def has_mode_options?: () -> bool
+            def clear_mode_options: () -> void
+
+            # Usage statistics for the namespace over the last 7 days.
+            # Used to calculate On-Demand capacity limits, also useful for capacity planning.
+            attr_accessor stats(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats?
+            def has_stats?: () -> bool
+            def clear_stats: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              has_legacy_limits: bool?,
+              "has_legacy_limits" => bool?,
+              current_capacity: (::Temporalio::Api::Cloud::Namespace::V1::Capacity | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::init_map)?,
+              "current_capacity" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::init_map)?,
+              mode_options: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::init_map)?,
+              "mode_options" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions::init_map)?,
+              stats: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::init_map)?,
+              "stats" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("has_legacy_limits" name) -> bool
+              | ("current_capacity" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity?
+              | ("mode_options" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions?
+              | ("stats" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats?
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("has_legacy_limits" name, bool value) -> void
+              | ("current_capacity" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity? value) -> void
+              | ("mode_options" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions? value) -> void
+              | ("stats" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::Stats? value) -> void
           end
         end
       end

@@ -16,6 +16,21 @@ module Temporalio
           super(connection, Internal::Bridge::Client::SERVICE_CLOUD)
         end
 
+        # Calls CloudService.GetCurrentIdentity API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityResponse] API response.
+        def get_current_identity(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_current_identity',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.GetUsers API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest] API request.
@@ -871,6 +886,21 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.GetAuditLogs API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsResponse] API response.
+        def get_audit_logs(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_audit_logs',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.ValidateAccountAuditLogSink API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest] API request.
@@ -881,6 +911,126 @@ module Temporalio
             rpc: 'validate_account_audit_log_sink',
             request_class: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest,
             response_class: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateAccountAuditLogSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkResponse] API response.
+        def create_account_audit_log_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_account_audit_log_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetAccountAuditLogSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkResponse] API response.
+        def get_account_audit_log_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_account_audit_log_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetAccountAuditLogSinks API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksResponse] API response.
+        def get_account_audit_log_sinks(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_account_audit_log_sinks',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateAccountAuditLogSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkResponse] API response.
+        def update_account_audit_log_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_account_audit_log_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteAccountAuditLogSink API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkResponse] API response.
+        def delete_account_audit_log_sink(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_account_audit_log_sink',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetNamespaceCapacityInfo API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoResponse] API response.
+        def get_namespace_capacity_info(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_namespace_capacity_info',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateBillingReport API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportResponse] API response.
+        def create_billing_report(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_billing_report',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetBillingReport API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse] API response.
+        def get_billing_report(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_billing_report',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse,
             request:,
             rpc_options:
           )

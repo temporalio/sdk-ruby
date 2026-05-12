@@ -74,7 +74,6 @@ module Temporalio
               ("max_tasks_per_second" name, ::Google::Protobuf::DoubleValue? value) -> void
         end
 
-        # Experimental. Worker Deployments are experimental and might significantly change in the future.
         class TaskQueueVersioningInfo < ::Google::Protobuf::AbstractMessage
 
           # Specifies which Deployment Version should receive new workflow executions and tasks of
@@ -816,6 +815,34 @@ module Temporalio
           def []=:
               ("rule" name, ::Temporalio::Api::TaskQueue::V1::CompatibleBuildIdRedirectRule? value) -> void
             | ("create_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        end
+
+        class PollerGroupInfo < ::Google::Protobuf::AbstractMessage
+
+          attr_reader id(): ::String
+          attr_writer id(): ::String | ::Symbol
+          def clear_id: () -> void
+
+          attr_reader weight(): ::Float
+          attr_writer weight(): ::Float | ::Integer
+          def clear_weight: () -> void
+
+          type init_map = {
+            id: (::String | ::Symbol)?,
+            "id" => (::String | ::Symbol)?,
+            weight: (::Float | ::Integer)?,
+            "weight" => (::Float | ::Integer)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("id" name) -> ::String
+            | ("weight" name) -> ::Float
+
+          def []=:
+              ("id" name, (::String | ::Symbol) value) -> void
+            | ("weight" name, (::Float | ::Integer) value) -> void
         end
 
         # Attached to task responses to give hints to the SDK about how it may adjust its number of

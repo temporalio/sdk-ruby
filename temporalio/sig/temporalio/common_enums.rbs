@@ -22,6 +22,7 @@ module Temporalio
 
     UNSPECIFIED: enum
     AUTO_UPGRADE: enum
+    USE_RAMPING_VERSION: enum
   end
 
   module SuggestContinueAsNewReason
