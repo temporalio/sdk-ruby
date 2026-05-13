@@ -1,6 +1,6 @@
 # Ruby Rust Bridge
 
-This is a Ruby extension written in Rust to incorporate https://github.com/temporalio/sdk-core (included as a
+This is a Ruby extension written in Rust to incorporate https://github.com/temporalio/sdk-rust (included as a
 submodule). This leverages https://github.com/oxidize-rb/rb-sys and https://github.com/matsadler/magnus.
 
 ## Tokio Async to Ruby Async

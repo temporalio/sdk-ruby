@@ -74,6 +74,7 @@ module Temporalio
           attr_reader retry_policy: RetryPolicy?
           attr_reader memo: Hash[String, Object?]?
           attr_reader search_attributes: SearchAttributes?
+          attr_reader priority: Priority
           attr_reader arg_hints: Array[Object]?
           attr_reader headers: Hash[String, Object?]?
 
@@ -90,6 +91,7 @@ module Temporalio
             ?retry_policy: RetryPolicy?,
             ?memo: Hash[String, Object?]?,
             ?search_attributes: SearchAttributes?,
+            ?priority: Priority,
             ?arg_hints: Array[Object]?,
             ?headers: Hash[String, Object?]?
           ) -> StartWorkflow
