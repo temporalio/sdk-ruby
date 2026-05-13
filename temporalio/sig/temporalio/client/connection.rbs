@@ -12,6 +12,7 @@ module Temporalio
         attr_reader http_connect_proxy: HTTPConnectProxyOptions
         attr_reader runtime: Runtime
         attr_reader lazy_connect: bool
+        attr_reader dns_load_balancing: DnsLoadBalancingOptions?
 
         def initialize: (
           target_host: String,
@@ -23,7 +24,8 @@ module Temporalio
           keep_alive: KeepAliveOptions,
           http_connect_proxy: HTTPConnectProxyOptions?,
           runtime: Runtime,
-          lazy_connect: bool
+          lazy_connect: bool,
+          dns_load_balancing: DnsLoadBalancingOptions?
         ) -> void
 
         def to_h: -> Hash[Symbol, untyped]
@@ -85,6 +87,14 @@ module Temporalio
         ) -> void
       end
 
+      class DnsLoadBalancingOptions
+        attr_reader resolution_interval: Float
+
+        def initialize: (
+          ?resolution_interval: Float
+        ) -> void
+      end
+
       attr_reader options: Options
 
       # TODO(cretz): Update when generated
@@ -106,6 +116,7 @@ module Temporalio
         ?http_connect_proxy: HTTPConnectProxyOptions?,
         ?runtime: Runtime,
         ?lazy_connect: bool,
+        ?dns_load_balancing: DnsLoadBalancingOptions?,
         ?around_connect: nil | ^(Options) { (Options) -> void } -> void
       ) -> void
 

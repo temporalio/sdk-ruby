@@ -24,7 +24,8 @@ module Temporalio
         :keep_alive,
         :http_connect_proxy,
         :runtime,
-        :lazy_connect
+        :lazy_connect,
+        :dns_load_balancing
       )
 
       # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
@@ -132,6 +133,22 @@ module Temporalio
       #   @return [String, nil] Pass for HTTP basic auth for the proxy, must be combined with {basic_auth_user}.
       class HTTPConnectProxyOptions; end # rubocop:disable Lint/EmptyClass
 
+      DnsLoadBalancingOptions = Data.define(
+        :resolution_interval
+      )
+
+      # DNS load balancing options for client connections. When set, Core periodically re-resolves the target host's
+      # DNS records and round-robins requests across the resolved addresses. Mutually exclusive with
+      # {HTTPConnectProxyOptions} -- DNS load balancing is silently disabled when an HTTP CONNECT proxy is configured.
+      #
+      # @!attribute resolution_interval
+      #   @return [Float] How often to re-resolve DNS, in seconds. Default 30.0.
+      class DnsLoadBalancingOptions
+        def initialize(resolution_interval: 30.0)
+          super
+        end
+      end
+
       # @return [Options] Frozen options for this client which has the same attributes as {initialize}. Note that if
       #   {api_key=} or {rpc_metadata=} are updated, the options object is replaced with those changes (it is not
       #   mutated in place).
@@ -169,6 +186,8 @@ module Temporalio
       # @param lazy_connect [Boolean] If true, there is no connection until the first call is attempted or a worker
       #   is created with it. Clients from lazy connections cannot be used for workers if they have not performed a
       #   connection.
+      # @param dns_load_balancing [DnsLoadBalancingOptions, nil] DNS load balancing options for this connection. Default
+      #   is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are mutually exclusive.
       # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block must
       #   be yielded to only once with the options. The block does not return a meaningful value, nor should
       #   around_connect.
@@ -185,6 +204,7 @@ module Temporalio
         http_connect_proxy: nil,
         runtime: Runtime.default,
         lazy_connect: false,
+        dns_load_balancing: nil,
         around_connect: nil
       )
         @options = Options.new(
@@ -197,7 +217,8 @@ module Temporalio
           keep_alive:,
           http_connect_proxy:,
           runtime:,
-          lazy_connect:
+          lazy_connect:,
+          dns_load_balancing:
         ).freeze
         @core_client_mutex = Mutex.new
         # Create core client now if not lazy, applying around_connect if present
@@ -327,6 +348,11 @@ module Temporalio
             target_host: @options.http_connect_proxy.target_host,
             basic_auth_user: @options.http_connect_proxy.basic_auth_user,
             basic_auth_pass: @options.http_connect_proxy.basic_auth_pass
+          )
+        end
+        if (dns_load_balancing = @options.dns_load_balancing)
+          options.dns_load_balancing = Internal::Bridge::Client::DnsLoadBalancingOptions.new(
+            resolution_interval: dns_load_balancing.resolution_interval
           )
         end
         Internal::Bridge::Client.new(@options.runtime._core_runtime, options)

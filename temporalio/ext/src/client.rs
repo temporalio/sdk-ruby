@@ -2,7 +2,8 @@ use std::{collections::HashMap, future::Future, marker::PhantomData, time::Durat
 
 use temporalio_client::{
     ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
-    HttpConnectProxyOptions, RetryOptions, TlsOptions, errors::ClientConnectError,
+    DnsLoadBalancingOptions, HttpConnectProxyOptions, RetryOptions, TlsOptions,
+    errors::ClientConnectError,
 };
 
 use magnus::{
@@ -177,6 +178,18 @@ impl Client {
                         }
                     },
                 })
+            } else {
+                None
+            },
+        )
+        .dns_load_balancing(
+            if options.child(id!("http_connect_proxy"))?.is_some() {
+                None
+            } else if let Some(dns) = options.child(id!("dns_load_balancing"))? {
+                let mut opts = DnsLoadBalancingOptions::default();
+                opts.resolution_interval =
+                    Duration::from_secs_f64(dns.member(id!("resolution_interval"))?);
+                Some(opts)
             } else {
                 None
             },

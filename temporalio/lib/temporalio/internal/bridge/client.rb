@@ -16,7 +16,8 @@ module Temporalio
           :tls, # Optional
           :rpc_retry,
           :keep_alive, # Optional
-          :http_connect_proxy # Optional
+          :http_connect_proxy, # Optional
+          :dns_load_balancing # Optional
         )
 
         TLSOptions = Struct.new(
@@ -44,6 +45,10 @@ module Temporalio
           :target_host,
           :basic_auth_user, # Optional
           :basic_auth_pass # Optional
+        )
+
+        DnsLoadBalancingOptions = Struct.new(
+          :resolution_interval
         )
 
         def self.new(runtime, options)

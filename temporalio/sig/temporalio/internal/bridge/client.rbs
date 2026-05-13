@@ -13,7 +13,8 @@ module Temporalio
           attr_accessor rpc_retry: RPCRetryOptions
           attr_accessor keep_alive: KeepAliveOptions?
           attr_accessor http_connect_proxy: HTTPConnectProxyOptions?
-  
+          attr_accessor dns_load_balancing: DnsLoadBalancingOptions?
+
           def initialize: (
             target_host: String,
             client_name: String,
@@ -24,7 +25,8 @@ module Temporalio
             ?tls: TLSOptions?,
             rpc_retry: RPCRetryOptions,
             ?keep_alive: KeepAliveOptions?,
-            ?http_connect_proxy: HTTPConnectProxyOptions?
+            ?http_connect_proxy: HTTPConnectProxyOptions?,
+            ?dns_load_balancing: DnsLoadBalancingOptions?
           ) -> void
         end
 
@@ -74,11 +76,19 @@ module Temporalio
           attr_accessor target_host: String
           attr_accessor basic_auth_user: String?
           attr_accessor basic_auth_pass: String?
-  
+
           def initialize: (
             target_host: String,
             basic_auth_user: String?,
             basic_auth_pass: String?
+          ) -> void
+        end
+
+        class DnsLoadBalancingOptions
+          attr_accessor resolution_interval: Float
+
+          def initialize: (
+            resolution_interval: Float
           ) -> void
         end
 
