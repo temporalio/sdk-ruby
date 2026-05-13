@@ -3,6 +3,7 @@
 require 'google/protobuf/well_known_types'
 require 'logger'
 require 'temporalio/api'
+require 'temporalio/client/activity_handle'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
@@ -471,6 +472,20 @@ module Temporalio
       WorkflowHandle.new(
         client: self, id: workflow_id, run_id:, result_run_id: run_id, first_execution_run_id:, result_hint:
       )
+    end
+
+    # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
+    # (a different process, a different language SDK, or by another client) and you have only its ID.
+    #
+    # @param activity_id [String] ID for the activity.
+    # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
+    #   latest run of the given activity ID.
+    # @param result_hint [Object, nil] Converter hint for the activity's result. Set this when you know what
+    #   type the activity returns so {ActivityHandle#result}'s deserialization uses the right hint.
+    #
+    # @return [ActivityHandle] The activity handle.
+    def activity_handle(activity_id, activity_run_id: nil, result_hint: nil)
+      ActivityHandle.new(client: self, id: activity_id, run_id: activity_run_id, result_hint:)
     end
 
     # Start an update, possibly starting the workflow at the same time if it doesn't exist (depending upon ID conflict

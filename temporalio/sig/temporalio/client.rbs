@@ -130,6 +130,12 @@ module Temporalio
       ?result_hint: Object?
     ) -> WorkflowHandle
 
+    def activity_handle: (
+      String activity_id,
+      ?activity_run_id: String?,
+      ?result_hint: Object?
+    ) -> ActivityHandle
+
     def start_update_with_start_workflow: (
       Workflow::Definition::Update | Symbol | String update,
       *Object? args,
