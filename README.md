@@ -86,7 +86,7 @@ Also see:
 
 ### Installation
 
-The Ruby SDK works with Ruby 3.3, 3.4, and 4.0. (Ruby 3.3.2+ is recommended over 3.3.0 due to problems with fibers.)
+The Ruby SDK works with Ruby 3.3, 3.4, and 4.0. (If using Fibers, Ruby 3.3.2+ is recommended due to problems with fibers in previous versions.)
 
 Can require in a Gemfile like:
 
