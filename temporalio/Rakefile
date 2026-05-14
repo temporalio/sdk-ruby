@@ -94,7 +94,7 @@ end
 
 task :rust_lint do
   sh 'cargo', 'clippy', '-p', 'temporalio_bridge', '--no-deps', '--', '-Dwarnings'
-  sh 'cargo', 'fmt', '--check'
+  sh 'cargo', 'fmt', '--check', '-p', 'temporalio_bridge'
 end
 
 task default: ['rubocop', 'yard', 'rbs:install_collection', 'steep', 'rust_lint', 'compile', 'test']
