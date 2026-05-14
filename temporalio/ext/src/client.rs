@@ -183,19 +183,17 @@ impl Client {
                 None
             },
         )
-        .dns_load_balancing(
-            if options.child(id!("http_connect_proxy"))?.is_some() {
-                warn!("Disabling DNS load balancing because http_connect_proxy is set");
-                None
-            } else if let Some(dns) = options.child(id!("dns_load_balancing"))? {
-                let mut opts = DnsLoadBalancingOptions::default();
-                opts.resolution_interval =
-                    Duration::from_secs_f64(dns.member(id!("resolution_interval"))?);
-                Some(opts)
-            } else {
-                None
-            },
-        )
+        .dns_load_balancing(if options.child(id!("http_connect_proxy"))?.is_some() {
+            warn!("Disabling DNS load balancing because http_connect_proxy is set");
+            None
+        } else if let Some(dns) = options.child(id!("dns_load_balancing"))? {
+            let mut opts = DnsLoadBalancingOptions::default();
+            opts.resolution_interval =
+                Duration::from_secs_f64(dns.member(id!("resolution_interval"))?);
+            Some(opts)
+        } else {
+            None
+        })
         .maybe_metrics_meter(metrics_meter)
         .build();
 
