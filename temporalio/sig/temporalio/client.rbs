@@ -50,7 +50,8 @@ module Temporalio
       ?keep_alive: Connection::KeepAliveOptions,
       ?http_connect_proxy: Connection::HTTPConnectProxyOptions?,
       ?runtime: Runtime,
-      ?lazy_connect: bool
+      ?lazy_connect: bool,
+      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?
     ) -> Client
 
     def self._validate_plugins!: (Array[Plugin] plugins) -> void
