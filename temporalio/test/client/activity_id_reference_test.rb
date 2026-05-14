@@ -4,9 +4,8 @@ require 'temporalio/client/activity_id_reference'
 require 'test'
 
 class ActivityIDReferenceTest < Test
-  # The workflow-form `.new` was the public surface before SAA. This pins that it still constructs
-  # exactly the same shape so existing callers continue to work.
-  def test_new_constructs_workflow_form_unchanged
+  # `.new(workflow_id:, run_id:, activity_id:)` constructs a workflow-form reference.
+  def test_new_constructs_workflow_form
     ref = Temporalio::Client::ActivityIDReference.new(
       workflow_id: 'wf-1', run_id: 'r-1', activity_id: 'act-1'
     )
@@ -56,10 +55,10 @@ class ActivityIDReferenceTest < Test
     sa_ref = Temporalio::Client::ActivityIDReference.for_standalone(
       activity_id: 'act-2', activity_run_id: 'ar-2'
     )
-    # workflow-form unchanged
+    # workflow-form
     assert_equal 'wf-1', wf_ref.workflow_id
     assert_nil wf_ref.activity_run_id
-    # standalone-form unchanged
+    # standalone-form
     assert_nil sa_ref.workflow_id
     assert_equal 'ar-2', sa_ref.activity_run_id
   end

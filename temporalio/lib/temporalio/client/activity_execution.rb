@@ -187,8 +187,7 @@ module Temporalio
           user_metadata.first
         end
 
-        # @return [Integer] Number of state transitions persisted for this activity. Surfaces a proto
-        #   field that Java's first SAA release left out — Ruby exposes it from day one.
+        # @return [Integer] Number of times this activity's persisted state has been mutated.
         def state_transition_count
           @raw_info.state_transition_count
         end

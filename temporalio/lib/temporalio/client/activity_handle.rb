@@ -7,11 +7,8 @@ require 'temporalio/error'
 
 module Temporalio
   class Client
-    # Handle for interacting with a standalone activity. This is usually created via
-    # {Client.activity_handle}, or via `Client#start_activity` (step 3).
-    #
-    # Calls bridge RPCs directly through {Client::Connection}'s `workflow_service` plumbing.
-    # Step 4 of the SAA plan will refactor these to flow through the interceptor chain.
+    # Handle for interacting with a standalone activity. Usually created via {Client.activity_handle}
+    # or {Client#start_activity}.
     class ActivityHandle
       # @return [String] ID for the activity.
       attr_reader :id
