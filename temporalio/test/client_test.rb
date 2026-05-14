@@ -27,6 +27,28 @@ class ClientTest < Test
     assert client.connection.connected?
   end
 
+  def test_dns_load_balancing_default_nil
+    client = Temporalio::Client.connect('localhost:7233', 'default', lazy_connect: true)
+    assert_nil client.connection.options.dns_load_balancing
+  end
+
+  def test_dns_load_balancing_custom_preserved
+    dns_opts = Temporalio::Client::Connection::DnsLoadBalancingOptions.new(resolution_interval: 5.0)
+    client = Temporalio::Client.connect(
+      'localhost:7233', 'default', lazy_connect: true, dns_load_balancing: dns_opts
+    )
+    stored = client.connection.options.dns_load_balancing
+    assert_equal dns_opts, stored
+    raise 'stored is nil' if stored.nil?
+
+    assert_in_delta 5.0, stored.resolution_interval
+  end
+
+  def test_dns_load_balancing_default_interval
+    opts = Temporalio::Client::Connection::DnsLoadBalancingOptions.new
+    assert_in_delta 30.0, opts.resolution_interval
+  end
+
   class TrackCallsInterceptor
     include Temporalio::Client::Interceptor
 

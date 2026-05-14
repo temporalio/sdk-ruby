@@ -95,6 +95,9 @@ module Temporalio
     # @param runtime [Runtime] Runtime for this client.
     # @param lazy_connect [Boolean] If true, the client will not connect until the first call is attempted or a worker
     #   is created with it. Lazy clients cannot be used for workers if they have not performed a connection.
+    # @param dns_load_balancing [Connection::DnsLoadBalancingOptions, nil] DNS load balancing options for the
+    #   connection. Default is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are
+    #   mutually exclusive.
     #
     # @return [Client] Connected client.
     #
@@ -116,7 +119,8 @@ module Temporalio
       keep_alive: Connection::KeepAliveOptions.new, # Set to nil to disable
       http_connect_proxy: nil,
       runtime: Runtime.default,
-      lazy_connect: false
+      lazy_connect: false,
+      dns_load_balancing: nil
     )
       # Prepare connection. The connection var is needed here so it can be used in callback for plugin.
       base_connection = nil
@@ -162,6 +166,7 @@ module Temporalio
         http_connect_proxy:,
         runtime:,
         lazy_connect:,
+        dns_load_balancing:,
         around_connect: # steep:ignore
       )
 
