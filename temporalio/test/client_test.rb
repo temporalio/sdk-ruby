@@ -39,6 +39,7 @@ class ClientTest < Test
     )
     stored = client.connection.options.dns_load_balancing
     assert_equal dns_opts, stored
+    raise 'stored is nil' if stored.nil?
     assert_in_delta 5.0, stored.resolution_interval # steep:ignore
   end
 
