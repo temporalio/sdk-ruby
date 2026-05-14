@@ -480,7 +480,7 @@ module Temporalio
     end
 
     # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
-    # (a different process, a different language SDK, or by another client) and you have only its ID.
+    # (a different process, or by another client) and you have only its ID.
     #
     # @param activity_id [String] ID for the activity.
     # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
