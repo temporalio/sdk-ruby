@@ -11,6 +11,7 @@ use magnus::{
     scan_args,
 };
 use tonic::{Status, metadata::MetadataKey};
+use tracing::warn;
 use url::Url;
 
 use super::{ROOT_MOD, error, id, new_error};
@@ -184,6 +185,7 @@ impl Client {
         )
         .dns_load_balancing(
             if options.child(id!("http_connect_proxy"))?.is_some() {
+                warn!("Disabling DNS load balancing because http_connect_proxy is set");
                 None
             } else if let Some(dns) = options.child(id!("dns_load_balancing"))? {
                 let mut opts = DnsLoadBalancingOptions::default();
