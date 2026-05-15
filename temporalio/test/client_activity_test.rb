@@ -38,6 +38,15 @@ class ClientActivityTest < Test
     end
   end
 
+  # Sleeps for `delay_seconds` then returns "delayed:#{delay}". Used by tests that need
+  # observable blocking behavior on the client side.
+  class DelayedActivity < Temporalio::Activity::Definition
+    def execute(delay_seconds)
+      sleep(delay_seconds)
+      "delayed:#{delay_seconds}"
+    end
+  end
+
   # Run a worker with the supplied activities for the body of the block and yield the task_queue.
   def with_activity_worker(activities, &block)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
@@ -230,17 +239,24 @@ class ClientActivityTest < Test
   end
 
   def test_get_activity_result_polls_until_activity_completes
-    with_activity_worker([SimpleActivity]) do |task_queue|
-      activity_id = "act-#{SecureRandom.uuid}"
+    # Genuinely test the blocking behavior of result(): start a slow activity, call result,
+    # and assert both that we waited long enough for the activity to finish AND that we got
+    # the right value back. A SimpleActivity-based test wouldn't prove polling at all because
+    # the activity is already done by the time result() asks the server.
+    delay = 2.0
+    with_activity_worker([DelayedActivity]) do |task_queue|
       handle = env.client.start_activity(
-        SimpleActivity,
-        'polled',
-        id: activity_id,
+        DelayedActivity, delay,
+        id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
-        start_to_close_timeout: 10
+        start_to_close_timeout: 30
       )
-      # result blocks until completion via long-poll
-      assert_equal 'saa: polled', handle.result
+      t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      result = handle.result
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0
+      assert_equal "delayed:#{delay}", result
+      assert_operator elapsed, :>=, delay * 0.75,
+                      "Expected result() to block for at least #{delay * 0.75}s (proving long-poll), got #{elapsed}s"
     end
   end
 

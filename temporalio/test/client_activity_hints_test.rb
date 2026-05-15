@@ -9,8 +9,7 @@ require 'temporalio/worker'
 require 'test'
 
 # Verify that hints (arg_hints, result_hint) propagate correctly through SAA paths.
-# Uses a wrapping JSON payload converter (mirrors `HintTrackingJSONConverter` in worker_workflow_test.rb)
-# that captures every hint passed to to_payload / from_payload.
+# Uses a wrapping JSON payload converter that captures every hint passed to to_payload / from_payload.
 class ClientActivityHintsTest < Test
   class HintTrackingJSONConverter < Temporalio::Converters::PayloadConverter::JSONPlain
     attr_accessor :outbound_hints, :inbound_hints
