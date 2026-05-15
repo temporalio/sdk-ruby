@@ -38,7 +38,7 @@ module Temporalio
     # @!attribute activity_type
     #   @return [String] Type name for the activity.
     # @!attribute attempt
-    #   @return [Integer] Attempt the activity is on.
+    #   @return [Integer] Attempt the activity is on. Attempts start at 1 and increment on each retry.
     # @!attribute current_attempt_scheduled_time
     #   @return [Time] When the current attempt was scheduled.
     # @!attribute heartbeat_timeout

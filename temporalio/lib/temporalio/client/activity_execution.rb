@@ -124,7 +124,7 @@ module Temporalio
           Internal::ProtoUtils.timestamp_to_time(@raw_info.last_started_time)
         end
 
-        # @return [Integer] Current attempt number.
+        # @return [Integer] Current attempt number. Attempts start at 1 and increment on each retry.
         def attempt
           @raw_info.attempt
         end
