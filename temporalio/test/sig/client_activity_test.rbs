@@ -1,0 +1,3 @@
+class ClientActivityTest < Test
+  def with_activity_worker: (Array[singleton(Temporalio::Activity::Definition)] activities) { (String) -> untyped } -> untyped
+end

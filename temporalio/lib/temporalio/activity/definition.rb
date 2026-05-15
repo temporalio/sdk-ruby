@@ -155,6 +155,36 @@ module Temporalio
         # @return [Object, nil] Result hint
         attr_reader :result_hint
 
+        # Resolve an activity argument (class / instance / Info / Symbol / String) into a `[name, arg_hints,
+        # result_hint]` triple. Used by `Client#start_activity` to accept the same flexible activity argument
+        # forms that `Workflow.execute_activity` accepts.
+        #
+        # @param activity [Class<Definition>, Definition, Info, Symbol, String] Activity argument.
+        # @return [Array(String, Array[Object]?, Object?)] name, arg_hints, result_hint.
+        def self._type_and_hints_from_parameter(activity)
+          case activity
+          when String, Symbol
+            [activity.to_s, nil, nil]
+          when Class
+            unless activity < Definition
+              raise ArgumentError,
+                    "Class '#{activity}' does not extend Temporalio::Activity::Definition"
+            end
+
+            info = from_activity(activity)
+            raise ArgumentError, 'Cannot pass dynamic activity to start_activity' unless info.name
+
+            [info.name.to_s, info.arg_hints, info.result_hint]
+          when Definition, Info
+            info = from_activity(activity)
+            raise ArgumentError, 'Cannot pass dynamic activity to start_activity' unless info.name
+
+            [info.name.to_s, info.arg_hints, info.result_hint]
+          else
+            raise ArgumentError, "#{activity} is not an activity class, instance, info, symbol, or string"
+          end
+        end
+
         # Obtain definition info representing the given activity, which can be a class, instance, or definition info.
         #
         # @param activity [Definition, Class<Definition>, Info] Activity to get info for.

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'securerandom'
 require 'temporalio/api'
 require 'temporalio/client/activity_execution'
+require 'temporalio/client/interceptor'
 require 'temporalio/error'
 
 module Temporalio
@@ -29,8 +29,7 @@ module Temporalio
       end
 
       # Wait for the activity's outcome (result or failure). Long-polls describe_activity_execution
-      # internally, looping until the server returns an empty long-poll token (meaning the activity is
-      # complete).
+      # internally until the activity reaches a terminal state.
       #
       # @param result_hint [Object, nil] Override the result hint. If nil, uses {#result_hint}.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -41,24 +40,14 @@ module Temporalio
       # @raise [Error::RPCError] RPC error from call.
       def result(result_hint: nil, rpc_options: nil)
         hint = result_hint || @result_hint
-        req = Api::WorkflowService::V1::DescribeActivityExecutionRequest.new(
-          namespace: @client.namespace,
-          activity_id: @id,
-          run_id: @run_id || '',
-          include_outcome: true
+        outcome = @client._impl.fetch_activity_outcome(
+          Interceptor::FetchActivityOutcomeInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            rpc_options:
+          )
         )
-        loop do
-          resp = @client.workflow_service.describe_activity_execution(req, rpc_options:)
-          unless resp.long_poll_token.empty?
-            # Activity is still running; re-poll using the token.
-            req.long_poll_token = resp.long_poll_token
-            # The token implies run_id must also be present on the next request.
-            req.run_id = resp.run_id unless resp.run_id.empty?
-            next
-          end
-          # Activity is complete. Process the outcome.
-          return _process_outcome(resp.outcome, hint)
-        end
+        _process_outcome(outcome, hint)
       end
 
       # Describe the activity (one-shot, no long-poll).
@@ -68,15 +57,13 @@ module Temporalio
       # @return [ActivityExecution::Description] Activity description.
       # @raise [Error::RPCError] RPC error from call.
       def describe(rpc_options: nil)
-        resp = @client.workflow_service.describe_activity_execution(
-          Api::WorkflowService::V1::DescribeActivityExecutionRequest.new(
-            namespace: @client.namespace,
-            activity_id: @id,
-            run_id: @run_id || ''
-          ),
-          rpc_options:
+        @client._impl.describe_activity(
+          Interceptor::DescribeActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            rpc_options:
+          )
         )
-        ActivityExecution::Description.new(resp, @client.data_converter)
       end
 
       # Request cancellation of the activity.
@@ -85,16 +72,13 @@ module Temporalio
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [Error::RPCError] RPC error from call.
       def cancel(reason = nil, rpc_options: nil)
-        @client.workflow_service.request_cancel_activity_execution(
-          Api::WorkflowService::V1::RequestCancelActivityExecutionRequest.new(
-            namespace: @client.namespace,
-            activity_id: @id,
-            run_id: @run_id || '',
-            identity: @client.connection.identity,
-            request_id: SecureRandom.uuid,
-            reason: reason || ''
-          ),
-          rpc_options:
+        @client._impl.cancel_activity(
+          Interceptor::CancelActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            reason:,
+            rpc_options:
+          )
         )
         nil
       end
@@ -105,16 +89,13 @@ module Temporalio
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [Error::RPCError] RPC error from call.
       def terminate(reason = nil, rpc_options: nil)
-        @client.workflow_service.terminate_activity_execution(
-          Api::WorkflowService::V1::TerminateActivityExecutionRequest.new(
-            namespace: @client.namespace,
-            activity_id: @id,
-            run_id: @run_id || '',
-            identity: @client.connection.identity,
-            request_id: SecureRandom.uuid,
-            reason: reason || ''
-          ),
-          rpc_options:
+        @client._impl.terminate_activity(
+          Interceptor::TerminateActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            reason:,
+            rpc_options:
+          )
         )
         nil
       end

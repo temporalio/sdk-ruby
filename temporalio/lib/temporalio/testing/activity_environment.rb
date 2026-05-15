@@ -18,11 +18,13 @@ module Temporalio
       def self.default_info
         @default_info ||= Activity::Info.new(
           activity_id: 'test',
+          activity_run_id: nil,
           activity_type: 'unknown',
           attempt: 1,
           current_attempt_scheduled_time: Time.at(0),
           heartbeat_timeout: nil,
           local?: false,
+          namespace: 'default',
           priority: Temporalio::Priority.default,
           raw_heartbeat_details: [],
           retry_policy: RetryPolicy.new,
