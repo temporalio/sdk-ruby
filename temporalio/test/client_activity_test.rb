@@ -312,4 +312,196 @@ class ClientActivityTest < Test
     end
   end
 
+  def test_start_activity_id_reuse_policy_reject_duplicate_throws
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # First start completes successfully.
+      env.client.execute_activity(
+        SimpleActivity, 'first',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 10,
+        id_reuse_policy: Temporalio::ActivityIDReusePolicy::REJECT_DUPLICATE
+      )
+      # Second start with REJECT_DUPLICATE on the same ID rejects.
+      assert_raises(Temporalio::Error::ActivityAlreadyStartedError) do
+        env.client.start_activity(
+          SimpleActivity, 'second',
+          id: activity_id, task_queue: task_queue, start_to_close_timeout: 10,
+          id_reuse_policy: Temporalio::ActivityIDReusePolicy::REJECT_DUPLICATE
+        )
+      end
+    end
+  end
+
+  def test_start_activity_id_reuse_policy_reject_duplicate_overridable_by_later_request
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # First start with REJECT_DUPLICATE, completes.
+      env.client.execute_activity(
+        SimpleActivity, 'first',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 10,
+        id_reuse_policy: Temporalio::ActivityIDReusePolicy::REJECT_DUPLICATE
+      )
+      # Second start with same ID also REJECT_DUPLICATE → rejected.
+      assert_raises(Temporalio::Error::ActivityAlreadyStartedError) do
+        env.client.start_activity(
+          SimpleActivity, 'second',
+          id: activity_id, task_queue: task_queue, start_to_close_timeout: 10,
+          id_reuse_policy: Temporalio::ActivityIDReusePolicy::REJECT_DUPLICATE
+        )
+      end
+      # Third start with ALLOW_DUPLICATE → succeeds, overriding the prior REJECT_DUPLICATE.
+      result = env.client.execute_activity(
+        SimpleActivity, 'third',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 10,
+        id_reuse_policy: Temporalio::ActivityIDReusePolicy::ALLOW_DUPLICATE
+      )
+      assert_equal 'saa: third', result
+    end
+  end
+
+  def test_describe_timeouts_round_trip
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue,
+        schedule_to_close_timeout: 60,
+        schedule_to_start_timeout: 30,
+        start_to_close_timeout: 45,
+        heartbeat_timeout: 5
+      )
+      desc = handle.describe
+      assert_in_delta 60.0, desc.schedule_to_close_timeout, 0.5
+      assert_in_delta 30.0, desc.schedule_to_start_timeout, 0.5
+      assert_in_delta 45.0, desc.start_to_close_timeout, 0.5
+      assert_in_delta 5.0, desc.heartbeat_timeout, 0.5
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_describe_priority_round_trip
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      priority = Temporalio::Priority.new(priority_key: 3)
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        priority: priority
+      )
+      desc = handle.describe
+      assert_equal 3, desc.priority.priority_key
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_describe_summary_set_at_start
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        summary: 'my activity summary'
+      )
+      desc = handle.describe
+      assert_equal 'my activity summary', desc.summary
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_describe_retry_policy_round_trip
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      retry_policy = Temporalio::RetryPolicy.new(
+        initial_interval: 1.5,
+        backoff_coefficient: 2.5,
+        max_interval: 30.0,
+        max_attempts: 7
+      )
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        retry_policy: retry_policy
+      )
+      desc = handle.describe
+      rp = desc.retry_policy
+      assert_in_delta 1.5, rp.initial_interval, 0.01
+      assert_in_delta 2.5, rp.backoff_coefficient, 0.01
+      assert_in_delta 30.0, rp.max_interval, 0.01
+      assert_equal 7, rp.max_attempts
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_cancel_running_activity_transitions_to_canceled
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        heartbeat_timeout: 5
+      )
+      # Wait until the activity has actually started before cancelling.
+      assert_eventually do
+        desc = handle.describe
+        assert_operator desc.attempt, :>=, 1
+      end
+      handle.cancel('test-cancel')
+      # Activity observes cancellation, raises CanceledError; server records CANCELED.
+      assert_eventually do
+        desc = handle.describe
+        assert_equal Temporalio::Client::ActivityExecutionStatus::CANCELED, desc.status
+      end
+      # handle.result should raise ActivityFailedError with a CanceledError cause.
+      err = assert_raises(Temporalio::Error::ActivityFailedError) { handle.result }
+      assert_instance_of Temporalio::Error::CanceledError, err.cause
+    end
+  end
+
+  def test_describe_canceled_reason_after_cancel
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      handle = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30
+      )
+      handle.cancel('user-cancel-reason')
+      assert_eventually do
+        desc = handle.describe
+        assert_equal 'user-cancel-reason', desc.canceled_reason
+      end
+      # SlowActivity observes cancellation and raises CanceledError; activity completes itself, no terminate needed.
+    end
+  end
+
+  def test_describe_attempt_starts_at_1
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      env.client.execute_activity(
+        SimpleActivity, 'attempt',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 10
+      )
+      desc = env.client.activity_handle(activity_id).describe
+      assert_equal 1, desc.attempt
+    end
+  end
+
+  def test_id_conflict_policy_use_existing_returns_handle_for_running
+    with_activity_worker([SlowActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      first = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30
+      )
+      # Second start with same id + USE_EXISTING returns a handle to the running activity.
+      second = env.client.start_activity(
+        SlowActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        id_conflict_policy: Temporalio::ActivityIDConflictPolicy::USE_EXISTING
+      )
+      # Both handles target the same activity_id (same activity_run_id from the server too).
+      assert_equal first.id, second.id
+      assert_equal first.run_id, second.run_id
+      first.terminate('cleanup')
+    end
+  end
 end

@@ -1,0 +1,4 @@
+class ActivityInfoStandaloneTest < Test
+  def capture_next: -> Hash[Symbol, untyped]
+  def drain_captures: -> void
+end
