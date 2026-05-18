@@ -165,17 +165,8 @@ module Temporalio
           case activity
           when String, Symbol
             [activity.to_s, nil, nil]
-          when Class
-            unless activity < Definition
-              raise ArgumentError,
-                    "Class '#{activity}' does not extend Temporalio::Activity::Definition"
-            end
-
-            info = from_activity(activity)
-            raise ArgumentError, 'Cannot pass dynamic activity to start_activity' unless info.name
-
-            [info.name.to_s, info.arg_hints, info.result_hint]
-          when Definition, Info
+          when Class, Definition, Info
+            # Return or construct an Info -- needed because we want the checks in Info.initialize.
             info = from_activity(activity)
             raise ArgumentError, 'Cannot pass dynamic activity to start_activity' unless info.name
 
