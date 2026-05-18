@@ -495,8 +495,8 @@ module Temporalio
 
     # Start a standalone activity execution and return its handle.
     #
-    # @param activity [Class<Activity::Definition>, Activity::Definition::Info, Symbol, String] Activity definition class
-    #   or activity name.
+    # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
+    #   Activity definition, definition class or activity name.
     # @param args [Array<Object>] Arguments to the activity.
     # @param id [String] Unique identifier for the activity execution.
     # @param task_queue [String] Task queue to run the activity on.
@@ -564,6 +564,27 @@ module Temporalio
 
     # Start a standalone activity execution and wait for its result. Shortcut for
     # {start_activity} + {ActivityHandle#result}.
+    #
+    # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
+    #   Activity definition, definition class or activity name.
+    # @param args [Array<Object>] Arguments to the activity.
+    # @param id [String] Unique identifier for the activity execution.
+    # @param task_queue [String] Task queue to run the activity on.
+    # @param schedule_to_close_timeout [Float, nil] Schedule-to-close timeout in seconds. Either this or
+    #   `start_to_close_timeout` must be specified.
+    # @param schedule_to_start_timeout [Float, nil] Schedule-to-start timeout in seconds.
+    # @param start_to_close_timeout [Float, nil] Start-to-close timeout in seconds. Either this or
+    #   `schedule_to_close_timeout` must be specified.
+    # @param heartbeat_timeout [Float, nil] Heartbeat timeout in seconds.
+    # @param id_reuse_policy [ActivityIDReusePolicy] How already-existing IDs are treated.
+    # @param id_conflict_policy [ActivityIDConflictPolicy] How already-running activities of the same ID are treated.
+    # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
+    # @param summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param priority [Priority] Priority for the activity.
+    # @param arg_hints [Array<Object>, nil] Argument hints.
+    # @param result_hint [Object, nil] Result hint.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
     # @return [Object, nil] Successful result of the activity.
     # @raise [Error::ActivityAlreadyStartedError] Activity already exists with this ID.
