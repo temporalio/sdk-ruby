@@ -481,15 +481,25 @@ module Temporalio
               @instance.pending_nexus_operation_starts.delete(seq)
             end
 
-            # Handle start failure
-            if resolution.failed
+            # Handle start resolution
+            case resolution.status
+            when :operation_token
+              operation_token = resolution.operation_token
+            when :started_sync
+              operation_token = nil
+            when :failed
               input.cancellation.remove_cancel_callback(cancel_callback_key)
-              raise @instance.failure_converter.from_failure(resolution.failed, @instance.payload_converter)
+              raise @instance.failure_converter.from_failure(
+                resolution.failed, @instance.payload_converter
+              )
+            else
+              input.cancellation.remove_cancel_callback(cancel_callback_key)
+              raise "Unknown Nexus operation start status: #{resolution.status.inspect}"
             end
 
             # Create handle and add to pending operations (result will come via resolve_nexus_operation)
             handle = NexusOperationHandle.new(
-              operation_token: resolution.operation_token,
+              operation_token:,
               instance: @instance,
               cancellation: input.cancellation,
               cancel_callback_key:,
