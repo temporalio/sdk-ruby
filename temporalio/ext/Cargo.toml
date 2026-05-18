@@ -20,7 +20,7 @@ rb-sys = "0.9"
 temporalio-client = { version = "0.3.0", path = "./sdk-core/crates/client" }
 temporalio-common = { version = "0.3.0", path = "./sdk-core/crates/common", features = ["envconfig"] }
 temporalio-sdk-core = { version = "0.3.0", path = "./sdk-core/crates/sdk-core", features = ["ephemeral-server", "otel"] }
-tokio = "1.47"
+tokio = "1.52"
 tokio-stream = "0.1"
 tokio-util = "0.7"
 tonic = { workspace = true }
