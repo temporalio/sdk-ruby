@@ -7,11 +7,7 @@ require 'temporalio/worker'
 require 'temporalio/workflow'
 require 'test'
 
-# Multi-interceptor ordering tests for the workflow client-call chain. Mirrors
-# `test/client_activity_interceptor_chain_test.rb` so the convention documented in client.rb's YARD
-# (`"The earlier interceptors wrap the later ones"`) is enforced for workflows the same way it is for
-# the new SAA paths. Without these tests, a change to the chain assembly in client.rb (`reverse_each.reduce`)
-# could swap the order silently.
+# Multi-interceptor ordering tests for the workflow client-call chain.
 class ClientWorkflowInterceptorChainTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute
