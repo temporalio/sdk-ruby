@@ -510,7 +510,8 @@ module Temporalio
     # @param id_conflict_policy [ActivityIDConflictPolicy] How already-running activities of the same ID are treated.
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
-    # @param summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
@@ -529,10 +530,11 @@ module Temporalio
       start_to_close_timeout: nil,
       heartbeat_timeout: nil,
       id_reuse_policy: ActivityIDReusePolicy::ALLOW_DUPLICATE,
-      id_conflict_policy: ActivityIDConflictPolicy::FAIL,
+      id_conflict_policy: ActivityIDConflictPolicy::UNSPECIFIED,
       retry_policy: nil,
       search_attributes: nil,
-      summary: nil,
+      static_summary: nil,
+      static_details: nil,
       priority: Priority.default,
       arg_hints: nil,
       result_hint: nil,
@@ -553,11 +555,12 @@ module Temporalio
                              id_conflict_policy:,
                              retry_policy:,
                              search_attributes:,
-                             summary:,
+                             static_summary:,
+                             static_details:,
+                             headers: {},
                              priority:,
                              arg_hints: arg_hints || defn_arg_hints,
                              result_hint: result_hint || defn_result_hint,
-                             headers: {},
                              rpc_options:
                            ))
     end
@@ -580,7 +583,8 @@ module Temporalio
     # @param id_conflict_policy [ActivityIDConflictPolicy] How already-running activities of the same ID are treated.
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
-    # @param summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
@@ -600,10 +604,11 @@ module Temporalio
       start_to_close_timeout: nil,
       heartbeat_timeout: nil,
       id_reuse_policy: ActivityIDReusePolicy::ALLOW_DUPLICATE,
-      id_conflict_policy: ActivityIDConflictPolicy::FAIL,
+      id_conflict_policy: ActivityIDConflictPolicy::UNSPECIFIED,
       retry_policy: nil,
       search_attributes: nil,
-      summary: nil,
+      static_summary: nil,
+      static_details: nil,
       priority: Priority.default,
       arg_hints: nil,
       result_hint: nil,
@@ -622,7 +627,8 @@ module Temporalio
         id_conflict_policy:,
         retry_policy:,
         search_attributes:,
-        summary:,
+        static_summary:,
+        static_details:,
         priority:,
         arg_hints:,
         result_hint:,

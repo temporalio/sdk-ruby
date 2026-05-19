@@ -410,16 +410,18 @@ class ClientActivityTest < Test
     end
   end
 
-  def test_describe_summary_set_at_start
+  def test_describe_static_summary_and_details_set_at_start
     with_activity_worker([SlowActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
       handle = env.client.start_activity(
         SlowActivity,
         id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
-        summary: 'my activity summary'
+        static_summary: 'my activity summary',
+        static_details: 'my activity details'
       )
       desc = handle.describe
-      assert_equal 'my activity summary', desc.summary
+      assert_equal 'my activity summary', desc.static_summary
+      assert_equal 'my activity details', desc.static_details
       handle.terminate('cleanup')
     end
   end

@@ -273,11 +273,12 @@ module Temporalio
         :id_conflict_policy,
         :retry_policy,
         :search_attributes,
-        :summary,
+        :static_summary,
+        :static_details,
+        :headers,
         :priority,
         :arg_hints,
         :result_hint,
-        :headers,
         :rpc_options
       )
 

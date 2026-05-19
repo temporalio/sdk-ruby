@@ -445,11 +445,12 @@ module Temporalio
         attr_reader id_conflict_policy: ActivityIDConflictPolicy::enum
         attr_reader retry_policy: RetryPolicy?
         attr_reader search_attributes: SearchAttributes?
-        attr_reader summary: String?
+        attr_reader static_summary: String?
+        attr_reader static_details: String?
+        attr_reader headers: Hash[String, Object?]
         attr_reader priority: Priority
         attr_reader arg_hints: Array[Object]?
         attr_reader result_hint: Object?
-        attr_reader headers: Hash[String, Object?]
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
@@ -465,11 +466,12 @@ module Temporalio
           id_conflict_policy: ActivityIDConflictPolicy::enum,
           retry_policy: RetryPolicy?,
           search_attributes: SearchAttributes?,
-          summary: String?,
+          static_summary: String?,
+          static_details: String?,
+          headers: Hash[String, Object?],
           priority: Priority,
           arg_hints: Array[Object]?,
           result_hint: Object?,
-          headers: Hash[String, Object?],
           rpc_options: RPCOptions?
         ) -> void
       end

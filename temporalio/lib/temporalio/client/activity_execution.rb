@@ -183,8 +183,13 @@ module Temporalio
         end
 
         # @return [String, nil] Static user-metadata summary on the activity.
-        def summary
+        def static_summary
           user_metadata.first
+        end
+
+        # @return [String, nil] Static user-metadata details on the activity. May be in markdown format.
+        def static_details
+          user_metadata.last
         end
 
         # @return [Integer] Number of times this activity's persisted state has been mutated.
