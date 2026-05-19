@@ -309,6 +309,7 @@ class ClientActivityTest < Test
       handle = env.client.activity_handle(activity_id) # run_id: nil
       desc = handle.describe
       assert_equal activity_id, desc.activity_id
+      assert_equal 'saa: nil-run', handle.result
     end
   end
 
