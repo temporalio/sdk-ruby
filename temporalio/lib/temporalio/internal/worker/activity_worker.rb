@@ -173,7 +173,7 @@ module Temporalio
           workflow_id = Internal::ProtoUtils.string_or(start.workflow_execution&.workflow_id, nil)
           workflow_run_id = Internal::ProtoUtils.string_or(start.workflow_execution&.run_id, nil)
           workflow_type = Internal::ProtoUtils.string_or(start.workflow_type, nil)
-          activity_run_id = Internal::ProtoUtils.string_or(start.run_id, nil) if start.respond_to?(:run_id)
+          activity_run_id = Internal::ProtoUtils.string_or(start.run_id, nil)
           namespace = start.workflow_namespace
           info = Activity::Info.new(
             activity_id: start.activity_id,

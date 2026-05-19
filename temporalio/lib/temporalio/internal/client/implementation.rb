@@ -30,6 +30,13 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
+        # Proto routing convention for standalone activity completion: `*_by_id` requests carry
+        # `resource_id = "activity:<activity_id>"`. See the resource_id field comment on
+        # `RecordActivityTaskHeartbeatByIdRequest` (and the analogous Completed/Failed/Canceled
+        # requests) in `workflowservice/v1/request_response.proto`. Workflow-scheduled activities
+        # leave resource_id empty.
+        STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX = 'activity:'
+
         def self.with_default_rpc_options(user_rpc_options)
           # If the user did not provide an override_retry, we need to make sure
           # we use an option set that has it as "true"
@@ -820,7 +827,7 @@ module Temporalio
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
                        details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
-                       resource_id: ref.standalone? ? "activity:#{ref.activity_id}" : ''
+                       resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
                      ),
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
@@ -855,7 +862,7 @@ module Temporalio
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint)),
-                resource_id: ref.standalone? ? "activity:#{ref.activity_id}" : ''
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -893,7 +900,7 @@ module Temporalio
                 identity: @client.connection.identity,
                 failure: @client.data_converter.to_failure(input.error),
                 last_heartbeat_details:,
-                resource_id: ref.standalone? ? "activity:#{ref.activity_id}" : ''
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -923,7 +930,7 @@ module Temporalio
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
-                resource_id: ref.standalone? ? "activity:#{ref.activity_id}" : ''
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
