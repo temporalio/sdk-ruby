@@ -1125,6 +1125,7 @@ Get a handle to an existing standalone activity to describe, cancel, terminate, 
 ```ruby
 handle = client.activity_handle('my-activity-id')
 description = handle.describe       # ActivityExecution::Description
+result = handle.result              # blocks until the activity reaches a terminal state
 handle.cancel('reason for cancel')
 handle.terminate('reason for terminate')
 ```
