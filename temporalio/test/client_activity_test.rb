@@ -47,6 +47,19 @@ class ClientActivityTest < Test
     end
   end
 
+  # Fails on the first attempt, succeeds on the second. Used to force a retry so `attempt > 1` is
+  # observable. Uses `Activity::Context.current.info.attempt` rather than class-level state so it's
+  # safe to share across parallel tests.
+  class RetryOnceActivity < Temporalio::Activity::Definition
+    def execute
+      if Temporalio::Activity::Context.current.info.attempt < 2
+        raise Temporalio::Error::ApplicationError, 'retryable failure on attempt 1'
+      end
+
+      'succeeded-after-retry'
+    end
+  end
+
   # Run a worker with the supplied activities for the body of the block and yield the task_queue.
   def with_activity_worker(activities, &block)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
@@ -502,6 +515,22 @@ class ClientActivityTest < Test
       )
       desc = env.client.activity_handle(activity_id).describe
       assert_equal 1, desc.attempt
+    end
+  end
+
+  def test_describe_attempt_after_retry
+    with_activity_worker([RetryOnceActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      result = env.client.execute_activity(
+        RetryOnceActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        retry_policy: Temporalio::RetryPolicy.new(
+          initial_interval: 0.1, backoff_coefficient: 1.0, max_interval: 0.1, max_attempts: 3
+        )
+      )
+      assert_equal 'succeeded-after-retry', result
+      desc = env.client.activity_handle(activity_id).describe
+      assert_equal 2, desc.attempt
     end
   end
 

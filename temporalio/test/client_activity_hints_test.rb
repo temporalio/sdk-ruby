@@ -173,6 +173,26 @@ class ClientActivityHintsTest < Test
                  'AsyncActivityHandle#complete should pass result_hint into the converter'
   end
 
+  def test_activity_handle_constructor_result_hint_used_for_result_decode
+    client = build_tracking_client
+    task_queue = "saa-hints-tq-#{SecureRandom.uuid}"
+    activity_id = "act-#{SecureRandom.uuid}"
+    Temporalio::Worker.new(client:, task_queue:, activities: [HintActivity]).run do
+      client.execute_activity(
+        HintActivity, 'ctor-hint',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 10
+      )
+      # Fresh handle with a constructor-time result_hint; no override at result() call site.
+      handle = client.activity_handle(activity_id, result_hint: :constructor_result_hint)
+      handle.result
+    end
+    inbound = @hint_converter.inbound_hints || []
+    result_decode = inbound.find { |e| e[:hint] == :constructor_result_hint }
+    refute_nil result_decode,
+               'Expected handle.result to decode with the constructor-time result_hint from activity_handle()'
+    assert_equal 'result-of:ctor-hint', result_decode[:value]
+  end
+
   def test_activity_handle_result_hint_override
     client = build_tracking_client
     task_queue = "saa-hints-tq-#{SecureRandom.uuid}"
