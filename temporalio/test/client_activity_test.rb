@@ -313,8 +313,7 @@ class ClientActivityTest < Test
     end
   end
 
-  def test_activity_handle_describe_cancel_terminate_smoke
-    # Use start + describe + terminate (not cancel — cancel needs heartbeating to take effect).
+  def test_activity_handle_describe_terminate_smoke
     with_activity_worker([SlowActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
       handle = env.client.start_activity(
