@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+require 'temporalio/activity'
 require 'temporalio/client'
 require 'temporalio/converters/data_converter'
 require 'temporalio/converters/payload_converter'
@@ -30,6 +31,25 @@ class ClientActivityHintsTest < Test
 
     def execute(value)
       "result-of:#{value}"
+    end
+  end
+
+  # Activity that signals readiness then raises CompleteAsyncError so the test can complete it
+  # externally through AsyncActivityHandle (the path being hint-tested).
+  class AsyncHintActivity < Temporalio::Activity::Definition
+    READY = Queue.new
+
+    def execute
+      READY << true
+      raise Temporalio::Activity::CompleteAsyncError
+    end
+
+    def self.wait_ready
+      Timeout.timeout(15) { READY.pop }
+    end
+
+    def self.drain
+      READY.clear
     end
   end
 
@@ -68,6 +88,17 @@ class ClientActivityHintsTest < Test
     result_decode = inbound.find { |e| e[:value] == 'result-of:hello' }
     refute_nil result_decode, 'Expected client to decode the activity result'
     assert_equal :saa_result, result_decode[:hint], 'Client-side result decode should use definition result_hint'
+
+    # Worker-side arg decode uses the definition's arg_hint.
+    worker_arg_decode = inbound.find { |e| e[:value] == 'hello' }
+    refute_nil worker_arg_decode, 'Expected worker to decode the activity argument'
+    assert_equal :saa_arg, worker_arg_decode[:hint], 'Worker-side arg decode should use definition arg_hint'
+
+    # Worker-side result encode uses the definition's result_hint.
+    worker_result_encode = outbound.find { |e| e[:value] == 'result-of:hello' }
+    refute_nil worker_result_encode, 'Expected worker to encode the activity result'
+    assert_equal :saa_result, worker_result_encode[:hint],
+                 'Worker-side result encode should use definition result_hint'
   end
 
   def test_activity_hints_call_site_override
@@ -117,6 +148,29 @@ class ClientActivityHintsTest < Test
     result_decode = inbound.find { |e| e[:value] == 'result-of:by-name' }
     refute_nil result_decode
     assert_nil result_decode[:hint], 'By-name activity should decode result with nil hint'
+  end
+
+  def test_async_completion_complete_uses_result_hint
+    AsyncHintActivity.drain
+    client = build_tracking_client
+    task_queue = "saa-hints-tq-#{SecureRandom.uuid}"
+    Temporalio::Worker.new(client:, task_queue:, activities: [AsyncHintActivity]).run do
+      handle = client.start_activity(
+        AsyncHintActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 30
+      )
+      AsyncHintActivity.wait_ready
+      ref = Temporalio::Client::ActivityIDReference.for_standalone(activity_id: handle.id)
+      client.async_activity_handle(ref).complete('async-result', result_hint: :async_complete_hint)
+      handle.result
+    end
+    outbound = @hint_converter.outbound_hints || []
+    result_encode = outbound.find { |e| e[:value] == 'async-result' }
+    refute_nil result_encode, 'Expected async completion to encode the result payload'
+    assert_equal :async_complete_hint, result_encode[:hint],
+                 'AsyncActivityHandle#complete should pass result_hint into the converter'
   end
 
   def test_activity_handle_result_hint_override
