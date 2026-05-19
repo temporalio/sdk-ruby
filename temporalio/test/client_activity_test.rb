@@ -217,7 +217,7 @@ class ClientActivityTest < Test
       desc = env.client.activity_handle(activity_id).describe
       # Completed activities will have non-zero state transitions.
       assert_kind_of Integer, desc.state_transition_count
-      assert_operator desc.state_transition_count, :>=, 0
+      assert_operator desc.state_transition_count, :>, 0
     end
   end
 
@@ -291,7 +291,7 @@ class ClientActivityTest < Test
       assert_eventually do
         count = env.client.count_activities("ActivityId=\"#{activity_id}\"")
         assert_kind_of Temporalio::Client::ActivityExecutionCount, count
-        assert_operator count.count, :>=, 1
+        assert_equal 1, count.count
       end
     end
   end
