@@ -1021,7 +1021,7 @@ module Temporalio
               run_id: input.activity_run_id || '',
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid,
-              reason: input.reason || ''
+              reason: input.reason
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
@@ -1036,7 +1036,7 @@ module Temporalio
               run_id: input.activity_run_id || '',
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid,
-              reason: input.reason || ''
+              reason: input.reason
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
