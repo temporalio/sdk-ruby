@@ -28,8 +28,9 @@ module Temporalio
         @result_hint = result_hint
       end
 
-      # Wait for the activity's outcome (result or failure). Long-polls PollActivityExecution
-      # internally until the activity reaches a terminal state.
+      # Wait for the activity's outcome (result or failure). Internally long-polls
+      # PollActivityExecution and reissues until the activity reaches a terminal state, so this can
+      # block indefinitely for long-running activities.
       #
       # @param result_hint [Object, nil] Override the result hint. If nil, uses {#result_hint}.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.

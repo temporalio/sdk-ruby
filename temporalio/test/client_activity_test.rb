@@ -273,6 +273,46 @@ class ClientActivityTest < Test
     end
   end
 
+  def test_get_activity_result_reissues_poll_across_server_long_poll_deadline
+    # Verifies that fetch_activity_outcome reissues PollActivityExecution when the server's
+    # long-poll deadline expires before the activity reaches a terminal state. Simulates the
+    # server returning an empty PollActivityExecutionResponse (no `outcome`) for the first few
+    # calls — exactly what the server returns when its long-poll deadline expires — by wrapping
+    # the workflow_service so the loop is forced to iterate across at least one such "deadline."
+    # Without the loop, the first empty response would cause ActivityHandle#result to raise
+    # "Activity completed but outcome is missing from server response."
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      ws = env.client.workflow_service
+      original_poll = ws.method(:poll_activity_execution)
+      empty_responses_remaining = 2
+      poll_count = 0
+      ws.define_singleton_method(:poll_activity_execution) do |req, **kwargs|
+        poll_count += 1
+        if empty_responses_remaining.positive?
+          empty_responses_remaining -= 1
+          # Server's long-poll deadline expired without the activity reaching a terminal state.
+          Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse.new
+        else
+          original_poll.call(req, **kwargs)
+        end
+      end
+
+      begin
+        result = env.client.execute_activity(
+          SimpleActivity, 'reissue',
+          id: "act-#{SecureRandom.uuid}",
+          task_queue: task_queue,
+          start_to_close_timeout: 10
+        )
+        assert_equal 'saa: reissue', result
+        assert_operator poll_count, :>=, 3,
+                        "Expected at least 3 PollActivityExecution calls (2 injected empties + 1 real), got #{poll_count}"
+      ensure
+        ws.singleton_class.send(:remove_method, :poll_activity_execution)
+      end
+    end
+  end
+
   def test_list_activities_simple_list_is_accurate
     with_activity_worker([SimpleActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"

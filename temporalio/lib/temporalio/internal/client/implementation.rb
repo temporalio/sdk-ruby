@@ -1077,18 +1077,22 @@ module Temporalio
         end
 
         # Long-polls PollActivityExecution until the activity reaches a terminal state. Returns the
-        # ActivityExecutionOutcome.
+        # ActivityExecutionOutcome. The server's long-poll deadline may expire before the activity
+        # completes; in that case PollActivityExecutionResponse comes back with an unpopulated
+        # `outcome` field and the call must be reissued.
         def fetch_activity_outcome(input)
           req = Api::WorkflowService::V1::PollActivityExecutionRequest.new(
             namespace: @client.namespace,
             activity_id: input.activity_id,
             run_id: input.activity_run_id || ''
           )
-          resp = @client.workflow_service.poll_activity_execution(
-            req,
-            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
-          )
-          resp.outcome
+          loop do
+            resp = @client.workflow_service.poll_activity_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+            return resp.outcome if resp.outcome
+          end
         end
       end
     end
