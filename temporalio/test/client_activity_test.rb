@@ -486,8 +486,10 @@ class ClientActivityTest < Test
       assert_eventually do
         desc = handle.describe
         assert_equal 'user-cancel-reason', desc.canceled_reason
+        assert_equal Temporalio::Client::ActivityExecutionStatus::CANCELED, desc.status
       end
-      # SlowActivity observes cancellation and raises CanceledError; activity completes itself, no terminate needed.
+      err = assert_raises(Temporalio::Error::ActivityFailedError) { handle.result }
+      assert_instance_of Temporalio::Error::CanceledError, err.cause
     end
   end
 
