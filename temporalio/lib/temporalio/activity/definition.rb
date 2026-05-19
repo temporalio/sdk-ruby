@@ -155,9 +155,10 @@ module Temporalio
         # @return [Object, nil] Result hint
         attr_reader :result_hint
 
-        # Resolve an activity argument (class / instance / Info / Symbol / String) into a `[name, arg_hints,
-        # result_hint]` triple. Used by `Client#start_activity` to accept the same flexible activity argument
-        # forms that `Workflow.execute_activity` accepts.
+        # Resolve an activity argument into a `[name, arg_hints, result_hint]` triple. Used by
+        # `Client#start_activity` to accept any of: a `Definition` subclass, an instance of one,
+        # an `Info`, a `Symbol` activity name, or a `String` activity name. Class/instance/Info
+        # inputs carry their definition's hints; Symbol/String inputs return `nil` hints.
         #
         # @param activity [Class<Definition>, Definition, Info, Symbol, String] Activity argument.
         # @return [Array(String, Array[Object]?, Object?)] name, arg_hints, result_hint.
