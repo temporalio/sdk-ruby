@@ -714,7 +714,8 @@ class WorkerWorkflowHandlerTest < Test
       id = "wf-#{SecureRandom.uuid}"
       start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
         UpdateWithStartWorkflow, 123,
-        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL,
+        priority: Temporalio::Priority.new(priority_key: 2, fairness_key: 'update-start', fairness_weight: 0.7)
       )
       # Run and confirm result of update is pre-workflow-execute
       assert_equal 456, env.client.execute_update_with_start_workflow(
@@ -723,6 +724,11 @@ class WorkerWorkflowHandlerTest < Test
       # Confirm query is total
       handle = start_workflow_operation.workflow_handle
       assert_equal 579, handle.query(UpdateWithStartWorkflow.counter)
+      started_event = handle.fetch_history_events.find(&:workflow_execution_started_event_attributes)
+      priority = started_event.workflow_execution_started_event_attributes.priority
+      assert_equal 2, priority.priority_key
+      assert_equal 'update-start', priority.fairness_key
+      assert_in_delta 0.7, priority.fairness_weight, 0.001
 
       # Update with start 5 more times
       5.times do
@@ -902,7 +908,8 @@ class WorkerWorkflowHandlerTest < Test
       id = "wf-#{SecureRandom.uuid}"
       start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
         SignalWithStartWorkflow, 'workflow-start',
-        id:, task_queue: worker.task_queue
+        id:, task_queue: worker.task_queue,
+        priority: Temporalio::Priority.new(priority_key: 4, fairness_key: 'signal-start', fairness_weight: 1.3)
       )
       handle = env.client.signal_with_start_workflow(
         SignalWithStartWorkflow.add_event, 'signal', start_workflow_operation:
@@ -911,6 +918,11 @@ class WorkerWorkflowHandlerTest < Test
       assert_same handle, start_workflow_operation.workflow_handle
       # Confirm signal event came first
       assert_equal %w[signal workflow-start], handle.query(SignalWithStartWorkflow.events)
+      started_event = handle.fetch_history_events.find(&:workflow_execution_started_event_attributes)
+      priority = started_event.workflow_execution_started_event_attributes.priority
+      assert_equal 4, priority.priority_key
+      assert_equal 'signal-start', priority.fairness_key
+      assert_in_delta 1.3, priority.fairness_weight, 0.001
 
       # Signal with start 3 more times
       3.times do |i|

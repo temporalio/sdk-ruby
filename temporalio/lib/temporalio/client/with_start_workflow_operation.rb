@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'temporalio/common_enums'
+require 'temporalio/priority'
 
 module Temporalio
   class Client
@@ -24,6 +25,7 @@ module Temporalio
         :memo,
         :search_attributes,
         :start_delay,
+        :priority,
         :arg_hints,
         :result_hint,
         :headers
@@ -40,6 +42,8 @@ module Temporalio
       #
       # Note, for {Client.start_update_with_start_workflow} and {Client.execute_update_with_start_workflow},
       # `id_conflict_policy` is required.
+      #
+      # @param priority [Priority] Priority of the workflow that may be started. This is currently experimental.
       def initialize(
         workflow,
         *args,
@@ -57,6 +61,7 @@ module Temporalio
         memo: nil,
         search_attributes: nil,
         start_delay: nil,
+        priority: Priority.default,
         arg_hints: nil,
         result_hint: nil,
         headers: {}
@@ -80,6 +85,7 @@ module Temporalio
           memo:,
           search_attributes:,
           start_delay:,
+          priority:,
           arg_hints: arg_hints || defn_arg_hints,
           result_hint: result_hint || defn_result_hint,
           headers:
