@@ -104,9 +104,7 @@ module Temporalio
       private
 
       def _process_outcome(outcome, hint)
-        if outcome.nil?
-          raise Error, 'Activity completed but outcome is missing from server response'
-        end
+        raise Error, 'Activity completed but outcome is missing from server response' if outcome.nil?
 
         case outcome.value
         when :failure

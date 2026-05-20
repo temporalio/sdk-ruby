@@ -105,7 +105,7 @@ module Temporalio
         end
 
         # @return [Boolean] Whether the activity has recorded any heartbeat details.
-        def has_heartbeat_details? # rubocop:disable Naming/PredicateName
+        def has_heartbeat_details? # rubocop:disable Naming/PredicatePrefix
           !@raw_info.heartbeat_details&.payloads.nil? && !@raw_info.heartbeat_details.payloads.empty?
         end
 

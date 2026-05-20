@@ -18,11 +18,6 @@ class ClientActivityAsyncCompletionTest < Test
   class AsyncCompleteActivity < Temporalio::Activity::Definition
     READY = Queue.new
 
-    def execute
-      READY << true
-      raise Temporalio::Activity::CompleteAsyncError
-    end
-
     def self.wait_ready
       Timeout.timeout(15) { READY.pop }
     end
@@ -30,9 +25,14 @@ class ClientActivityAsyncCompletionTest < Test
     def self.drain
       READY.clear
     end
+
+    def execute
+      READY << true
+      raise Temporalio::Activity::CompleteAsyncError
+    end
   end
 
-  def with_async_worker(&block)
+  def with_async_worker(&)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
       client: env.client,

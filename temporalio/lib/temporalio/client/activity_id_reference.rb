@@ -27,19 +27,6 @@ module Temporalio
       # @return [String, nil] Run ID for the workflow. Set only for workflow-run activity references.
       attr_reader :run_id
 
-      # Construct a workflow-run activity reference.
-      #
-      # @param workflow_id [String] ID for the workflow.
-      # @param run_id [String, nil] Run ID for the workflow.
-      # @param activity_id [String] ID for the activity.
-      # @return [ActivityIDReference] A reference suitable for {Client#async_activity_handle}.
-      def initialize(workflow_id:, run_id:, activity_id:)
-        @workflow_id = workflow_id
-        @run_id = run_id
-        @activity_id = activity_id
-        @activity_run_id = nil
-      end
-
       # Construct a standalone activity reference.
       #
       # @param activity_id [String] ID for the activity.
@@ -52,6 +39,19 @@ module Temporalio
           ref.instance_variable_set(:@workflow_id, nil)
           ref.instance_variable_set(:@run_id, nil)
         end
+      end
+
+      # Construct a workflow-run activity reference.
+      #
+      # @param workflow_id [String] ID for the workflow.
+      # @param run_id [String, nil] Run ID for the workflow.
+      # @param activity_id [String] ID for the activity.
+      # @return [ActivityIDReference] A reference suitable for {Client#async_activity_handle}.
+      def initialize(workflow_id:, run_id:, activity_id:)
+        @workflow_id = workflow_id
+        @run_id = run_id
+        @activity_id = activity_id
+        @activity_run_id = nil
       end
 
       # @return [Boolean] True if this reference is the standalone-form (activity_run_id without workflow_id).

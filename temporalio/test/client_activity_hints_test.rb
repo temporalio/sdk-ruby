@@ -39,17 +39,17 @@ class ClientActivityHintsTest < Test
   class AsyncHintActivity < Temporalio::Activity::Definition
     READY = Queue.new
 
-    def execute
-      READY << true
-      raise Temporalio::Activity::CompleteAsyncError
-    end
-
     def self.wait_ready
       Timeout.timeout(15) { READY.pop }
     end
 
     def self.drain
       READY.clear
+    end
+
+    def execute
+      READY << true
+      raise Temporalio::Activity::CompleteAsyncError
     end
   end
 

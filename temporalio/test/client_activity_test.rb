@@ -25,9 +25,7 @@ class ClientActivityTest < Test
   class SlowActivity < Temporalio::Activity::Definition
     def execute
       Temporalio::Activity::Context.current.heartbeat
-      until Temporalio::Activity::Context.current.cancellation.canceled?
-        sleep 0.1
-      end
+      sleep 0.1 until Temporalio::Activity::Context.current.cancellation.canceled?
       raise Temporalio::Error::CanceledError, 'canceled'
     end
   end
@@ -61,7 +59,7 @@ class ClientActivityTest < Test
   end
 
   # Run a worker with the supplied activities for the body of the block and yield the task_queue.
-  def with_activity_worker(activities, &block)
+  def with_activity_worker(activities, &)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
       client: env.client,
@@ -306,7 +304,8 @@ class ClientActivityTest < Test
         )
         assert_equal 'saa: reissue', result
         assert_operator poll_count, :>=, 3,
-                        "Expected at least 3 PollActivityExecution calls (2 injected empties + 1 real), got #{poll_count}"
+                        'Expected at least 3 PollActivityExecution calls (2 injected empties + 1 real), ' \
+                        "got #{poll_count}"
       ensure
         ws.singleton_class.send(:remove_method, :poll_activity_execution)
       end
@@ -546,7 +545,7 @@ class ClientActivityTest < Test
     end
   end
 
-  def test_describe_attempt_starts_at_1
+  def test_describe_attempt_starts_at_one
     with_activity_worker([SimpleActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
       env.client.execute_activity(

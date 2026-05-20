@@ -75,7 +75,7 @@ class ClientWorkflowInterceptorChainTest < Test
     Temporalio::Client.new(**env.client.options.with(interceptors: interceptors).to_h)
   end
 
-  def with_workflow_worker(client, &block)
+  def with_workflow_worker(client, &)
     task_queue = "wf-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
       client: client,

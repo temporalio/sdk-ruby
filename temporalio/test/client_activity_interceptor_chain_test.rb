@@ -76,7 +76,7 @@ class ClientActivityInterceptorChainTest < Test
     Temporalio::Client.new(**env.client.options.with(interceptors: interceptors).to_h)
   end
 
-  def with_activity_worker(client, activities, &block)
+  def with_activity_worker(client, activities, &)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
       client: client,
