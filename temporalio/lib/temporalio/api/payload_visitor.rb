@@ -178,6 +178,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_create_custom_role_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_create_namespace_export_sink_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
@@ -233,6 +239,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_delete_connectivity_rule_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_delete_custom_role_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -347,6 +359,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_update_api_key_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_update_custom_role_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
