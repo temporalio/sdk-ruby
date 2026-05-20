@@ -327,7 +327,8 @@ module Temporalio
             user_metadata: ProtoUtils.to_user_metadata(
               start_options.static_summary, start_options.static_details, @client.data_converter
             ),
-            header: ProtoUtils.headers_to_proto(start_options.headers, @client.data_converter)
+            header: ProtoUtils.headers_to_proto(start_options.headers, @client.data_converter),
+            priority: start_options.priority._to_proto
           )
         end
 
