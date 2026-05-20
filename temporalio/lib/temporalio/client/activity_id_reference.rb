@@ -9,7 +9,7 @@ module Temporalio
     # Reference to an activity for use with {Client#async_activity_handle}. There are two shapes,
     # depending on whether the activity is run in a workflow, or as a standalone activity.
     #
-    # 1. Activity run in a workflow -- use {ActivityIDReference.new}:
+    # 1. Activity run in a workflow -- use {ActivityIDReference#initialize}:
     #    `ActivityIDReference.new(workflow_id:, run_id:, activity_id:)`.
     #
     # 2. Standalone Activity (started  via {Client#start_activity}): use the class factory
