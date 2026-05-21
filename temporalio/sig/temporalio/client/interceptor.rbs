@@ -432,6 +432,116 @@ module Temporalio
         ) -> void
       end
 
+      class StartActivityInput
+        attr_reader activity: String
+        attr_reader args: Array[Object?]
+        attr_reader activity_id: String
+        attr_reader task_queue: String
+        attr_reader schedule_to_close_timeout: duration?
+        attr_reader schedule_to_start_timeout: duration?
+        attr_reader start_to_close_timeout: duration?
+        attr_reader heartbeat_timeout: duration?
+        attr_reader id_reuse_policy: ActivityIDReusePolicy::enum
+        attr_reader id_conflict_policy: ActivityIDConflictPolicy::enum
+        attr_reader retry_policy: RetryPolicy?
+        attr_reader search_attributes: SearchAttributes?
+        attr_reader static_summary: String?
+        attr_reader static_details: String?
+        attr_reader headers: Hash[String, Object?]
+        attr_reader priority: Priority
+        attr_reader arg_hints: Array[Object]?
+        attr_reader result_hint: Object?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity: String,
+          args: Array[Object?],
+          activity_id: String,
+          task_queue: String,
+          schedule_to_close_timeout: duration?,
+          schedule_to_start_timeout: duration?,
+          start_to_close_timeout: duration?,
+          heartbeat_timeout: duration?,
+          id_reuse_policy: ActivityIDReusePolicy::enum,
+          id_conflict_policy: ActivityIDConflictPolicy::enum,
+          retry_policy: RetryPolicy?,
+          search_attributes: SearchAttributes?,
+          static_summary: String?,
+          static_details: String?,
+          headers: Hash[String, Object?],
+          priority: Priority,
+          arg_hints: Array[Object]?,
+          result_hint: Object?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class DescribeActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class CancelActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader reason: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          reason: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class TerminateActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader reason: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          reason: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class ListActivitiesInput
+        attr_reader query: String
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (query: String, rpc_options: RPCOptions?) -> void
+      end
+
+      class CountActivitiesInput
+        attr_reader query: String
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (query: String, rpc_options: RPCOptions?) -> void
+      end
+
+      class FetchActivityOutcomeInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
       class Outbound
         attr_reader next_interceptor: Outbound
 
@@ -488,6 +598,20 @@ module Temporalio
         def fail_async_activity: (FailAsyncActivityInput input) -> void
 
         def report_cancellation_async_activity: (ReportCancellationAsyncActivityInput input) -> void
+
+        def start_activity: (StartActivityInput input) -> ActivityHandle
+
+        def describe_activity: (DescribeActivityInput input) -> ActivityExecution::Description
+
+        def cancel_activity: (CancelActivityInput input) -> void
+
+        def terminate_activity: (TerminateActivityInput input) -> void
+
+        def list_activities: (ListActivitiesInput input) -> Enumerator[ActivityExecution, ActivityExecution]
+
+        def count_activities: (CountActivitiesInput input) -> ActivityExecutionCount
+
+        def fetch_activity_outcome: (FetchActivityOutcomeInput input) -> untyped
       end
     end
   end

@@ -2703,7 +2703,7 @@ class WorkerWorkflowTest < Test
   class LeftoverWaitActivity < Temporalio::Activity::Definition
     def execute
       ctx = Temporalio::Activity::Context.current
-      ctx.client.workflow_handle(ctx.info.workflow_id).signal(LeftoverWaitWorkflow.some_signal)
+      ctx.client.workflow_handle(ctx.info.workflow_id || raise).signal(LeftoverWaitWorkflow.some_signal)
     end
   end
 

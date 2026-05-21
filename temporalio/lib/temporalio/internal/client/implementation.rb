@@ -4,6 +4,9 @@ require 'google/protobuf/well_known_types'
 require 'securerandom'
 require 'temporalio/activity'
 require 'temporalio/api'
+require 'temporalio/client/activity_execution'
+require 'temporalio/client/activity_execution_count'
+require 'temporalio/client/activity_handle'
 require 'temporalio/client/activity_id_reference'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
@@ -27,6 +30,13 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
+        # Proto routing convention for standalone activity completion: `*_by_id` requests carry
+        # `resource_id = "activity:<activity_id>"`. See the resource_id field comment on
+        # `RecordActivityTaskHeartbeatByIdRequest` (and the analogous Completed/Failed/Canceled
+        # requests) in `workflowservice/v1/request_response.proto`. Workflow-scheduled activities
+        # leave resource_id empty.
+        STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX = 'activity:'
+
         def self.with_default_rpc_options(user_rpc_options)
           # If the user did not provide an override_retry, we need to make sure
           # we use an option set that has it as "true"
@@ -808,22 +818,24 @@ module Temporalio
         end
 
         def heartbeat_async_activity(input)
-          resp = if input.task_token_or_id_reference.is_a?(Temporalio::Client::ActivityIDReference)
+          ref = input.task_token_or_id_reference
+          resp = if ref.is_a?(Temporalio::Client::ActivityIDReference)
                    @client.workflow_service.record_activity_task_heartbeat_by_id(
                      Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest.new(
-                       workflow_id: input.task_token_or_id_reference.workflow_id,
-                       run_id: input.task_token_or_id_reference.run_id,
-                       activity_id: input.task_token_or_id_reference.activity_id,
+                       workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
+                       run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
+                       activity_id: ref.activity_id,
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
-                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
+                       resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
                      ),
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
                  else
                    @client.workflow_service.record_activity_task_heartbeat(
                      Api::WorkflowService::V1::RecordActivityTaskHeartbeatRequest.new(
-                       task_token: input.task_token_or_id_reference,
+                       task_token: ref,
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
                        details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
@@ -841,22 +853,24 @@ module Temporalio
         end
 
         def complete_async_activity(input)
-          if input.task_token_or_id_reference.is_a?(Temporalio::Client::ActivityIDReference)
+          ref = input.task_token_or_id_reference
+          if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_completed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest.new(
-                workflow_id: input.task_token_or_id_reference.workflow_id,
-                run_id: input.task_token_or_id_reference.run_id,
-                activity_id: input.task_token_or_id_reference.activity_id,
+                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
+                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
+                activity_id: ref.activity_id,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint))
+                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint)),
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_completed(
               Api::WorkflowService::V1::RespondActivityTaskCompletedRequest.new(
-                task_token: input.task_token_or_id_reference,
+                task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint))
@@ -876,23 +890,25 @@ module Temporalio
                                        hints: input.last_heartbeat_detail_hints
                                      )
                                    end
-          if input.task_token_or_id_reference.is_a?(Temporalio::Client::ActivityIDReference)
+          ref = input.task_token_or_id_reference
+          if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_failed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest.new(
-                workflow_id: input.task_token_or_id_reference.workflow_id,
-                run_id: input.task_token_or_id_reference.run_id,
-                activity_id: input.task_token_or_id_reference.activity_id,
+                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
+                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
+                activity_id: ref.activity_id,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 failure: @client.data_converter.to_failure(input.error),
-                last_heartbeat_details:
+                last_heartbeat_details:,
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_failed(
               Api::WorkflowService::V1::RespondActivityTaskFailedRequest.new(
-                task_token: input.task_token_or_id_reference,
+                task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 failure: @client.data_converter.to_failure(input.error),
@@ -905,22 +921,24 @@ module Temporalio
         end
 
         def report_cancellation_async_activity(input)
-          if input.task_token_or_id_reference.is_a?(Temporalio::Client::ActivityIDReference)
+          ref = input.task_token_or_id_reference
+          if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_canceled_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest.new(
-                workflow_id: input.task_token_or_id_reference.workflow_id,
-                run_id: input.task_token_or_id_reference.run_id,
-                activity_id: input.task_token_or_id_reference.activity_id,
+                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
+                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
+                activity_id: ref.activity_id,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
+                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
           else
             @client.workflow_service.respond_activity_task_canceled(
               Api::WorkflowService::V1::RespondActivityTaskCanceledRequest.new(
-                task_token: input.task_token_or_id_reference,
+                task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
@@ -929,6 +947,160 @@ module Temporalio
             )
           end
           nil
+        end
+
+        def start_activity(input)
+          req = Api::WorkflowService::V1::StartActivityExecutionRequest.new(
+            namespace: @client.namespace,
+            identity: @client.connection.identity,
+            request_id: SecureRandom.uuid,
+            activity_id: input.activity_id,
+            activity_type: Api::Common::V1::ActivityType.new(name: input.activity),
+            task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
+            input: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
+            schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
+            schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
+            start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
+            heartbeat_timeout: ProtoUtils.seconds_to_duration(input.heartbeat_timeout),
+            id_reuse_policy: input.id_reuse_policy,
+            id_conflict_policy: input.id_conflict_policy,
+            retry_policy: input.retry_policy&._to_proto,
+            search_attributes: input.search_attributes&._to_proto,
+            user_metadata: ProtoUtils.to_user_metadata(
+              input.static_summary, input.static_details, @client.data_converter
+            ),
+            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
+            priority: input.priority._to_proto
+          )
+
+          begin
+            resp = @client.workflow_service.start_activity_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+          rescue Error::RPCError => e
+            if e.code == Error::RPCError::Code::ALREADY_EXISTS && e.grpc_status.details.first
+              details = e.grpc_status.details.first.unpack(
+                Api::ErrorDetails::V1::ActivityExecutionAlreadyStartedFailure
+              )
+              if details
+                raise Error::ActivityAlreadyStartedError.new(
+                  activity_id: input.activity_id,
+                  activity_type: input.activity,
+                  activity_run_id: details.run_id
+                )
+              end
+            end
+            raise
+          end
+
+          Temporalio::Client::ActivityHandle.new(
+            client: @client,
+            id: input.activity_id,
+            run_id: resp.run_id,
+            result_hint: input.result_hint
+          )
+        end
+
+        def describe_activity(input)
+          resp = @client.workflow_service.describe_activity_execution(
+            Api::WorkflowService::V1::DescribeActivityExecutionRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::ActivityExecution::Description.new(resp, @client.data_converter)
+        end
+
+        def cancel_activity(input)
+          @client.workflow_service.request_cancel_activity_execution(
+            Api::WorkflowService::V1::RequestCancelActivityExecutionRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def terminate_activity(input)
+          @client.workflow_service.terminate_activity_execution(
+            Api::WorkflowService::V1::TerminateActivityExecutionRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def list_activities(input)
+          Enumerator.new do |yielder|
+            req = Api::WorkflowService::V1::ListActivityExecutionsRequest.new(
+              namespace: @client.namespace,
+              query: input.query || ''
+            )
+            loop do
+              resp = @client.workflow_service.list_activity_executions(
+                req,
+                rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+              )
+              resp.executions.each do |raw_info|
+                yielder << Temporalio::Client::ActivityExecution.new(raw_info)
+              end
+              break if resp.next_page_token.empty?
+
+              req.next_page_token = resp.next_page_token
+            end
+          end
+        end
+
+        def count_activities(input)
+          resp = @client.workflow_service.count_activity_executions(
+            Api::WorkflowService::V1::CountActivityExecutionsRequest.new(
+              namespace: @client.namespace,
+              query: input.query || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::ActivityExecutionCount.new(
+            resp.count,
+            resp.groups.map do |group|
+              Temporalio::Client::ActivityExecutionCount::AggregationGroup.new(
+                group.count,
+                group.group_values.map { |payload| SearchAttributes._value_from_payload(payload) }
+              )
+            end
+          )
+        end
+
+        # Long-polls PollActivityExecution until the activity reaches a terminal state. Returns the
+        # ActivityExecutionOutcome. The server's long-poll deadline may expire before the activity
+        # completes; in that case PollActivityExecutionResponse comes back with an unpopulated
+        # `outcome` field and the call must be reissued.
+        def fetch_activity_outcome(input)
+          req = Api::WorkflowService::V1::PollActivityExecutionRequest.new(
+            namespace: @client.namespace,
+            activity_id: input.activity_id,
+            run_id: input.activity_run_id || ''
+          )
+          loop do
+            resp = @client.workflow_service.poll_activity_execution(
+              req,
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            )
+            return resp.outcome if resp.outcome
+          end
         end
       end
     end

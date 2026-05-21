@@ -40,6 +40,15 @@ module Temporalio
       end
     end
 
+    # Error returned from {Client::ActivityHandle#result} when a standalone activity terminates in failure
+    # (failed / canceled / terminated / timed out). The underlying cause is available via +cause+.
+    class ActivityFailedError < Error
+      # @!visibility private
+      def initialize(message = 'Activity execution failed')
+        super
+      end
+    end
+
     # Error that occurs when a workflow was continued as new.
     class WorkflowContinuedAsNewError < Error
       # @return [String] New execution run ID the workflow continued to.

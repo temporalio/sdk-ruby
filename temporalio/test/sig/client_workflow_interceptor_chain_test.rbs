@@ -1,0 +1,7 @@
+class ClientWorkflowInterceptorChainTest < Test
+  def client_with_interceptors: (Array[Temporalio::Client::Interceptor]) -> Temporalio::Client
+
+  def with_workflow_worker: (
+    Temporalio::Client client
+  ) { (String) -> untyped } -> untyped
+end

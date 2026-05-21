@@ -584,7 +584,7 @@ class WorkerActivityTest < Test
       info = Temporalio::Activity::Context.current.info
       @task_token.push(info.task_token)
       @id_ref.push(Temporalio::Client::ActivityIDReference.new(
-                     workflow_id: info.workflow_id,
+                     workflow_id: info.workflow_id || raise,
                      run_id: info.workflow_run_id,
                      activity_id: info.activity_id
                    ))
@@ -1040,7 +1040,7 @@ class WorkerActivityTest < Test
   class ClientAccessActivity < Temporalio::Activity::Definition
     def execute
       desc = Temporalio::Activity::Context.current.client.workflow_handle(
-        Temporalio::Activity::Context.current.info.workflow_id
+        Temporalio::Activity::Context.current.info.workflow_id || raise
       ).describe
       desc.raw_description.pending_activities.first.activity_type.name
     end

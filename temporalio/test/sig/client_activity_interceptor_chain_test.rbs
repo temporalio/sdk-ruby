@@ -1,0 +1,8 @@
+class ClientActivityInterceptorChainTest < Test
+  def client_with_interceptors: (Array[Temporalio::Client::Interceptor]) -> Temporalio::Client
+
+  def with_activity_worker: (
+    Temporalio::Client client,
+    Array[singleton(Temporalio::Activity::Definition)] activities
+  ) { (String) -> untyped } -> untyped
+end

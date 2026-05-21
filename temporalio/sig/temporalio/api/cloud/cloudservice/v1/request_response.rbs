@@ -4208,6 +4208,302 @@ module Temporalio
             def []=:
                 ("billing_report" name, ::Temporalio::Api::Cloud::Billing::V1::BillingReport? value) -> void
           end
+
+          class GetCustomRolesRequest < ::Google::Protobuf::AbstractMessage
+
+            # The requested size of the page to retrieve.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetCustomRolesResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of custom roles in ascending ID order.
+            attr_accessor custom_roles(): ::Google::Protobuf::RepeatedField
+            def clear_custom_roles: () -> void
+
+            # The next page token.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              custom_roles: ::Array[::Temporalio::Api::Cloud::Identity::V1::CustomRole]?,
+              "custom_roles" => ::Array[::Temporalio::Api::Cloud::Identity::V1::CustomRole]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("custom_roles" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("custom_roles" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetCustomRoleRequest < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the custom role to retrieve.
+            attr_reader role_id(): ::String
+            attr_writer role_id(): ::String | ::Symbol
+            def clear_role_id: () -> void
+
+            type init_map = {
+              role_id: (::String | ::Symbol)?,
+              "role_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("role_id" name) -> ::String
+
+            def []=:
+                ("role_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetCustomRoleResponse < ::Google::Protobuf::AbstractMessage
+
+            # The custom role retrieved.
+            attr_accessor custom_role(): ::Temporalio::Api::Cloud::Identity::V1::CustomRole?
+            def has_custom_role?: () -> bool
+            def clear_custom_role: () -> void
+
+            type init_map = {
+              custom_role: (::Temporalio::Api::Cloud::Identity::V1::CustomRole | ::Temporalio::Api::Cloud::Identity::V1::CustomRole::init_map)?,
+              "custom_role" => (::Temporalio::Api::Cloud::Identity::V1::CustomRole | ::Temporalio::Api::Cloud::Identity::V1::CustomRole::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("custom_role" name) -> ::Temporalio::Api::Cloud::Identity::V1::CustomRole?
+
+            def []=:
+                ("custom_role" name, ::Temporalio::Api::Cloud::Identity::V1::CustomRole? value) -> void
+          end
+
+          class CreateCustomRoleRequest < ::Google::Protobuf::AbstractMessage
+
+            # The specification for the custom role to create.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The ID to use for this async operation.
+            # Optional, if not provided a random ID will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              spec: (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("spec" name) -> ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("spec" name, ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec? value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class CreateCustomRoleResponse < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the custom role created.
+            attr_reader role_id(): ::String
+            attr_writer role_id(): ::String | ::Symbol
+            def clear_role_id: () -> void
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              role_id: (::String | ::Symbol)?,
+              "role_id" => (::String | ::Symbol)?,
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("role_id" name) -> ::String
+              | ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("role_id" name, (::String | ::Symbol) value) -> void
+              | ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class UpdateCustomRoleRequest < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the custom role to update.
+            attr_reader role_id(): ::String
+            attr_writer role_id(): ::String | ::Symbol
+            def clear_role_id: () -> void
+
+            # The new custom role specification.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The version of the custom role for which this update is intended.
+            # The latest version can be found in the GetCustomRole operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The ID to use for this async operation.
+            # Optional, if not provided a random ID will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              role_id: (::String | ::Symbol)?,
+              "role_id" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("role_id" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("role_id" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateCustomRoleResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class DeleteCustomRoleRequest < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the custom role to delete.
+            attr_reader role_id(): ::String
+            attr_writer role_id(): ::String | ::Symbol
+            def clear_role_id: () -> void
+
+            # The version of the custom role for which this delete is intended.
+            # The latest version can be found in the GetCustomRole operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The ID to use for this async operation.
+            # Optional, if not provided a random ID will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              role_id: (::String | ::Symbol)?,
+              "role_id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("role_id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("role_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class DeleteCustomRoleResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
         end
       end
     end

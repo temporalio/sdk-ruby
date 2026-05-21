@@ -11,6 +11,14 @@ module Temporalio
       def initialize: (workflow_id: String, workflow_type: String, run_id: String?) -> void
     end
 
+    class ActivityAlreadyStartedError < Failure
+      attr_reader activity_id: String
+      attr_reader activity_type: String
+      attr_reader activity_run_id: String?
+
+      def initialize: (activity_id: String, activity_type: String, activity_run_id: String?) -> void
+    end
+
     class ApplicationError < Failure
       attr_reader details: Array[Object?]
       attr_reader type: String?

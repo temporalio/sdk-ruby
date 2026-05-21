@@ -259,6 +259,72 @@ module Temporalio
         :rpc_options
       )
 
+      # Input for {Outbound.start_activity}.
+      StartActivityInput = Data.define(
+        :activity,
+        :args,
+        :activity_id,
+        :task_queue,
+        :schedule_to_close_timeout,
+        :schedule_to_start_timeout,
+        :start_to_close_timeout,
+        :heartbeat_timeout,
+        :id_reuse_policy,
+        :id_conflict_policy,
+        :retry_policy,
+        :search_attributes,
+        :static_summary,
+        :static_details,
+        :headers,
+        :priority,
+        :arg_hints,
+        :result_hint,
+        :rpc_options
+      )
+
+      # Input for {Outbound.describe_activity}.
+      DescribeActivityInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :rpc_options
+      )
+
+      # Input for {Outbound.cancel_activity}.
+      CancelActivityInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.terminate_activity}.
+      TerminateActivityInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.list_activities}.
+      ListActivitiesInput = Data.define(
+        :query,
+        :rpc_options
+      )
+
+      # Input for {Outbound.count_activities}.
+      CountActivitiesInput = Data.define(
+        :query,
+        :rpc_options
+      )
+
+      # Input for {Outbound.fetch_activity_outcome}. Used by `ActivityHandle#result` for long-polling
+      # the activity outcome via `DescribeActivityExecution` with `include_outcome: true`.
+      FetchActivityOutcomeInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :rpc_options
+      )
+
       # Outbound interceptor for intercepting client calls. This should be extended by users needing to intercept client
       # actions.
       class Outbound
@@ -466,6 +532,60 @@ module Temporalio
         # @param input [ReportCancellationAsyncActivityInput] Input.
         def report_cancellation_async_activity(input)
           next_interceptor.report_cancellation_async_activity(input)
+        end
+
+        # Called for every {Client.start_activity} and {Client.execute_activity} call.
+        #
+        # @param input [StartActivityInput] Input.
+        # @return [ActivityHandle] Activity handle.
+        def start_activity(input)
+          next_interceptor.start_activity(input)
+        end
+
+        # Called for every {ActivityHandle.describe} call.
+        #
+        # @param input [DescribeActivityInput] Input.
+        # @return [ActivityExecution::Description] Activity description.
+        def describe_activity(input)
+          next_interceptor.describe_activity(input)
+        end
+
+        # Called for every {ActivityHandle.cancel} call.
+        #
+        # @param input [CancelActivityInput] Input.
+        def cancel_activity(input)
+          next_interceptor.cancel_activity(input)
+        end
+
+        # Called for every {ActivityHandle.terminate} call.
+        #
+        # @param input [TerminateActivityInput] Input.
+        def terminate_activity(input)
+          next_interceptor.terminate_activity(input)
+        end
+
+        # Called for every {Client.list_activities} call.
+        #
+        # @param input [ListActivitiesInput] Input.
+        # @return [Enumerator<ActivityExecution>] Activity executions.
+        def list_activities(input)
+          next_interceptor.list_activities(input)
+        end
+
+        # Called for every {Client.count_activities} call.
+        #
+        # @param input [CountActivitiesInput] Input.
+        # @return [ActivityExecutionCount] Activity count.
+        def count_activities(input)
+          next_interceptor.count_activities(input)
+        end
+
+        # Called by {ActivityHandle.result} to long-poll the activity outcome.
+        #
+        # @param input [FetchActivityOutcomeInput] Input.
+        # @return [Api::Activity::V1::ActivityExecutionOutcome] Activity outcome.
+        def fetch_activity_outcome(input)
+          next_interceptor.fetch_activity_outcome(input)
         end
       end
     end
