@@ -6,6 +6,9 @@ require 'temporalio/api'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
+require 'temporalio/client/nexus_client'
+require 'temporalio/client/nexus_operation_execution_count'
+require 'temporalio/client/nexus_operation_handle'
 require 'temporalio/client/plugin'
 require 'temporalio/client/schedule'
 require 'temporalio/client/schedule_handle'
@@ -51,6 +54,18 @@ module Temporalio
 
     # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
     class Options; end # rubocop:disable Lint/EmptyClass
+
+    ListNexusOperationPage = Data.define(:operations, :next_page_token)
+
+    # A page of Nexus operations returned by {Client#list_nexus_operation_page}.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @!attribute operations
+    #   @return [Array] List of Nexus operation executions in this page.
+    # @!attribute next_page_token
+    #   @return [String, nil] Token for the next page of results. nil if there are no more results.
+    class ListNexusOperationPage; end # rubocop:disable Lint/EmptyClass
 
     ListWorkflowPage = Data.define(:executions, :next_page_token)
 
@@ -720,6 +735,85 @@ module Temporalio
     # @see https://docs.temporal.io/visibility
     def list_schedules(query = nil, rpc_options: nil)
       @impl.list_schedules(Interceptor::ListSchedulesInput.new(query:, rpc_options:))
+    end
+
+    # Create a Nexus client for the given endpoint and service.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @param endpoint [String] Endpoint name.
+    # @param service [String] Service name.
+    # @return [NexusClient] Nexus client.
+    def create_nexus_client(endpoint, service)
+      NexusClient.new(client: self, endpoint:, service:)
+    end
+
+    # List Nexus operations.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @param query [String, nil] A Temporal visibility list filter.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Enumerator] Enumerable Nexus operations.
+    # @raise [Error::RPCError] RPC error from call.
+    def list_nexus_operations(query = nil, rpc_options: nil)
+      next_page_token = nil
+      Enumerator.new do |yielder|
+        loop do
+          page = @impl.list_nexus_operation_page(Interceptor::ListNexusOperationPageInput.new(
+                                                   query:,
+                                                   rpc_options:,
+                                                   next_page_token:,
+                                                   page_size: nil
+                                                 ))
+          page.operations.each { |op| yielder << op }
+          next_page_token = page.next_page_token
+          break if (next_page_token || '').empty?
+        end
+      end
+    end
+
+    # List Nexus operations one page at a time.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @param query [String, nil] A Temporal visibility list filter.
+    # @param page_size [Integer, nil] Maximum number of results to return.
+    # @param next_page_token [String, nil] Token for the next page of results.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [ListNexusOperationPage] Page of Nexus operations.
+    # @raise [Error::RPCError] RPC error from call.
+    def list_nexus_operation_page(query = nil, page_size: nil, next_page_token: nil, rpc_options: nil)
+      @impl.list_nexus_operation_page(Interceptor::ListNexusOperationPageInput.new(query:,
+                                                                                   next_page_token:,
+                                                                                   page_size:,
+                                                                                   rpc_options:))
+    end
+
+    # Count Nexus operations.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @param query [String, nil] A Temporal visibility list filter.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [NexusOperationExecutionCount] Count of Nexus operations.
+    # @raise [Error::RPCError] RPC error from call.
+    def count_nexus_operations(query = nil, rpc_options: nil)
+      @impl.count_nexus_operations(Interceptor::CountNexusOperationsInput.new(query:, rpc_options:))
+    end
+
+    # Get a handle to an existing standalone Nexus operation.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    #
+    # @param operation_id [String] Operation ID.
+    # @param run_id [String, nil] Operation run ID.
+    # @return [NexusOperationHandle] The operation handle.
+    def nexus_operation_handle(operation_id, run_id: nil)
+      NexusOperationHandle.new(client: self, operation_id:, run_id:)
     end
 
     # Get an async activity handle.

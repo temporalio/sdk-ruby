@@ -39,6 +39,20 @@ module Temporalio
       def initialize: -> void
     end
 
+    class NexusOperationAlreadyStartedError < Error
+      attr_reader operation_id: String
+      attr_reader run_id: String
+
+      def initialize: (operation_id: String, run_id: String) -> void
+    end
+
+    class NexusOperationFailedError < Error
+      attr_reader operation_id: String
+      attr_reader run_id: String?
+
+      def initialize: (operation_id: String, run_id: String?) -> void
+    end
+
     class AsyncActivityCanceledError < Error
       attr_reader details: Activity::CancellationDetails
 

@@ -432,6 +432,118 @@ module Temporalio
         ) -> void
       end
 
+      class StartNexusOperationInput
+        attr_reader endpoint: String
+        attr_reader service: String
+        attr_reader operation: String
+        attr_reader input: Object?
+        attr_reader operation_id: String
+        attr_reader schedule_to_close_timeout: Float?
+        attr_reader schedule_to_start_timeout: Float?
+        attr_reader start_to_close_timeout: Float?
+        attr_reader id_reuse_policy: Integer
+        attr_reader id_conflict_policy: Integer
+        attr_reader search_attributes: SearchAttributes?
+        attr_reader nexus_header: Hash[String, String]
+        attr_reader static_summary: String?
+        attr_reader headers: Hash[String, Object?]
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          endpoint: String,
+          service: String,
+          operation: String,
+          input: Object?,
+          operation_id: String,
+          schedule_to_close_timeout: Float?,
+          schedule_to_start_timeout: Float?,
+          start_to_close_timeout: Float?,
+          id_reuse_policy: Integer,
+          id_conflict_policy: Integer,
+          search_attributes: SearchAttributes?,
+          nexus_header: Hash[String, String],
+          static_summary: String?,
+          headers: Hash[String, Object?],
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class DescribeNexusOperationInput
+        attr_reader operation_id: String
+        attr_reader run_id: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          operation_id: String,
+          run_id: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class CancelNexusOperationInput
+        attr_reader operation_id: String
+        attr_reader run_id: String?
+        attr_reader reason: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          operation_id: String,
+          run_id: String?,
+          reason: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class TerminateNexusOperationInput
+        attr_reader operation_id: String
+        attr_reader run_id: String?
+        attr_reader reason: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          operation_id: String,
+          run_id: String?,
+          reason: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class PollNexusOperationInput
+        attr_reader operation_id: String
+        attr_reader run_id: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          operation_id: String,
+          run_id: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class ListNexusOperationPageInput
+        attr_reader query: String?
+        attr_reader next_page_token: String?
+        attr_reader page_size: Integer?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          query: String?,
+          next_page_token: String?,
+          page_size: Integer?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class CountNexusOperationsInput
+        attr_reader query: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          query: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
       class Outbound
         attr_reader next_interceptor: Outbound
 
@@ -488,6 +600,20 @@ module Temporalio
         def fail_async_activity: (FailAsyncActivityInput input) -> void
 
         def report_cancellation_async_activity: (ReportCancellationAsyncActivityInput input) -> void
+
+        def start_nexus_operation: (StartNexusOperationInput input) -> NexusOperationHandle
+
+        def describe_nexus_operation: (DescribeNexusOperationInput input) -> untyped
+
+        def cancel_nexus_operation: (CancelNexusOperationInput input) -> void
+
+        def terminate_nexus_operation: (TerminateNexusOperationInput input) -> void
+
+        def list_nexus_operation_page: (ListNexusOperationPageInput input) -> Client::ListNexusOperationPage
+
+        def count_nexus_operations: (CountNexusOperationsInput input) -> NexusOperationExecutionCount
+
+        def poll_nexus_operation: (PollNexusOperationInput input) -> Object?
       end
     end
   end

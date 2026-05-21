@@ -107,6 +107,42 @@ module Temporalio
       end
     end
 
+    # Error when a Nexus operation has already been started with the same ID.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    class NexusOperationAlreadyStartedError < Error
+      # @return [String] Operation ID that was already started.
+      attr_reader :operation_id
+
+      # @return [String] Run ID of the already-started operation.
+      attr_reader :run_id
+
+      # @!visibility private
+      def initialize(operation_id:, run_id:)
+        super("Nexus operation already started: #{operation_id}")
+        @operation_id = operation_id
+        @run_id = run_id
+      end
+    end
+
+    # Error when a standalone Nexus operation fails.
+    #
+    # WARNING: Standalone Nexus operations are experimental.
+    class NexusOperationFailedError < Error
+      # @return [String] Operation ID.
+      attr_reader :operation_id
+
+      # @return [String, nil] Operation run ID.
+      attr_reader :run_id
+
+      # @!visibility private
+      def initialize(operation_id:, run_id:)
+        super('Nexus operation failed')
+        @operation_id = operation_id
+        @run_id = run_id
+      end
+    end
+
     # Error raised by a client for a general RPC failure.
     class RPCError < Error
       # @return [Code] Status code for the error.
