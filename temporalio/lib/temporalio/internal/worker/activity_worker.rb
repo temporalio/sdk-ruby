@@ -168,8 +168,8 @@ module Temporalio
         end
 
         def execute_activity(task_token, defn, start)
-          # Build info. Standalone activities have empty workflow_execution / workflow_type / workflow_namespace
-          # on the wire; translate empty strings to nil for the user-facing Info fields.
+          # Build info. Standalone activities have some empty fields on the wire; translate
+          # empty strings to nil for the user-facing Info fields.
           workflow_id = Internal::ProtoUtils.string_or(start.workflow_execution&.workflow_id, nil)
           workflow_run_id = Internal::ProtoUtils.string_or(start.workflow_execution&.run_id, nil)
           workflow_type = Internal::ProtoUtils.string_or(start.workflow_type, nil)
