@@ -175,6 +175,64 @@ module Support
       assert_empty errors
     end
 
+    def test_apply_method_sig_catches_incompatible_override_after_inherited_method_sig
+      base_class = Class.new do
+        def to_h
+          { value: 'base' }
+        end
+      end
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      override_class = Class.new(base_class) do
+        extend T::Sig
+
+        def to_h
+          { 'profile' => { value: 'override' } }
+        end
+      end
+
+      Support.const_set(:SigApplicatorInheritedMethodSigTest, inherited_method_class)
+      Support.const_set(:SigApplicatorIncompatibleOverrideTest, override_class)
+
+      inherited_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorInheritedMethodSigTest
+          sig { returns(T::Hash[Symbol, T.untyped]) }
+          def to_h; end
+        end
+      RBI
+      override_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorIncompatibleOverrideTest
+          sig { returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
+          def to_h; end
+        end
+      RBI
+
+      errors = []
+      assert apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorInheritedMethodSigTest',
+        inherited_method_node,
+        errors,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty errors
+
+      refute apply_method_sig(
+        override_class,
+        'Support::SigApplicatorIncompatibleOverrideTest',
+        override_method_node,
+        errors,
+        sig_eval_scope: override_class
+      )
+      assert_includes errors.join("\n"), 'Incompatible return type in signature for override of method `to_h`'
+    ensure
+      if Support.const_defined?(:SigApplicatorInheritedMethodSigTest, false)
+        Support.send(:remove_const, :SigApplicatorInheritedMethodSigTest)
+      end
+      if Support.const_defined?(:SigApplicatorIncompatibleOverrideTest, false)
+        Support.send(:remove_const, :SigApplicatorIncompatibleOverrideTest)
+      end
+    end
+
     def test_apply_method_sig_resolves_singleton_sig_constants_in_class_namespace
       klass = Class.new do
         extend T::Sig

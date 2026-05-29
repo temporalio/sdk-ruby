@@ -4,7 +4,8 @@ require 'rbi'
 require 'sorbet-runtime'
 
 # Parses the SDK's RBI file and applies Sorbet runtime type signatures to the
-# real (already-loaded) class implementations using define_method.
+# real (already-loaded) class implementations using Sorbet's method_added
+# machinery.
 # This enables sorbet-runtime to validate argument and return types at runtime
 # during test execution, catching any drift between the RBI and actual code.
 #
@@ -227,7 +228,7 @@ module SigApplicator
         sig_source = rewrite_block_param(sig_source, method_node, sig) if has_anon_block
         begin
           apply_sig_source(sig_eval_scope, target, sig_source, singleton_method)
-          target.send(:define_method, method_name, original)
+          apply_pending_sig(sig_eval_scope, target, method_name, singleton_method)
 
           # Force eager sig validation so mismatches are caught now rather than
           # causing cascading failures on first call.
@@ -235,7 +236,7 @@ module SigApplicator
           T::Utils.signature_for_method(method_obj)
         rescue StandardError => e
           # Restore the original method without the sig wrapper
-          target.send(:define_method, method_name, original)
+          restore_original_method(target, method_name, original)
           errors << "#{full_name}: #{e.message}"
           return false
         end
@@ -258,6 +259,20 @@ module SigApplicator
         RUBY
       else
         target.class_eval(sig_source)
+      end
+    end
+
+    # The RBI sig is evaluated after the real method already exists, so Ruby
+    # will not naturally fire method_added. Call Sorbet's hook directly instead
+    # of redefining the method to make Ruby fire it.
+    def apply_pending_sig(sig_eval_scope, target, method_name, singleton_method)
+      hook_mod = singleton_method ? sig_eval_scope : target
+      T::Private::Methods._on_method_added(hook_mod, target, method_name)
+    end
+
+    def restore_original_method(target, method_name, original)
+      T::Private::DeclState.current.without_on_method_added do
+        target.send(:define_method, method_name, original)
       end
     end
 

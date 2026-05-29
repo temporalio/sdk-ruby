@@ -6779,7 +6779,7 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
     override_env_vars: T.unsafe(nil)
   ); end
 
-  sig { returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
+  sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
   def to_h; end
 end
 
