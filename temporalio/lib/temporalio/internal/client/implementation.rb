@@ -37,6 +37,28 @@ module Temporalio
         # leave resource_id empty.
         STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX = 'activity:'
 
+        # Returns the activity_id / workflow_id / run_id / resource_id fields for a `*_by_id`
+        # async-completion request, depending on whether the reference is the standalone or
+        # workflow-bound form. Splat into the request constructor's kwargs alongside the
+        # request-specific fields.
+        def self._activity_id_reference_request_fields(ref)
+          if ref.standalone?
+            {
+              workflow_id: nil,
+              run_id: ref.activity_run_id,
+              activity_id: ref.activity_id,
+              resource_id: "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}"
+            }
+          else
+            {
+              workflow_id: ref.workflow_id,
+              run_id: ref.run_id,
+              activity_id: ref.activity_id,
+              resource_id: nil
+            }
+          end
+        end
+
         def self.with_default_rpc_options(user_rpc_options)
           # If the user did not provide an override_retry, we need to make sure
           # we use an option set that has it as "true"
@@ -822,13 +844,10 @@ module Temporalio
           resp = if ref.is_a?(Temporalio::Client::ActivityIDReference)
                    @client.workflow_service.record_activity_task_heartbeat_by_id(
                      Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest.new(
-                       workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
-                       run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
-                       activity_id: ref.activity_id,
+                       **Implementation._activity_id_reference_request_fields(ref),
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
-                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
-                       resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
+                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
                      ),
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
@@ -857,13 +876,10 @@ module Temporalio
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_completed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest.new(
-                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
-                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
-                activity_id: ref.activity_id,
+                **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint)),
-                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
+                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint))
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -894,14 +910,11 @@ module Temporalio
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_failed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest.new(
-                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
-                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
-                activity_id: ref.activity_id,
+                **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
                 failure: @client.data_converter.to_failure(input.error),
-                last_heartbeat_details:,
-                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
+                last_heartbeat_details:
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -925,13 +938,10 @@ module Temporalio
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_canceled_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest.new(
-                workflow_id: ref.standalone? ? '' : (ref.workflow_id || ''),
-                run_id: ref.standalone? ? (ref.activity_run_id || '') : (ref.run_id || ''),
-                activity_id: ref.activity_id,
+                **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints),
-                resource_id: ref.standalone? ? "#{STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX}#{ref.activity_id}" : ''
+                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )

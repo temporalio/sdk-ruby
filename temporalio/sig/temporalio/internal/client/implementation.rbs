@@ -4,6 +4,8 @@ module Temporalio
       class Implementation < Temporalio::Client::Interceptor::Outbound
         STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX: String
 
+        def self._activity_id_reference_request_fields: (Temporalio::Client::ActivityIDReference ref) -> Hash[Symbol, String?]
+
         def self.with_default_rpc_options: (Temporalio::Client::RPCOptions? user_rpc_options) -> Temporalio::Client::RPCOptions
 
         def initialize: (Temporalio::Client client) -> void

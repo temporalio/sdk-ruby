@@ -13,7 +13,7 @@ module Temporalio
       # @return [String] ID for the activity.
       attr_reader :id
 
-      # @return [String, nil] Run ID for this activity execution. nil targets the latest run.
+      # @return [String, nil] Run ID for this activity execution. When nil, this handle targets the latest run.
       attr_reader :run_id
 
       # @return [Object, nil] Result hint used when deserializing the activity's result. May be overridden per
