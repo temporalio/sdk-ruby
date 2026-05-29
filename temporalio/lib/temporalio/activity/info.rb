@@ -34,7 +34,7 @@ module Temporalio
     # @!attribute activity_id
     #   @return [String] ID for the activity.
     # @!attribute activity_run_id
-    #   @return [String, nil] Run ID for a standalone activity execution. Nil for activities scheduled from a workflow.
+    #   @return [String, nil] Run ID for a standalone activity execution. nil for activities scheduled from a workflow.
     # @!attribute activity_type
     #   @return [String] Type name for the activity.
     # @!attribute attempt
@@ -71,15 +71,15 @@ module Temporalio
     #   @return [String] Task token uniquely identifying this activity. Note, this is a `ASCII-8BIT` encoded string, not
     #     a `UTF-8` encoded string nor a valid UTF-8 string.
     # @!attribute workflow_id
-    #   @return [String, nil] Workflow ID that started this activity. Nil for standalone activities.
+    #   @return [String, nil] Workflow ID that started this activity. nil for standalone activities.
     # @!attribute workflow_namespace
     #   @return [String] Namespace this activity is on.
     #   @deprecated Use {#namespace} instead. The value is identical regardless of whether the activity is
     #     standalone or scheduled from a workflow.
     # @!attribute workflow_run_id
-    #   @return [String, nil] Workflow run ID that started this activity. Nil for standalone activities.
+    #   @return [String, nil] Workflow run ID that started this activity. nil for standalone activities.
     # @!attribute workflow_type
-    #   @return [String, nil] Workflow type name that started this activity. Nil for standalone activities.
+    #   @return [String, nil] Workflow type name that started this activity. nil for standalone activities.
     #
     # @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate this
     #   class or it may break in incompatible ways.

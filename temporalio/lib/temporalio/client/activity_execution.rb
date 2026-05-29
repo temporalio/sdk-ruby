@@ -27,7 +27,7 @@ module Temporalio
         @raw_info.activity_id
       end
 
-      # @return [String, nil] Run ID for this activity execution attempt. Nil if absent on the server.
+      # @return [String, nil] Run ID for this activity execution attempt. nil if absent on the server.
       def activity_run_id
         Internal::ProtoUtils.string_or(@raw_info.run_id, nil)
       end

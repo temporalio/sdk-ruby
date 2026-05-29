@@ -30,7 +30,7 @@ module Temporalio
       # Construct a standalone activity reference.
       #
       # @param activity_id [String] ID for the activity.
-      # @param activity_run_id [String, nil] Run ID for the activity execution. Nil targets the latest run.
+      # @param activity_run_id [String, nil] Run ID for the activity execution. nil targets the latest run.
       # @return [ActivityIDReference] A reference suitable for {Client#async_activity_handle}.
       def self.for_standalone(activity_id:, activity_run_id: nil)
         allocate.tap do |ref|
