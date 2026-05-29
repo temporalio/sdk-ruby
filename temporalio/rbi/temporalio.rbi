@@ -1324,7 +1324,8 @@ class Temporalio::Client
         keep_alive: Temporalio::Client::Connection::KeepAliveOptions,
         http_connect_proxy: T.nilable(Temporalio::Client::Connection::HTTPConnectProxyOptions),
         runtime: Temporalio::Runtime,
-        lazy_connect: T::Boolean
+        lazy_connect: T::Boolean,
+        dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions)
       ).returns(Temporalio::Client)
     end
     def connect(
@@ -1343,7 +1344,8 @@ class Temporalio::Client
       keep_alive: T.unsafe(nil),
       http_connect_proxy: T.unsafe(nil),
       runtime: T.unsafe(nil),
-      lazy_connect: T.unsafe(nil)
+      lazy_connect: T.unsafe(nil),
+      dns_load_balancing: T.unsafe(nil)
     ); end
   end
 end
@@ -1456,6 +1458,7 @@ class Temporalio::Client::Connection
       http_connect_proxy: T.nilable(Temporalio::Client::Connection::HTTPConnectProxyOptions),
       runtime: Temporalio::Runtime,
       lazy_connect: T::Boolean,
+      dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions),
       around_connect: T.nilable(T.proc.params(arg0: Temporalio::Client::Connection::Options, arg1: T.proc.params(arg0: Temporalio::Client::Connection::Options).void).void)
     ).void
   end
@@ -1470,6 +1473,7 @@ class Temporalio::Client::Connection
     http_connect_proxy: T.unsafe(nil),
     runtime: T.unsafe(nil),
     lazy_connect: T.unsafe(nil),
+    dns_load_balancing: T.unsafe(nil),
     around_connect: T.unsafe(nil)
   ); end
 
@@ -1537,6 +1541,9 @@ class Temporalio::Client::Connection::Options < ::Data
 
   sig { returns(T::Boolean) }
   def lazy_connect; end
+
+  sig { returns(T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions)) }
+  def dns_load_balancing; end
 
   sig { returns(T::Hash[Symbol, T.untyped]) }
   def to_h; end
@@ -1679,6 +1686,25 @@ class Temporalio::Client::Connection::HTTPConnectProxyOptions < ::Data
 
     sig { params(args: T.untyped).returns(Temporalio::Client::Connection::HTTPConnectProxyOptions) }
     def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Connection::DnsLoadBalancingOptions < ::Data
+  sig { params(resolution_interval: Float).void }
+  def initialize(resolution_interval: T.unsafe(nil)); end
+
+  sig { returns(Float) }
+  def resolution_interval; end
+
+  class << self
+    sig { params(resolution_interval: Float).returns(Temporalio::Client::Connection::DnsLoadBalancingOptions) }
+    def new(resolution_interval: T.unsafe(nil)); end
+
+    sig { params(resolution_interval: Float).returns(Temporalio::Client::Connection::DnsLoadBalancingOptions) }
+    def [](resolution_interval: T.unsafe(nil)); end
 
     sig { returns(T::Array[Symbol]) }
     def members; end
@@ -2136,6 +2162,9 @@ class Temporalio::Client::Schedule::Action::StartWorkflow < ::Data
   sig { returns(T.nilable(Temporalio::SearchAttributes)) }
   def search_attributes; end
 
+  sig { returns(Temporalio::Priority) }
+  def priority; end
+
   sig { returns(T.nilable(T::Array[Object])) }
   def arg_hints; end
 
@@ -2160,11 +2189,12 @@ class Temporalio::Client::Schedule::Action::StartWorkflow < ::Data
         retry_policy: T.nilable(Temporalio::RetryPolicy),
         memo: T.nilable(T::Hash[String, T.nilable(Object)]),
         search_attributes: T.nilable(Temporalio::SearchAttributes),
+        priority: Temporalio::Priority,
         arg_hints: T.nilable(T::Array[Object]),
         headers: T.nilable(T::Hash[String, T.nilable(Object)])
       ).returns(Temporalio::Client::Schedule::Action::StartWorkflow)
     end
-    def new(workflow, *args, id:, task_queue:, static_summary: T.unsafe(nil), static_details: T.unsafe(nil), execution_timeout: T.unsafe(nil), run_timeout: T.unsafe(nil), task_timeout: T.unsafe(nil), retry_policy: T.unsafe(nil), memo: T.unsafe(nil), search_attributes: T.unsafe(nil), arg_hints: T.unsafe(nil), headers: T.unsafe(nil)); end
+    def new(workflow, *args, id:, task_queue:, static_summary: T.unsafe(nil), static_details: T.unsafe(nil), execution_timeout: T.unsafe(nil), run_timeout: T.unsafe(nil), task_timeout: T.unsafe(nil), retry_policy: T.unsafe(nil), memo: T.unsafe(nil), search_attributes: T.unsafe(nil), priority: T.unsafe(nil), arg_hints: T.unsafe(nil), headers: T.unsafe(nil)); end
 
     sig { params(args: T.untyped).returns(Temporalio::Client::Schedule::Action::StartWorkflow) }
     def [](*args); end
@@ -2787,6 +2817,7 @@ class Temporalio::Client::WithStartWorkflowOperation
       memo: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)]),
       search_attributes: T.nilable(Temporalio::SearchAttributes),
       start_delay: T.nilable(T.any(Integer, Float)),
+      priority: Temporalio::Priority,
       arg_hints: T.nilable(T::Array[Object]),
       result_hint: T.nilable(Object),
       headers: T.nilable(T::Hash[String, T.nilable(Object)])
@@ -2809,6 +2840,7 @@ class Temporalio::Client::WithStartWorkflowOperation
     memo: T.unsafe(nil),
     search_attributes: T.unsafe(nil),
     start_delay: T.unsafe(nil),
+    priority: T.unsafe(nil),
     arg_hints: T.unsafe(nil),
     result_hint: T.unsafe(nil),
     headers: T.unsafe(nil)
