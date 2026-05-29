@@ -318,7 +318,7 @@ module Temporalio
       )
 
       # Input for {Outbound.fetch_activity_outcome}. Used by `ActivityHandle#result` for long-polling
-      # the activity outcome via `DescribeActivityExecution` with `include_outcome: true`.
+      # the activity outcome via `PollActivityExecution`.
       FetchActivityOutcomeInput = Data.define(
         :activity_id,
         :activity_run_id,
