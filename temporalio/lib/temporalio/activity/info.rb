@@ -46,7 +46,7 @@ module Temporalio
     # @!attribute local?
     #   @return [Boolean] Whether the activity is a local activity or not.
     # @!attribute namespace
-    #   @return [String] Namespace this activity is on. Always set, including for standalone activities. Prefer this
+    #   @return [String, nil] Namespace this activity is on. Always set, including for standalone activities. Prefer this
     #     accessor over the deprecated {workflow_namespace}.
     # @!attribute priority
     #   @return [Priority] The priority of this activity.
@@ -73,7 +73,7 @@ module Temporalio
     # @!attribute workflow_id
     #   @return [String, nil] Workflow ID that started this activity. nil for standalone activities.
     # @!attribute workflow_namespace
-    #   @return [String] Namespace this activity is on.
+    #   @return [String, nil] Namespace this activity is on.
     #   @deprecated Use {#namespace} instead. The value is identical regardless of whether the activity is
     #     standalone or scheduled from a workflow.
     # @!attribute workflow_run_id
