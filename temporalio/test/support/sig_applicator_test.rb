@@ -175,6 +175,60 @@ module Support
       assert_empty errors
     end
 
+    def test_apply_method_sig_does_not_emit_extra_method_added_events
+      klass = Class.new do
+        extend T::Sig
+
+        class << self
+          attr_accessor :method_added_events
+        end
+
+        self.method_added_events = []
+
+        def self.method_added(name)
+          method_added_events << name
+          super
+        end
+
+        def foo
+          'ok'
+        end
+      end
+      klass.method_added_events.clear
+      method_node = parse_method('class X; sig { returns(String) }; def foo; end; end')
+      errors = []
+
+      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
+      assert_empty errors
+      assert_equal 'ok', klass.new.foo
+      assert_equal klass.method_added_events.select { |name| name == :foo }, klass.method_added_events
+      # Sorbet replaces the method twice, we should not add to this
+      assert_equal klass.method_added_events.size, 2
+    end
+
+    def test_apply_method_sig_restores_original_method_when_instrumentation_fails
+      klass = Class.new do
+        extend T::Sig
+
+        def foo(value)
+          "original: #{value}"
+        end
+      end
+      original = klass.instance_method(:foo)
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(other: String).returns(String) }
+          def foo(other); end
+        end
+      RBI
+      errors = []
+
+      refute apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
+      assert_includes errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      assert_equal original, klass.instance_method(:foo)
+      assert_equal 'original: ok', klass.new.foo('ok')
+    end
+
     def test_apply_method_sig_catches_incompatible_override_after_inherited_method_sig
       base_class = Class.new do
         def to_h
