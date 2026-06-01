@@ -25,8 +25,8 @@ module Temporalio
         ?hints: Array[Object]?
       ) -> Array[Object?]
 
-      def to_failure: (Exception error) -> untyped
-      def from_failure: (untyped failure) -> Exception
+      def to_failure: (Exception error) -> Api::Failure::V1::Failure
+      def from_failure: (Api::Failure::V1::Failure failure) -> Exception
     end
   end
 end

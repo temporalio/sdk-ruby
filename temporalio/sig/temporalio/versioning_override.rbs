@@ -1,17 +1,17 @@
 module Temporalio
   class VersioningOverride
-    def _to_proto: -> untyped
+    def _to_proto: -> Api::Workflow::V1::VersioningOverride
 
     class Pinned < VersioningOverride
         attr_reader version: WorkerDeploymentVersion
 
         def initialize: (WorkerDeploymentVersion version) -> void
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Workflow::V1::VersioningOverride
     end
 
     class AutoUpgrade < VersioningOverride
         def initialize: -> void
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Workflow::V1::VersioningOverride
     end
   end
 end

@@ -11,7 +11,7 @@ module Temporalio
         id: String,
         workflow_id: String,
         workflow_run_id: String?,
-        known_outcome: untyped?,
+        known_outcome: Api::Update::V1::Outcome?,
         result_hint: Object?
       ) -> void
 

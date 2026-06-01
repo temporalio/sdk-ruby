@@ -51,12 +51,12 @@ module Temporalio
       def initialize: (
         String message,
         code: Code::enum,
-        raw_grpc_status: String? | untyped
+        raw_grpc_status: String? | Api::Common::V1::GrpcStatus
       ) -> void
 
-      def grpc_status: -> untyped
+      def grpc_status: -> Api::Common::V1::GrpcStatus
 
-      private def create_grpc_status: -> untyped
+      private def create_grpc_status: -> Api::Common::V1::GrpcStatus
 
       module Code
         OK: 0

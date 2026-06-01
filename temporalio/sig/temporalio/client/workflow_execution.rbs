@@ -1,9 +1,9 @@
 module Temporalio
   class Client
     class WorkflowExecution
-      attr_reader raw_info: untyped
+      attr_reader raw_info: Api::Workflow::V1::WorkflowExecutionInfo
 
-      def initialize: (untyped raw_info, Converters::DataConverter data_converter) -> void
+      def initialize: (Api::Workflow::V1::WorkflowExecutionInfo raw_info, Converters::DataConverter data_converter) -> void
 
       def close_time: -> Time?
       def execution_time: -> Time?
@@ -20,9 +20,12 @@ module Temporalio
       def workflow_type: -> String
 
       class Description < WorkflowExecution
-        attr_reader raw_description: untyped
+        attr_reader raw_description: Api::WorkflowService::V1::DescribeWorkflowExecutionResponse
 
-        def initialize: (untyped raw_description, Converters::DataConverter data_converter) -> void
+        def initialize: (
+          Api::WorkflowService::V1::DescribeWorkflowExecutionResponse raw_description,
+          Converters::DataConverter data_converter
+        ) -> void
 
         def static_summary: -> String?
         def static_details: -> String?
