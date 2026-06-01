@@ -37,7 +37,7 @@ module Temporalio
         ?skip_archival: bool,
         ?specific_run_id: String?,
         ?rpc_options: RPCOptions?
-      ) -> Enumerator[untyped, untyped]
+      ) -> Enumerator[Api::History::V1::HistoryEvent, Api::History::V1::HistoryEvent]
 
       def signal: (
         Workflow::Definition::Signal | Symbol | String signal,

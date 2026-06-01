@@ -2,9 +2,9 @@ module Temporalio
   class WorkflowHistory
     def self.from_history_json: (String json) -> WorkflowHistory
 
-    attr_reader events: Array[untyped]
+    attr_reader events: Array[Api::History::V1::HistoryEvent]
     
-    def initialize: (Array[untyped] events) -> void
+    def initialize: (Array[Api::History::V1::HistoryEvent] events) -> void
 
     def workflow_id: -> String
 

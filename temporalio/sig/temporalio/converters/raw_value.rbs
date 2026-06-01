@@ -1,9 +1,9 @@
 module Temporalio
   module Converters
     class RawValue
-      attr_reader payload: untyped
+      attr_reader payload: Api::Common::V1::Payload
 
-      def initialize: (untyped payload) -> void
+      def initialize: (Api::Common::V1::Payload payload) -> void
     end
   end
 end

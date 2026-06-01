@@ -1,46 +1,46 @@
 module Temporalio
   module Internal
     module ProtoUtils
-      def self.seconds_to_duration: (duration? seconds_numeric) -> untyped?
+      def self.seconds_to_duration: (duration? seconds_numeric) -> Google::Protobuf::Duration?
 
-      def self.duration_to_seconds: (untyped? duration) -> Float?
+      def self.duration_to_seconds: (Google::Protobuf::Duration? duration) -> Float?
 
-      def self.time_to_timestamp: (Time? time) -> untyped?
+      def self.time_to_timestamp: (Time? time) -> Google::Protobuf::Timestamp?
 
-      def self.timestamp_to_time: (untyped? timestamp) -> Time?
+      def self.timestamp_to_time: (Google::Protobuf::Timestamp? timestamp) -> Time?
 
       def self.memo_to_proto: (
         Hash[String | Symbol, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
-      ) -> untyped?
+      ) -> Api::Common::V1::Memo?
 
       def self.memo_to_proto_hash: (
         Hash[String | Symbol, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
-      ) -> Hash[String, untyped]?
+      ) -> Hash[String, Api::Common::V1::Payload]?
 
       def self.memo_from_proto: (
-        untyped? memo,
+        Api::Common::V1::Memo? memo,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> Hash[String, Object?]?
 
       def self.headers_to_proto: (
         Hash[String, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
-      ) -> untyped?
+      ) -> Api::Common::V1::Header?
 
       def self.headers_to_proto_hash: (
         Hash[String, Object?]? hash,
         Converters::DataConverter | Converters::PayloadConverter converter
-      ) -> Hash[String, untyped]?
+      ) -> Hash[String, Api::Common::V1::Payload]?
 
       def self.headers_from_proto: (
-        untyped? headers,
+        Api::Common::V1::Header? headers,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> Hash[String, Object?]?
 
       def self.headers_from_proto_map: (
-        Hash[String, untyped]? headers,
+        (Hash[String, Api::Common::V1::Payload] | Google::Protobuf::Map[String, Api::Common::V1::Payload])? headers,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> Hash[String, Object?]?
 
@@ -51,7 +51,7 @@ module Temporalio
 
       def self.convert_from_payload_array: (
         Converters::DataConverter | Converters::PayloadConverter converter,
-        Array[untyped] payloads,
+        Array[Api::Common::V1::Payload] | Google::Protobuf::RepeatedField payloads,
         hints: Array[Object]?
       ) -> Array[Object?]
 
@@ -59,7 +59,7 @@ module Temporalio
         Converters::DataConverter | Converters::PayloadConverter converter,
         Array[Object?] values,
         hints: Array[Object]?
-      ) -> Array[untyped]
+      ) -> Array[Api::Common::V1::Payload]
 
       def self.assert_non_reserved_name: (String | Symbol | nil name) -> void
       def self.reserved_name?: (String | Symbol | nil name) -> bool
@@ -68,16 +68,16 @@ module Temporalio
         String? summary,
         String? details,
         Converters::DataConverter | Converters::PayloadConverter converter
-      ) -> untyped
+      ) -> Api::Sdk::V1::UserMetadata?
 
       def self.from_user_metadata: (
-        untyped metadata,
+        Api::Sdk::V1::UserMetadata? metadata,
         Converters::DataConverter | Converters::PayloadConverter converter
       ) -> [String?, String?]
 
       class LazyMemo
         def initialize: (
-          untyped? raw_memo,
+          Api::Common::V1::Memo? raw_memo,
           Converters::DataConverter | Converters::PayloadConverter converter,
         ) -> void
 
@@ -85,7 +85,7 @@ module Temporalio
       end
 
       class LazySearchAttributes
-        def initialize: (untyped? raw_search_attributes) -> void
+        def initialize: (Api::Common::V1::SearchAttributes? raw_search_attributes) -> void
 
         def get: -> SearchAttributes?
       end

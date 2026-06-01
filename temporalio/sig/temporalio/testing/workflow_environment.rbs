@@ -104,9 +104,9 @@ module Temporalio
 
       def current_time: -> Time
 
-      def create_nexus_endpoint: (name: String, task_queue: String) -> untyped
+      def create_nexus_endpoint: (name: String, task_queue: String) -> Api::Nexus::V1::Endpoint
 
-      def delete_nexus_endpoint: (untyped endpoint) -> nil
+      def delete_nexus_endpoint: (Api::Nexus::V1::Endpoint endpoint) -> nil
 
       def auto_time_skipping_disabled: [T] { -> T } -> T
 
