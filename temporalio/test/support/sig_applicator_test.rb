@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'delegate'
+require 'logger'
 require 'minitest/autorun'
 require 'rbi'
 require 'support/sig_applicator'
@@ -236,7 +238,7 @@ module Support
         end
       end
       inherited_method_class = Class.new(base_class) { extend T::Sig }
-      override_class = Class.new(base_class) do
+      override_class = Class.new(inherited_method_class) do
         extend T::Sig
 
         def to_h
@@ -284,6 +286,138 @@ module Support
       end
       if Support.const_defined?(:SigApplicatorIncompatibleOverrideTest, false)
         Support.send(:remove_const, :SigApplicatorIncompatibleOverrideTest)
+      end
+    end
+
+    def test_apply_method_sig_for_inherited_method_does_not_wrap_original_owner
+      original_delegator_initialize = Delegator.instance_method(:initialize)
+      inherited_method_class = Class.new(SimpleDelegator) { extend T::Sig }
+      child_class = Class.new(inherited_method_class) do
+        attr_reader :marker
+
+        def initialize(obj:, marker:)
+          @marker = marker
+          super(obj)
+        end
+      end
+      Support.const_set(:SigApplicatorDelegatorSigTest, inherited_method_class)
+
+      inherited_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorDelegatorSigTest
+          sig { params(obj: ::Logger).void }
+          def initialize(obj); end
+        end
+      RBI
+
+      errors = []
+      assert apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorDelegatorSigTest',
+        inherited_method_node,
+        errors,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty errors
+
+      assert_equal original_delegator_initialize, Delegator.instance_method(:initialize)
+      assert_equal inherited_method_class, inherited_method_class.instance_method(:initialize).owner
+
+      child = child_class.new(obj: Logger.new(nil), marker: :ok)
+      assert_equal :ok, child.marker
+      assert_instance_of Logger, child.__getobj__
+    ensure
+      if Support.const_defined?(:SigApplicatorDelegatorSigTest, false)
+        Support.send(:remove_const, :SigApplicatorDelegatorSigTest)
+      end
+    end
+
+    def test_apply_method_sig_preserves_inherited_method_visibility
+      base_class = Class.new do
+        protected
+
+        def protected_value
+          'protected'
+        end
+
+        private
+
+        def private_value
+          'private'
+        end
+      end
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      Support.const_set(:SigApplicatorVisibilityTest, inherited_method_class)
+
+      protected_node = parse_method(<<~RBI)
+        class Support::SigApplicatorVisibilityTest
+          sig { returns(String) }
+          def protected_value; end
+        end
+      RBI
+      private_node = parse_method(<<~RBI)
+        class Support::SigApplicatorVisibilityTest
+          sig { returns(String) }
+          def private_value; end
+        end
+      RBI
+
+      errors = []
+      assert apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorVisibilityTest',
+        protected_node,
+        errors,
+        sig_eval_scope: inherited_method_class
+      )
+      assert apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorVisibilityTest',
+        private_node,
+        errors,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty errors
+
+      assert inherited_method_class.protected_method_defined?(:protected_value)
+      assert inherited_method_class.private_method_defined?(:private_value)
+      refute inherited_method_class.public_method_defined?(:protected_value)
+      refute inherited_method_class.public_method_defined?(:private_value)
+    ensure
+      if Support.const_defined?(:SigApplicatorVisibilityTest, false)
+        Support.send(:remove_const, :SigApplicatorVisibilityTest)
+      end
+    end
+
+    def test_apply_method_sig_removes_local_copy_when_inherited_instrumentation_fails
+      base_class = Class.new do
+        def foo(value)
+          "original: #{value}"
+        end
+      end
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      Support.const_set(:SigApplicatorInheritedRestoreTest, inherited_method_class)
+
+      method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorInheritedRestoreTest
+          sig { params(other: String).returns(String) }
+          def foo(other); end
+        end
+      RBI
+
+      errors = []
+      refute apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorInheritedRestoreTest',
+        method_node,
+        errors,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_includes errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      assert_equal base_class, inherited_method_class.instance_method(:foo).owner
+      assert_equal 'original: ok', inherited_method_class.new.foo('ok')
+    ensure
+      if Support.const_defined?(:SigApplicatorInheritedRestoreTest, false)
+        Support.send(:remove_const, :SigApplicatorInheritedRestoreTest)
       end
     end
 

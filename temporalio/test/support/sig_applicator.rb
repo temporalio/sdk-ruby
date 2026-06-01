@@ -219,6 +219,10 @@ module SigApplicator
       return :skipped if skip_method?(original, method_node, method_name)
 
       has_anon_block = anonymous_block?(original)
+      # For inherited methods, copy the method locally so a subclass sig does not
+      # instrument the parent globally.
+      inherited_method = original.owner != target
+      original = define_local_method_copy(target, method_name, original) if inherited_method
 
       method_node.sigs.each do |sig|
         # RBI::Sig#string serializes back to valid T::Sig DSL source
@@ -236,7 +240,7 @@ module SigApplicator
           T::Utils.signature_for_method(method_obj)
         rescue StandardError => e
           # Restore the original method without the sig wrapper
-          restore_original_method(target, method_name, original)
+          restore_original_method(target, method_name, original, remove_local_method: inherited_method)
           errors << "#{full_name}: #{e.message}"
           return false
         end
@@ -270,9 +274,29 @@ module SigApplicator
       T::Private::Methods._on_method_added(hook_mod, target, method_name)
     end
 
-    def restore_original_method(target, method_name, original)
+    def define_local_method_copy(target, method_name, original)
+      visibility = method_visibility(target, method_name)
       T::Private::DeclState.current.without_on_method_added do
         target.send(:define_method, method_name, original)
+        target.send(visibility, method_name)
+      end
+      target.instance_method(method_name)
+    end
+
+    def method_visibility(target, method_name)
+      return :private if target.private_method_defined?(method_name)
+      return :protected if target.protected_method_defined?(method_name)
+
+      :public
+    end
+
+    def restore_original_method(target, method_name, original, remove_local_method: false)
+      T::Private::DeclState.current.without_on_method_added do
+        if remove_local_method
+          target.send(:remove_method, method_name)
+        else
+          target.send(:define_method, method_name, original)
+        end
       end
     end
 

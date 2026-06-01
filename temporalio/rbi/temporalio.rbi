@@ -6502,7 +6502,7 @@ class Temporalio::Converters::PayloadConverter::Composite < ::Temporalio::Conver
   sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: T.nilable(Temporalio::Api::Common::V1::Payload), hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 
   class ConverterNotFound < ::Temporalio::Error; end
@@ -6518,7 +6518,7 @@ class Temporalio::Converters::PayloadConverter::Encoding
   sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(T.nilable(Temporalio::Api::Common::V1::Payload)) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
-  sig { params(payload: Temporalio::Api::Common::V1::Payload, hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  sig { params(payload: T.nilable(Temporalio::Api::Common::V1::Payload), hint: T.nilable(Object)).returns(T.nilable(Object)) }
   def from_payload(payload, hint: T.unsafe(nil)); end
 end
 
