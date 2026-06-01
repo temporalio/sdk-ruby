@@ -45,6 +45,16 @@ class ClientActivityTest < Test
     end
   end
 
+  # Dynamic activity (no name) — declared only to verify that Client#start_activity rejects it.
+  # Never registered with a worker in these tests.
+  class DynamicActivity < Temporalio::Activity::Definition
+    activity_dynamic
+
+    def execute(*_args)
+      'dynamic'
+    end
+  end
+
   # Fails on the first attempt, succeeds on the second. Used to force a retry so `attempt > 1` is
   # observable. Uses `Activity::Context.current.info.attempt` rather than class-level state so it's
   # safe to share across parallel tests.
@@ -105,6 +115,70 @@ class ClientActivityTest < Test
       )
       assert_equal 'saa: by-name', result
     end
+  end
+
+  def test_execute_activity_by_symbol
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      result = env.client.execute_activity(
+        :SimpleActivity,
+        'by-symbol',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'saa: by-symbol', result
+    end
+  end
+
+  def test_execute_activity_by_definition_instance
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      result = env.client.execute_activity(
+        SimpleActivity.new,
+        'by-instance',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'saa: by-instance', result
+    end
+  end
+
+  def test_execute_activity_by_definition_info
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      info = Temporalio::Activity::Definition::Info.from_activity(SimpleActivity)
+      result = env.client.execute_activity(
+        info,
+        'by-info',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'saa: by-info', result
+    end
+  end
+
+  def test_start_activity_rejects_dynamic_activity
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        DynamicActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: 'unreached-tq',
+        start_to_close_timeout: 10
+      )
+    end
+    assert_match(/dynamic activity/i, err.message)
+  end
+
+  def test_start_activity_rejects_junk_param
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        42, # steep:ignore
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: 'unreached-tq',
+        start_to_close_timeout: 10
+      )
+    end
+    assert_match(/not an activity/i, err.message)
   end
 
   def test_start_activity_already_started_throws

@@ -103,7 +103,7 @@ class ClientActivityInterceptorChainTest < Test
     assert_includes events, 'A:fetch_activity_outcome'
   end
 
-  def test_describe_cancel_terminate_interceptors_called
+  def test_describe_terminate_interceptors_called
     events = []
     interceptor = RecordingInterceptor.new('A', events)
     client = client_with_interceptors([interceptor])
@@ -119,6 +119,29 @@ class ClientActivityInterceptorChainTest < Test
     end
     assert_includes events, 'A:describe_activity'
     assert_includes events, 'A:terminate_activity'
+  end
+
+  def test_cancel_activity_interceptor_called
+    events = []
+    interceptor = RecordingInterceptor.new('A', events)
+    client = client_with_interceptors([interceptor])
+    with_activity_worker(client, [SimpleActivity]) do |task_queue|
+      handle = client.start_activity(
+        SimpleActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      # SimpleActivity is fast; the cancel RPC may race the activity's completion and the server
+      # may reject it. The interceptor still runs client-side before the RPC, which is what we're
+      # asserting. Swallow any RPC error.
+      begin
+        handle.cancel('test')
+      rescue Temporalio::Error::RPCError
+        # expected: cancel rejected after activity already completed
+      end
+    end
+    assert_includes events, 'A:cancel_activity'
   end
 
   def test_list_and_count_activities_interceptors_called
