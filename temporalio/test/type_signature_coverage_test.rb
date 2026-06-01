@@ -24,7 +24,6 @@ class TypeSignatureCoverageTest < Minitest::Test
     temporalio/api/payload_visitor
     temporalio/api/workflowservice
     temporalio/internal
-    temporalio/internal/bridge
     temporalio/internal/bridge/api
     temporalio/internal/bridge/api/activity_result/activity_result
     temporalio/internal/bridge/api/activity_task/activity_task
@@ -40,29 +39,16 @@ class TypeSignatureCoverageTest < Minitest::Test
     temporalio/internal/bridge/runtime
     temporalio/internal/bridge/testing
     temporalio/internal/bridge/worker
-    temporalio/internal/client/implementation
-    temporalio/internal/metric
-    temporalio/internal/proto_utils
     temporalio/internal/worker/activity_worker
     temporalio/internal/worker/multi_runner
     temporalio/internal/worker/workflow_instance
-    temporalio/internal/worker/workflow_instance/child_workflow_handle
     temporalio/internal/worker/workflow_instance/context
-    temporalio/internal/worker/workflow_instance/details
-    temporalio/internal/worker/workflow_instance/external_workflow_handle
     temporalio/internal/worker/workflow_instance/externally_immutable_hash
-    temporalio/internal/worker/workflow_instance/handler_execution
     temporalio/internal/worker/workflow_instance/handler_hash
-    temporalio/internal/worker/workflow_instance/illegal_call_tracer
-    temporalio/internal/worker/workflow_instance/inbound_implementation
-    temporalio/internal/worker/workflow_instance/nexus_client
-    temporalio/internal/worker/workflow_instance/nexus_operation_handle
     temporalio/internal/worker/workflow_instance/outbound_implementation
     temporalio/internal/worker/workflow_instance/replay_safe_logger
     temporalio/internal/worker/workflow_instance/replay_safe_metric
-    temporalio/internal/worker/workflow_instance/scheduler
     temporalio/internal/worker/workflow_worker
-    temporalio/version
   ].freeze
 
   def test_ruby_files_have_matching_rbs_files
