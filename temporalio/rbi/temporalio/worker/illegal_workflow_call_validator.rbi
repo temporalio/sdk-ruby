@@ -1,0 +1,36 @@
+# typed: true
+
+# Sorbet RBI types for the Temporal Ruby SDK.
+# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
+
+class Temporalio::Worker::IllegalWorkflowCallValidator
+  extend T::Sig
+
+  sig { returns(T.nilable(Symbol)) }
+  def method_name; end
+
+  sig { returns(T.proc.params(arg0: Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo).void) }
+  def block; end
+
+  sig { params(method_name: T.nilable(Symbol), block: T.proc.params(arg0: Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo).void).void }
+  def initialize(method_name: T.unsafe(nil), &block); end
+
+  sig { returns(T::Array[Temporalio::Worker::IllegalWorkflowCallValidator]) }
+  def self.default_time_validators; end
+
+  sig { returns(Temporalio::Worker::IllegalWorkflowCallValidator) }
+  def self.known_safe_mutex_validator; end
+end
+
+class Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo < ::Data
+  extend T::Sig
+
+  sig { returns(String) }
+  def class_name; end
+
+  sig { returns(Symbol) }
+  def method_name; end
+
+  sig { returns(TracePoint) }
+  def trace_point; end
+end

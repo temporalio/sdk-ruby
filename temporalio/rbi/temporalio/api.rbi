@@ -3,6 +3,8 @@
 # Sorbet RBI types for the Temporal Ruby SDK.
 # This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
 
-module Temporalio
-  VERSION = T.let(T.unsafe(nil), String)
-end
+module Temporalio::Api; end
+
+module Temporalio::Api::Common; end
+
+module Temporalio::Api::Common::V1; end
