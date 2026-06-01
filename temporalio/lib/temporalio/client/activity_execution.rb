@@ -148,7 +148,7 @@ module Temporalio
           @data_converter.from_failure(@raw_info.last_failure)
         end
 
-        # @return [Time, nil] Schedule + schedule-to-close timeout.
+        # @return [Time, nil] Schedule time + schedule-to-close timeout.
         def expiration_time
           Internal::ProtoUtils.timestamp_to_time(@raw_info.expiration_time)
         end
