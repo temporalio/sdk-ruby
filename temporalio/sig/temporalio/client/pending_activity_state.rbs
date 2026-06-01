@@ -1,0 +1,14 @@
+module Temporalio
+  class Client
+    module PendingActivityState
+      type enum = Integer
+
+      UNSPECIFIED: enum
+      SCHEDULED: enum
+      STARTED: enum
+      CANCEL_REQUESTED: enum
+      PAUSED: enum
+      PAUSE_REQUESTED: enum
+    end
+  end
+end

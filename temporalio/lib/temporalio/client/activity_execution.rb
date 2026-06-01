@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/client/activity_execution_status'
+require 'temporalio/client/pending_activity_state'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/priority'
 require 'temporalio/retry_policy'
@@ -80,9 +81,11 @@ module Temporalio
           @data_converter = data_converter
         end
 
-        # @return [PendingActivityState, nil] More detailed breakdown of the running state (PendingActivityState).
+        # @return [PendingActivityState, nil] More detailed breakdown of the running state when
+        #   the activity's status is RUNNING; nil otherwise.
         def run_state
-          @raw_info.run_state
+          Internal::ProtoUtils.enum_to_int(Api::Enums::V1::PendingActivityState, @raw_info.run_state,
+                                           zero_means_nil: true)
         end
 
         # @return [Float, nil] Schedule-to-close timeout in seconds.
