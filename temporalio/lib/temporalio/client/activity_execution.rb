@@ -34,7 +34,7 @@ module Temporalio
 
       # @return [String] Type name of the activity.
       def activity_type
-        @raw_info.activity_type&.name || ''
+        @raw_info.activity_type&.name
       end
 
       # @return [Time, nil] When the activity was scheduled.
