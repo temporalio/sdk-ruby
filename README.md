@@ -1469,29 +1469,20 @@ Now can run `steep`:
 
     bundle exec rake steep
 
-### Maintaining Type Signatures
+### Type Signatures (Experimental)
 
 The SDK ships two sets of type signatures:
 
-* **RBS** (`sig/`) -- Source-of-truth types validated by Steep in CI. Update these whenever a public API changes.
-* **RBI** (`rbi/temporalio.rbi`) -- Enriched Sorbet types derived from the RBS signatures. Must be updated manually
-  when the RBS changes (see below).
+* **RBS**: Maintained throughout development of the SDK, but only recently made public.
+* **RBI**: Sorbet types maintained in parallel with the RBS signatures. Must be
+  updated manually when the RBS changes (see below).
+* **Generated protobuf RBI** (`rbi/temporalio/api/`) -- Sorbet types generated from protobuf files in parallel with
+  generated protobuf RBS.
 
-The RBI is validated in CI by running the test suite with `TEMPORAL_SORBET_RUNTIME_CHECK=1`, which applies every RBI
-signature to the real implementation at runtime via `SigApplicator`. This catches drift between the RBI and actual code
-(e.g. a renamed parameter, a changed return type, or a missing method).
+The RBI signatures are validated at runtime by running the test suite, which applies every RBI
+signature to the real implementation at runtime via `SigApplicator`. This catches drift between the RBI and actual code.
 
-**When adding or changing a public method:**
-
-1. Update the RBS file in `sig/` as usual. Verify with `bundle exec rake steep`.
-2. Update `rbi/temporalio.rbi` to match.
-3. Run tests with runtime type checking enabled `TEMPORAL_SORBET_RUNTIME_CHECK=1 bundle exec rake test`
-
-**What NOT to include in the RBI:**
-* `Temporalio::Internal::*` types (excluded entirely)
-* Methods prefixed with `_` (internal use only)
-* `Temporalio::Api::*` protobuf types (except `Api::Common::V1::Payload` and `Payloads` which users reference in
-  custom codecs)
+This is yet another reason to ensure any changes you make have test coverage.
 
 ### Proto Generation
 
@@ -1501,3 +1492,9 @@ Run:
 
 `proto:generate` now requires `protoc >= 34.0` because we generate RBS alongside the generated Ruby
 protobuf files.
+
+We use `protoc-gen-rbi` to generated protobuf RBI.
+
+It can be installed via `go install`:
+
+    go install github.com/coinbase/protoc-gen-rbi@$(cat ../.protoc-gen-rbi-version)

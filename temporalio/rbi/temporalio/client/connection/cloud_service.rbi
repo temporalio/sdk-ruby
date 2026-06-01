@@ -9,6 +9,9 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   sig { params(connection: Temporalio::Client::Connection).void }
   def initialize(connection); end
 
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetCurrentIdentityResponse) }
+  def get_current_identity(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUsersResponse) }
   def get_users(request, rpc_options: T.unsafe(nil)); end
 
@@ -180,6 +183,33 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteConnectivityRuleResponse) }
   def delete_connectivity_rule(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetAuditLogsResponse) }
+  def get_audit_logs(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::ValidateAccountAuditLogSinkResponse) }
   def validate_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateAccountAuditLogSinkResponse) }
+  def create_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinkResponse) }
+  def get_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetAccountAuditLogSinksResponse) }
+  def get_account_audit_log_sinks(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateAccountAuditLogSinkResponse) }
+  def update_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteAccountAuditLogSinkResponse) }
+  def delete_account_audit_log_sink(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetNamespaceCapacityInfoResponse) }
+  def get_namespace_capacity_info(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateBillingReportResponse) }
+  def create_billing_report(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse) }
+  def get_billing_report(request, rpc_options: T.unsafe(nil)); end
 end

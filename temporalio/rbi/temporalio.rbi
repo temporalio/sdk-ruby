@@ -11,38 +11,6 @@ end
 module Temporalio::Api; end
 module Temporalio::Api::Common; end
 module Temporalio::Api::Common::V1; end
-class Temporalio::Api::Common::V1::Payload
-  extend T::Sig
-
-  sig { params(kwargs: T.untyped).void }
-  def initialize(**kwargs); end
-
-  sig { returns(T::Hash[String, String]) }
-  def metadata; end
-
-  sig { returns(String) }
-  def data; end
-
-  sig { returns(String) }
-  def to_proto; end
-
-  class << self
-    extend T::Sig
-
-    sig { params(data: String).returns(Temporalio::Api::Common::V1::Payload) }
-    def decode(data); end
-  end
-end
-
-class Temporalio::Api::Common::V1::Payloads
-  extend T::Sig
-
-  sig { params(kwargs: T.untyped).void }
-  def initialize(**kwargs); end
-
-  sig { returns(T::Array[Temporalio::Api::Common::V1::Payload]) }
-  def payloads; end
-end
 
 module Temporalio::Activity; end
 
@@ -6848,10 +6816,10 @@ class Temporalio::Testing::WorkflowEnvironment
   sig { returns(Time) }
   def current_time; end
 
-  sig { params(name: String, task_queue: String).returns(T.untyped) }
+  sig { params(name: String, task_queue: String).returns(Temporalio::Api::Nexus::V1::Endpoint) }
   def create_nexus_endpoint(name:, task_queue:); end
 
-  sig { params(endpoint: T.untyped).returns(NilClass) }
+  sig { params(endpoint: Temporalio::Api::Nexus::V1::Endpoint).returns(NilClass) }
   def delete_nexus_endpoint(endpoint); end
 
   sig { type_parameters(:T).params(block: T.proc.returns(T.type_parameter(:T))).returns(T.type_parameter(:T)) }

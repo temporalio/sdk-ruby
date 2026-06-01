@@ -213,6 +213,18 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkerDeploymentsResponse) }
   def list_worker_deployments(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentResponse) }
+  def create_worker_deployment(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CreateWorkerDeploymentVersionResponse) }
+  def create_worker_deployment_version(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionComputeConfigResponse) }
+  def update_worker_deployment_version_compute_config(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ValidateWorkerDeploymentVersionComputeConfigResponse) }
+  def validate_worker_deployment_version_compute_config(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateWorkerDeploymentVersionMetadataResponse) }
   def update_worker_deployment_version_metadata(request, rpc_options: T.unsafe(nil)); end
 
@@ -303,24 +315,48 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   sig { params(request: Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse) }
   def start_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionResponse) }
+  def start_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse) }
   def describe_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionResponse) }
+  def describe_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
 
   sig { params(request: Temporalio::Api::WorkflowService::V1::PollActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse) }
   def poll_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse) }
+  def poll_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::ListActivityExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse) }
   def list_activity_executions(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListNexusOperationExecutionsResponse) }
+  def list_nexus_operation_executions(request, rpc_options: T.unsafe(nil)); end
 
   sig { params(request: Temporalio::Api::WorkflowService::V1::CountActivityExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountActivityExecutionsResponse) }
   def count_activity_executions(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountNexusOperationExecutionsResponse) }
+  def count_nexus_operation_executions(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionResponse) }
   def request_cancel_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::RequestCancelNexusOperationExecutionResponse) }
+  def request_cancel_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
 
   sig { params(request: Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionResponse) }
   def terminate_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
   sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse) }
   def delete_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionResponse) }
+  def terminate_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse) }
+  def delete_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
 end
