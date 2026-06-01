@@ -404,6 +404,41 @@ class ClientActivityTest < Test
     end
   end
 
+  def test_list_activities_paginates
+    # Smoke test for the pagination loop in Implementation#list_activities. Wraps
+    # workflow_service.list_activity_executions to return two canned pages — the first with a
+    # non-empty next_page_token, the second (in response to that token) empty — and asserts the
+    # Enumerator transparently follows the token and yields executions from both pages.
+    ws = env.client.workflow_service
+    call_count = 0
+    received_tokens = []
+    ws.define_singleton_method(:list_activity_executions) do |req, **_kwargs|
+      call_count += 1
+      received_tokens << req.next_page_token.dup
+      next_token = call_count == 1 ? 'page-2-token' : ''
+      Temporalio::Api::WorkflowService::V1::ListActivityExecutionsResponse.new(
+        executions: [
+          Temporalio::Api::Activity::V1::ActivityExecutionListInfo.new(
+            activity_id: "act-page-#{call_count}",
+            activity_type: Temporalio::Api::Common::V1::ActivityType.new(name: 'SimpleActivity')
+          )
+        ],
+        next_page_token: next_token
+      )
+    end
+
+    begin
+      results = env.client.list_activities('').to_a
+      assert_equal 2, call_count, "pagination loop should have made 2 RPC calls; made #{call_count}"
+      assert_equal %w[act-page-1 act-page-2], results.map(&:activity_id)
+      # First call has no page token; second call carries the token from the first response.
+      assert_empty received_tokens[0]
+      assert_equal 'page-2-token', received_tokens[1]
+    ensure
+      ws.singleton_class.send(:remove_method, :list_activity_executions)
+    end
+  end
+
   def test_count_activities_simple_count_is_accurate
     with_activity_worker([SimpleActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
