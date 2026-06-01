@@ -38,7 +38,7 @@ module Temporalio
       end
 
       # @return [Time, nil] When the activity was scheduled.
-      def scheduled_time
+      def schedule_time
         Internal::ProtoUtils.timestamp_to_time(@raw_info.schedule_time)
       end
 
