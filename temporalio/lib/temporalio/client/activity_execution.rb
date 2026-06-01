@@ -79,7 +79,7 @@ module Temporalio
           @data_converter = data_converter
         end
 
-        # @return [Symbol] More detailed breakdown of the running state (PendingActivityState).
+        # @return [PendingActivityState, nil] More detailed breakdown of the running state (PendingActivityState).
         def run_state
           @raw_info.run_state
         end

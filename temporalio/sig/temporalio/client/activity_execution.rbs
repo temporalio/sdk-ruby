@@ -20,7 +20,7 @@ module Temporalio
 
         def initialize: (untyped raw_description, Converters::DataConverter data_converter) -> void
 
-        def run_state: -> Symbol
+        def run_state: -> PendingActivityState?
         def schedule_to_close_timeout: -> Float?
         def schedule_to_start_timeout: -> Float?
         def start_to_close_timeout: -> Float?
