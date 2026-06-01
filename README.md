@@ -1149,9 +1149,6 @@ else
 end
 ```
 
-Standalone activities require the dev server to enable the SAA feature flags. See the test bootstrap in
-`temporalio/test/test.rb` for the required `--dynamic-config-value` flags.
-
 ### Telemetry
 
 #### Metrics
