@@ -13,7 +13,7 @@ module Temporalio
     # Info for a standalone activity execution. Returned by list_activities; extended by {Description}
     # for describe results.
     class ActivityExecution
-      # @return [Api::Activity::V1::ActivityExecutionInfo] Underlying protobuf info.
+      # @return [Api::Activity::V1::ActivityExecutionListInfo, Api::Activity::V1::ActivityExecutionInfo] Underlying protobuf info.
       attr_reader :raw_info
 
       # @!visibility private
