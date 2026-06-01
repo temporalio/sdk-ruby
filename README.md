@@ -1111,7 +1111,7 @@ handle = client.start_activity(
 result = handle.result   # blocks until the activity completes
 ```
 
-Or use the start-and-wait shortcut:
+Or use the execute helper to start and wait:
 
 ```ruby
 result = client.execute_activity(
@@ -1126,7 +1126,7 @@ Get a handle to an existing standalone activity to describe, cancel, terminate, 
 handle = client.activity_handle('my-activity-id')
 description = handle.describe       # ActivityExecution::Description
 result = handle.result              # blocks until the activity reaches a terminal state
-handle.cancel('reason for cancel'). # or
+handle.cancel('reason for cancel')  # or
 handle.terminate('reason for terminate')
 ```
 
