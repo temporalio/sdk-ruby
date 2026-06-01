@@ -73,9 +73,9 @@ module Temporalio
     # @!attribute workflow_id
     #   @return [String, nil] Workflow ID that started this activity. nil for standalone activities.
     # @!attribute workflow_namespace
-    #   @return [String, nil] Namespace this activity is on.
-    #   @deprecated Use {#namespace} instead. The value is identical regardless of whether the activity is
-    #     standalone or scheduled from a workflow.
+    #   @return [String, nil] Namespace of the workflow that scheduled this activity. Nil for standalone
+    #     activities. Prefer {#namespace}, which is always set.
+    #   @deprecated Use {#namespace} instead.
     # @!attribute workflow_run_id
     #   @return [String, nil] Workflow run ID that started this activity. nil for standalone activities.
     # @!attribute workflow_type

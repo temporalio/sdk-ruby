@@ -24,7 +24,8 @@ class ActivityInfoStandaloneTest < Test
         workflow_id: info.workflow_id,
         workflow_run_id: info.workflow_run_id,
         workflow_type: info.workflow_type,
-        namespace: info.namespace
+        namespace: info.namespace,
+        workflow_namespace: info.workflow_namespace
       }
       'reported'
     end
@@ -62,6 +63,7 @@ class ActivityInfoStandaloneTest < Test
     assert_nil captured[:workflow_id], 'standalone activity should have nil workflow_id'
     assert_nil captured[:workflow_run_id], 'standalone activity should have nil workflow_run_id'
     assert_nil captured[:workflow_type], 'standalone activity should have nil workflow_type'
+    assert_nil captured[:workflow_namespace], 'standalone activity should have nil workflow_namespace'
     assert_equal env.client.namespace, captured[:namespace]
   end
 
@@ -90,5 +92,7 @@ class ActivityInfoStandaloneTest < Test
     refute_nil captured[:workflow_type], 'workflow-scheduled activity should have non-nil workflow_type'
     assert_equal 'CallActivityWorkflow', captured[:workflow_type]
     assert_equal env.client.namespace, captured[:namespace]
+    assert_equal env.client.namespace, captured[:workflow_namespace],
+                 'workflow-scheduled activity should have workflow_namespace equal to namespace'
   end
 end
