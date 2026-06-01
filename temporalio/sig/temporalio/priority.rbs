@@ -6,11 +6,11 @@ module Temporalio
 
     def initialize: (?priority_key: Integer?, ?fairness_key: String?, ?fairness_weight: Float?) -> void
 
-    def self._from_proto: (untyped) -> Priority
+    def self._from_proto: (Api::Common::V1::Priority?) -> Priority
 
     def self.default: -> Priority
 
-    def _to_proto: -> untyped
+    def _to_proto: -> Api::Common::V1::Priority?
 
     def empty?: -> bool
   end

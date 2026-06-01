@@ -1,8 +1,8 @@
 module Temporalio
   module Converters
     class PayloadCodec
-      def encode: (Enumerable[untyped] payloads) -> Array[untyped]
-      def decode: (Enumerable[untyped] payloads) -> Array[untyped]
+      def encode: (Enumerable[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
+      def decode: (Enumerable[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
     end
   end
 end

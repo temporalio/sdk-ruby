@@ -7,7 +7,7 @@ module Temporalio
       attr_reader state: State
 
       def self._from_proto: (
-        untyped raw_schedule,
+        Api::Schedule::V1::Schedule raw_schedule,
         Converters::DataConverter data_converter
       ) -> Schedule
 
@@ -18,7 +18,7 @@ module Temporalio
         ?state: State
       ) -> void
 
-      def _to_proto: (Converters::DataConverter data_converter) -> untyped
+      def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::Schedule
 
       def with: (**untyped) -> Schedule
 
@@ -26,11 +26,11 @@ module Temporalio
         attr_reader id: String
         attr_reader schedule: Schedule
         attr_reader info: Schedule::Info
-        attr_reader raw_description: untyped
+        attr_reader raw_description: Api::WorkflowService::V1::DescribeScheduleResponse
 
         def initialize: (
           id: String,
-          raw_description: untyped,
+          raw_description: Api::WorkflowService::V1::DescribeScheduleResponse,
           data_converter: Converters::DataConverter
         ) -> void
 
@@ -48,16 +48,16 @@ module Temporalio
         attr_reader created_at: Time
         attr_reader last_updated_at: Time?
 
-        def initialize: (raw_info: untyped) -> void
+        def initialize: (raw_info: Api::Schedule::V1::ScheduleInfo) -> void
       end
 
       module Action
         def self._from_proto: (
-          untyped raw_action,
+          Api::Schedule::V1::ScheduleAction raw_action,
           Converters::DataConverter data_converter
         ) -> Action
 
-        def _to_proto: (Converters::DataConverter data_converter) -> untyped
+        def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::ScheduleAction
 
         class StartWorkflow
           include Action
@@ -97,13 +97,13 @@ module Temporalio
           ) -> StartWorkflow
 
           def self._from_proto: (
-            untyped raw_info,
+            Api::Workflow::V1::NewWorkflowExecutionInfo raw_info,
             Converters::DataConverter data_converter
           ) -> StartWorkflow
 
           def with: (**untyped) -> StartWorkflow
 
-          def _to_proto: (Converters::DataConverter data_converter) -> untyped
+          def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::ScheduleAction
         end
       end
 
@@ -129,7 +129,7 @@ module Temporalio
           ?overlap: OverlapPolicy::enum?
         ) -> void
 
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Schedule::V1::BackfillRequest
       end
 
       module ActionExecution
@@ -139,7 +139,7 @@ module Temporalio
           attr_reader workflow_id: String
           attr_reader first_execution_run_id: String
 
-          def initialize: (raw_execution: untyped) -> void
+          def initialize: (raw_execution: Api::Common::V1::WorkflowExecution) -> void
         end
       end
 
@@ -148,7 +148,7 @@ module Temporalio
         attr_reader started_at: Time
         attr_reader action: ActionExecution
 
-        def initialize: (raw_result: untyped) -> void
+        def initialize: (raw_result: Api::Schedule::V1::ScheduleActionResult) -> void
       end
 
       class Spec
@@ -161,7 +161,7 @@ module Temporalio
         attr_reader jitter: Float?
         attr_reader time_zone_name: String?
 
-        def self._from_proto: (untyped raw_spec) -> Spec
+        def self._from_proto: (Api::Schedule::V1::ScheduleSpec raw_spec) -> Spec
 
         def initialize: (
           ?calendars: Array[Calendar],
@@ -174,7 +174,7 @@ module Temporalio
           ?time_zone_name: String?
         ) -> void
 
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Schedule::V1::ScheduleSpec
 
         def with: (**untyped) -> Spec
 
@@ -188,7 +188,7 @@ module Temporalio
           attr_reader day_of_week: Array[Schedule::Range]
           attr_reader comment: String?
 
-          def self._from_proto: (untyped raw_cal) -> Calendar
+          def self._from_proto: (Api::Schedule::V1::StructuredCalendarSpec raw_cal) -> Calendar
 
           def initialize: (
             ?second: Array[Schedule::Range],
@@ -201,21 +201,21 @@ module Temporalio
             ?comment: String?
           ) -> void
 
-          def _to_proto: -> untyped
+          def _to_proto: -> Api::Schedule::V1::StructuredCalendarSpec
         end
 
         class Interval
           attr_reader every: duration
           attr_reader offset: duration?
 
-          def self._from_proto: (untyped raw_int) -> Interval
+          def self._from_proto: (Api::Schedule::V1::IntervalSpec raw_int) -> Interval
 
           def initialize: (
             every: duration,
             ?offset: duration?
           ) -> void
 
-          def _to_proto: -> untyped
+          def _to_proto: -> Api::Schedule::V1::IntervalSpec
         end
       end
 
@@ -230,11 +230,11 @@ module Temporalio
           ?Integer step
         ) -> Range
 
-        def self._from_proto: (untyped raw_range) -> Range
-        def self._from_protos: (Array[untyped] raw_ranges) -> Array[Range]
-        def self._to_protos: (Array[Range] ranges) -> Array[untyped]
+        def self._from_proto: (Api::Schedule::V1::Range raw_range) -> Range
+        def self._from_protos: (Google::Protobuf::RepeatedField raw_ranges) -> Array[Range]
+        def self._to_protos: (Array[Range] ranges) -> Array[Api::Schedule::V1::Range]
 
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Schedule::V1::Range
       end
 
       class Policy
@@ -242,7 +242,7 @@ module Temporalio
         attr_reader catchup_window: duration
         attr_reader pause_on_failure: bool
 
-        def self._from_proto: (untyped raw_policies) -> Policy
+        def self._from_proto: (Api::Schedule::V1::SchedulePolicies raw_policies) -> Policy
 
         def initialize: (
           ?overlap: OverlapPolicy::enum,
@@ -250,7 +250,7 @@ module Temporalio
           ?pause_on_failure: bool
         ) -> void
 
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Schedule::V1::SchedulePolicies
       end
 
       class State
@@ -259,7 +259,7 @@ module Temporalio
         attr_reader limited_actions: bool
         attr_reader remaining_actions: Integer
 
-        def self._from_proto: (untyped raw_state) -> State
+        def self._from_proto: (Api::Schedule::V1::ScheduleState raw_state) -> State
 
         def initialize: (
           ?note: String?,
@@ -268,7 +268,7 @@ module Temporalio
           ?remaining_actions: Integer
         ) -> void
 
-        def _to_proto: -> untyped
+        def _to_proto: -> Api::Schedule::V1::ScheduleState
       end
 
       class Update
@@ -290,12 +290,12 @@ module Temporalio
       module List
         class Description
           attr_reader id: String
-          attr_reader schedule: Schedule
-          attr_reader info: Info
-          attr_reader raw_entry: untyped
+          attr_reader schedule: Schedule?
+          attr_reader info: Info?
+          attr_reader raw_entry: Api::Schedule::V1::ScheduleListEntry
 
           def initialize: (
-            raw_entry: untyped,
+            raw_entry: Api::Schedule::V1::ScheduleListEntry,
             data_converter: Converters::DataConverter
           ) -> void
         end
@@ -305,7 +305,7 @@ module Temporalio
           attr_reader spec: Spec
           attr_reader state: State
 
-          def initialize: (raw_info: untyped) -> void
+          def initialize: (raw_info: Api::Schedule::V1::ScheduleListInfo) -> void
         end
 
         module Action
@@ -322,14 +322,14 @@ module Temporalio
           attr_reader recent_actions: Array[ActionResult]
           attr_reader next_action_times: Array[Time]
 
-          def initialize: (raw_info: untyped) -> void
+          def initialize: (raw_info: Api::Schedule::V1::ScheduleListInfo) -> void
         end
 
         class State
           attr_reader note: String?
           attr_reader paused: bool
 
-          def initialize: (raw_info: untyped) -> void
+          def initialize: (raw_info: Api::Schedule::V1::ScheduleListInfo) -> void
         end
       end
     end

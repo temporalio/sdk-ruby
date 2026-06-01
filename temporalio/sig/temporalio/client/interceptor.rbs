@@ -559,7 +559,9 @@ module Temporalio
 
         def describe_workflow: (DescribeWorkflowInput input) -> WorkflowExecution::Description
 
-        def fetch_workflow_history_events: (FetchWorkflowHistoryEventsInput input) -> Enumerator[untyped, untyped]
+        def fetch_workflow_history_events: (
+          FetchWorkflowHistoryEventsInput input
+        ) -> Enumerator[Api::History::V1::HistoryEvent, Api::History::V1::HistoryEvent]
 
         def signal_workflow: (SignalWorkflowInput input) -> void
 
@@ -567,7 +569,7 @@ module Temporalio
 
         def start_workflow_update: (StartWorkflowUpdateInput input) -> WorkflowUpdateHandle
 
-        def poll_workflow_update: (PollWorkflowUpdateInput input) -> untyped
+        def poll_workflow_update: (PollWorkflowUpdateInput input) -> Api::Update::V1::Outcome
 
         def cancel_workflow: (CancelWorkflowInput input) -> void
 
