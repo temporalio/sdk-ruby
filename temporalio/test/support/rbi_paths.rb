@@ -6,7 +6,8 @@ module RbiPaths
   GENERATED_PREFIXES = [
     File.join(ROOT, 'google', ''),
     File.join(ROOT, 'temporalio', 'api', ''),
-    File.join(ROOT, 'temporalio', 'client', 'connection', '')
+    File.join(ROOT, 'temporalio', 'client', 'connection', ''),
+    File.join(ROOT, 'temporalio', 'internal', 'bridge', 'api', '')
   ].freeze
 
   class << self

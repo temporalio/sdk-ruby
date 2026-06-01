@@ -53,6 +53,7 @@ class ProtoGen
     'lib/temporalio/internal/bridge/api',
     'lib/protoc-gen-openapiv2',
     'rbi/temporalio/api',
+    'rbi/temporalio/internal/bridge/api',
     'sig/temporalio/api',
     'sig/temporalio/internal/bridge/api',
     'sig/protoc-gen-openapiv2',
@@ -208,6 +209,14 @@ class ProtoGen
         require 'temporalio/api/operatorservice/v1/request_response'
       TEXT
     )
+    FileUtils.mkdir_p(['rbi/temporalio/api/cloud', 'rbi/temporalio/api/operatorservice', 'rbi/temporalio/api/workflowservice'])
+    FileUtils.mkdir_p(['sig/temporalio/api/cloud', 'sig/temporalio/api/operatorservice', 'sig/temporalio/api/workflowservice'])
+    File.write('rbi/temporalio/api/cloud/cloudservice.rbi', generated_empty_module_rbi('Temporalio::Api::Cloud::CloudService'))
+    File.write('rbi/temporalio/api/operatorservice.rbi', generated_empty_module_rbi('Temporalio::Api::OperatorService'))
+    File.write('rbi/temporalio/api/workflowservice.rbi', generated_empty_module_rbi('Temporalio::Api::WorkflowService'))
+    File.write('sig/temporalio/api/cloud/cloudservice.rbs', generated_empty_module_rbs(%w[Temporalio Api Cloud CloudService]))
+    File.write('sig/temporalio/api/operatorservice.rbs', generated_empty_module_rbs(%w[Temporalio Api OperatorService]))
+    File.write('sig/temporalio/api/workflowservice.rbs', generated_empty_module_rbs(%w[Temporalio Api WorkflowService]))
     File.write(
       'lib/temporalio/api.rb',
       <<~TEXT
@@ -418,14 +427,17 @@ class ProtoGen
 
   def generate_core_protos
     FileUtils.rm_rf('lib/temporalio/internal/bridge/api')
+    FileUtils.rm_rf('rbi/temporalio/internal/bridge/api')
     # Generate API to temp dir
     FileUtils.rm_rf('tmp-proto')
-    FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
+    FileUtils.mkdir_p(['tmp-proto/rbi', 'tmp-proto/ruby', 'tmp-proto/rbs'])
     system(
       protoc_command,
       *google_proto_include_flags,
       '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
       '--proto_path=ext/sdk-core/crates/common/protos/local',
+      "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
+      '--rbi_out=grpc=false:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *Dir.glob('ext/sdk-core/crates/common/protos/local/**/*.proto'),
@@ -443,9 +455,12 @@ class ProtoGen
       FileUtils.mv(path, path.sub('_pb', ''))
     end
     # Move from temp dir and remove temp dir
+    Dir.glob('tmp-proto/rbi/temporal/sdk/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/temporal/sdk/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     FileUtils.mkdir_p('lib/temporalio/internal/bridge/api')
     FileUtils.cp_r(Dir.glob('tmp-proto/ruby/temporal/sdk/core/*'), 'lib/temporalio/internal/bridge/api')
+    FileUtils.mkdir_p('rbi/temporalio/internal/bridge/api')
+    FileUtils.cp_r(Dir.glob('tmp-proto/rbi/temporal/sdk/core/*'), 'rbi/temporalio/internal/bridge/api')
     FileUtils.mkdir_p('sig/temporalio/internal/bridge/api')
     FileUtils.cp_r(Dir.glob('tmp-proto/rbs/temporal/sdk/core/*'), 'sig/temporalio/internal/bridge/api')
     FileUtils.rm_rf('tmp-proto')
@@ -455,8 +470,34 @@ class ProtoGen
     require_relative 'payload_visitor_gen'
     gen = PayloadVisitorGen.new
     File.write('lib/temporalio/api/payload_visitor.rb', gen.gen_file_code)
+    FileUtils.mkdir_p('rbi/temporalio/api')
+    File.write('rbi/temporalio/api/payload_visitor.rbi', gen.gen_rbi_code)
     FileUtils.mkdir_p('sig/temporalio/api')
     File.write('sig/temporalio/api/payload_visitor.rbs', gen.gen_rbs_code)
+  end
+
+  def generated_empty_module_rbi(class_name)
+    <<~TEXT
+      # typed: true
+
+      # Generated code.  DO NOT EDIT!
+
+      module #{class_name}; end
+    TEXT
+  end
+
+  def generated_empty_module_rbs(names)
+    indent = +''
+    body = +''
+    names.each do |name|
+      body << "#{indent}module #{name}\n"
+      indent << '  '
+    end
+    names.reverse_each do |_name|
+      indent = indent[0...-2]
+      body << "#{indent}end\n"
+    end
+    body
   end
 
   def protoc_command

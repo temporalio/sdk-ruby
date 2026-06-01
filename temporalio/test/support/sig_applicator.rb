@@ -319,7 +319,7 @@ module SigApplicator
 
     # Determines whether a method should be skipped for sig application based
     # on parameter shape mismatches between the RBI sig and the actual method.
-    def skip_method?(original, method_node, method_name)
+    def skip_method?(original, method_node, _method_name)
       actual_params = original.parameters
 
       # Block param mismatch: methods using yield with no block param,
@@ -331,9 +331,11 @@ module SigApplicator
       sig_has_block = sig_block_params.any?
       return true if actual_has_block != sig_has_block
 
-      # Setter methods where Ruby creates unnamed params (attr_writer)
+      # Native/extension methods may expose positional parameters without
+      # names. Sorbet runtime signatures cannot name those parameters without
+      # adding Ruby wrappers, so keep those RBIs for static checking only.
       has_unnamed_params = actual_params.any? { |_kind, name| name.nil? }
-      return true if has_unnamed_params && method_name.end_with?('=')
+      return true if has_unnamed_params
 
       # Synthetic methods (e.g., Data.define generates .new, .[], #initialize,
       # #with with a single splat) where the RBI provides typed keyword params
