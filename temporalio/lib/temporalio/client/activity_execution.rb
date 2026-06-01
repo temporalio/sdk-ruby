@@ -13,7 +13,8 @@ module Temporalio
     # Info for a standalone activity execution. Returned by list_activities; extended by {Description}
     # for describe results.
     class ActivityExecution
-      # @return [Api::Activity::V1::ActivityExecutionListInfo, Api::Activity::V1::ActivityExecutionInfo] Underlying protobuf info.
+      # @return [Api::Activity::V1::ActivityExecutionListInfo, Api::Activity::V1::ActivityExecutionInfo]
+      #   Underlying protobuf info.
       attr_reader :raw_info
 
       # @!visibility private
@@ -107,6 +108,14 @@ module Temporalio
         # @return [Boolean] Whether the activity has recorded any heartbeat details.
         def has_heartbeat_details? # rubocop:disable Naming/PredicatePrefix
           !@raw_info.heartbeat_details&.payloads.nil? && !@raw_info.heartbeat_details.payloads.empty?
+        end
+
+        # Deserialized last-heartbeat details. Empty when no heartbeat has been recorded.
+        #
+        # @param hints [Array<Object>, nil] Hints, if any, to assist conversion.
+        # @return [Array<Object>] Converted details.
+        def heartbeat_details(hints: nil)
+          @data_converter.from_payloads(@raw_info.heartbeat_details, hints:)
         end
 
         # @return [RetryPolicy] Retry policy in effect for this activity.
