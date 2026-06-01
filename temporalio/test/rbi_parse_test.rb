@@ -2,12 +2,11 @@
 
 require 'minitest/autorun'
 require 'rbi'
+require 'support/rbi_paths'
 
 class RbiParseTest < Minitest::Test
-  RBI_GLOB = File.expand_path('../rbi/**/*.rbi', __dir__ || '')
-
   def test_all_rbi_files_parse
-    paths = Dir.glob(RBI_GLOB)
+    paths = RbiPaths.all
 
     assert paths.any?, 'Expected at least one RBI file'
 

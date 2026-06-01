@@ -2,8 +2,9 @@
 
 require 'rbi'
 require 'sorbet-runtime'
+require_relative 'rbi_paths'
 
-# Parses the SDK's RBI file and applies Sorbet runtime type signatures to the
+# Parses the SDK's manual RBI files and applies Sorbet runtime type signatures to the
 # real (already-loaded) class implementations using Sorbet's method_added
 # machinery.
 # This enables sorbet-runtime to validate argument and return types at runtime
@@ -13,8 +14,6 @@ require 'sorbet-runtime'
 # rather than raising mid-execution. This avoids hanging workflows where a
 # TypeError would cause an unrecoverable task failure that retries forever.
 module SigApplicator
-  RBI_PATH = File.expand_path('../../rbi/temporalio.rbi', __dir__)
-
   # Namespace prefixes to skip — these are generated classes (e.g., protobuf)
   # whose methods may not be visible via normal Ruby reflection.
   SKIP_PREFIXES = [
@@ -53,15 +52,17 @@ module SigApplicator
       # extend it per-target inside apply_method_sig.
       ::Module.include(::T::Sig)
 
-      tree = RBI::Parser.parse_file(RBI_PATH)
       errors = []
       skipped = 0
       applied = 0
 
-      tree.nodes.each do |node|
-        a, s = apply_scope(node, errors)
-        applied += a
-        skipped += s
+      rbi_paths.each do |path|
+        tree = RBI::Parser.parse_file(path)
+        tree.nodes.each do |node|
+          a, s = apply_scope(node, errors)
+          applied += a
+          skipped += s
+        end
       end
 
       warn "SigApplicator: applied #{applied} runtime type signatures (#{skipped} skipped)"
@@ -96,6 +97,10 @@ module SigApplicator
     end
 
     private
+
+    def rbi_paths
+      RbiPaths.manual
+    end
 
     def configure_error_handler!
       T::Configuration.call_validation_error_handler = lambda do |_sig, opts|

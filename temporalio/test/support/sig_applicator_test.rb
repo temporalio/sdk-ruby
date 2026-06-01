@@ -151,13 +151,64 @@ module Support
 
       Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
 
-      error = assert_raises(RuntimeError) { SigApplicator.apply_all! }
+      error = assert_raises(RuntimeError) do
+        with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      end
       assert_includes error.message, 'SigApplicator: 1 methods could not be instrumented:'
       assert_includes error.message, 'Support::SigApplicatorApplyAllTest.foo:'
     ensure
       parser.send(:define_method, :parse_file, original_parse_file)
       if Support.const_defined?(:SigApplicatorApplyAllTest, false)
         Support.send(:remove_const, :SigApplicatorApplyAllTest)
+      end
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
+    def test_apply_all_reads_all_rbi_paths
+      test_class = Class.new do
+        def self.foo(value)
+          value
+        end
+
+        def self.bar(value)
+          value
+        end
+      end
+      Support.const_set(:SigApplicatorMultiFileTest, test_class)
+
+      trees = {
+        'one.rbi' => RBI::Parser.parse_string(<<~RBI),
+          class Support::SigApplicatorMultiFileTest
+            sig { params(value: String).returns(String) }
+            def self.foo(value); end
+          end
+        RBI
+        'two.rbi' => RBI::Parser.parse_string(<<~RBI)
+          class Support::SigApplicatorMultiFileTest
+            sig { params(value: String).returns(String) }
+            def self.bar(value); end
+          end
+        RBI
+      }
+      parsed_paths = []
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) do |path|
+        parsed_paths << path
+        trees.fetch(path)
+      end
+
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+
+      with_sig_applicator_rbi_paths(trees.keys) { SigApplicator.apply_all! }
+
+      assert_equal trees.keys, parsed_paths
+      assert_empty SigApplicator.type_errors
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorMultiFileTest, false)
+        Support.send(:remove_const, :SigApplicatorMultiFileTest)
       end
       Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
@@ -480,6 +531,17 @@ module Support
         errors,
         sig_eval_scope:
       )
+    end
+
+    def with_sig_applicator_rbi_paths(paths)
+      singleton_class = SigApplicator.singleton_class
+      original = singleton_class.instance_method(:rbi_paths)
+      singleton_class.send(:define_method, :rbi_paths) { paths }
+      singleton_class.send(:private, :rbi_paths)
+      yield
+    ensure
+      singleton_class.send(:define_method, :rbi_paths, original)
+      singleton_class.send(:private, :rbi_paths)
     end
   end
 end
