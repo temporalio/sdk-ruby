@@ -14,12 +14,6 @@ require_relative 'rbi_paths'
 # rather than raising mid-execution. This avoids hanging workflows where a
 # TypeError would cause an unrecoverable task failure that retries forever.
 module SigApplicator
-  # Namespace prefixes to skip — these are generated classes (e.g., protobuf)
-  # whose methods may not be visible via normal Ruby reflection.
-  SKIP_PREFIXES = [
-    'Temporalio::Api::'
-  ].freeze
-
   # Classes that use Sorbet generic type members (e.g., Elem = type_member)
   # which don't exist at runtime without T::Generic.
   SKIP_CLASSES = [
@@ -164,7 +158,6 @@ module SigApplicator
 
       class_name = node.name if node.respond_to?(:name)
       return [0, 0] unless class_name
-      return [0, 0] if SKIP_PREFIXES.any? { |prefix| class_name.start_with?(prefix) }
       return [0, 0] if SKIP_CLASSES.include?(class_name)
 
       begin
