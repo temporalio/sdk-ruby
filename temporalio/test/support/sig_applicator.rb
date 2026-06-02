@@ -14,8 +14,7 @@ require_relative 'rbi_paths'
 # rather than raising mid-execution. This avoids hanging workflows where a
 # TypeError would cause an unrecoverable task failure that retries forever.
 module SigApplicator
-  # Classes that use Sorbet generic type members (e.g., Elem = type_member)
-  # which don't exist at runtime without T::Generic.
+  # Classes that use Sorbet generic type members which require the implementing class to include T::Generic.
   SKIP_CLASSES = [
     'Temporalio::Workflow::Future'
   ].freeze

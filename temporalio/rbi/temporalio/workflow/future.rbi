@@ -5,6 +5,7 @@
 
 class Temporalio::Workflow::Future
   extend T::Sig
+  extend T::Generic
 
   Elem = type_member
 
@@ -15,7 +16,7 @@ class Temporalio::Workflow::Future
   def failure; end
 
   sig { params(block: T.nilable(T.proc.returns(Elem))).void }
-  def initialize(&block); end
+  def initialize(&); end
 
   sig { returns(T::Boolean) }
   def done?; end
