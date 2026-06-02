@@ -52,26 +52,26 @@ class Temporalio::Activity::Definition::Info
   def self.from_activity(activity); end
 
   sig { returns(T.nilable(T.any(String, Symbol))) }
-  def name; end
+  attr_reader :name
 
   sig { returns(T.nilable(T.any(Object, Proc))) }
-  def instance; end
+  attr_reader :instance
 
   sig { returns(Proc) }
-  def proc; end
+  attr_reader :proc
 
   sig { returns(Symbol) }
-  def executor; end
+  attr_reader :executor
 
   sig { returns(T::Boolean) }
-  def cancel_raise; end
+  attr_reader :cancel_raise
 
   sig { returns(T::Boolean) }
-  def raw_args; end
+  attr_reader :raw_args
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
+  attr_reader :arg_hints
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 end

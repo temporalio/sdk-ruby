@@ -10,7 +10,7 @@ class Temporalio::VersioningOverride::Pinned < ::Temporalio::VersioningOverride
   def initialize(version); end
 
   sig { returns(Temporalio::WorkerDeploymentVersion) }
-  def version; end
+  attr_reader :version
 end
 
 class Temporalio::VersioningOverride::AutoUpgrade < ::Temporalio::VersioningOverride; end

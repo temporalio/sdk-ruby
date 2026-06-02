@@ -49,10 +49,10 @@ class Temporalio::SearchAttributes::Key
   def initialize(name, type); end
 
   sig { returns(String) }
-  def name; end
+  attr_reader :name
 
   sig { returns(Integer) }
-  def type; end
+  attr_reader :type
 
   sig { params(value: Object).void }
   def validate_value(value); end
@@ -78,10 +78,10 @@ class Temporalio::SearchAttributes::Update
   def initialize(key, value); end
 
   sig { returns(Temporalio::SearchAttributes::Key) }
-  def key; end
+  attr_reader :key
 
   sig { returns(T.nilable(Object)) }
-  def value; end
+  attr_reader :value
 end
 
 module Temporalio::SearchAttributes::IndexedValueType

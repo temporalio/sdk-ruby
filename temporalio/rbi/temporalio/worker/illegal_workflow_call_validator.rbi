@@ -7,10 +7,10 @@ class Temporalio::Worker::IllegalWorkflowCallValidator
   extend T::Sig
 
   sig { returns(T.nilable(Symbol)) }
-  def method_name; end
+  attr_reader :method_name
 
   sig { returns(T.proc.params(arg0: Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo).void) }
-  def block; end
+  attr_reader :block
 
   sig { params(method_name: T.nilable(Symbol), block: T.proc.params(arg0: Temporalio::Worker::IllegalWorkflowCallValidator::CallInfo).void).void }
   def initialize(method_name: T.unsafe(nil), &block); end

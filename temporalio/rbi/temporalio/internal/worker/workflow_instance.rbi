@@ -14,109 +14,103 @@ class Temporalio::Internal::Worker::WorkflowInstance
   def self.new_completion_with_failure(run_id:, error:, failure_converter:, payload_converter:); end
 
   sig { returns(Temporalio::Internal::Worker::WorkflowInstance::Context) }
-  def context; end
+  attr_reader :context
 
   sig { returns(Temporalio::Internal::Worker::WorkflowInstance::ReplaySafeLogger) }
-  def logger; end
+  attr_reader :logger
 
   sig { returns(Temporalio::Workflow::Info) }
-  def info; end
+  attr_reader :info
 
   sig { returns(Temporalio::Internal::Worker::WorkflowInstance::Scheduler) }
-  def scheduler; end
+  attr_reader :scheduler
 
   sig { returns(T::Boolean) }
-  def disable_eager_activity_execution; end
+  attr_reader :disable_eager_activity_execution
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_activities; end
+  attr_reader :pending_activities
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_timers; end
+  attr_reader :pending_timers
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_child_workflow_starts; end
+  attr_reader :pending_child_workflow_starts
 
   sig { returns(T::Hash[Integer, Temporalio::Internal::Worker::WorkflowInstance::ChildWorkflowHandle]) }
-  def pending_child_workflows; end
+  attr_reader :pending_child_workflows
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_nexus_operation_starts; end
+  attr_reader :pending_nexus_operation_starts
 
   sig { returns(T::Hash[Integer, Temporalio::Internal::Worker::WorkflowInstance::NexusOperationHandle]) }
-  def pending_nexus_operations; end
+  attr_reader :pending_nexus_operations
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_external_signals; end
+  attr_reader :pending_external_signals
 
   sig { returns(T::Hash[Integer, Fiber]) }
-  def pending_external_cancels; end
+  attr_reader :pending_external_cancels
 
   sig { returns(T::Array[Temporalio::Internal::Worker::WorkflowInstance::HandlerExecution]) }
-  def in_progress_handlers; end
+  attr_reader :in_progress_handlers
 
   sig { returns(Temporalio::Converters::PayloadConverter) }
-  def payload_converter; end
+  attr_reader :payload_converter
 
   sig { returns(Temporalio::Converters::FailureConverter) }
-  def failure_converter; end
+  attr_reader :failure_converter
 
   sig { returns(Temporalio::Cancellation) }
-  def cancellation; end
+  attr_reader :cancellation
 
   sig { returns(T::Boolean) }
-  def continue_as_new_suggested; end
+  attr_reader :continue_as_new_suggested
 
   sig { returns(T::Array[Integer]) }
-  def suggest_continue_as_new_reasons; end
+  attr_reader :suggest_continue_as_new_reasons
 
   sig { returns(T::Boolean) }
-  def target_worker_deployment_version_changed; end
+  attr_reader :target_worker_deployment_version_changed
 
   sig { returns(T.nilable(Temporalio::WorkerDeploymentVersion)) }
-  def current_deployment_version; end
+  attr_reader :current_deployment_version
 
   sig { returns(Integer) }
-  def current_history_length; end
+  attr_reader :current_history_length
 
   sig { returns(Integer) }
-  def current_history_size; end
+  attr_reader :current_history_size
 
   sig { returns(T::Boolean) }
-  def replaying; end
+  attr_reader :replaying
 
   sig { returns(Random) }
-  def random; end
+  attr_reader :random
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Signal]) }
-  def signal_handlers; end
+  attr_reader :signal_handlers
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Query]) }
-  def query_handlers; end
+  attr_reader :query_handlers
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Update]) }
-  def update_handlers; end
+  attr_reader :update_handlers
 
   sig { returns(T::Boolean) }
-  def context_frozen; end
+  attr_reader :context_frozen
 
   sig { returns(T.proc.params(arg0: String).void) }
-  def assert_valid_local_activity; end
+  attr_reader :assert_valid_local_activity
 
   sig { returns(T::Boolean) }
-  def in_query_or_validator; end
+  attr_reader :in_query_or_validator
 
   sig { returns(T::Boolean) }
-  def io_enabled; end
-
-  sig { params(io_enabled: T::Boolean).returns(T::Boolean) }
-  def io_enabled=(io_enabled); end
+  attr_accessor :io_enabled
 
   sig { returns(T.nilable(String)) }
-  def current_details; end
-
-  sig { params(current_details: T.nilable(String)).returns(T.nilable(String)) }
-  def current_details=(current_details); end
+  attr_accessor :current_details
 
   sig { params(details: Temporalio::Internal::Worker::WorkflowInstance::Details).void }
   def initialize(details); end

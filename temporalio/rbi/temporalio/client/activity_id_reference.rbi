@@ -8,11 +8,11 @@ class Temporalio::Client::ActivityIDReference
   def initialize(workflow_id:, run_id:, activity_id:); end
 
   sig { returns(String) }
-  def workflow_id; end
+  attr_reader :workflow_id
 
   sig { returns(T.nilable(String)) }
-  def run_id; end
+  attr_reader :run_id
 
   sig { returns(String) }
-  def activity_id; end
+  attr_reader :activity_id
 end

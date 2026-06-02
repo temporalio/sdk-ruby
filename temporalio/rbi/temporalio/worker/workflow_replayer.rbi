@@ -7,7 +7,7 @@ class Temporalio::Worker::WorkflowReplayer
   extend T::Sig
 
   sig { returns(Temporalio::Worker::WorkflowReplayer::Options) }
-  def options; end
+  attr_reader :options
 
   sig do
     params(
@@ -128,10 +128,10 @@ class Temporalio::Worker::WorkflowReplayer::ReplayResult
   extend T::Sig
 
   sig { returns(Temporalio::WorkflowHistory) }
-  def history; end
+  attr_reader :history
 
   sig { returns(T.nilable(Exception)) }
-  def replay_failure; end
+  attr_reader :replay_failure
 
   sig { params(history: Temporalio::WorkflowHistory, replay_failure: T.nilable(Exception)).void }
   def initialize(history:, replay_failure:); end

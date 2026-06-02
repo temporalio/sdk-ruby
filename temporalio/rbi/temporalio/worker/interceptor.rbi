@@ -42,7 +42,7 @@ class Temporalio::Worker::Interceptor::Activity::Inbound
   extend T::Sig
 
   sig { returns(Temporalio::Worker::Interceptor::Activity::Inbound) }
-  def next_interceptor; end
+  attr_reader :next_interceptor
 
   sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Inbound).void }
   def initialize(next_interceptor); end
@@ -58,7 +58,7 @@ class Temporalio::Worker::Interceptor::Activity::Outbound
   extend T::Sig
 
   sig { returns(Temporalio::Worker::Interceptor::Activity::Outbound) }
-  def next_interceptor; end
+  attr_reader :next_interceptor
 
   sig { params(next_interceptor: Temporalio::Worker::Interceptor::Activity::Outbound).void }
   def initialize(next_interceptor); end
@@ -142,7 +142,7 @@ class Temporalio::Worker::Interceptor::Workflow::Inbound
   extend T::Sig
 
   sig { returns(Temporalio::Worker::Interceptor::Workflow::Inbound) }
-  def next_interceptor; end
+  attr_reader :next_interceptor
 
   sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Inbound).void }
   def initialize(next_interceptor); end
@@ -458,7 +458,7 @@ class Temporalio::Worker::Interceptor::Workflow::Outbound
   extend T::Sig
 
   sig { returns(Temporalio::Worker::Interceptor::Workflow::Outbound) }
-  def next_interceptor; end
+  attr_reader :next_interceptor
 
   sig { params(next_interceptor: Temporalio::Worker::Interceptor::Workflow::Outbound).void }
   def initialize(next_interceptor); end

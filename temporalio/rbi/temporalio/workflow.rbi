@@ -346,70 +346,38 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
   ); end
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def args; end
-
-  sig { params(value: T::Array[T.nilable(Object)]).void }
-  def args=(value); end
+  attr_accessor :args
 
   sig { returns(T.nilable(T.any(T.class_of(Temporalio::Workflow::Definition), String, Symbol))) }
-  def workflow; end
-
-  sig { params(value: T.nilable(T.any(T.class_of(Temporalio::Workflow::Definition), String, Symbol))).void }
-  def workflow=(value); end
+  attr_accessor :workflow
 
   sig { returns(T.nilable(String)) }
-  def task_queue; end
-
-  sig { params(value: T.nilable(String)).void }
-  def task_queue=(value); end
+  attr_accessor :task_queue
 
   sig { returns(T.nilable(T.any(Integer, Float))) }
-  def run_timeout; end
-
-  sig { params(value: T.nilable(T.any(Integer, Float))).void }
-  def run_timeout=(value); end
+  attr_accessor :run_timeout
 
   sig { returns(T.nilable(T.any(Integer, Float))) }
-  def task_timeout; end
-
-  sig { params(value: T.nilable(T.any(Integer, Float))).void }
-  def task_timeout=(value); end
+  attr_accessor :task_timeout
 
   sig { returns(T.nilable(Temporalio::RetryPolicy)) }
-  def retry_policy; end
-
-  sig { params(value: T.nilable(Temporalio::RetryPolicy)).void }
-  def retry_policy=(value); end
+  attr_accessor :retry_policy
 
   sig { returns(T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)])) }
-  def memo; end
-
-  sig { params(value: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)])).void }
-  def memo=(value); end
+  attr_accessor :memo
 
   sig { returns(T.nilable(Temporalio::SearchAttributes)) }
-  def search_attributes; end
-
-  sig { params(value: T.nilable(Temporalio::SearchAttributes)).void }
-  def search_attributes=(value); end
+  attr_accessor :search_attributes
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
-
-  sig { params(value: T.nilable(T::Array[Object])).void }
-  def arg_hints=(value); end
+  attr_accessor :arg_hints
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
-  def headers; end
-
-  sig { params(value: T::Hash[String, T.nilable(Object)]).void }
-  def headers=(value); end
+  attr_accessor :headers
 
   sig { returns(T.nilable(Integer)) }
-  def initial_versioning_behavior; end
+  attr_accessor :initial_versioning_behavior
 
-  sig { params(value: T.nilable(Integer)).void }
-  def initial_versioning_behavior=(value); end
 end
 
 class Temporalio::Workflow::InvalidWorkflowStateError < ::Temporalio::Error; end

@@ -23,10 +23,10 @@ class Temporalio::Client
     interceptors: T.unsafe(nil),
     logger: T.unsafe(nil),
     default_workflow_query_reject_condition: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig { returns(Temporalio::Client::Options) }
-  def options; end
+  attr_reader :options
 
   sig { returns(Temporalio::Client::Connection) }
   def connection; end
@@ -45,7 +45,8 @@ class Temporalio::Client
 
   sig do
     params(
-      workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol, String),
+      workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol,
+                      String),
       args: T.nilable(Object),
       id: String,
       task_queue: String,
@@ -92,11 +93,12 @@ class Temporalio::Client
     arg_hints: T.unsafe(nil),
     result_hint: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig do
     params(
-      workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol, String),
+      workflow: T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info, Symbol,
+                      String),
       args: T.nilable(Object),
       id: String,
       task_queue: String,
@@ -143,8 +145,8 @@ class Temporalio::Client
     arg_hints: T.unsafe(nil),
     result_hint: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig do
     params(
       workflow_id: String,
@@ -153,7 +155,9 @@ class Temporalio::Client
       result_hint: T.nilable(Object)
     ).returns(Temporalio::Client::WorkflowHandle)
   end
-  def workflow_handle(workflow_id, run_id: T.unsafe(nil), first_execution_run_id: T.unsafe(nil), result_hint: T.unsafe(nil)); end
+  def workflow_handle(workflow_id, run_id: T.unsafe(nil), first_execution_run_id: T.unsafe(nil),
+                      result_hint: T.unsafe(nil))
+  end
 
   sig do
     params(
@@ -176,8 +180,8 @@ class Temporalio::Client
     arg_hints: T.unsafe(nil),
     result_hint: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig do
     params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
@@ -197,8 +201,8 @@ class Temporalio::Client
     arg_hints: T.unsafe(nil),
     result_hint: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig do
     params(
       signal: T.any(Temporalio::Workflow::Definition::Signal, Symbol, String),
@@ -214,8 +218,8 @@ class Temporalio::Client
     start_workflow_operation:,
     arg_hints: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig do
     params(
       query: T.nilable(String),
@@ -232,7 +236,9 @@ class Temporalio::Client
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)
     ).returns(Temporalio::Client::ListWorkflowPage)
   end
-  def list_workflow_page(query = T.unsafe(nil), page_size: T.unsafe(nil), next_page_token: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+  def list_workflow_page(query = T.unsafe(nil), page_size: T.unsafe(nil), next_page_token: T.unsafe(nil),
+                         rpc_options: T.unsafe(nil))
+  end
 
   sig do
     params(
@@ -261,8 +267,8 @@ class Temporalio::Client
     memo: T.unsafe(nil),
     search_attributes: T.unsafe(nil),
     rpc_options: T.unsafe(nil)
-  ); end
-
+  )
+  end
   sig { params(id: String).returns(Temporalio::Client::ScheduleHandle) }
   def schedule_handle(id); end
 
@@ -321,11 +327,12 @@ class Temporalio::Client
       runtime: T.unsafe(nil),
       lazy_connect: T.unsafe(nil),
       dns_load_balancing: T.unsafe(nil)
-    ); end
+    )
+    end
   end
 end
 
-class Temporalio::Client::Options < ::Data
+class Temporalio::Client::Options < Data
   sig { returns(Temporalio::Client::Connection) }
   def connection; end
 
@@ -365,7 +372,7 @@ class Temporalio::Client::Options < ::Data
   end
 end
 
-class Temporalio::Client::ListWorkflowPage < ::Data
+class Temporalio::Client::ListWorkflowPage < Data
   sig { returns(T::Array[Temporalio::Client::WorkflowExecution]) }
   def executions; end
 
@@ -393,29 +400,19 @@ class Temporalio::Client::RPCOptions
       override_retry: T.nilable(T::Boolean)
     ).void
   end
-  def initialize(metadata: T.unsafe(nil), timeout: T.unsafe(nil), cancellation: T.unsafe(nil), override_retry: T.unsafe(nil)); end
+  def initialize(metadata: T.unsafe(nil), timeout: T.unsafe(nil), cancellation: T.unsafe(nil),
+                 override_retry: T.unsafe(nil))
+  end
 
   sig { returns(T.nilable(T::Hash[String, String])) }
-  def metadata; end
+  attr_accessor :metadata
 
-  sig { params(value: T.nilable(T::Hash[String, String])).void }
-  def metadata=(value); end
-
-  sig { returns(T.nilable(Numeric)) }
-  def timeout; end
-
-  sig { params(value: T.nilable(Float)).void }
-  def timeout=(value); end
+  sig { returns(T.nilable(Float)) }
+  attr_accessor :timeout
 
   sig { returns(T.nilable(Temporalio::Cancellation)) }
-  def cancellation; end
-
-  sig { params(value: T.nilable(Temporalio::Cancellation)).void }
-  def cancellation=(value); end
+  attr_accessor :cancellation
 
   sig { returns(T.nilable(T::Boolean)) }
-  def override_retry; end
-
-  sig { params(value: T.nilable(T::Boolean)).void }
-  def override_retry=(value); end
+  attr_accessor :override_retry
 end

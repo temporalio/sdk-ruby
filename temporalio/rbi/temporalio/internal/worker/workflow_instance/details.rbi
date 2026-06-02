@@ -4,46 +4,46 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
   extend T::Sig
 
   sig { returns(String) }
-  def namespace; end
+  attr_reader :namespace
 
   sig { returns(String) }
-  def task_queue; end
+  attr_reader :task_queue
 
   sig { returns(Temporalio::Workflow::Definition::Info) }
-  def definition; end
+  attr_reader :definition
 
   sig { returns(Object) }
-  def initial_activation; end
+  attr_reader :initial_activation
 
   sig { returns(Logger) }
-  def logger; end
+  attr_reader :logger
 
   sig { returns(Temporalio::Metric::Meter) }
-  def metric_meter; end
+  attr_reader :metric_meter
 
   sig { returns(Temporalio::Converters::PayloadConverter) }
-  def payload_converter; end
+  attr_reader :payload_converter
 
   sig { returns(Temporalio::Converters::FailureConverter) }
-  def failure_converter; end
+  attr_reader :failure_converter
 
   sig { returns(T::Array[Temporalio::Worker::Interceptor::Workflow]) }
-  def interceptors; end
+  attr_reader :interceptors
 
   sig { returns(T::Boolean) }
-  def disable_eager_activity_execution; end
+  attr_reader :disable_eager_activity_execution
 
   sig { returns(T::Hash[String, Object]) }
-  def illegal_calls; end
+  attr_reader :illegal_calls
 
   sig { returns(T::Array[T.class_of(Exception)]) }
-  def workflow_failure_exception_types; end
+  attr_reader :workflow_failure_exception_types
 
   sig { returns(T::Boolean) }
-  def unsafe_workflow_io_enabled; end
+  attr_reader :unsafe_workflow_io_enabled
 
   sig { returns(T.proc.params(arg0: String).void) }
-  def assert_valid_local_activity; end
+  attr_reader :assert_valid_local_activity
 
   sig do
     params(

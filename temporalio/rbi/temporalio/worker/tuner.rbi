@@ -7,16 +7,16 @@ class Temporalio::Worker::Tuner
   extend T::Sig
 
   sig { returns(SlotSupplier) }
-  def workflow_slot_supplier; end
+  attr_reader :workflow_slot_supplier
 
   sig { returns(SlotSupplier) }
-  def activity_slot_supplier; end
+  attr_reader :activity_slot_supplier
 
   sig { returns(SlotSupplier) }
-  def local_activity_slot_supplier; end
+  attr_reader :local_activity_slot_supplier
 
   sig { returns(T.nilable(Temporalio::Worker::ThreadPool)) }
-  def custom_slot_supplier_thread_pool; end
+  attr_reader :custom_slot_supplier_thread_pool
 
   sig do
     params(
@@ -70,7 +70,7 @@ class Temporalio::Worker::Tuner::SlotSupplier::Fixed < ::Temporalio::Worker::Tun
   extend T::Sig
 
   sig { returns(Integer) }
-  def slots; end
+  attr_reader :slots
 
   sig { params(slots: Integer).void }
   def initialize(slots); end
@@ -80,10 +80,10 @@ class Temporalio::Worker::Tuner::SlotSupplier::ResourceBased < ::Temporalio::Wor
   extend T::Sig
 
   sig { returns(Temporalio::Worker::Tuner::ResourceBasedTunerOptions) }
-  def tuner_options; end
+  attr_reader :tuner_options
 
   sig { returns(Temporalio::Worker::Tuner::ResourceBasedSlotOptions) }
-  def slot_options; end
+  attr_reader :slot_options
 
   sig do
     params(

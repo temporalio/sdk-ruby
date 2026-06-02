@@ -13,7 +13,7 @@ class Temporalio::Converters::FailureConverter
   def initialize(encode_common_attributes: T.unsafe(nil)); end
 
   sig { returns(T::Boolean) }
-  def encode_common_attributes; end
+  attr_reader :encode_common_attributes
 
   sig { params(error: Exception, converter: T.any(Temporalio::Converters::DataConverter, Temporalio::Converters::PayloadConverter)).returns(Temporalio::Api::Failure::V1::Failure) }
   def to_failure(error, converter); end

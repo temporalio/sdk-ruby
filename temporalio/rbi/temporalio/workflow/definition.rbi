@@ -110,43 +110,43 @@ class Temporalio::Workflow::Definition::Info
   extend T::Sig
 
   sig { returns(T.class_of(Temporalio::Workflow::Definition)) }
-  def workflow_class; end
+  attr_reader :workflow_class
 
   sig { returns(T.nilable(String)) }
-  def override_name; end
+  attr_reader :override_name
 
   sig { returns(T::Boolean) }
-  def dynamic; end
+  attr_reader :dynamic
 
   sig { returns(T::Boolean) }
-  def init; end
+  attr_reader :init
 
   sig { returns(T::Boolean) }
-  def raw_args; end
+  attr_reader :raw_args
 
   sig { returns(T::Array[T.class_of(Exception)]) }
-  def failure_exception_types; end
+  attr_reader :failure_exception_types
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Signal]) }
-  def signals; end
+  attr_reader :signals
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Query]) }
-  def queries; end
+  attr_reader :queries
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Update]) }
-  def updates; end
+  attr_reader :updates
 
   sig { returns(T.nilable(Integer)) }
-  def versioning_behavior; end
+  attr_reader :versioning_behavior
 
   sig { returns(T.nilable(Symbol)) }
-  def dynamic_options_method; end
+  attr_reader :dynamic_options_method
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
+  attr_reader :arg_hints
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 
   sig { params(workflow_class: T.class_of(Temporalio::Workflow::Definition)).returns(Temporalio::Workflow::Definition::Info) }
   def self.from_class(workflow_class); end
@@ -192,22 +192,22 @@ class Temporalio::Workflow::Definition::Signal
   extend T::Sig
 
   sig { returns(T.nilable(String)) }
-  def name; end
+  attr_reader :name
 
   sig { returns(T.any(Symbol, Proc)) }
-  def to_invoke; end
+  attr_reader :to_invoke
 
   sig { returns(T.nilable(String)) }
-  def description; end
+  attr_reader :description
 
   sig { returns(T::Boolean) }
-  def raw_args; end
+  attr_reader :raw_args
 
   sig { returns(Integer) }
-  def unfinished_policy; end
+  attr_reader :unfinished_policy
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
+  attr_reader :arg_hints
 
   sig do
     params(
@@ -226,22 +226,22 @@ class Temporalio::Workflow::Definition::Query
   extend T::Sig
 
   sig { returns(T.nilable(String)) }
-  def name; end
+  attr_reader :name
 
   sig { returns(T.any(Symbol, Proc)) }
-  def to_invoke; end
+  attr_reader :to_invoke
 
   sig { returns(T.nilable(String)) }
-  def description; end
+  attr_reader :description
 
   sig { returns(T::Boolean) }
-  def raw_args; end
+  attr_reader :raw_args
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
+  attr_reader :arg_hints
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 
   sig do
     params(
@@ -260,28 +260,28 @@ class Temporalio::Workflow::Definition::Update
   extend T::Sig
 
   sig { returns(T.nilable(String)) }
-  def name; end
+  attr_reader :name
 
   sig { returns(T.any(Symbol, Proc)) }
-  def to_invoke; end
+  attr_reader :to_invoke
 
   sig { returns(T.nilable(String)) }
-  def description; end
+  attr_reader :description
 
   sig { returns(T::Boolean) }
-  def raw_args; end
+  attr_reader :raw_args
 
   sig { returns(Integer) }
-  def unfinished_policy; end
+  attr_reader :unfinished_policy
 
   sig { returns(T.nilable(T.any(Symbol, Proc))) }
-  def validator_to_invoke; end
+  attr_reader :validator_to_invoke
 
   sig { returns(T.nilable(T::Array[Object])) }
-  def arg_hints; end
+  attr_reader :arg_hints
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 
   sig do
     params(

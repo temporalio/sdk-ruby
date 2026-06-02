@@ -8,10 +8,10 @@ class Temporalio::Client::AsyncActivityHandle
   def initialize(client:, task_token:, id_reference:); end
 
   sig { returns(T.nilable(String)) }
-  def task_token; end
+  attr_reader :task_token
 
   sig { returns(T.nilable(Temporalio::Client::ActivityIDReference)) }
-  def id_reference; end
+  attr_reader :id_reference
 
   sig do
     params(

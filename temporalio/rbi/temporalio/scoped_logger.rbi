@@ -8,16 +8,10 @@ class Temporalio::ScopedLogger < ::SimpleDelegator
   def initialize(obj); end
 
   sig { returns(T.nilable(Proc)) }
-  def scoped_values_getter; end
-
-  sig { params(value: T.nilable(Proc)).void }
-  def scoped_values_getter=(value); end
+  attr_accessor :scoped_values_getter
 
   sig { returns(T::Boolean) }
-  def disable_scoped_values; end
-
-  sig { params(value: T::Boolean).void }
-  def disable_scoped_values=(value); end
+  attr_accessor :disable_scoped_values
 
   sig { params(severity: T.nilable(Integer), message: T.nilable(Object), progname: T.nilable(Object)).void }
   def add(severity, message = nil, progname = nil); end
@@ -49,10 +43,10 @@ class Temporalio::ScopedLogger::LogMessage
   def initialize(message, scoped_values); end
 
   sig { returns(Object) }
-  def message; end
+  attr_reader :message
 
   sig { returns(Object) }
-  def scoped_values; end
+  attr_reader :scoped_values
 
   sig { returns(String) }
   def inspect; end

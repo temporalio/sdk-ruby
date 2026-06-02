@@ -258,6 +258,37 @@ module Support
       Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
+    def test_apply_all_applies_attr_writer_signature
+      test_class = Class.new do
+        attr_writer :name
+      end
+      Support.const_set(:SigApplicatorAttrWriterTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrWriterTest
+          sig { params(name: String).returns(Object) }
+          attr_writer :name
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      test_class.new.name = 123
+
+      assert_includes SigApplicator.type_errors.join("\n"), "Parameter 'name': Expected type String, got type Integer"
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrWriterTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrWriterTest)
+      end
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
     def test_apply_all_applies_attr_accessor_signature
       test_class = Class.new do
         attr_accessor :count

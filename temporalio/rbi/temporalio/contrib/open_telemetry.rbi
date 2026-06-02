@@ -15,7 +15,7 @@ class Temporalio::Contrib::OpenTelemetry::TracingInterceptor
   extend T::Sig
 
   sig { returns(T.untyped) }
-  def tracer; end
+  attr_reader :tracer
 
   sig do
     params(

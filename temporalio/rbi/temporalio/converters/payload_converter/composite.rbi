@@ -7,7 +7,7 @@ class Temporalio::Converters::PayloadConverter::Composite < ::Temporalio::Conver
   extend T::Sig
 
   sig { returns(T::Hash[String, Temporalio::Converters::PayloadConverter::Encoding]) }
-  def converters; end
+  attr_reader :converters
 
   sig { params(converters: Temporalio::Converters::PayloadConverter::Encoding).void }
   def initialize(*converters); end

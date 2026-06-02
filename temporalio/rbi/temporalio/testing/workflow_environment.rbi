@@ -7,7 +7,7 @@ class Temporalio::Testing::WorkflowEnvironment
   extend T::Sig
 
   sig { returns(Temporalio::Client) }
-  def client; end
+  attr_reader :client
 
   sig { params(client: Temporalio::Client).void }
   def initialize(client); end

@@ -7,13 +7,13 @@ class Temporalio::Converters::DataConverter
   extend T::Sig
 
   sig { returns(Temporalio::Converters::PayloadConverter) }
-  def payload_converter; end
+  attr_reader :payload_converter
 
   sig { returns(Temporalio::Converters::FailureConverter) }
-  def failure_converter; end
+  attr_reader :failure_converter
 
   sig { returns(T.nilable(Temporalio::Converters::PayloadCodec)) }
-  def payload_codec; end
+  attr_reader :payload_codec
 
   sig { returns(Temporalio::Converters::DataConverter) }
   def self.default; end

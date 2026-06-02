@@ -10,10 +10,10 @@ class Temporalio::Workflow::Future
   Elem = type_member
 
   sig { returns(T.nilable(Elem)) }
-  def result; end
+  attr_reader :result
 
   sig { returns(T.nilable(Exception)) }
-  def failure; end
+  attr_reader :failure
 
   sig { params(block: T.nilable(T.proc.returns(Elem))).void }
   def initialize(&); end

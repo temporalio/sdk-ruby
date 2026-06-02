@@ -762,7 +762,7 @@ class Temporalio::Client::Interceptor::Outbound
   def initialize(next_interceptor); end
 
   sig { returns(Temporalio::Client::Interceptor::Outbound) }
-  def next_interceptor; end
+  attr_reader :next_interceptor
 
   sig { params(input: Temporalio::Client::Interceptor::StartWorkflowInput).returns(Temporalio::Client::WorkflowHandle) }
   def start_workflow(input); end

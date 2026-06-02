@@ -11,7 +11,7 @@ class Temporalio::WorkflowHistory
   def self.from_history_json(json); end
 
   sig { returns(T::Array[Temporalio::Api::History::V1::HistoryEvent]) }
-  def events; end
+  attr_reader :events
 
   sig { returns(String) }
   def workflow_id; end

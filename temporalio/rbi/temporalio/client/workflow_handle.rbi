@@ -17,19 +17,19 @@ class Temporalio::Client::WorkflowHandle
   def initialize(client:, id:, run_id:, result_run_id:, first_execution_run_id:, result_hint:); end
 
   sig { returns(String) }
-  def id; end
+  attr_reader :id
 
   sig { returns(T.nilable(String)) }
-  def run_id; end
+  attr_reader :run_id
 
   sig { returns(T.nilable(String)) }
-  def result_run_id; end
+  attr_reader :result_run_id
 
   sig { returns(T.nilable(String)) }
-  def first_execution_run_id; end
+  attr_reader :first_execution_run_id
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 
   sig do
     params(

@@ -8,7 +8,7 @@ class Temporalio::Client::WorkflowExecution
   def initialize(raw_info, data_converter); end
 
   sig { returns(Temporalio::Api::Workflow::V1::WorkflowExecutionInfo) }
-  def raw_info; end
+  attr_reader :raw_info
 
   sig { returns(T.nilable(Time)) }
   def close_time; end
@@ -55,7 +55,7 @@ class Temporalio::Client::WorkflowExecution::Description < ::Temporalio::Client:
   def initialize(raw_description, data_converter); end
 
   sig { returns(Temporalio::Api::WorkflowService::V1::DescribeWorkflowExecutionResponse) }
-  def raw_description; end
+  attr_reader :raw_description
 
   sig { returns(T.nilable(String)) }
   def static_summary; end

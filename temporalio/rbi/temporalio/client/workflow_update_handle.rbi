@@ -17,16 +17,16 @@ class Temporalio::Client::WorkflowUpdateHandle
   def initialize(client:, id:, workflow_id:, workflow_run_id:, known_outcome:, result_hint:); end
 
   sig { returns(String) }
-  def id; end
+  attr_reader :id
 
   sig { returns(String) }
-  def workflow_id; end
+  attr_reader :workflow_id
 
   sig { returns(T.nilable(String)) }
-  def workflow_run_id; end
+  attr_reader :workflow_run_id
 
   sig { returns(T.nilable(Object)) }
-  def result_hint; end
+  attr_reader :result_hint
 
   sig { returns(T::Boolean) }
   def result_obtained?; end

@@ -8,7 +8,7 @@ class Temporalio::Client::ScheduleHandle
   def initialize(client:, id:); end
 
   sig { returns(String) }
-  def id; end
+  attr_reader :id
 
   sig do
     params(

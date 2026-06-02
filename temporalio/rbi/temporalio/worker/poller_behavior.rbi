@@ -9,7 +9,7 @@ class Temporalio::Worker::PollerBehavior::SimpleMaximum < ::Temporalio::Worker::
   extend T::Sig
 
   sig { returns(Integer) }
-  def maximum; end
+  attr_reader :maximum
 
   sig { params(maximum: Integer).void }
   def initialize(maximum); end
@@ -19,13 +19,13 @@ class Temporalio::Worker::PollerBehavior::Autoscaling < ::Temporalio::Worker::Po
   extend T::Sig
 
   sig { returns(Integer) }
-  def minimum; end
+  attr_reader :minimum
 
   sig { returns(Integer) }
-  def maximum; end
+  attr_reader :maximum
 
   sig { returns(Integer) }
-  def initial; end
+  attr_reader :initial
 
   sig { params(minimum: Integer, maximum: Integer, initial: Integer).void }
   def initialize(minimum: T.unsafe(nil), maximum: T.unsafe(nil), initial: T.unsafe(nil)); end

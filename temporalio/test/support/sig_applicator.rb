@@ -304,7 +304,7 @@ module SigApplicator
       when RBI::AttrReader
         [[attr_name, attr_node.sigs.map(&:string)]]
       when RBI::AttrWriter
-        [["#{attr_name}=", writer_sig_sources(attr_node, attr_name)]]
+        [["#{attr_name}=", attr_node.sigs.map(&:string)]]
       when RBI::AttrAccessor
         [
           [attr_name, attr_node.sigs.map(&:string)],

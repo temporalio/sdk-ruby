@@ -7,7 +7,7 @@ class Temporalio::Worker
   extend T::Sig
 
   sig { returns(Options) }
-  def options; end
+  attr_reader :options
 
   sig do
     params(

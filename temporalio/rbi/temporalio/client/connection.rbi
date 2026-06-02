@@ -36,16 +36,16 @@ class Temporalio::Client::Connection
   ); end
 
   sig { returns(Temporalio::Client::Connection::Options) }
-  def options; end
+  attr_reader :options
 
   sig { returns(Temporalio::Client::Connection::WorkflowService) }
-  def workflow_service; end
+  attr_reader :workflow_service
 
   sig { returns(Temporalio::Client::Connection::OperatorService) }
-  def operator_service; end
+  attr_reader :operator_service
 
   sig { returns(Temporalio::Client::Connection::CloudService) }
-  def cloud_service; end
+  attr_reader :cloud_service
 
   sig { returns(String) }
   def target_host; end

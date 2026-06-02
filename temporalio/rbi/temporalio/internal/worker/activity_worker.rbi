@@ -6,10 +6,10 @@ class Temporalio::Internal::Worker::ActivityWorker
   LOG_TASKS = T.let(T.unsafe(nil), T::Boolean)
 
   sig { returns(Temporalio::Worker) }
-  def worker; end
+  attr_reader :worker
 
   sig { returns(Temporalio::Internal::Bridge::Worker) }
-  def bridge_worker; end
+  attr_reader :bridge_worker
 
   sig { params(worker: Temporalio::Worker, bridge_worker: Temporalio::Internal::Bridge::Worker).void }
   def initialize(worker:, bridge_worker:); end
@@ -60,19 +60,13 @@ class Temporalio::Internal::Worker::ActivityWorker::RunningActivity < Temporalio
   extend T::Sig
 
   sig { returns(T::Boolean) }
-  def _server_requested_cancel; end
+  attr_reader :_server_requested_cancel
 
   sig { returns(T.nilable(Temporalio::Activity::Definition)) }
-  def instance; end
-
-  sig { params(instance: T.nilable(Temporalio::Activity::Definition)).void }
-  def instance=(instance); end
+  attr_accessor :instance
 
   sig { returns(T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)) }
-  def _outbound_impl; end
-
-  sig { params(outbound_impl: T.nilable(Temporalio::Worker::Interceptor::Activity::Outbound)).void }
-  def _outbound_impl=(outbound_impl); end
+  attr_accessor :_outbound_impl
 
   sig do
     params(

@@ -4,10 +4,10 @@ class Temporalio::Internal::Worker::WorkflowInstance::NexusClient < Temporalio::
   extend T::Sig
 
   sig { returns(String) }
-  def endpoint; end
+  attr_reader :endpoint
 
   sig { returns(String) }
-  def service; end
+  attr_reader :service
 
   sig do
     params(

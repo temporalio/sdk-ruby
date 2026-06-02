@@ -98,49 +98,49 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
   extend T::Sig
 
   sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Info]) }
-  def workflow_definitions; end
+  attr_reader :workflow_definitions
 
   sig { returns(Temporalio::Internal::Bridge::Worker) }
-  def bridge_worker; end
+  attr_reader :bridge_worker
 
   sig { returns(Logger) }
-  def logger; end
+  attr_reader :logger
 
   sig { returns(Temporalio::Metric::Meter) }
-  def metric_meter; end
+  attr_reader :metric_meter
 
   sig { returns(Temporalio::Converters::DataConverter) }
-  def data_converter; end
+  attr_reader :data_converter
 
   sig { returns(T.nilable(Float)) }
-  def deadlock_timeout; end
+  attr_reader :deadlock_timeout
 
   sig { returns(T::Hash[String, Object]) }
-  def illegal_calls; end
+  attr_reader :illegal_calls
 
   sig { returns(String) }
-  def namespace; end
+  attr_reader :namespace
 
   sig { returns(String) }
-  def task_queue; end
+  attr_reader :task_queue
 
   sig { returns(T::Boolean) }
-  def disable_eager_activity_execution; end
+  attr_reader :disable_eager_activity_execution
 
   sig { returns(T::Array[Temporalio::Worker::Interceptor::Workflow]) }
-  def workflow_interceptors; end
+  attr_reader :workflow_interceptors
 
   sig { returns(T::Array[T.class_of(Exception)]) }
-  def workflow_failure_exception_types; end
+  attr_reader :workflow_failure_exception_types
 
   sig { returns(T::Boolean) }
-  def unsafe_workflow_io_enabled; end
+  attr_reader :unsafe_workflow_io_enabled
 
   sig { returns(T.proc.params(arg0: String).void) }
-  def assert_valid_local_activity; end
+  attr_reader :assert_valid_local_activity
 
-  sig { params(on_eviction: T.proc.params(arg0: String, arg1: Object).void).void }
-  def on_eviction=(on_eviction); end
+  sig { params(on_eviction: T.proc.params(arg0: String, arg1: Object).void).returns(T.proc.params(arg0: String, arg1: Object).void) }
+  attr_writer :on_eviction
 
   sig do
     params(

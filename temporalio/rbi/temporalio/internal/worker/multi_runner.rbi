@@ -41,13 +41,13 @@ class Temporalio::Internal::Worker::MultiRunner::Event::PollSuccess < Temporalio
   extend T::Sig
 
   sig { returns(Object) }
-  def worker; end
+  attr_reader :worker
 
   sig { returns(Symbol) }
-  def worker_type; end
+  attr_reader :worker_type
 
   sig { returns(String) }
-  def bytes; end
+  attr_reader :bytes
 
   sig { params(worker: Object, worker_type: Symbol, bytes: String).void }
   def initialize(worker:, worker_type:, bytes:); end
@@ -57,13 +57,13 @@ class Temporalio::Internal::Worker::MultiRunner::Event::PollFailure < Temporalio
   extend T::Sig
 
   sig { returns(Object) }
-  def worker; end
+  attr_reader :worker
 
   sig { returns(Symbol) }
-  def worker_type; end
+  attr_reader :worker_type
 
   sig { returns(Exception) }
-  def error; end
+  attr_reader :error
 
   sig { params(worker: Object, worker_type: Symbol, error: Exception).void }
   def initialize(worker:, worker_type:, error:); end
@@ -73,10 +73,10 @@ class Temporalio::Internal::Worker::MultiRunner::Event::WorkflowActivationDecode
   extend T::Sig
 
   sig { returns(Temporalio::Internal::Worker::WorkflowWorker) }
-  def workflow_worker; end
+  attr_reader :workflow_worker
 
   sig { returns(Object) }
-  def activation; end
+  attr_reader :activation
 
   sig { params(workflow_worker: Temporalio::Internal::Worker::WorkflowWorker, activation: Object).void }
   def initialize(workflow_worker:, activation:); end
@@ -86,16 +86,16 @@ class Temporalio::Internal::Worker::MultiRunner::Event::WorkflowActivationComple
   extend T::Sig
 
   sig { returns(Temporalio::Internal::Worker::WorkflowWorker) }
-  def workflow_worker; end
+  attr_reader :workflow_worker
 
   sig { returns(Object) }
-  def activation_completion; end
+  attr_reader :activation_completion
 
   sig { returns(T::Boolean) }
-  def encoded; end
+  attr_reader :encoded
 
   sig { returns(Queue) }
-  def completion_complete_queue; end
+  attr_reader :completion_complete_queue
 
   sig do
     params(
@@ -112,10 +112,10 @@ class Temporalio::Internal::Worker::MultiRunner::Event::WorkflowActivationComple
   extend T::Sig
 
   sig { returns(String) }
-  def run_id; end
+  attr_reader :run_id
 
   sig { returns(T.nilable(Exception)) }
-  def error; end
+  attr_reader :error
 
   sig { params(run_id: String, error: T.nilable(Exception)).void }
   def initialize(run_id:, error:); end
@@ -125,10 +125,10 @@ class Temporalio::Internal::Worker::MultiRunner::Event::PollerShutDown < Tempora
   extend T::Sig
 
   sig { returns(Object) }
-  def worker; end
+  attr_reader :worker
 
   sig { returns(Symbol) }
-  def worker_type; end
+  attr_reader :worker_type
 
   sig { params(worker: Object, worker_type: Symbol).void }
   def initialize(worker:, worker_type:); end
@@ -145,7 +145,7 @@ class Temporalio::Internal::Worker::MultiRunner::Event::BlockSuccess < Temporali
   extend T::Sig
 
   sig { returns(T.nilable(Object)) }
-  def result; end
+  attr_reader :result
 
   sig { params(result: T.nilable(Object)).void }
   def initialize(result:); end
@@ -155,7 +155,7 @@ class Temporalio::Internal::Worker::MultiRunner::Event::BlockFailure < Temporali
   extend T::Sig
 
   sig { returns(Exception) }
-  def error; end
+  attr_reader :error
 
   sig { params(error: Exception).void }
   def initialize(error:); end
@@ -168,7 +168,7 @@ class Temporalio::Internal::Worker::MultiRunner::InjectEventForTesting < Tempora
   extend T::Sig
 
   sig { returns(Temporalio::Internal::Worker::MultiRunner::Event) }
-  def event; end
+  attr_reader :event
 
   sig { params(event: Temporalio::Internal::Worker::MultiRunner::Event).void }
   def initialize(event); end

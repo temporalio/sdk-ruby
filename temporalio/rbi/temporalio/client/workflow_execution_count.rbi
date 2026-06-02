@@ -8,10 +8,10 @@ class Temporalio::Client::WorkflowExecutionCount
   def initialize(count, groups); end
 
   sig { returns(Integer) }
-  def count; end
+  attr_reader :count
 
   sig { returns(T::Array[Temporalio::Client::WorkflowExecutionCount::AggregationGroup]) }
-  def groups; end
+  attr_reader :groups
 end
 
 class Temporalio::Client::WorkflowExecutionCount::AggregationGroup
@@ -19,8 +19,8 @@ class Temporalio::Client::WorkflowExecutionCount::AggregationGroup
   def initialize(count, group_values); end
 
   sig { returns(Integer) }
-  def count; end
+  attr_reader :count
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def group_values; end
+  attr_reader :group_values
 end

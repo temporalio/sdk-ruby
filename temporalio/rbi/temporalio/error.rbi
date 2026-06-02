@@ -13,13 +13,13 @@ class Temporalio::Error::WorkflowAlreadyStartedError < ::Temporalio::Error::Fail
   def initialize(workflow_id:, workflow_type:, run_id:); end
 
   sig { returns(String) }
-  def workflow_id; end
+  attr_reader :workflow_id
 
   sig { returns(String) }
-  def workflow_type; end
+  attr_reader :workflow_type
 
   sig { returns(T.nilable(String)) }
-  def run_id; end
+  attr_reader :run_id
 end
 
 class Temporalio::Error::ApplicationError < ::Temporalio::Error::Failure
@@ -36,19 +36,19 @@ class Temporalio::Error::ApplicationError < ::Temporalio::Error::Failure
   def initialize(message, *details, type: nil, non_retryable: false, next_retry_delay: nil, category: T.unsafe(nil)); end
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def details; end
+  attr_reader :details
 
   sig { returns(T.nilable(String)) }
-  def type; end
+  attr_reader :type
 
   sig { returns(T::Boolean) }
-  def non_retryable; end
+  attr_reader :non_retryable
 
   sig { returns(T.nilable(T.any(Integer, Float))) }
-  def next_retry_delay; end
+  attr_reader :next_retry_delay
 
   sig { returns(Integer) }
-  def category; end
+  attr_reader :category
 
   sig { returns(T::Boolean) }
   def retryable?; end
@@ -64,7 +64,7 @@ class Temporalio::Error::CanceledError < ::Temporalio::Error::Failure
   def initialize(message, details: []); end
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def details; end
+  attr_reader :details
 end
 
 class Temporalio::Error::TerminatedError < ::Temporalio::Error::Failure
@@ -72,7 +72,7 @@ class Temporalio::Error::TerminatedError < ::Temporalio::Error::Failure
   def initialize(message, details:); end
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def details; end
+  attr_reader :details
 end
 
 class Temporalio::Error::TimeoutError < ::Temporalio::Error::Failure
@@ -86,10 +86,10 @@ class Temporalio::Error::TimeoutError < ::Temporalio::Error::Failure
   def initialize(message, type:, last_heartbeat_details:); end
 
   sig { returns(Integer) }
-  def type; end
+  attr_reader :type
 
   sig { returns(T::Array[T.nilable(Object)]) }
-  def last_heartbeat_details; end
+  attr_reader :last_heartbeat_details
 end
 
 module Temporalio::Error::TimeoutError::TimeoutType
@@ -104,7 +104,7 @@ class Temporalio::Error::ServerError < ::Temporalio::Error::Failure
   def initialize(message, non_retryable:); end
 
   sig { returns(T::Boolean) }
-  def non_retryable; end
+  attr_reader :non_retryable
 
   sig { returns(T::Boolean) }
   def retryable?; end
@@ -135,22 +135,22 @@ class Temporalio::Error::ActivityError < ::Temporalio::Error::Failure
   def initialize(message, scheduled_event_id:, started_event_id:, identity:, activity_type:, activity_id:, retry_state:); end
 
   sig { returns(Integer) }
-  def scheduled_event_id; end
+  attr_reader :scheduled_event_id
 
   sig { returns(Integer) }
-  def started_event_id; end
+  attr_reader :started_event_id
 
   sig { returns(String) }
-  def identity; end
+  attr_reader :identity
 
   sig { returns(String) }
-  def activity_type; end
+  attr_reader :activity_type
 
   sig { returns(String) }
-  def activity_id; end
+  attr_reader :activity_id
 
   sig { returns(T.nilable(Integer)) }
-  def retry_state; end
+  attr_reader :retry_state
 end
 
 class Temporalio::Error::ChildWorkflowError < ::Temporalio::Error::Failure
@@ -169,25 +169,25 @@ class Temporalio::Error::ChildWorkflowError < ::Temporalio::Error::Failure
   def initialize(message, namespace:, workflow_id:, run_id:, workflow_type:, initiated_event_id:, started_event_id:, retry_state:); end
 
   sig { returns(String) }
-  def namespace; end
+  attr_reader :namespace
 
   sig { returns(String) }
-  def workflow_id; end
+  attr_reader :workflow_id
 
   sig { returns(String) }
-  def run_id; end
+  attr_reader :run_id
 
   sig { returns(String) }
-  def workflow_type; end
+  attr_reader :workflow_type
 
   sig { returns(Integer) }
-  def initiated_event_id; end
+  attr_reader :initiated_event_id
 
   sig { returns(Integer) }
-  def started_event_id; end
+  attr_reader :started_event_id
 
   sig { returns(T.nilable(Integer)) }
-  def retry_state; end
+  attr_reader :retry_state
 end
 
 class Temporalio::Error::NexusOperationError < ::Temporalio::Error::Failure
@@ -203,16 +203,16 @@ class Temporalio::Error::NexusOperationError < ::Temporalio::Error::Failure
   def initialize(message, endpoint:, service:, operation:, operation_token:); end
 
   sig { returns(String) }
-  def endpoint; end
+  attr_reader :endpoint
 
   sig { returns(String) }
-  def service; end
+  attr_reader :service
 
   sig { returns(String) }
-  def operation; end
+  attr_reader :operation
 
   sig { returns(T.nilable(String)) }
-  def operation_token; end
+  attr_reader :operation_token
 end
 
 class Temporalio::Error::NexusHandlerError < ::Temporalio::Error::Failure
@@ -226,10 +226,10 @@ class Temporalio::Error::NexusHandlerError < ::Temporalio::Error::Failure
   def initialize(message, error_type:, retry_behavior:); end
 
   sig { returns(Symbol) }
-  def error_type; end
+  attr_reader :error_type
 
   sig { returns(Integer) }
-  def retry_behavior; end
+  attr_reader :retry_behavior
 end
 
 module Temporalio::Error::NexusHandlerError::RetryBehavior
@@ -243,7 +243,7 @@ class Temporalio::Error::AsyncActivityCanceledError < ::Temporalio::Error
   def initialize(details); end
 
   sig { returns(Temporalio::Activity::CancellationDetails) }
-  def details; end
+  attr_reader :details
 end
 
 class Temporalio::Error::WorkflowFailedError < ::Temporalio::Error
@@ -256,7 +256,7 @@ class Temporalio::Error::WorkflowContinuedAsNewError < ::Temporalio::Error
   def initialize(new_run_id:); end
 
   sig { returns(String) }
-  def new_run_id; end
+  attr_reader :new_run_id
 end
 
 class Temporalio::Error::WorkflowQueryFailedError < ::Temporalio::Error; end
@@ -266,7 +266,7 @@ class Temporalio::Error::WorkflowQueryRejectedError < ::Temporalio::Error
   def initialize(status:); end
 
   sig { returns(Integer) }
-  def status; end
+  attr_reader :status
 end
 
 class Temporalio::Error::WorkflowUpdateFailedError < ::Temporalio::Error
@@ -289,7 +289,7 @@ class Temporalio::Error::RPCError < ::Temporalio::Error
   def initialize(message, code:, raw_grpc_status:); end
 
   sig { returns(Integer) }
-  def code; end
+  attr_reader :code
 
   sig { returns(Temporalio::Api::Common::V1::GrpcStatus) }
   def grpc_status; end

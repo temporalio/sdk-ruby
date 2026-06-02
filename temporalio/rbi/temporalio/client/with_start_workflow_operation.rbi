@@ -52,10 +52,7 @@ class Temporalio::Client::WithStartWorkflowOperation
   ); end
 
   sig { returns(Temporalio::Client::WithStartWorkflowOperation::Options) }
-  def options; end
-
-  sig { params(value: Temporalio::Client::WithStartWorkflowOperation::Options).void }
-  def options=(value); end
+  attr_accessor :options
 
   sig { params(wait: T::Boolean).returns(T.nilable(Temporalio::Client::WorkflowHandle)) }
   def workflow_handle(wait: T.unsafe(nil)); end

@@ -10,7 +10,7 @@ class Temporalio::SimplePlugin
   extend T::Sig
 
   sig { returns(Temporalio::SimplePlugin::Options) }
-  def options; end
+  attr_reader :options
 
   sig do
     params(
