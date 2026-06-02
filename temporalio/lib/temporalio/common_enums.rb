@@ -84,7 +84,8 @@ module Temporalio
       Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_TOO_MANY_UPDATES
   end
 
-  # How already-in-use activity IDs are handled on start.
+  # Controls behavior when an activity with the same ID was previously run and is now closed.
+  # Defaults to `ALLOW_DUPLICATE`.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDReusePolicy
@@ -98,7 +99,7 @@ module Temporalio
     REJECT_DUPLICATE = Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_REJECT_DUPLICATE
   end
 
-  # How already-running activities of the same ID are handled on start.
+  # Controls behavior when an activity with the same ID is currently running. Defaults to `FAIL`.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDConflictPolicy
