@@ -289,23 +289,6 @@ class ClientActivityTest < Test
     end
   end
 
-  def test_state_transition_count_is_present
-    with_activity_worker([SimpleActivity]) do |task_queue|
-      activity_id = "act-#{SecureRandom.uuid}"
-      env.client.execute_activity(
-        SimpleActivity,
-        'stc',
-        id: activity_id,
-        task_queue: task_queue,
-        start_to_close_timeout: 10
-      )
-      desc = env.client.activity_handle(activity_id).describe
-      # Completed activities will have non-zero state transitions.
-      assert_kind_of Integer, desc.state_transition_count
-      assert_operator desc.state_transition_count, :>, 0
-    end
-  end
-
   def test_terminate_running_activity_result_throws_terminated_error
     with_activity_worker([SlowActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"

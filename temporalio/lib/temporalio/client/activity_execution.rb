@@ -204,11 +204,6 @@ module Temporalio
           user_metadata.last
         end
 
-        # @return [Integer] Number of times this activity's persisted state has been mutated.
-        def state_transition_count
-          @raw_info.state_transition_count
-        end
-
         private
 
         def user_metadata
