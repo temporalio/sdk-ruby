@@ -506,8 +506,10 @@ module Temporalio
     # @param start_to_close_timeout [Float, nil] Start-to-close timeout in seconds. Either this or
     #   `schedule_to_close_timeout` must be specified.
     # @param heartbeat_timeout [Float, nil] Heartbeat timeout in seconds.
-    # @param id_reuse_policy [ActivityIDReusePolicy] How already-existing IDs are treated.
-    # @param id_conflict_policy [ActivityIDConflictPolicy] How already-running activities of the same ID are treated.
+    # @param id_reuse_policy [ActivityIDReusePolicy] Controls behavior when an activity with the same ID
+    #   was previously run and has reached a terminal state. Defaults to `ALLOW_DUPLICATE`.
+    # @param id_conflict_policy [ActivityIDConflictPolicy] Controls behavior when an activity with the same ID
+    #   is currently running. Defaults to `FAIL` (reject the start attempt).
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
@@ -579,8 +581,10 @@ module Temporalio
     # @param start_to_close_timeout [Float, nil] Start-to-close timeout in seconds. Either this or
     #   `schedule_to_close_timeout` must be specified.
     # @param heartbeat_timeout [Float, nil] Heartbeat timeout in seconds.
-    # @param id_reuse_policy [ActivityIDReusePolicy] How already-existing IDs are treated.
-    # @param id_conflict_policy [ActivityIDConflictPolicy] How already-running activities of the same ID are treated.
+    # @param id_reuse_policy [ActivityIDReusePolicy] Controls behavior when an activity with the same ID
+    #   was previously run and has reached a terminal state. Defaults to `ALLOW_DUPLICATE`.
+    # @param id_conflict_policy [ActivityIDConflictPolicy] Controls behavior when an activity with the same ID
+    #   is currently running. Defaults to `FAIL` (reject the start attempt).
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
