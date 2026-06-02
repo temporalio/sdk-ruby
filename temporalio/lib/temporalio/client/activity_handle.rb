@@ -37,7 +37,7 @@ module Temporalio
       #
       # @return [Object, nil] Deserialized activity result.
       #
-      # @raise [Error::ActivityFailedError] With +cause+ populated from the activity failure.
+      # @raise [Error::ActivityFailedError] With `cause` populated from the activity failure.
       # @raise [Error::RPCError] RPC error from call.
       def result(result_hint: nil, rpc_options: nil)
         hint = result_hint || @result_hint
