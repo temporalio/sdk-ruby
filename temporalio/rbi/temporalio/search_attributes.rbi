@@ -63,10 +63,10 @@ class Temporalio::SearchAttributes::Key
   sig { returns(Temporalio::SearchAttributes::Update) }
   def value_unset; end
 
-  sig { params(other: T.untyped).returns(T::Boolean) }
+  sig { params(other: T.anything).returns(T::Boolean) }
   def ==(other); end
 
-  sig { params(other: T.untyped).returns(T::Boolean) }
+  sig { params(other: T.anything).returns(T::Boolean) }
   def eql?(other); end
 
   sig { returns(Integer) }

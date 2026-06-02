@@ -12,13 +12,13 @@ module Temporalio::Worker::Plugin
   sig { params(options: Temporalio::Worker::Options).returns(Temporalio::Worker::Options) }
   def configure_worker(options); end
 
-  sig { params(options: Temporalio::Worker::Plugin::RunWorkerOptions, next_call: T.proc.params(arg0: Temporalio::Worker::Plugin::RunWorkerOptions).returns(T.untyped)).returns(T.untyped) }
+  sig { params(options: Temporalio::Worker::Plugin::RunWorkerOptions, next_call: T.proc.params(arg0: Temporalio::Worker::Plugin::RunWorkerOptions).returns(T.anything)).returns(T.anything) }
   def run_worker(options, next_call); end
 
   sig { params(options: Temporalio::Worker::WorkflowReplayer::Options).returns(Temporalio::Worker::WorkflowReplayer::Options) }
   def configure_workflow_replayer(options); end
 
-  sig { params(options: Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions, next_call: T.proc.params(arg0: Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions).returns(T.untyped)).returns(T.untyped) }
+  sig { params(options: Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions, next_call: T.proc.params(arg0: Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions).returns(T.anything)).returns(T.anything) }
   def with_workflow_replay_worker(options, next_call); end
 end
 

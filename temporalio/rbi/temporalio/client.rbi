@@ -354,7 +354,7 @@ class Temporalio::Client::Options < Data
   sig { returns(T.nilable(Integer)) }
   def default_workflow_query_reject_condition; end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, T.anything]) }
   def to_h; end
 
   sig { params(kwargs: T.untyped).returns(Temporalio::Client::Options) }

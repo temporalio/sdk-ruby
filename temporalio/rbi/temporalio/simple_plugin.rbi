@@ -21,7 +21,7 @@ class Temporalio::SimplePlugin
       workflows: T.nilable(T.any(T::Array[T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info)], T.proc.params(arg0: T::Array[T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info)]).returns(T::Array[T.any(T.class_of(Temporalio::Workflow::Definition), Temporalio::Workflow::Definition::Info)]))),
       worker_interceptors: T.nilable(T.any(T::Array[T.any(Temporalio::Worker::Interceptor::Activity, Temporalio::Worker::Interceptor::Workflow)], T.proc.params(arg0: T::Array[T.any(Temporalio::Worker::Interceptor::Activity, Temporalio::Worker::Interceptor::Workflow)]).returns(T::Array[T.any(Temporalio::Worker::Interceptor::Activity, Temporalio::Worker::Interceptor::Workflow)]))),
       workflow_failure_exception_types: T.nilable(T.any(T::Array[String], T.proc.params(arg0: T::Array[String]).returns(T::Array[String]))),
-      run_context: T.nilable(T.proc.params(arg0: T.any(Temporalio::Worker::Plugin::RunWorkerOptions, Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions), arg1: T.proc.params(arg0: T.any(Temporalio::Worker::Plugin::RunWorkerOptions, Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions)).returns(T.untyped)).returns(T.untyped))
+      run_context: T.nilable(T.proc.params(arg0: T.any(Temporalio::Worker::Plugin::RunWorkerOptions, Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions), arg1: T.proc.params(arg0: T.any(Temporalio::Worker::Plugin::RunWorkerOptions, Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions)).returns(T.anything)).returns(T.anything))
     ).void
   end
   def initialize(

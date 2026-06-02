@@ -14,14 +14,14 @@ class Temporalio::Contrib::OpenTelemetry::TracingInterceptor
 
   extend T::Sig
 
-  sig { returns(T.untyped) }
+  sig { returns(T.anything) }
   attr_reader :tracer
 
   sig do
     params(
-      tracer: T.untyped,
+      tracer: T.anything,
       header_key: String,
-      propagator: T.untyped,
+      propagator: T.anything,
       always_create_workflow_spans: T::Boolean
     ).void
   end
@@ -36,8 +36,8 @@ module Temporalio::Contrib::OpenTelemetry::Workflow
       type_parameters(:T)
         .params(
           name: String,
-          attributes: T::Hash[T.untyped, T.untyped],
-          links: T.nilable(T::Array[T.untyped]),
+          attributes: T::Hash[T.anything, T.anything],
+          links: T.nilable(T::Array[T.anything]),
           kind: T.nilable(Symbol),
           exception: T.nilable(Exception),
           even_during_replay: T::Boolean,
@@ -57,12 +57,12 @@ module Temporalio::Contrib::OpenTelemetry::Workflow
     sig do
       params(
         name: String,
-        attributes: T::Hash[T.untyped, T.untyped],
-        links: T.nilable(T::Array[T.untyped]),
+        attributes: T::Hash[T.anything, T.anything],
+        links: T.nilable(T::Array[T.anything]),
         kind: T.nilable(Symbol),
         exception: T.nilable(Exception),
         even_during_replay: T::Boolean
-      ).returns(T.untyped)
+      ).returns(T.anything)
     end
     def completed_span(
       name,

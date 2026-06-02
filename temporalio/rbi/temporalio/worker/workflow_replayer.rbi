@@ -26,7 +26,7 @@ class Temporalio::Worker::WorkflowReplayer
       unsafe_workflow_io_enabled: T::Boolean,
       debug_mode: T::Boolean,
       runtime: Temporalio::Runtime,
-      block: T.nilable(T.proc.params(worker: Temporalio::Worker::WorkflowReplayer::ReplayWorker).returns(T.untyped))
+      block: T.nilable(T.proc.params(worker: Temporalio::Worker::WorkflowReplayer::ReplayWorker).returns(T.anything))
     ).void
   end
   def initialize(

@@ -69,7 +69,7 @@ class Temporalio::Workflow::Info < ::Struct
   sig { returns(String) }
   def workflow_type; end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, Object]) }
   def to_h; end
 end
 
@@ -85,7 +85,7 @@ class Temporalio::Workflow::Info::ParentInfo < ::Struct
   sig { returns(String) }
   def workflow_id; end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, String]) }
   def to_h; end
 end
 
@@ -98,6 +98,6 @@ class Temporalio::Workflow::Info::RootInfo < ::Struct
   sig { returns(String) }
   def workflow_id; end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, String]) }
   def to_h; end
 end

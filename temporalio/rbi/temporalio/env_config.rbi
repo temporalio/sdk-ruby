@@ -40,13 +40,13 @@ class Temporalio::EnvConfig::ClientConfigTLS < ::Data
     client_private_key: T.unsafe(nil)
   ); end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, T.anything]) }
   def to_h; end
 
   sig { returns(T.any(Temporalio::Client::Connection::TLSOptions, FalseClass)) }
   def to_client_tls_options; end
 
-  sig { params(hash: T.nilable(T::Hash[Symbol, T.untyped])).returns(T.nilable(Temporalio::EnvConfig::ClientConfigTLS)) }
+  sig { params(hash: T.nilable(T::Hash[Symbol, T.anything])).returns(T.nilable(Temporalio::EnvConfig::ClientConfigTLS)) }
   def self.from_h(hash); end
 end
 
@@ -85,7 +85,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
     grpc_meta: T.unsafe(nil)
   ); end
 
-  sig { params(hash: T::Hash[Symbol, T.untyped]).returns(Temporalio::EnvConfig::ClientConfigProfile) }
+  sig { params(hash: T::Hash[Symbol, T.anything]).returns(Temporalio::EnvConfig::ClientConfigProfile) }
   def self.from_h(hash); end
 
   sig do
@@ -107,10 +107,10 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
     override_env_vars: T.unsafe(nil)
   ); end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, T.anything]) }
   def to_h; end
 
-  sig { returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.untyped]]) }
+  sig { returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.anything]]) }
   def to_client_connect_options; end
 end
 
@@ -123,7 +123,7 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
   sig { params(profiles: T::Hash[String, Temporalio::EnvConfig::ClientConfigProfile]).void }
   def initialize(profiles: T.unsafe(nil)); end
 
-  sig { params(hash: T::Hash[String, T::Hash[Symbol, T.untyped]]).returns(Temporalio::EnvConfig::ClientConfig) }
+  sig { params(hash: T::Hash[String, T::Hash[Symbol, T.anything]]).returns(Temporalio::EnvConfig::ClientConfig) }
   def self.from_h(hash); end
 
   sig do
@@ -143,7 +143,7 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
       disable_env: T::Boolean,
       config_file_strict: T::Boolean,
       override_env_vars: T.nilable(T::Hash[String, String])
-    ).returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.untyped]])
+    ).returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.anything]])
   end
   def self.load_client_connect_options(
     profile: T.unsafe(nil),
@@ -154,6 +154,6 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
     override_env_vars: T.unsafe(nil)
   ); end
 
-  sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
+  sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, T.anything]]) }
   def to_h; end
 end

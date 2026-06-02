@@ -42,7 +42,7 @@ class Temporalio::Workflow::Future
   class << self
     extend T::Sig
 
-    sig { params(futures: Temporalio::Workflow::Future[T.untyped]).returns(Temporalio::Workflow::Future[NilClass]) }
+    sig { params(futures: Temporalio::Workflow::Future[T.anything]).returns(Temporalio::Workflow::Future[NilClass]) }
     def all_of(*futures); end
 
     sig do
@@ -59,7 +59,7 @@ class Temporalio::Workflow::Future
     end
     def try_any_of(*futures); end
 
-    sig { params(futures: Temporalio::Workflow::Future[T.untyped]).returns(Temporalio::Workflow::Future[NilClass]) }
+    sig { params(futures: Temporalio::Workflow::Future[T.anything]).returns(Temporalio::Workflow::Future[NilClass]) }
     def try_all_of(*futures); end
   end
 end

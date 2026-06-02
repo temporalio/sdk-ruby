@@ -40,7 +40,7 @@ class Temporalio::Testing::ActivityEnvironment
     params(
       activity: T.any(Temporalio::Activity::Definition, T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition::Info),
       args: T.nilable(Object)
-    ).returns(T.untyped)
+    ).returns(T.anything)
   end
   def run(activity, *args); end
 end

@@ -12,6 +12,6 @@ class Temporalio::Workflow::UpdateInfo < ::Struct
   sig { returns(String) }
   def name; end
 
-  sig { returns(T::Hash[Symbol, T.untyped]) }
+  sig { returns(T::Hash[Symbol, String]) }
   def to_h; end
 end

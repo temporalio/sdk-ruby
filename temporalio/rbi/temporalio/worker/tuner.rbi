@@ -101,12 +101,12 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom < ::Temporalio::Worker::Tu
     params(
       context: ReserveContext,
       cancellation: Temporalio::Cancellation,
-      block: T.proc.params(arg0: T.untyped).void
+      block: T.proc.params(arg0: T.anything).void
     ).void
   end
   def reserve_slot(context, cancellation, &block); end
 
-  sig { params(context: ReserveContext).returns(T.untyped) }
+  sig { params(context: ReserveContext).returns(T.anything) }
   def try_reserve_slot(context); end
 
   sig { params(context: MarkUsedContext).void }
@@ -144,7 +144,7 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom::MarkUsedContext < ::Data
   sig { returns(T.any(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Workflow, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Activity, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::LocalActivity, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Nexus)) }
   def slot_info; end
 
-  sig { returns(T.untyped) }
+  sig { returns(T.anything) }
   def permit; end
 end
 
@@ -154,7 +154,7 @@ class Temporalio::Worker::Tuner::SlotSupplier::Custom::ReleaseContext < ::Data
   sig { returns(T.nilable(T.any(Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Workflow, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Activity, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::LocalActivity, Temporalio::Worker::Tuner::SlotSupplier::Custom::SlotInfo::Nexus))) }
   def slot_info; end
 
-  sig { returns(T.untyped) }
+  sig { returns(T.anything) }
   def permit; end
 end
 
