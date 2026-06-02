@@ -31,7 +31,6 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_api_key_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_billing_report_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_connectivity_rule_response: (untyped value) -> void
-      def api_cloud_cloudservice_v1_create_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_nexus_endpoint_request: (untyped value) -> void
@@ -42,7 +41,6 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_api_key_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_connectivity_rule_response: (untyped value) -> void
-      def api_cloud_cloudservice_v1_delete_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_region_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_response: (untyped value) -> void
@@ -62,7 +60,6 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_api_key_response: (untyped value) -> void
-      def api_cloud_cloudservice_v1_update_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_tags_response: (untyped value) -> void

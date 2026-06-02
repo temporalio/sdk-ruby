@@ -277,26 +277,6 @@ module Temporalio
           Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse
-        def get_custom_roles: (
-          Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest request,
-          ?rpc_options: RPCOptions?
-        ) -> Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse
-        def get_custom_role: (
-          Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest request,
-          ?rpc_options: RPCOptions?
-        ) -> Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse
-        def create_custom_role: (
-          Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest request,
-          ?rpc_options: RPCOptions?
-        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse
-        def update_custom_role: (
-          Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest request,
-          ?rpc_options: RPCOptions?
-        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse
-        def delete_custom_role: (
-          Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest request,
-          ?rpc_options: RPCOptions?
-        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse
       end
     end
   end
