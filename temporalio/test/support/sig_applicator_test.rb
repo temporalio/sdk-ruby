@@ -62,6 +62,20 @@ module Support
       refute skip_method?(original, method_node, :foo)
     end
 
+    def test_does_not_skip_proc_typed_regular_arg
+      klass = Class.new do
+        def run_worker(options, next_call); end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(options: String, next_call: T.proc.params(arg0: String).returns(Object)).returns(Object) }
+          def run_worker(options, next_call); end
+        end
+      RBI
+      original = klass.instance_method(:run_worker)
+      refute skip_method?(original, method_node, :run_worker)
+    end
+
     # --- Anonymous block sig rewriting ---
 
     def test_rewrite_block_param
@@ -76,6 +90,14 @@ module Support
     def test_rewrite_block_param_no_block
       input = 'sig { params(name: String).void }'
       method_node = parse_method('class X; sig { params(name: String).void }; def foo(name); end; end')
+      assert_equal input, rewrite_block_param(input, method_node, method_node.sigs.first)
+    end
+
+    def test_rewrite_block_param_does_not_rewrite_regular_proc_arg
+      input = 'sig { params(next_call: T.proc.void).void }'
+      method_node = parse_method(
+        'class X; sig { params(next_call: T.proc.void).void }; def foo(next_call); end; end'
+      )
       assert_equal input, rewrite_block_param(input, method_node, method_node.sigs.first)
     end
 
@@ -353,6 +375,27 @@ module Support
 
       assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
       assert_empty errors
+    end
+
+    def test_apply_method_sig_supports_proc_typed_regular_arg
+      klass = Class.new do
+        extend T::Sig
+
+        def run_worker(options, next_call)
+          next_call.call(options)
+        end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(options: String, next_call: T.proc.params(arg0: String).returns(Integer)).returns(Integer) }
+          def run_worker(options, next_call); end
+        end
+      RBI
+      errors = []
+
+      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
+      assert_empty errors
+      assert_equal 2, klass.new.run_worker('ok', ->(_value) { 2 })
     end
 
     def test_apply_method_sig_does_not_emit_extra_method_added_events

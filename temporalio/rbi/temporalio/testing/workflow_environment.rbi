@@ -37,27 +37,29 @@ class Temporalio::Testing::WorkflowEnvironment
     extend T::Sig
 
     sig do
-      params(
-        namespace: String,
-        data_converter: Temporalio::Converters::DataConverter,
-        interceptors: T::Array[Temporalio::Client::Interceptor],
-        logger: Logger,
-        default_workflow_query_reject_condition: T.nilable(Integer),
-        ip: String,
-        port: T.nilable(Integer),
-        ui: T::Boolean,
-        ui_port: T.nilable(Integer),
-        search_attributes: T::Array[Temporalio::SearchAttributes::Key],
-        runtime: Temporalio::Runtime,
-        dev_server_existing_path: T.nilable(String),
-        dev_server_database_filename: T.nilable(String),
-        dev_server_log_format: String,
-        dev_server_log_level: String,
-        dev_server_download_version: String,
-        dev_server_download_dest_dir: T.nilable(String),
-        dev_server_extra_args: T::Array[String],
-        dev_server_download_ttl: T.nilable(Float)
-      ).returns(Temporalio::Testing::WorkflowEnvironment)
+      type_parameters(:T)
+        .params(
+          namespace: String,
+          data_converter: Temporalio::Converters::DataConverter,
+          interceptors: T::Array[Temporalio::Client::Interceptor],
+          logger: Logger,
+          default_workflow_query_reject_condition: T.nilable(Integer),
+          ip: String,
+          port: T.nilable(Integer),
+          ui: T::Boolean,
+          ui_port: T.nilable(Integer),
+          search_attributes: T::Array[Temporalio::SearchAttributes::Key],
+          runtime: Temporalio::Runtime,
+          dev_server_existing_path: T.nilable(String),
+          dev_server_database_filename: T.nilable(String),
+          dev_server_log_format: String,
+          dev_server_log_level: String,
+          dev_server_download_version: String,
+          dev_server_download_dest_dir: T.nilable(String),
+          dev_server_extra_args: T::Array[String],
+          dev_server_download_ttl: T.nilable(Float),
+          block: T.nilable(T.proc.params(arg0: Temporalio::Testing::WorkflowEnvironment).returns(T.type_parameter(:T)))
+        ).returns(T.any(Temporalio::Testing::WorkflowEnvironment, T.type_parameter(:T)))
     end
     def start_local(
       namespace: T.unsafe(nil),
@@ -78,23 +80,26 @@ class Temporalio::Testing::WorkflowEnvironment
       dev_server_download_version: T.unsafe(nil),
       dev_server_download_dest_dir: T.unsafe(nil),
       dev_server_extra_args: T.unsafe(nil),
-      dev_server_download_ttl: T.unsafe(nil)
+      dev_server_download_ttl: T.unsafe(nil),
+      &block
     ); end
 
     sig do
-      params(
-        data_converter: Temporalio::Converters::DataConverter,
-        interceptors: T::Array[Temporalio::Client::Interceptor],
-        logger: Logger,
-        default_workflow_query_reject_condition: T.nilable(Integer),
-        port: T.nilable(Integer),
-        runtime: Temporalio::Runtime,
-        test_server_existing_path: T.nilable(String),
-        test_server_download_version: String,
-        test_server_download_dest_dir: T.nilable(String),
-        test_server_extra_args: T::Array[String],
-        test_server_download_ttl: T.nilable(Float)
-      ).returns(Temporalio::Testing::WorkflowEnvironment)
+      type_parameters(:T)
+        .params(
+          data_converter: Temporalio::Converters::DataConverter,
+          interceptors: T::Array[Temporalio::Client::Interceptor],
+          logger: Logger,
+          default_workflow_query_reject_condition: T.nilable(Integer),
+          port: T.nilable(Integer),
+          runtime: Temporalio::Runtime,
+          test_server_existing_path: T.nilable(String),
+          test_server_download_version: String,
+          test_server_download_dest_dir: T.nilable(String),
+          test_server_extra_args: T::Array[String],
+          test_server_download_ttl: T.nilable(Float),
+          block: T.nilable(T.proc.params(arg0: Temporalio::Testing::WorkflowEnvironment).returns(T.type_parameter(:T)))
+        ).returns(T.any(Temporalio::Testing::WorkflowEnvironment, T.type_parameter(:T)))
     end
     def start_time_skipping(
       data_converter: T.unsafe(nil),
@@ -107,7 +112,8 @@ class Temporalio::Testing::WorkflowEnvironment
       test_server_download_version: T.unsafe(nil),
       test_server_download_dest_dir: T.unsafe(nil),
       test_server_extra_args: T.unsafe(nil),
-      test_server_download_ttl: T.unsafe(nil)
+      test_server_download_ttl: T.unsafe(nil),
+      &block
     ); end
   end
 end

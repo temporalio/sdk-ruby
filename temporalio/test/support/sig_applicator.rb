@@ -38,6 +38,39 @@ module SigApplicator
     RBI::AttrWriter
   ].freeze
 
+  MethodShape = Data.define(:actual_params, :rbi_params) do
+    def self.from(original, method_node)
+      new(original.parameters, method_node.params)
+    end
+
+    def actual_block_param
+      actual_params.find { |kind, _| kind == :block }
+    end
+
+    def rbi_block_param
+      rbi_params.find { |param| param.is_a?(RBI::BlockParam) }
+    end
+
+    def actual_block?
+      !actual_block_param.nil?
+    end
+
+    def rbi_block?
+      !rbi_block_param.nil?
+    end
+
+    def actual_non_block_params
+      actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
+    end
+
+    def sig_method_params(sig)
+      block_param_name = rbi_block_param&.name
+      return sig.params unless block_param_name
+
+      sig.params.reject { |param| param.name.to_s == block_param_name.to_s }
+    end
+  end
+
   @type_errors = []
   @mutex = Mutex.new
   @summary_hook_registered = false
@@ -411,10 +444,8 @@ module SigApplicator
 
     # Rewrites the RBI block parameter name to `"&": <type>` so
     # sorbet-runtime matches the anonymous block parameter.
-    def rewrite_block_param(sig_source, method_node, sig)
-      block_param_name =
-        method_node.params.find { |param| param.is_a?(RBI::BlockParam) }&.name ||
-        sig.params.find { |param| param.type&.include?('T.proc') }&.name
+    def rewrite_block_param(sig_source, method_node, _sig)
+      block_param_name = method_node.params.find { |param| param.is_a?(RBI::BlockParam) }&.name
 
       return sig_source unless block_param_name
 
@@ -424,29 +455,25 @@ module SigApplicator
     # Determines whether a method should be skipped for sig application based
     # on parameter shape mismatches between the RBI sig and the actual method.
     def skip_method?(original, method_node, _method_name)
-      actual_params = original.parameters
+      shape = MethodShape.from(original, method_node)
 
       # Block param mismatch: methods using yield with no block param,
       # or sigs that omit declared blocks. Anonymous blocks (def foo(&))
       # are handled via sig rewriting in apply_method_sig.
-      actual_block = actual_params.find { |kind, _| kind == :block }
-      sig_block_params = method_node.sigs.flat_map { |sig| sig.params.select { |p| p.type&.include?('T.proc') } }
-      actual_has_block = !actual_block.nil?
-      sig_has_block = sig_block_params.any?
-      return true if actual_has_block != sig_has_block
+      return true if shape.actual_block? != shape.rbi_block?
 
       # Native/extension methods may expose positional parameters without
       # names. Sorbet runtime signatures cannot name those parameters without
       # adding Ruby wrappers, so keep those RBIs for static checking only.
-      has_unnamed_params = actual_params.any? { |_kind, name| name.nil? }
+      has_unnamed_params = shape.actual_params.any? { |_kind, name| name.nil? }
       return true if has_unnamed_params
 
       # Synthetic methods (e.g., Data.define generates .new, .[], #initialize,
       # #with with a single splat) where the RBI provides typed keyword params
       # for better static checking but the runtime signature is incompatible.
-      non_block_params = actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
+      non_block_params = shape.actual_non_block_params
       all_rest_or_unnamed = non_block_params.all? { |kind, _| kind == :rest || kind == :keyrest }
-      sig_named_params = method_node.sigs.flat_map { |s| s.params.reject { |p| p.type&.include?('T.proc') } }
+      sig_named_params = method_node.sigs.flat_map { |sig| shape.sig_method_params(sig) }
       return true if all_rest_or_unnamed && non_block_params.any? && sig_named_params.any?
 
       false
