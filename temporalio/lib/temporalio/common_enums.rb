@@ -90,8 +90,7 @@ module Temporalio
   module ActivityIDReusePolicy
     # Always allow starting an activity using the same activity ID.
     ALLOW_DUPLICATE = Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_ALLOW_DUPLICATE
-    # Allow starting an activity using the same ID only when the last activity's final state is one
-    # of failed, canceled, terminated, or timed out.
+    # Allow starting an activity using the same ID only when the last activity execution was not successful.
     ALLOW_DUPLICATE_FAILED_ONLY =
       Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY
     # Do not permit re-use of the ID for this activity. Future start requests could potentially change the policy,
