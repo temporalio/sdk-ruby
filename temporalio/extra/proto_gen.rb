@@ -209,12 +209,27 @@ class ProtoGen
         require 'temporalio/api/operatorservice/v1/request_response'
       TEXT
     )
-    FileUtils.mkdir_p(['rbi/temporalio/api/cloud', 'rbi/temporalio/api/operatorservice', 'rbi/temporalio/api/workflowservice'])
-    FileUtils.mkdir_p(['sig/temporalio/api/cloud', 'sig/temporalio/api/operatorservice', 'sig/temporalio/api/workflowservice'])
+    FileUtils.mkdir_p(
+      [
+        'rbi/temporalio/api/cloud',
+        'rbi/temporalio/api/operatorservice',
+        'rbi/temporalio/api/workflowservice'
+      ]
+    )
+    FileUtils.mkdir_p(
+      [
+        'sig/temporalio/api/cloud',
+        'sig/temporalio/api/operatorservice',
+        'sig/temporalio/api/workflowservice'
+      ]
+    )
     File.write('rbi/temporalio/api/cloud/cloudservice.rbi', generated_empty_module_rbi('Temporalio::Api::Cloud::CloudService'))
     File.write('rbi/temporalio/api/operatorservice.rbi', generated_empty_module_rbi('Temporalio::Api::OperatorService'))
     File.write('rbi/temporalio/api/workflowservice.rbi', generated_empty_module_rbi('Temporalio::Api::WorkflowService'))
-    File.write('sig/temporalio/api/cloud/cloudservice.rbs', generated_empty_module_rbs(%w[Temporalio Api Cloud CloudService]))
+    File.write(
+      'sig/temporalio/api/cloud/cloudservice.rbs',
+      generated_empty_module_rbs(%w[Temporalio Api Cloud CloudService])
+    )
     File.write('sig/temporalio/api/operatorservice.rbs', generated_empty_module_rbs(%w[Temporalio Api OperatorService]))
     File.write('sig/temporalio/api/workflowservice.rbs', generated_empty_module_rbs(%w[Temporalio Api WorkflowService]))
     File.write(

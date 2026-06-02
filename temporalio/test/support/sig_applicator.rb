@@ -282,7 +282,7 @@ module SigApplicator
         has_anon_block ? rewrite_block_param(sig_source, method_node, sig) : sig_source
       end
 
-      apply_sig_sources_to_method(
+      apply_sig_sources_to_method?(
         target,
         full_name,
         method_name,
@@ -314,7 +314,7 @@ module SigApplicator
             next
           end
 
-          result = apply_sig_sources_to_method(
+          result = apply_sig_sources_to_method?(
             target,
             full_name,
             method_name,
@@ -358,7 +358,7 @@ module SigApplicator
       end
     end
 
-    def apply_sig_sources_to_method(
+    def apply_sig_sources_to_method?(
       target,
       full_name,
       method_name,
