@@ -74,12 +74,11 @@ module SigApplicator
   end
 
   @type_errors = []
-  @mutex = Mutex.new
   @summary_hook_registered = false
 
   class << self
     def apply_all!
-      @mutex.synchronize { @type_errors.clear }
+      @type_errors.clear
       configure_error_handler!
       register_summary_hook!
 
@@ -108,18 +107,11 @@ module SigApplicator
     def record_type_error(message)
       return if Thread.current[:sig_applicator_suppressed]
 
-      # Avoid illegal_call_tracing_disabled here — interacting with the
-      # workflow tracer + mutex from inside error handlers can cause
-      # non-deterministic behavior. Instead, rescue the NondeterminismError
-      # that fires when accessing Mutex from within a workflow.
-      @mutex.synchronize { @type_errors << message }
-    rescue Temporalio::Workflow::NondeterminismError
-      # Best-effort: append without synchronization when inside a workflow
       @type_errors << message
     end
 
     def type_errors
-      @mutex.synchronize { @type_errors.dup }
+      @type_errors.dup
     end
 
     # Suppress type error recording for the duration of a block.

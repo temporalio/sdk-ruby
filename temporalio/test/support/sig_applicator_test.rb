@@ -687,13 +687,10 @@ module Support
     end
 
     def replace_sig_applicator_type_errors(new_errors)
-      mutex = SigApplicator.instance_variable_get(:@mutex)
-      mutex.synchronize do
-        errors = SigApplicator.instance_variable_get(:@type_errors)
-        previous = errors.dup
-        errors.replace(new_errors)
-        previous
-      end
+      errors = SigApplicator.instance_variable_get(:@type_errors)
+      previous = errors.dup
+      errors.replace(new_errors)
+      previous
     end
 
     def with_sig_applicator_rbi_paths(paths)

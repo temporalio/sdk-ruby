@@ -4,7 +4,6 @@ module SigApplicator
   ATTR_NODE_CLASSES: Array[Class]
 
   @type_errors: Array[String]
-  @mutex: Mutex
   @summary_hook_registered: bool
 
   class MethodShape
