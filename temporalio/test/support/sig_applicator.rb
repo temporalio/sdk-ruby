@@ -40,6 +40,7 @@ module SigApplicator
 
   @type_errors = []
   @mutex = Mutex.new
+  @summary_hook_registered = false
 
   class << self
     def apply_all!
@@ -123,25 +124,27 @@ module SigApplicator
       end
     end
 
-    # Register a Minitest test class that runs last and asserts no type
-    # errors were collected.
+    # Register a Minitest after-run hook that asserts no type errors were
+    # collected.
     def register_summary_hook!
-      # Minitest runs test classes in alphabetical order by default.
-      # "ZZZ" ensures this runs after all other tests.
-      klass = Class.new(Minitest::Test) do
-        define_method(:test_no_sorbet_runtime_type_errors) do
-          errors = SigApplicator.type_errors
-          return if errors.empty?
+      return if @summary_hook_registered
 
-          unique = errors.tally
-          summary = "SigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):\n"
-          unique.sort_by { |_, count| -count }.each do |msg, count|
-            summary << "  [#{count}x] #{msg}\n"
-          end
-          flunk summary
-        end
+      @summary_hook_registered = true
+      Minitest.after_run do
+        raise_recorded_type_errors!
       end
-      Object.const_set(:ZZZSigApplicatorTest, klass)
+    end
+
+    def raise_recorded_type_errors!
+      errors = type_errors
+      return if errors.empty?
+
+      unique = errors.tally
+      summary = "SigApplicator: #{errors.size} runtime type errors detected (#{unique.size} unique):\n"
+      unique.sort_by { |_, count| -count }.each do |msg, count|
+        summary << "  [#{count}x] #{msg}\n"
+      end
+      raise Minitest::Assertion, summary.chomp
     end
 
     def raise_instrumentation_errors!(errors)

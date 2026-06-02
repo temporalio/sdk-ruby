@@ -140,6 +140,36 @@ module Support
       refute skip_method?(original, method_node, :foo)
     end
 
+    def test_register_summary_hook_uses_after_run
+      original_registered = SigApplicator.instance_variable_get(:@summary_hook_registered)
+      hooks = []
+      minitest_singleton_class = Minitest.singleton_class
+      original_after_run = Minitest.method(:after_run)
+      minitest_singleton_class.send(:define_method, :after_run) { |&block| hooks << block }
+      SigApplicator.instance_variable_set(:@summary_hook_registered, false)
+
+      SigApplicator.send(:register_summary_hook!)
+
+      assert_equal 1, hooks.size
+      assert SigApplicator.instance_variable_get(:@summary_hook_registered)
+      refute Object.const_defined?(:ZZZSigApplicatorTest)
+    ensure
+      minitest_singleton_class&.send(:define_method, :after_run, original_after_run)
+      SigApplicator.instance_variable_set(:@summary_hook_registered, original_registered)
+    end
+
+    def test_raise_recorded_type_errors_reports_unique_counts
+      replace_sig_applicator_type_errors(['first error', 'second error', 'first error'])
+
+      error = assert_raises(Minitest::Assertion) do
+        SigApplicator.send(:raise_recorded_type_errors!)
+      end
+
+      assert_includes error.message, 'SigApplicator: 3 runtime type errors detected (2 unique):'
+      assert_includes error.message, '  [2x] first error'
+      assert_includes error.message, '  [1x] second error'
+    end
+
     def test_apply_all_raises_when_signature_cannot_be_instrumented
       test_class = Class.new do
         extend T::Sig
@@ -159,8 +189,6 @@ module Support
       original_parse_file = RBI::Parser.method(:parse_file)
       parser.send(:define_method, :parse_file) { |_path| tree }
 
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
-
       error = assert_raises(RuntimeError) do
         with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
       end
@@ -171,7 +199,6 @@ module Support
       if Support.const_defined?(:SigApplicatorApplyAllTest, false)
         Support.send(:remove_const, :SigApplicatorApplyAllTest)
       end
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
     def test_apply_all_reads_all_rbi_paths
@@ -209,8 +236,6 @@ module Support
         trees.fetch(path)
       end
 
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
-
       with_sig_applicator_rbi_paths(trees.keys) { SigApplicator.apply_all! }
 
       assert_equal trees.keys, parsed_paths
@@ -220,7 +245,6 @@ module Support
       if Support.const_defined?(:SigApplicatorMultiFileTest, false)
         Support.send(:remove_const, :SigApplicatorMultiFileTest)
       end
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
     def test_apply_all_applies_attr_reader_signature
@@ -244,8 +268,6 @@ module Support
       original_parse_file = RBI::Parser.method(:parse_file)
       parser.send(:define_method, :parse_file) { |_path| tree }
 
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
-
       with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
       test_class.new(123).name
 
@@ -255,7 +277,6 @@ module Support
       if Support.const_defined?(:SigApplicatorAttrReaderTest, false)
         Support.send(:remove_const, :SigApplicatorAttrReaderTest)
       end
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
     def test_apply_all_applies_attr_writer_signature
@@ -275,8 +296,6 @@ module Support
       original_parse_file = RBI::Parser.method(:parse_file)
       parser.send(:define_method, :parse_file) { |_path| tree }
 
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
-
       with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
       test_class.new.name = 123
 
@@ -286,7 +305,6 @@ module Support
       if Support.const_defined?(:SigApplicatorAttrWriterTest, false)
         Support.send(:remove_const, :SigApplicatorAttrWriterTest)
       end
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
     def test_apply_all_applies_attr_accessor_signature
@@ -306,8 +324,6 @@ module Support
       original_parse_file = RBI::Parser.method(:parse_file)
       parser.send(:define_method, :parse_file) { |_path| tree }
 
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
-
       with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
 
       instance = test_class.new
@@ -322,7 +338,6 @@ module Support
       if Support.const_defined?(:SigApplicatorAttrAccessorTest, false)
         Support.send(:remove_const, :SigApplicatorAttrAccessorTest)
       end
-      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
     def test_apply_method_sig_supports_anonymous_block_with_named_rbi_block
