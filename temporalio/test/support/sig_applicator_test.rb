@@ -8,6 +8,16 @@ require 'support/sig_applicator'
 
 module Support
   class SigApplicatorTest < Minitest::Test
+    def setup
+      super
+      @sig_applicator_type_errors = replace_sig_applicator_type_errors([])
+    end
+
+    def teardown
+      replace_sig_applicator_type_errors(@sig_applicator_type_errors)
+      super
+    end
+
     # --- Block param mismatch skips ---
 
     def test_does_not_skip_anonymous_block_with_sig_block
@@ -606,6 +616,16 @@ module Support
 
     def attr_method_sig_sources(attr_node, attr_name)
       SigApplicator.send(:attr_method_sig_sources, attr_node, attr_name)
+    end
+
+    def replace_sig_applicator_type_errors(new_errors)
+      mutex = SigApplicator.instance_variable_get(:@mutex)
+      mutex.synchronize do
+        errors = SigApplicator.instance_variable_get(:@type_errors)
+        previous = errors.dup
+        errors.replace(new_errors)
+        previous
+      end
     end
 
     def with_sig_applicator_rbi_paths(paths)
