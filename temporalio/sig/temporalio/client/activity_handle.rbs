@@ -20,7 +20,7 @@ module Temporalio
 
       def terminate: (?String? reason, ?rpc_options: RPCOptions?) -> void
 
-      private def _process_outcome: (untyped outcome, Object? hint) -> Object?
+      private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
     end
   end
 end

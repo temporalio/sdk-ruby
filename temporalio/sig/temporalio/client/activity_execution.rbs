@@ -1,14 +1,14 @@
 module Temporalio
   class Client
     class ActivityExecution
-      attr_reader raw_info: untyped
+      attr_reader raw_info: Api::Activity::V1::ActivityExecutionListInfo | Api::Activity::V1::ActivityExecutionInfo
 
-      def initialize: (untyped raw_info) -> void
+      def initialize: (Api::Activity::V1::ActivityExecutionListInfo | Api::Activity::V1::ActivityExecutionInfo raw_info) -> void
 
       def activity_id: -> String
       def activity_run_id: -> String?
       def activity_type: -> String
-      def scheduled_time: -> Time?
+      def schedule_time: -> Time?
       def close_time: -> Time?
       def status: -> ActivityExecutionStatus::enum
       def search_attributes: -> SearchAttributes?
@@ -16,9 +16,9 @@ module Temporalio
       def execution_duration: -> Float?
 
       class Description < ActivityExecution
-        attr_reader raw_description: untyped
+        attr_reader raw_description: Api::WorkflowService::V1::DescribeActivityExecutionResponse
 
-        def initialize: (untyped raw_description, Converters::DataConverter data_converter) -> void
+        def initialize: (Api::WorkflowService::V1::DescribeActivityExecutionResponse raw_description, Converters::DataConverter data_converter) -> void
 
         def run_state: -> PendingActivityState::enum?
         def schedule_to_close_timeout: -> Float?

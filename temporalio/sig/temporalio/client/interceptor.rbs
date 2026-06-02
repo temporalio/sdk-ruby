@@ -613,7 +613,7 @@ module Temporalio
 
         def count_activities: (CountActivitiesInput input) -> ActivityExecutionCount
 
-        def fetch_activity_outcome: (FetchActivityOutcomeInput input) -> untyped
+        def fetch_activity_outcome: (FetchActivityOutcomeInput input) -> Api::Activity::V1::ActivityExecutionOutcome?
       end
     end
   end

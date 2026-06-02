@@ -71,6 +71,7 @@ module Temporalio
     def connection: -> Connection
     def namespace: -> String
     def data_converter: -> Converters::DataConverter
+    def _impl: -> Interceptor::Outbound
     def workflow_service: -> Connection::WorkflowService
     def operator_service: -> Connection::OperatorService
 
