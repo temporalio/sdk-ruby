@@ -154,7 +154,9 @@ class Test < Minitest::Test
             '--dynamic-config-value', 'frontend.enableVersioningWorkflowAPIs=true',
             '--dynamic-config-value', 'frontend.enableVersioningDataAPIs=true',
             '--dynamic-config-value', 'frontend.enableCancelWorkerPollsOnShutdown=true',
-            '--dynamic-config-value', 'system.enableDeploymentVersions=true'
+            '--dynamic-config-value', 'system.enableDeploymentVersions=true',
+            # Enable activity pause
+            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true'
           ]
         )
         Minitest.after_run do
