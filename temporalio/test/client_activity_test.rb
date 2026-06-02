@@ -181,6 +181,41 @@ class ClientActivityTest < Test
     assert_match(/not an activity/i, err.message)
   end
 
+  def test_start_activity_rejects_empty_activity_id
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        SimpleActivity, 'x',
+        id: '',
+        task_queue: 'unreached-tq',
+        start_to_close_timeout: 10
+      )
+    end
+    assert_match(/activity_id is required/i, err.message)
+  end
+
+  def test_start_activity_rejects_empty_task_queue
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        SimpleActivity, 'x',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: '',
+        start_to_close_timeout: 10
+      )
+    end
+    assert_match(/task_queue is required/i, err.message)
+  end
+
+  def test_start_activity_rejects_missing_timeouts
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        SimpleActivity, 'x',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: 'unreached-tq'
+      )
+    end
+    assert_match(/schedule_to_close_timeout or start_to_close_timeout/i, err.message)
+  end
+
   def test_start_activity_already_started_throws
     with_activity_worker([SlowActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"

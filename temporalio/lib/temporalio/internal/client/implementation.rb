@@ -960,6 +960,12 @@ module Temporalio
         end
 
         def start_activity(input)
+          raise ArgumentError, 'activity_id is required' if input.activity_id.nil? || input.activity_id.empty?
+          raise ArgumentError, 'task_queue is required' if input.task_queue.nil? || input.task_queue.to_s.empty?
+          if input.schedule_to_close_timeout.nil? && input.start_to_close_timeout.nil?
+            raise ArgumentError, 'either schedule_to_close_timeout or start_to_close_timeout is required'
+          end
+
           req = Api::WorkflowService::V1::StartActivityExecutionRequest.new(
             namespace: @client.namespace,
             identity: @client.connection.identity,
