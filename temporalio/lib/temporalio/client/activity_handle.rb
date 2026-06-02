@@ -51,7 +51,7 @@ module Temporalio
         _process_outcome(outcome, hint)
       end
 
-      # Describe the activity (one-shot, no long-poll).
+      # Describe the activity.
       #
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
