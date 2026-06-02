@@ -4,7 +4,7 @@ require 'minitest/autorun'
 require 'pathname'
 
 class TypeSignatureCoverageTest < Minitest::Test
-  ROOT = Pathname.new(File.expand_path('..', __dir__))
+  ROOT = Pathname.new(File.expand_path('..', __dir__ || raise))
   LIB_ROOT = ROOT.join('lib')
   RBI_ROOT = ROOT.join('rbi')
   SIG_ROOT = ROOT.join('sig')
