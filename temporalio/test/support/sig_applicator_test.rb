@@ -104,7 +104,8 @@ module Support
     # --- Setter / unnamed param skips ---
 
     def test_skips_attr_writer_with_unnamed_params
-      klass = Class.new { attr_writer :bar }
+      klass = Class.new
+      klass.send(:attr_writer, :bar)
       method_node = parse_method(
         'class X; sig { params(value: Integer).void }; def bar=(value); end; end'
       )
@@ -270,13 +271,11 @@ module Support
     end
 
     def test_apply_all_applies_attr_reader_signature
-      test_class = Class.new do
-        attr_reader :name
-
-        def initialize(name)
-          @name = name
-        end
+      test_class = Class.new
+      test_class.send(:define_method, :initialize) do |name|
+        @name = name
       end
+      test_class.send(:attr_reader, :name)
       Support.const_set(:SigApplicatorAttrReaderTest, test_class)
 
       tree = RBI::Parser.parse_string(<<~RBI)
@@ -291,7 +290,7 @@ module Support
       parser.send(:define_method, :parse_file) { |_path| tree }
 
       with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
-      test_class.new(123).name
+      test_class.send(:new, 123).name
 
       assert_includes SigApplicator.type_errors.join("\n"), 'Return value: Expected type String, got type Integer'
     ensure
@@ -302,9 +301,8 @@ module Support
     end
 
     def test_apply_all_applies_attr_writer_signature
-      test_class = Class.new do
-        attr_writer :name
-      end
+      test_class = Class.new
+      test_class.send(:attr_writer, :name)
       Support.const_set(:SigApplicatorAttrWriterTest, test_class)
 
       tree = RBI::Parser.parse_string(<<~RBI)
@@ -330,9 +328,8 @@ module Support
     end
 
     def test_apply_all_applies_attr_accessor_signature
-      test_class = Class.new do
-        attr_accessor :count
-      end
+      test_class = Class.new
+      test_class.send(:attr_accessor, :count)
       Support.const_set(:SigApplicatorAttrAccessorTest, test_class)
 
       tree = RBI::Parser.parse_string(<<~RBI)
@@ -399,34 +396,26 @@ module Support
     end
 
     def test_apply_method_sig_does_not_emit_extra_method_added_events
+      method_added_events = []
       klass = Class.new do
         extend T::Sig
 
-        class << self
-          attr_accessor :method_added_events
-        end
-
-        self.method_added_events = []
-
-        def self.method_added(name)
-          method_added_events << name
-          super
-        end
+        define_singleton_method(:method_added) { |name| method_added_events << name }
 
         def foo
           'ok'
         end
       end
-      klass.method_added_events.clear
+      method_added_events.clear
       method_node = parse_method('class X; sig { returns(String) }; def foo; end; end')
       errors = []
 
       assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
       assert_empty errors
       assert_equal 'ok', klass.new.foo
-      assert_equal klass.method_added_events.select { |name| name == :foo }, klass.method_added_events
+      assert_equal method_added_events.select { |name| name == :foo }, method_added_events
       # Sorbet replaces the method twice, we should not add to this
-      assert_equal klass.method_added_events.size, 2
+      assert_equal method_added_events.size, 2
     end
 
     def test_apply_method_sig_restores_original_method_when_instrumentation_fails
@@ -513,14 +502,12 @@ module Support
     def test_apply_method_sig_for_inherited_method_does_not_wrap_original_owner
       original_delegator_initialize = Delegator.instance_method(:initialize)
       inherited_method_class = Class.new(SimpleDelegator) { extend T::Sig }
-      child_class = Class.new(inherited_method_class) do
-        attr_reader :marker
-
-        def initialize(obj:, marker:)
-          @marker = marker
-          super(obj)
-        end
+      child_class = Class.new(inherited_method_class)
+      child_class.send(:define_method, :initialize) do |obj:, marker:|
+        @marker = marker
+        super(obj)
       end
+      child_class.send(:attr_reader, :marker)
       Support.const_set(:SigApplicatorDelegatorSigTest, inherited_method_class)
 
       inherited_method_node = parse_method(<<~RBI)
@@ -543,7 +530,7 @@ module Support
       assert_equal original_delegator_initialize, Delegator.instance_method(:initialize)
       assert_equal inherited_method_class, inherited_method_class.instance_method(:initialize).owner
 
-      child = child_class.new(obj: Logger.new(nil), marker: :ok)
+      child = child_class.send(:new, obj: Logger.new(nil), marker: :ok)
       assert_equal :ok, child.marker
       assert_instance_of Logger, child.__getobj__
     ensure
@@ -553,19 +540,11 @@ module Support
     end
 
     def test_apply_method_sig_preserves_inherited_method_visibility
-      base_class = Class.new do
-        protected
-
-        def protected_value
-          'protected'
-        end
-
-        private
-
-        def private_value
-          'private'
-        end
-      end
+      base_class = Class.new
+      base_class.define_method(:protected_value) { 'protected' }
+      base_class.define_method(:private_value) { 'private' }
+      base_class.send(:protected, :protected_value)
+      base_class.send(:private, :private_value)
       inherited_method_class = Class.new(base_class) { extend T::Sig }
       Support.const_set(:SigApplicatorVisibilityTest, inherited_method_class)
 

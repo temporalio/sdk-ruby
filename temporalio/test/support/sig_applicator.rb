@@ -38,7 +38,9 @@ module SigApplicator
     RBI::AttrWriter
   ].freeze
 
-  MethodShape = Data.define(:actual_params, :rbi_params) do
+  MethodShape = Data.define(:actual_params, :rbi_params)
+
+  class MethodShape
     def self.from(original, method_node)
       new(original.parameters, method_node.params)
     end
@@ -60,7 +62,7 @@ module SigApplicator
     end
 
     def actual_non_block_params
-      actual_params.reject { |kind, _| kind == :block } # rubocop:disable Style/HashExcept
+      actual_params.reject { |param| param.first == :block }
     end
 
     def sig_method_params(sig)

@@ -1,0 +1,21 @@
+module Support
+  class SigApplicatorTest < Minitest::Test
+    @sig_applicator_type_errors: Array[String]
+
+    private
+
+    def parse_method: (String source) -> untyped
+    def skip_method?: (UnboundMethod original, untyped method_node, Symbol method_name) -> bool
+    def rewrite_block_param: (String sig_source, untyped method_node, untyped sig) -> String
+    def apply_method_sig: (
+      Module target,
+      String class_name,
+      untyped method_node,
+      Array[String] errors,
+      sig_eval_scope: Module
+    ) -> (bool | :skipped)
+    def attr_method_sig_sources: (untyped attr_node, untyped attr_name) -> Array[[untyped, Array[String]]]
+    def replace_sig_applicator_type_errors: (Array[String] new_errors) -> Array[String]
+    def with_sig_applicator_rbi_paths: (Array[String] paths) { () -> untyped } -> untyped
+  end
+end

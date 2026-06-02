@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module RbiPaths
-  ROOT = File.expand_path('../../rbi', __dir__)
+  ROOT = File.expand_path('../../rbi', __dir__ || raise)
 
   GENERATED_PREFIXES = [
     File.join(ROOT, 'google', ''),

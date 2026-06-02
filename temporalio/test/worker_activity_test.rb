@@ -178,7 +178,7 @@ class WorkerActivityTest < Test
         )
       end
       if defined?(SigApplicator)
-        SigApplicator.suppress_errors(&block)
+        SigApplicator.suppress_errors { block.call }
       else
         block.call
       end
