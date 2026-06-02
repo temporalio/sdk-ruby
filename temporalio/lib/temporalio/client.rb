@@ -592,7 +592,7 @@ module Temporalio
     #
     # @return [Object, nil] Successful result of the activity.
     # @raise [Error::ActivityAlreadyStartedError] Activity already exists with this ID.
-    # @raise [Error::ActivityFailedError] Activity failed; `cause` has the underlying failure.
+    # @raise [Error::ActivityFailedError] With `cause` populated from the activity failure.
     # @raise [Error::RPCError] RPC error from call.
     def execute_activity(
       activity,

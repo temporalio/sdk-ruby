@@ -40,8 +40,8 @@ module Temporalio
       end
     end
 
-    # Error returned from {Client::ActivityHandle#result} when a standalone activity terminates in failure
-    # (failed / canceled / terminated / timed out). The underlying cause is available via `cause`.
+    # Error returned from {Client::ActivityHandle#result} when the activity did not complete successfully.
+    # The specific activity failure can be accessed via `cause`.
     class ActivityFailedError < Error
       # @!visibility private
       def initialize(message = 'Activity execution failed')
