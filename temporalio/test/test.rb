@@ -155,11 +155,6 @@ class Test < Minitest::Test
             '--dynamic-config-value', 'frontend.enableVersioningDataAPIs=true',
             '--dynamic-config-value', 'frontend.enableCancelWorkerPollsOnShutdown=true',
             '--dynamic-config-value', 'system.enableDeploymentVersions=true',
-            # Activity pause + Standalone Activities
-            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true',
-            '--dynamic-config-value', 'activity.enableStandalone=true',
-            '--dynamic-config-value', 'history.enableChasm=true',
-            '--dynamic-config-value', 'history.enableTransitionHistory=true'
           ]
         )
         Minitest.after_run do
