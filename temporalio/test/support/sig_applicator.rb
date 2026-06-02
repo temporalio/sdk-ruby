@@ -39,6 +39,12 @@ module SigApplicator
     ]
   ).freeze
 
+  ATTR_NODE_CLASSES = [
+    RBI::AttrAccessor,
+    RBI::AttrReader,
+    RBI::AttrWriter
+  ].freeze
+
   @type_errors = []
   @mutex = Mutex.new
 
@@ -65,7 +71,7 @@ module SigApplicator
         end
       end
 
-      warn "SigApplicator: applied #{applied} runtime type signatures (#{skipped} skipped)"
+      warn "SigApplicator: applied #{applied} runtime type signatures (#{skipped} skipped)" if skipped.positive?
 
       raise_instrumentation_errors!(errors)
     end
@@ -181,22 +187,38 @@ module SigApplicator
           elsif result
             applied += 1
           end
+        when *ATTR_NODE_CLASSES
+          a, s = apply_attr_sig(klass, class_name, child, errors, sig_eval_scope: klass)
+          applied += a
+          skipped += s
         when RBI::SingletonClass
           child.nodes.each do |scn|
-            next unless scn.is_a?(RBI::Method)
-
-            result = apply_method_sig(
-              klass.singleton_class,
-              class_name,
-              scn,
-              errors,
-              class_method: true,
-              sig_eval_scope: klass
-            )
-            if result == :skipped
-              skipped += 1
-            elsif result
-              applied += 1
+            case scn
+            when RBI::Method
+              result = apply_method_sig(
+                klass.singleton_class,
+                class_name,
+                scn,
+                errors,
+                class_method: true,
+                sig_eval_scope: klass
+              )
+              if result == :skipped
+                skipped += 1
+              elsif result
+                applied += 1
+              end
+            when *ATTR_NODE_CLASSES
+              a, s = apply_attr_sig(
+                klass.singleton_class,
+                class_name,
+                scn,
+                errors,
+                class_method: true,
+                sig_eval_scope: klass
+              )
+              applied += a
+              skipped += s
             end
           end
         end
@@ -224,31 +246,118 @@ module SigApplicator
       return :skipped if skip_method?(original, method_node, method_name)
 
       has_anon_block = anonymous_block?(original)
+      sig_sources = method_node.sigs.map do |sig|
+        # RBI::Sig#string serializes back to valid T::Sig DSL source
+        sig_source = sig.string
+        # Anonymous block params (def foo(&)) need `"&":` instead of the RBI
+        # block parameter name.
+        has_anon_block ? rewrite_block_param(sig_source, method_node, sig) : sig_source
+      end
+
+      apply_sig_sources_to_method(
+        target,
+        full_name,
+        method_name,
+        sig_sources,
+        errors,
+        original:,
+        singleton_method:,
+        sig_eval_scope:
+      )
+    end
+
+    def apply_attr_sig(target, class_name, attr_node, errors, class_method: false, sig_eval_scope: target)
+      return [0, 0] if attr_node.sigs.empty?
+
+      singleton_method = class_method
+      separator = singleton_method ? '.' : '#'
+      applied = 0
+      skipped = 0
+
+      attr_node.names.each do |attr_name|
+        attr_method_sig_sources(attr_node, attr_name).each do |method_name, sig_sources|
+          method_name = method_name.to_sym
+          full_name = "#{class_name}#{separator}#{method_name}"
+
+          begin
+            original = target.instance_method(method_name)
+          rescue NameError
+            errors << "#{full_name}: method not found"
+            next
+          end
+
+          result = apply_sig_sources_to_method(
+            target,
+            full_name,
+            method_name,
+            sig_sources,
+            errors,
+            original:,
+            singleton_method:,
+            sig_eval_scope:
+          )
+          if result == :skipped
+            skipped += 1
+          elsif result
+            applied += 1
+          end
+        end
+      end
+
+      [applied, skipped]
+    end
+
+    def attr_method_sig_sources(attr_node, attr_name)
+      case attr_node
+      when RBI::AttrReader
+        [[attr_name, attr_node.sigs.map(&:string)]]
+      when RBI::AttrWriter
+        [["#{attr_name}=", writer_sig_sources(attr_node, attr_name)]]
+      when RBI::AttrAccessor
+        [
+          [attr_name, attr_node.sigs.map(&:string)],
+          ["#{attr_name}=", writer_sig_sources(attr_node, attr_name)]
+        ]
+      else
+        raise ArgumentError, "Unsupported attr node type: #{attr_node.class}"
+      end
+    end
+
+    def writer_sig_sources(attr_node, attr_name)
+      attr_node.sigs.map do |sig|
+        return_type = sig.return_type || 'T.untyped'
+        "sig { params(#{attr_name}: #{return_type}).returns(#{return_type}) }"
+      end
+    end
+
+    def apply_sig_sources_to_method(
+      target,
+      full_name,
+      method_name,
+      sig_sources,
+      errors,
+      original:,
+      singleton_method:,
+      sig_eval_scope:
+    )
       # For inherited methods, copy the method locally so a subclass sig does not
       # instrument the parent globally.
       inherited_method = original.owner != target
       original = define_local_method_copy(target, method_name, original) if inherited_method
 
-      method_node.sigs.each do |sig|
-        # RBI::Sig#string serializes back to valid T::Sig DSL source
-        sig_source = sig.string
-        # Anonymous block params (def foo(&)) need `"&":` instead of the RBI
-        # block parameter name.
-        sig_source = rewrite_block_param(sig_source, method_node, sig) if has_anon_block
-        begin
-          apply_sig_source(sig_eval_scope, target, sig_source, singleton_method)
-          apply_pending_sig(sig_eval_scope, target, method_name, singleton_method)
+      sig_sources.each do |sig_source|
+        apply_sig_source(sig_eval_scope, target, sig_source, singleton_method)
+        apply_pending_sig(sig_eval_scope, target, method_name, singleton_method)
 
-          # Force eager sig validation so mismatches are caught now rather than
-          # causing cascading failures on first call.
-          method_obj = target.instance_method(method_name)
-          T::Utils.signature_for_method(method_obj)
-        rescue StandardError => e
-          # Restore the original method without the sig wrapper
-          restore_original_method(target, method_name, original, remove_local_method: inherited_method)
-          errors << "#{full_name}: #{e.message}"
-          return false
-        end
+        # Force eager sig validation so mismatches are caught now rather than
+        # causing cascading failures on first call.
+        method_obj = target.instance_method(method_name)
+        T::Utils.signature_for_method(method_obj)
+      rescue StandardError => e
+        # Restore the original method without the sig wrapper
+        restore_original_method(target, method_name, original, remove_local_method: inherited_method)
+        errors << "#{full_name}: #{e.message}"
+        return false
       end
 
       true

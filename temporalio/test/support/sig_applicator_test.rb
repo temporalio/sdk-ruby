@@ -213,6 +213,77 @@ module Support
       Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
     end
 
+    def test_apply_all_applies_attr_reader_signature
+      test_class = Class.new do
+        attr_reader :name
+
+        def initialize(name)
+          @name = name
+        end
+      end
+      Support.const_set(:SigApplicatorAttrReaderTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrReaderTest
+          sig { returns(String) }
+          attr_reader :name
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      test_class.new(123).name
+
+      assert_includes SigApplicator.type_errors.join("\n"), 'Return value: Expected type String, got type Integer'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrReaderTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrReaderTest)
+      end
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
+    def test_apply_all_applies_attr_accessor_signature
+      test_class = Class.new do
+        attr_accessor :count
+      end
+      Support.const_set(:SigApplicatorAttrAccessorTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrAccessorTest
+          sig { returns(Integer) }
+          attr_accessor :count
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+
+      instance = test_class.new
+      instance.count = 'bad'
+      instance.count
+
+      errors = SigApplicator.type_errors.join("\n")
+      assert_includes errors, "Parameter 'count': Expected type Integer, got type String"
+      assert_includes errors, 'Return value: Expected type Integer, got type String'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrAccessorTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrAccessorTest)
+      end
+      Object.send(:remove_const, :ZZZSigApplicatorTest) if Object.const_defined?(:ZZZSigApplicatorTest)
+    end
+
     def test_apply_method_sig_supports_anonymous_block_with_named_rbi_block
       klass = Class.new do
         extend T::Sig
@@ -531,6 +602,10 @@ module Support
         errors,
         sig_eval_scope:
       )
+    end
+
+    def attr_method_sig_sources(attr_node, attr_name)
+      SigApplicator.send(:attr_method_sig_sources, attr_node, attr_name)
     end
 
     def with_sig_applicator_rbi_paths(paths)
