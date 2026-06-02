@@ -67,7 +67,7 @@ module SigApplicator
   def self.apply_sig_source: (Module sig_eval_scope, Module target, String sig_source, bool singleton_method) -> void
   def self.apply_pending_sig: (Module sig_eval_scope, Module target, Symbol method_name, bool singleton_method) -> void
   def self.define_local_method_copy: (Module target, Symbol method_name, UnboundMethod original) -> UnboundMethod
-  def self.method_visibility: (Module target, Symbol method_name) -> Symbol
+  def self.method_visibility: (Module target, Symbol method_name) -> (:public | :protected | :private)
   def self.restore_original_method: (
     Module target,
     Symbol method_name,
