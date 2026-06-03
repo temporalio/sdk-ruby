@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::Client::WorkflowExecution
   sig { params(raw_info: Temporalio::Api::Workflow::V1::WorkflowExecutionInfo, data_converter: Temporalio::Converters::DataConverter).void }
   def initialize(raw_info, data_converter); end

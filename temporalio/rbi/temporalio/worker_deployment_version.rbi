@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::WorkerDeploymentVersion < ::Data
   sig { params(deployment_name: String, build_id: String).void }
   def initialize(deployment_name:, build_id:); end

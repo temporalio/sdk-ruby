@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::Client::Connection::Service
   sig { params(connection: Temporalio::Client::Connection, service: Integer).void }
   def initialize(connection, service); end

@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::SearchAttributes
   sig { params(existing: T.nilable(T.any(Temporalio::SearchAttributes, T::Hash[Temporalio::SearchAttributes::Key, Object]))).void }
   def initialize(existing = nil); end

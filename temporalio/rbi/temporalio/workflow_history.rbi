@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::WorkflowHistory
   sig { params(events: T::Array[Temporalio::Api::History::V1::HistoryEvent]).void }
   def initialize(events); end

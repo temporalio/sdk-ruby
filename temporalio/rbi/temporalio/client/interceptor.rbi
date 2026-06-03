@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 module Temporalio::Client::Interceptor
   sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).returns(Temporalio::Client::Interceptor::Outbound) }
   def intercept_client(next_interceptor); end

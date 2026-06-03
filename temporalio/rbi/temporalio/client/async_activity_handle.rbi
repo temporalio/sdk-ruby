@@ -1,8 +1,5 @@
 # typed: true
 
-# Sorbet RBI types for the Temporal Ruby SDK.
-# This file was split from rbi/temporalio.rbi by extra/split_rbi.rb.
-
 class Temporalio::Client::AsyncActivityHandle
   sig { params(client: Temporalio::Client, task_token: T.nilable(String), id_reference: T.nilable(Temporalio::Client::ActivityIDReference)).void }
   def initialize(client:, task_token:, id_reference:); end
