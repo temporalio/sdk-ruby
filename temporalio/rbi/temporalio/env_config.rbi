@@ -40,7 +40,7 @@ class Temporalio::EnvConfig::ClientConfigTLS < ::Data
     client_private_key: T.unsafe(nil)
   ); end
 
-  sig { returns(T::Hash[Symbol, T.anything]) }
+  sig { returns(T::Hash[Symbol, Object]) }
   def to_h; end
 
   sig { returns(T.any(Temporalio::Client::Connection::TLSOptions, FalseClass)) }
@@ -107,7 +107,7 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
     override_env_vars: T.unsafe(nil)
   ); end
 
-  sig { returns(T::Hash[Symbol, T.anything]) }
+  sig { returns(T::Hash[Symbol, Object]) }
   def to_h; end
 
   sig { returns([T::Array[T.nilable(String)], T::Hash[Symbol, T.anything]]) }
@@ -154,6 +154,6 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
     override_env_vars: T.unsafe(nil)
   ); end
 
-  sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, T.anything]]) }
+  sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, Object]]) }
   def to_h; end
 end

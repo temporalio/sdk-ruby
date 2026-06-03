@@ -5,7 +5,7 @@ require 'support/rbi_paths'
 
 class RbiUntypedCountTest < Minitest::Test
   # Please do not increase this just to pass the test. Use concrete types where possible.
-  ANYTHING_COUNT = 36
+  ANYTHING_COUNT = 31
 
   # Data class initializers cannot be easily typed and are expected to use `T.untyped`
   ALLOWED_UNTYPED_PATTERNS = [
