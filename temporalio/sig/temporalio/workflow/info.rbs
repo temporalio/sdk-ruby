@@ -60,7 +60,7 @@ module Temporalio
           workflow_id: String
         ) -> void
 
-        def to_h: -> Hash[Symbol, untyped]
+        def to_h: -> Hash[Symbol, String]
       end
 
       class RootInfo
@@ -72,7 +72,7 @@ module Temporalio
           workflow_id: String
         ) -> void
 
-        def to_h: -> Hash[Symbol, untyped]
+        def to_h: -> Hash[Symbol, String]
       end
     end
   end

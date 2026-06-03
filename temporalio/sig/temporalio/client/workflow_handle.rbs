@@ -28,6 +28,7 @@ module Temporalio
 
       def fetch_history: (
         ?event_filter_type: Integer,
+        ?skip_archival: bool,
         ?rpc_options: RPCOptions?
       ) -> WorkflowHistory
 
