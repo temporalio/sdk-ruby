@@ -1,0 +1,8 @@
+module Temporalio
+  module Internal
+    module Bridge
+      module Api
+      end
+    end
+  end
+end

@@ -97,13 +97,9 @@ module Temporalio
 
       attr_reader options: Options
 
-      # TODO(cretz): Update when generated
-      # attr_reader workflow_service: WorkflowService
-      # attr_reader operator_service: OperatorService
-      # attr_reader cloud_service: CloudService
-      attr_reader workflow_service: untyped
-      attr_reader operator_service: untyped
-      attr_reader cloud_service: untyped
+      attr_reader workflow_service: WorkflowService
+      attr_reader operator_service: OperatorService
+      attr_reader cloud_service: CloudService
 
       def initialize: (
         target_host: String,
