@@ -1,8 +1,0 @@
-module Temporalio
-  module Api
-    module Cloud
-      module CloudService
-      end
-    end
-  end
-end

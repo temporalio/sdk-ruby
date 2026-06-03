@@ -1,6 +1,0 @@
-module Temporalio
-  module Api
-    module OperatorService
-    end
-  end
-end

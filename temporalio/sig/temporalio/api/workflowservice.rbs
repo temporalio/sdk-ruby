@@ -1,6 +1,0 @@
-module Temporalio
-  module Api
-    module WorkflowService
-    end
-  end
-end
