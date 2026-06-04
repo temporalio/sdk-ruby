@@ -2,11 +2,13 @@ module Temporalio
   module Activity
     class Info
       attr_reader activity_id: String
+      attr_reader activity_run_id: String?
       attr_reader activity_type: String
       attr_reader attempt: Integer
       attr_reader current_attempt_scheduled_time: Time
       attr_reader heartbeat_timeout: Float?
       attr_reader local?: bool
+      attr_reader namespace: String
       attr_reader priority: Temporalio::Priority
       attr_reader raw_heartbeat_details: Array[Converters::RawValue]
       attr_reader retry_policy: RetryPolicy?
@@ -16,18 +18,20 @@ module Temporalio
       attr_reader started_time: Time
       attr_reader task_queue: String
       attr_reader task_token: String
-      attr_reader workflow_id: String
-      attr_reader workflow_namespace: String
-      attr_reader workflow_run_id: String
-      attr_reader workflow_type: String
+      attr_reader workflow_id: String?
+      attr_reader workflow_namespace: String?
+      attr_reader workflow_run_id: String?
+      attr_reader workflow_type: String?
 
       def initialize: (
         activity_id: String,
+        activity_run_id: String?,
         activity_type: String,
         attempt: Integer,
         current_attempt_scheduled_time: Time,
         heartbeat_timeout: Float?,
         local?: bool,
+        namespace: String,
         priority: Temporalio::Priority?,
         raw_heartbeat_details: Array[Converters::RawValue],
         retry_policy: RetryPolicy?,
@@ -37,11 +41,13 @@ module Temporalio
         started_time: Time,
         task_queue: String,
         task_token: String,
-        workflow_id: String,
-        workflow_namespace: String,
-        workflow_run_id: String,
-        workflow_type: String
+        workflow_id: String?,
+        workflow_namespace: String?,
+        workflow_run_id: String?,
+        workflow_type: String?
       ) -> void
+
+      def in_workflow?: -> bool
 
       def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
 

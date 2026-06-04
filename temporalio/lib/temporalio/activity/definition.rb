@@ -155,6 +155,28 @@ module Temporalio
         # @return [Object, nil] Result hint
         attr_reader :result_hint
 
+        # Resolve an activity argument into a `[name, arg_hints, result_hint]` triple. Used by
+        # `Client#start_activity` to accept any of: a `Definition` subclass, an instance of one,
+        # an `Info`, a `Symbol` activity name, or a `String` activity name. Class/instance/Info
+        # inputs carry their definition's hints; Symbol/String inputs return `nil` hints.
+        #
+        # @param activity [Class<Definition>, Definition, Info, Symbol, String] Activity argument.
+        # @return [Array(String, Array[Object]?, Object?)] name, arg_hints, result_hint.
+        def self._type_and_hints_from_parameter(activity)
+          case activity
+          when String, Symbol
+            [activity.to_s, nil, nil]
+          when Class, Definition, Info
+            # Return or construct an Info -- needed because we want the checks in Info.initialize.
+            info = from_activity(activity)
+            raise ArgumentError, 'Cannot pass dynamic activity to start_activity' unless info.name
+
+            [info.name.to_s, info.arg_hints, info.result_hint]
+          else
+            raise ArgumentError, "#{activity} is not an activity class, instance, info, symbol, or string"
+          end
+        end
+
         # Obtain definition info representing the given activity, which can be a class, instance, or definition info.
         #
         # @param activity [Definition, Class<Definition>, Info] Activity to get info for.

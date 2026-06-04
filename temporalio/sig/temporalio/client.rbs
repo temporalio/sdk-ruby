@@ -71,6 +71,7 @@ module Temporalio
     def connection: -> Connection
     def namespace: -> String
     def data_converter: -> Converters::DataConverter
+    def _impl: -> Interceptor::Outbound
     def workflow_service: -> Connection::WorkflowService
     def operator_service: -> Connection::OperatorService
 
@@ -130,6 +131,58 @@ module Temporalio
       ?first_execution_run_id: String?,
       ?result_hint: Object?
     ) -> WorkflowHandle
+
+    def activity_handle: (
+      String activity_id,
+      ?activity_run_id: String?,
+      ?result_hint: Object?
+    ) -> ActivityHandle
+
+    def start_activity: (
+      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      *Object? args,
+      id: String,
+      task_queue: String,
+      ?schedule_to_close_timeout: duration?,
+      ?schedule_to_start_timeout: duration?,
+      ?start_to_close_timeout: duration?,
+      ?heartbeat_timeout: duration?,
+      ?id_reuse_policy: ActivityIDReusePolicy::enum,
+      ?id_conflict_policy: ActivityIDConflictPolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?search_attributes: SearchAttributes?,
+      ?static_summary: String?,
+      ?static_details: String?,
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
+      ?rpc_options: RPCOptions?
+    ) -> ActivityHandle
+
+    def execute_activity: (
+      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      *Object? args,
+      id: String,
+      task_queue: String,
+      ?schedule_to_close_timeout: duration?,
+      ?schedule_to_start_timeout: duration?,
+      ?start_to_close_timeout: duration?,
+      ?heartbeat_timeout: duration?,
+      ?id_reuse_policy: ActivityIDReusePolicy::enum,
+      ?id_conflict_policy: ActivityIDConflictPolicy::enum,
+      ?retry_policy: RetryPolicy?,
+      ?search_attributes: SearchAttributes?,
+      ?static_summary: String?,
+      ?static_details: String?,
+      ?priority: Priority,
+      ?arg_hints: Array[Object]?,
+      ?result_hint: Object?,
+      ?rpc_options: RPCOptions?
+    ) -> Object?
+
+    def list_activities: (String query, ?rpc_options: RPCOptions?) -> Enumerator[ActivityExecution, ActivityExecution]
+
+    def count_activities: (String query, ?rpc_options: RPCOptions?) -> ActivityExecutionCount
 
     def start_update_with_start_workflow: (
       Workflow::Definition::Update | Symbol | String update,

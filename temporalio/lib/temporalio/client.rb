@@ -3,6 +3,7 @@
 require 'google/protobuf/well_known_types'
 require 'logger'
 require 'temporalio/api'
+require 'temporalio/client/activity_handle'
 require 'temporalio/client/async_activity_handle'
 require 'temporalio/client/connection'
 require 'temporalio/client/interceptor'
@@ -476,6 +477,189 @@ module Temporalio
       WorkflowHandle.new(
         client: self, id: workflow_id, run_id:, result_run_id: run_id, first_execution_run_id:, result_hint:
       )
+    end
+
+    # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
+    # (a different process, or by another client) and you have only its ID.
+    #
+    # @param activity_id [String] ID for the activity.
+    # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
+    #   latest run of the given activity ID.
+    # @param result_hint [Object, nil] Converter hint for the activity's result. Set this when you know what
+    #   type the activity returns so {ActivityHandle#result}'s deserialization uses the right hint.
+    #
+    # @return [ActivityHandle] The activity handle.
+    def activity_handle(activity_id, activity_run_id: nil, result_hint: nil)
+      ActivityHandle.new(client: self, id: activity_id, run_id: activity_run_id, result_hint:)
+    end
+
+    # Start a standalone activity execution and return its handle.
+    #
+    # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
+    #   Activity definition, definition class or activity name.
+    # @param args [Array<Object>] Arguments to the activity.
+    # @param id [String] Unique identifier for the activity execution.
+    # @param task_queue [String] Task queue to run the activity on.
+    # @param schedule_to_close_timeout [Float, nil] Schedule-to-close timeout in seconds. Either this or
+    #   `start_to_close_timeout` must be specified.
+    # @param schedule_to_start_timeout [Float, nil] Schedule-to-start timeout in seconds.
+    # @param start_to_close_timeout [Float, nil] Start-to-close timeout in seconds. Either this or
+    #   `schedule_to_close_timeout` must be specified.
+    # @param heartbeat_timeout [Float, nil] Heartbeat timeout in seconds.
+    # @param id_reuse_policy [ActivityIDReusePolicy] Controls behavior when an activity with the same ID
+    #   was previously run and has reached a terminal state. Defaults to `ALLOW_DUPLICATE`.
+    # @param id_conflict_policy [ActivityIDConflictPolicy] Controls behavior when an activity with the same ID
+    #   is currently running. Defaults to `FAIL` (reject the start attempt).
+    # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
+    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
+    # @param priority [Priority] Priority for the activity.
+    # @param arg_hints [Array<Object>, nil] Argument hints.
+    # @param result_hint [Object, nil] Result hint.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [ActivityHandle] Handle to the started activity.
+    # @raise [Error::ActivityAlreadyStartedError] Activity already exists with this ID.
+    # @raise [Error::RPCError] RPC error from call.
+    def start_activity(
+      activity,
+      *args,
+      id:,
+      task_queue:,
+      schedule_to_close_timeout: nil,
+      schedule_to_start_timeout: nil,
+      start_to_close_timeout: nil,
+      heartbeat_timeout: nil,
+      id_reuse_policy: ActivityIDReusePolicy::ALLOW_DUPLICATE,
+      id_conflict_policy: ActivityIDConflictPolicy::FAIL,
+      retry_policy: nil,
+      search_attributes: nil,
+      static_summary: nil,
+      static_details: nil,
+      priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil,
+      rpc_options: nil
+    )
+      activity_name, defn_arg_hints, defn_result_hint =
+        Activity::Definition::Info._type_and_hints_from_parameter(activity)
+      @impl.start_activity(Interceptor::StartActivityInput.new(
+                             activity: activity_name,
+                             args:,
+                             activity_id: id,
+                             task_queue:,
+                             schedule_to_close_timeout:,
+                             schedule_to_start_timeout:,
+                             start_to_close_timeout:,
+                             heartbeat_timeout:,
+                             id_reuse_policy:,
+                             id_conflict_policy:,
+                             retry_policy:,
+                             search_attributes:,
+                             static_summary:,
+                             static_details:,
+                             headers: {},
+                             priority:,
+                             arg_hints: arg_hints || defn_arg_hints,
+                             result_hint: result_hint || defn_result_hint,
+                             rpc_options:
+                           ))
+    end
+
+    # Start a standalone activity execution and wait for its result. Shortcut for
+    # {start_activity} + {ActivityHandle#result}.
+    #
+    # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
+    #   Activity definition, definition class or activity name.
+    # @param args [Array<Object>] Arguments to the activity.
+    # @param id [String] Unique identifier for the activity execution.
+    # @param task_queue [String] Task queue to run the activity on.
+    # @param schedule_to_close_timeout [Float, nil] Schedule-to-close timeout in seconds. Either this or
+    #   `start_to_close_timeout` must be specified.
+    # @param schedule_to_start_timeout [Float, nil] Schedule-to-start timeout in seconds.
+    # @param start_to_close_timeout [Float, nil] Start-to-close timeout in seconds. Either this or
+    #   `schedule_to_close_timeout` must be specified.
+    # @param heartbeat_timeout [Float, nil] Heartbeat timeout in seconds.
+    # @param id_reuse_policy [ActivityIDReusePolicy] Controls behavior when an activity with the same ID
+    #   was previously run and has reached a terminal state. Defaults to `ALLOW_DUPLICATE`.
+    # @param id_conflict_policy [ActivityIDConflictPolicy] Controls behavior when an activity with the same ID
+    #   is currently running. Defaults to `FAIL` (reject the start attempt).
+    # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
+    # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
+    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
+    # @param priority [Priority] Priority for the activity.
+    # @param arg_hints [Array<Object>, nil] Argument hints.
+    # @param result_hint [Object, nil] Result hint.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Object, nil] Successful result of the activity.
+    # @raise [Error::ActivityAlreadyStartedError] Activity already exists with this ID.
+    # @raise [Error::ActivityFailedError] With `cause` populated from the activity failure.
+    # @raise [Error::RPCError] RPC error from call.
+    def execute_activity(
+      activity,
+      *args,
+      id:,
+      task_queue:,
+      schedule_to_close_timeout: nil,
+      schedule_to_start_timeout: nil,
+      start_to_close_timeout: nil,
+      heartbeat_timeout: nil,
+      id_reuse_policy: ActivityIDReusePolicy::ALLOW_DUPLICATE,
+      id_conflict_policy: ActivityIDConflictPolicy::FAIL,
+      retry_policy: nil,
+      search_attributes: nil,
+      static_summary: nil,
+      static_details: nil,
+      priority: Priority.default,
+      arg_hints: nil,
+      result_hint: nil,
+      rpc_options: nil
+    )
+      start_activity(
+        activity,
+        *args,
+        id:,
+        task_queue:,
+        schedule_to_close_timeout:,
+        schedule_to_start_timeout:,
+        start_to_close_timeout:,
+        heartbeat_timeout:,
+        id_reuse_policy:,
+        id_conflict_policy:,
+        retry_policy:,
+        search_attributes:,
+        static_summary:,
+        static_details:,
+        priority:,
+        arg_hints:,
+        result_hint:,
+        rpc_options:
+      ).result
+    end
+
+    # List standalone activities matching a visibility query.
+    #
+    # @param query [String] Visibility list filter.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [Enumerator<ActivityExecution>] Lazy enumerable of matching activity executions.
+    # @raise [Error::RPCError] RPC error from call.
+    def list_activities(query, rpc_options: nil)
+      @impl.list_activities(Interceptor::ListActivitiesInput.new(query:, rpc_options:))
+    end
+
+    # Count standalone activities matching a visibility query.
+    #
+    # @param query [String] Visibility list filter.
+    # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+    #
+    # @return [ActivityExecutionCount] Count of activities (with per-group counts if the query had a group-by clause).
+    # @raise [Error::RPCError] RPC error from call.
+    def count_activities(query, rpc_options: nil)
+      @impl.count_activities(Interceptor::CountActivitiesInput.new(query:, rpc_options:))
     end
 
     # Start an update, possibly starting the workflow at the same time if it doesn't exist (depending upon ID conflict

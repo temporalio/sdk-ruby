@@ -168,9 +168,18 @@ module Temporalio
         end
 
         def execute_activity(task_token, defn, start)
-          # Build info
+          # Build info. Standalone activities have some empty fields on the wire; translate
+          # empty strings to nil for the user-facing Info fields.
+          workflow_id = Internal::ProtoUtils.string_or(start.workflow_execution&.workflow_id, nil)
+          workflow_run_id = Internal::ProtoUtils.string_or(start.workflow_execution&.run_id, nil)
+          workflow_type = Internal::ProtoUtils.string_or(start.workflow_type, nil)
+          activity_run_id = Internal::ProtoUtils.string_or(start.run_id, nil)
+          # `namespace` is always set. `workflow_namespace` is the deprecated accessor, nil for standalone activities.
+          namespace = Internal::ProtoUtils.string_or(start.workflow_namespace, @worker.options.client.namespace)
+          workflow_namespace = workflow_id.nil? ? nil : namespace
           info = Activity::Info.new(
             activity_id: start.activity_id,
+            activity_run_id: activity_run_id,
             activity_type: start.activity_type,
             attempt: start.attempt,
             current_attempt_scheduled_time: Internal::ProtoUtils.timestamp_to_time(
@@ -178,6 +187,7 @@ module Temporalio
             ) || raise, # Never nil
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
+            namespace: namespace,
             priority: Priority._from_proto(start.priority),
             raw_heartbeat_details: begin
               payloads = start.heartbeat_details.to_ary
@@ -192,10 +202,10 @@ module Temporalio
             started_time: Internal::ProtoUtils.timestamp_to_time(start.started_time) || raise, # Never nil
             task_queue: @worker.options.task_queue,
             task_token:,
-            workflow_id: start.workflow_execution.workflow_id,
-            workflow_namespace: start.workflow_namespace,
-            workflow_run_id: start.workflow_execution.run_id,
-            workflow_type: start.workflow_type
+            workflow_id: workflow_id,
+            workflow_namespace: workflow_namespace,
+            workflow_run_id: workflow_run_id,
+            workflow_type: workflow_type
           )
 
           # Build input

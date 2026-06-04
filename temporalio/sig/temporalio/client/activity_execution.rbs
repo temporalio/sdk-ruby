@@ -1,0 +1,50 @@
+module Temporalio
+  class Client
+    class ActivityExecution
+      attr_reader raw_info: Api::Activity::V1::ActivityExecutionListInfo | Api::Activity::V1::ActivityExecutionInfo
+
+      def initialize: (Api::Activity::V1::ActivityExecutionListInfo | Api::Activity::V1::ActivityExecutionInfo raw_info) -> void
+
+      def activity_id: -> String
+      def activity_run_id: -> String?
+      def activity_type: -> String
+      def schedule_time: -> Time?
+      def close_time: -> Time?
+      def status: -> ActivityExecutionStatus::enum
+      def search_attributes: -> SearchAttributes?
+      def task_queue: -> String
+      def execution_duration: -> Float?
+
+      class Description < ActivityExecution
+        attr_reader raw_description: Api::WorkflowService::V1::DescribeActivityExecutionResponse
+
+        def initialize: (Api::WorkflowService::V1::DescribeActivityExecutionResponse raw_description, Converters::DataConverter data_converter) -> void
+
+        def run_state: -> PendingActivityState::enum?
+        def schedule_to_close_timeout: -> Float?
+        def schedule_to_start_timeout: -> Float?
+        def start_to_close_timeout: -> Float?
+        def heartbeat_timeout: -> Float?
+        def has_heartbeat_details?: -> bool
+        def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
+        def retry_policy: -> RetryPolicy
+        def last_heartbeat_time: -> Time?
+        def last_started_time: -> Time?
+        def attempt: -> Integer
+        def last_failure: -> Error::Failure?
+        def expiration_time: -> Time?
+        def last_worker_identity: -> String?
+        def current_retry_interval: -> Float?
+        def last_attempt_complete_time: -> Time?
+        def next_attempt_schedule_time: -> Time?
+        def last_deployment_version: -> WorkerDeploymentVersion?
+        def priority: -> Priority
+        def canceled_reason: -> String?
+        def static_summary: -> String?
+        def static_details: -> String?
+
+        private def user_metadata: -> [String?, String?]
+      end
+    end
+  end
+end

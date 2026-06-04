@@ -1092,6 +1092,63 @@ it will raise the error raised in the activity.
 The constructor of the environment has multiple keyword arguments that can be set to affect the activity context for the
 activity.
 
+#### Standalone Activities
+
+Activities can be started directly from a client, outside the context of any workflow. Standalone activities reuse the
+existing `Activity::Definition` class — the same activity code runs whether invoked from a workflow or as a standalone
+activity. They are addressed by `activity_id` (with an optional `activity_run_id` for disambiguating re-runs).
+
+Start a standalone activity:
+
+```ruby
+handle = client.start_activity(
+  MyActivity,
+  'some-arg',
+  id: 'my-activity-id',
+  task_queue: 'my-task-queue',
+  start_to_close_timeout: 60
+)
+result = handle.result   # blocks until the activity completes
+```
+
+Or use the execute helper to start and wait:
+
+```ruby
+result = client.execute_activity(
+  MyActivity, 'some-arg',
+  id: 'my-activity-id', task_queue: 'my-task-queue', start_to_close_timeout: 60
+)
+```
+
+Get a handle to an existing standalone activity to describe, cancel, terminate, or fetch its result:
+
+```ruby
+handle = client.activity_handle('my-activity-id')
+description = handle.describe       # ActivityExecution::Description
+result = handle.result              # blocks until the activity reaches a terminal state
+handle.cancel('reason for cancel')  # or
+handle.terminate('reason for terminate')
+```
+
+List and count standalone activities (visibility queries):
+
+```ruby
+client.list_activities('ActivityType="MyActivity"').each { |exec| puts exec.activity_id }
+count = client.count_activities('ActivityType="MyActivity"').count
+```
+
+Inside an activity body, `Temporalio::Activity::Context.current.info` exposes whether the activity is standalone
+or workflow-scheduled:
+
+```ruby
+info = Temporalio::Activity::Context.current.info
+if info.in_workflow?
+  # info.workflow_id, info.workflow_run_id, info.workflow_type are set
+else
+  # info.activity_run_id is set; workflow_* fields are nil
+end
+```
+
 ### Telemetry
 
 #### Metrics

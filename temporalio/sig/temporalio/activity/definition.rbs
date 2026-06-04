@@ -41,6 +41,10 @@ module Temporalio
 
         def self.from_activity: (Definition | singleton(Definition) | Info activity) -> Info
 
+        def self._type_and_hints_from_parameter: (
+          singleton(Definition) | Definition | Info | Symbol | String activity
+        ) -> [String, Array[Object]?, Object?]
+
         def initialize: (
           name: String | Symbol | nil,
           ?instance: Object | Proc | nil,

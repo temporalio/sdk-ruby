@@ -29,6 +29,26 @@ module Temporalio
       end
     end
 
+    # Error raised by a client when a standalone activity execution has already started.
+    class ActivityAlreadyStartedError < Failure
+      # @return [String] ID of the already-started activity.
+      attr_reader :activity_id
+
+      # @return [String] Activity type name of the already-started activity.
+      attr_reader :activity_type
+
+      # @return [String, nil] Run ID of the already-started activity if known.
+      attr_reader :activity_run_id
+
+      # @!visibility private
+      def initialize(activity_id:, activity_type:, activity_run_id:)
+        super('Activity execution already started')
+        @activity_id = activity_id
+        @activity_type = activity_type
+        @activity_run_id = activity_run_id
+      end
+    end
+
     # Error raised during workflow/activity execution.
     class ApplicationError < Failure
       # @return [Array<Object, nil>] User-defined details on the error.

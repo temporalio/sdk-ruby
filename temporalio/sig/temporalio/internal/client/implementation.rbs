@@ -2,13 +2,31 @@ module Temporalio
   module Internal
     module Client
       class Implementation < Temporalio::Client::Interceptor::Outbound
+        STANDALONE_ACTIVITY_RESOURCE_ID_PREFIX: String
+
+        def self._activity_id_reference_request_fields: (Temporalio::Client::ActivityIDReference ref) -> Hash[Symbol, String?]
+
         def self.with_default_rpc_options: (Temporalio::Client::RPCOptions? user_rpc_options) -> Temporalio::Client::RPCOptions
 
         def initialize: (Temporalio::Client client) -> void
-                      
+
         def _start_workflow_request_from_with_start_options: (
           untyped klass, Temporalio::Client::WithStartWorkflowOperation::Options start_options
         ) -> untyped
+
+        def start_activity: (Temporalio::Client::Interceptor::StartActivityInput input) -> Temporalio::Client::ActivityHandle
+
+        def describe_activity: (Temporalio::Client::Interceptor::DescribeActivityInput input) -> Temporalio::Client::ActivityExecution::Description
+
+        def cancel_activity: (Temporalio::Client::Interceptor::CancelActivityInput input) -> void
+
+        def terminate_activity: (Temporalio::Client::Interceptor::TerminateActivityInput input) -> void
+
+        def list_activities: (Temporalio::Client::Interceptor::ListActivitiesInput input) -> Enumerator[Temporalio::Client::ActivityExecution, Temporalio::Client::ActivityExecution]
+
+        def count_activities: (Temporalio::Client::Interceptor::CountActivitiesInput input) -> Temporalio::Client::ActivityExecutionCount
+
+        def fetch_activity_outcome: (Temporalio::Client::Interceptor::FetchActivityOutcomeInput input) -> Temporalio::Api::Activity::V1::ActivityExecutionOutcome?
       end
     end
   end

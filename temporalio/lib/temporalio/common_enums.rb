@@ -84,6 +84,30 @@ module Temporalio
       Api::Enums::V1::SuggestContinueAsNewReason::SUGGEST_CONTINUE_AS_NEW_REASON_TOO_MANY_UPDATES
   end
 
+  # Controls behavior when an activity with the same ID was previously run and is now closed.
+  #
+  # @see https://docs.temporal.io/activities
+  module ActivityIDReusePolicy
+    # Always allow starting an activity using the same activity ID.
+    ALLOW_DUPLICATE = Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_ALLOW_DUPLICATE
+    # Allow starting an activity using the same ID only when the last activity execution was not successful.
+    ALLOW_DUPLICATE_FAILED_ONLY =
+      Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_ALLOW_DUPLICATE_FAILED_ONLY
+    # Do not permit re-use of the ID for this activity. Future start requests could potentially change the policy,
+    # allowing re-use of the ID.
+    REJECT_DUPLICATE = Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_REJECT_DUPLICATE
+  end
+
+  # Controls behavior when an activity with the same ID is currently running.
+  #
+  # @see https://docs.temporal.io/activities
+  module ActivityIDConflictPolicy
+    # Don't start a new activity; instead fail with already-started error.
+    FAIL = Api::Enums::V1::ActivityIdConflictPolicy::ACTIVITY_ID_CONFLICT_POLICY_FAIL
+    # Don't start a new activity; instead return a handle for the running activity.
+    USE_EXISTING = Api::Enums::V1::ActivityIdConflictPolicy::ACTIVITY_ID_CONFLICT_POLICY_USE_EXISTING
+  end
+
   # Specifies when a workflow might move from a worker of one Build Id to another.
   module VersioningBehavior
     # Unspecified versioning behavior. By default, workers opting into worker versioning will

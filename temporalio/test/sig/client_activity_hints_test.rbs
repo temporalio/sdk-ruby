@@ -1,0 +1,5 @@
+class ClientActivityHintsTest < Test
+  @hint_converter: untyped
+
+  def build_tracking_client: -> Temporalio::Client
+end

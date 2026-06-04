@@ -1,0 +1,26 @@
+module Temporalio
+  class Client
+    class ActivityHandle
+      attr_reader id: String
+      attr_reader run_id: String?
+      attr_reader result_hint: Object?
+
+      def initialize: (
+        client: Client,
+        id: String,
+        run_id: String?,
+        result_hint: Object?
+      ) -> void
+
+      def result: (?result_hint: Object?, ?rpc_options: RPCOptions?) -> Object?
+
+      def describe: (?rpc_options: RPCOptions?) -> ActivityExecution::Description
+
+      def cancel: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      def terminate: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
+    end
+  end
+end

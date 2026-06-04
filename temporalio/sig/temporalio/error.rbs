@@ -12,6 +12,10 @@ module Temporalio
       def initialize: -> void
     end
 
+    class ActivityFailedError < Error
+      def initialize: -> void
+    end
+
     class WorkflowContinuedAsNewError < Error
       attr_reader new_run_id: String
 

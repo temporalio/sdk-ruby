@@ -1,0 +1,3 @@
+class ClientActivityAsyncCompletionTest < Test
+  def with_async_worker: () { (String) -> untyped } -> untyped
+end

@@ -1,0 +1,15 @@
+module Temporalio
+  class Client
+    module ActivityExecutionStatus
+      type enum = Integer
+
+      UNSPECIFIED: enum
+      RUNNING: enum
+      COMPLETED: enum
+      FAILED: enum
+      CANCELED: enum
+      TERMINATED: enum
+      TIMED_OUT: enum
+    end
+  end
+end

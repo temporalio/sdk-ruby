@@ -7,11 +7,13 @@ module Temporalio
   module Activity
     Info = Data.define(
       :activity_id,
+      :activity_run_id,
       :activity_type,
       :attempt,
       :current_attempt_scheduled_time,
       :heartbeat_timeout,
       :local?,
+      :namespace,
       :priority,
       :retry_policy,
       :raw_heartbeat_details,
@@ -31,16 +33,20 @@ module Temporalio
     #
     # @!attribute activity_id
     #   @return [String] ID for the activity.
+    # @!attribute activity_run_id
+    #   @return [String, nil] Run ID for a standalone activity execution. nil for activities scheduled from a workflow.
     # @!attribute activity_type
     #   @return [String] Type name for the activity.
     # @!attribute attempt
-    #   @return [Integer] Attempt the activity is on.
+    #   @return [Integer] Attempt the activity is on. Attempts start at 1 and increment on each retry.
     # @!attribute current_attempt_scheduled_time
     #   @return [Time] When the current attempt was scheduled.
     # @!attribute heartbeat_timeout
     #   @return [Float, nil] Heartbeat timeout set by the caller.
     # @!attribute local?
     #   @return [Boolean] Whether the activity is a local activity or not.
+    # @!attribute namespace
+    #   @return [String] Namespace this activity is on.
     # @!attribute priority
     #   @return [Priority] The priority of this activity.
     # @!attribute retry_policy
@@ -64,17 +70,24 @@ module Temporalio
     #   @return [String] Task token uniquely identifying this activity. Note, this is a `ASCII-8BIT` encoded string, not
     #     a `UTF-8` encoded string nor a valid UTF-8 string.
     # @!attribute workflow_id
-    #   @return [String] Workflow ID that started this activity.
+    #   @return [String, nil] Workflow ID that started this activity. nil for standalone activities.
     # @!attribute workflow_namespace
-    #   @return [String] Namespace this activity is on.
+    #   @return [String, nil] Namespace of the workflow that scheduled this activity. Nil for standalone
+    #     activities. Prefer {#namespace}, which is always set.
+    #   @deprecated Use {#namespace} instead.
     # @!attribute workflow_run_id
-    #   @return [String] Workflow run ID that started this activity.
+    #   @return [String, nil] Workflow run ID that started this activity. nil for standalone activities.
     # @!attribute workflow_type
-    #   @return [String] Workflow type name that started this activity.
+    #   @return [String, nil] Workflow type name that started this activity. nil for standalone activities.
     #
     # @note WARNING: This class may have required parameters added to its constructor. Users should not instantiate this
     #   class or it may break in incompatible ways.
     class Info
+      # @return [Boolean] True if this activity was scheduled by a workflow execution; false for standalone activities.
+      def in_workflow?
+        !workflow_id.nil?
+      end
+
       # Convert raw heartbeat details into Ruby types.
       #
       # Note, this live-converts every invocation.

@@ -41,4 +41,20 @@ module Temporalio
     PINNED: enum
     AUTO_UPGRADE: enum
   end
+
+  module ActivityIDReusePolicy
+    type enum = Integer
+
+    ALLOW_DUPLICATE: enum
+    ALLOW_DUPLICATE_FAILED_ONLY: enum
+    REJECT_DUPLICATE: enum
+  end
+
+  module ActivityIDConflictPolicy
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    FAIL: enum
+    USE_EXISTING: enum
+  end
 end
