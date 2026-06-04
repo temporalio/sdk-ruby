@@ -1,0 +1,44 @@
+module Temporalio
+  class Client
+    class NexusClient
+      attr_reader endpoint: String
+      attr_reader service: String
+
+      def initialize: (
+        client: Client,
+        endpoint: String,
+        service: String
+      ) -> void
+
+      def start_operation: (
+        String | Symbol operation,
+        ?Object? input,
+        ?id: String,
+        ?schedule_to_close_timeout: Float?,
+        ?schedule_to_start_timeout: Float?,
+        ?start_to_close_timeout: Float?,
+        ?id_reuse_policy: Integer,
+        ?id_conflict_policy: Integer,
+        ?search_attributes: SearchAttributes?,
+        ?nexus_header: Hash[String, String],
+        ?static_summary: String?,
+        ?rpc_options: RPCOptions?
+      ) -> NexusOperationHandle
+
+      def execute_operation: (
+        String | Symbol operation,
+        ?Object? input,
+        ?id: String,
+        ?schedule_to_close_timeout: Float?,
+        ?schedule_to_start_timeout: Float?,
+        ?start_to_close_timeout: Float?,
+        ?id_reuse_policy: Integer,
+        ?id_conflict_policy: Integer,
+        ?search_attributes: SearchAttributes?,
+        ?nexus_header: Hash[String, String],
+        ?static_summary: String?,
+        ?rpc_options: RPCOptions?
+      ) -> Object?
+    end
+  end
+end

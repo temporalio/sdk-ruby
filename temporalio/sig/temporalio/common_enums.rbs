@@ -34,6 +34,22 @@ module Temporalio
     TOO_MANY_UPDATES: enum
   end
 
+  module NexusOperationIDReusePolicy
+    type enum = Integer
+
+    ALLOW_DUPLICATE: enum
+    ALLOW_DUPLICATE_FAILED_ONLY: enum
+    REJECT_DUPLICATE: enum
+  end
+
+  module NexusOperationIDConflictPolicy
+    type enum = Integer
+
+    UNSPECIFIED: enum
+    FAIL: enum
+    USE_EXISTING: enum
+  end
+
   module VersioningBehavior
     type enum = Integer
 

@@ -1,0 +1,32 @@
+module Temporalio
+  class Client
+    class NexusOperationHandle
+      attr_reader operation_id: String
+      attr_reader run_id: String?
+
+      def initialize: (
+        client: Client,
+        operation_id: String,
+        run_id: String?
+      ) -> void
+
+      def result: (
+        ?rpc_options: RPCOptions?
+      ) -> Object?
+
+      def describe: (
+        ?rpc_options: RPCOptions?
+      ) -> untyped
+
+      def cancel: (
+        ?reason: String?,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def terminate: (
+        ?reason: String?,
+        ?rpc_options: RPCOptions?
+      ) -> void
+    end
+  end
+end

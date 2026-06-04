@@ -147,7 +147,7 @@ class Test < Minitest::Test
       if target_host.empty?
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
-          dev_server_download_version: 'v1.7.0',
+          dev_server_download_version: 'v1.7.1-standalone-nexus-operations',
           dev_server_extra_args: [
             # Allow continue as new to be immediate
             '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
@@ -156,7 +156,21 @@ class Test < Minitest::Test
             '--dynamic-config-value', 'frontend.enableCancelWorkerPollsOnShutdown=true',
             '--dynamic-config-value', 'system.enableDeploymentVersions=true',
             # Enable activity pause
-            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true'
+            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true',
+            # Enable standalone Nexus operations
+            '--http-port', '7243',
+            '--dynamic-config-value', 'nexusoperation.enableStandalone=true',
+            '--dynamic-config-value', 'component.nexusoperations.useSystemCallbackURL=false',
+            '--dynamic-config-value',
+            'component.nexusoperations.callback.endpoint.template="http://localhost:7243/namespaces/{{.NamespaceName}}/nexus/callback"',
+            '--dynamic-config-value', 'system.refreshNexusEndpointsMinWait="0s"',
+            '--dynamic-config-value', 'component.nexusoperations.recordCancelRequestCompletionEvents=true',
+            '--dynamic-config-value', 'activity.enableStandalone=true',
+            '--dynamic-config-value', 'component.callbacks.allowedAddresses=[{"Pattern":"*","AllowInsecure":true}]',
+            '--dynamic-config-value', 'history.enableChasm=true',
+            '--dynamic-config-value', 'history.enableTransitionHistory=true',
+            '--dynamic-config-value', 'history.enableChasmCallbacks=true',
+            '--dynamic-config-value', 'history.enableRequestIdRefLinks=true'
           ]
         )
         Minitest.after_run do

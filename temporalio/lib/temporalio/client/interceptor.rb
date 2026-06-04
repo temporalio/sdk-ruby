@@ -259,6 +259,83 @@ module Temporalio
         :rpc_options
       )
 
+      # Input for {Outbound.start_nexus_operation}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      StartNexusOperationInput = Data.define(
+        :endpoint,
+        :service,
+        :operation,
+        :input,
+        :operation_id,
+        :schedule_to_close_timeout,
+        :schedule_to_start_timeout,
+        :start_to_close_timeout,
+        :id_reuse_policy,
+        :id_conflict_policy,
+        :search_attributes,
+        :nexus_header,
+        :static_summary,
+        :headers,
+        :rpc_options
+      )
+
+      # Input for {Outbound.describe_nexus_operation}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      DescribeNexusOperationInput = Data.define(
+        :operation_id,
+        :run_id,
+        :rpc_options
+      )
+
+      # Input for {Outbound.cancel_nexus_operation}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      CancelNexusOperationInput = Data.define(
+        :operation_id,
+        :run_id,
+        :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.terminate_nexus_operation}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      TerminateNexusOperationInput = Data.define(
+        :operation_id,
+        :run_id,
+        :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.poll_nexus_operation}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      PollNexusOperationInput = Data.define(
+        :operation_id,
+        :run_id,
+        :rpc_options
+      )
+
+      # Input for {Outbound.list_nexus_operation_page}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      ListNexusOperationPageInput = Data.define(
+        :query,
+        :next_page_token,
+        :page_size,
+        :rpc_options
+      )
+
+      # Input for {Outbound.count_nexus_operations}.
+      #
+      # WARNING: Standalone Nexus operations are experimental.
+      CountNexusOperationsInput = Data.define(
+        :query,
+        :rpc_options
+      )
+
       # Outbound interceptor for intercepting client calls. This should be extended by users needing to intercept client
       # actions.
       class Outbound
@@ -466,6 +543,73 @@ module Temporalio
         # @param input [ReportCancellationAsyncActivityInput] Input.
         def report_cancellation_async_activity(input)
           next_interceptor.report_cancellation_async_activity(input)
+        end
+
+        # Called for every {NexusClient.start_operation} and {NexusClient.execute_operation} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [StartNexusOperationInput] Input.
+        # @return [NexusOperationHandle] Nexus operation handle.
+        def start_nexus_operation(input)
+          next_interceptor.start_nexus_operation(input)
+        end
+
+        # Called for every {NexusOperationHandle.describe} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [DescribeNexusOperationInput] Input.
+        def describe_nexus_operation(input)
+          next_interceptor.describe_nexus_operation(input)
+        end
+
+        # Called for every {NexusOperationHandle.cancel} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [CancelNexusOperationInput] Input.
+        def cancel_nexus_operation(input)
+          next_interceptor.cancel_nexus_operation(input)
+        end
+
+        # Called for every {NexusOperationHandle.terminate} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [TerminateNexusOperationInput] Input.
+        def terminate_nexus_operation(input)
+          next_interceptor.terminate_nexus_operation(input)
+        end
+
+        # Called for every {Client.list_nexus_operation_page} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [ListNexusOperationPageInput] Input.
+        # @return [Client::ListNexusOperationPage] Page of Nexus operations.
+        def list_nexus_operation_page(input)
+          next_interceptor.list_nexus_operation_page(input)
+        end
+
+        # Called for every {Client.count_nexus_operations} call.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [CountNexusOperationsInput] Input.
+        # @return [NexusOperationExecutionCount] Count.
+        def count_nexus_operations(input)
+          next_interceptor.count_nexus_operations(input)
+        end
+
+        # Called when polling for Nexus operation result.
+        #
+        # WARNING: Standalone Nexus operations are experimental.
+        #
+        # @param input [PollNexusOperationInput] Input.
+        # @return [Object, nil] Result of the operation.
+        def poll_nexus_operation(input)
+          next_interceptor.poll_nexus_operation(input)
         end
       end
     end
