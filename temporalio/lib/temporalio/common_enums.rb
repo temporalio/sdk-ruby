@@ -85,7 +85,6 @@ module Temporalio
   end
 
   # Controls behavior when an activity with the same ID was previously run and is now closed.
-  # Defaults to `ALLOW_DUPLICATE`.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDReusePolicy
@@ -99,12 +98,10 @@ module Temporalio
     REJECT_DUPLICATE = Api::Enums::V1::ActivityIdReusePolicy::ACTIVITY_ID_REUSE_POLICY_REJECT_DUPLICATE
   end
 
-  # Controls behavior when an activity with the same ID is currently running. Defaults to `FAIL`.
+  # Controls behavior when an activity with the same ID is currently running.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDConflictPolicy
-    # Unset.
-    UNSPECIFIED = Api::Enums::V1::ActivityIdConflictPolicy::ACTIVITY_ID_CONFLICT_POLICY_UNSPECIFIED
     # Don't start a new activity; instead fail with already-started error.
     FAIL = Api::Enums::V1::ActivityIdConflictPolicy::ACTIVITY_ID_CONFLICT_POLICY_FAIL
     # Don't start a new activity; instead return a handle for the running activity.
