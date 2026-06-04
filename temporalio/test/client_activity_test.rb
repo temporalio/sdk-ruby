@@ -719,4 +719,128 @@ class ClientActivityTest < Test
       first.terminate('cleanup')
     end
   end
+
+  def test_start_activity_rejects_negative_start_delay
+    err = assert_raises(ArgumentError) do
+      env.client.start_activity(
+        SimpleActivity, 'x',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: 'unreached-tq',
+        start_to_close_timeout: 10,
+        start_delay: -1
+      )
+    end
+    assert_match(/start_delay must be non-negative/i, err.message)
+  end
+
+  def test_start_activity_with_start_delay_dispatches_after_delay
+    delay = 2.0
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      result = env.client.execute_activity(
+        SimpleActivity, 'delayed',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        start_delay: delay
+      )
+      assert_equal 'saa: delayed', result
+      desc = env.client.activity_handle(activity_id).describe
+      assert_equal Temporalio::Client::ActivityExecutionStatus::COMPLETED, desc.status
+      last_started = desc.last_started_time or raise 'last_started_time should be set on a dispatched activity'
+      schedule = desc.schedule_time or raise 'schedule_time should be set'
+      observed_gap = last_started - schedule
+      # 500ms tolerance, matching dotnet/python/ts/go.
+      assert_operator observed_gap, :>=, delay - 0.5,
+                      "Expected dispatch to be delayed by ~#{delay}s; observed gap #{observed_gap}s"
+    end
+  end
+
+  def test_start_activity_with_zero_start_delay_dispatches_immediately
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      result = env.client.execute_activity(
+        SimpleActivity, 'zero-delay',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        start_delay: 0
+      )
+      assert_equal 'saa: zero-delay', result
+      desc = env.client.activity_handle(activity_id).describe
+      last_started = desc.last_started_time or raise 'last_started_time should be set on a dispatched activity'
+      schedule = desc.schedule_time or raise 'schedule_time should be set'
+      observed_gap = last_started - schedule
+      # Without the delay being applied, the gap should be small. 1.0s is generous
+      # for slow CI machines but still well below any plausible "delay" value.
+      assert_operator observed_gap, :<, 1.0,
+                      "Expected near-immediate dispatch with start_delay: 0; observed gap #{observed_gap}s"
+    end
+  end
+
+  def test_cancel_during_start_delay_transitions_to_canceled_immediately
+    # No worker is registered for this task queue, so the activity cannot run.
+    # The 30s delay is far longer than the test can wait — if cancel-during-delay
+    # is broken and the dispatch timer must elapse first, the assert_eventually below
+    # will time out at 10s.
+    task_queue = "saa-tq-no-worker-#{SecureRandom.uuid}"
+    activity_id = "act-#{SecureRandom.uuid}"
+    handle = env.client.start_activity(
+      SimpleActivity, 'should-not-run',
+      id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+      start_delay: 30.0
+    )
+    t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    handle.cancel('canceled-during-delay')
+    assert_eventually do
+      desc = handle.describe
+      assert_equal Temporalio::Client::ActivityExecutionStatus::CANCELED, desc.status
+      assert_nil desc.last_started_time, 'activity should not have started during delay window'
+    end
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0
+    # Cancel must be honored long before the 30s delay would elapse.
+    assert_operator elapsed, :<, 10.0,
+                    "Cancel-during-delay took #{elapsed}s; expected immediate transition"
+  end
+
+  def test_terminate_during_start_delay_transitions_to_terminated_immediately
+    task_queue = "saa-tq-no-worker-#{SecureRandom.uuid}"
+    activity_id = "act-#{SecureRandom.uuid}"
+    handle = env.client.start_activity(
+      SimpleActivity, 'should-not-run',
+      id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+      start_delay: 30.0
+    )
+    t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    handle.terminate('terminated-during-delay')
+    assert_eventually do
+      desc = handle.describe
+      assert_equal Temporalio::Client::ActivityExecutionStatus::TERMINATED, desc.status
+      assert_nil desc.last_started_time, 'activity should not have started during delay window'
+    end
+    elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0
+    assert_operator elapsed, :<, 10.0,
+                    "Terminate-during-delay took #{elapsed}s; expected immediate transition"
+  end
+
+  def test_start_delay_extends_schedule_to_start_timeout
+    # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s). Per the blueprint,
+    # the ScheduleToStart clock starts AFTER the delay elapses, so the activity must still
+    # be dispatched and run successfully. If start_delay were not extending the timeout,
+    # the activity would fail with a ScheduleToStartTimeout before the worker picked it up.
+    delay = 1.0
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      result = env.client.execute_activity(
+        SimpleActivity, 'extended',
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 30,
+        schedule_to_start_timeout: 0.5,
+        start_delay: delay
+      )
+      elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0
+      assert_equal 'saa: extended', result
+      # Belt-and-braces: confirm the delay actually was applied. Without this, the test could
+      # pass for the wrong reason if start_delay were silently ignored (no delay → no timeout
+      # interaction tested at all).
+      assert_operator elapsed, :>=, delay - 0.25,
+                      "Expected total wait to include the #{delay}s start_delay; observed #{elapsed}s"
+    end
+  end
 end

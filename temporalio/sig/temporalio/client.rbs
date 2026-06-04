@@ -154,6 +154,7 @@ module Temporalio
       ?static_summary: String?,
       ?static_details: String?,
       ?priority: Priority,
+      ?start_delay: duration?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?,
       ?rpc_options: RPCOptions?
@@ -175,6 +176,7 @@ module Temporalio
       ?static_summary: String?,
       ?static_details: String?,
       ?priority: Priority,
+      ?start_delay: duration?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?,
       ?rpc_options: RPCOptions?

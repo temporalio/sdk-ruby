@@ -449,6 +449,7 @@ module Temporalio
         attr_reader static_details: String?
         attr_reader headers: Hash[String, Object?]
         attr_reader priority: Priority
+        attr_reader start_delay: duration?
         attr_reader arg_hints: Array[Object]?
         attr_reader result_hint: Object?
         attr_reader rpc_options: RPCOptions?
@@ -470,6 +471,7 @@ module Temporalio
           static_details: String?,
           headers: Hash[String, Object?],
           priority: Priority,
+          start_delay: duration?,
           arg_hints: Array[Object]?,
           result_hint: Object?,
           rpc_options: RPCOptions?
