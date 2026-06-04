@@ -4,17 +4,16 @@ require 'rbi'
 require 'sorbet-runtime'
 require_relative 'rbi_paths'
 
-# Parses the SDK's manual RBI files and applies Sorbet runtime type signatures to the
-# real (already-loaded) class implementations using Sorbet's method_added
+# Parses the Ruby SDK's RBI files and applies Sorbet runtime type signatures to
+# already-loaded class implementations using Sorbet's method_added
 # machinery.
 # This enables sorbet-runtime to validate argument and return types at runtime
-# during test execution, catching any drift between the RBI and actual code.
+# during test execution.
 #
 # Type mismatches are collected and reported as a summary after the test run
-# rather than raising mid-execution. This avoids hanging workflows where a
-# TypeError would cause an unrecoverable task failure that retries forever.
+# rather than raising mid-execution.
 module SigApplicator
-  # Classes that use Sorbet generic type members which require the implementing class to include T::Generic.
+  # Classes that use Sorbet generic type members require the implementing class to include T::Generic.
   SKIP_CLASSES = [
     'Temporalio::Workflow::Future'
   ].freeze
@@ -73,6 +72,34 @@ module SigApplicator
     end
   end
 
+  class Accumulator
+    attr_accessor :applied, :skipped, :missing, :errors
+
+    def initialize(applied: 0, skipped: 0, missing: 0, errors: [])
+      @applied = applied
+      @skipped = skipped
+      @missing = missing
+      @errors = errors
+    end
+
+    def record(result)
+      case result
+      when :applied
+        @applied += 1
+      when :skipped
+        @skipped += 1
+      when :missing
+        @missing += 1
+      else
+        raise ArgumentError, "unexpected accumulator symbol #{result}"
+      end
+    end
+
+    def error(error)
+      @errors << error
+    end
+  end
+
   @type_errors = []
   @summary_hook_registered = false
 
@@ -82,26 +109,23 @@ module SigApplicator
       configure_error_handler!
       register_summary_hook!
 
-      # Make T::Sig available on all modules/classes so we don't need to
-      # extend it per-target inside apply_method_sig.
+      # Make T::Sig available on all modules/classes
       ::Module.include(::T::Sig)
 
-      errors = []
-      skipped = 0
-      applied = 0
+      acc = Accumulator.new(applied: 0, skipped: 0, missing: 0, errors: [])
 
       rbi_paths.each do |path|
         tree = RBI::Parser.parse_file(path)
         tree.nodes.each do |node|
-          a, s = apply_scope(node, errors)
-          applied += a
-          skipped += s
+          apply_scope(node, acc)
         end
       end
 
-      warn "SigApplicator: applied #{applied} runtime type signatures (#{skipped} skipped)" if skipped.positive?
+      if acc.skipped.positive?
+        warn "SigApplicator: applied #{acc.applied} runtime type signatures (#{acc.skipped} skipped)"
+      end
 
-      raise_instrumentation_errors!(errors)
+      raise_instrumentation_errors!(acc)
     end
 
     def record_type_error(message)
@@ -114,7 +138,6 @@ module SigApplicator
       @type_errors.dup
     end
 
-    # Suppress type error recording for the duration of a block.
     # Use for tests that intentionally pass wrong types.
     def suppress_errors
       raise 'SigApplicator.suppress_errors cannot be nested' if Thread.current[:sig_applicator_suppressed]
@@ -155,8 +178,7 @@ module SigApplicator
       end
     end
 
-    # Register a Minitest after-run hook that asserts no type errors were
-    # collected.
+    # Register an after-run hook that asserts no type errors seen
     def register_summary_hook!
       return if @summary_hook_registered
 
@@ -178,98 +200,94 @@ module SigApplicator
       raise Minitest::Assertion, summary.chomp
     end
 
-    def raise_instrumentation_errors!(errors)
-      return if errors.empty?
+    def raise_instrumentation_errors!(acc)
+      return if acc.errors.empty? && acc.missing.zero?
 
-      summary = "SigApplicator: #{errors.size} methods could not be instrumented:\n"
-      errors.each { |error| summary << "  #{error}\n" }
+      summary = "SigApplicator: #{acc.errors.size} methods could not be instrumented:\n"
+      acc.errors.each { |error| summary << "  #{error}\n" }
+      summary << "#{acc.missing} methods missing a signature" if acc.missing.positive?
       raise summary.chomp
     end
 
-    def apply_scope(node, errors)
-      return [0, 0] unless node.respond_to?(:nodes)
+    def apply_scope(node, acc)
+      return unless node.respond_to?(:nodes)
 
       class_name = node.name if node.respond_to?(:name)
-      return [0, 0] unless class_name
-      return [0, 0] if SKIP_CLASSES.include?(class_name)
+      return unless class_name
+
+      if SKIP_CLASSES.include?(class_name)
+        acc.record :skipped
+        return
+      end
 
       begin
         klass = Object.const_get(class_name)
       rescue NameError
-        errors << "#{class_name}: class not found"
-        return [0, 0]
+        acc.error "#{class_name}: class not found"
+        return
       end
-
-      applied = 0
-      skipped = 0
 
       node.nodes.each do |child|
         case child
         when RBI::Method
           target = child.is_singleton ? klass.singleton_class : klass
-          result = apply_method_sig(target, class_name, child, errors, sig_eval_scope: klass)
-          if result == :skipped
-            skipped += 1
-          elsif result
-            applied += 1
-          end
+          apply_method_sig(target, class_name, child, acc, sig_eval_scope: klass)
         when *ATTR_NODE_CLASSES
-          a, s = apply_attr_sig(klass, class_name, child, errors, sig_eval_scope: klass)
-          applied += a
-          skipped += s
+          apply_attr_sig(klass, class_name, child, acc, sig_eval_scope: klass)
         when RBI::SingletonClass
           child.nodes.each do |scn|
             case scn
             when RBI::Method
-              result = apply_method_sig(
+              apply_method_sig(
                 klass.singleton_class,
                 class_name,
                 scn,
-                errors,
+                acc,
                 class_method: true,
                 sig_eval_scope: klass
               )
-              if result == :skipped
-                skipped += 1
-              elsif result
-                applied += 1
-              end
             when *ATTR_NODE_CLASSES
-              a, s = apply_attr_sig(
+              apply_attr_sig(
                 klass.singleton_class,
                 class_name,
                 scn,
-                errors,
+                acc,
                 class_method: true,
                 sig_eval_scope: klass
               )
-              applied += a
-              skipped += s
             end
           end
         end
       end
-      [applied, skipped]
     end
 
-    def apply_method_sig(target, class_name, method_node, errors, class_method: false, sig_eval_scope: target)
-      return false if method_node.sigs.empty?
+    def apply_method_sig(target, class_name, method_node, acc, class_method: false, sig_eval_scope: target)
+      if method_node.sigs.empty?
+        acc.record :missing
+        return
+      end
 
       method_name = method_node.name.to_sym
       singleton_method = class_method || method_node.is_singleton
       separator = singleton_method ? '.' : '#'
       full_name = "#{class_name}#{separator}#{method_name}"
 
-      return :skipped if SKIP_METHODS.include?(full_name)
+      if SKIP_METHODS.include?(full_name)
+        acc.record :skipped
+        return
+      end
 
       begin
         original = target.instance_method(method_name)
       rescue NameError
-        errors << "#{full_name}: method not found"
-        return false
+        acc.error "#{full_name}: method not found"
+        return
       end
 
-      return :skipped if skip_method?(original, method_node, method_name)
+      if skip_method?(original, method_node, method_name)
+        acc.record :skipped
+        return
+      end
 
       has_anon_block = anonymous_block?(original)
       sig_sources = method_node.sigs.map do |sig|
@@ -280,25 +298,23 @@ module SigApplicator
         has_anon_block ? rewrite_block_param(sig_source, method_node, sig) : sig_source
       end
 
-      apply_sig_sources_to_method?(
+      apply_sig_sources_to_method(
         target,
         full_name,
         method_name,
         sig_sources,
-        errors,
+        acc,
         original:,
         singleton_method:,
         sig_eval_scope:
       )
     end
 
-    def apply_attr_sig(target, class_name, attr_node, errors, class_method: false, sig_eval_scope: target)
-      return [0, 0] if attr_node.sigs.empty?
+    def apply_attr_sig(target, class_name, attr_node, acc, class_method: false, sig_eval_scope: target)
+      return if attr_node.sigs.empty?
 
       singleton_method = class_method
       separator = singleton_method ? '.' : '#'
-      applied = 0
-      skipped = 0
 
       attr_node.names.each do |attr_name|
         attr_method_sig_sources(attr_node, attr_name).each do |method_name, sig_sources|
@@ -308,29 +324,22 @@ module SigApplicator
           begin
             original = target.instance_method(method_name)
           rescue NameError
-            errors << "#{full_name}: method not found"
+            acc.error "#{full_name}: method not found"
             next
           end
 
-          result = apply_sig_sources_to_method?(
+          apply_sig_sources_to_method(
             target,
             full_name,
             method_name,
             sig_sources,
-            errors,
+            acc,
             original:,
             singleton_method:,
             sig_eval_scope:
           )
-          if result == :skipped
-            skipped += 1
-          elsif result
-            applied += 1
-          end
         end
       end
-
-      [applied, skipped]
     end
 
     def attr_method_sig_sources(attr_node, attr_name)
@@ -356,12 +365,12 @@ module SigApplicator
       end
     end
 
-    def apply_sig_sources_to_method?(
+    def apply_sig_sources_to_method(
       target,
       full_name,
       method_name,
       sig_sources,
-      errors,
+      acc,
       original:,
       singleton_method:,
       sig_eval_scope:
@@ -382,11 +391,10 @@ module SigApplicator
       rescue StandardError => e
         # Restore the original method without the sig wrapper
         restore_original_method(target, method_name, original, remove_local_method: inherited_method)
-        errors << "#{full_name}: #{e.message}"
-        return false
+        acc.error "#{full_name}: #{e.message}"
       end
 
-      true
+      acc.record :applied
     end
 
     def anonymous_block?(method)
@@ -406,9 +414,8 @@ module SigApplicator
       end
     end
 
-    # The RBI sig is evaluated after the real method already exists, so Ruby
-    # will not naturally fire method_added. Call Sorbet's hook directly instead
-    # of redefining the method to make Ruby fire it.
+    # The RBI sig is evaluated after the real method already exists,
+    # call Sorbet's hook directly instead or redefining the method.
     def apply_pending_sig(sig_eval_scope, target, method_name, singleton_method)
       hook_mod = singleton_method ? sig_eval_scope : target
       T::Private::Methods._on_method_added(hook_mod, target, method_name)
@@ -423,13 +430,6 @@ module SigApplicator
       target.instance_method(method_name)
     end
 
-    def method_visibility(target, method_name)
-      return :private if target.private_method_defined?(method_name)
-      return :protected if target.protected_method_defined?(method_name)
-
-      :public
-    end
-
     def restore_original_method(target, method_name, original, remove_local_method: false)
       T::Private::DeclState.current.without_on_method_added do
         if remove_local_method
@@ -438,6 +438,13 @@ module SigApplicator
           target.send(:define_method, method_name, original)
         end
       end
+    end
+
+    def method_visibility(target, method_name)
+      return :private if target.private_method_defined?(method_name)
+      return :protected if target.protected_method_defined?(method_name)
+
+      :public
     end
 
     # Rewrites the RBI block parameter name to `"&": <type>` so
@@ -450,25 +457,23 @@ module SigApplicator
       sig_source.sub(/\b#{Regexp.escape(block_param_name)}:\s/, '"&": ')
     end
 
-    # Determines whether a method should be skipped for sig application based
-    # on parameter shape mismatches between the RBI sig and the actual method.
+    # Determines whether a method should be omitted from instrumenting
+    # due to mismatches between typing and implementations.
     def skip_method?(original, method_node, _method_name)
       shape = MethodShape.from(original, method_node)
 
       # Block param mismatch: methods using yield with no block param,
-      # or sigs that omit declared blocks. Anonymous blocks (def foo(&))
-      # are handled via sig rewriting in apply_method_sig.
+      # or sigs that omit declared blocks.
       return true if shape.actual_block? != shape.rbi_block?
 
-      # Native/extension methods may expose positional parameters without
+      # Native methods may expose positional parameters without
       # names. Sorbet runtime signatures cannot name those parameters without
-      # adding Ruby wrappers, so keep those RBIs for static checking only.
+      # adding Ruby wrappers.
       has_unnamed_params = shape.actual_params.any? { |_kind, name| name.nil? }
       return true if has_unnamed_params
 
-      # Synthetic methods (e.g., Data.define generates .new, .[], #initialize,
-      # #with with a single splat) where the RBI provides typed keyword params
-      # for better static checking but the runtime signature is incompatible.
+      # Data.define generates initializers with splats where
+      # RBI provides typed keyword params for better static checking.
       non_block_params = shape.actual_non_block_params
       all_rest_or_unnamed = non_block_params.all? { |kind, _| kind == :rest || kind == :keyrest }
       sig_named_params = method_node.sigs.flat_map { |sig| shape.sig_method_params(sig) }

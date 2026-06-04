@@ -11,9 +11,10 @@ module Support
       Module target,
       String class_name,
       untyped method_node,
-      Array[String] errors,
+      SigApplicator::Accumulator acc,
       sig_eval_scope: Module
-    ) -> (bool | :skipped)
+    ) -> void
+    def new_accumulator: -> SigApplicator::Accumulator
     def attr_method_sig_sources: (untyped attr_node, untyped attr_name) -> Array[[untyped, Array[String]]]
     def replace_sig_applicator_type_errors: (Array[String] new_errors) -> Array[String]
     def with_sig_applicator_rbi_paths: (Array[String] paths) { () -> untyped } -> untyped

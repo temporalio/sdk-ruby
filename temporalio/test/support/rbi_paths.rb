@@ -3,6 +3,8 @@
 module RbiPaths
   ROOT = File.expand_path('../../rbi', __dir__ || raise)
 
+  # We skip over instrumenting protobuf generated files as accessors aren't define as methods
+  # and `SigApplicator` requires methods to instrument a class.
   GENERATED_PREFIXES = [
     File.join(ROOT, 'google', ''),
     File.join(ROOT, 'temporalio', 'api', ''),

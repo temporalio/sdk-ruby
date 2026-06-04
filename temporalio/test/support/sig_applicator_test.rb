@@ -381,10 +381,10 @@ module Support
       method_node = parse_method(
         'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
       )
-      errors = []
+      acc = new_accumulator
 
-      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
-      assert_empty errors
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
     end
 
     def test_apply_method_sig_supports_proc_typed_regular_arg
@@ -401,10 +401,10 @@ module Support
           def run_worker(options, next_call); end
         end
       RBI
-      errors = []
+      acc = new_accumulator
 
-      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
-      assert_empty errors
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
       assert_equal 2, klass.new.run_worker('ok', ->(_value) { 2 })
     end
 
@@ -421,10 +421,10 @@ module Support
       end
       method_added_events.clear
       method_node = parse_method('class X; sig { returns(String) }; def foo; end; end')
-      errors = []
+      acc = new_accumulator
 
-      assert apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
-      assert_empty errors
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
       assert_equal 'ok', klass.new.foo
       assert_equal method_added_events.select { |name| name == :foo }, method_added_events
       # Sorbet replaces the method twice, we should not add to this
@@ -446,10 +446,10 @@ module Support
           def foo(other); end
         end
       RBI
-      errors = []
+      acc = new_accumulator
 
-      refute apply_method_sig(klass, 'X', method_node, errors, sig_eval_scope: klass)
-      assert_includes errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_includes acc.errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
       assert_equal original, klass.instance_method(:foo)
       assert_equal 'original: ok', klass.new.foo('ok')
     end
@@ -485,24 +485,24 @@ module Support
         end
       RBI
 
-      errors = []
-      assert apply_method_sig(
+      acc = new_accumulator
+      apply_method_sig(
         inherited_method_class,
         'Support::SigApplicatorInheritedMethodSigTest',
         inherited_method_node,
-        errors,
+        acc,
         sig_eval_scope: inherited_method_class
       )
-      assert_empty errors
+      assert_empty acc.errors
 
-      refute apply_method_sig(
+      apply_method_sig(
         override_class,
         'Support::SigApplicatorIncompatibleOverrideTest',
         override_method_node,
-        errors,
+        acc,
         sig_eval_scope: override_class
       )
-      assert_includes errors.join("\n"), 'Incompatible return type in signature for override of method `to_h`'
+      assert_includes acc.errors.join("\n"), 'Incompatible return type in signature for override of method `to_h`'
     ensure
       if Support.const_defined?(:SigApplicatorInheritedMethodSigTest, false)
         Support.send(:remove_const, :SigApplicatorInheritedMethodSigTest)
@@ -530,15 +530,15 @@ module Support
         end
       RBI
 
-      errors = []
-      assert apply_method_sig(
+      acc = new_accumulator
+      apply_method_sig(
         inherited_method_class,
         'Support::SigApplicatorDelegatorSigTest',
         inherited_method_node,
-        errors,
+        acc,
         sig_eval_scope: inherited_method_class
       )
-      assert_empty errors
+      assert_empty acc.errors
 
       assert_equal original_delegator_initialize, Delegator.instance_method(:initialize)
       assert_equal inherited_method_class, inherited_method_class.instance_method(:initialize).owner
@@ -574,22 +574,22 @@ module Support
         end
       RBI
 
-      errors = []
-      assert apply_method_sig(
+      acc = new_accumulator
+      apply_method_sig(
         inherited_method_class,
         'Support::SigApplicatorVisibilityTest',
         protected_node,
-        errors,
+        acc,
         sig_eval_scope: inherited_method_class
       )
-      assert apply_method_sig(
+      apply_method_sig(
         inherited_method_class,
         'Support::SigApplicatorVisibilityTest',
         private_node,
-        errors,
+        acc,
         sig_eval_scope: inherited_method_class
       )
-      assert_empty errors
+      assert_empty acc.errors
 
       assert inherited_method_class.protected_method_defined?(:protected_value)
       assert inherited_method_class.private_method_defined?(:private_value)
@@ -617,15 +617,15 @@ module Support
         end
       RBI
 
-      errors = []
-      refute apply_method_sig(
+      acc = new_accumulator
+      apply_method_sig(
         inherited_method_class,
         'Support::SigApplicatorInheritedRestoreTest',
         method_node,
-        errors,
+        acc,
         sig_eval_scope: inherited_method_class
       )
-      assert_includes errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      assert_includes acc.errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
       assert_equal base_class, inherited_method_class.instance_method(:foo).owner
       assert_equal 'original: ok', inherited_method_class.new.foo('ok')
     ensure
@@ -652,16 +652,16 @@ module Support
           def self.foo(value); end
         end
       RBI
-      errors = []
+      acc = new_accumulator
 
-      assert apply_method_sig(
+      apply_method_sig(
         klass.singleton_class,
         'Support::SigApplicatorSingletonScopeTest',
         method_node,
-        errors,
+        acc,
         sig_eval_scope: klass
       )
-      assert_empty errors
+      assert_empty acc.errors
     ensure
       if Support.const_defined?(:SigApplicatorSingletonScopeTest, false)
         Support.send(:remove_const, :SigApplicatorSingletonScopeTest)
@@ -684,15 +684,19 @@ module Support
       SigApplicator.send(:rewrite_block_param, sig_source, method_node, sig)
     end
 
-    def apply_method_sig(target, class_name, method_node, errors, sig_eval_scope:)
+    def apply_method_sig(target, class_name, method_node, acc, sig_eval_scope:)
       SigApplicator.send(
         :apply_method_sig,
         target,
         class_name,
         method_node,
-        errors,
+        acc,
         sig_eval_scope:
       )
+    end
+
+    def new_accumulator
+      SigApplicator::Accumulator.new(applied: 0, skipped: 0, missing: 0, errors: [])
     end
 
     def attr_method_sig_sources(attr_node, attr_name)

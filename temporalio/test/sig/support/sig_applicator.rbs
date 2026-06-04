@@ -22,6 +22,18 @@ module SigApplicator
     def sig_method_params: (untyped sig) -> Array[untyped]
   end
 
+  class Accumulator
+    attr_reader applied: Integer
+    attr_reader skipped: Integer
+    attr_reader missing: Integer
+    attr_reader errors: Array[String]
+
+    def initialize: (applied: Integer, skipped: Integer, missing: Integer, errors: Array[String]) -> void
+
+    def record: (:applied | :skipped | :missing result) -> void
+    def error: (String error) -> void
+  end
+
   def self.apply_all!: -> void
   def self.record_type_error: (String message) -> void
   def self.type_errors: -> Array[String]
@@ -34,35 +46,35 @@ module SigApplicator
   def self.register_summary_hook!: -> void
   def self.raise_recorded_type_errors!: -> void
   def self.raise_instrumentation_errors!: (Array[String] errors) -> void
-  def self.apply_scope: (untyped node, Array[String] errors) -> [Integer, Integer]
+  def self.apply_scope: (untyped node, Accumulator acc) -> void
   def self.apply_method_sig: (
     Module target,
     String class_name,
     untyped method_node,
-    Array[String] errors,
+    Accumulator acc,
     ?class_method: bool,
     ?sig_eval_scope: Module
-  ) -> (bool | :skipped)
+  ) -> void
   def self.apply_attr_sig: (
     Module target,
     String class_name,
     untyped attr_node,
-    Array[String] errors,
+    Accumulator acc,
     ?class_method: bool,
     ?sig_eval_scope: Module
-  ) -> [Integer, Integer]
+  ) -> void
   def self.attr_method_sig_sources: (untyped attr_node, untyped attr_name) -> Array[[untyped, Array[String]]]
   def self.writer_sig_sources: (untyped attr_node, untyped attr_name) -> Array[String]
-  def self.apply_sig_sources_to_method?: (
+  def self.apply_sig_sources_to_method: (
     Module target,
     String full_name,
     Symbol method_name,
     Array[String] sig_sources,
-    Array[String] errors,
+    Accumulator acc,
     original: UnboundMethod,
     singleton_method: bool,
     sig_eval_scope: Module
-  ) -> bool
+  ) -> void
   def self.anonymous_block?: (UnboundMethod method) -> bool?
   def self.apply_sig_source: (Module sig_eval_scope, Module target, String sig_source, bool singleton_method) -> void
   def self.apply_pending_sig: (Module sig_eval_scope, Module target, Symbol method_name, bool singleton_method) -> void
