@@ -174,8 +174,7 @@ module Temporalio
           workflow_run_id = Internal::ProtoUtils.string_or(start.workflow_execution&.run_id, nil)
           workflow_type = Internal::ProtoUtils.string_or(start.workflow_type, nil)
           activity_run_id = Internal::ProtoUtils.string_or(start.run_id, nil)
-          # `namespace` is always set (falling back to the client's namespace for standalone activities).
-          # `workflow_namespace` is the deprecated accessor, nil for standalone activities.
+          # `namespace` is always set. `workflow_namespace` is the deprecated accessor, nil for standalone activities.
           namespace = Internal::ProtoUtils.string_or(start.workflow_namespace, @worker.options.client.namespace)
           workflow_namespace = workflow_id.nil? ? nil : namespace
           info = Activity::Info.new(
