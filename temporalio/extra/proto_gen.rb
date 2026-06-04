@@ -116,7 +116,7 @@ class ProtoGen
       '--proto_path=ext/additional_protos',
       *extra_proto_paths,
       "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
-      '--rbi_out=grpc=false:tmp-proto/rbi',
+      '--rbi_out=grpc=true:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *api_protos,
