@@ -117,10 +117,14 @@ module SigApplicator
     # Suppress type error recording for the duration of a block.
     # Use for tests that intentionally pass wrong types.
     def suppress_errors
+      raise 'SigApplicator.suppress_errors cannot be nested' if Thread.current[:sig_applicator_suppressed]
+
       Thread.current[:sig_applicator_suppressed] = true
-      yield
-    ensure
-      Thread.current[:sig_applicator_suppressed] = false
+      begin
+        yield
+      ensure
+        Thread.current[:sig_applicator_suppressed] = false
+      end
     end
 
     private

@@ -193,6 +193,19 @@ module Support
       assert_includes error.message, '  [1x] second error'
     end
 
+    def test_suppress_errors_rejects_nesting_without_clearing_outer_suppression
+      SigApplicator.suppress_errors do
+        error = assert_raises(RuntimeError) do
+          SigApplicator.suppress_errors {} # rubocop:disable Lint/EmptyBlock
+        end
+        assert_equal 'SigApplicator.suppress_errors cannot be nested', error.message
+
+        SigApplicator.record_type_error('still suppressed')
+      end
+
+      assert_empty SigApplicator.type_errors
+    end
+
     def test_apply_all_raises_when_signature_cannot_be_instrumented
       test_class = Class.new do
         extend T::Sig
