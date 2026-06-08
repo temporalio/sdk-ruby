@@ -794,46 +794,40 @@ class ClientActivityTest < Test
   end
 
   def test_cancel_during_start_delay_transitions_to_canceled_immediately
-    # No worker is registered for this task queue, so the activity cannot run.
-    # The 30s delay is far longer than assert_eventually's default 10s ceiling — if
-    # cancel-during-delay were broken and the dispatch timer had to elapse first, the
-    # assert_eventually would time out before status flipped. The inner
-    # `assert_nil desc.last_started_time` proves the activity never dispatched.
-    task_queue = "saa-tq-no-worker-#{SecureRandom.uuid}"
-    handle = env.client.start_activity(
-      SimpleActivity, 'should-not-run',
-      id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 30,
-      start_delay: 30.0
-    )
-    handle.cancel('canceled-during-delay')
-    assert_eventually do
-      desc = handle.describe
-      assert_equal Temporalio::Client::ActivityExecutionStatus::CANCELED, desc.status
-      assert_nil desc.last_started_time, 'activity should not have started during delay window'
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      handle = env.client.start_activity(
+        SimpleActivity, 'should-not-run',
+        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 30,
+        start_delay: 30.0
+      )
+      handle.cancel('canceled-during-delay')
+      assert_eventually do
+        desc = handle.describe
+        assert_equal Temporalio::Client::ActivityExecutionStatus::CANCELED, desc.status
+        assert_nil desc.last_started_time, 'activity should not have started during delay window'
+      end
     end
   end
 
   def test_terminate_during_start_delay_transitions_to_terminated_immediately
-    task_queue = "saa-tq-no-worker-#{SecureRandom.uuid}"
-    handle = env.client.start_activity(
-      SimpleActivity, 'should-not-run',
-      id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 30,
-      start_delay: 30.0
-    )
-    handle.terminate('terminated-during-delay')
-    assert_eventually do
-      desc = handle.describe
-      assert_equal Temporalio::Client::ActivityExecutionStatus::TERMINATED, desc.status
-      assert_nil desc.last_started_time, 'activity should not have started during delay window'
+    with_activity_worker([SimpleActivity]) do |task_queue|
+      handle = env.client.start_activity(
+        SimpleActivity, 'should-not-run',
+        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 30,
+        start_delay: 30.0
+      )
+      handle.terminate('terminated-during-delay')
+      assert_eventually do
+        desc = handle.describe
+        assert_equal Temporalio::Client::ActivityExecutionStatus::TERMINATED, desc.status
+        assert_nil desc.last_started_time, 'activity should not have started during delay window'
+      end
     end
   end
 
   def test_start_delay_extends_schedule_to_start_timeout
-    # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s). The
-    # ScheduleToStart clock starts AFTER the delay elapses, so the activity
-    # must still be dispatched and run successfully. If start_delay were not
-    # extending the timeout, the activity would fail with a
-    # ScheduleToStartTimeout before the worker picked it up.
+    # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s), and would fire if it
+    # were not properly delayed by start_delay.
     delay = 1.0
     with_activity_worker([SimpleActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
@@ -848,11 +842,8 @@ class ClientActivityTest < Test
   end
 
   def test_start_delay_extends_schedule_to_close_timeout
-    # schedule_to_close_timeout (0.5s) is shorter than start_delay (1.0s).  The
-    # ScheduleToClose clock starts AFTER the delay elapses (deadline =
-    # scheduleTime + startDelay + scheduleToCloseTimeout). If start_delay did
-    # NOT extend it, the activity would fail with ScheduleToCloseTimeout before
-    # the worker ever picked it up.
+    # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s), and would fire if it
+    # were not properly delayed by start_delay.
     delay = 1.0
     with_activity_worker([SimpleActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
