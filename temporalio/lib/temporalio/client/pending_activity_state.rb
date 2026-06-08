@@ -6,7 +6,6 @@ module Temporalio
   class Client
     # More detailed breakdown of a running activity's state.
     module PendingActivityState
-      UNSPECIFIED = Api::Enums::V1::PendingActivityState::PENDING_ACTIVITY_STATE_UNSPECIFIED
       SCHEDULED = Api::Enums::V1::PendingActivityState::PENDING_ACTIVITY_STATE_SCHEDULED
       STARTED = Api::Enums::V1::PendingActivityState::PENDING_ACTIVITY_STATE_STARTED
       CANCEL_REQUESTED = Api::Enums::V1::PendingActivityState::PENDING_ACTIVITY_STATE_CANCEL_REQUESTED
