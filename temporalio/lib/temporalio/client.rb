@@ -517,6 +517,7 @@ module Temporalio
     # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -596,6 +597,7 @@ module Temporalio
     # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
