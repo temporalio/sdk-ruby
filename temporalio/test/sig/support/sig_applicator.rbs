@@ -45,7 +45,7 @@ module SigApplicator
   def self.configure_error_handler!: -> void
   def self.register_summary_hook!: -> void
   def self.raise_recorded_type_errors!: -> void
-  def self.raise_instrumentation_errors!: (Array[String] errors) -> void
+  def self.raise_instrumentation_errors!: (Accumulator acc) -> void
   def self.apply_scope: (untyped node, Accumulator acc) -> void
   def self.apply_method_sig: (
     Module target,
