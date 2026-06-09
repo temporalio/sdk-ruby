@@ -279,6 +279,7 @@ module Temporalio
         :static_details,
         :headers,
         :priority,
+        :start_delay,
         :arg_hints,
         :result_hint,
         :rpc_options

@@ -29,3 +29,10 @@ accepts a standalone-form `ActivityIDReference` (constructed via `ActivityIDRefe
 async completion.
 
 See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
+
+#### Start Delay for Standalone Activities
+
+`Client#start_activity` and `Client#execute_activity` now accept a `start_delay:` kwarg. When set, the server creates the activity immediately,
+but defers dispatch to a worker until the delay elapses. Retry attempts do not re-apply the delay.
+`ScheduleToStart` and `ScheduleToClose` timeout clocks begin counting after the delay
+elapses; `StartToClose` and `Heartbeat` are unaffected. Currently experimental.
