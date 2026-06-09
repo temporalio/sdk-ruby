@@ -39,3 +39,9 @@ When a `workflow_update_validator` rejected an update sent via
 `wait_for_stage: COMPLETED`), the client polled history for an outcome that was never written
 and surfaced the failure as `Temporalio::Error::RPCError` with code `NOT_FOUND`. The caller now
 correctly receives `Temporalio::Error::WorkflowUpdateFailedError`. (#454)
+#### Start Delay for Standalone Activities
+
+`Client#start_activity` and `Client#execute_activity` now accept a `start_delay:` kwarg. When set, the server creates the activity immediately,
+but defers dispatch to a worker until the delay elapses. Retry attempts do not re-apply the delay.
+`ScheduleToStart` and `ScheduleToClose` timeout clocks begin counting after the delay
+elapses; `StartToClose` and `Heartbeat` are unaffected. Currently experimental.
