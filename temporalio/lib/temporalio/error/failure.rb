@@ -30,6 +30,8 @@ module Temporalio
     end
 
     # Error raised by a client when a standalone activity execution has already started.
+    #
+    # WARNING: Standalone Activities are experimental.
     class ActivityAlreadyStartedError < Failure
       # @return [String] ID of the already-started activity.
       attr_reader :activity_id
