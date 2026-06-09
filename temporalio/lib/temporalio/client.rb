@@ -519,6 +519,9 @@ module Temporalio
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
+    #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -542,6 +545,7 @@ module Temporalio
       static_summary: nil,
       static_details: nil,
       priority: Priority.default,
+      start_delay: nil,
       arg_hints: nil,
       result_hint: nil,
       rpc_options: nil
@@ -565,6 +569,7 @@ module Temporalio
                              static_details:,
                              headers: {},
                              priority:,
+                             start_delay:,
                              arg_hints: arg_hints || defn_arg_hints,
                              result_hint: result_hint || defn_result_hint,
                              rpc_options:
@@ -596,6 +601,9 @@ module Temporalio
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
+    #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -620,6 +628,7 @@ module Temporalio
       static_summary: nil,
       static_details: nil,
       priority: Priority.default,
+      start_delay: nil,
       arg_hints: nil,
       result_hint: nil,
       rpc_options: nil
@@ -640,6 +649,7 @@ module Temporalio
         static_summary:,
         static_details:,
         priority:,
+        start_delay:,
         arg_hints:,
         result_hint:,
         rpc_options:
