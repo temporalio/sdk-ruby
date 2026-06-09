@@ -13,6 +13,14 @@ class ClientActivityInterceptorChainTest < Test
     end
   end
 
+  class SleepUntilCancelActivity < Temporalio::Activity::Definition
+    def execute
+      Temporalio::Activity::Context.current.heartbeat
+      sleep 0.1 until Temporalio::Activity::Context.current.cancellation.canceled?
+      raise Temporalio::Error::CanceledError, 'canceled'
+    end
+  end
+
   # Records the order of calls through the interceptor chain.
   class RecordingInterceptor
     include Temporalio::Client::Interceptor
@@ -107,9 +115,9 @@ class ClientActivityInterceptorChainTest < Test
     events = []
     interceptor = RecordingInterceptor.new('A', events)
     client = client_with_interceptors([interceptor])
-    with_activity_worker(client, [SimpleActivity]) do |task_queue|
+    with_activity_worker(client, [SleepUntilCancelActivity]) do |task_queue|
       handle = client.start_activity(
-        SimpleActivity,
+        SleepUntilCancelActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10
