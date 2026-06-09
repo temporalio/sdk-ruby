@@ -482,6 +482,8 @@ module Temporalio
     # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
     # (a different process, or by another client) and you have only its ID.
     #
+    # WARNING: Standalone Activities are experimental.
+    #
     # @param activity_id [String] ID for the activity.
     # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
     #   latest run of the given activity ID.
@@ -494,6 +496,8 @@ module Temporalio
     end
 
     # Start a standalone activity execution and return its handle.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
@@ -514,7 +518,7 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity.
+    # @param priority [Priority] Priority for the activity. This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -570,6 +574,8 @@ module Temporalio
     # Start a standalone activity execution and wait for its result. Shortcut for
     # {start_activity} + {ActivityHandle#result}.
     #
+    # WARNING: Standalone Activities are experimental.
+    #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
     # @param args [Array<Object>] Arguments to the activity.
@@ -589,7 +595,7 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity.
+    # @param priority [Priority] Priority for the activity. This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -642,6 +648,8 @@ module Temporalio
 
     # List standalone activities matching a visibility query.
     #
+    # WARNING: Standalone Activities are experimental.
+    #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
@@ -652,6 +660,8 @@ module Temporalio
     end
 
     # Count standalone activities matching a visibility query.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
