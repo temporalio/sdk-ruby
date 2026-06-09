@@ -35,6 +35,7 @@ module Temporalio
     #   @return [String] ID for the activity.
     # @!attribute activity_run_id
     #   @return [String, nil] Run ID for a standalone activity execution. nil for activities scheduled from a workflow.
+    #     WARNING: Standalone Activities are experimental.
     # @!attribute activity_type
     #   @return [String] Type name for the activity.
     # @!attribute attempt
@@ -84,6 +85,8 @@ module Temporalio
     #   class or it may break in incompatible ways.
     class Info
       # @return [Boolean] True if this activity was scheduled by a workflow execution; false for standalone activities.
+      #
+      # WARNING: Standalone Activities are experimental.
       def in_workflow?
         !workflow_id.nil?
       end

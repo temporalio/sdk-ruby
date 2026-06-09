@@ -86,6 +86,8 @@ module Temporalio
 
   # Controls behavior when an activity with the same ID was previously run and is now closed.
   #
+  # WARNING: Standalone Activities are experimental.
+  #
   # @see https://docs.temporal.io/activities
   module ActivityIDReusePolicy
     # Always allow starting an activity using the same activity ID.
@@ -99,6 +101,8 @@ module Temporalio
   end
 
   # Controls behavior when an activity with the same ID is currently running.
+  #
+  # WARNING: Standalone Activities are experimental.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDConflictPolicy

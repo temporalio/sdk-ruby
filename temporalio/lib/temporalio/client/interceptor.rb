@@ -260,6 +260,8 @@ module Temporalio
       )
 
       # Input for {Outbound.start_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       StartActivityInput = Data.define(
         :activity,
         :args,
@@ -284,6 +286,8 @@ module Temporalio
       )
 
       # Input for {Outbound.describe_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       DescribeActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -291,6 +295,8 @@ module Temporalio
       )
 
       # Input for {Outbound.cancel_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       CancelActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -299,6 +305,8 @@ module Temporalio
       )
 
       # Input for {Outbound.terminate_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       TerminateActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -307,12 +315,16 @@ module Temporalio
       )
 
       # Input for {Outbound.list_activities}.
+      #
+      # WARNING: Standalone Activities are experimental.
       ListActivitiesInput = Data.define(
         :query,
         :rpc_options
       )
 
       # Input for {Outbound.count_activities}.
+      #
+      # WARNING: Standalone Activities are experimental.
       CountActivitiesInput = Data.define(
         :query,
         :rpc_options
@@ -320,6 +332,8 @@ module Temporalio
 
       # Input for {Outbound.fetch_activity_outcome}. Used by `ActivityHandle#result` for long-polling
       # the activity outcome via `PollActivityExecution`.
+      #
+      # WARNING: Standalone Activities are experimental.
       FetchActivityOutcomeInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -537,6 +551,8 @@ module Temporalio
 
         # Called for every {Client.start_activity} and {Client.execute_activity} call.
         #
+        # WARNING: Standalone Activities are experimental.
+        #
         # @param input [StartActivityInput] Input.
         # @return [ActivityHandle] Activity handle.
         def start_activity(input)
@@ -544,6 +560,8 @@ module Temporalio
         end
 
         # Called for every {ActivityHandle.describe} call.
+        #
+        # WARNING: Standalone Activities are experimental.
         #
         # @param input [DescribeActivityInput] Input.
         # @return [ActivityExecution::Description] Activity description.
@@ -553,6 +571,8 @@ module Temporalio
 
         # Called for every {ActivityHandle.cancel} call.
         #
+        # WARNING: Standalone Activities are experimental.
+        #
         # @param input [CancelActivityInput] Input.
         def cancel_activity(input)
           next_interceptor.cancel_activity(input)
@@ -560,12 +580,16 @@ module Temporalio
 
         # Called for every {ActivityHandle.terminate} call.
         #
+        # WARNING: Standalone Activities are experimental.
+        #
         # @param input [TerminateActivityInput] Input.
         def terminate_activity(input)
           next_interceptor.terminate_activity(input)
         end
 
         # Called for every {Client.list_activities} call.
+        #
+        # WARNING: Standalone Activities are experimental.
         #
         # @param input [ListActivitiesInput] Input.
         # @return [Enumerator<ActivityExecution>] Activity executions.
@@ -575,6 +599,8 @@ module Temporalio
 
         # Called for every {Client.count_activities} call.
         #
+        # WARNING: Standalone Activities are experimental.
+        #
         # @param input [CountActivitiesInput] Input.
         # @return [ActivityExecutionCount] Activity count.
         def count_activities(input)
@@ -582,6 +608,8 @@ module Temporalio
         end
 
         # Called by {ActivityHandle.result} to long-poll the activity outcome.
+        #
+        # WARNING: Standalone Activities are experimental.
         #
         # @param input [FetchActivityOutcomeInput] Input.
         # @return [Api::Activity::V1::ActivityExecutionOutcome] Activity outcome.

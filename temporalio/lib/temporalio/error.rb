@@ -42,6 +42,8 @@ module Temporalio
 
     # Error returned from {Client::ActivityHandle#result} when the activity did not complete successfully.
     # The specific activity failure can be accessed via `cause`.
+    #
+    # WARNING: Standalone Activities are experimental.
     class ActivityFailedError < Error
       # @!visibility private
       def initialize(message = 'Activity execution failed')
