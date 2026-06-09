@@ -217,7 +217,7 @@ module Temporalio
             end
 
             # If the user wants to wait until completed, we must poll until outcome if not already there
-            if input.wait_for_stage == Temporalio::Client::WorkflowUpdateWaitStage::COMPLETED && update_resp.outcome
+            if input.wait_for_stage == Temporalio::Client::WorkflowUpdateWaitStage::COMPLETED && !update_resp.outcome
               update_resp.outcome = @client._impl.poll_workflow_update(
                 Temporalio::Client::Interceptor::PollWorkflowUpdateInput.new(
                   workflow_id: start_options.id,
