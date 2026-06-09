@@ -259,7 +259,9 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.start_activity}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.start_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       StartActivityInput = Data.define(
         :activity,
         :args,
@@ -282,14 +284,18 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.describe_activity}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.describe_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       DescribeActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
         :rpc_options
       )
 
-      # Input for {Outbound.cancel_activity}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.cancel_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       CancelActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -297,7 +303,9 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.terminate_activity}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.terminate_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
       TerminateActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
@@ -305,20 +313,26 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.list_activities}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.list_activities}.
+      #
+      # WARNING: Standalone Activities are experimental.
       ListActivitiesInput = Data.define(
         :query,
         :rpc_options
       )
 
-      # Input for {Outbound.count_activities}. WARNING: Standalone Activities are experimental.
+      # Input for {Outbound.count_activities}.
+      #
+      # WARNING: Standalone Activities are experimental.
       CountActivitiesInput = Data.define(
         :query,
         :rpc_options
       )
 
       # Input for {Outbound.fetch_activity_outcome}. Used by `ActivityHandle#result` for long-polling
-      # the activity outcome via `PollActivityExecution`. WARNING: Standalone Activities are experimental.
+      # the activity outcome via `PollActivityExecution`.
+      #
+      # WARNING: Standalone Activities are experimental.
       FetchActivityOutcomeInput = Data.define(
         :activity_id,
         :activity_run_id,

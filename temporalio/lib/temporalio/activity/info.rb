@@ -85,7 +85,8 @@ module Temporalio
     #   class or it may break in incompatible ways.
     class Info
       # @return [Boolean] True if this activity was scheduled by a workflow execution; false for standalone activities.
-      #   WARNING: Standalone Activities are experimental.
+      #
+      # WARNING: Standalone Activities are experimental.
       def in_workflow?
         !workflow_id.nil?
       end

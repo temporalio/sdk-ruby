@@ -85,7 +85,9 @@ module Temporalio
   end
 
   # Controls behavior when an activity with the same ID was previously run and is now closed. Used with
-  # standalone activities started via {Client#start_activity}. WARNING: Standalone Activities are experimental.
+  # standalone activities started via {Client#start_activity}.
+  #
+  # WARNING: Standalone Activities are experimental.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDReusePolicy
@@ -100,7 +102,9 @@ module Temporalio
   end
 
   # Controls behavior when an activity with the same ID is currently running. Used with standalone
-  # activities started via {Client#start_activity}. WARNING: Standalone Activities are experimental.
+  # activities started via {Client#start_activity}.
+  #
+  # WARNING: Standalone Activities are experimental.
   #
   # @see https://docs.temporal.io/activities
   module ActivityIDConflictPolicy

@@ -57,7 +57,8 @@ module Temporalio
       end
 
       # @return [Boolean] True if this reference is the standalone-form (activity_run_id without workflow_id).
-      #   WARNING: Standalone Activities are experimental.
+      #
+      # WARNING: Standalone Activities are experimental.
       def standalone?
         @workflow_id.nil?
       end
