@@ -1474,13 +1474,12 @@ Now can run `steep`:
 The SDK ships two sets of type signatures:
 
 * **RBS**: Maintained throughout development of the SDK, but only recently made public.
-* **RBI**: Sorbet types maintained in parallel with the RBS signatures. Must be
-  updated manually when the RBS changes (see below).
-* **Generated protobuf RBI** (`rbi/temporalio/api/`) -- Sorbet types generated from protobuf files in parallel with
-  generated protobuf RBS.
+* **RBI**: Sorbet types maintained in parallel with the RBS signatures.
 
-The RBI signatures are validated at runtime by running the test suite, which applies every RBI
-signature to the real implementation at runtime via `SigApplicator`. This catches drift between the RBI and actual code.
+We leverage `protoc` and the `protoc-gen-rbi` plugin to generate RBS and RBI types for all of our Protobuf messages and services.
+
+The RBI signatures are validated at runtime by running the test suite with `TEMPORAL_SORBET_RUNTIME_CHECK=1`, which applies every RBI
+signature to the real implementation at runtime via `SigApplicator`.
 
 This is yet another reason to ensure any changes you make have test coverage.
 
