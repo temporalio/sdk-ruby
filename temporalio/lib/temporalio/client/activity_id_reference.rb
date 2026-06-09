@@ -29,6 +29,8 @@ module Temporalio
 
       # Construct a standalone activity reference.
       #
+      # WARNING: Standalone Activities are experimental.
+      #
       # @param activity_id [String] ID for the activity.
       # @param activity_run_id [String, nil] Run ID for the activity execution. nil targets the latest run.
       # @return [ActivityIDReference] A reference suitable for {Client#async_activity_handle}.
@@ -55,6 +57,7 @@ module Temporalio
       end
 
       # @return [Boolean] True if this reference is the standalone-form (activity_run_id without workflow_id).
+      #   WARNING: Standalone Activities are experimental.
       def standalone?
         @workflow_id.nil?
       end
