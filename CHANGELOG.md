@@ -30,6 +30,16 @@ async completion.
 
 See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
 
+### Fixed
+
+#### `execute_update_with_start_workflow` no longer raises `RPCError NOT_FOUND` on validator rejection
+
+When a `workflow_update_validator` rejected an update sent via
+`Client#execute_update_with_start_workflow` (or `#start_update_with_start_workflow` with
+`wait_for_stage: COMPLETED`), the client polled history for an outcome that was never written
+and surfaced the failure as `Temporalio::Error::RPCError` with code `NOT_FOUND`. The caller now
+correctly receives `Temporalio::Error::WorkflowUpdateFailedError`. (#454)
+
 #### Start Delay for Standalone Activities
 
 `Client#start_activity` and `Client#execute_activity` now accept a `start_delay:` kwarg. When set, the server creates the activity immediately,

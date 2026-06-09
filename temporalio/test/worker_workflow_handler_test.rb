@@ -692,6 +692,16 @@ class WorkerWorkflowHandlerTest < Test
     end
 
     workflow_update
+    def rejected_by_validator(value)
+      raise "Update handler should not run when validator rejects (got #{value})"
+    end
+
+    workflow_update_validator :rejected_by_validator
+    def validate_rejected_by_validator(value)
+      raise 'Validator rejection reason' if value.negative?
+    end
+
+    workflow_update
     def start_waiting
       Temporalio::Workflow.wait_condition { @finish_waiting }
     end
@@ -780,6 +790,30 @@ class WorkerWorkflowHandlerTest < Test
       end
       assert_instance_of Temporalio::Error::ApplicationError, err.cause
       assert_equal 'Intentional failure', err.cause.message
+      assert_equal 123, start_workflow_operation.workflow_handle.query(UpdateWithStartWorkflow.counter)
+    end
+  end
+
+  def test_update_with_start_validator_rejection
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [UpdateWithStartWorkflow]
+    )
+    worker.run do
+      id = "wf-#{SecureRandom.uuid}"
+      start_workflow_operation = Temporalio::Client::WithStartWorkflowOperation.new(
+        UpdateWithStartWorkflow, 123,
+        id:, task_queue: worker.task_queue, id_conflict_policy: Temporalio::WorkflowIDConflictPolicy::FAIL
+      )
+      err = assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
+        env.client.execute_update_with_start_workflow(
+          UpdateWithStartWorkflow.rejected_by_validator, -1,
+          start_workflow_operation:
+        )
+      end
+      assert_instance_of Temporalio::Error::ApplicationError, err.cause
+      assert_equal 'Validator rejection reason', err.cause.message
       assert_equal 123, start_workflow_operation.workflow_handle.query(UpdateWithStartWorkflow.counter)
     end
   end
