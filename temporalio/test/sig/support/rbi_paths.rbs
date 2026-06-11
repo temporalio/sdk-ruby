@@ -1,0 +1,7 @@
+module RbiPaths
+  ROOT: String
+  GENERATED_PREFIXES: Array[String]
+
+  def self.all: -> Array[String]
+  def self.manual: -> Array[String]
+end

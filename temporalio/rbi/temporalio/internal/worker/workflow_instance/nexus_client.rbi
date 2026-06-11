@@ -1,0 +1,47 @@
+# typed: true
+
+class Temporalio::Internal::Worker::WorkflowInstance::NexusClient < Temporalio::Workflow::NexusClient
+  extend T::Sig
+
+  sig { returns(String) }
+  attr_reader :endpoint
+
+  sig { returns(String) }
+  attr_reader :service
+
+  sig do
+    params(
+      endpoint: T.any(Symbol, String),
+      service: T.any(Symbol, String),
+      outbound: Object
+    ).void
+  end
+  def initialize(endpoint:, service:, outbound:); end
+
+  sig do
+    params(
+      operation: T.any(Symbol, String),
+      arg: T.nilable(Object),
+      schedule_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      schedule_to_start_timeout: T.nilable(T.any(Integer, Float)),
+      start_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      cancellation_type: Integer,
+      summary: T.nilable(String),
+      cancellation: Temporalio::Cancellation,
+      arg_hint: T.nilable(Object),
+      result_hint: T.nilable(Object)
+    ).returns(Temporalio::Workflow::NexusOperationHandle)
+  end
+  def start_operation(
+    operation,
+    arg,
+    schedule_to_close_timeout: T.unsafe(nil),
+    schedule_to_start_timeout: T.unsafe(nil),
+    start_to_close_timeout: T.unsafe(nil),
+    cancellation_type: T.unsafe(nil),
+    summary: T.unsafe(nil),
+    cancellation: T.unsafe(nil),
+    arg_hint: T.unsafe(nil),
+    result_hint: T.unsafe(nil)
+  ); end
+end

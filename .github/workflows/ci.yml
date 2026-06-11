@@ -63,6 +63,12 @@ jobs:
         with:
           go-version: stable
 
+      - name: Install protoc-gen-rbi
+        shell: bash
+        run: |
+          go install "github.com/coinbase/protoc-gen-rbi@$(tr -d '\n' < .protoc-gen-rbi-version)"
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
       - name: Install protoc
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
         with:
@@ -103,6 +109,35 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
 
         run: bundle exec rake TESTOPTS="--verbose"
+
+      - name: Test Ruby with Sorbet runtime assertions
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        working-directory: ./temporalio
+        # Timeout just in case there's a hanging part in rake
+        timeout-minutes: 10
+        # Set env vars for cloud tests. If secrets aren't present, tests will be skipped.
+        env:
+          # For mTLS tests
+          TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}.tmprl.cloud:7233
+          TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT: ${{ secrets.TEMPORAL_CLIENT_CERT }}
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY: ${{ secrets.TEMPORAL_CLIENT_KEY }}
+
+          # For API key tests
+          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: us-east-1.aws.api.temporal.io:7233
+          TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+
+          # For cloud ops tests
+          TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST: saas-api.tmprl.cloud:443
+          TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+          TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
+
+          # Enable Sorbet runtime type checking to verify RBI accuracy.
+          TEMPORAL_SORBET_RUNTIME_CHECK: "1"
+
+        run: bundle exec rake test TESTOPTS="--verbose"
 
       - name: Deploy docs
         # Only deploy on main merge, not in PRs

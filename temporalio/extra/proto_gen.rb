@@ -7,7 +7,9 @@ require 'open3'
 # Generator for the proto files.
 class ProtoGen
   PROTOC_VERSION_FILE = File.expand_path('../../.protoc-version', __dir__)
+  PROTOC_GEN_RBI_VERSION_FILE = File.expand_path('../../.protoc-gen-rbi-version', __dir__)
   MINIMUM_PROTOC_VERSION = Gem::Version.new(File.read(PROTOC_VERSION_FILE).strip)
+  PROTOC_GEN_RBI_VERSION = File.read(PROTOC_GEN_RBI_VERSION_FILE).strip
   SERVICE_DEFINITIONS = [
     {
       require_path: './lib/temporalio/api/workflowservice/v1/service',
@@ -50,12 +52,15 @@ class ProtoGen
     'lib/temporalio/api',
     'lib/temporalio/internal/bridge/api',
     'lib/protoc-gen-openapiv2',
+    'rbi/temporalio/api',
+    'rbi/temporalio/internal/bridge/api',
     'sig/temporalio/api',
     'sig/temporalio/internal/bridge/api',
     'sig/protoc-gen-openapiv2',
     *SERVICE_DEFINITIONS.flat_map do |service|
       [
         "lib/temporalio/client/connection/#{service[:file_name]}.rb",
+        "rbi/temporalio/client/connection/#{service[:file_name]}.rbi",
         "sig/temporalio/client/connection/#{service[:file_name]}.rbs"
       ]
     end,
@@ -71,11 +76,13 @@ class ProtoGen
   def run
     FileUtils.rm_rf('lib/temporalio/api')
     FileUtils.rm_rf('lib/protoc-gen-openapiv2')
+    FileUtils.rm_rf('rbi/temporalio/api')
     FileUtils.rm_rf('sig/temporalio/api')
     FileUtils.rm_rf('sig/temporalio/internal/bridge/api')
     FileUtils.rm_rf('sig/protoc-gen-openapiv2')
 
     verify_protoc!
+    verify_protoc_gen_rbi!
 
     generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_upstream/**/*.proto').reject do |proto|
       proto.include?('google')
@@ -99,7 +106,7 @@ class ProtoGen
   def generate_api_protos(api_protos, extra_proto_paths: [])
     # Generate API to temp dir and move
     FileUtils.rm_rf('tmp-proto')
-    FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
+    FileUtils.mkdir_p(['tmp-proto/rbi', 'tmp-proto/rbs', 'tmp-proto/ruby'])
     system(
       protoc_command,
       *google_proto_include_flags,
@@ -108,6 +115,8 @@ class ProtoGen
       '--proto_path=ext/sdk-core/crates/common/protos/testsrv_upstream',
       '--proto_path=ext/additional_protos',
       *extra_proto_paths,
+      "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
+      '--rbi_out=grpc=true:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *api_protos,
@@ -130,8 +139,11 @@ class ProtoGen
     end
 
     # Move from temp dir and remove temp dir
+    Dir.glob('tmp-proto/rbi/temporal/api/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/temporal/api/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     FileUtils.cp_r('tmp-proto/ruby/temporal/api', 'lib/temporalio')
+    FileUtils.mkdir_p('rbi/temporalio')
+    FileUtils.cp_r('tmp-proto/rbi/temporal/api', 'rbi/temporalio')
     FileUtils.mkdir_p('sig/temporalio')
     FileUtils.cp_r('tmp-proto/rbs/temporal/api', 'sig/temporalio')
     FileUtils.rm_rf('tmp-proto')
@@ -139,11 +151,13 @@ class ProtoGen
 
   def generate_openapiv2_protos
     FileUtils.rm_rf('tmp-proto')
-    FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
+    FileUtils.mkdir_p(['tmp-proto/rbi', 'tmp-proto/rbs', 'tmp-proto/ruby'])
     system(
       protoc_command,
       *google_proto_include_flags,
       '--proto_path=ext/sdk-core/crates/common/protos',
+      "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
+      '--rbi_out=grpc=false:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *Dir.glob('ext/sdk-core/crates/common/protos/protoc-gen-openapiv2/**/*.proto'),
@@ -158,9 +172,11 @@ class ProtoGen
       File.write(path, content)
       FileUtils.mv(path, path.sub('_pb', ''))
     end
+    Dir.glob('tmp-proto/rbi/protoc-gen-openapiv2/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/protoc-gen-openapiv2/**/*.rbs') { |path| normalize_generated_rbs!(path) }
-    FileUtils.mkdir_p(['lib/temporalio/api', 'sig/temporalio/api'])
+    FileUtils.mkdir_p(['lib/temporalio/api', 'rbi/temporalio/api', 'sig/temporalio/api'])
     FileUtils.cp_r('tmp-proto/ruby/protoc-gen-openapiv2', 'lib/temporalio/api/protoc_gen_openapiv2')
+    FileUtils.cp_r('tmp-proto/rbi/protoc-gen-openapiv2', 'rbi/temporalio/api/protoc_gen_openapiv2')
     FileUtils.cp_r('tmp-proto/rbs/protoc-gen-openapiv2', 'sig/temporalio/api/protoc_gen_openapiv2')
     FileUtils.rm_rf('tmp-proto')
   end
@@ -193,6 +209,29 @@ class ProtoGen
         require 'temporalio/api/operatorservice/v1/request_response'
       TEXT
     )
+    FileUtils.mkdir_p(
+      [
+        'rbi/temporalio/api/cloud',
+        'rbi/temporalio/api/operatorservice',
+        'rbi/temporalio/api/workflowservice'
+      ]
+    )
+    FileUtils.mkdir_p(
+      [
+        'sig/temporalio/api/cloud',
+        'sig/temporalio/api/operatorservice',
+        'sig/temporalio/api/workflowservice'
+      ]
+    )
+    File.write('rbi/temporalio/api/cloud/cloudservice.rbi', generated_empty_module_rbi('Temporalio::Api::Cloud::CloudService'))
+    File.write('rbi/temporalio/api/operatorservice.rbi', generated_empty_module_rbi('Temporalio::Api::OperatorService'))
+    File.write('rbi/temporalio/api/workflowservice.rbi', generated_empty_module_rbi('Temporalio::Api::WorkflowService'))
+    File.write(
+      'sig/temporalio/api/cloud/cloudservice.rbs',
+      generated_empty_module_rbs(%w[Temporalio Api Cloud CloudService])
+    )
+    File.write('sig/temporalio/api/operatorservice.rbs', generated_empty_module_rbs(%w[Temporalio Api OperatorService]))
+    File.write('sig/temporalio/api/workflowservice.rbs', generated_empty_module_rbs(%w[Temporalio Api WorkflowService]))
     File.write(
       'lib/temporalio/api.rb',
       <<~TEXT
@@ -314,6 +353,34 @@ class ProtoGen
         end
       TEXT
     end
+
+    # Open file to generate RBI code
+    FileUtils.mkdir_p('rbi/temporalio/client/connection')
+    File.open("rbi/temporalio/client/connection/#{file_name}.rbi", 'w') do |file|
+      file.puts <<~TEXT
+        # typed: false
+        # frozen_string_literal: true
+
+        # Generated code.  DO NOT EDIT!
+
+        class Temporalio::Client::Connection::#{class_name} < ::Temporalio::Client::Connection::Service
+          extend T::Sig
+
+          sig { params(connection: Temporalio::Client::Connection).void }
+          def initialize(connection); end
+      TEXT
+
+      desc.each do |method|
+        rpc = method.name.gsub(/([A-Z])/, '_\1').downcase.delete_prefix('_')
+        file.puts <<-TEXT
+
+  sig { params(request: #{method.input_type.msgclass}, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(#{method.output_type.msgclass}) }
+  def #{rpc}(request, rpc_options: T.unsafe(nil)); end
+        TEXT
+      end
+
+      file.puts 'end'
+    end
   end
 
   def generate_rust_client_file
@@ -375,14 +442,17 @@ class ProtoGen
 
   def generate_core_protos
     FileUtils.rm_rf('lib/temporalio/internal/bridge/api')
+    FileUtils.rm_rf('rbi/temporalio/internal/bridge/api')
     # Generate API to temp dir
     FileUtils.rm_rf('tmp-proto')
-    FileUtils.mkdir_p(['tmp-proto/ruby', 'tmp-proto/rbs'])
+    FileUtils.mkdir_p(['tmp-proto/rbi', 'tmp-proto/ruby', 'tmp-proto/rbs'])
     system(
       protoc_command,
       *google_proto_include_flags,
       '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
       '--proto_path=ext/sdk-core/crates/common/protos/local',
+      "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
+      '--rbi_out=grpc=false:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
       *Dir.glob('ext/sdk-core/crates/common/protos/local/**/*.proto'),
@@ -400,9 +470,12 @@ class ProtoGen
       FileUtils.mv(path, path.sub('_pb', ''))
     end
     # Move from temp dir and remove temp dir
+    Dir.glob('tmp-proto/rbi/temporal/sdk/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/temporal/sdk/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     FileUtils.mkdir_p('lib/temporalio/internal/bridge/api')
     FileUtils.cp_r(Dir.glob('tmp-proto/ruby/temporal/sdk/core/*'), 'lib/temporalio/internal/bridge/api')
+    FileUtils.mkdir_p('rbi/temporalio/internal/bridge/api')
+    FileUtils.cp_r(Dir.glob('tmp-proto/rbi/temporal/sdk/core/*'), 'rbi/temporalio/internal/bridge/api')
     FileUtils.mkdir_p('sig/temporalio/internal/bridge/api')
     FileUtils.cp_r(Dir.glob('tmp-proto/rbs/temporal/sdk/core/*'), 'sig/temporalio/internal/bridge/api')
     FileUtils.rm_rf('tmp-proto')
@@ -412,8 +485,34 @@ class ProtoGen
     require_relative 'payload_visitor_gen'
     gen = PayloadVisitorGen.new
     File.write('lib/temporalio/api/payload_visitor.rb', gen.gen_file_code)
+    FileUtils.mkdir_p('rbi/temporalio/api')
+    File.write('rbi/temporalio/api/payload_visitor.rbi', gen.gen_rbi_code)
     FileUtils.mkdir_p('sig/temporalio/api')
     File.write('sig/temporalio/api/payload_visitor.rbs', gen.gen_rbs_code)
+  end
+
+  def generated_empty_module_rbi(class_name)
+    <<~TEXT
+      # typed: true
+
+      # Generated code.  DO NOT EDIT!
+
+      module #{class_name}; end
+    TEXT
+  end
+
+  def generated_empty_module_rbs(names)
+    indent = +''
+    body = +''
+    names.each do |name|
+      body << "#{indent}module #{name}\n"
+      indent << '  '
+    end
+    names.reverse_each do |_name|
+      indent = indent[0...-2]
+      body << "#{indent}end\n"
+    end
+    body
   end
 
   def protoc_command
@@ -423,6 +522,40 @@ class ProtoGen
   def google_proto_include_flags
     include_dir = ENV.fetch('PROTOC_INCLUDE', nil)
     include_dir ? ["--proto_path=#{include_dir}"] : []
+  end
+
+  def protoc_gen_rbi_command
+    @protoc_gen_rbi_command ||= begin
+      env_path = ENV.fetch('PROTOC_GEN_RBI', nil)
+      if env_path
+        raise "PROTOC_GEN_RBI is set to #{env_path.inspect}, but it is not executable" unless executable_file?(env_path)
+
+        env_path
+      else
+        find_executable('protoc-gen-rbi') || begin
+          home_path = File.join(Dir.home, 'go', 'bin', 'protoc-gen-rbi')
+          executable_file?(home_path) ? home_path : nil
+        end
+      end
+    end
+  end
+
+  def verify_protoc_gen_rbi!
+    return if protoc_gen_rbi_command
+
+    raise "protoc-gen-rbi #{PROTOC_GEN_RBI_VERSION} is required and was not found. " \
+          "Install with: go install github.com/coinbase/protoc-gen-rbi@#{PROTOC_GEN_RBI_VERSION}"
+  end
+
+  def find_executable(command)
+    ENV.fetch('PATH', '').split(File::PATH_SEPARATOR).filter_map do |dir|
+      path = File.join(dir, command)
+      path if executable_file?(path)
+    end.first
+  end
+
+  def executable_file?(path)
+    !path.empty? && File.file?(path) && File.executable?(path)
   end
 
   def protoc_version
@@ -483,5 +616,15 @@ class ProtoGen
     File.write(path, content)
     # Keep RBS filenames aligned with the Ruby files we already rename away from the `_pb` suffix.
     FileUtils.mv(path, path.sub('_pb', ''))
+  end
+
+  def normalize_generated_rbi!(path)
+    content = File.binread(path)
+    content = content.gsub("\r\n", "\n").gsub(/[ \t]+(?=\n)/, '').gsub(/[ \t]+\z/, '')
+    File.write(path, content)
+
+    # Keep RBI filenames aligned with the Ruby files we already rename away from the `_pb` suffix.
+    new_path = path.sub('_pb', '')
+    FileUtils.mv(path, new_path) unless new_path == path
   end
 end
