@@ -10,6 +10,7 @@ class ClientScheduleTest < Test
   also_run_all_tests_in_fiber
 
   def test_basics # rubocop:disable Metrics/AbcSize
+    expected_ids = []
     assert_no_schedules
 
     # Create a schedule with lots of things
@@ -68,6 +69,7 @@ class ClientScheduleTest < Test
       schedule,
       memo: { 'memokey2' => 'memoval2' }
     )
+    expected_ids << handle.id
 
     # Describe it and check values
     desc = handle.describe
@@ -180,8 +182,8 @@ class ClientScheduleTest < Test
     # Create 4 more schedules of the same type and confirm they are in the list
     # eventually. But create two with different search attributes.
     env.ensure_common_search_attribute_keys
-    expected_ids = [handle.id] + 4.times.map do |index|
-      env.client.create_schedule(
+    4.times do |index|
+      expected_ids << env.client.create_schedule(
         "#{handle.id}-#{index + 1}",
         new_schedule,
         search_attributes: if index >= 2
@@ -225,7 +227,7 @@ class ClientScheduleTest < Test
       assert_equal [handle3.id], env.client.list_schedules("`#{ATTR_KEY_INTEGER.name}` = 1234").map(&:id)
     end
   ensure
-    delete_schedules(*expected_ids) if defined?(expected_ids)
+    delete_schedules(*expected_ids) if expected_ids
   end
 
   def test_calendar_spec_defaults
@@ -260,7 +262,7 @@ class ClientScheduleTest < Test
       assert_equal desc.info.next_action_times[i - 1] + (24 * 60 * 60), next_action_time unless i.zero?
     end
   ensure
-    delete_schedules(handle.id) if defined?(handle)
+    delete_schedules(handle.id) if handle
   end
 
   def test_trigger_immediately
@@ -291,7 +293,7 @@ class ClientScheduleTest < Test
       assert_equal 'some-result', env.client.workflow_handle(exec.workflow_id).result
     end
   ensure
-    delete_schedules(handle.id) if defined?(handle)
+    delete_schedules(handle.id) if handle
   end
 
   def test_backfill
@@ -342,6 +344,6 @@ class ClientScheduleTest < Test
     # tests are always on 1.24+
     assert_equal 7, handle.describe.info.num_actions
   ensure
-    delete_schedules(handle.id) if defined?(handle)
+    delete_schedules(handle.id) if handle
   end
 end
