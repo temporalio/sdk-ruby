@@ -21,7 +21,7 @@ module Temporalio
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
-      def to_client_tls_options: -> (untyped | false)
+      def to_client_tls_options: -> (Client::Connection::TLSOptions | false)
 
       private
 
@@ -34,7 +34,7 @@ module Temporalio
       attr_reader namespace: String?
       attr_reader api_key: String?
       attr_reader tls: ClientConfigTLS?
-      attr_reader grpc_meta: Hash[untyped, untyped]
+      attr_reader grpc_meta: Hash[String, String]
 
       def self.from_h: (Hash[untyped, untyped] hash) -> ClientConfigProfile
 
@@ -52,7 +52,7 @@ module Temporalio
         ?namespace: String?,
         ?api_key: String?,
         ?tls: ClientConfigTLS?,
-        ?grpc_meta: Hash[untyped, untyped]
+        ?grpc_meta: Hash[String, String]
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
@@ -83,4 +83,4 @@ module Temporalio
       def to_h: -> Hash[String, Hash[Symbol, untyped]]
     end
   end
-end 
+end

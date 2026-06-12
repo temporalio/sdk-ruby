@@ -121,7 +121,7 @@ module Temporalio
         class RPCFailure < Error
           def code: -> Temporalio::Error::RPCError::Code::enum
           def message: -> String
-          def details: -> String
+          def details: -> String?
         end
 
         class CancellationToken

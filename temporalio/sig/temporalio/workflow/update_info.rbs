@@ -9,7 +9,7 @@ module Temporalio
         name: String
       ) -> void
 
-      def to_h: -> Hash[Symbol, untyped]
+      def to_h: -> Hash[Symbol, String]
     end
   end
 end
