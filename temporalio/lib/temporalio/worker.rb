@@ -81,12 +81,13 @@ module Temporalio
       # hashing all bytecode of required files. This means later/dynamic require
       # won't be accounted for because this is memoized. It also means the
       # tiniest code change will affect this, which is what we want since this
-      # is meant to be a "binary checksum". We have chosen to use MD5 for speed,
-      # similarity with other SDKs, and because security is not a factor.
+      # is meant to be a "binary checksum". We use SHA-256 because it is
+      # FIPS-approved (MD5 is rejected by FIPS-mode OpenSSL); security is not a
+      # factor here, this is purely a checksum.
       require 'digest'
 
       saw_bridge = false
-      build_id = $LOADED_FEATURES.each_with_object(Digest::MD5.new) do |file, digest|
+      build_id = $LOADED_FEATURES.each_with_object(Digest::SHA256.new) do |file, digest|
         saw_bridge = true if file.include?('temporalio_bridge.')
         digest.update(File.read(file)) if File.file?(file)
       end.hexdigest

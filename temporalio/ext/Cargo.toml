@@ -17,9 +17,9 @@ magnus = "0.8"
 parking_lot = "0.12"
 prost = { workspace = true }
 rb-sys = "0.9"
-temporalio-client = { version = "0.4.0", path = "./sdk-core/crates/client" }
-temporalio-common = { version = "0.4.0", path = "./sdk-core/crates/common", features = ["envconfig"] }
-temporalio-sdk-core = { version = "0.4.0", path = "./sdk-core/crates/sdk-core", features = ["ephemeral-server", "otel"] }
+temporalio-client = { version = "0.4.0", path = "./sdk-core/crates/client", default-features = false, features = ["envconfig"] }
+temporalio-common = { version = "0.4.0", path = "./sdk-core/crates/common", features = ["envconfig", "prometheus"] }
+temporalio-sdk-core = { version = "0.4.0", path = "./sdk-core/crates/sdk-core", default-features = false, features = ["ephemeral-server"] }
 tokio = "1.47"
 tokio-stream = "0.1"
 tokio-util = "0.7"
@@ -27,6 +27,12 @@ tonic = { workspace = true }
 tracing = "0.1"
 url = "2.5"
 dhat = { version = "0.3", optional = true }
+aws-lc-rs = { version = "1", features = ["fips"], optional = true }
 
 [features]
+default = ["otel-export", "tls-ring"]
 dhat-heap = ["dhat"]
+otel-export = ["temporalio-sdk-core/otel"]
+tls-ring = ["temporalio-sdk-core/tls-ring", "temporalio-client/tls-ring"]
+tls-aws-lc = ["otel-export", "temporalio-sdk-core/tls-aws-lc", "temporalio-client/tls-aws-lc"]
+fips = ["tls-aws-lc", "dep:aws-lc-rs"]
