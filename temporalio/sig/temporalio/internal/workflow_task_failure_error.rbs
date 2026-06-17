@@ -1,0 +1,6 @@
+module Temporalio
+  module Internal
+    module WorkflowTaskFailureError
+    end
+  end
+end

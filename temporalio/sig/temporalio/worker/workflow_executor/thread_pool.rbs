@@ -50,6 +50,7 @@ module Temporalio
         end
 
         class DeadlockError < Exception
+          include Internal::WorkflowTaskFailureError
         end
       end
     end

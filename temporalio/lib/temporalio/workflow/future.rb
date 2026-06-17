@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/workflow_task_failure_error'
 require 'temporalio/workflow'
 
 module Temporalio
@@ -81,6 +82,10 @@ module Temporalio
         @fiber = Fiber.schedule do
           @result = block.call # steep:ignore
         rescue Exception => e # rubocop:disable Lint/RescueException
+          # These errors invalidate the whole workflow task. If stored and only raised on wait, the activation may
+          # complete successfully with commands that were emitted before the error.
+          raise if e.is_a?(Internal::WorkflowTaskFailureError)
+
           @failure = e
         ensure
           @done = true

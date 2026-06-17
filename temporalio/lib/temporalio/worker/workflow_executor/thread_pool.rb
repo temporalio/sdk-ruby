@@ -4,6 +4,7 @@ require 'etc'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/internal/worker/workflow_instance'
+require 'temporalio/internal/workflow_task_failure_error'
 require 'temporalio/scoped_logger'
 require 'temporalio/worker/thread_pool'
 require 'temporalio/worker/workflow_executor'
@@ -229,7 +230,9 @@ module Temporalio
         private_constant :Worker
 
         # Error raised when a processing a workflow task takes more than the expected amount of time.
-        class DeadlockError < Exception; end # rubocop:disable Lint/InheritException
+        class DeadlockError < Exception # rubocop:disable Lint/InheritException
+          include Internal::WorkflowTaskFailureError
+        end
       end
     end
   end
