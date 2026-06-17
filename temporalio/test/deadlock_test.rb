@@ -76,7 +76,6 @@ class DeadlockTest < Test
       activities: [BasicActivity],
       max_cached_workflows: 0
     )
-    # new_worker(task_queue:, max_cached_workflows: 0)
     worker2.run do
       assert_eventually(timeout: 20.0) do
         events = handle.fetch_history_events.to_a
