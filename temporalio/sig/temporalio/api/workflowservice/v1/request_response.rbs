@@ -7896,6 +7896,440 @@ module Temporalio
           def initialize: (?init_map initial_value) -> void
         end
 
+        class UpdateActivityExecutionOptionsRequest < ::Google::Protobuf::AbstractMessage
+
+          # Namespace of the workflow which scheduled this activity
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          # If provided, targets a workflow activity for the given workflow ID.
+          # If empty, targets a standalone activity.
+          attr_reader workflow_id(): ::String
+          attr_writer workflow_id(): ::String | ::Symbol
+          def clear_workflow_id: () -> void
+
+          # The ID of the activity to target.
+          attr_reader activity_id(): ::String
+          attr_writer activity_id(): ::String | ::Symbol
+          def clear_activity_id: () -> void
+
+          # Run ID of the workflow or standalone activity.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # The identity of the client who initiated this request
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
+          # Activity options. Partial updates are accepted and controlled by update_mask
+          attr_accessor activity_options(): ::Temporalio::Api::Activity::V1::ActivityOptions?
+          def has_activity_options?: () -> bool
+          def clear_activity_options: () -> void
+
+          # Controls which fields from `activity_options` will be applied
+          attr_accessor update_mask(): ::Google::Protobuf::FieldMask?
+          def has_update_mask?: () -> bool
+          def clear_update_mask: () -> void
+
+          # If set, the activity options will be restored to the default.
+          # Default options are then options activity was created with.
+          # They are part of the first schedule event.
+          # This flag cannot be combined with any other option; if you supply
+          # restore_original together with other options, the request will be rejected.
+          attr_accessor restore_original(): bool
+          def clear_restore_original: () -> void
+
+          # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+          attr_reader resource_id(): ::String
+          attr_writer resource_id(): ::String | ::Symbol
+          def clear_resource_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_id: (::String | ::Symbol)?,
+            "workflow_id" => (::String | ::Symbol)?,
+            activity_id: (::String | ::Symbol)?,
+            "activity_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
+            activity_options: (::Temporalio::Api::Activity::V1::ActivityOptions | ::Temporalio::Api::Activity::V1::ActivityOptions::init_map)?,
+            "activity_options" => (::Temporalio::Api::Activity::V1::ActivityOptions | ::Temporalio::Api::Activity::V1::ActivityOptions::init_map)?,
+            update_mask: (::Google::Protobuf::FieldMask | ::Google::Protobuf::FieldMask)?,
+            "update_mask" => (::Google::Protobuf::FieldMask | ::Google::Protobuf::FieldMask)?,
+            restore_original: bool?,
+            "restore_original" => bool?,
+            resource_id: (::String | ::Symbol)?,
+            "resource_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_id" name) -> ::String
+            | ("activity_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("identity" name) -> ::String
+            | ("activity_options" name) -> ::Temporalio::Api::Activity::V1::ActivityOptions?
+            | ("update_mask" name) -> ::Google::Protobuf::FieldMask?
+            | ("restore_original" name) -> bool
+            | ("resource_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_id" name, (::String | ::Symbol) value) -> void
+            | ("activity_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
+            | ("activity_options" name, ::Temporalio::Api::Activity::V1::ActivityOptions? value) -> void
+            | ("update_mask" name, ::Google::Protobuf::FieldMask? value) -> void
+            | ("restore_original" name, bool value) -> void
+            | ("resource_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class UpdateActivityExecutionOptionsResponse < ::Google::Protobuf::AbstractMessage
+
+          # Activity options after an update
+          attr_accessor activity_options(): ::Temporalio::Api::Activity::V1::ActivityOptions?
+          def has_activity_options?: () -> bool
+          def clear_activity_options: () -> void
+
+          type init_map = {
+            activity_options: (::Temporalio::Api::Activity::V1::ActivityOptions | ::Temporalio::Api::Activity::V1::ActivityOptions::init_map)?,
+            "activity_options" => (::Temporalio::Api::Activity::V1::ActivityOptions | ::Temporalio::Api::Activity::V1::ActivityOptions::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("activity_options" name) -> ::Temporalio::Api::Activity::V1::ActivityOptions?
+
+          def []=:
+              ("activity_options" name, ::Temporalio::Api::Activity::V1::ActivityOptions? value) -> void
+        end
+
+        class PauseActivityExecutionRequest < ::Google::Protobuf::AbstractMessage
+
+          # Namespace of the workflow which scheduled this activity.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          # If provided, pause a workflow activity (or activities) for the given workflow ID.
+          # If empty, targets a standalone activity.
+          attr_reader workflow_id(): ::String
+          attr_writer workflow_id(): ::String | ::Symbol
+          def clear_workflow_id: () -> void
+
+          # The ID of the activity to target.
+          attr_reader activity_id(): ::String
+          attr_writer activity_id(): ::String | ::Symbol
+          def clear_activity_id: () -> void
+
+          # Run ID of the workflow or standalone activity.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # The identity of the client who initiated this request.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
+          # Reason to pause the activity.
+          attr_reader reason(): ::String
+          attr_writer reason(): ::String | ::Symbol
+          def clear_reason: () -> void
+
+          # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+          attr_reader resource_id(): ::String
+          attr_writer resource_id(): ::String | ::Symbol
+          def clear_resource_id: () -> void
+
+          # Used to de-dupe pause requests.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_id: (::String | ::Symbol)?,
+            "workflow_id" => (::String | ::Symbol)?,
+            activity_id: (::String | ::Symbol)?,
+            "activity_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
+            reason: (::String | ::Symbol)?,
+            "reason" => (::String | ::Symbol)?,
+            resource_id: (::String | ::Symbol)?,
+            "resource_id" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_id" name) -> ::String
+            | ("activity_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("identity" name) -> ::String
+            | ("reason" name) -> ::String
+            | ("resource_id" name) -> ::String
+            | ("request_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_id" name, (::String | ::Symbol) value) -> void
+            | ("activity_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
+            | ("reason" name, (::String | ::Symbol) value) -> void
+            | ("resource_id" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class PauseActivityExecutionResponse < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
+
+        class UnpauseActivityExecutionRequest < ::Google::Protobuf::AbstractMessage
+
+          # Namespace of the workflow which scheduled this activity.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          # If provided, targets a workflow activity for the given workflow ID.
+          # If empty, targets a standalone activity.
+          attr_reader workflow_id(): ::String
+          attr_writer workflow_id(): ::String | ::Symbol
+          def clear_workflow_id: () -> void
+
+          # The ID of the activity to target.
+          attr_reader activity_id(): ::String
+          attr_writer activity_id(): ::String | ::Symbol
+          def clear_activity_id: () -> void
+
+          # Run ID of the workflow or standalone activity.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # The identity of the client who initiated this request.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
+          # Providing this flag will also reset the number of attempts.
+          attr_accessor reset_attempts(): bool
+          def clear_reset_attempts: () -> void
+
+          # Providing this flag will also reset the heartbeat details.
+          attr_accessor reset_heartbeat(): bool
+          def clear_reset_heartbeat: () -> void
+
+          # Reason to unpause the activity.
+          attr_reader reason(): ::String
+          attr_writer reason(): ::String | ::Symbol
+          def clear_reason: () -> void
+
+          # If set, the activity will start at a random time within the specified jitter duration.
+          attr_reader jitter(): ::Google::Protobuf::Duration?
+          attr_writer jitter(): (::Google::Protobuf::Duration | ::int)?
+          def has_jitter?: () -> bool
+          def clear_jitter: () -> void
+
+          # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+          attr_reader resource_id(): ::String
+          attr_writer resource_id(): ::String | ::Symbol
+          def clear_resource_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_id: (::String | ::Symbol)?,
+            "workflow_id" => (::String | ::Symbol)?,
+            activity_id: (::String | ::Symbol)?,
+            "activity_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
+            reset_attempts: bool?,
+            "reset_attempts" => bool?,
+            reset_heartbeat: bool?,
+            "reset_heartbeat" => bool?,
+            reason: (::String | ::Symbol)?,
+            "reason" => (::String | ::Symbol)?,
+            jitter: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "jitter" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            resource_id: (::String | ::Symbol)?,
+            "resource_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_id" name) -> ::String
+            | ("activity_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("identity" name) -> ::String
+            | ("reset_attempts" name) -> bool
+            | ("reset_heartbeat" name) -> bool
+            | ("reason" name) -> ::String
+            | ("jitter" name) -> ::Google::Protobuf::Duration?
+            | ("resource_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_id" name, (::String | ::Symbol) value) -> void
+            | ("activity_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
+            | ("reset_attempts" name, bool value) -> void
+            | ("reset_heartbeat" name, bool value) -> void
+            | ("reason" name, (::String | ::Symbol) value) -> void
+            | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("resource_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class UnpauseActivityExecutionResponse < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
+
+        class ResetActivityExecutionRequest < ::Google::Protobuf::AbstractMessage
+
+          # Namespace of the workflow which scheduled this activity.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          # If provided, targets a workflow activity for the given workflow ID.
+          # If empty, targets a standalone activity.
+          attr_reader workflow_id(): ::String
+          attr_writer workflow_id(): ::String | ::Symbol
+          def clear_workflow_id: () -> void
+
+          # The ID of the activity to target.
+          attr_reader activity_id(): ::String
+          attr_writer activity_id(): ::String | ::Symbol
+          def clear_activity_id: () -> void
+
+          # Run ID of the workflow or standalone activity.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # The identity of the client who initiated this request.
+          attr_reader identity(): ::String
+          attr_writer identity(): ::String | ::Symbol
+          def clear_identity: () -> void
+
+          # Indicates that activity should reset heartbeat details.
+          # This flag will be applied only to the new instance of the activity.
+          attr_accessor reset_heartbeat(): bool
+          def clear_reset_heartbeat: () -> void
+
+          # If activity is paused, it will remain paused after reset
+          attr_accessor keep_paused(): bool
+          def clear_keep_paused: () -> void
+
+          # If set, and activity is in backoff, the activity will start at a random time within the specified jitter duration.
+          # (unless it is paused and keep_paused is set)
+          attr_reader jitter(): ::Google::Protobuf::Duration?
+          attr_writer jitter(): (::Google::Protobuf::Duration | ::int)?
+          def has_jitter?: () -> bool
+          def clear_jitter: () -> void
+
+          # If set, the activity options will be restored to the defaults.
+          # Default options are then options activity was created with.
+          # They are part of the first schedule event.
+          attr_accessor restore_original_options(): bool
+          def clear_restore_original_options: () -> void
+
+          # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+          attr_reader resource_id(): ::String
+          attr_writer resource_id(): ::String | ::Symbol
+          def clear_resource_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_id: (::String | ::Symbol)?,
+            "workflow_id" => (::String | ::Symbol)?,
+            activity_id: (::String | ::Symbol)?,
+            "activity_id" => (::String | ::Symbol)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            identity: (::String | ::Symbol)?,
+            "identity" => (::String | ::Symbol)?,
+            reset_heartbeat: bool?,
+            "reset_heartbeat" => bool?,
+            keep_paused: bool?,
+            "keep_paused" => bool?,
+            jitter: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "jitter" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            restore_original_options: bool?,
+            "restore_original_options" => bool?,
+            resource_id: (::String | ::Symbol)?,
+            "resource_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_id" name) -> ::String
+            | ("activity_id" name) -> ::String
+            | ("run_id" name) -> ::String
+            | ("identity" name) -> ::String
+            | ("reset_heartbeat" name) -> bool
+            | ("keep_paused" name) -> bool
+            | ("jitter" name) -> ::Google::Protobuf::Duration?
+            | ("restore_original_options" name) -> bool
+            | ("resource_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_id" name, (::String | ::Symbol) value) -> void
+            | ("activity_id" name, (::String | ::Symbol) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("identity" name, (::String | ::Symbol) value) -> void
+            | ("reset_heartbeat" name, bool value) -> void
+            | ("keep_paused" name, bool value) -> void
+            | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("restore_original_options" name, bool value) -> void
+            | ("resource_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class ResetActivityExecutionResponse < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
+
         # Keep the parameters in sync with:
         #   - temporal.api.batch.v1.BatchOperationUpdateWorkflowExecutionOptions.
         #   - temporal.api.workflow.v1.PostResetOperation.UpdateWorkflowOptions.

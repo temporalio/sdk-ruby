@@ -474,6 +474,14 @@ impl Client {
                     workflow_service,
                     pause_activity
                 ),
+                "pause_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    pause_activity_execution
+                ),
                 "pause_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -601,6 +609,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     reset_activity
+                ),
+                "reset_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    reset_activity_execution
                 ),
                 "reset_sticky_task_queue" => rpc_call!(
                     self,
@@ -850,6 +866,14 @@ impl Client {
                     workflow_service,
                     unpause_activity
                 ),
+                "unpause_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    unpause_activity_execution
+                ),
                 "unpause_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -857,6 +881,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     unpause_workflow_execution
+                ),
+                "update_activity_execution_options" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    update_activity_execution_options
                 ),
                 "update_activity_options" => rpc_call!(
                     self,

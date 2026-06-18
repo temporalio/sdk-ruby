@@ -518,6 +518,78 @@ module Temporalio
         ) -> void
       end
 
+      class PauseActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader reason: String?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          reason: String?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class UnpauseActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader reason: String?
+        attr_reader reset_attempts: bool
+        attr_reader reset_heartbeat: bool
+        attr_reader jitter: Float?
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          reason: String?,
+          reset_attempts: bool,
+          reset_heartbeat: bool,
+          jitter: Float?,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class ResetActivityInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader reset_heartbeat: bool
+        attr_reader keep_paused: bool
+        attr_reader jitter: Float?
+        attr_reader restore_original_options: bool
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          reset_heartbeat: bool,
+          keep_paused: bool,
+          jitter: Float?,
+          restore_original_options: bool,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
+      class UpdateActivityOptionsInput
+        attr_reader activity_id: String
+        attr_reader activity_run_id: String?
+        attr_reader activity_options: untyped
+        attr_reader update_mask: untyped
+        attr_reader restore_original: bool
+        attr_reader rpc_options: RPCOptions?
+
+        def initialize: (
+          activity_id: String,
+          activity_run_id: String?,
+          activity_options: untyped,
+          update_mask: untyped,
+          restore_original: bool,
+          rpc_options: RPCOptions?
+        ) -> void
+      end
+
       class ListActivitiesInput
         attr_reader query: String
         attr_reader rpc_options: RPCOptions?
@@ -610,6 +682,14 @@ module Temporalio
         def cancel_activity: (CancelActivityInput input) -> void
 
         def terminate_activity: (TerminateActivityInput input) -> void
+
+        def pause_activity: (PauseActivityInput input) -> void
+
+        def unpause_activity: (UnpauseActivityInput input) -> void
+
+        def reset_activity: (ResetActivityInput input) -> void
+
+        def update_activity_options: (UpdateActivityOptionsInput input) -> untyped
 
         def list_activities: (ListActivitiesInput input) -> Enumerator[ActivityExecution, ActivityExecution]
 

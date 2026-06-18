@@ -1,0 +1,9 @@
+class ClientActivityOperatorCommandsTest < Test
+  PAUSED_STATES: Array[Integer]
+
+  def assert_paused: (Temporalio::Client::ActivityHandle handle) -> void
+
+  def with_activity_worker: (Array[singleton(Temporalio::Activity::Definition)] activities) { (String) -> untyped } -> untyped
+
+  def start_running_slow_activity: (String task_queue, **untyped kwargs) -> Temporalio::Client::ActivityHandle
+end

@@ -22,6 +22,14 @@ module Temporalio
 
         def terminate_activity: (Temporalio::Client::Interceptor::TerminateActivityInput input) -> void
 
+        def pause_activity: (Temporalio::Client::Interceptor::PauseActivityInput input) -> void
+
+        def unpause_activity: (Temporalio::Client::Interceptor::UnpauseActivityInput input) -> void
+
+        def reset_activity: (Temporalio::Client::Interceptor::ResetActivityInput input) -> void
+
+        def update_activity_options: (Temporalio::Client::Interceptor::UpdateActivityOptionsInput input) -> untyped
+
         def list_activities: (Temporalio::Client::Interceptor::ListActivitiesInput input) -> Enumerator[Temporalio::Client::ActivityExecution, Temporalio::Client::ActivityExecution]
 
         def count_activities: (Temporalio::Client::Interceptor::CountActivitiesInput input) -> Temporalio::Client::ActivityExecutionCount

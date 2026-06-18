@@ -1,0 +1,198 @@
+# frozen_string_literal: true
+
+require 'securerandom'
+require 'temporalio/client'
+require 'temporalio/testing'
+require 'temporalio/worker'
+require 'test'
+
+# Tests for the standalone-activity operator commands on ActivityHandle:
+# pause / unpause / reset / update_options. Each asserts an observable server state change.
+class ClientActivityOperatorCommandsTest < Test
+  # Long-running activity that heartbeats and runs until cancellation. Used so the activity stays
+  # in a running/started state long enough for operator commands to be observable.
+  class SlowActivity < Temporalio::Activity::Definition
+    def execute
+      Temporalio::Activity::Context.current.heartbeat
+      sleep 0.1 until Temporalio::Activity::Context.current.cancellation.canceled?
+      raise Temporalio::Error::CanceledError, 'canceled'
+    end
+  end
+
+  # Returns immediately. Used together with a start delay so it can be paused while scheduled
+  # (before it ever runs) and then resumed to a successful completion.
+  class QuickActivity < Temporalio::Activity::Definition
+    def execute
+      'resumed'
+    end
+  end
+
+  # Fails the first attempt so a retry is forced, then succeeds. Used to exercise reset against an
+  # activity that has recorded more than one attempt.
+  class FailThenSucceedActivity < Temporalio::Activity::Definition
+    def execute
+      if Temporalio::Activity::Context.current.info.attempt < 3
+        raise Temporalio::Error::ApplicationError, 'retryable failure'
+      end
+
+      'done'
+    end
+  end
+
+  # A running activity does not transition straight to PAUSED on pause: the server records
+  # PAUSE_REQUESTED and only moves to PAUSED once the worker acknowledges (drops the attempt). A
+  # long-running heartbeating activity that has not yet noticed the pause stays in PAUSE_REQUESTED,
+  # so both states count as "paused" for an observability assertion.
+  PAUSED_STATES = [
+    Temporalio::Client::PendingActivityState::PAUSED,
+    Temporalio::Client::PendingActivityState::PAUSE_REQUESTED
+  ].freeze
+
+  def assert_paused(handle)
+    assert_eventually do
+      assert_includes PAUSED_STATES, handle.describe.run_state
+    end
+  end
+
+  def with_activity_worker(activities, &)
+    task_queue = "saa-tq-#{SecureRandom.uuid}"
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: task_queue,
+      activities: activities
+    )
+    worker.run { yield task_queue }
+  end
+
+  # Start a SlowActivity and wait until it has actually started running on the worker.
+  def start_running_slow_activity(task_queue, **kwargs)
+    activity_id = "act-#{SecureRandom.uuid}"
+    handle = env.client.start_activity(
+      SlowActivity,
+      id: activity_id, task_queue: task_queue, start_to_close_timeout: 60,
+      heartbeat_timeout: 30, **kwargs
+    )
+    assert_eventually do
+      desc = handle.describe
+      assert_equal Temporalio::Client::PendingActivityState::STARTED, desc.run_state
+    end
+    handle
+  end
+
+  def test_pause_shows_paused
+    with_activity_worker([SlowActivity]) do |task_queue|
+      handle = start_running_slow_activity(task_queue)
+      handle.pause('test-pause-reason')
+      assert_paused(handle)
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_unpause_resumes
+    with_activity_worker([QuickActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # Start with a long delay so the activity sits in SCHEDULED and can be paused before it runs.
+      handle = env.client.start_activity(
+        QuickActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60,
+        start_delay: 30.0
+      )
+      handle.pause('pause-before-unpause')
+      # A not-yet-started (scheduled) activity transitions fully to PAUSED.
+      assert_eventually do
+        assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
+      end
+
+      handle.unpause
+      # After unpause the activity proceeds and completes successfully (proving it resumed).
+      assert_equal 'resumed', handle.result
+    end
+  end
+
+  def test_reset
+    with_activity_worker([FailThenSucceedActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      handle = env.client.start_activity(
+        FailThenSucceedActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60,
+        retry_policy: Temporalio::RetryPolicy.new(
+          initial_interval: 0.2, backoff_coefficient: 1.0, max_interval: 0.2, max_attempts: 50
+        )
+      )
+      # Wait until the activity has recorded more than one attempt (i.e. it has retried).
+      assert_eventually do
+        assert_operator handle.describe.attempt, :>, 1
+      end
+
+      handle.reset
+      # After reset the attempt counter goes back to the start.
+      assert_eventually do
+        assert_equal 1, handle.describe.attempt
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_update_options_respects_mask
+    with_activity_worker([SlowActivity]) do |task_queue|
+      handle = start_running_slow_activity(
+        task_queue,
+        start_to_close_timeout: 45,
+        schedule_to_close_timeout: 120
+      )
+
+      updated = handle.update_options(start_to_close_timeout: 90.0)
+
+      # Returned options: only start_to_close changed; schedule_to_close kept its original value.
+      assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
+      assert_in_delta 120.0, updated.schedule_to_close_timeout, 0.5
+
+      # Confirm via describe that the partial update was applied server-side.
+      assert_eventually do
+        desc = handle.describe
+        assert_in_delta 90.0, desc.start_to_close_timeout, 0.5
+        assert_in_delta 120.0, desc.schedule_to_close_timeout, 0.5
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_update_options_restore_original_exclusive
+    with_activity_worker([SlowActivity]) do |task_queue|
+      handle = start_running_slow_activity(task_queue)
+      # Wrap the RPC so we can prove it is never reached when the validation fails.
+      ws = env.client.workflow_service
+      reached = false
+      original = ws.method(:update_activity_execution_options)
+      ws.define_singleton_method(:update_activity_execution_options) do |req, **kwargs|
+        reached = true
+        original.call(req, **kwargs)
+      end
+      begin
+        err = assert_raises(ArgumentError) do
+          handle.update_options(restore_original: true, start_to_close_timeout: 5.0)
+        end
+        assert_match(/restore_original cannot be combined/i, err.message)
+        refute reached, 'update_activity_execution_options RPC should not be reached when validation fails'
+      ensure
+        ws.singleton_class.send(:remove_method, :update_activity_execution_options)
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_update_options_restore_original_alone
+    with_activity_worker([SlowActivity]) do |task_queue|
+      handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
+
+      # Change an option away from the original.
+      changed = handle.update_options(start_to_close_timeout: 90.0)
+      assert_in_delta 90.0, changed.start_to_close_timeout, 0.5
+
+      # restore_original alone reverts to the value the activity was created with.
+      restored = handle.update_options(restore_original: true)
+      assert_in_delta 45.0, restored.start_to_close_timeout, 0.5
+      handle.terminate('cleanup')
+    end
+  end
+end

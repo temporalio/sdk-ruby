@@ -1,6 +1,8 @@
 module Temporalio
   class Client
     class ActivityHandle
+      UNSET: Object
+
       attr_reader id: String
       attr_reader run_id: String?
       attr_reader result_hint: Object?
@@ -19,6 +21,58 @@ module Temporalio
       def cancel: (?String? reason, ?rpc_options: RPCOptions?) -> void
 
       def terminate: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      def pause: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      def unpause: (
+        ?reason: String?,
+        ?reset_attempts: bool,
+        ?reset_heartbeat: bool,
+        ?jitter: Float?,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def reset: (
+        ?reset_heartbeat: bool,
+        ?keep_paused: bool,
+        ?jitter: Float?,
+        ?restore_original_options: bool,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def update_options: (
+        ?task_queue: (String | Symbol)?,
+        ?schedule_to_close_timeout: Float?,
+        ?schedule_to_start_timeout: Float?,
+        ?start_to_close_timeout: Float?,
+        ?heartbeat_timeout: Float?,
+        ?retry_policy: RetryPolicy?,
+        ?priority: Priority?,
+        ?restore_original: bool,
+        ?rpc_options: RPCOptions?
+      ) -> UpdatedOptions
+
+      class UpdatedOptions
+        attr_reader task_queue: String?
+        attr_reader schedule_to_close_timeout: Float?
+        attr_reader schedule_to_start_timeout: Float?
+        attr_reader start_to_close_timeout: Float?
+        attr_reader heartbeat_timeout: Float?
+        attr_reader retry_policy: RetryPolicy?
+        attr_reader priority: Priority
+
+        def self._from_proto: (untyped options) -> UpdatedOptions
+
+        def initialize: (
+          task_queue: String?,
+          schedule_to_close_timeout: Float?,
+          schedule_to_start_timeout: Float?,
+          start_to_close_timeout: Float?,
+          heartbeat_timeout: Float?,
+          retry_policy: RetryPolicy?,
+          priority: Priority
+        ) -> void
+      end
 
       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
     end

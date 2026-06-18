@@ -1,0 +1,3 @@
+class ClientActivityOperatorCommandsInterceptorTest < Test
+  def client_with_interceptor: (Array[untyped] events) -> Temporalio::Client
+end

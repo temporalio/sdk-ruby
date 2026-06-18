@@ -4,6 +4,9 @@ require 'temporalio/api'
 require 'temporalio/client/activity_execution'
 require 'temporalio/client/interceptor'
 require 'temporalio/error'
+require 'temporalio/internal/proto_utils'
+require 'temporalio/priority'
+require 'temporalio/retry_policy'
 
 module Temporalio
   class Client
@@ -12,6 +15,36 @@ module Temporalio
     #
     # WARNING: Standalone Activities are experimental.
     class ActivityHandle
+      # Sentinel used by {#update_options} to distinguish an option that was not provided from one
+      # explicitly set (including set to nil). Only provided options are included in the update mask.
+      UNSET = Object.new
+      private_constant :UNSET
+
+      # Read-only view of a standalone activity's options, returned by {ActivityHandle#update_options}.
+      #
+      # WARNING: Standalone Activities are experimental.
+      UpdatedOptions = Data.define(
+        :task_queue,
+        :schedule_to_close_timeout,
+        :schedule_to_start_timeout,
+        :start_to_close_timeout,
+        :heartbeat_timeout,
+        :retry_policy,
+        :priority
+      ) do
+        # @!visibility private
+        def self._from_proto(options)
+          new(
+            task_queue: Internal::ProtoUtils.string_or(options.task_queue&.name, nil),
+            schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(options.schedule_to_close_timeout),
+            schedule_to_start_timeout: Internal::ProtoUtils.duration_to_seconds(options.schedule_to_start_timeout),
+            start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(options.start_to_close_timeout),
+            heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(options.heartbeat_timeout),
+            retry_policy: options.retry_policy ? RetryPolicy._from_proto(options.retry_policy) : nil,
+            priority: Priority._from_proto(options.priority)
+          )
+        end
+      end
       # @return [String] ID for the activity.
       attr_reader :id
 
@@ -101,6 +134,161 @@ module Temporalio
           )
         )
         nil
+      end
+
+      # Pause the activity. A paused activity is not scheduled or retried until it is unpaused via
+      # {#unpause}.
+      #
+      # WARNING: Standalone Activities are experimental.
+      #
+      # @param reason [String, nil] Optional reason recorded on the server.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      # @raise [Error::RPCError] RPC error from call.
+      def pause(reason = nil, rpc_options: nil)
+        @client._impl.pause_activity(
+          Interceptor::PauseActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            reason:,
+            rpc_options:
+          )
+        )
+        nil
+      end
+
+      # Unpause the activity, allowing it to be scheduled or retried again.
+      #
+      # WARNING: Standalone Activities are experimental.
+      #
+      # @param reason [String, nil] Optional reason recorded on the server.
+      # @param reset_attempts [Boolean] If true, also reset the activity's attempt count.
+      # @param reset_heartbeat [Boolean] If true, also reset the activity's heartbeat details.
+      # @param jitter [Float, nil] If set, the activity will start at a random time within this
+      #   duration (in seconds).
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      # @raise [Error::RPCError] RPC error from call.
+      def unpause(reason: nil, reset_attempts: false, reset_heartbeat: false, jitter: nil, rpc_options: nil)
+        @client._impl.unpause_activity(
+          Interceptor::UnpauseActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            reason:,
+            reset_attempts:,
+            reset_heartbeat:,
+            jitter:,
+            rpc_options:
+          )
+        )
+        nil
+      end
+
+      # Reset the activity. Resetting sets the attempt count back to the start and resets the
+      # activity's timeouts.
+      #
+      # WARNING: Standalone Activities are experimental.
+      #
+      # @param reset_heartbeat [Boolean] If true, reset the activity's heartbeat details.
+      # @param keep_paused [Boolean] If true and the activity is paused, it remains paused after reset.
+      # @param jitter [Float, nil] If set and the activity is in backoff, it will start at a random
+      #   time within this duration (in seconds).
+      # @param restore_original_options [Boolean] If true, restore the activity options to the
+      #   originals it was created with.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      # @raise [Error::RPCError] RPC error from call.
+      def reset(reset_heartbeat: false, keep_paused: false, jitter: nil, restore_original_options: false,
+                rpc_options: nil)
+        @client._impl.reset_activity(
+          Interceptor::ResetActivityInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            reset_heartbeat:,
+            keep_paused:,
+            jitter:,
+            restore_original_options:,
+            rpc_options:
+          )
+        )
+        nil
+      end
+
+      # Update the activity's options. Only the options explicitly provided are changed; any option
+      # left as its default is not included in the update.
+      #
+      # WARNING: Standalone Activities are experimental.
+      #
+      # @param task_queue [String, nil] New task queue.
+      # @param schedule_to_close_timeout [Float, nil] New schedule-to-close timeout in seconds.
+      # @param schedule_to_start_timeout [Float, nil] New schedule-to-start timeout in seconds.
+      # @param start_to_close_timeout [Float, nil] New start-to-close timeout in seconds.
+      # @param heartbeat_timeout [Float, nil] New heartbeat timeout in seconds.
+      # @param retry_policy [RetryPolicy, nil] New retry policy.
+      # @param priority [Priority, nil] New priority.
+      # @param restore_original [Boolean] If true, restore the options to the originals the activity
+      #   was created with. Mutually exclusive with any other option.
+      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      #
+      # @return [UpdatedOptions] The activity options after the update.
+      #
+      # @raise [ArgumentError] If `restore_original` is combined with any other option.
+      # @raise [Error::RPCError] RPC error from call.
+      def update_options(
+        task_queue: UNSET,
+        schedule_to_close_timeout: UNSET,
+        schedule_to_start_timeout: UNSET,
+        start_to_close_timeout: UNSET,
+        heartbeat_timeout: UNSET,
+        retry_policy: UNSET,
+        priority: UNSET,
+        restore_original: false,
+        rpc_options: nil
+      )
+        options = Api::Activity::V1::ActivityOptions.new
+        paths = []
+
+        unless UNSET.equal?(task_queue)
+          paths << 'task_queue'
+          options.task_queue = Api::TaskQueue::V1::TaskQueue.new(name: task_queue.to_s) if task_queue
+        end
+        unless UNSET.equal?(schedule_to_close_timeout)
+          paths << 'schedule_to_close_timeout'
+          options.schedule_to_close_timeout = Internal::ProtoUtils.seconds_to_duration(schedule_to_close_timeout)
+        end
+        unless UNSET.equal?(schedule_to_start_timeout)
+          paths << 'schedule_to_start_timeout'
+          options.schedule_to_start_timeout = Internal::ProtoUtils.seconds_to_duration(schedule_to_start_timeout)
+        end
+        unless UNSET.equal?(start_to_close_timeout)
+          paths << 'start_to_close_timeout'
+          options.start_to_close_timeout = Internal::ProtoUtils.seconds_to_duration(start_to_close_timeout)
+        end
+        unless UNSET.equal?(heartbeat_timeout)
+          paths << 'heartbeat_timeout'
+          options.heartbeat_timeout = Internal::ProtoUtils.seconds_to_duration(heartbeat_timeout)
+        end
+        unless UNSET.equal?(retry_policy)
+          paths << 'retry_policy'
+          options.retry_policy = retry_policy&._to_proto
+        end
+        unless UNSET.equal?(priority)
+          paths << 'priority'
+          options.priority = priority&._to_proto
+        end
+
+        if restore_original && !paths.empty?
+          raise ArgumentError, 'restore_original cannot be combined with any other option'
+        end
+
+        result = @client._impl.update_activity_options(
+          Interceptor::UpdateActivityOptionsInput.new(
+            activity_id: id,
+            activity_run_id: run_id,
+            activity_options: options,
+            update_mask: Google::Protobuf::FieldMask.new(paths:),
+            restore_original:,
+            rpc_options:
+          )
+        )
+        UpdatedOptions._from_proto(result)
       end
 
       private
