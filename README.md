@@ -1348,34 +1348,22 @@ section for how to build a the repository.
 The SDK works on Ruby 3.2+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
 `async` gem) are only supported on Ruby versions 3.3 and newer.
 
-### FIPS Compliance
+### FIPS Compliance (Beta)
 
-FIPS 140-3 compliant cryptography is available as an **opt-in source build**. The default published gems are **not**
-FIPS compliant: they use the `ring` crypto backend, which is not FIPS-validated. The opt-in build instead uses
-[`aws-lc-rs`](https://github.com/aws/aws-lc-rs) compiled in FIPS mode (wrapping AWS-LC's FIPS 140-3 validated module)
-for both the gRPC client and the OTLP metric exporter.
+> **NOTE**: FIPS support is in **Beta**. It is opt-in, source-build only, and currently exercised on Linux only.
 
-Because the crypto backend is chosen at compile time, FIPS cannot be enabled on a precompiled platform gem. You must
-build the native extension yourself with the `TEMPORALIO_FIPS=1` environment variable set. Building requires a recursive
-clone (the published "source" gem cannot be built directly — see [Platform Support](#platform-support)), along with
-Rust, Go, and protoc (see the [Build](#build) section for prerequisites):
+FIPS 140-3 compliant cryptography is available as an **opt-in source build**. The published gems are **not** FIPS
+compliant — they use the `ring` backend, which is not FIPS-validated. Because the crypto backend is chosen at compile
+time, FIPS cannot be enabled on a precompiled platform gem: you must build the native extension yourself with
+`TEMPORALIO_FIPS=1`. When set, the build:
 
-    # From a recursive clone, in the temporalio/ directory:
-    TEMPORALIO_FIPS=1 bundle exec rake compile
+* Selects [`aws-lc-rs`](https://github.com/aws/aws-lc-rs) in FIPS mode (AWS-LC's FIPS 140-3 validated module) for the
+  gRPC client and OTLP metric exporter, in place of `ring`.
+* Hashes the default worker build id with `Digest::SHA256` instead of MD5, which FIPS-mode OpenSSL rejects.
 
-To produce an installable FIPS gem for your platform, pass the variable through `rb-sys-dock` (see
-[Build Platform-specific Gem](#build-platform-specific-gem)):
+To produce an installable FIPS gem for your platform:
 
     TEMPORALIO_FIPS=1 bundle exec rb-sys-dock --platform x86_64-linux --ruby-versions 3.4 --build
-
-Additional considerations for a fully FIPS-compliant deployment:
-
-* **Ruby's own crypto must be FIPS-capable.** The SDK uses `SecureRandom` (for request IDs) and `Digest::SHA256` (for
-  the default worker build id). Both are FIPS-approved, but rely on Ruby being built against a FIPS-enabled OpenSSL. The
-  default build id was changed from MD5 to SHA-256 so it does not fail under FIPS-mode OpenSSL.
-* **Toolchain.** The `aws-lc-rs` FIPS build compiles AWS-LC from C/assembly and requires Go and a compatible C compiler.
-  On some Linux toolchains you may need to pin `CC=gcc-10`/`CXX=g++-10` (the cross-compilation Docker image already does
-  this).
 
 ### Migration from Coinbase Ruby SDK
 
@@ -1441,7 +1429,7 @@ not work for other Ruby versions or other OS/arch combinations. For that, see "B
 [an issue](https://github.com/rust-lang/rust/issues/34283) that causes runtime stack size problems.
 
 **NOTE**: Set `TEMPORALIO_FIPS=1` before compiling to build with the FIPS-mode `aws-lc-rs` crypto backend. See the
-[FIPS Compliance](#fips-compliance) section.
+[FIPS Compliance](#fips-compliance-beta) section.
 
 To lint, build, and test:
 

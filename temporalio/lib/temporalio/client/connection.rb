@@ -304,6 +304,7 @@ module Temporalio
 
       def new_core_client
         Internal::Bridge.assert_fiber_compatibility!
+        Internal::Bridge.assert_fips_compatibility!
 
         options = Internal::Bridge::Client::Options.new(
           target_host: @options.target_host,

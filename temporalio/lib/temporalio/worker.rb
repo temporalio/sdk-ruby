@@ -170,6 +170,7 @@ module Temporalio
       raise ArgumentError, 'Not all parameters are workers' unless workers.all?(Worker)
 
       Internal::Bridge.assert_fiber_compatibility!
+      Internal::Bridge.assert_fips_compatibility!
 
       # Start the multi runner
       runner = Internal::Worker::MultiRunner.new(workers:, shutdown_signals:)
