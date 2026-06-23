@@ -80,4 +80,49 @@ class ClientActivityOperatorCommandsBuildTest < Test
     # The canned response decoded back through the handle.
     assert_in_delta 30.0, updated.start_to_close_timeout, 0.001
   end
+
+  def test_update_options_all_fields_mask
+    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
+    handle = client.activity_handle('act-1', activity_run_id: 'run-1')
+
+    ws = client.workflow_service
+    captured = {}
+    ws.define_singleton_method(:update_activity_execution_options) do |req, **_kwargs|
+      captured[:update] = req
+      Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse.new(
+        activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new
+      )
+    end
+
+    begin
+      handle.update_options(
+        task_queue: 'tq',
+        schedule_to_close_timeout: 100.0,
+        schedule_to_start_timeout: 10.0,
+        start_to_close_timeout: 30.0,
+        heartbeat_timeout: 5.0,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 7),
+        priority: Temporalio::Priority.new(priority_key: 3)
+      )
+    ensure
+      ws.singleton_class.send(:remove_method, :update_activity_execution_options)
+    end
+
+    update_req = captured.fetch(:update)
+
+    expected_paths = %w[
+      task_queue schedule_to_close_timeout schedule_to_start_timeout start_to_close_timeout
+      heartbeat_timeout retry_policy priority
+    ]
+    assert_equal expected_paths.sort, update_req.update_mask.paths.to_a.sort
+
+    opts = update_req.activity_options
+    assert_equal 'tq', opts.task_queue.name
+    assert_equal 100, opts.schedule_to_close_timeout.seconds
+    assert_equal 10, opts.schedule_to_start_timeout.seconds
+    assert_equal 30, opts.start_to_close_timeout.seconds
+    assert_equal 5, opts.heartbeat_timeout.seconds
+    assert_equal 7, opts.retry_policy.maximum_attempts
+    assert_equal 3, opts.priority.priority_key
+  end
 end
