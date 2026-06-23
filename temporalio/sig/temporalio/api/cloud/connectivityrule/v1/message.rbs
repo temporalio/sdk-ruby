@@ -116,10 +116,23 @@ module Temporalio
           # A public connectivity rule allows access to the namespace via the public internet.
           class PublicConnectivityRule < ::Google::Protobuf::AbstractMessage
 
+            # Flag to determine namespace is connected via a predictable set of IPs on public internet
+            # temporal:versioning:min_version=v0.15.0
+            attr_accessor enable_stable_ips(): bool
+            def clear_enable_stable_ips: () -> void
+
             type init_map = {
+              enable_stable_ips: bool?,
+              "enable_stable_ips" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("enable_stable_ips" name) -> bool
+
+            def []=:
+                ("enable_stable_ips" name, bool value) -> void
           end
 
           # A private connectivity rule allows connections from a specific private vpc only.

@@ -1741,6 +1741,66 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.PauseActivityExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse] API response.
+        def pause_activity_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'pause_activity_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.ResetActivityExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse] API response.
+        def reset_activity_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'reset_activity_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UnpauseActivityExecution API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse] API response.
+        def unpause_activity_execution(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'unpause_activity_execution',
+            request_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls WorkflowService.UpdateActivityExecutionOptions API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse] API response.
+        def update_activity_execution_options(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_activity_execution_options',
+            request_class: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.TerminateNexusOperationExecution API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest] API request.

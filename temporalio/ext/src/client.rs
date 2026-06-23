@@ -138,6 +138,7 @@ impl Client {
                     .member::<Option<RString>>(id!("server_root_ca_cert"))?
                     .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
                 domain: tls.member(id!("domain"))?,
+                server_cert_verifier: None,
             })
         } else {
             None

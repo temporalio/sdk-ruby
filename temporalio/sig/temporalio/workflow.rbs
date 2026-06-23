@@ -176,6 +176,7 @@ module Temporalio
       attr_accessor task_queue: String?
       attr_accessor run_timeout: duration?
       attr_accessor task_timeout: duration?
+      attr_accessor backoff_start_interval: duration?
       attr_accessor retry_policy: RetryPolicy?
       attr_accessor memo: Hash[String | Symbol, Object?]?
       attr_accessor search_attributes: SearchAttributes?
@@ -189,6 +190,7 @@ module Temporalio
         ?task_queue: String?,
         ?run_timeout: duration?,
         ?task_timeout: duration?,
+        ?backoff_start_interval: duration?,
         ?retry_policy: RetryPolicy?,
         ?memo: Hash[String | Symbol, Object?]?,
         ?search_attributes: SearchAttributes?,

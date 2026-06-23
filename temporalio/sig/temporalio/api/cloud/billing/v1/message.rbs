@@ -11,6 +11,28 @@ module Temporalio
       module Billing
         module V1
           class BillingReportSpec < ::Google::Protobuf::AbstractMessage
+            module BillingReportGranularity
+
+              BILLING_REPORT_GRANULARITY_UNSPECIFIED: 0
+
+              BILLING_REPORT_GRANULARITY_HOURLY: 1
+
+              BILLING_REPORT_GRANULARITY_DAILY: 2
+
+              BILLING_REPORT_GRANULARITY_MONTHLY: 3
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :BILLING_REPORT_GRANULARITY_UNSPECIFIED | :BILLING_REPORT_GRANULARITY_HOURLY | :BILLING_REPORT_GRANULARITY_DAILY | :BILLING_REPORT_GRANULARITY_MONTHLY
+
+              type strings = "BILLING_REPORT_GRANULARITY_UNSPECIFIED" | "BILLING_REPORT_GRANULARITY_HOURLY" | "BILLING_REPORT_GRANULARITY_DAILY" | "BILLING_REPORT_GRANULARITY_MONTHLY"
+
+              type numbers = 0 | 1 | 2 | 3
+            end
 
             # The start time of the billing report (in UTC).
             attr_reader start_time_inclusive(): ::Google::Protobuf::Timestamp?
@@ -37,6 +59,14 @@ module Temporalio
             attr_writer description(): ::String | ::Symbol
             def clear_description: () -> void
 
+            # The data granularity of the billing report.
+            # Optional, default is hourly.
+            # temporal:versioning:min_version=v0.16.0
+            attr_reader granularity(): ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Integer
+            attr_writer granularity(): ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::strings | ::Integer | ::Float
+            attr_reader granularity_const(): ::Integer
+            def clear_granularity: () -> void
+
             type init_map = {
               start_time_inclusive: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               "start_time_inclusive" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
@@ -46,6 +76,8 @@ module Temporalio
               "download_url_expiration_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
               description: (::String | ::Symbol)?,
               "description" => (::String | ::Symbol)?,
+              granularity: (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::strings | ::Integer | ::Float)?,
+              "granularity" => (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::strings | ::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -55,12 +87,14 @@ module Temporalio
               | ("end_time_exclusive" name) -> ::Google::Protobuf::Timestamp?
               | ("download_url_expiration_duration" name) -> ::Google::Protobuf::Duration?
               | ("description" name) -> ::String
+              | ("granularity" name) -> (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Integer)
 
             def []=:
                 ("start_time_inclusive" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("end_time_exclusive" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("download_url_expiration_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
               | ("description" name, (::String | ::Symbol) value) -> void
+              | ("granularity" name, (::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::names | ::Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity::strings | ::Integer | ::Float) value) -> void
           end
 
           class BillingReport < ::Google::Protobuf::AbstractMessage

@@ -180,11 +180,30 @@ module Temporalio
           def has_input?: () -> bool
           def clear_input: () -> void
 
+          # The request ID of the request.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
+          # Callbacks to be called by the server when this update reaches a terminal state.
+          attr_accessor completion_callbacks(): ::Google::Protobuf::RepeatedField
+          def clear_completion_callbacks: () -> void
+
+          # Links to be associated with this update.
+          attr_accessor links(): ::Google::Protobuf::RepeatedField
+          def clear_links: () -> void
+
           type init_map = {
             meta: (::Temporalio::Api::Update::V1::Meta | ::Temporalio::Api::Update::V1::Meta::init_map)?,
             "meta" => (::Temporalio::Api::Update::V1::Meta | ::Temporalio::Api::Update::V1::Meta::init_map)?,
             input: (::Temporalio::Api::Update::V1::Input | ::Temporalio::Api::Update::V1::Input::init_map)?,
             "input" => (::Temporalio::Api::Update::V1::Input | ::Temporalio::Api::Update::V1::Input::init_map)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
+            completion_callbacks: ::Array[::Temporalio::Api::Common::V1::Callback]?,
+            "completion_callbacks" => ::Array[::Temporalio::Api::Common::V1::Callback]?,
+            links: ::Array[::Temporalio::Api::Common::V1::Link]?,
+            "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -192,10 +211,16 @@ module Temporalio
           def []:
               ("meta" name) -> ::Temporalio::Api::Update::V1::Meta?
             | ("input" name) -> ::Temporalio::Api::Update::V1::Input?
+            | ("request_id" name) -> ::String
+            | ("completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
+            | ("links" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
               ("meta" name, ::Temporalio::Api::Update::V1::Meta? value) -> void
             | ("input" name, ::Temporalio::Api::Update::V1::Input? value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
+            | ("completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         # An Update protocol message indicating that a Workflow Update has been rejected.
