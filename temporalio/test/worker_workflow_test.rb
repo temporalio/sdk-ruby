@@ -240,16 +240,20 @@ class WorkerWorkflowTest < Test
       [
         Temporalio::Workflow.continue_as_new_suggested,
         Temporalio::Workflow.current_history_length,
-        Temporalio::Workflow.current_history_size
+        Temporalio::Workflow.current_history_size,
+        Temporalio::Workflow.suggest_continue_as_new_reasons
       ]
     end
   end
 
   def test_history_info
-    can_suggested, hist_len, hist_size = execute_workflow(HistoryInfoWorkflow) #: [bool, Integer, Integer]
+    can_suggested, hist_len, hist_size, reasons =
+      execute_workflow(HistoryInfoWorkflow) #: [bool, Integer, Integer, Array[Integer]]
     refute can_suggested
     assert hist_len > 60
     assert hist_size > 1500
+    assert_instance_of Array, reasons
+    assert_empty reasons
   end
 
   class WaitConditionWorkflow < Temporalio::Workflow::Definition

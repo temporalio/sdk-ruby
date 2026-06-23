@@ -180,7 +180,9 @@ module Temporalio
           @commands = []
           @current_activation_error = nil
           @continue_as_new_suggested = activation.continue_as_new_suggested
-          @suggest_continue_as_new_reasons = activation.suggest_continue_as_new_reasons.map(&:to_i)
+          @suggest_continue_as_new_reasons = activation.suggest_continue_as_new_reasons.map do |reason|
+            ProtoUtils.enum_to_int(Api::Enums::V1::SuggestContinueAsNewReason, reason)
+          end
           @target_worker_deployment_version_changed = activation.target_worker_deployment_version_changed
           @current_deployment_version = WorkerDeploymentVersion._from_bridge(
             activation.deployment_version_for_current_task
