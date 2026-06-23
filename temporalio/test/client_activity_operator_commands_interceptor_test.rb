@@ -77,8 +77,6 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
       end
 
       handle.pause('reason')
-      # A running activity records PAUSE_REQUESTED first, only reaching PAUSED once the worker drops
-      # the attempt; both count as paused for this flow-through assertion.
       paused_states = [
         Temporalio::Client::PendingActivityState::PAUSED,
         Temporalio::Client::PendingActivityState::PAUSE_REQUESTED

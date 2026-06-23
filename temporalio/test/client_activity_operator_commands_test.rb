@@ -9,8 +9,7 @@ require 'test'
 # Tests for the standalone-activity operator commands on ActivityHandle:
 # pause / unpause / reset / update_options. Each asserts an observable server state change.
 class ClientActivityOperatorCommandsTest < Test
-  # Long-running activity that heartbeats and runs until cancellation. Used so the activity stays
-  # in a running/started state long enough for operator commands to be observable.
+  # Long-running activity that heartbeats and runs until cancellation.
   class SlowActivity < Temporalio::Activity::Definition
     def execute
       Temporalio::Activity::Context.current.heartbeat
@@ -27,8 +26,8 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Fails the first attempt so a retry is forced, then succeeds. Used to exercise reset against an
-  # activity that has recorded more than one attempt.
+  # Fails the first two attempts so retries are forced, then succeeds on the third. Used to exercise
+  # reset against an activity that has recorded more than one attempt.
   class FailThenSucceedActivity < Temporalio::Activity::Definition
     def execute
       if Temporalio::Activity::Context.current.info.attempt < 3
@@ -205,7 +204,7 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_update_options_restore_original_alone
+  def test_update_options_restore_original
     with_activity_worker([SlowActivity]) do |task_queue|
       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
 

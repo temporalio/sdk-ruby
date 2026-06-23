@@ -16,7 +16,7 @@ module Temporalio
     # WARNING: Standalone Activities are experimental.
     class ActivityHandle
       # Sentinel used by {#update_options} to distinguish an option that was not provided from one
-      # explicitly set (including set to nil). Only provided options are included in the update mask.
+      # explicitly set to nil. Only provided options are included in the update mask.
       UNSET = Object.new
       private_constant :UNSET
 
