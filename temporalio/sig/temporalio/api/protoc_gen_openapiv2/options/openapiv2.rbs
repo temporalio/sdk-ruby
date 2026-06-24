@@ -70,7 +70,7 @@ module Grpc
           # The transfer protocol of the API. Values MUST be from the list: "http",
           # "https", "ws", "wss". If the schemes is not included, the default scheme to
           # be used is the one used to access the OpenAPI definition itself.
-          attr_accessor schemes(): ::Google::Protobuf::RepeatedField
+          attr_accessor schemes(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer])
           attr_reader schemes_const(): ::Array[::Integer]
           def clear_schemes: () -> void
 
@@ -155,7 +155,7 @@ module Grpc
             | ("info" name) -> ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Info?
             | ("host" name) -> ::String
             | ("base_path" name) -> ::String
-            | ("schemes" name) -> (::Google::Protobuf::RepeatedField)
+            | ("schemes" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer]))
             | ("consumes" name) -> (::Google::Protobuf::RepeatedField)
             | ("produces" name) -> (::Google::Protobuf::RepeatedField)
             | ("responses" name) -> (::Google::Protobuf::Map[::String, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Response])
@@ -170,7 +170,7 @@ module Grpc
             | ("info" name, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Info? value) -> void
             | ("host" name, (::String | ::Symbol) value) -> void
             | ("base_path" name, (::String | ::Symbol) value) -> void
-            | ("schemes" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("schemes" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer])) value) -> void
             | ("consumes" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("produces" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("responses" name, (::Google::Protobuf::Map[::String, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Response]) value) -> void
@@ -254,7 +254,7 @@ module Grpc
           # The transfer protocol for the operation. Values MUST be from the list:
           # "http", "https", "ws", "wss". The value overrides the OpenAPI Object
           # schemes definition.
-          attr_accessor schemes(): ::Google::Protobuf::RepeatedField
+          attr_accessor schemes(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer])
           attr_reader schemes_const(): ::Array[::Integer]
           def clear_schemes: () -> void
 
@@ -324,7 +324,7 @@ module Grpc
             | ("consumes" name) -> (::Google::Protobuf::RepeatedField)
             | ("produces" name) -> (::Google::Protobuf::RepeatedField)
             | ("responses" name) -> (::Google::Protobuf::Map[::String, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Response])
-            | ("schemes" name) -> (::Google::Protobuf::RepeatedField)
+            | ("schemes" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer]))
             | ("deprecated" name) -> bool
             | ("security" name) -> ::Google::Protobuf::RepeatedField
             | ("extensions" name) -> (::Google::Protobuf::Map[::String, ::Google::Protobuf::Value])
@@ -339,7 +339,7 @@ module Grpc
             | ("consumes" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("produces" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("responses" name, (::Google::Protobuf::Map[::String, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::Response]) value) -> void
-            | ("schemes" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("schemes" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::Scheme::names | ::Integer])) value) -> void
             | ("deprecated" name, bool value) -> void
             | ("security" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("extensions" name, (::Google::Protobuf::Map[::String, ::Google::Protobuf::Value]) value) -> void
@@ -1168,7 +1168,7 @@ module Grpc
           attr_accessor array(): ::Google::Protobuf::RepeatedField
           def clear_array: () -> void
 
-          attr_accessor type(): ::Google::Protobuf::RepeatedField
+          attr_accessor type(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::JSONSchema::JSONSchemaSimpleTypes::names | ::Integer])
           attr_reader type_const(): ::Array[::Integer]
           def clear_type: () -> void
 
@@ -1271,7 +1271,7 @@ module Grpc
             | ("min_properties" name) -> ::Integer
             | ("required" name) -> (::Google::Protobuf::RepeatedField)
             | ("array" name) -> (::Google::Protobuf::RepeatedField)
-            | ("type" name) -> (::Google::Protobuf::RepeatedField)
+            | ("type" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::JSONSchema::JSONSchemaSimpleTypes::names | ::Integer]))
             | ("format" name) -> ::String
             | ("enum" name) -> (::Google::Protobuf::RepeatedField)
             | ("field_configuration" name) -> ::Grpc::Gateway::ProtocGenOpenapiv2::Options::JSONSchema::FieldConfiguration?
@@ -1299,7 +1299,7 @@ module Grpc
             | ("min_properties" name, (::Integer | ::Float) value) -> void
             | ("required" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("array" name, (::Google::Protobuf::RepeatedField) value) -> void
-            | ("type" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("type" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Grpc::Gateway::ProtocGenOpenapiv2::Options::JSONSchema::JSONSchemaSimpleTypes::names | ::Integer])) value) -> void
             | ("format" name, (::String | ::Symbol) value) -> void
             | ("enum" name, (::Google::Protobuf::RepeatedField) value) -> void
             | ("field_configuration" name, ::Grpc::Gateway::ProtocGenOpenapiv2::Options::JSONSchema::FieldConfiguration? value) -> void

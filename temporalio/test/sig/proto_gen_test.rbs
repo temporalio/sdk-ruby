@@ -1,0 +1,9 @@
+class Dir
+  def self.mktmpdir: () { (String dir) -> untyped } -> untyped
+end
+
+class ProtoGenTest < Test
+  private
+
+  def normalize_rbs: (String content) -> String
+end

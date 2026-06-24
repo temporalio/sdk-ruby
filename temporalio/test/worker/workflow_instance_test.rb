@@ -51,7 +51,7 @@ module Worker
           failure_converter: data_converter.failure_converter,
           interceptors: [],
           disable_eager_activity_execution: false,
-          illegal_calls: nil,
+          illegal_calls: {},
           workflow_failure_exception_types: [],
           unsafe_workflow_io_enabled: false,
           assert_valid_local_activity: ->(_) {}

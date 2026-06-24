@@ -473,6 +473,10 @@ class ProtoGen
       /\(::Google::Protobuf::EnumDescriptor & ::Google::Protobuf::_SpecificEnumDescriptor\[[^\]]+\]\)/,
       '::Google::Protobuf::EnumDescriptor'
     )
+    content.gsub!(
+      /::Google::Protobuf::RepeatedField\[([^,\]]*::names[^,\]]*), [^\]]+\]/,
+      '(::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[\1])'
+    )
     content.gsub!(/::Google::Protobuf::RepeatedField\[[^\]]+\]/, '::Google::Protobuf::RepeatedField')
     content.gsub!(
       /::Google::Protobuf::Map\[([^,\]]+), ([^,\]]+), [^\]]+\]/,

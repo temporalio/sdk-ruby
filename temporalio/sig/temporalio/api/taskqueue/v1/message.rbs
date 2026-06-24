@@ -569,7 +569,7 @@ module Temporalio
           # Task reachability for a worker in a single task queue.
           # See the TaskReachability docstring for information about each enum variant.
           # If reachability is empty, this worker is considered unreachable in this task queue.
-          attr_accessor reachability(): ::Google::Protobuf::RepeatedField
+          attr_accessor reachability(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskReachability::names | ::Integer])
           attr_reader reachability_const(): ::Array[::Integer]
           def clear_reachability: () -> void
 
@@ -584,11 +584,11 @@ module Temporalio
 
           def []:
               ("task_queue" name) -> ::String
-            | ("reachability" name) -> (::Google::Protobuf::RepeatedField)
+            | ("reachability" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskReachability::names | ::Integer]))
 
           def []=:
               ("task_queue" name, (::String | ::Symbol) value) -> void
-            | ("reachability" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("reachability" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskReachability::names | ::Integer])) value) -> void
         end
 
         # Reachability of tasks for a worker by build id, in one or more task queues.

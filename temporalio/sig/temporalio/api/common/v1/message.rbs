@@ -464,7 +464,7 @@ module Temporalio
           def clear_current_run_only: () -> void
 
           # Event types not to be reapplied
-          attr_accessor reset_reapply_exclude_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor reset_reapply_exclude_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer])
           attr_reader reset_reapply_exclude_types_const(): ::Array[::Integer]
           def clear_reset_reapply_exclude_types: () -> void
 
@@ -499,7 +499,7 @@ module Temporalio
             | ("build_id" name) -> ::String
             | ("reset_reapply_type" name) -> (::Temporalio::Api::Enums::V1::ResetReapplyType::names | ::Integer)
             | ("current_run_only" name) -> bool
-            | ("reset_reapply_exclude_types" name) -> (::Google::Protobuf::RepeatedField)
+            | ("reset_reapply_exclude_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer]))
 
           def []=:
               ("first_workflow_task" name, ::Google::Protobuf::Empty? value) -> void
@@ -508,7 +508,7 @@ module Temporalio
             | ("build_id" name, ((::String | ::Symbol)?) value) -> void
             | ("reset_reapply_type" name, (::Temporalio::Api::Enums::V1::ResetReapplyType::names | ::Temporalio::Api::Enums::V1::ResetReapplyType::strings | ::Integer | ::Float) value) -> void
             | ("current_run_only" name, bool value) -> void
-            | ("reset_reapply_exclude_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("reset_reapply_exclude_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer])) value) -> void
         end
 
         # Callback to attach to various events in the system, e.g. workflow run completion.

@@ -859,7 +859,7 @@ module Temporalio
 
           # The reason(s) that suggest_continue_as_new is true, if it is.
           # Unset if suggest_continue_as_new is false.
-          attr_accessor suggest_continue_as_new_reasons(): ::Google::Protobuf::RepeatedField
+          attr_accessor suggest_continue_as_new_reasons(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer])
           attr_reader suggest_continue_as_new_reasons_const(): ::Array[::Integer]
           def clear_suggest_continue_as_new_reasons: () -> void
 
@@ -919,7 +919,7 @@ module Temporalio
             | ("identity" name) -> ::String
             | ("request_id" name) -> ::String
             | ("suggest_continue_as_new" name) -> bool
-            | ("suggest_continue_as_new_reasons" name) -> (::Google::Protobuf::RepeatedField)
+            | ("suggest_continue_as_new_reasons" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer]))
             | ("target_worker_deployment_version_changed" name) -> bool
             | ("history_size_bytes" name) -> ::Integer
             | ("worker_version" name) -> ::Temporalio::Api::Common::V1::WorkerVersionStamp?
@@ -930,7 +930,7 @@ module Temporalio
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("request_id" name, (::String | ::Symbol) value) -> void
             | ("suggest_continue_as_new" name, bool value) -> void
-            | ("suggest_continue_as_new_reasons" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("suggest_continue_as_new_reasons" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer])) value) -> void
             | ("target_worker_deployment_version_changed" name, bool value) -> void
             | ("history_size_bytes" name, (::Integer | ::Float) value) -> void
             | ("worker_version" name, ::Temporalio::Api::Common::V1::WorkerVersionStamp? value) -> void

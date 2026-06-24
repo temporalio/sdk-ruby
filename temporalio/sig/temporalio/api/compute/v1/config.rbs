@@ -14,7 +14,7 @@ module Temporalio
           # Optional. The set of task queue types this scaling group serves.
           # If not provided, this scaling group serves all not otherwise defined
           # task types.
-          attr_accessor task_queue_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor task_queue_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])
           attr_reader task_queue_types_const(): ::Array[::Integer]
           def clear_task_queue_types: () -> void
 
@@ -42,12 +42,12 @@ module Temporalio
           def initialize: (?init_map initial_value) -> void
 
           def []:
-              ("task_queue_types" name) -> (::Google::Protobuf::RepeatedField)
+              ("task_queue_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer]))
             | ("provider" name) -> ::Temporalio::Api::Compute::V1::ComputeProvider?
             | ("scaler" name) -> ::Temporalio::Api::Compute::V1::ComputeScaler?
 
           def []=:
-              ("task_queue_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+              ("task_queue_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])) value) -> void
             | ("provider" name, ::Temporalio::Api::Compute::V1::ComputeProvider? value) -> void
             | ("scaler" name, ::Temporalio::Api::Compute::V1::ComputeScaler? value) -> void
         end
@@ -137,7 +137,7 @@ module Temporalio
 
         class ComputeConfigScalingGroupSummary < ::Google::Protobuf::AbstractMessage
 
-          attr_accessor task_queue_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor task_queue_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])
           attr_reader task_queue_types_const(): ::Array[::Integer]
           def clear_task_queue_types: () -> void
 
@@ -155,11 +155,11 @@ module Temporalio
           def initialize: (?init_map initial_value) -> void
 
           def []:
-              ("task_queue_types" name) -> (::Google::Protobuf::RepeatedField)
+              ("task_queue_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer]))
             | ("provider_type" name) -> ::String
 
           def []=:
-              ("task_queue_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+              ("task_queue_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])) value) -> void
             | ("provider_type" name, (::String | ::Symbol) value) -> void
         end
       end

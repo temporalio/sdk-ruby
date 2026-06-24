@@ -3348,7 +3348,7 @@ module Temporalio
           def clear_reset_reapply_type: () -> void
 
           # Event types not to be reapplied
-          attr_accessor reset_reapply_exclude_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor reset_reapply_exclude_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer])
           attr_reader reset_reapply_exclude_types_const(): ::Array[::Integer]
           def clear_reset_reapply_exclude_types: () -> void
 
@@ -3393,7 +3393,7 @@ module Temporalio
             | ("workflow_task_finish_event_id" name) -> ::Integer
             | ("request_id" name) -> ::String
             | ("reset_reapply_type" name) -> (::Temporalio::Api::Enums::V1::ResetReapplyType::names | ::Integer)
-            | ("reset_reapply_exclude_types" name) -> (::Google::Protobuf::RepeatedField)
+            | ("reset_reapply_exclude_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer]))
             | ("post_reset_operations" name) -> ::Google::Protobuf::RepeatedField
             | ("identity" name) -> ::String
 
@@ -3404,7 +3404,7 @@ module Temporalio
             | ("workflow_task_finish_event_id" name, (::Integer | ::Float) value) -> void
             | ("request_id" name, (::String | ::Symbol) value) -> void
             | ("reset_reapply_type" name, (::Temporalio::Api::Enums::V1::ResetReapplyType::names | ::Temporalio::Api::Enums::V1::ResetReapplyType::strings | ::Integer | ::Float) value) -> void
-            | ("reset_reapply_exclude_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("reset_reapply_exclude_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::ResetReapplyExcludeType::names | ::Integer])) value) -> void
             | ("post_reset_operations" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
         end
@@ -4236,7 +4236,7 @@ module Temporalio
 
           # Task queue types that help server cancel outstanding poll RPC
           # calls from SDK. This avoids a race condition that can lead to tasks being lost.
-          attr_accessor task_queue_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor task_queue_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])
           attr_reader task_queue_types_const(): ::Array[::Integer]
           def clear_task_queue_types: () -> void
 
@@ -4269,7 +4269,7 @@ module Temporalio
             | ("worker_heartbeat" name) -> ::Temporalio::Api::Worker::V1::WorkerHeartbeat?
             | ("worker_instance_key" name) -> ::String
             | ("task_queue" name) -> ::String
-            | ("task_queue_types" name) -> (::Google::Protobuf::RepeatedField)
+            | ("task_queue_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer]))
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -4279,7 +4279,7 @@ module Temporalio
             | ("worker_heartbeat" name, ::Temporalio::Api::Worker::V1::WorkerHeartbeat? value) -> void
             | ("worker_instance_key" name, (::String | ::Symbol) value) -> void
             | ("task_queue" name, (::String | ::Symbol) value) -> void
-            | ("task_queue_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("task_queue_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])) value) -> void
         end
 
         class ShutdownWorkerResponse < ::Google::Protobuf::AbstractMessage
@@ -4521,7 +4521,7 @@ module Temporalio
           # Deprecated (as part of the ENHANCED mode deprecation).
           # Task queue types to report info about. If not specified, all types are considered.
           # @deprecated
-          attr_accessor task_queue_types(): ::Google::Protobuf::RepeatedField
+          attr_accessor task_queue_types(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])
           attr_reader task_queue_types_const(): ::Array[::Integer]
           def clear_task_queue_types: () -> void
 
@@ -4574,7 +4574,7 @@ module Temporalio
             | ("include_task_queue_status" name) -> bool
             | ("api_mode" name) -> (::Temporalio::Api::Enums::V1::DescribeTaskQueueMode::names | ::Integer)
             | ("versions" name) -> ::Temporalio::Api::TaskQueue::V1::TaskQueueVersionSelection?
-            | ("task_queue_types" name) -> (::Google::Protobuf::RepeatedField)
+            | ("task_queue_types" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer]))
             | ("report_pollers" name) -> bool
             | ("report_task_reachability" name) -> bool
 
@@ -4587,7 +4587,7 @@ module Temporalio
             | ("include_task_queue_status" name, bool value) -> void
             | ("api_mode" name, (::Temporalio::Api::Enums::V1::DescribeTaskQueueMode::names | ::Temporalio::Api::Enums::V1::DescribeTaskQueueMode::strings | ::Integer | ::Float) value) -> void
             | ("versions" name, ::Temporalio::Api::TaskQueue::V1::TaskQueueVersionSelection? value) -> void
-            | ("task_queue_types" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("task_queue_types" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::TaskQueueType::names | ::Integer])) value) -> void
             | ("report_pollers" name, bool value) -> void
             | ("report_task_reachability" name, bool value) -> void
         end
