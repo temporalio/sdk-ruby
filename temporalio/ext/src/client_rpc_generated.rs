@@ -474,6 +474,14 @@ impl Client {
                     workflow_service,
                     pause_activity
                 ),
+                "pause_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    pause_activity_execution
+                ),
                 "pause_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -601,6 +609,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     reset_activity
+                ),
+                "reset_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    reset_activity_execution
                 ),
                 "reset_sticky_task_queue" => rpc_call!(
                     self,
@@ -850,6 +866,14 @@ impl Client {
                     workflow_service,
                     unpause_activity
                 ),
+                "unpause_activity_execution" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    unpause_activity_execution
+                ),
                 "unpause_workflow_execution" => rpc_call!(
                     self,
                     callback,
@@ -857,6 +881,14 @@ impl Client {
                     WorkflowService,
                     workflow_service,
                     unpause_workflow_execution
+                ),
+                "update_activity_execution_options" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    update_activity_execution_options
                 ),
                 "update_activity_options" => rpc_call!(
                     self,
@@ -1104,6 +1136,14 @@ impl Client {
                     cloud_service,
                     create_connectivity_rule
                 ),
+                "create_custom_role" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    create_custom_role
+                ),
                 "create_namespace" => rpc_call!(
                     self,
                     callback,
@@ -1175,6 +1215,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     delete_connectivity_rule
+                ),
+                "delete_custom_role" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    delete_custom_role
                 ),
                 "delete_namespace" => rpc_call!(
                     self,
@@ -1328,6 +1376,22 @@ impl Client {
                     cloud_service,
                     get_current_identity
                 ),
+                "get_custom_role" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_custom_role
+                ),
+                "get_custom_roles" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_custom_roles
+                ),
                 "get_namespace" => rpc_call!(
                     self,
                     callback,
@@ -1408,6 +1472,14 @@ impl Client {
                     cloud_service,
                     get_service_account
                 ),
+                "get_service_account_namespace_assignments" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_service_account_namespace_assignments
+                ),
                 "get_service_accounts" => rpc_call!(
                     self,
                     callback,
@@ -1438,6 +1510,14 @@ impl Client {
                     cloud_service,
                     get_user_group_members
                 ),
+                "get_user_group_namespace_assignments" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_user_group_namespace_assignments
+                ),
                 "get_user_groups" => rpc_call!(
                     self,
                     callback,
@@ -1445,6 +1525,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     get_user_groups
+                ),
+                "get_user_namespace_assignments" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    get_user_namespace_assignments
                 ),
                 "get_users" => {
                     rpc_call!(self, callback, call, CloudService, cloud_service, get_users)
@@ -1512,6 +1600,14 @@ impl Client {
                     CloudService,
                     cloud_service,
                     update_api_key
+                ),
+                "update_custom_role" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    CloudService,
+                    cloud_service,
+                    update_custom_role
                 ),
                 "update_namespace" => rpc_call!(
                     self,

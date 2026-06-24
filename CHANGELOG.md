@@ -35,6 +35,8 @@ Existing workflow-only code paths are unaffected at runtime. The recommended mig
 
 ### Added
 
+- Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
+
 #### Standalone Activities
 
 Activities can now be started directly from a client, independently of any workflow. `Client#start_activity`

@@ -62,11 +62,18 @@ module Temporalio
             attr_reader role_const(): ::Integer
             def clear_role: () -> void
 
+            # List of custom role IDs assigned to the user or service account.
+            # temporal:versioning:min_version=v0.13.0
+            attr_accessor custom_roles(): ::Google::Protobuf::RepeatedField
+            def clear_custom_roles: () -> void
+
             type init_map = {
               role_deprecated: (::String | ::Symbol)?,
               "role_deprecated" => (::String | ::Symbol)?,
               role: (::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::names | ::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::strings | ::Integer | ::Float)?,
               "role" => (::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::names | ::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::strings | ::Integer | ::Float)?,
+              custom_roles: ::Array[::String | ::Symbol]?,
+              "custom_roles" => ::Array[::String | ::Symbol]?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -74,10 +81,12 @@ module Temporalio
             def []:
                 ("role_deprecated" name) -> ::String
               | ("role" name) -> (::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::names | ::Integer)
+              | ("custom_roles" name) -> (::Google::Protobuf::RepeatedField)
 
             def []=:
                 ("role_deprecated" name, (::String | ::Symbol) value) -> void
               | ("role" name, (::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::names | ::Temporalio::Api::Cloud::Identity::V1::AccountAccess::Role::strings | ::Integer | ::Float) value) -> void
+              | ("custom_roles" name, (::Google::Protobuf::RepeatedField) value) -> void
           end
 
           class NamespaceAccess < ::Google::Protobuf::AbstractMessage
@@ -153,11 +162,20 @@ module Temporalio
             attr_accessor namespace_accesses(): ::Google::Protobuf::Map[::String, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess]
             def clear_namespace_accesses: () -> void
 
+            # List of custom role IDs assigned to the user or service account.
+            # Deprecated: Not supported after v0.12.0 api version. Use account_access.custom_roles instead.
+            # temporal:versioning:max_version=v0.12.0
+            # @deprecated
+            attr_accessor custom_roles_deprecated(): ::Google::Protobuf::RepeatedField
+            def clear_custom_roles_deprecated: () -> void
+
             type init_map = {
               account_access: (::Temporalio::Api::Cloud::Identity::V1::AccountAccess | ::Temporalio::Api::Cloud::Identity::V1::AccountAccess::init_map)?,
               "account_access" => (::Temporalio::Api::Cloud::Identity::V1::AccountAccess | ::Temporalio::Api::Cloud::Identity::V1::AccountAccess::init_map)?,
               namespace_accesses: ::Hash[::String | ::Symbol, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess]?,
               "namespace_accesses" => ::Hash[::String | ::Symbol, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess]?,
+              custom_roles_deprecated: ::Array[::String | ::Symbol]?,
+              "custom_roles_deprecated" => ::Array[::String | ::Symbol]?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -165,10 +183,12 @@ module Temporalio
             def []:
                 ("account_access" name) -> ::Temporalio::Api::Cloud::Identity::V1::AccountAccess?
               | ("namespace_accesses" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess])
+              | ("custom_roles_deprecated" name) -> (::Google::Protobuf::RepeatedField)
 
             def []=:
                 ("account_access" name, ::Temporalio::Api::Cloud::Identity::V1::AccountAccess? value) -> void
               | ("namespace_accesses" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess]) value) -> void
+              | ("custom_roles_deprecated" name, (::Google::Protobuf::RepeatedField) value) -> void
           end
 
           class NamespaceScopedAccess < ::Google::Protobuf::AbstractMessage
@@ -963,6 +983,358 @@ module Temporalio
               | ("description" name, (::String | ::Symbol) value) -> void
               | ("expiry_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("disabled" name, bool value) -> void
+          end
+
+          class CustomRoleSpec < ::Google::Protobuf::AbstractMessage
+            class Resources < ::Google::Protobuf::AbstractMessage
+
+              # The resource type the permission applies to.
+              attr_reader resource_type(): ::String
+              attr_writer resource_type(): ::String | ::Symbol
+              def clear_resource_type: () -> void
+
+              # The resource IDs the permission applies to. Can be empty if allow_all is true.
+              attr_accessor resource_ids(): ::Google::Protobuf::RepeatedField
+              def clear_resource_ids: () -> void
+
+              # Whether the permission applies to all resources of the given type.
+              attr_accessor allow_all(): bool
+              def clear_allow_all: () -> void
+
+              type init_map = {
+                resource_type: (::String | ::Symbol)?,
+                "resource_type" => (::String | ::Symbol)?,
+                resource_ids: ::Array[::String | ::Symbol]?,
+                "resource_ids" => ::Array[::String | ::Symbol]?,
+                allow_all: bool?,
+                "allow_all" => bool?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("resource_type" name) -> ::String
+                | ("resource_ids" name) -> (::Google::Protobuf::RepeatedField)
+                | ("allow_all" name) -> bool
+
+              def []=:
+                  ("resource_type" name, (::String | ::Symbol) value) -> void
+                | ("resource_ids" name, (::Google::Protobuf::RepeatedField) value) -> void
+                | ("allow_all" name, bool value) -> void
+            end
+
+            class Permission < ::Google::Protobuf::AbstractMessage
+
+              # The resources the permission applies to.
+              attr_accessor resources(): ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources?
+              def has_resources?: () -> bool
+              def clear_resources: () -> void
+
+              # The actions allowed by the permission.
+              attr_accessor actions(): ::Google::Protobuf::RepeatedField
+              def clear_actions: () -> void
+
+              type init_map = {
+                resources: (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources::init_map)?,
+                "resources" => (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources::init_map)?,
+                actions: ::Array[::String | ::Symbol]?,
+                "actions" => ::Array[::String | ::Symbol]?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("resources" name) -> ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources?
+                | ("actions" name) -> (::Google::Protobuf::RepeatedField)
+
+              def []=:
+                  ("resources" name, ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Resources? value) -> void
+                | ("actions" name, (::Google::Protobuf::RepeatedField) value) -> void
+            end
+
+            # The name of the custom role.
+            attr_reader name(): ::String
+            attr_writer name(): ::String | ::Symbol
+            def clear_name: () -> void
+
+            # The description of the custom role.
+            attr_reader description(): ::String
+            attr_writer description(): ::String | ::Symbol
+            def clear_description: () -> void
+
+            # The permissions assigned to the custom role.
+            attr_accessor permissions(): ::Google::Protobuf::RepeatedField
+            def clear_permissions: () -> void
+
+            type init_map = {
+              name: (::String | ::Symbol)?,
+              "name" => (::String | ::Symbol)?,
+              description: (::String | ::Symbol)?,
+              "description" => (::String | ::Symbol)?,
+              permissions: ::Array[::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Permission]?,
+              "permissions" => ::Array[::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Permission]?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("name" name) -> ::String
+              | ("description" name) -> ::String
+              | ("permissions" name) -> ::Google::Protobuf::RepeatedField
+
+            def []=:
+                ("name" name, (::String | ::Symbol) value) -> void
+              | ("description" name, (::String | ::Symbol) value) -> void
+              | ("permissions" name, ::Google::Protobuf::RepeatedField value) -> void
+          end
+
+          class CustomRole < ::Google::Protobuf::AbstractMessage
+
+            # The id of the custom role.
+            attr_reader id(): ::String
+            attr_writer id(): ::String | ::Symbol
+            def clear_id: () -> void
+
+            # The current version of the custom role specification.
+            # The next update operation will have to include this version.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The custom role specification.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The current state of the custom role.
+            # For any failed state, reach out to Temporal Cloud support for remediation.
+            attr_reader state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer
+            attr_writer state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float
+            attr_reader state_const(): ::Integer
+            def clear_state: () -> void
+
+            # The id of the async operation that is creating/updating/deleting the custom role, if any.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            # The date and time when the custom role was created.
+            attr_reader created_time(): ::Google::Protobuf::Timestamp?
+            attr_writer created_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_created_time?: () -> bool
+            def clear_created_time: () -> void
+
+            # The date and time when the custom role was last modified.
+            # Will not be set if the custom role has never been modified.
+            attr_reader last_modified_time(): ::Google::Protobuf::Timestamp?
+            attr_writer last_modified_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_last_modified_time?: () -> bool
+            def clear_last_modified_time: () -> void
+
+            type init_map = {
+              id: (::String | ::Symbol)?,
+              "id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec | ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::init_map)?,
+              state: (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              "state" => (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+              created_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "created_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              last_modified_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "last_modified_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec?
+              | ("state" name) -> (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer)
+              | ("async_operation_id" name) -> ::String
+              | ("created_time" name) -> ::Google::Protobuf::Timestamp?
+              | ("last_modified_time" name) -> ::Google::Protobuf::Timestamp?
+
+            def []=:
+                ("id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec? value) -> void
+              | ("state" name, (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+              | ("created_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("last_modified_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
+
+          class UserNamespaceAssignment < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the user.
+            attr_reader id(): ::String
+            attr_writer id(): ::String | ::Symbol
+            def clear_id: () -> void
+
+            # The email of the user.
+            attr_reader email(): ::String
+            attr_writer email(): ::String | ::Symbol
+            def clear_email: () -> void
+
+            # The access assigned to the user at the namespace level.
+            attr_accessor namespace_access(): ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+            def has_namespace_access?: () -> bool
+            def clear_namespace_access: () -> void
+
+            # True if the user has inherited access to the namespace through an account or project role.
+            attr_accessor inherited_access(): bool
+            def clear_inherited_access: () -> void
+
+            # The current resource version of the user.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            type init_map = {
+              id: (::String | ::Symbol)?,
+              "id" => (::String | ::Symbol)?,
+              email: (::String | ::Symbol)?,
+              "email" => (::String | ::Symbol)?,
+              namespace_access: (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              "namespace_access" => (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              inherited_access: bool?,
+              "inherited_access" => bool?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("id" name) -> ::String
+              | ("email" name) -> ::String
+              | ("namespace_access" name) -> ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+              | ("inherited_access" name) -> bool
+              | ("resource_version" name) -> ::String
+
+            def []=:
+                ("id" name, (::String | ::Symbol) value) -> void
+              | ("email" name, (::String | ::Symbol) value) -> void
+              | ("namespace_access" name, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess? value) -> void
+              | ("inherited_access" name, bool value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+          end
+
+          class ServiceAccountNamespaceAssignment < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the service account.
+            attr_reader id(): ::String
+            attr_writer id(): ::String | ::Symbol
+            def clear_id: () -> void
+
+            # The name of the service account.
+            attr_reader name(): ::String
+            attr_writer name(): ::String | ::Symbol
+            def clear_name: () -> void
+
+            # The access assigned to the service account at the namespace level.
+            attr_accessor namespace_access(): ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+            def has_namespace_access?: () -> bool
+            def clear_namespace_access: () -> void
+
+            # True if the service account has inherited access to the namespace through an account or project role.
+            attr_accessor inherited_access(): bool
+            def clear_inherited_access: () -> void
+
+            # The current resource version of the service account.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            type init_map = {
+              id: (::String | ::Symbol)?,
+              "id" => (::String | ::Symbol)?,
+              name: (::String | ::Symbol)?,
+              "name" => (::String | ::Symbol)?,
+              namespace_access: (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              "namespace_access" => (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              inherited_access: bool?,
+              "inherited_access" => bool?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("id" name) -> ::String
+              | ("name" name) -> ::String
+              | ("namespace_access" name) -> ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+              | ("inherited_access" name) -> bool
+              | ("resource_version" name) -> ::String
+
+            def []=:
+                ("id" name, (::String | ::Symbol) value) -> void
+              | ("name" name, (::String | ::Symbol) value) -> void
+              | ("namespace_access" name, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess? value) -> void
+              | ("inherited_access" name, bool value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UserGroupNamespaceAssignment < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the group.
+            attr_reader id(): ::String
+            attr_writer id(): ::String | ::Symbol
+            def clear_id: () -> void
+
+            # The display name of the group.
+            attr_reader display_name(): ::String
+            attr_writer display_name(): ::String | ::Symbol
+            def clear_display_name: () -> void
+
+            # The access assigned to the group at the namespace level.
+            attr_accessor namespace_access(): ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+            def has_namespace_access?: () -> bool
+            def clear_namespace_access: () -> void
+
+            # True if the group has inherited access to the namespace through an account or project role.
+            attr_accessor inherited_access(): bool
+            def clear_inherited_access: () -> void
+
+            # The current resource version of the group.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            type init_map = {
+              id: (::String | ::Symbol)?,
+              "id" => (::String | ::Symbol)?,
+              display_name: (::String | ::Symbol)?,
+              "display_name" => (::String | ::Symbol)?,
+              namespace_access: (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              "namespace_access" => (::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess | ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::init_map)?,
+              inherited_access: bool?,
+              "inherited_access" => bool?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("id" name) -> ::String
+              | ("display_name" name) -> ::String
+              | ("namespace_access" name) -> ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess?
+              | ("inherited_access" name) -> bool
+              | ("resource_version" name) -> ::String
+
+            def []=:
+                ("id" name, (::String | ::Symbol) value) -> void
+              | ("display_name" name, (::String | ::Symbol) value) -> void
+              | ("namespace_access" name, ::Temporalio::Api::Cloud::Identity::V1::NamespaceAccess? value) -> void
+              | ("inherited_access" name, bool value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
           end
 
           module OwnerType

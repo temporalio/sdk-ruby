@@ -465,6 +465,22 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse
+        def pause_activity_execution: (
+          Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse
+        def reset_activity_execution: (
+          Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse
+        def unpause_activity_execution: (
+          Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse
+        def update_activity_execution_options: (
+          Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse
         def terminate_nexus_operation_execution: (
           Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest request,
           ?rpc_options: RPCOptions?
