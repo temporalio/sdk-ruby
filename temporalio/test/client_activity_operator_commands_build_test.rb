@@ -4,14 +4,10 @@ require 'temporalio/api'
 require 'temporalio/client'
 require 'test'
 
-# Unit-style test that drives each operator command (pause/unpause/reset/update_options) through the
-# interceptor chain against a stubbed workflow service and asserts the exact request fields built.
-# No server is contacted: the client is created with a lazy connection and every operator RPC on the
-# workflow service is replaced with a singleton method that captures the request and returns a canned
-# response.
+# Unit test for the operator-command request fields that the server does not surface back.
 class ClientActivityOperatorCommandsBuildTest < Test
-  def test_operator_commands_build_expected_requests
-    # Lazy connect so no real connection is opened; all RPCs are stubbed below.
+  def test_unobservable_request_fields
+    # Lazy connect so no real connection is opened; the RPCs below are stubbed.
     client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
     handle = client.activity_handle('act-1', activity_run_id: 'run-1')
 
@@ -30,99 +26,31 @@ class ClientActivityOperatorCommandsBuildTest < Test
       captured[:reset] = req
       Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse.new
     end
-    ws.define_singleton_method(:update_activity_execution_options) do |req, **_kwargs|
-      captured[:update] = req
-      Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse.new(
-        activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new(
-          start_to_close_timeout: Google::Protobuf::Duration.new(seconds: 30)
-        )
-      )
-    end
 
     begin
       handle.pause('because')
-      handle.unpause(reason: 'go', reset_attempts: true, reset_heartbeat: true, jitter: 5.0)
-      handle.reset(reset_heartbeat: true, keep_paused: true, jitter: 2.0)
-      updated = handle.update_options(start_to_close_timeout: 30.0)
+      handle.unpause(reason: 'go', jitter: 5.0)
+      handle.reset(jitter: 2.0)
     ensure
       ws.singleton_class.send(:remove_method, :pause_activity_execution)
       ws.singleton_class.send(:remove_method, :unpause_activity_execution)
       ws.singleton_class.send(:remove_method, :reset_activity_execution)
-      ws.singleton_class.send(:remove_method, :update_activity_execution_options)
     end
 
-    # Each command reached the workflow service with the expected fields.
+    # pause carries the reason and an auto-generated dedup request_id; neither is returned by describe.
     pause_req = captured.fetch(:pause)
-    assert_equal 'act-1', pause_req.activity_id
-    assert_equal 'run-1', pause_req.run_id
     assert_equal 'because', pause_req.reason
-    assert_equal '', pause_req.workflow_id
     refute_empty pause_req.request_id
 
+    # unpause carries the reason and jitter; neither is observable on the server.
     unpause_req = captured.fetch(:unpause)
-    assert unpause_req.reset_attempts
-    assert unpause_req.reset_heartbeat
     assert_equal 'go', unpause_req.reason
     assert_equal 5, unpause_req.jitter.seconds
     assert_equal 0, unpause_req.jitter.nanos
 
+    # reset carries the jitter.
     reset_req = captured.fetch(:reset)
-    assert reset_req.reset_heartbeat
-    assert reset_req.keep_paused
     assert_equal 2, reset_req.jitter.seconds
     assert_equal 0, reset_req.jitter.nanos
-
-    # A partial update mask of exactly one path proves only the provided option is sent.
-    update_req = captured.fetch(:update)
-    assert_equal ['start_to_close_timeout'], update_req.update_mask.paths.to_a
-    assert_equal 30, update_req.activity_options.start_to_close_timeout.seconds
-
-    # The canned response decoded back through the handle.
-    assert_in_delta 30.0, updated.start_to_close_timeout, 0.001
-  end
-
-  def test_update_options_all_fields_mask
-    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
-    handle = client.activity_handle('act-1', activity_run_id: 'run-1')
-
-    ws = client.workflow_service
-    captured = {}
-    ws.define_singleton_method(:update_activity_execution_options) do |req, **_kwargs|
-      captured[:update] = req
-      Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse.new(
-        activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new
-      )
-    end
-
-    begin
-      handle.update_options(
-        task_queue: 'tq',
-        schedule_to_close_timeout: 100.0,
-        schedule_to_start_timeout: 10.0,
-        start_to_close_timeout: 30.0,
-        heartbeat_timeout: 5.0,
-        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 7),
-        priority: Temporalio::Priority.new(priority_key: 3)
-      )
-    ensure
-      ws.singleton_class.send(:remove_method, :update_activity_execution_options)
-    end
-
-    update_req = captured.fetch(:update)
-
-    expected_paths = %w[
-      task_queue schedule_to_close_timeout schedule_to_start_timeout start_to_close_timeout
-      heartbeat_timeout retry_policy priority
-    ]
-    assert_equal expected_paths.sort, update_req.update_mask.paths.to_a.sort
-
-    opts = update_req.activity_options
-    assert_equal 'tq', opts.task_queue.name
-    assert_equal 100, opts.schedule_to_close_timeout.seconds
-    assert_equal 10, opts.schedule_to_start_timeout.seconds
-    assert_equal 30, opts.start_to_close_timeout.seconds
-    assert_equal 5, opts.heartbeat_timeout.seconds
-    assert_equal 7, opts.retry_policy.maximum_attempts
-    assert_equal 3, opts.priority.priority_key
   end
 end

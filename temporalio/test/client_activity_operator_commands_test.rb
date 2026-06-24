@@ -180,6 +180,47 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  def test_update_options_all_fields
+    with_activity_worker([QuickActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # Start delayed so the activity stays SCHEDULED (never runs) while we update every option and
+      # observe each one applied.
+      handle = env.client.start_activity(
+        QuickActivity,
+        id: activity_id, task_queue: task_queue,
+        schedule_to_close_timeout: 100, start_to_close_timeout: 30, start_delay: 300.0
+      )
+
+      updated = handle.update_options(
+        schedule_to_close_timeout: 200.0,
+        schedule_to_start_timeout: 15.0,
+        start_to_close_timeout: 90.0,
+        heartbeat_timeout: 25.0,
+        retry_policy: Temporalio::RetryPolicy.new(initial_interval: 1.0, backoff_coefficient: 2.0, max_attempts: 7),
+        priority: Temporalio::Priority.new(priority_key: 3)
+      )
+
+      # Every field is settable and lands: the returned options reflect each new value.
+      assert_in_delta 200.0, updated.schedule_to_close_timeout, 0.5
+      assert_in_delta 15.0, updated.schedule_to_start_timeout, 0.5
+      assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
+      assert_in_delta 25.0, updated.heartbeat_timeout, 0.5
+      assert_equal 7, updated.retry_policy&.max_attempts
+      assert_equal 3, updated.priority.priority_key
+
+      # And describe reflects them server-side.
+      desc = handle.describe
+      assert_in_delta 200.0, desc.schedule_to_close_timeout, 0.5
+      assert_in_delta 15.0, desc.schedule_to_start_timeout, 0.5
+      assert_in_delta 90.0, desc.start_to_close_timeout, 0.5
+      assert_in_delta 25.0, desc.heartbeat_timeout, 0.5
+      assert_equal 7, desc.retry_policy&.max_attempts
+      assert_equal 3, desc.priority.priority_key
+
+      handle.terminate('cleanup')
+    end
+  end
+
   def test_update_options_restore_original_exclusive
     with_activity_worker([SlowActivity]) do |task_queue|
       handle = start_running_slow_activity(task_queue)
