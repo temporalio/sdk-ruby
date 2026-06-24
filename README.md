@@ -1348,9 +1348,9 @@ section for how to build a the repository.
 The SDK works on Ruby 3.2+, but due to [an issue](https://github.com/temporalio/sdk-ruby/issues/162), fibers (and
 `async` gem) are only supported on Ruby versions 3.3 and newer.
 
-### FIPS Compliance (Beta)
+### FIPS Compliance (Experimental)
 
-> **NOTE**: FIPS support is in **Beta**. It is opt-in, source-build only, and currently exercised on Linux only.
+> **NOTE**: FIPS support is in **Experimental**. It is opt-in, source-build only, and currently exercised on Linux only.
 
 FIPS 140-3 compliant cryptography is available as an **opt-in source build**. The published gems are **not** FIPS
 compliant — they use the `ring` backend, which is not FIPS-validated. Because the crypto backend is chosen at compile
@@ -1359,7 +1359,7 @@ time, FIPS cannot be enabled on a precompiled platform gem: you must build the n
 
 * Selects [`aws-lc-rs`](https://github.com/aws/aws-lc-rs) in FIPS mode (AWS-LC's FIPS 140-3 validated module) for the
   gRPC client and OTLP metric exporter, in place of `ring`.
-* Hashes the default worker build id with `Digest::SHA256` instead of MD5, which FIPS-mode OpenSSL rejects.
+* Hashes the default worker build id with `Digest::SHA256` instead of MD5.
 
 To produce an installable FIPS gem for your platform:
 
