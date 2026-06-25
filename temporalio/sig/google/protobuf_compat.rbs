@@ -10,11 +10,6 @@ module Google
     class Empty < AbstractMessage
     end
 
-    interface _RepeatedEnumField[out Elem]
-      def each: () { (Elem value) -> void } -> void
-      def map: [T] () { (Elem value) -> T } -> ::Array[T]
-    end
-
     class DoubleValue < AbstractMessage
       attr_accessor value(): Float
     end

@@ -138,7 +138,7 @@ module Temporalio
 
           # Allowed namespace states for requested operation.
           # For example NAMESPACE_STATE_DELETED is forbidden for most operations but allowed for DescribeNamespace.
-          attr_accessor allowed_states(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::NamespaceState::names | ::Integer])
+          attr_accessor allowed_states(): ::Google::Protobuf::RepeatedField
           attr_reader allowed_states_const(): ::Array[::Integer]
           def clear_allowed_states: () -> void
 
@@ -156,12 +156,12 @@ module Temporalio
           def []:
               ("namespace" name) -> ::String
             | ("state" name) -> (::Temporalio::Api::Enums::V1::NamespaceState::names | ::Integer)
-            | ("allowed_states" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::NamespaceState::names | ::Integer]))
+            | ("allowed_states" name) -> (::Google::Protobuf::RepeatedField)
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
             | ("state" name, (::Temporalio::Api::Enums::V1::NamespaceState::names | ::Temporalio::Api::Enums::V1::NamespaceState::strings | ::Integer | ::Float) value) -> void
-            | ("allowed_states" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::NamespaceState::names | ::Integer])) value) -> void
+            | ("allowed_states" name, (::Google::Protobuf::RepeatedField) value) -> void
         end
 
         class NamespaceNotFoundFailure < ::Google::Protobuf::AbstractMessage

@@ -110,7 +110,7 @@ module Temporalio
             # Experimental. Optionally decide the versioning behavior that the first task of the new run should use.
             # For example, choose to AutoUpgrade on continue-as-new instead of inheriting the pinned version
             # of the previous run.
-            attr_accessor suggest_continue_as_new_reasons(): (::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer])
+            attr_accessor suggest_continue_as_new_reasons(): ::Google::Protobuf::RepeatedField
             attr_reader suggest_continue_as_new_reasons_const(): ::Array[::Integer]
             def clear_suggest_continue_as_new_reasons: () -> void
 
@@ -160,7 +160,7 @@ module Temporalio
               | ("continue_as_new_suggested" name) -> bool
               | ("deployment_version_for_current_task" name) -> ::Temporalio::Internal::Bridge::Api::Common::WorkerDeploymentVersion?
               | ("last_sdk_version" name) -> ::String
-              | ("suggest_continue_as_new_reasons" name) -> ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer]))
+              | ("suggest_continue_as_new_reasons" name) -> (::Google::Protobuf::RepeatedField)
               | ("target_worker_deployment_version_changed" name) -> bool
 
             def []=:
@@ -174,7 +174,7 @@ module Temporalio
               | ("continue_as_new_suggested" name, bool value) -> void
               | ("deployment_version_for_current_task" name, ::Temporalio::Internal::Bridge::Api::Common::WorkerDeploymentVersion? value) -> void
               | ("last_sdk_version" name, (::String | ::Symbol) value) -> void
-              | ("suggest_continue_as_new_reasons" name, ((::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer])) value) -> void
+              | ("suggest_continue_as_new_reasons" name, (::Google::Protobuf::RepeatedField) value) -> void
               | ("target_worker_deployment_version_changed" name, bool value) -> void
           end
 

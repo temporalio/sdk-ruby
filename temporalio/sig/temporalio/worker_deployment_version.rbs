@@ -5,9 +5,7 @@ module Temporalio
 
     def self.from_canonical_string: (String canonical) -> WorkerDeploymentVersion
 
-    def self._from_bridge: (
-      (Internal::Bridge::Worker::WorkerDeploymentVersion | Internal::Bridge::Api::Common::WorkerDeploymentVersion)? bridge
-    ) -> WorkerDeploymentVersion?
+    def self._from_bridge: (Internal::Bridge::Worker::WorkerDeploymentVersion? bridge) -> WorkerDeploymentVersion?
 
     def initialize: (deployment_name: String, build_id: String) -> void
 

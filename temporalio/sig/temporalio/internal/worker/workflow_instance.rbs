@@ -2,23 +2,6 @@ module Temporalio
   module Internal
     module Worker
       class WorkflowInstance
-        interface _Activation
-          def continue_as_new_suggested: -> bool
-          def suggest_continue_as_new_reasons: -> (
-            ::Google::Protobuf::RepeatedField & ::Google::Protobuf::_RepeatedEnumField[
-              ::Temporalio::Api::Enums::V1::SuggestContinueAsNewReason::names | ::Integer
-            ]
-          )
-          def target_worker_deployment_version_changed: -> bool
-          def deployment_version_for_current_task: -> untyped
-          def history_length: -> Integer
-          def history_size_bytes: -> Integer
-          def is_replaying: -> bool
-          def timestamp: -> untyped
-          def jobs: -> untyped
-          def run_id: -> String
-        end
-
         def self.new_completion_with_failure: (
           run_id: String,
           error: Exception,
@@ -62,7 +45,7 @@ module Temporalio
 
         def initialize: (Details details) -> void
 
-        def activate: (_Activation activation) -> untyped
+        def activate: (untyped activation) -> untyped
 
         def add_command: (untyped command) -> void
 
