@@ -646,6 +646,7 @@ module Temporalio
     # Error that is raised by a workflow out of the primary workflow method to issue a continue-as-new.
     class ContinueAsNewError < Error
       attr_accessor :args, :workflow, :task_queue, :run_timeout, :task_timeout,
+                    :backoff_start_interval,
                     :retry_policy, :memo, :search_attributes, :arg_hints, :headers,
                     :initial_versioning_behavior
 
@@ -660,6 +661,8 @@ module Temporalio
       #   from the current workflow.
       # @param task_timeout [Float, nil] Timeout of a single workflow task in seconds. The default is _not_ carried over
       #   from the current workflow.
+      # @param backoff_start_interval [Float, nil] Delay before the first workflow task of the continued run is
+      #   scheduled.
       # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow. If unset/nil, the current workflow retry
       #   policy is used.
       # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow. If unset/nil, the current workflow memo
@@ -680,6 +683,7 @@ module Temporalio
         task_queue: nil,
         run_timeout: nil,
         task_timeout: nil,
+        backoff_start_interval: nil,
         retry_policy: nil,
         memo: nil,
         search_attributes: nil,
@@ -693,6 +697,7 @@ module Temporalio
         @task_queue = task_queue
         @run_timeout = run_timeout
         @task_timeout = task_timeout
+        @backoff_start_interval = backoff_start_interval
         @retry_policy = retry_policy
         @memo = memo
         @search_attributes = search_attributes

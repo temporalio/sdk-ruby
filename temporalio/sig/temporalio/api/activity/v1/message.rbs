@@ -208,6 +208,7 @@ module Temporalio
           def clear_retry_policy: () -> void
 
           # Details provided in the last recorded activity heartbeat.
+          # DescribeActivityExecution does not set this field unless include_heartbeat_details was true in the request.
           attr_accessor heartbeat_details(): ::Temporalio::Api::Common::V1::Payloads?
           def has_heartbeat_details?: () -> bool
           def clear_heartbeat_details: () -> void
@@ -254,6 +255,7 @@ module Temporalio
           def clear_close_time: () -> void
 
           # Failure details from the last failed attempt.
+          # DescribeActivityExecution does not set this field unless include_last_failure was true in the request.
           attr_accessor last_failure(): ::Temporalio::Api::Failure::V1::Failure?
           def has_last_failure?: () -> bool
           def clear_last_failure: () -> void
@@ -334,6 +336,24 @@ module Temporalio
           attr_writer total_heartbeat_count(): ::Integer | ::Float
           def clear_total_heartbeat_count: () -> void
 
+          # The name of the SDK of the worker that most recently picked up an attempt of this activity.
+          # Overwritten on each new attempt. Empty if unknown.
+          attr_reader sdk_name(): ::String
+          attr_writer sdk_name(): ::String | ::Symbol
+          def clear_sdk_name: () -> void
+
+          # The version of the SDK of the worker that most recently picked up an attempt of this activity.
+          # Overwritten on each new attempt. Empty if unknown.
+          attr_reader sdk_version(): ::String
+          attr_writer sdk_version(): ::String | ::Symbol
+          def clear_sdk_version: () -> void
+
+          # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+          attr_reader start_delay(): ::Google::Protobuf::Duration?
+          attr_writer start_delay(): (::Google::Protobuf::Duration | ::int)?
+          def has_start_delay?: () -> bool
+          def clear_start_delay: () -> void
+
           type init_map = {
             activity_id: (::String | ::Symbol)?,
             "activity_id" => (::String | ::Symbol)?,
@@ -403,6 +423,12 @@ module Temporalio
             "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
             total_heartbeat_count: (::Integer | ::Float)?,
             "total_heartbeat_count" => (::Integer | ::Float)?,
+            sdk_name: (::String | ::Symbol)?,
+            "sdk_name" => (::String | ::Symbol)?,
+            sdk_version: (::String | ::Symbol)?,
+            "sdk_version" => (::String | ::Symbol)?,
+            start_delay: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "start_delay" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -442,6 +468,9 @@ module Temporalio
             | ("canceled_reason" name) -> ::String
             | ("links" name) -> ::Google::Protobuf::RepeatedField
             | ("total_heartbeat_count" name) -> ::Integer
+            | ("sdk_name" name) -> ::String
+            | ("sdk_version" name) -> ::String
+            | ("start_delay" name) -> ::Google::Protobuf::Duration?
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -478,6 +507,9 @@ module Temporalio
             | ("canceled_reason" name, (::String | ::Symbol) value) -> void
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("total_heartbeat_count" name, (::Integer | ::Float) value) -> void
+            | ("sdk_name" name, (::String | ::Symbol) value) -> void
+            | ("sdk_version" name, (::String | ::Symbol) value) -> void
+            | ("start_delay" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         # Limited activity information returned in the list response.

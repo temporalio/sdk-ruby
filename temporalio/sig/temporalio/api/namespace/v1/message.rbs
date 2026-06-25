@@ -53,6 +53,18 @@ module Temporalio
             attr_accessor poller_autoscaling(): bool
             def clear_poller_autoscaling: () -> void
 
+            # True if the namespace supports worker commands (server-to-worker communication via control queues).
+            attr_accessor worker_commands(): bool
+            def clear_worker_commands: () -> void
+
+            # True if the namespace supports standalone Nexus operations.
+            attr_accessor standalone_nexus_operation(): bool
+            def clear_standalone_nexus_operation: () -> void
+
+            # True if the namespace supports attaching callbacks on workflow updates
+            attr_accessor workflow_update_callbacks(): bool
+            def clear_workflow_update_callbacks: () -> void
+
             type init_map = {
               eager_workflow_start: bool?,
               "eager_workflow_start" => bool?,
@@ -72,6 +84,12 @@ module Temporalio
               "worker_poll_complete_on_shutdown" => bool?,
               poller_autoscaling: bool?,
               "poller_autoscaling" => bool?,
+              worker_commands: bool?,
+              "worker_commands" => bool?,
+              standalone_nexus_operation: bool?,
+              "standalone_nexus_operation" => bool?,
+              workflow_update_callbacks: bool?,
+              "workflow_update_callbacks" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -86,6 +104,9 @@ module Temporalio
               | ("standalone_activities" name) -> bool
               | ("worker_poll_complete_on_shutdown" name) -> bool
               | ("poller_autoscaling" name) -> bool
+              | ("worker_commands" name) -> bool
+              | ("standalone_nexus_operation" name) -> bool
+              | ("workflow_update_callbacks" name) -> bool
 
             def []=:
                 ("eager_workflow_start" name, bool value) -> void
@@ -97,6 +118,9 @@ module Temporalio
               | ("standalone_activities" name, bool value) -> void
               | ("worker_poll_complete_on_shutdown" name, bool value) -> void
               | ("poller_autoscaling" name, bool value) -> void
+              | ("worker_commands" name, bool value) -> void
+              | ("standalone_nexus_operation" name, bool value) -> void
+              | ("workflow_update_callbacks" name, bool value) -> void
           end
 
           class Limits < ::Google::Protobuf::AbstractMessage

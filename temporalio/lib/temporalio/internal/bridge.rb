@@ -25,6 +25,26 @@ module Temporalio
               'see https://github.com/temporalio/sdk-ruby/issues/162'
       end
 
+      # On FIPS builds the native crypto backend (aws-lc-rs) is FIPS-validated, but the SDK still relies on Ruby's
+      # own OpenSSL for `SecureRandom` (request IDs) and the default worker build id digest. Those are only
+      # FIPS-backed if Ruby was built against a FIPS-enabled OpenSSL with FIPS mode active. If not, warn once rather
+      # than raise. No-op on non-FIPS builds.
+      def self.assert_fips_compatibility!
+        return unless FIPS
+        return if @fips_compatibility_checked
+
+        @fips_compatibility_checked = true
+        require 'openssl'
+        return if OpenSSL.fips_mode
+
+        warn 'temporalio: built for FIPS (aws-lc-rs) but Ruby OpenSSL is not in FIPS mode; SecureRandom and the ' \
+             'default worker build id will not use a FIPS-validated module. Build Ruby against a FIPS-enabled ' \
+             'OpenSSL and enable FIPS mode for full compliance.'
+      rescue StandardError
+        # Some OpenSSL builds cannot report fips_mode; do not block usage over an unanswerable check.
+        nil
+      end
+
       def self.fibers_supported
         # We do not allow fibers on < 3.3 due to a bug we still need to dig
         # into: https://github.com/temporalio/sdk-ruby/issues/162

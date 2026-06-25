@@ -826,6 +826,11 @@ module Temporalio
           attr_writer invalid_schedule_error(): ::String | ::Symbol
           def clear_invalid_schedule_error: () -> void
 
+          # Size of the schedule's internal state (including payloads) in bytes.
+          attr_reader state_size_bytes(): ::Integer
+          attr_writer state_size_bytes(): ::Integer | ::Float
+          def clear_state_size_bytes: () -> void
+
           type init_map = {
             action_count: (::Integer | ::Float)?,
             "action_count" => (::Integer | ::Float)?,
@@ -849,6 +854,8 @@ module Temporalio
             "update_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             invalid_schedule_error: (::String | ::Symbol)?,
             "invalid_schedule_error" => (::String | ::Symbol)?,
+            state_size_bytes: (::Integer | ::Float)?,
+            "state_size_bytes" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -865,6 +872,7 @@ module Temporalio
             | ("create_time" name) -> ::Google::Protobuf::Timestamp?
             | ("update_time" name) -> ::Google::Protobuf::Timestamp?
             | ("invalid_schedule_error" name) -> ::String
+            | ("state_size_bytes" name) -> ::Integer
 
           def []=:
               ("action_count" name, (::Integer | ::Float) value) -> void
@@ -878,6 +886,7 @@ module Temporalio
             | ("create_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
             | ("update_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
             | ("invalid_schedule_error" name, (::String | ::Symbol) value) -> void
+            | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
         end
 
         class Schedule < ::Google::Protobuf::AbstractMessage
@@ -956,6 +965,11 @@ module Temporalio
           attr_accessor future_action_times(): ::Google::Protobuf::RepeatedField
           def clear_future_action_times: () -> void
 
+          # Size of the schedule's internal state (including payloads) in bytes.
+          attr_reader state_size_bytes(): ::Integer
+          attr_writer state_size_bytes(): ::Integer | ::Float
+          def clear_state_size_bytes: () -> void
+
           type init_map = {
             spec: (::Temporalio::Api::Schedule::V1::ScheduleSpec | ::Temporalio::Api::Schedule::V1::ScheduleSpec::init_map)?,
             "spec" => (::Temporalio::Api::Schedule::V1::ScheduleSpec | ::Temporalio::Api::Schedule::V1::ScheduleSpec::init_map)?,
@@ -969,6 +983,8 @@ module Temporalio
             "recent_actions" => ::Array[::Temporalio::Api::Schedule::V1::ScheduleActionResult]?,
             future_action_times: ::Array[::Google::Protobuf::Timestamp | ::Time]?,
             "future_action_times" => ::Array[::Google::Protobuf::Timestamp | ::Time]?,
+            state_size_bytes: (::Integer | ::Float)?,
+            "state_size_bytes" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -980,6 +996,7 @@ module Temporalio
             | ("paused" name) -> bool
             | ("recent_actions" name) -> ::Google::Protobuf::RepeatedField
             | ("future_action_times" name) -> (::Google::Protobuf::RepeatedField)
+            | ("state_size_bytes" name) -> ::Integer
 
           def []=:
               ("spec" name, ::Temporalio::Api::Schedule::V1::ScheduleSpec? value) -> void
@@ -988,6 +1005,7 @@ module Temporalio
             | ("paused" name, bool value) -> void
             | ("recent_actions" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("future_action_times" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
         end
 
         # ScheduleListEntry is returned by ListSchedules.

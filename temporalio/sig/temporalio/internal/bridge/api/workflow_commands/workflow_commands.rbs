@@ -777,6 +777,12 @@ module Temporalio
             attr_reader initial_versioning_behavior_const(): ::Integer
             def clear_initial_versioning_behavior: () -> void
 
+            # Delay before the first workflow task of the continued run is scheduled.
+            attr_reader backoff_start_interval(): ::Google::Protobuf::Duration?
+            attr_writer backoff_start_interval(): (::Google::Protobuf::Duration | ::int)?
+            def has_backoff_start_interval?: () -> bool
+            def clear_backoff_start_interval: () -> void
+
             type init_map = {
               workflow_type: (::String | ::Symbol)?,
               "workflow_type" => (::String | ::Symbol)?,
@@ -800,6 +806,8 @@ module Temporalio
               "versioning_intent" => (::Temporalio::Internal::Bridge::Api::Common::VersioningIntent::names | ::Temporalio::Internal::Bridge::Api::Common::VersioningIntent::strings | ::Integer | ::Float)?,
               initial_versioning_behavior: (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
               "initial_versioning_behavior" => (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float)?,
+              backoff_start_interval: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+              "backoff_start_interval" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -816,6 +824,7 @@ module Temporalio
               | ("retry_policy" name) -> ::Temporalio::Api::Common::V1::RetryPolicy?
               | ("versioning_intent" name) -> (::Temporalio::Internal::Bridge::Api::Common::VersioningIntent::names | ::Integer)
               | ("initial_versioning_behavior" name) -> (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Integer)
+              | ("backoff_start_interval" name) -> ::Google::Protobuf::Duration?
 
             def []=:
                 ("workflow_type" name, (::String | ::Symbol) value) -> void
@@ -829,6 +838,7 @@ module Temporalio
               | ("retry_policy" name, ::Temporalio::Api::Common::V1::RetryPolicy? value) -> void
               | ("versioning_intent" name, (::Temporalio::Internal::Bridge::Api::Common::VersioningIntent::names | ::Temporalio::Internal::Bridge::Api::Common::VersioningIntent::strings | ::Integer | ::Float) value) -> void
               | ("initial_versioning_behavior" name, (::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::names | ::Temporalio::Api::Enums::V1::ContinueAsNewVersioningBehavior::strings | ::Integer | ::Float) value) -> void
+              | ("backoff_start_interval" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
           end
 
           # Indicate a workflow has completed as cancelled. Generally sent as a response to an activation

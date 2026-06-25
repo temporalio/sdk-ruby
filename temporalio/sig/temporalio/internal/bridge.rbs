@@ -1,7 +1,11 @@
 module Temporalio
   module Internal
     module Bridge
+      # Whether the bridge was compiled with the FIPS-mode crypto backend. Defined in Rust.
+      FIPS: bool
+
       def self.assert_fiber_compatibility!: -> void
+      def self.assert_fips_compatibility!: -> void
       def self.fibers_supported: -> bool
 
       module EnvConfig

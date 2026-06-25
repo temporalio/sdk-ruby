@@ -824,6 +824,53 @@ module Temporalio
               | ("run_id" name, (::String | ::Symbol) value) -> void
           end
 
+          # A link to a workflow execution. This is a more general version of WorkflowEvent that doesn't specify a 
+          # particular event within the workflow, useful when you want to link to a workflow but there is no particular event to link to,
+          # such as a Query or a Rejected Update.
+          class Workflow < ::Google::Protobuf::AbstractMessage
+
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            attr_reader workflow_id(): ::String
+            attr_writer workflow_id(): ::String | ::Symbol
+            def clear_workflow_id: () -> void
+
+            attr_reader run_id(): ::String
+            attr_writer run_id(): ::String | ::Symbol
+            def clear_run_id: () -> void
+
+            attr_reader reason(): ::String
+            attr_writer reason(): ::String | ::Symbol
+            def clear_reason: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              workflow_id: (::String | ::Symbol)?,
+              "workflow_id" => (::String | ::Symbol)?,
+              run_id: (::String | ::Symbol)?,
+              "run_id" => (::String | ::Symbol)?,
+              reason: (::String | ::Symbol)?,
+              "reason" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("workflow_id" name) -> ::String
+              | ("run_id" name) -> ::String
+              | ("reason" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("workflow_id" name, (::String | ::Symbol) value) -> void
+              | ("run_id" name, (::String | ::Symbol) value) -> void
+              | ("reason" name, (::String | ::Symbol) value) -> void
+          end
+
           attr_accessor workflow_event(): ::Temporalio::Api::Common::V1::Link::WorkflowEvent?
           def has_workflow_event?: () -> bool
           def clear_workflow_event: () -> void
@@ -840,7 +887,11 @@ module Temporalio
           def has_nexus_operation?: () -> bool
           def clear_nexus_operation: () -> void
 
-          attr_reader variant(): (::Temporalio::Api::Common::V1::Link::WorkflowEvent | ::Temporalio::Api::Common::V1::Link::BatchJob | ::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::NexusOperation)?
+          attr_accessor workflow(): ::Temporalio::Api::Common::V1::Link::Workflow?
+          def has_workflow?: () -> bool
+          def clear_workflow: () -> void
+
+          attr_reader variant(): (::Temporalio::Api::Common::V1::Link::WorkflowEvent | ::Temporalio::Api::Common::V1::Link::BatchJob | ::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::NexusOperation | ::Temporalio::Api::Common::V1::Link::Workflow)?
           def has_variant?: () -> bool
           def clear_variant: () -> void
 
@@ -853,6 +904,8 @@ module Temporalio
             "activity" => (::Temporalio::Api::Common::V1::Link::Activity | ::Temporalio::Api::Common::V1::Link::Activity::init_map)?,
             nexus_operation: (::Temporalio::Api::Common::V1::Link::NexusOperation | ::Temporalio::Api::Common::V1::Link::NexusOperation::init_map)?,
             "nexus_operation" => (::Temporalio::Api::Common::V1::Link::NexusOperation | ::Temporalio::Api::Common::V1::Link::NexusOperation::init_map)?,
+            workflow: (::Temporalio::Api::Common::V1::Link::Workflow | ::Temporalio::Api::Common::V1::Link::Workflow::init_map)?,
+            "workflow" => (::Temporalio::Api::Common::V1::Link::Workflow | ::Temporalio::Api::Common::V1::Link::Workflow::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -862,12 +915,14 @@ module Temporalio
             | ("batch_job" name) -> ::Temporalio::Api::Common::V1::Link::BatchJob?
             | ("activity" name) -> ::Temporalio::Api::Common::V1::Link::Activity?
             | ("nexus_operation" name) -> ::Temporalio::Api::Common::V1::Link::NexusOperation?
+            | ("workflow" name) -> ::Temporalio::Api::Common::V1::Link::Workflow?
 
           def []=:
               ("workflow_event" name, ::Temporalio::Api::Common::V1::Link::WorkflowEvent? value) -> void
             | ("batch_job" name, ::Temporalio::Api::Common::V1::Link::BatchJob? value) -> void
             | ("activity" name, ::Temporalio::Api::Common::V1::Link::Activity? value) -> void
             | ("nexus_operation" name, ::Temporalio::Api::Common::V1::Link::NexusOperation? value) -> void
+            | ("workflow" name, ::Temporalio::Api::Common::V1::Link::Workflow? value) -> void
         end
 
         # Principal is an authenticated caller identity computed by the server from trusted
