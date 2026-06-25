@@ -81,6 +81,12 @@ fn init(ruby: &Ruby) -> Result<(), Error> {
     testing::init(ruby)?;
     worker::init(ruby)?;
 
+    // Whether the bridge was compiled with the FIPS-mode crypto backend. Used
+    // by Ruby to opt the default build ID into a FIPS-approved hash; see
+    // `Temporalio::Worker._load_default_build_id`.
+    ruby.get_inner(&ROOT_MOD)
+        .const_set("FIPS", cfg!(feature = "fips"))?;
+
     #[cfg(feature = "dhat-heap")]
     {
         let bridge_mod = ruby.get_inner(&ROOT_MOD);

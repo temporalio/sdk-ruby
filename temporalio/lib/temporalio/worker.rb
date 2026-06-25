@@ -81,12 +81,16 @@ module Temporalio
       # hashing all bytecode of required files. This means later/dynamic require
       # won't be accounted for because this is memoized. It also means the
       # tiniest code change will affect this, which is what we want since this
-      # is meant to be a "binary checksum". We have chosen to use MD5 for speed,
-      # similarity with other SDKs, and because security is not a factor.
+      # is meant to be a "binary checksum". We default to MD5 for speed,
+      # similarity with other SDKs, and because security is not a factor. On
+      # FIPS builds we use SHA-256 instead, since MD5 is rejected by FIPS-mode
+      # OpenSSL. This is opt-in (tied to the FIPS build) so existing,
+      # non-FIPS users keep their stable MD5-based build IDs.
       require 'digest'
 
+      initial_digest = Internal::Bridge::FIPS ? Digest::SHA256.new : Digest::MD5.new
       saw_bridge = false
-      build_id = $LOADED_FEATURES.each_with_object(Digest::MD5.new) do |file, digest|
+      build_id = $LOADED_FEATURES.each_with_object(initial_digest) do |file, digest|
         saw_bridge = true if file.include?('temporalio_bridge.')
         digest.update(File.read(file)) if File.file?(file)
       end.hexdigest
@@ -166,6 +170,7 @@ module Temporalio
       raise ArgumentError, 'Not all parameters are workers' unless workers.all?(Worker)
 
       Internal::Bridge.assert_fiber_compatibility!
+      Internal::Bridge.assert_fips_compatibility!
 
       # Start the multi runner
       runner = Internal::Worker::MultiRunner.new(workers:, shutdown_signals:)
