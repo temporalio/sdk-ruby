@@ -19,6 +19,10 @@ to docs, or any other relevant information.
 
 ## [Unreleased]
 
+### Added
+
+- Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
+
 ### Fixed
 
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
@@ -43,8 +47,6 @@ Existing workflow-only code paths are unaffected at runtime. The recommended mig
 `Activity::Info#in_workflow?` and branch on the result.
 
 ### Added
-
-- Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
 
 #### Standalone Activities
 
