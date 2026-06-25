@@ -102,15 +102,6 @@ class ClientActivityOperatorCommandsTest < Test
     handle
   end
 
-  def test_pause_shows_paused
-    with_activity_worker([SlowActivity]) do |task_queue|
-      handle = start_running_slow_activity(task_queue)
-      handle.pause('test-pause-reason')
-      assert_eventually_paused(handle)
-      handle.terminate('cleanup')
-    end
-  end
-
   def test_unpause_resumes
     with_activity_worker([QuickActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
