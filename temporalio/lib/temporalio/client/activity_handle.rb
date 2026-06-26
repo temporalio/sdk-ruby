@@ -246,7 +246,7 @@ module Temporalio
         paths = []
 
         unless UNSET.equal?(task_queue)
-          paths << 'task_queue'
+          paths << 'task_queue.name'
           options.task_queue = Api::TaskQueue::V1::TaskQueue.new(name: task_queue.to_s) if task_queue
         end
         unless UNSET.equal?(schedule_to_close_timeout)

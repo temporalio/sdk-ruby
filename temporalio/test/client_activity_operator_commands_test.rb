@@ -183,6 +183,7 @@ class ClientActivityOperatorCommandsTest < Test
       )
 
       updated = handle.update_options(
+        task_queue: 'updated-tq',
         schedule_to_close_timeout: 200.0,
         schedule_to_start_timeout: 15.0,
         start_to_close_timeout: 90.0,
@@ -192,6 +193,7 @@ class ClientActivityOperatorCommandsTest < Test
       )
 
       # Every field is settable and lands: the returned options reflect each new value.
+      assert_equal 'updated-tq', updated.task_queue
       assert_in_delta 200.0, updated.schedule_to_close_timeout, 0.5
       assert_in_delta 15.0, updated.schedule_to_start_timeout, 0.5
       assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
@@ -201,6 +203,7 @@ class ClientActivityOperatorCommandsTest < Test
 
       # And describe reflects them server-side.
       desc = handle.describe
+      assert_equal 'updated-tq', desc.task_queue
       assert_in_delta 200.0, desc.schedule_to_close_timeout, 0.5
       assert_in_delta 15.0, desc.schedule_to_start_timeout, 0.5
       assert_in_delta 90.0, desc.start_to_close_timeout, 0.5
