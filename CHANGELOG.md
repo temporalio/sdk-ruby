@@ -49,6 +49,14 @@ async completion.
 
 See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
 
+#### Standalone Activity operator commands
+
+`Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
+`#unpause`, `#reset`, and `#update_options`. `#pause` and `#unpause` hold and resume the activity.
+`#reset` rewinds the activity to its first attempt. `#update_options` partially updates the
+activity's options — `task_queue`, the timeouts, `retry_policy`, and `priority` — or restores
+the originals (`restore_original:`).  Currently experimental.
+
 ### Fixed
 
 #### `execute_update_with_start_workflow` no longer raises `RPCError NOT_FOUND` on validator rejection
