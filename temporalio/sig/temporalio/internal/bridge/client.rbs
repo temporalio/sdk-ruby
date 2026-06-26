@@ -14,6 +14,7 @@ module Temporalio
           attr_accessor keep_alive: KeepAliveOptions?
           attr_accessor http_connect_proxy: HTTPConnectProxyOptions?
           attr_accessor dns_load_balancing: DnsLoadBalancingOptions?
+          attr_accessor grpc_compression: GrpcCompressionOptions?
 
           def initialize: (
             target_host: String,
@@ -26,7 +27,8 @@ module Temporalio
             rpc_retry: RPCRetryOptions,
             ?keep_alive: KeepAliveOptions?,
             ?http_connect_proxy: HTTPConnectProxyOptions?,
-            ?dns_load_balancing: DnsLoadBalancingOptions?
+            ?dns_load_balancing: DnsLoadBalancingOptions?,
+            ?grpc_compression: GrpcCompressionOptions?
           ) -> void
         end
 
@@ -89,6 +91,14 @@ module Temporalio
 
           def initialize: (
             resolution_interval: Float
+          ) -> void
+        end
+
+        class GrpcCompressionOptions
+          attr_accessor codec: String
+
+          def initialize: (
+            codec: String
           ) -> void
         end
 
