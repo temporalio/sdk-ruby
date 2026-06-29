@@ -25,7 +25,8 @@ module Temporalio
         :http_connect_proxy,
         :runtime,
         :lazy_connect,
-        :dns_load_balancing
+        :dns_load_balancing,
+        :grpc_compression
       )
 
       # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
@@ -149,6 +150,25 @@ module Temporalio
         end
       end
 
+      # Transport-level gRPC compression options for client connections.
+      module GrpcCompressionOptions
+        # Use gzip for transport-level gRPC compression.
+        class Gzip
+          # @return [Symbol] Compression codec name.
+          def codec
+            :gzip
+          end
+        end
+
+        # Disable transport-level gRPC compression.
+        class None
+          # @return [Symbol] Compression codec name.
+          def codec
+            :none
+          end
+        end
+      end
+
       # @return [Options] Frozen options for this client which has the same attributes as {initialize}. Note that if
       #   {api_key=} or {rpc_metadata=} are updated, the options object is replaced with those changes (it is not
       #   mutated in place).
@@ -188,6 +208,8 @@ module Temporalio
       #   connection.
       # @param dns_load_balancing [DnsLoadBalancingOptions, nil] DNS load balancing options for this connection. Default
       #   is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are mutually exclusive.
+      # @param grpc_compression [GrpcCompressionOptions::Gzip, GrpcCompressionOptions::None] Transport-level gRPC
+      #   compression. Defaults to gzip. Set to {GrpcCompressionOptions::None} to opt out.
       # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block must
       #   be yielded to only once with the options. The block does not return a meaningful value, nor should
       #   around_connect.
@@ -205,6 +227,7 @@ module Temporalio
         runtime: Runtime.default,
         lazy_connect: false,
         dns_load_balancing: nil,
+        grpc_compression: GrpcCompressionOptions::Gzip.new,
         around_connect: nil
       )
         @options = Options.new(
@@ -218,7 +241,8 @@ module Temporalio
           http_connect_proxy:,
           runtime:,
           lazy_connect:,
-          dns_load_balancing:
+          dns_load_balancing:,
+          grpc_compression:
         ).freeze
         @core_client_mutex = Mutex.new
         # Create core client now if not lazy, applying around_connect if present
@@ -322,6 +346,16 @@ module Temporalio
           ),
           identity: @options.identity || "#{Process.pid}@#{Socket.gethostname}"
         )
+        grpc_compression_codec = case @options.grpc_compression
+                                 when GrpcCompressionOptions::Gzip
+                                   'gzip'
+                                 when GrpcCompressionOptions::None
+                                   'none'
+                                 else
+                                   raise ArgumentError,
+                                         "Invalid gRPC compression options: #{@options.grpc_compression.inspect}"
+                                 end
+        options.grpc_compression = Internal::Bridge::Client::GrpcCompressionOptions.new(codec: grpc_compression_codec)
         # Auto-enable TLS when API key is provided and tls not explicitly set
         tls = @options.tls
         tls = true if tls.nil? && @options.api_key

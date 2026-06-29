@@ -99,6 +99,9 @@ module Temporalio
     # @param dns_load_balancing [Connection::DnsLoadBalancingOptions, nil] DNS load balancing options for the
     #   connection. Default is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are
     #   mutually exclusive.
+    # @param grpc_compression [Connection::GrpcCompressionOptions::Gzip, Connection::GrpcCompressionOptions::None]
+    #   Transport-level gRPC compression. Defaults to gzip. Set to {Connection::GrpcCompressionOptions::None} to opt
+    #   out.
     #
     # @return [Client] Connected client.
     #
@@ -121,7 +124,8 @@ module Temporalio
       http_connect_proxy: nil,
       runtime: Runtime.default,
       lazy_connect: false,
-      dns_load_balancing: nil
+      dns_load_balancing: nil,
+      grpc_compression: Connection::GrpcCompressionOptions::Gzip.new
     )
       # Prepare connection. The connection var is needed here so it can be used in callback for plugin.
       base_connection = nil
@@ -168,6 +172,7 @@ module Temporalio
         runtime:,
         lazy_connect:,
         dns_load_balancing:,
+        grpc_compression:,
         around_connect: # steep:ignore
       )
 

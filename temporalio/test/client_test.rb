@@ -49,6 +49,21 @@ class ClientTest < Test
     assert_in_delta 30.0, opts.resolution_interval
   end
 
+  def test_grpc_compression_defaults_to_gzip
+    client = Temporalio::Client.connect('localhost:7233', 'default', lazy_connect: true)
+    assert_instance_of Temporalio::Client::Connection::GrpcCompressionOptions::Gzip,
+                       client.connection.options.grpc_compression
+    assert_equal :gzip, client.connection.options.grpc_compression.codec
+  end
+
+  def test_grpc_compression_none_preserved
+    compression_opts = Temporalio::Client::Connection::GrpcCompressionOptions::None.new
+    client = Temporalio::Client.connect(
+      'localhost:7233', 'default', lazy_connect: true, grpc_compression: compression_opts
+    )
+    assert_equal compression_opts, client.connection.options.grpc_compression
+  end
+
   class TrackCallsInterceptor
     include Temporalio::Client::Interceptor
 
