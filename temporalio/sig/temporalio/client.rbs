@@ -51,7 +51,8 @@ module Temporalio
       ?http_connect_proxy: Connection::HTTPConnectProxyOptions?,
       ?runtime: Runtime,
       ?lazy_connect: bool,
-      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?
+      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?,
+      ?grpc_compression: Connection::GrpcCompressionOptions::Gzip | Connection::GrpcCompressionOptions::None
     ) -> Client
 
     def self._validate_plugins!: (Array[Plugin] plugins) -> void
