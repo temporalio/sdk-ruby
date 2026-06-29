@@ -27,8 +27,9 @@ to docs, or any other relevant information.
 
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
 
-Workflow activations containing continue-as-new suggestion reasons previously failed because the worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now converted from bridge enum symbols to
-`Temporalio::SuggestContinueAsNewReason` integer enum values before being exposed to workflows.
+Workflow activations containing continue-as-new suggestion reasons previously failed because the
+worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now 
+converted from bridge enum symbols to `Temporalio::SuggestContinueAsNewReason` integer enum values before being exposed to workflows.
 
 ## [v1.5.0] - 2026-06-11
 
