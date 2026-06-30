@@ -1,0 +1,724 @@
+# frozen_string_literal: true
+
+require 'delegate'
+require 'logger'
+require 'minitest/autorun'
+require 'rbi'
+require 'support/sig_applicator'
+
+module Support
+  class SigApplicatorTest < Minitest::Test
+    def setup
+      super
+      @sig_applicator_type_errors = replace_sig_applicator_type_errors([])
+    end
+
+    def teardown
+      replace_sig_applicator_type_errors(@sig_applicator_type_errors)
+      super
+    end
+
+    # --- Block param mismatch skips ---
+
+    def test_does_not_skip_anonymous_block_with_sig_block
+      klass = Class.new do
+        def foo(&); end
+      end
+      method_node = parse_method(
+        'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
+      )
+      original = klass.instance_method(:foo)
+      refute skip_method?(original, method_node, :foo)
+    end
+
+    def test_skips_method_with_block_but_sig_without
+      klass = Class.new do
+        def foo(&); end
+      end
+      method_node = parse_method('class X; sig { void }; def foo; end; end')
+      original = klass.instance_method(:foo)
+      assert skip_method?(original, method_node, :foo)
+    end
+
+    def test_skips_sig_with_block_but_method_without
+      klass = Class.new do
+        def foo; end
+      end
+      method_node = parse_method(
+        'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
+      )
+      original = klass.instance_method(:foo)
+      assert skip_method?(original, method_node, :foo)
+    end
+
+    def test_does_not_skip_matching_named_block
+      klass = Class.new do
+        def foo(&blk); end # rubocop:disable Naming/BlockForwarding
+      end
+      method_node = parse_method(
+        'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
+      )
+      original = klass.instance_method(:foo)
+      refute skip_method?(original, method_node, :foo)
+    end
+
+    def test_does_not_skip_proc_typed_regular_arg
+      klass = Class.new do
+        def run_worker(options, next_call); end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(options: String, next_call: T.proc.params(arg0: String).returns(Object)).returns(Object) }
+          def run_worker(options, next_call); end
+        end
+      RBI
+      original = klass.instance_method(:run_worker)
+      refute skip_method?(original, method_node, :run_worker)
+    end
+
+    # --- Anonymous block sig rewriting ---
+
+    def test_rewrite_block_param
+      input = 'sig { params(name: String, blk: T.proc.void).void }'
+      expected = 'sig { params(name: String, "&": T.proc.void).void }'
+      method_node = parse_method(
+        'class X; sig { params(name: String, blk: T.proc.void).void }; def foo(name, &blk); end; end'
+      )
+      assert_equal expected, rewrite_block_param(input, method_node, method_node.sigs.first)
+    end
+
+    def test_rewrite_block_param_no_block
+      input = 'sig { params(name: String).void }'
+      method_node = parse_method('class X; sig { params(name: String).void }; def foo(name); end; end')
+      assert_equal input, rewrite_block_param(input, method_node, method_node.sigs.first)
+    end
+
+    def test_rewrite_block_param_does_not_rewrite_regular_proc_arg
+      input = 'sig { params(next_call: T.proc.void).void }'
+      method_node = parse_method(
+        'class X; sig { params(next_call: T.proc.void).void }; def foo(next_call); end; end'
+      )
+      assert_equal input, rewrite_block_param(input, method_node, method_node.sigs.first)
+    end
+
+    # --- Setter / unnamed param skips ---
+
+    def test_skips_attr_writer_with_unnamed_params
+      klass = Class.new
+      klass.send(:attr_writer, :bar)
+      method_node = parse_method(
+        'class X; sig { params(value: Integer).void }; def bar=(value); end; end'
+      )
+      original = klass.instance_method(:bar=)
+      assert skip_method?(original, method_node, :bar=)
+    end
+
+    def test_does_not_skip_regular_setter
+      klass = Class.new do
+        def bar=(value); end
+      end
+      method_node = parse_method(
+        'class X; sig { params(value: Integer).void }; def bar=(value); end; end'
+      )
+      original = klass.instance_method(:bar=)
+      refute skip_method?(original, method_node, :bar=)
+    end
+
+    # --- Synthetic rest-param skips ---
+
+    def test_skips_rest_only_method_with_named_sig_params
+      klass = Class.new do
+        def initialize(*args); end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(name: String, age: Integer).void }
+          def initialize(name:, age:); end
+        end
+      RBI
+      original = klass.instance_method(:initialize)
+      assert skip_method?(original, method_node, :initialize)
+    end
+
+    def test_does_not_skip_when_params_match
+      klass = Class.new do
+        def foo(val1, val2); end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(val1: Integer, val2: String).returns(String) }
+          def foo(val1, val2); end
+        end
+      RBI
+      original = klass.instance_method(:foo)
+      refute skip_method?(original, method_node, :foo)
+    end
+
+    def test_does_not_skip_no_param_method
+      klass = Class.new do
+        def foo; end
+      end
+      method_node = parse_method('class X; sig { returns(String) }; def foo; end; end')
+      original = klass.instance_method(:foo)
+      refute skip_method?(original, method_node, :foo)
+    end
+
+    def test_register_summary_hook_uses_after_run
+      original_registered = SigApplicator.instance_variable_get(:@summary_hook_registered)
+      hooks = []
+      minitest_singleton_class = Minitest.singleton_class
+      original_after_run = Minitest.method(:after_run)
+      minitest_singleton_class.send(:define_method, :after_run) { |&block| hooks << block }
+      SigApplicator.instance_variable_set(:@summary_hook_registered, false)
+
+      SigApplicator.send(:register_summary_hook!)
+
+      assert_equal 1, hooks.size
+      assert SigApplicator.instance_variable_get(:@summary_hook_registered)
+      refute Object.const_defined?(:ZZZSigApplicatorTest)
+    ensure
+      minitest_singleton_class&.send(:define_method, :after_run, original_after_run)
+      SigApplicator.instance_variable_set(:@summary_hook_registered, original_registered)
+    end
+
+    def test_raise_recorded_type_errors_reports_unique_counts
+      replace_sig_applicator_type_errors(['first error', 'second error', 'first error'])
+
+      error = assert_raises(Minitest::Assertion) do
+        SigApplicator.send(:raise_recorded_type_errors!)
+      end
+
+      assert_includes error.message, 'SigApplicator: 3 runtime type errors detected (2 unique):'
+      assert_includes error.message, '  [2x] first error'
+      assert_includes error.message, '  [1x] second error'
+    end
+
+    def test_suppress_errors_rejects_nesting_without_clearing_outer_suppression
+      SigApplicator.suppress_errors do
+        error = assert_raises(RuntimeError) do
+          SigApplicator.suppress_errors {} # rubocop:disable Lint/EmptyBlock
+        end
+        assert_equal 'SigApplicator.suppress_errors cannot be nested', error.message
+
+        SigApplicator.record_type_error('still suppressed')
+      end
+
+      assert_empty SigApplicator.type_errors
+    end
+
+    def test_apply_all_raises_when_signature_cannot_be_instrumented
+      test_class = Class.new do
+        extend T::Sig
+
+        def self.foo(value); end
+      end
+      Support.const_set(:SigApplicatorApplyAllTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorApplyAllTest
+          sig { params(other: String).void }
+          def self.foo(value); end
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      error = assert_raises(RuntimeError) do
+        with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      end
+      assert_includes error.message, 'SigApplicator: 1 methods could not be instrumented:'
+      assert_includes error.message, 'Support::SigApplicatorApplyAllTest.foo:'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorApplyAllTest, false)
+        Support.send(:remove_const, :SigApplicatorApplyAllTest)
+      end
+    end
+
+    def test_apply_all_reads_all_rbi_paths
+      test_class = Class.new do
+        def self.foo(value)
+          value
+        end
+
+        def self.bar(value)
+          value
+        end
+      end
+      Support.const_set(:SigApplicatorMultiFileTest, test_class)
+
+      trees = {
+        'one.rbi' => RBI::Parser.parse_string(<<~RBI),
+          class Support::SigApplicatorMultiFileTest
+            sig { params(value: String).returns(String) }
+            def self.foo(value); end
+          end
+        RBI
+        'two.rbi' => RBI::Parser.parse_string(<<~RBI)
+          class Support::SigApplicatorMultiFileTest
+            sig { params(value: String).returns(String) }
+            def self.bar(value); end
+          end
+        RBI
+      }
+      parsed_paths = []
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) do |path|
+        parsed_paths << path
+        trees.fetch(path)
+      end
+
+      with_sig_applicator_rbi_paths(trees.keys) { SigApplicator.apply_all! }
+
+      assert_equal trees.keys, parsed_paths
+      assert_empty SigApplicator.type_errors
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorMultiFileTest, false)
+        Support.send(:remove_const, :SigApplicatorMultiFileTest)
+      end
+    end
+
+    def test_apply_all_applies_attr_reader_signature
+      test_class = Class.new
+      test_class.send(:define_method, :initialize) do |name|
+        @name = name
+      end
+      test_class.send(:attr_reader, :name)
+      Support.const_set(:SigApplicatorAttrReaderTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrReaderTest
+          sig { returns(String) }
+          attr_reader :name
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      test_class.send(:new, 123).name
+
+      assert_includes SigApplicator.type_errors.join("\n"), 'Return value: Expected type String, got type Integer'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrReaderTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrReaderTest)
+      end
+    end
+
+    def test_apply_all_applies_attr_writer_signature
+      test_class = Class.new
+      test_class.send(:attr_writer, :name)
+      Support.const_set(:SigApplicatorAttrWriterTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrWriterTest
+          sig { params(name: String).returns(Object) }
+          attr_writer :name
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      test_class.new.name = 123
+
+      assert_includes SigApplicator.type_errors.join("\n"), "Parameter 'name': Expected type String, got type Integer"
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrWriterTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrWriterTest)
+      end
+    end
+
+    def test_apply_all_applies_attr_accessor_signature
+      test_class = Class.new
+      test_class.send(:attr_accessor, :count)
+      Support.const_set(:SigApplicatorAttrAccessorTest, test_class)
+
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Support::SigApplicatorAttrAccessorTest
+          sig { returns(Integer) }
+          attr_accessor :count
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+
+      instance = test_class.new
+      instance.count = 'bad'
+      instance.count
+
+      errors = SigApplicator.type_errors.join("\n")
+      assert_includes errors, "Parameter 'count': Expected type Integer, got type String"
+      assert_includes errors, 'Return value: Expected type Integer, got type String'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+      if Support.const_defined?(:SigApplicatorAttrAccessorTest, false)
+        Support.send(:remove_const, :SigApplicatorAttrAccessorTest)
+      end
+    end
+
+    def test_apply_method_sig_supports_anonymous_block_with_named_rbi_block
+      klass = Class.new do
+        extend T::Sig
+
+        def foo(&); end
+      end
+      method_node = parse_method(
+        'class X; sig { params(blk: T.proc.void).void }; def foo(&blk); end; end'
+      )
+      acc = new_accumulator
+
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
+    end
+
+    def test_apply_method_sig_supports_proc_typed_regular_arg
+      klass = Class.new do
+        extend T::Sig
+
+        def run_worker(options, next_call)
+          next_call.call(options)
+        end
+      end
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(options: String, next_call: T.proc.params(arg0: String).returns(Integer)).returns(Integer) }
+          def run_worker(options, next_call); end
+        end
+      RBI
+      acc = new_accumulator
+
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
+      assert_equal 2, klass.new.run_worker('ok', ->(_value) { 2 })
+    end
+
+    def test_apply_method_sig_does_not_emit_extra_method_added_events
+      method_added_events = []
+      klass = Class.new do
+        extend T::Sig
+
+        define_singleton_method(:method_added) { |name| method_added_events << name }
+
+        def foo
+          'ok'
+        end
+      end
+      method_added_events.clear
+      method_node = parse_method('class X; sig { returns(String) }; def foo; end; end')
+      acc = new_accumulator
+
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_empty acc.errors
+      assert_equal 'ok', klass.new.foo
+      assert_equal method_added_events.select { |name| name == :foo }, method_added_events
+      # Sorbet replaces the method twice, we should not add to this
+      assert_equal method_added_events.size, 2
+    end
+
+    def test_apply_method_sig_restores_original_method_when_instrumentation_fails
+      klass = Class.new do
+        extend T::Sig
+
+        def foo(value)
+          "original: #{value}"
+        end
+      end
+      original = klass.instance_method(:foo)
+      method_node = parse_method(<<~RBI)
+        class X
+          sig { params(other: String).returns(String) }
+          def foo(other); end
+        end
+      RBI
+      acc = new_accumulator
+
+      apply_method_sig(klass, 'X', method_node, acc, sig_eval_scope: klass)
+      assert_includes acc.errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      assert_equal original, klass.instance_method(:foo)
+      assert_equal 'original: ok', klass.new.foo('ok')
+    end
+
+    def test_apply_method_sig_catches_incompatible_override_after_inherited_method_sig
+      base_class = Class.new do
+        def to_h
+          { value: 'base' }
+        end
+      end
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      override_class = Class.new(inherited_method_class) do
+        extend T::Sig
+
+        def to_h
+          { 'profile' => { value: 'override' } }
+        end
+      end
+
+      Support.const_set(:SigApplicatorInheritedMethodSigTest, inherited_method_class)
+      Support.const_set(:SigApplicatorIncompatibleOverrideTest, override_class)
+
+      inherited_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorInheritedMethodSigTest
+          sig { returns(T::Hash[Symbol, T.untyped]) }
+          def to_h; end
+        end
+      RBI
+      override_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorIncompatibleOverrideTest
+          sig { returns(T::Hash[String, T::Hash[Symbol, T.untyped]]) }
+          def to_h; end
+        end
+      RBI
+
+      acc = new_accumulator
+      apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorInheritedMethodSigTest',
+        inherited_method_node,
+        acc,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty acc.errors
+
+      apply_method_sig(
+        override_class,
+        'Support::SigApplicatorIncompatibleOverrideTest',
+        override_method_node,
+        acc,
+        sig_eval_scope: override_class
+      )
+      assert_includes acc.errors.join("\n"), 'Incompatible return type in signature for override of method `to_h`'
+    ensure
+      if Support.const_defined?(:SigApplicatorInheritedMethodSigTest, false)
+        Support.send(:remove_const, :SigApplicatorInheritedMethodSigTest)
+      end
+      if Support.const_defined?(:SigApplicatorIncompatibleOverrideTest, false)
+        Support.send(:remove_const, :SigApplicatorIncompatibleOverrideTest)
+      end
+    end
+
+    def test_apply_method_sig_for_inherited_method_does_not_wrap_original_owner
+      original_delegator_initialize = Delegator.instance_method(:initialize)
+      inherited_method_class = Class.new(SimpleDelegator) { extend T::Sig }
+      child_class = Class.new(inherited_method_class)
+      child_class.send(:define_method, :initialize) do |obj:, marker:|
+        @marker = marker
+        super(obj)
+      end
+      child_class.send(:attr_reader, :marker)
+      Support.const_set(:SigApplicatorDelegatorSigTest, inherited_method_class)
+
+      inherited_method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorDelegatorSigTest
+          sig { params(obj: ::Logger).void }
+          def initialize(obj); end
+        end
+      RBI
+
+      acc = new_accumulator
+      apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorDelegatorSigTest',
+        inherited_method_node,
+        acc,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty acc.errors
+
+      assert_equal original_delegator_initialize, Delegator.instance_method(:initialize)
+      assert_equal inherited_method_class, inherited_method_class.instance_method(:initialize).owner
+
+      child = child_class.send(:new, obj: Logger.new(nil), marker: :ok)
+      assert_equal :ok, child.marker
+      assert_instance_of Logger, child.__getobj__
+    ensure
+      if Support.const_defined?(:SigApplicatorDelegatorSigTest, false)
+        Support.send(:remove_const, :SigApplicatorDelegatorSigTest)
+      end
+    end
+
+    def test_apply_method_sig_preserves_inherited_method_visibility
+      base_class = Class.new
+      base_class.define_method(:protected_value) { 'protected' }
+      base_class.define_method(:private_value) { 'private' }
+      base_class.send(:protected, :protected_value)
+      base_class.send(:private, :private_value)
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      Support.const_set(:SigApplicatorVisibilityTest, inherited_method_class)
+
+      protected_node = parse_method(<<~RBI)
+        class Support::SigApplicatorVisibilityTest
+          sig { returns(String) }
+          def protected_value; end
+        end
+      RBI
+      private_node = parse_method(<<~RBI)
+        class Support::SigApplicatorVisibilityTest
+          sig { returns(String) }
+          def private_value; end
+        end
+      RBI
+
+      acc = new_accumulator
+      apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorVisibilityTest',
+        protected_node,
+        acc,
+        sig_eval_scope: inherited_method_class
+      )
+      apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorVisibilityTest',
+        private_node,
+        acc,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_empty acc.errors
+
+      assert inherited_method_class.protected_method_defined?(:protected_value)
+      assert inherited_method_class.private_method_defined?(:private_value)
+      refute inherited_method_class.public_method_defined?(:protected_value)
+      refute inherited_method_class.public_method_defined?(:private_value)
+    ensure
+      if Support.const_defined?(:SigApplicatorVisibilityTest, false)
+        Support.send(:remove_const, :SigApplicatorVisibilityTest)
+      end
+    end
+
+    def test_apply_method_sig_removes_local_copy_when_inherited_instrumentation_fails
+      base_class = Class.new do
+        def foo(value)
+          "original: #{value}"
+        end
+      end
+      inherited_method_class = Class.new(base_class) { extend T::Sig }
+      Support.const_set(:SigApplicatorInheritedRestoreTest, inherited_method_class)
+
+      method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorInheritedRestoreTest
+          sig { params(other: String).returns(String) }
+          def foo(other); end
+        end
+      RBI
+
+      acc = new_accumulator
+      apply_method_sig(
+        inherited_method_class,
+        'Support::SigApplicatorInheritedRestoreTest',
+        method_node,
+        acc,
+        sig_eval_scope: inherited_method_class
+      )
+      assert_includes acc.errors.join("\n"), 'The declaration for `foo` is missing parameter(s): value'
+      assert_equal base_class, inherited_method_class.instance_method(:foo).owner
+      assert_equal 'original: ok', inherited_method_class.new.foo('ok')
+    ensure
+      if Support.const_defined?(:SigApplicatorInheritedRestoreTest, false)
+        Support.send(:remove_const, :SigApplicatorInheritedRestoreTest)
+      end
+    end
+
+    def test_apply_method_sig_resolves_singleton_sig_constants_in_class_namespace
+      klass = Class.new do
+        extend T::Sig
+
+        class << self
+          extend T::Sig
+        end
+
+        def self.foo(value); end
+      end
+      klass.const_set(:Inner, Data.define(:value))
+      Support.const_set(:SigApplicatorSingletonScopeTest, klass)
+      method_node = parse_method(<<~RBI)
+        class Support::SigApplicatorSingletonScopeTest
+          sig { params(value: Inner).void }
+          def self.foo(value); end
+        end
+      RBI
+      acc = new_accumulator
+
+      apply_method_sig(
+        klass.singleton_class,
+        'Support::SigApplicatorSingletonScopeTest',
+        method_node,
+        acc,
+        sig_eval_scope: klass
+      )
+      assert_empty acc.errors
+    ensure
+      if Support.const_defined?(:SigApplicatorSingletonScopeTest, false)
+        Support.send(:remove_const, :SigApplicatorSingletonScopeTest)
+      end
+    end
+
+    private
+
+    def parse_method(source)
+      tree = RBI::Parser.parse_string(source)
+      klass = tree.nodes.first
+      klass.nodes.find { |n| n.is_a?(RBI::Method) }
+    end
+
+    def skip_method?(original, method_node, method_name)
+      SigApplicator.send(:skip_method?, original, method_node, method_name)
+    end
+
+    def rewrite_block_param(sig_source, method_node, sig)
+      SigApplicator.send(:rewrite_block_param, sig_source, method_node, sig)
+    end
+
+    def apply_method_sig(target, class_name, method_node, acc, sig_eval_scope:)
+      SigApplicator.send(
+        :apply_method_sig,
+        target,
+        class_name,
+        method_node,
+        acc,
+        sig_eval_scope:
+      )
+    end
+
+    def new_accumulator
+      SigApplicator::Accumulator.new(applied: 0, skipped: 0, missing: 0, errors: [])
+    end
+
+    def attr_method_sig_sources(attr_node, attr_name)
+      SigApplicator.send(:attr_method_sig_sources, attr_node, attr_name)
+    end
+
+    def replace_sig_applicator_type_errors(new_errors)
+      errors = SigApplicator.instance_variable_get(:@type_errors)
+      previous = errors.dup
+      errors.replace(new_errors)
+      previous
+    end
+
+    def with_sig_applicator_rbi_paths(paths)
+      singleton_class = SigApplicator.singleton_class
+      original = singleton_class.instance_method(:rbi_paths)
+      singleton_class.send(:define_method, :rbi_paths) { paths }
+      singleton_class.send(:private, :rbi_paths)
+      yield
+    ensure
+      singleton_class.send(:define_method, :rbi_paths, original)
+      singleton_class.send(:private, :rbi_paths)
+    end
+  end
+end

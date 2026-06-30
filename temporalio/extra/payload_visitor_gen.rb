@@ -190,6 +190,72 @@ class PayloadVisitorGen
     TEXT
   end
 
+  # Generate file Sorbet signature.
+  #
+  # @return [String] File signature.
+  def gen_rbi_code
+    method_defs = payload_methods.filter_map do |_, method_hash|
+      next if method_hash[:fields].empty?
+
+      <<~TEXT
+        sig { params(value: Object).void }
+        def #{method_name_from_desc(method_hash[:desc])}(value); end
+      TEXT
+    end.sort
+
+    <<~TEXT
+      # typed: true
+
+      # Generated code.  DO NOT EDIT!
+
+      class Temporalio::Api::PayloadVisitor
+        extend T::Sig
+
+        sig do
+          params(
+            on_enter: T.nilable(T.proc.params(value: Object).returns(Object)),
+            on_exit: T.nilable(T.proc.params(value: Object).returns(Object)),
+            skip_search_attributes: T::Boolean,
+            traverse_any: T::Boolean,
+            block: T.proc.params(value: Object).returns(Object)
+          ).void
+        end
+        def initialize(
+          on_enter: T.unsafe(nil),
+          on_exit: T.unsafe(nil),
+          skip_search_attributes: T.unsafe(false),
+          traverse_any: T.unsafe(false),
+          &block
+        ); end
+
+        sig { params(value: Object).returns(NilClass) }
+        def run(value); end
+
+        sig { params(value: Object).void }
+        def _run_activation(value); end
+
+        sig { params(value: Object).void }
+        def _run_activation_completion(value); end
+
+        private
+
+        sig { params(name: String).returns(String) }
+        def method_name_from_proto_name(name); end
+
+        sig { params(value: Object).returns(Object) }
+        def api_common_v1_payload(value); end
+
+        sig { params(value: Object).returns(Object) }
+        def api_common_v1_payload_repeated(value); end
+
+        sig { params(value: Object).void }
+        def google_protobuf_any(value); end
+
+      #{method_defs.join("\n").gsub("\n", "\n  ")}
+      end
+    TEXT
+  end
+
   private
 
   def payload_methods

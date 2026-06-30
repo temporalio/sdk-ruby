@@ -1,0 +1,14 @@
+class TypeSignatureCoverageTest < Minitest::Test
+  ROOT: Pathname
+  LIB_ROOT: Pathname
+  RBI_ROOT: Pathname
+  SIG_ROOT: Pathname
+
+  @ruby_paths: Array[String]?
+
+  private
+
+  def ruby_paths: -> Array[String]
+  def missing_signature_paths: (Pathname root, String extension) -> Array[String]
+  def relative_stems: (Pathname root, String pattern) -> Array[String]
+end

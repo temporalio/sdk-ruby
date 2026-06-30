@@ -140,7 +140,7 @@ module Temporalio
     ) -> ActivityHandle
 
     def start_activity: (
-      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      singleton(Activity::Definition) | Activity::Definition | Activity::Definition::Info | Symbol | String activity,
       *Object? args,
       id: String,
       task_queue: String,
@@ -162,7 +162,7 @@ module Temporalio
     ) -> ActivityHandle
 
     def execute_activity: (
-      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      singleton(Activity::Definition) | Activity::Definition | Activity::Definition::Info | Symbol | String activity,
       *Object? args,
       id: String,
       task_queue: String,

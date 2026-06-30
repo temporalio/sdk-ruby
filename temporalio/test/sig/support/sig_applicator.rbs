@@ -1,0 +1,91 @@
+module SigApplicator
+  SKIP_CLASSES: Array[String]
+  SKIP_METHODS: Set[String]
+  ATTR_NODE_CLASSES: Array[Class]
+
+  @type_errors: Array[String]
+  @summary_hook_registered: bool
+
+  class MethodShape
+    attr_reader actual_params: Array[untyped]
+    attr_reader rbi_params: Array[untyped]
+
+    def self.from: (UnboundMethod original, untyped method_node) -> MethodShape
+
+    def initialize: (Array[untyped] actual_params, Array[untyped] rbi_params) -> void
+
+    def actual_block_param: -> untyped?
+    def rbi_block_param: -> untyped?
+    def actual_block?: -> bool
+    def rbi_block?: -> bool
+    def actual_non_block_params: -> Array[untyped]
+    def sig_method_params: (untyped sig) -> Array[untyped]
+  end
+
+  class Accumulator
+    attr_reader applied: Integer
+    attr_reader skipped: Integer
+    attr_reader missing: Integer
+    attr_reader errors: Array[String]
+
+    def initialize: (applied: Integer, skipped: Integer, missing: Integer, errors: Array[String]) -> void
+
+    def record: (:applied | :skipped | :missing result) -> void
+    def error: (String error) -> void
+  end
+
+  def self.apply_all!: -> void
+  def self.record_type_error: (String message) -> void
+  def self.type_errors: -> Array[String]
+  def self.suppress_errors: () { () -> untyped } -> untyped
+
+  private
+
+  def self.rbi_paths: -> Array[String]
+  def self.configure_error_handler!: -> void
+  def self.register_summary_hook!: -> void
+  def self.raise_recorded_type_errors!: -> void
+  def self.raise_instrumentation_errors!: (Accumulator acc) -> void
+  def self.apply_scope: (untyped node, Accumulator acc) -> void
+  def self.apply_method_sig: (
+    Module target,
+    String class_name,
+    untyped method_node,
+    Accumulator acc,
+    ?class_method: bool,
+    ?sig_eval_scope: Module
+  ) -> void
+  def self.apply_attr_sig: (
+    Module target,
+    String class_name,
+    untyped attr_node,
+    Accumulator acc,
+    ?class_method: bool,
+    ?sig_eval_scope: Module
+  ) -> void
+  def self.attr_method_sig_sources: (untyped attr_node, untyped attr_name) -> Array[[untyped, Array[String]]]
+  def self.writer_sig_sources: (untyped attr_node, untyped attr_name) -> Array[String]
+  def self.apply_sig_sources_to_method: (
+    Module target,
+    String full_name,
+    Symbol method_name,
+    Array[String] sig_sources,
+    Accumulator acc,
+    original: UnboundMethod,
+    singleton_method: bool,
+    sig_eval_scope: Module
+  ) -> void
+  def self.anonymous_block?: (UnboundMethod method) -> bool?
+  def self.apply_sig_source: (Module sig_eval_scope, Module target, String sig_source, bool singleton_method) -> void
+  def self.apply_pending_sig: (Module sig_eval_scope, Module target, Symbol method_name, bool singleton_method) -> void
+  def self.define_local_method_copy: (Module target, Symbol method_name, UnboundMethod original) -> UnboundMethod
+  def self.method_visibility: (Module target, Symbol method_name) -> (:public | :protected | :private)
+  def self.restore_original_method: (
+    Module target,
+    Symbol method_name,
+    UnboundMethod original,
+    ?remove_local_method: bool
+  ) -> void
+  def self.rewrite_block_param: (String sig_source, untyped method_node, untyped sig) -> String
+  def self.skip_method?: (UnboundMethod original, untyped method_node, Symbol method_name) -> bool
+end
