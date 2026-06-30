@@ -147,11 +147,15 @@ class ProtoGen
 
     # Move from temp dir and remove temp dir
     Dir.glob('tmp-proto/rbi/temporal/api/**/*.rbi') { |path| normalize_generated_rbi!(path) }
+    Dir.glob('tmp-proto/rbi/nexusannotations/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/temporal/api/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     Dir.glob('tmp-proto/rbs/nexusannotations/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     FileUtils.cp_r('tmp-proto/ruby/temporal/api', 'lib/temporalio')
     FileUtils.mkdir_p('rbi/temporalio')
     FileUtils.cp_r('tmp-proto/rbi/temporal/api', 'rbi/temporalio')
+    if File.directory?('tmp-proto/rbi/nexusannotations')
+      FileUtils.cp_r('tmp-proto/rbi/nexusannotations', 'rbi/temporalio/api')
+    end
     if File.directory?('tmp-proto/ruby/nexusannotations')
       FileUtils.cp_r('tmp-proto/ruby/nexusannotations', 'lib/temporalio/api')
     end

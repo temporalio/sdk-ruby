@@ -10,4 +10,6 @@ class Temporalio::Worker::WorkflowExecutor::ThreadPool < ::Temporalio::Worker::W
   def initialize(max_threads: T.unsafe(nil), thread_pool: T.unsafe(nil)); end
 end
 
-class Temporalio::Worker::WorkflowExecutor::ThreadPool::DeadlockError < ::Exception; end
+class Temporalio::Worker::WorkflowExecutor::ThreadPool::DeadlockError < ::Exception
+  include Temporalio::Internal::WorkflowTaskFailureError
+end

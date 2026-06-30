@@ -71,7 +71,8 @@ class Temporalio::Internal::Bridge::Client::Options < ::Struct
       rpc_retry: Temporalio::Internal::Bridge::Client::RPCRetryOptions,
       keep_alive: T.nilable(Temporalio::Internal::Bridge::Client::KeepAliveOptions),
       http_connect_proxy: T.nilable(Temporalio::Internal::Bridge::Client::HTTPConnectProxyOptions),
-      dns_load_balancing: T.nilable(Temporalio::Internal::Bridge::Client::DnsLoadBalancingOptions)
+      dns_load_balancing: T.nilable(Temporalio::Internal::Bridge::Client::DnsLoadBalancingOptions),
+      grpc_compression: T.nilable(Temporalio::Internal::Bridge::Client::GrpcCompressionOptions)
     ).void
   end
   def initialize(
@@ -85,7 +86,8 @@ class Temporalio::Internal::Bridge::Client::Options < ::Struct
     rpc_retry,
     keep_alive,
     http_connect_proxy,
-    dns_load_balancing
+    dns_load_balancing,
+    grpc_compression
   ); end
 
   sig { returns(String) }
@@ -153,6 +155,12 @@ class Temporalio::Internal::Bridge::Client::Options < ::Struct
 
   sig { params(_: T.nilable(Temporalio::Internal::Bridge::Client::DnsLoadBalancingOptions)).void }
   def dns_load_balancing=(_); end
+
+  sig { returns(T.nilable(Temporalio::Internal::Bridge::Client::GrpcCompressionOptions)) }
+  def grpc_compression; end
+
+  sig { params(_: T.nilable(Temporalio::Internal::Bridge::Client::GrpcCompressionOptions)).void }
+  def grpc_compression=(_); end
 end
 
 class Temporalio::Internal::Bridge::Client::TLSOptions < ::Struct
@@ -305,6 +313,13 @@ class Temporalio::Internal::Bridge::Client::DnsLoadBalancingOptions < ::Struct
 
   sig { params(_: T.any(Integer, Float)).void }
   def resolution_interval=(_); end
+end
+
+class Temporalio::Internal::Bridge::Client::GrpcCompressionOptions < ::Struct
+  extend T::Sig
+
+  sig { returns(String) }
+  def codec; end
 end
 
 class Temporalio::Internal::Bridge::Client::RPCFailure < Temporalio::Error

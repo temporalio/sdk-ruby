@@ -416,12 +416,18 @@ class Temporalio::Api::Update::V1::Request
   sig do
     params(
       meta: T.nilable(Temporalio::Api::Update::V1::Meta),
-      input: T.nilable(Temporalio::Api::Update::V1::Input)
+      input: T.nilable(Temporalio::Api::Update::V1::Input),
+      request_id: T.nilable(String),
+      completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
+      links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)])
     ).void
   end
   def initialize(
     meta: nil,
-    input: nil
+    input: nil,
+    request_id: "",
+    completion_callbacks: [],
+    links: []
   )
   end
 
@@ -447,6 +453,51 @@ class Temporalio::Api::Update::V1::Request
 
   sig { void }
   def clear_input
+  end
+
+  # The request ID of the request.
+  sig { returns(String) }
+  def request_id
+  end
+
+  # The request ID of the request.
+  sig { params(value: String).void }
+  def request_id=(value)
+  end
+
+  # The request ID of the request.
+  sig { void }
+  def clear_request_id
+  end
+
+  # Callbacks to be called by the server when this update reaches a terminal state.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]) }
+  def completion_callbacks
+  end
+
+  # Callbacks to be called by the server when this update reaches a terminal state.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def completion_callbacks=(value)
+  end
+
+  # Callbacks to be called by the server when this update reaches a terminal state.
+  sig { void }
+  def clear_completion_callbacks
+  end
+
+  # Links to be associated with this update.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]) }
+  def links
+  end
+
+  # Links to be associated with this update.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def links=(value)
+  end
+
+  # Links to be associated with this update.
+  sig { void }
+  def clear_links
   end
 
   sig { params(field: String).returns(T.untyped) }

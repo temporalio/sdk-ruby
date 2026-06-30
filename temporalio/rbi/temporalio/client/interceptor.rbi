@@ -754,6 +754,211 @@ class Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput < ::
   end
 end
 
+class Temporalio::Client::Interceptor::StartActivityInput < ::Data
+  sig { returns(String) }
+  def activity; end
+
+  sig { returns(T::Array[T.nilable(Object)]) }
+  def args; end
+
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(String) }
+  def task_queue; end
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  def schedule_to_close_timeout; end
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  def schedule_to_start_timeout; end
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  def start_to_close_timeout; end
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  def heartbeat_timeout; end
+
+  sig { returns(Integer) }
+  def id_reuse_policy; end
+
+  sig { returns(Integer) }
+  def id_conflict_policy; end
+
+  sig { returns(T.nilable(Temporalio::RetryPolicy)) }
+  def retry_policy; end
+
+  sig { returns(T.nilable(Temporalio::SearchAttributes)) }
+  def search_attributes; end
+
+  sig { returns(T.nilable(String)) }
+  def static_summary; end
+
+  sig { returns(T.nilable(String)) }
+  def static_details; end
+
+  sig { returns(T::Hash[String, T.nilable(Object)]) }
+  def headers; end
+
+  sig { returns(Temporalio::Priority) }
+  def priority; end
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  def start_delay; end
+
+  sig { returns(T.nilable(T::Array[Object])) }
+  def arg_hints; end
+
+  sig { returns(T.nilable(Object)) }
+  def result_hint; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::StartActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::StartActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::DescribeActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::DescribeActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::DescribeActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::CancelActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(String)) }
+  def reason; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::CancelActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::CancelActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::TerminateActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(String)) }
+  def reason; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::TerminateActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::TerminateActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::ListActivitiesInput < ::Data
+  sig { returns(String) }
+  def query; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::ListActivitiesInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::ListActivitiesInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::CountActivitiesInput < ::Data
+  sig { returns(String) }
+  def query; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::CountActivitiesInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::CountActivitiesInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
+class Temporalio::Client::Interceptor::FetchActivityOutcomeInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::FetchActivityOutcomeInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::FetchActivityOutcomeInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
 class Temporalio::Client::Interceptor::Outbound
   sig { params(next_interceptor: Temporalio::Client::Interceptor::Outbound).void }
   def initialize(next_interceptor); end
@@ -838,4 +1043,25 @@ class Temporalio::Client::Interceptor::Outbound
 
   sig { params(input: Temporalio::Client::Interceptor::ReportCancellationAsyncActivityInput).void }
   def report_cancellation_async_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::StartActivityInput).returns(Temporalio::Client::ActivityHandle) }
+  def start_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::DescribeActivityInput).returns(Temporalio::Client::ActivityExecution::Description) }
+  def describe_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::CancelActivityInput).void }
+  def cancel_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::TerminateActivityInput).void }
+  def terminate_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::ListActivitiesInput).returns(T::Enumerator[Temporalio::Client::ActivityExecution]) }
+  def list_activities(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::CountActivitiesInput).returns(Temporalio::Client::ActivityExecutionCount) }
+  def count_activities(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::FetchActivityOutcomeInput).returns(T.nilable(Temporalio::Api::Activity::V1::ActivityExecutionOutcome)) }
+  def fetch_activity_outcome(input); end
 end

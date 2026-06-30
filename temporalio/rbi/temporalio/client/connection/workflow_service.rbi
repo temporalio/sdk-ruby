@@ -354,6 +354,18 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse) }
   def delete_activity_execution(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse) }
+  def pause_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse) }
+  def reset_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse) }
+  def unpause_activity_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse) }
+  def update_activity_execution_options(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::TerminateNexusOperationExecutionResponse) }
   def terminate_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
 

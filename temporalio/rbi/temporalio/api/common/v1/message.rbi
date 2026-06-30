@@ -1327,14 +1327,16 @@ class Temporalio::Api::Common::V1::Link
       workflow_event: T.nilable(Temporalio::Api::Common::V1::Link::WorkflowEvent),
       batch_job: T.nilable(Temporalio::Api::Common::V1::Link::BatchJob),
       activity: T.nilable(Temporalio::Api::Common::V1::Link::Activity),
-      nexus_operation: T.nilable(Temporalio::Api::Common::V1::Link::NexusOperation)
+      nexus_operation: T.nilable(Temporalio::Api::Common::V1::Link::NexusOperation),
+      workflow: T.nilable(Temporalio::Api::Common::V1::Link::Workflow)
     ).void
   end
   def initialize(
     workflow_event: nil,
     batch_job: nil,
     activity: nil,
-    nexus_operation: nil
+    nexus_operation: nil,
+    workflow: nil
   )
   end
 
@@ -1384,6 +1386,18 @@ class Temporalio::Api::Common::V1::Link
 
   sig { void }
   def clear_nexus_operation
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Link::Workflow)) }
+  def workflow
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Link::Workflow)).void }
+  def workflow=(value)
+  end
+
+  sig { void }
+  def clear_workflow
   end
 
   sig { returns(T.nilable(Symbol)) }
@@ -2476,6 +2490,110 @@ class Temporalio::Api::Common::V1::Link::NexusOperation
   end
 
   sig { params(msg: Temporalio::Api::Common::V1::Link::NexusOperation, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# A link to a workflow execution. This is a more general version of WorkflowEvent that doesn't specify a
+# particular event within the workflow, useful when you want to link to a workflow but there is no particular event to link to,
+# such as a Query or a Rejected Update.
+class Temporalio::Api::Common::V1::Link::Workflow
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_id: T.nilable(String),
+      run_id: T.nilable(String),
+      reason: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_id: "",
+    run_id: "",
+    reason: ""
+  )
+  end
+
+  sig { returns(String) }
+  def namespace
+  end
+
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(String) }
+  def workflow_id
+  end
+
+  sig { params(value: String).void }
+  def workflow_id=(value)
+  end
+
+  sig { void }
+  def clear_workflow_id
+  end
+
+  sig { returns(String) }
+  def run_id
+  end
+
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  sig { void }
+  def clear_run_id
+  end
+
+  sig { returns(String) }
+  def reason
+  end
+
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  sig { void }
+  def clear_reason
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::Link::Workflow) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Link::Workflow).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::Link::Workflow) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Link::Workflow, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

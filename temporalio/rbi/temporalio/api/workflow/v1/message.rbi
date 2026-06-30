@@ -4540,17 +4540,79 @@ class Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed
   end
 end
 
+# Trigger for when a workflow update is completed.
+class Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      update_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    update_id: ""
+  )
+  end
+
+  sig { returns(String) }
+  def update_id
+  end
+
+  sig { params(value: String).void }
+  def update_id=(value)
+  end
+
+  sig { void }
+  def clear_update_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Workflow::V1::CallbackInfo::Trigger
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
 
   sig do
     params(
-      workflow_closed: T.nilable(Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed)
+      workflow_closed: T.nilable(Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed),
+      update_workflow_execution_completed: T.nilable(Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted)
     ).void
   end
   def initialize(
-    workflow_closed: nil
+    workflow_closed: nil,
+    update_workflow_execution_completed: nil
   )
   end
 
@@ -4564,6 +4626,18 @@ class Temporalio::Api::Workflow::V1::CallbackInfo::Trigger
 
   sig { void }
   def clear_workflow_closed
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted)) }
+  def update_workflow_execution_completed
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted)).void }
+  def update_workflow_execution_completed=(value)
+  end
+
+  sig { void }
+  def clear_update_workflow_execution_completed
   end
 
   sig { returns(T.nilable(Symbol)) }

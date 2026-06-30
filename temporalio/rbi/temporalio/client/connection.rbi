@@ -14,6 +14,7 @@ class Temporalio::Client::Connection
       runtime: Temporalio::Runtime,
       lazy_connect: T::Boolean,
       dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions),
+      grpc_compression: T.any(Temporalio::Client::Connection::GrpcCompressionOptions::Gzip, Temporalio::Client::Connection::GrpcCompressionOptions::None),
       around_connect: T.nilable(T.proc.params(arg0: Temporalio::Client::Connection::Options, arg1: T.proc.params(arg0: Temporalio::Client::Connection::Options).void).void)
     ).void
   end
@@ -29,6 +30,7 @@ class Temporalio::Client::Connection
     runtime: T.unsafe(nil),
     lazy_connect: T.unsafe(nil),
     dns_load_balancing: T.unsafe(nil),
+    grpc_compression: T.unsafe(nil),
     around_connect: T.unsafe(nil)
   ); end
 
@@ -100,6 +102,9 @@ class Temporalio::Client::Connection::Options < ::Data
   sig { returns(T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions)) }
   def dns_load_balancing; end
 
+  sig { returns(T.any(Temporalio::Client::Connection::GrpcCompressionOptions::Gzip, Temporalio::Client::Connection::GrpcCompressionOptions::None)) }
+  def grpc_compression; end
+
   sig { returns(T::Hash[Symbol, Object]) }
   def to_h; end
 
@@ -116,6 +121,18 @@ class Temporalio::Client::Connection::Options < ::Data
     sig { returns(T::Array[Symbol]) }
     def members; end
   end
+end
+
+module Temporalio::Client::Connection::GrpcCompressionOptions; end
+
+class Temporalio::Client::Connection::GrpcCompressionOptions::Gzip
+  sig { returns(Symbol) }
+  def codec; end
+end
+
+class Temporalio::Client::Connection::GrpcCompressionOptions::None
+  sig { returns(Symbol) }
+  def codec; end
 end
 
 class Temporalio::Client::Connection::TLSOptions < ::Data

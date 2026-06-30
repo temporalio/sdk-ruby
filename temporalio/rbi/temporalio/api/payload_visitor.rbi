@@ -88,6 +88,9 @@ sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_create_connectivity_rule_response(value); end
   
   sig { params(value: Object).void }
+  def api_cloud_cloudservice_v1_create_custom_role_response(value); end
+  
+  sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_create_namespace_export_sink_response(value); end
   
   sig { params(value: Object).void }
@@ -116,6 +119,9 @@ sig { params(value: Object).void }
   
   sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_delete_connectivity_rule_response(value); end
+  
+  sig { params(value: Object).void }
+  def api_cloud_cloudservice_v1_delete_custom_role_response(value); end
   
   sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_delete_namespace_export_sink_response(value); end
@@ -173,6 +179,9 @@ sig { params(value: Object).void }
   
   sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_update_api_key_response(value); end
+  
+  sig { params(value: Object).void }
+  def api_cloud_cloudservice_v1_update_custom_role_response(value); end
   
   sig { params(value: Object).void }
   def api_cloud_cloudservice_v1_update_namespace_export_sink_response(value); end

@@ -3,8 +3,13 @@
 module Temporalio::Internal::Bridge
   extend T::Sig
 
+  FIPS = T.let(T.unsafe(nil), T::Boolean)
+
   sig { void }
   def self.assert_fiber_compatibility!; end
+
+  sig { void }
+  def self.assert_fips_compatibility!; end
 
   sig { returns(T::Boolean) }
   def self.fibers_supported; end

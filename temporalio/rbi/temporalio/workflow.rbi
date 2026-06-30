@@ -320,6 +320,7 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
       task_queue: T.nilable(String),
       run_timeout: T.nilable(T.any(Integer, Float)),
       task_timeout: T.nilable(T.any(Integer, Float)),
+      backoff_start_interval: T.nilable(T.any(Integer, Float)),
       retry_policy: T.nilable(Temporalio::RetryPolicy),
       memo: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)]),
       search_attributes: T.nilable(Temporalio::SearchAttributes),
@@ -334,6 +335,7 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
     task_queue: T.unsafe(nil),
     run_timeout: T.unsafe(nil),
     task_timeout: T.unsafe(nil),
+    backoff_start_interval: T.unsafe(nil),
     retry_policy: T.unsafe(nil),
     memo: T.unsafe(nil),
     search_attributes: T.unsafe(nil),
@@ -356,6 +358,9 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
 
   sig { returns(T.nilable(T.any(Integer, Float))) }
   attr_accessor :task_timeout
+
+  sig { returns(T.nilable(T.any(Integer, Float))) }
+  attr_accessor :backoff_start_interval
 
   sig { returns(T.nilable(Temporalio::RetryPolicy)) }
   attr_accessor :retry_policy

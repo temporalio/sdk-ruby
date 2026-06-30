@@ -1560,7 +1560,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflow
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       retry_policy: T.nilable(Temporalio::Api::Common::V1::RetryPolicy),
       versioning_intent: T.nilable(T.any(Symbol, String, Integer)),
-      initial_versioning_behavior: T.nilable(T.any(Symbol, String, Integer))
+      initial_versioning_behavior: T.nilable(T.any(Symbol, String, Integer)),
+      backoff_start_interval: T.nilable(Google::Protobuf::Duration)
     ).void
   end
   def initialize(
@@ -1574,7 +1575,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflow
     search_attributes: nil,
     retry_policy: nil,
     versioning_intent: :UNSPECIFIED,
-    initial_versioning_behavior: :CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_UNSPECIFIED
+    initial_versioning_behavior: :CONTINUE_AS_NEW_VERSIONING_BEHAVIOR_UNSPECIFIED,
+    backoff_start_interval: nil
   )
   end
 
@@ -1759,6 +1761,21 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ContinueAsNewWorkflow
 # of the previous run.
   sig { void }
   def clear_initial_versioning_behavior
+  end
+
+  # Delay before the first workflow task of the continued run is scheduled.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def backoff_start_interval
+  end
+
+  # Delay before the first workflow task of the continued run is scheduled.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def backoff_start_interval=(value)
+  end
+
+  # Delay before the first workflow task of the continued run is scheduled.
+  sig { void }
+  def clear_backoff_start_interval
   end
 
   sig { params(field: String).returns(T.untyped) }

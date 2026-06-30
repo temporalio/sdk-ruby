@@ -335,7 +335,10 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
       user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
       canceled_reason: T.nilable(String),
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
-      total_heartbeat_count: T.nilable(Integer)
+      total_heartbeat_count: T.nilable(Integer),
+      sdk_name: T.nilable(String),
+      sdk_version: T.nilable(String),
+      start_delay: T.nilable(Google::Protobuf::Duration)
     ).void
   end
   def initialize(
@@ -372,7 +375,10 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
     user_metadata: nil,
     canceled_reason: "",
     links: [],
-    total_heartbeat_count: 0
+    total_heartbeat_count: 0,
+    sdk_name: "",
+    sdk_version: "",
+    start_delay: nil
   )
   end
 
@@ -575,16 +581,19 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
   end
 
   # Details provided in the last recorded activity heartbeat.
+# DescribeActivityExecution does not set this field unless include_heartbeat_details was true in the request.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::Payloads)) }
   def heartbeat_details
   end
 
   # Details provided in the last recorded activity heartbeat.
+# DescribeActivityExecution does not set this field unless include_heartbeat_details was true in the request.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::Payloads)).void }
   def heartbeat_details=(value)
   end
 
   # Details provided in the last recorded activity heartbeat.
+# DescribeActivityExecution does not set this field unless include_heartbeat_details was true in the request.
   sig { void }
   def clear_heartbeat_details
   end
@@ -695,16 +704,19 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
   end
 
   # Failure details from the last failed attempt.
+# DescribeActivityExecution does not set this field unless include_last_failure was true in the request.
   sig { returns(T.nilable(Temporalio::Api::Failure::V1::Failure)) }
   def last_failure
   end
 
   # Failure details from the last failed attempt.
+# DescribeActivityExecution does not set this field unless include_last_failure was true in the request.
   sig { params(value: T.nilable(Temporalio::Api::Failure::V1::Failure)).void }
   def last_failure=(value)
   end
 
   # Failure details from the last failed attempt.
+# DescribeActivityExecution does not set this field unless include_last_failure was true in the request.
   sig { void }
   def clear_last_failure
   end
@@ -929,6 +941,57 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
   # Total number of heartbeats recorded across all attempts of this activity, including retries.
   sig { void }
   def clear_total_heartbeat_count
+  end
+
+  # The name of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { returns(String) }
+  def sdk_name
+  end
+
+  # The name of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { params(value: String).void }
+  def sdk_name=(value)
+  end
+
+  # The name of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { void }
+  def clear_sdk_name
+  end
+
+  # The version of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { returns(String) }
+  def sdk_version
+  end
+
+  # The version of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { params(value: String).void }
+  def sdk_version=(value)
+  end
+
+  # The version of the SDK of the worker that most recently picked up an attempt of this activity.
+# Overwritten on each new attempt. Empty if unknown.
+  sig { void }
+  def clear_sdk_version
+  end
+
+  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def start_delay
+  end
+
+  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def start_delay=(value)
+  end
+
+  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  sig { void }
+  def clear_start_delay
   end
 
   sig { params(field: String).returns(T.untyped) }

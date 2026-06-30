@@ -7231,7 +7231,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
       attached_completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
       identity: T.nilable(String),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)
+      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig),
+      workflow_update_options: T.nilable(T::Array[T.nilable(Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate)])
     ).void
   end
   def initialize(
@@ -7241,7 +7242,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
     attached_completion_callbacks: [],
     identity: "",
     priority: nil,
-    time_skipping_config: nil
+    time_skipping_config: nil,
+    workflow_update_options: []
   )
   end
 
@@ -7357,6 +7359,21 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
   # If set, the time-skipping configuration was changed. Contains the full updated configuration.
   sig { void }
   def clear_time_skipping_config
+  end
+
+  # Updates to workflow updates options.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate)]) }
+  def workflow_update_options
+  end
+
+  # Updates to workflow updates options.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def workflow_update_options=(value)
+  end
+
+  # Updates to workflow updates options.
+  sig { void }
+  def clear_workflow_update_options
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -10572,6 +10589,105 @@ class Temporalio::Api::History::V1::History
   end
 
   sig { params(msg: Temporalio::Api::History::V1::History, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      update_id: T.nilable(String),
+      attached_request_id: T.nilable(String),
+      attached_completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)])
+    ).void
+  end
+  def initialize(
+    update_id: "",
+    attached_request_id: "",
+    attached_completion_callbacks: []
+  )
+  end
+
+  # The ID of the workflow update this update options update corresponds to.
+  sig { returns(String) }
+  def update_id
+  end
+
+  # The ID of the workflow update this update options update corresponds to.
+  sig { params(value: String).void }
+  def update_id=(value)
+  end
+
+  # The ID of the workflow update this update options update corresponds to.
+  sig { void }
+  def clear_update_id
+  end
+
+  # Request ID attached to the running workflow update so that subsequent requests with same
+# request ID will be deduped
+  sig { returns(String) }
+  def attached_request_id
+  end
+
+  # Request ID attached to the running workflow update so that subsequent requests with same
+# request ID will be deduped
+  sig { params(value: String).void }
+  def attached_request_id=(value)
+  end
+
+  # Request ID attached to the running workflow update so that subsequent requests with same
+# request ID will be deduped
+  sig { void }
+  def clear_attached_request_id
+  end
+
+  # Completion callbacks attached to the running workflow update.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]) }
+  def attached_completion_callbacks
+  end
+
+  # Completion callbacks attached to the running workflow update.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def attached_completion_callbacks=(value)
+  end
+
+  # Completion callbacks attached to the running workflow update.
+  sig { void }
+  def clear_attached_completion_callbacks
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

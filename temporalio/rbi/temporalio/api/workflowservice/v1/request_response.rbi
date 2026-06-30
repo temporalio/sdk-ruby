@@ -445,12 +445,14 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest
   sig do
     params(
       namespace: T.nilable(String),
-      id: T.nilable(String)
+      id: T.nilable(String),
+      weak_consistency: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
     namespace: "",
-    id: ""
+    id: "",
+    weak_consistency: false
   )
   end
 
@@ -476,6 +478,30 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceRequest
 
   sig { void }
   def clear_id
+  end
+
+  # If true, the server may serve the response from an eventually-consistent
+# source instead of reading through to persistence. Defaults to false,
+# which preserves read-after-write consistency. SDKs should set this when
+# fetching namespace capabilities on worker/client startup.
+  sig { returns(T::Boolean) }
+  def weak_consistency
+  end
+
+  # If true, the server may serve the response from an eventually-consistent
+# source instead of reading through to persistence. Defaults to false,
+# which preserves read-after-write consistency. SDKs should set this when
+# fetching namespace capabilities on worker/client startup.
+  sig { params(value: T::Boolean).void }
+  def weak_consistency=(value)
+  end
+
+  # If true, the server may serve the response from an eventually-consistent
+# source instead of reading through to persistence. Defaults to false,
+# which preserves read-after-write consistency. SDKs should set this when
+# fetching namespace capabilities on worker/client startup.
+  sig { void }
+  def clear_weak_consistency
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -522,7 +548,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
       replication_config: T.nilable(Temporalio::Api::Replication::V1::NamespaceReplicationConfig),
       failover_version: T.nilable(Integer),
       is_global_namespace: T.nilable(T::Boolean),
-      failover_history: T.nilable(T::Array[T.nilable(Temporalio::Api::Replication::V1::FailoverStatus)])
+      failover_history: T.nilable(T::Array[T.nilable(Temporalio::Api::Replication::V1::FailoverStatus)]),
+      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
     ).void
   end
   def initialize(
@@ -531,7 +558,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
     replication_config: nil,
     failover_version: 0,
     is_global_namespace: false,
-    failover_history: []
+    failover_history: [],
+    poller_group_infos: []
   )
   end
 
@@ -611,6 +639,27 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
 # states to ensure that the list does not grow unbounded.
   sig { void }
   def clear_failover_history
+  end
+
+  # The initial info that client should use for poller group assignment. This information is
+# updated through poll response. Client is supposed to use the info received in the latest
+# poll response.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]) }
+  def poller_group_infos
+  end
+
+  # The initial info that client should use for poller group assignment. This information is
+# updated through poll response. Client is supposed to use the info received in the latest
+# poll response.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def poller_group_infos=(value)
+  end
+
+  # The initial info that client should use for poller group assignment. This information is
+# updated through poll response. Client is supposed to use the info received in the latest
+# poll response.
+  sig { void }
+  def clear_poller_group_infos
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2245,7 +2294,7 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollWorkflowTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { returns(String) }
   def poller_group_id
@@ -2253,7 +2302,7 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollWorkflowTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { params(value: String).void }
   def poller_group_id=(value)
@@ -2261,7 +2310,7 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollWorkflowTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { void }
   def clear_poller_group_id
@@ -3709,7 +3758,7 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollActivityTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { returns(String) }
   def poller_group_id
@@ -3717,7 +3766,7 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollActivityTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { params(value: String).void }
   def poller_group_id=(value)
@@ -3725,7 +3774,7 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollActivityTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { void }
   def clear_poller_group_id
@@ -13972,13 +14021,15 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
     params(
       update_ref: T.nilable(Temporalio::Api::Update::V1::UpdateRef),
       outcome: T.nilable(Temporalio::Api::Update::V1::Outcome),
-      stage: T.nilable(T.any(Symbol, String, Integer))
+      stage: T.nilable(T.any(Symbol, String, Integer)),
+      link: T.nilable(Temporalio::Api::Common::V1::Link)
     ).void
   end
   def initialize(
     update_ref: nil,
     outcome: nil,
-    stage: :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED
+    stage: :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED,
+    link: nil
   )
   end
 
@@ -14058,6 +14109,21 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
 # may then retry the call as needed.
   sig { void }
   def clear_stage
+  end
+
+  # Link to the update event. May be null if the update has not yet been accepted.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Link)) }
+  def link
+  end
+
+  # Link to the update event. May be null if the update has not yet been accepted.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Link)).void }
+  def link=(value)
+  end
+
+  # Link to the update event. May be null if the update has not yet been accepted.
+  sig { void }
+  def clear_link
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -15358,7 +15424,7 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollNexusTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { returns(String) }
   def poller_group_id
@@ -15366,7 +15432,7 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollNexusTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { params(value: String).void }
   def poller_group_id=(value)
@@ -15374,7 +15440,7 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
 
   # Unless this is the first poll, the client must pass one of the poller group IDs received in
 # `poller_group_infos` of the last the PollNexusTaskQueueResponse according to the
-# instructions. If not set, the poll is routed randomly which can cause it being blocked
+# instructions. If not set, the poll is routed randomly which can cause it to be blocked
 # without receiving a task while the queue actually has tasks in another server location.
   sig { void }
   def clear_poller_group_id
@@ -16188,6 +16254,7 @@ class Temporalio::Api::WorkflowService::V1::ExecuteMultiOperationResponse
 end
 
 # NOTE: keep in sync with temporal.api.batch.v1.BatchOperationUpdateActivityOptions
+# Deprecated. Use `UpdateActivityExecutionOptionsRequest`.
 class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16340,7 +16407,7 @@ class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest
 
   # If set, the activity options will be restored to the default.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
 # This flag cannot be combined with any other option; if you supply
 # restore_original together with other options, the request will be rejected.
   sig { returns(T::Boolean) }
@@ -16349,7 +16416,7 @@ class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest
 
   # If set, the activity options will be restored to the default.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
 # This flag cannot be combined with any other option; if you supply
 # restore_original together with other options, the request will be rejected.
   sig { params(value: T::Boolean).void }
@@ -16358,7 +16425,7 @@ class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest
 
   # If set, the activity options will be restored to the default.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
 # This flag cannot be combined with any other option; if you supply
 # restore_original together with other options, the request will be rejected.
   sig { void }
@@ -16402,6 +16469,220 @@ class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsRequest
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_id: T.nilable(String),
+      activity_id: T.nilable(String),
+      run_id: T.nilable(String),
+      identity: T.nilable(String),
+      activity_options: T.nilable(Temporalio::Api::Activity::V1::ActivityOptions),
+      update_mask: T.nilable(Google::Protobuf::FieldMask),
+      restore_original: T.nilable(T::Boolean),
+      resource_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_id: "",
+    activity_id: "",
+    run_id: "",
+    identity: "",
+    activity_options: nil,
+    update_mask: nil,
+    restore_original: false,
+    resource_id: ""
+  )
+  end
+
+  # Namespace of the workflow which scheduled this activity
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Namespace of the workflow which scheduled this activity
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Namespace of the workflow which scheduled this activity
+  sig { void }
+  def clear_namespace
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { returns(String) }
+  def workflow_id
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { params(value: String).void }
+  def workflow_id=(value)
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { void }
+  def clear_workflow_id
+  end
+
+  # The ID of the activity to target.
+  sig { returns(String) }
+  def activity_id
+  end
+
+  # The ID of the activity to target.
+  sig { params(value: String).void }
+  def activity_id=(value)
+  end
+
+  # The ID of the activity to target.
+  sig { void }
+  def clear_activity_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { returns(String) }
+  def run_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { void }
+  def clear_run_id
+  end
+
+  # The identity of the client who initiated this request
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the client who initiated this request
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the client who initiated this request
+  sig { void }
+  def clear_identity
+  end
+
+  # Activity options. Partial updates are accepted and controlled by update_mask
+  sig { returns(T.nilable(Temporalio::Api::Activity::V1::ActivityOptions)) }
+  def activity_options
+  end
+
+  # Activity options. Partial updates are accepted and controlled by update_mask
+  sig { params(value: T.nilable(Temporalio::Api::Activity::V1::ActivityOptions)).void }
+  def activity_options=(value)
+  end
+
+  # Activity options. Partial updates are accepted and controlled by update_mask
+  sig { void }
+  def clear_activity_options
+  end
+
+  # Controls which fields from `activity_options` will be applied
+  sig { returns(T.nilable(Google::Protobuf::FieldMask)) }
+  def update_mask
+  end
+
+  # Controls which fields from `activity_options` will be applied
+  sig { params(value: T.nilable(Google::Protobuf::FieldMask)).void }
+  def update_mask=(value)
+  end
+
+  # Controls which fields from `activity_options` will be applied
+  sig { void }
+  def clear_update_mask
+  end
+
+  # If set, the activity options will be restored to the default.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+# This flag cannot be combined with any other option; if you supply
+# restore_original together with other options, the request will be rejected.
+  sig { returns(T::Boolean) }
+  def restore_original
+  end
+
+  # If set, the activity options will be restored to the default.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+# This flag cannot be combined with any other option; if you supply
+# restore_original together with other options, the request will be rejected.
+  sig { params(value: T::Boolean).void }
+  def restore_original=(value)
+  end
+
+  # If set, the activity options will be restored to the default.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+# This flag cannot be combined with any other option; if you supply
+# restore_original together with other options, the request will be rejected.
+  sig { void }
+  def clear_restore_original
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { returns(String) }
+  def resource_id
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { params(value: String).void }
+  def resource_id=(value)
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { void }
+  def clear_resource_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `UpdateActivityExecutionOptionsResponse`.
 class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16464,6 +16745,69 @@ class Temporalio::Api::WorkflowService::V1::UpdateActivityOptionsResponse
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      activity_options: T.nilable(Temporalio::Api::Activity::V1::ActivityOptions)
+    ).void
+  end
+  def initialize(
+    activity_options: nil
+  )
+  end
+
+  # Activity options after an update
+  sig { returns(T.nilable(Temporalio::Api::Activity::V1::ActivityOptions)) }
+  def activity_options
+  end
+
+  # Activity options after an update
+  sig { params(value: T.nilable(Temporalio::Api::Activity::V1::ActivityOptions)).void }
+  def activity_options=(value)
+  end
+
+  # Activity options after an update
+  sig { void }
+  def clear_activity_options
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `PauseActivityExecutionRequest`.
 class Temporalio::Api::WorkflowService::V1::PauseActivityRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16475,7 +16819,8 @@ class Temporalio::Api::WorkflowService::V1::PauseActivityRequest
       identity: T.nilable(String),
       id: T.nilable(String),
       type: T.nilable(String),
-      reason: T.nilable(String)
+      reason: T.nilable(String),
+      request_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -16484,7 +16829,8 @@ class Temporalio::Api::WorkflowService::V1::PauseActivityRequest
     identity: "",
     id: "",
     type: "",
-    reason: ""
+    reason: "",
+    request_id: ""
   )
   end
 
@@ -16581,6 +16927,21 @@ class Temporalio::Api::WorkflowService::V1::PauseActivityRequest
   def clear_reason
   end
 
+  # Used to de-dupe pause requests.
+  sig { returns(String) }
+  def request_id
+  end
+
+  # Used to de-dupe pause requests.
+  sig { params(value: String).void }
+  def request_id=(value)
+  end
+
+  # Used to de-dupe pause requests.
+  sig { void }
+  def clear_request_id
+  end
+
   sig { returns(T.nilable(Symbol)) }
   def activity
   end
@@ -16618,6 +16979,191 @@ class Temporalio::Api::WorkflowService::V1::PauseActivityRequest
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_id: T.nilable(String),
+      activity_id: T.nilable(String),
+      run_id: T.nilable(String),
+      identity: T.nilable(String),
+      reason: T.nilable(String),
+      resource_id: T.nilable(String),
+      request_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_id: "",
+    activity_id: "",
+    run_id: "",
+    identity: "",
+    reason: "",
+    resource_id: "",
+    request_id: ""
+  )
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { void }
+  def clear_namespace
+  end
+
+  # If provided, pause a workflow activity (or activities) for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { returns(String) }
+  def workflow_id
+  end
+
+  # If provided, pause a workflow activity (or activities) for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { params(value: String).void }
+  def workflow_id=(value)
+  end
+
+  # If provided, pause a workflow activity (or activities) for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { void }
+  def clear_workflow_id
+  end
+
+  # The ID of the activity to target.
+  sig { returns(String) }
+  def activity_id
+  end
+
+  # The ID of the activity to target.
+  sig { params(value: String).void }
+  def activity_id=(value)
+  end
+
+  # The ID of the activity to target.
+  sig { void }
+  def clear_activity_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { returns(String) }
+  def run_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { void }
+  def clear_run_id
+  end
+
+  # The identity of the client who initiated this request.
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the client who initiated this request.
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the client who initiated this request.
+  sig { void }
+  def clear_identity
+  end
+
+  # Reason to pause the activity.
+  sig { returns(String) }
+  def reason
+  end
+
+  # Reason to pause the activity.
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  # Reason to pause the activity.
+  sig { void }
+  def clear_reason
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { returns(String) }
+  def resource_id
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { params(value: String).void }
+  def resource_id=(value)
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { void }
+  def clear_resource_id
+  end
+
+  # Used to de-dupe pause requests.
+  sig { returns(String) }
+  def request_id
+  end
+
+  # Used to de-dupe pause requests.
+  sig { params(value: String).void }
+  def request_id=(value)
+  end
+
+  # Used to de-dupe pause requests.
+  sig { void }
+  def clear_request_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `PauseActivityExecutionResponse`.
 class Temporalio::Api::WorkflowService::V1::PauseActivityResponse
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16658,6 +17204,47 @@ class Temporalio::Api::WorkflowService::V1::PauseActivityResponse
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `UnpauseActivityExecutionRequest`.
 class Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16860,6 +17447,225 @@ class Temporalio::Api::WorkflowService::V1::UnpauseActivityRequest
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_id: T.nilable(String),
+      activity_id: T.nilable(String),
+      run_id: T.nilable(String),
+      identity: T.nilable(String),
+      reset_attempts: T.nilable(T::Boolean),
+      reset_heartbeat: T.nilable(T::Boolean),
+      reason: T.nilable(String),
+      jitter: T.nilable(Google::Protobuf::Duration),
+      resource_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_id: "",
+    activity_id: "",
+    run_id: "",
+    identity: "",
+    reset_attempts: false,
+    reset_heartbeat: false,
+    reason: "",
+    jitter: nil,
+    resource_id: ""
+  )
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { void }
+  def clear_namespace
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { returns(String) }
+  def workflow_id
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { params(value: String).void }
+  def workflow_id=(value)
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { void }
+  def clear_workflow_id
+  end
+
+  # The ID of the activity to target.
+  sig { returns(String) }
+  def activity_id
+  end
+
+  # The ID of the activity to target.
+  sig { params(value: String).void }
+  def activity_id=(value)
+  end
+
+  # The ID of the activity to target.
+  sig { void }
+  def clear_activity_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { returns(String) }
+  def run_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { void }
+  def clear_run_id
+  end
+
+  # The identity of the client who initiated this request.
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the client who initiated this request.
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the client who initiated this request.
+  sig { void }
+  def clear_identity
+  end
+
+  # Providing this flag will also reset the number of attempts.
+  sig { returns(T::Boolean) }
+  def reset_attempts
+  end
+
+  # Providing this flag will also reset the number of attempts.
+  sig { params(value: T::Boolean).void }
+  def reset_attempts=(value)
+  end
+
+  # Providing this flag will also reset the number of attempts.
+  sig { void }
+  def clear_reset_attempts
+  end
+
+  # Providing this flag will also reset the heartbeat details.
+  sig { returns(T::Boolean) }
+  def reset_heartbeat
+  end
+
+  # Providing this flag will also reset the heartbeat details.
+  sig { params(value: T::Boolean).void }
+  def reset_heartbeat=(value)
+  end
+
+  # Providing this flag will also reset the heartbeat details.
+  sig { void }
+  def clear_reset_heartbeat
+  end
+
+  # Reason to unpause the activity.
+  sig { returns(String) }
+  def reason
+  end
+
+  # Reason to unpause the activity.
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  # Reason to unpause the activity.
+  sig { void }
+  def clear_reason
+  end
+
+  # If set, the activity will start at a random time within the specified jitter duration.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def jitter
+  end
+
+  # If set, the activity will start at a random time within the specified jitter duration.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def jitter=(value)
+  end
+
+  # If set, the activity will start at a random time within the specified jitter duration.
+  sig { void }
+  def clear_jitter
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { returns(String) }
+  def resource_id
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { params(value: String).void }
+  def resource_id=(value)
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { void }
+  def clear_resource_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `UnpauseActivityExecutionResponse`.
 class Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -16900,7 +17706,48 @@ class Temporalio::Api::WorkflowService::V1::UnpauseActivityResponse
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # NOTE: keep in sync with temporal.api.batch.v1.BatchOperationResetActivities
+# Deprecated. Use `ResetActivityExecutionRequest`.
 class Temporalio::Api::WorkflowService::V1::ResetActivityRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -17076,21 +17923,21 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityRequest
 
   # If set, the activity options will be restored to the defaults.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
   sig { returns(T::Boolean) }
   def restore_original_options
   end
 
   # If set, the activity options will be restored to the defaults.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
   sig { params(value: T::Boolean).void }
   def restore_original_options=(value)
   end
 
   # If set, the activity options will be restored to the defaults.
 # Default options are then options activity was created with.
-# They are part of the first SCHEDULE event.
+# They are part of the first schedule event.
   sig { void }
   def clear_restore_original_options
   end
@@ -17132,6 +17979,237 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityRequest
   end
 end
 
+class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_id: T.nilable(String),
+      activity_id: T.nilable(String),
+      run_id: T.nilable(String),
+      identity: T.nilable(String),
+      reset_heartbeat: T.nilable(T::Boolean),
+      keep_paused: T.nilable(T::Boolean),
+      jitter: T.nilable(Google::Protobuf::Duration),
+      restore_original_options: T.nilable(T::Boolean),
+      resource_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_id: "",
+    activity_id: "",
+    run_id: "",
+    identity: "",
+    reset_heartbeat: false,
+    keep_paused: false,
+    jitter: nil,
+    restore_original_options: false,
+    resource_id: ""
+  )
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Namespace of the workflow which scheduled this activity.
+  sig { void }
+  def clear_namespace
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { returns(String) }
+  def workflow_id
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { params(value: String).void }
+  def workflow_id=(value)
+  end
+
+  # If provided, targets a workflow activity for the given workflow ID.
+# If empty, targets a standalone activity.
+  sig { void }
+  def clear_workflow_id
+  end
+
+  # The ID of the activity to target.
+  sig { returns(String) }
+  def activity_id
+  end
+
+  # The ID of the activity to target.
+  sig { params(value: String).void }
+  def activity_id=(value)
+  end
+
+  # The ID of the activity to target.
+  sig { void }
+  def clear_activity_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { returns(String) }
+  def run_id
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  # Run ID of the workflow or standalone activity.
+  sig { void }
+  def clear_run_id
+  end
+
+  # The identity of the client who initiated this request.
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the client who initiated this request.
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the client who initiated this request.
+  sig { void }
+  def clear_identity
+  end
+
+  # Indicates that activity should reset heartbeat details.
+# This flag will be applied only to the new instance of the activity.
+  sig { returns(T::Boolean) }
+  def reset_heartbeat
+  end
+
+  # Indicates that activity should reset heartbeat details.
+# This flag will be applied only to the new instance of the activity.
+  sig { params(value: T::Boolean).void }
+  def reset_heartbeat=(value)
+  end
+
+  # Indicates that activity should reset heartbeat details.
+# This flag will be applied only to the new instance of the activity.
+  sig { void }
+  def clear_reset_heartbeat
+  end
+
+  # If activity is paused, it will remain paused after reset
+  sig { returns(T::Boolean) }
+  def keep_paused
+  end
+
+  # If activity is paused, it will remain paused after reset
+  sig { params(value: T::Boolean).void }
+  def keep_paused=(value)
+  end
+
+  # If activity is paused, it will remain paused after reset
+  sig { void }
+  def clear_keep_paused
+  end
+
+  # If set, and activity is in backoff, the activity will start at a random time within the specified jitter duration.
+# (unless it is paused and keep_paused is set)
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def jitter
+  end
+
+  # If set, and activity is in backoff, the activity will start at a random time within the specified jitter duration.
+# (unless it is paused and keep_paused is set)
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def jitter=(value)
+  end
+
+  # If set, and activity is in backoff, the activity will start at a random time within the specified jitter duration.
+# (unless it is paused and keep_paused is set)
+  sig { void }
+  def clear_jitter
+  end
+
+  # If set, the activity options will be restored to the defaults.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+  sig { returns(T::Boolean) }
+  def restore_original_options
+  end
+
+  # If set, the activity options will be restored to the defaults.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+  sig { params(value: T::Boolean).void }
+  def restore_original_options=(value)
+  end
+
+  # If set, the activity options will be restored to the defaults.
+# Default options are then options activity was created with.
+# They are part of the first schedule event.
+  sig { void }
+  def clear_restore_original_options
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { returns(String) }
+  def resource_id
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { params(value: String).void }
+  def resource_id=(value)
+  end
+
+  # Resource ID for routing. Contains "workflow:{workflow_id}" for workflow activities or "activity:{activity_id}" for standalone activities.
+  sig { void }
+  def clear_resource_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Deprecated. Use `ResetActivityExecutionRequest`.
 class Temporalio::Api::WorkflowService::V1::ResetActivityResponse
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -17164,6 +18242,46 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityResponse
   end
 
   sig { params(msg: Temporalio::Api::WorkflowService::V1::ResetActivityResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -21905,14 +23023,16 @@ class Temporalio::Api::WorkflowService::V1::ListWorkersRequest
       namespace: T.nilable(String),
       page_size: T.nilable(Integer),
       next_page_token: T.nilable(String),
-      query: T.nilable(String)
+      query: T.nilable(String),
+      include_system_workers: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
     namespace: "",
     page_size: 0,
     next_page_token: "",
-    query: ""
+    query: "",
+    include_system_workers: false
   )
   end
 
@@ -21998,6 +23118,24 @@ class Temporalio::Api::WorkflowService::V1::ListWorkersRequest
 #* Status
   sig { void }
   def clear_query
+  end
+
+  # When true, the response will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { returns(T::Boolean) }
+  def include_system_workers
+  end
+
+  # When true, the response will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { params(value: T::Boolean).void }
+  def include_system_workers=(value)
+  end
+
+  # When true, the response will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { void }
+  def clear_include_system_workers
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -23913,7 +25051,9 @@ class Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest
       run_id: T.nilable(String),
       include_input: T.nilable(T::Boolean),
       include_outcome: T.nilable(T::Boolean),
-      long_poll_token: T.nilable(String)
+      long_poll_token: T.nilable(String),
+      include_heartbeat_details: T.nilable(T::Boolean),
+      include_last_failure: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -23922,7 +25062,9 @@ class Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest
     run_id: "",
     include_input: false,
     include_outcome: false,
-    long_poll_token: ""
+    long_poll_token: "",
+    include_heartbeat_details: false,
+    include_last_failure: false
   )
   end
 
@@ -24025,6 +25167,36 @@ class Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionRequest
   def clear_long_poll_token
   end
 
+  # Include the heartbeat_details field inside info in the response if available.
+  sig { returns(T::Boolean) }
+  def include_heartbeat_details
+  end
+
+  # Include the heartbeat_details field inside info in the response if available.
+  sig { params(value: T::Boolean).void }
+  def include_heartbeat_details=(value)
+  end
+
+  # Include the heartbeat_details field inside info in the response if available.
+  sig { void }
+  def clear_include_heartbeat_details
+  end
+
+  # Include the last_failure field inside info in the response if available.
+  sig { returns(T::Boolean) }
+  def include_last_failure
+  end
+
+  # Include the last_failure field inside info in the response if available.
+  sig { params(value: T::Boolean).void }
+  def include_last_failure=(value)
+  end
+
+  # Include the last_failure field inside info in the response if available.
+  sig { void }
+  def clear_include_last_failure
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -24097,17 +25269,20 @@ class Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse
   def clear_run_id
   end
 
-  # Information about the activity execution.
+  # Information about the activity execution. Fields heartbeat_details and last_failure are omitted unless
+# the request has include_heartbeat_details or include_last_failure set to true, respectively.
   sig { returns(T.nilable(Temporalio::Api::Activity::V1::ActivityExecutionInfo)) }
   def info
   end
 
-  # Information about the activity execution.
+  # Information about the activity execution. Fields heartbeat_details and last_failure are omitted unless
+# the request has include_heartbeat_details or include_last_failure set to true, respectively.
   sig { params(value: T.nilable(Temporalio::Api::Activity::V1::ActivityExecutionInfo)).void }
   def info=(value)
   end
 
-  # Information about the activity execution.
+  # Information about the activity execution. Fields heartbeat_details and last_failure are omitted unless
+# the request has include_heartbeat_details or include_last_failure set to true, respectively.
   sig { void }
   def clear_info
   end

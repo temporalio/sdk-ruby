@@ -11004,6 +11004,1331 @@ class Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse
   end
 end
 
+class Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The requested size of the page to retrieve.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      custom_roles: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRole)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    custom_roles: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of custom roles in ascending ID order.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRole)]) }
+  def custom_roles
+  end
+
+  # The list of custom roles in ascending ID order.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def custom_roles=(value)
+  end
+
+  # The list of custom roles in ascending ID order.
+  sig { void }
+  def clear_custom_roles
+  end
+
+  # The next page token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      role_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    role_id: ""
+  )
+  end
+
+  # The ID of the custom role to retrieve.
+  sig { returns(String) }
+  def role_id
+  end
+
+  # The ID of the custom role to retrieve.
+  sig { params(value: String).void }
+  def role_id=(value)
+  end
+
+  # The ID of the custom role to retrieve.
+  sig { void }
+  def clear_role_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      custom_role: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRole)
+    ).void
+  end
+  def initialize(
+    custom_role: nil
+  )
+  end
+
+  # The custom role retrieved.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRole)) }
+  def custom_role
+  end
+
+  # The custom role retrieved.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRole)).void }
+  def custom_role=(value)
+  end
+
+  # The custom role retrieved.
+  sig { void }
+  def clear_custom_role
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      spec: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    spec: nil,
+    async_operation_id: ""
+  )
+  end
+
+  # The specification for the custom role to create.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec)) }
+  def spec
+  end
+
+  # The specification for the custom role to create.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec)).void }
+  def spec=(value)
+  end
+
+  # The specification for the custom role to create.
+  sig { void }
+  def clear_spec
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      role_id: T.nilable(String),
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    role_id: "",
+    async_operation: nil
+  )
+  end
+
+  # The ID of the custom role created.
+  sig { returns(String) }
+  def role_id
+  end
+
+  # The ID of the custom role created.
+  sig { params(value: String).void }
+  def role_id=(value)
+  end
+
+  # The ID of the custom role created.
+  sig { void }
+  def clear_role_id
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      role_id: T.nilable(String),
+      spec: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    role_id: "",
+    spec: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The ID of the custom role to update.
+  sig { returns(String) }
+  def role_id
+  end
+
+  # The ID of the custom role to update.
+  sig { params(value: String).void }
+  def role_id=(value)
+  end
+
+  # The ID of the custom role to update.
+  sig { void }
+  def clear_role_id
+  end
+
+  # The new custom role specification.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec)) }
+  def spec
+  end
+
+  # The new custom role specification.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec)).void }
+  def spec=(value)
+  end
+
+  # The new custom role specification.
+  sig { void }
+  def clear_spec
+  end
+
+  # The version of the custom role for which this update is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the custom role for which this update is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the custom role for which this update is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      role_id: T.nilable(String),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    role_id: "",
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The ID of the custom role to delete.
+  sig { returns(String) }
+  def role_id
+  end
+
+  # The ID of the custom role to delete.
+  sig { params(value: String).void }
+  def role_id=(value)
+  end
+
+  # The ID of the custom role to delete.
+  sig { void }
+  def clear_role_id
+  end
+
+  # The version of the custom role for which this delete is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the custom role for which this delete is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the custom role for which this delete is intended.
+# The latest version can be found in the GetCustomRole operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The ID to use for this async operation.
+# Optional, if not provided a random ID will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The namespace to get users for.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The namespace to get users for.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The namespace to get users for.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      users: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserNamespaceAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    users: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of users with access to the namespace.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserNamespaceAssignment)]) }
+  def users
+  end
+
+  # The list of users with access to the namespace.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def users=(value)
+  end
+
+  # The list of users with access to the namespace.
+  sig { void }
+  def clear_users
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The namespace to get service accounts for.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The namespace to get service accounts for.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The namespace to get service accounts for.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      service_accounts: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccountNamespaceAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    service_accounts: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of service accounts with access to the namespace.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccountNamespaceAssignment)]) }
+  def service_accounts
+  end
+
+  # The list of service accounts with access to the namespace.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def service_accounts=(value)
+  end
+
+  # The list of service accounts with access to the namespace.
+  sig { void }
+  def clear_service_accounts
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The namespace to get user groups for.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The namespace to get user groups for.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The namespace to get user groups for.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      groups: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupNamespaceAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    groups: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of user groups with access to the namespace.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupNamespaceAssignment)]) }
+  def groups
+  end
+
+  # The list of user groups with access to the namespace.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def groups=(value)
+  end
+
+  # The list of user groups with access to the namespace.
+  sig { void }
+  def clear_groups
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest::GoogleGroupFilter
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods

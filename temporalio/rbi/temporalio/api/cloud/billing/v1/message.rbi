@@ -11,14 +11,16 @@ class Temporalio::Api::Cloud::Billing::V1::BillingReportSpec
       start_time_inclusive: T.nilable(Google::Protobuf::Timestamp),
       end_time_exclusive: T.nilable(Google::Protobuf::Timestamp),
       download_url_expiration_duration: T.nilable(Google::Protobuf::Duration),
-      description: T.nilable(String)
+      description: T.nilable(String),
+      granularity: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
     start_time_inclusive: nil,
     end_time_exclusive: nil,
     download_url_expiration_duration: nil,
-    description: ""
+    description: "",
+    granularity: :BILLING_REPORT_GRANULARITY_UNSPECIFIED
   )
   end
 
@@ -86,6 +88,27 @@ class Temporalio::Api::Cloud::Billing::V1::BillingReportSpec
 # Optional, default is empty.
   sig { void }
   def clear_description
+  end
+
+  # The data granularity of the billing report.
+# Optional, default is hourly.
+# temporal:versioning:min_version=v0.16.0
+  sig { returns(T.any(Symbol, Integer)) }
+  def granularity
+  end
+
+  # The data granularity of the billing report.
+# Optional, default is hourly.
+# temporal:versioning:min_version=v0.16.0
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def granularity=(value)
+  end
+
+  # The data granularity of the billing report.
+# Optional, default is hourly.
+# temporal:versioning:min_version=v0.16.0
+  sig { void }
+  def clear_granularity
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -397,6 +420,25 @@ class Temporalio::Api::Cloud::Billing::V1::BillingReport::Download
   end
 
   sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Cloud::Billing::V1::BillingReportSpec::BillingReportGranularity
+  self::BILLING_REPORT_GRANULARITY_UNSPECIFIED = T.let(0, Integer)
+  self::BILLING_REPORT_GRANULARITY_HOURLY = T.let(1, Integer)
+  self::BILLING_REPORT_GRANULARITY_DAILY = T.let(2, Integer)
+  self::BILLING_REPORT_GRANULARITY_MONTHLY = T.let(3, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
   def self.descriptor
   end
 end

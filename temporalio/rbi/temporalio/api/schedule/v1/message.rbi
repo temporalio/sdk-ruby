@@ -1756,7 +1756,8 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
       future_action_times: T.nilable(T::Array[T.nilable(Google::Protobuf::Timestamp)]),
       create_time: T.nilable(Google::Protobuf::Timestamp),
       update_time: T.nilable(Google::Protobuf::Timestamp),
-      invalid_schedule_error: T.nilable(String)
+      invalid_schedule_error: T.nilable(String),
+      state_size_bytes: T.nilable(Integer)
     ).void
   end
   def initialize(
@@ -1770,7 +1771,8 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
     future_action_times: [],
     create_time: nil,
     update_time: nil,
-    invalid_schedule_error: ""
+    invalid_schedule_error: "",
+    state_size_bytes: 0
   )
   end
 
@@ -1954,6 +1956,21 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
   def clear_invalid_schedule_error
   end
 
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { returns(Integer) }
+  def state_size_bytes
+  end
+
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { params(value: Integer).void }
+  def state_size_bytes=(value)
+  end
+
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { void }
+  def clear_state_size_bytes
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -2101,7 +2118,8 @@ class Temporalio::Api::Schedule::V1::ScheduleListInfo
       notes: T.nilable(String),
       paused: T.nilable(T::Boolean),
       recent_actions: T.nilable(T::Array[T.nilable(Temporalio::Api::Schedule::V1::ScheduleActionResult)]),
-      future_action_times: T.nilable(T::Array[T.nilable(Google::Protobuf::Timestamp)])
+      future_action_times: T.nilable(T::Array[T.nilable(Google::Protobuf::Timestamp)]),
+      state_size_bytes: T.nilable(Integer)
     ).void
   end
   def initialize(
@@ -2110,7 +2128,8 @@ class Temporalio::Api::Schedule::V1::ScheduleListInfo
     notes: "",
     paused: false,
     recent_actions: [],
-    future_action_times: []
+    future_action_times: [],
+    state_size_bytes: 0
   )
   end
 
@@ -2205,6 +2224,21 @@ class Temporalio::Api::Schedule::V1::ScheduleListInfo
 
   sig { void }
   def clear_future_action_times
+  end
+
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { returns(Integer) }
+  def state_size_bytes
+  end
+
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { params(value: Integer).void }
+  def state_size_bytes=(value)
+  end
+
+  # Size of the schedule's internal state (including payloads) in bytes.
+  sig { void }
+  def clear_state_size_bytes
   end
 
   sig { params(field: String).returns(T.untyped) }

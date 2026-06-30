@@ -154,6 +154,7 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
     end
 
     # Add a new region to a namespace
+# Deprecated: Use the UpdateNamespace() to add new replica in the namespace spec instead.
     sig do
       params(
         request: Temporalio::Api::Cloud::CloudService::V1::AddNamespaceRegionRequest
@@ -163,6 +164,7 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
     end
 
     # Delete a region from a namespace
+# Deprecated: Use the UpdateNamespace() to delete a replica in the namespace spec instead.
     sig do
       params(
         request: Temporalio::Api::Cloud::CloudService::V1::DeleteNamespaceRegionRequest
@@ -630,6 +632,78 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
       ).returns(Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse)
     end
     def get_billing_report(request)
+    end
+
+    # Get custom roles
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse)
+    end
+    def get_custom_roles(request)
+    end
+
+    # Get a custom role
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse)
+    end
+    def get_custom_role(request)
+    end
+
+    # Create a custom role
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse)
+    end
+    def create_custom_role(request)
+    end
+
+    # Update a custom role
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse)
+    end
+    def update_custom_role(request)
+    end
+
+    # Delete a custom role
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse)
+    end
+    def delete_custom_role(request)
+    end
+
+    # Get users with access to a namespace
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse)
+    end
+    def get_user_namespace_assignments(request)
+    end
+
+    # Get service accounts with access to a namespace
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse)
+    end
+    def get_service_account_namespace_assignments(request)
+    end
+
+    # Get user groups with access to a namespace
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse)
+    end
+    def get_user_group_namespace_assignments(request)
     end
   end
 end

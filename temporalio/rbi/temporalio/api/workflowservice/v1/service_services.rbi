@@ -670,6 +670,7 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     end
 
     # Deprecated. Use `UpdateWorkerVersioningRules`.
+# Will be removed in server version v1.32.0.
 #
 # Allows users to specify sets of worker build id versions on a per task queue basis. Versions
 # are ordered, and may be either compatible with some extant version, or a new incompatible
@@ -695,6 +696,7 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     end
 
     # Deprecated. Use `GetWorkerVersioningRules`.
+# Will be removed in server version v1.32.0.
 # Fetches the worker build id versioning sets for a task queue.
     sig do
       params(
@@ -725,7 +727,7 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
 # the target Build ID of a redirect rule is able to process event histories made by the source
 # Build ID by using [Patching](https://docs.temporal.io/workflows#patching) or other means.
 #
-# WARNING: Worker Versioning is not yet stable and the API and behavior may change incompatibly.
+# Will be removed in server version v1.32.0.
 # (-- api-linter: core::0127::http-annotation=disabled
 #     aip.dev/not-precedent: We do yet expose versioning API to HTTP. --)
     sig do
@@ -737,7 +739,7 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     end
 
     # Fetches the Build ID assignment and redirect rules for a Task Queue.
-# WARNING: Worker Versioning is not yet stable and the API and behavior may change incompatibly.
+# Will be removed in server version v1.32.0.
     sig do
       params(
         request: Temporalio::Api::WorkflowService::V1::GetWorkerVersioningRulesRequest
@@ -747,6 +749,7 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     end
 
     # Deprecated. Use `DescribeTaskQueue`.
+# Will be removed in server version v1.32.0.
 #
 # Fetches task reachability to determine whether a worker may be retired.
 # The request may specify task queues to query for or let the server fetch all task queues mapped to the given
@@ -1461,6 +1464,73 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
       ).returns(Temporalio::Api::WorkflowService::V1::DeleteActivityExecutionResponse)
     end
     def delete_activity_execution(request)
+    end
+
+    # PauseActivityExecution pauses the execution of an activity specified by its ID.
+# This API can be used to target a workflow activity or a standalone activity
+#
+# Pausing an activity means:
+# - If the activity is currently waiting for a retry or is running and subsequently fails,
+#   it will not be rescheduled until it is unpaused.
+# - If the activity is already paused, calling this method will have no effect.
+# - If the activity is running and finishes successfully, the activity will be completed.
+# - If the activity is running and finishes with failure:
+#   * if there is no retry left - the activity will be completed.
+#   * if there are more retries left - the activity will be paused.
+# For long-running activities:
+# - activities in paused state will send a cancellation with "activity_paused" set to 'true' in response to 'RecordActivityTaskHeartbeat'.
+#
+# Returns a `NotFound` error if there is no pending activity with the provided ID
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::PauseActivityExecutionRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::PauseActivityExecutionResponse)
+    end
+    def pause_activity_execution(request)
+    end
+
+    # ResetActivityExecution resets the execution of an activity specified by its ID.
+# This API can be used to target a workflow activity or a standalone activity.
+#
+# Resetting an activity means:
+# * number of attempts will be reset to 0.
+# * activity timeouts will be reset.
+# * if the activity is waiting for retry, and it is not paused or 'keep_paused' is not provided:
+#    it will be scheduled immediately (* see 'jitter' flag)
+#
+# Returns a `NotFound` error if there is no pending activity with the provided ID or type.
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::ResetActivityExecutionResponse)
+    end
+    def reset_activity_execution(request)
+    end
+
+    # UnpauseActivityExecution unpauses the execution of an activity specified by its ID.
+# This API can be used to target a workflow activity or a standalone activity.
+#
+# If activity is not paused, this call will have no effect.
+# If the activity was paused while waiting for retry, it will be scheduled immediately (* see 'jitter' flag).
+# Once the activity is unpaused, all timeout timers will be regenerated.
+#
+# Returns a `NotFound` error if there is no pending activity with the provided ID
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionResponse)
+    end
+    def unpause_activity_execution(request)
+    end
+
+    # UpdateActivityExecutionOptions is called by the client to update the options of an activity by its ID.
+# This API can be used to target a workflow activity or a standalone activity.
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse)
+    end
+    def update_activity_execution_options(request)
     end
 
     # TerminateNexusOperationExecution terminates an existing Nexus operation immediately.

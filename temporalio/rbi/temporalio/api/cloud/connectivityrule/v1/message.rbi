@@ -238,8 +238,33 @@ class Temporalio::Api::Cloud::ConnectivityRule::V1::PublicConnectivityRule
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
 
-  sig {void}
-  def initialize; end
+  sig do
+    params(
+      enable_stable_ips: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    enable_stable_ips: false
+  )
+  end
+
+  # Flag to determine namespace is connected via a predictable set of IPs on public internet
+# temporal:versioning:min_version=v0.15.0
+  sig { returns(T::Boolean) }
+  def enable_stable_ips
+  end
+
+  # Flag to determine namespace is connected via a predictable set of IPs on public internet
+# temporal:versioning:min_version=v0.15.0
+  sig { params(value: T::Boolean).void }
+  def enable_stable_ips=(value)
+  end
+
+  # Flag to determine namespace is connected via a predictable set of IPs on public internet
+# temporal:versioning:min_version=v0.15.0
+  sig { void }
+  def clear_enable_stable_ips
+  end
 
   sig { params(field: String).returns(T.untyped) }
   def [](field)

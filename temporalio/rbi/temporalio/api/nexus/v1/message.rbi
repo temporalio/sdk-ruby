@@ -1613,7 +1613,8 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionInfo
       nexus_header: T.nilable(T::Hash[String, String]),
       user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
-      identity: T.nilable(String)
+      identity: T.nilable(String),
+      state_size_bytes: T.nilable(Integer)
     ).void
   end
   def initialize(
@@ -1644,7 +1645,8 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionInfo
     nexus_header: ::Google::Protobuf::Map.new(:string, :string),
     user_metadata: nil,
     links: [],
-    identity: ""
+    identity: "",
+    state_size_bytes: 0
   )
   end
 
@@ -2098,6 +2100,21 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionInfo
   def clear_identity
   end
 
+  # Updated once on scheduled and once on terminal status.
+  sig { returns(Integer) }
+  def state_size_bytes
+  end
+
+  # Updated once on scheduled and once on terminal status.
+  sig { params(value: Integer).void }
+  def state_size_bytes=(value)
+  end
+
+  # Updated once on scheduled and once on terminal status.
+  sig { void }
+  def clear_state_size_bytes
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -2150,7 +2167,8 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionListInfo
       status: T.nilable(T.any(Symbol, String, Integer)),
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       state_transition_count: T.nilable(Integer),
-      execution_duration: T.nilable(Google::Protobuf::Duration)
+      execution_duration: T.nilable(Google::Protobuf::Duration),
+      state_size_bytes: T.nilable(Integer)
     ).void
   end
   def initialize(
@@ -2164,7 +2182,8 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionListInfo
     status: :NEXUS_OPERATION_EXECUTION_STATUS_UNSPECIFIED,
     search_attributes: nil,
     state_transition_count: 0,
-    execution_duration: nil
+    execution_duration: nil,
+    state_size_bytes: 0
   )
   end
 
@@ -2334,6 +2353,21 @@ class Temporalio::Api::Nexus::V1::NexusOperationExecutionListInfo
 # This field is only populated if the operation is closed.
   sig { void }
   def clear_execution_duration
+  end
+
+  # Updated once on scheduled and once on terminal status.
+  sig { returns(Integer) }
+  def state_size_bytes
+  end
+
+  # Updated once on scheduled and once on terminal status.
+  sig { params(value: Integer).void }
+  def state_size_bytes=(value)
+  end
+
+  # Updated once on scheduled and once on terminal status.
+  sig { void }
+  def clear_state_size_bytes
   end
 
   sig { params(field: String).returns(T.untyped) }

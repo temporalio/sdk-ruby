@@ -158,6 +158,123 @@ class Temporalio::Client
 
   sig do
     params(
+      activity_id: String,
+      activity_run_id: T.nilable(String),
+      result_hint: T.nilable(Object)
+    ).returns(Temporalio::Client::ActivityHandle)
+  end
+  def activity_handle(activity_id, activity_run_id: T.unsafe(nil), result_hint: T.unsafe(nil)); end
+
+  sig do
+    params(
+      activity: T.any(T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition, Temporalio::Activity::Definition::Info, Symbol, String),
+      args: T.nilable(Object),
+      id: String,
+      task_queue: String,
+      schedule_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      schedule_to_start_timeout: T.nilable(T.any(Integer, Float)),
+      start_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      heartbeat_timeout: T.nilable(T.any(Integer, Float)),
+      id_reuse_policy: Integer,
+      id_conflict_policy: Integer,
+      retry_policy: T.nilable(Temporalio::RetryPolicy),
+      search_attributes: T.nilable(Temporalio::SearchAttributes),
+      static_summary: T.nilable(String),
+      static_details: T.nilable(String),
+      priority: Temporalio::Priority,
+      start_delay: T.nilable(T.any(Integer, Float)),
+      arg_hints: T.nilable(T::Array[Object]),
+      result_hint: T.nilable(Object),
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(Temporalio::Client::ActivityHandle)
+  end
+  def start_activity(
+    activity,
+    *args,
+    id:,
+    task_queue:,
+    schedule_to_close_timeout: T.unsafe(nil),
+    schedule_to_start_timeout: T.unsafe(nil),
+    start_to_close_timeout: T.unsafe(nil),
+    heartbeat_timeout: T.unsafe(nil),
+    id_reuse_policy: T.unsafe(nil),
+    id_conflict_policy: T.unsafe(nil),
+    retry_policy: T.unsafe(nil),
+    search_attributes: T.unsafe(nil),
+    static_summary: T.unsafe(nil),
+    static_details: T.unsafe(nil),
+    priority: T.unsafe(nil),
+    start_delay: T.unsafe(nil),
+    arg_hints: T.unsafe(nil),
+    result_hint: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  )
+  end
+
+  sig do
+    params(
+      activity: T.any(T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition, Temporalio::Activity::Definition::Info, Symbol, String),
+      args: T.nilable(Object),
+      id: String,
+      task_queue: String,
+      schedule_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      schedule_to_start_timeout: T.nilable(T.any(Integer, Float)),
+      start_to_close_timeout: T.nilable(T.any(Integer, Float)),
+      heartbeat_timeout: T.nilable(T.any(Integer, Float)),
+      id_reuse_policy: Integer,
+      id_conflict_policy: Integer,
+      retry_policy: T.nilable(Temporalio::RetryPolicy),
+      search_attributes: T.nilable(Temporalio::SearchAttributes),
+      static_summary: T.nilable(String),
+      static_details: T.nilable(String),
+      priority: Temporalio::Priority,
+      start_delay: T.nilable(T.any(Integer, Float)),
+      arg_hints: T.nilable(T::Array[Object]),
+      result_hint: T.nilable(Object),
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(T.nilable(Object))
+  end
+  def execute_activity(
+    activity,
+    *args,
+    id:,
+    task_queue:,
+    schedule_to_close_timeout: T.unsafe(nil),
+    schedule_to_start_timeout: T.unsafe(nil),
+    start_to_close_timeout: T.unsafe(nil),
+    heartbeat_timeout: T.unsafe(nil),
+    id_reuse_policy: T.unsafe(nil),
+    id_conflict_policy: T.unsafe(nil),
+    retry_policy: T.unsafe(nil),
+    search_attributes: T.unsafe(nil),
+    static_summary: T.unsafe(nil),
+    static_details: T.unsafe(nil),
+    priority: T.unsafe(nil),
+    start_delay: T.unsafe(nil),
+    arg_hints: T.unsafe(nil),
+    result_hint: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  )
+  end
+
+  sig do
+    params(
+      query: String,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(T::Enumerator[Temporalio::Client::ActivityExecution])
+  end
+  def list_activities(query, rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
+      query: String,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(Temporalio::Client::ActivityExecutionCount)
+  end
+  def count_activities(query, rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
       update: T.any(Temporalio::Workflow::Definition::Update, Symbol, String),
       args: T.nilable(Object),
       start_workflow_operation: Temporalio::Client::WithStartWorkflowOperation,
@@ -303,7 +420,8 @@ class Temporalio::Client
         http_connect_proxy: T.nilable(Temporalio::Client::Connection::HTTPConnectProxyOptions),
         runtime: Temporalio::Runtime,
         lazy_connect: T::Boolean,
-        dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions)
+        dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions),
+        grpc_compression: T.any(Temporalio::Client::Connection::GrpcCompressionOptions::Gzip, Temporalio::Client::Connection::GrpcCompressionOptions::None)
       ).returns(Temporalio::Client)
     end
     def connect(
@@ -323,7 +441,8 @@ class Temporalio::Client
       http_connect_proxy: T.unsafe(nil),
       runtime: T.unsafe(nil),
       lazy_connect: T.unsafe(nil),
-      dns_load_balancing: T.unsafe(nil)
+      dns_load_balancing: T.unsafe(nil),
+      grpc_compression: T.unsafe(nil)
     )
     end
   end

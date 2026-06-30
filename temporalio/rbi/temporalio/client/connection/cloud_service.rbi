@@ -212,4 +212,28 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
 
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetBillingReportRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetBillingReportResponse) }
   def get_billing_report(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse) }
+  def get_custom_roles(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse) }
+  def get_custom_role(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse) }
+  def create_custom_role(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse) }
+  def update_custom_role(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse) }
+  def delete_custom_role(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse) }
+  def get_user_namespace_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse) }
+  def get_service_account_namespace_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse) }
+  def get_user_group_namespace_assignments(request, rpc_options: T.unsafe(nil)); end
 end

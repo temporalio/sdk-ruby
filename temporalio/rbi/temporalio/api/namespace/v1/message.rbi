@@ -694,7 +694,10 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
       workflow_pause: T.nilable(T::Boolean),
       standalone_activities: T.nilable(T::Boolean),
       worker_poll_complete_on_shutdown: T.nilable(T::Boolean),
-      poller_autoscaling: T.nilable(T::Boolean)
+      poller_autoscaling: T.nilable(T::Boolean),
+      worker_commands: T.nilable(T::Boolean),
+      standalone_nexus_operation: T.nilable(T::Boolean),
+      workflow_update_callbacks: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -706,7 +709,10 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
     workflow_pause: false,
     standalone_activities: false,
     worker_poll_complete_on_shutdown: false,
-    poller_autoscaling: false
+    poller_autoscaling: false,
+    worker_commands: false,
+    standalone_nexus_operation: false,
+    workflow_update_callbacks: false
   )
   end
 
@@ -855,6 +861,51 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
   # True if the namespace supports poller autoscaling
   sig { void }
   def clear_poller_autoscaling
+  end
+
+  # True if the namespace supports worker commands (server-to-worker communication via control queues).
+  sig { returns(T::Boolean) }
+  def worker_commands
+  end
+
+  # True if the namespace supports worker commands (server-to-worker communication via control queues).
+  sig { params(value: T::Boolean).void }
+  def worker_commands=(value)
+  end
+
+  # True if the namespace supports worker commands (server-to-worker communication via control queues).
+  sig { void }
+  def clear_worker_commands
+  end
+
+  # True if the namespace supports standalone Nexus operations.
+  sig { returns(T::Boolean) }
+  def standalone_nexus_operation
+  end
+
+  # True if the namespace supports standalone Nexus operations.
+  sig { params(value: T::Boolean).void }
+  def standalone_nexus_operation=(value)
+  end
+
+  # True if the namespace supports standalone Nexus operations.
+  sig { void }
+  def clear_standalone_nexus_operation
+  end
+
+  # True if the namespace supports attaching callbacks on workflow updates
+  sig { returns(T::Boolean) }
+  def workflow_update_callbacks
+  end
+
+  # True if the namespace supports attaching callbacks on workflow updates
+  sig { params(value: T::Boolean).void }
+  def workflow_update_callbacks=(value)
+  end
+
+  # True if the namespace supports attaching callbacks on workflow updates
+  sig { void }
+  def clear_workflow_update_callbacks
   end
 
   sig { params(field: String).returns(T.untyped) }
