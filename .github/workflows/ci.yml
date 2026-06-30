@@ -22,16 +22,23 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         # Earliest and latest supported
         rubyVersion: ["3.3", "4.0"]
-        
+        # Opt-in FIPS build (aws-lc-rs); Linux only, the aws-lc-rs FIPS toolchain is not exercised on macOS.
+        fips: [false, true]
+
+        exclude:
+          - os: macos-latest
+            fips: true
+
         include:
           - os: ubuntu-latest
             rubyVersion: "4.0"
+            fips: false
             checkTarget: true
             docsTarget: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: recursive
 
@@ -85,12 +92,37 @@ jobs:
         run: |
           bundle exec rake proto:check_generated
 
+      - name: Assert FIPS build links the validated aws-lc-rs module and not ring
+        if: ${{ matrix.fips }}
+        working-directory: ./temporalio
+        run: |
+          fips_tree() {
+            cargo tree -p temporalio_bridge --no-default-features --features fips -i "$1" 2>/dev/null
+          }
+
+          # The FIPS 140-3 validated module must actually be linked.
+          if [ -z "$(fips_tree aws-lc-fips-sys)" ]; then
+            echo "::error::aws-lc-fips-sys is absent from the FIPS dependency tree — the FIPS-validated module is not linked"
+            exit 1
+          fi
+          echo "aws-lc-fips-sys is present in the FIPS dependency tree"
+
+          # ring (non-FIPS) must not be linked.
+          if [ -n "$(fips_tree ring)" ]; then
+            echo "::error::ring is present in the FIPS dependency tree — TLS is not fully aws-lc-rs backed"
+            exit 1
+          fi
+          echo "ring is absent from the FIPS dependency tree"
+
       - name: Lint, compile, test Ruby
         working-directory: ./temporalio
         # Timeout just in case there's a hanging part in rake
         timeout-minutes: 20
         # Set env vars for cloud tests. If secrets aren't present, tests will be skipped.
         env:
+          # Selects the FIPS-mode aws-lc-rs crypto backend for the `fips: true` matrix legs.
+          TEMPORALIO_FIPS: ${{ matrix.fips && '1' || '' }}
+
           # For mTLS tests
           TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}.tmprl.cloud:7233
           TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
@@ -98,7 +130,7 @@ jobs:
           TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY: ${{ secrets.TEMPORAL_CLIENT_KEY }}
 
           # For API key tests
-          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: us-east-1.aws.api.temporal.io:7233
+          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: ca-central-1.aws.api.temporal.io:7233
           TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
           TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
 

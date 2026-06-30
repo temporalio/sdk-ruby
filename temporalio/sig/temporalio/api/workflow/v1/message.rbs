@@ -1422,28 +1422,57 @@ module Temporalio
             def initialize: (?init_map initial_value) -> void
           end
 
+          # Trigger for when a workflow update is completed.
+          class UpdateWorkflowExecutionCompleted < ::Google::Protobuf::AbstractMessage
+
+            attr_reader update_id(): ::String
+            attr_writer update_id(): ::String | ::Symbol
+            def clear_update_id: () -> void
+
+            type init_map = {
+              update_id: (::String | ::Symbol)?,
+              "update_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("update_id" name) -> ::String
+
+            def []=:
+                ("update_id" name, (::String | ::Symbol) value) -> void
+          end
+
           class Trigger < ::Google::Protobuf::AbstractMessage
 
             attr_accessor workflow_closed(): ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed?
             def has_workflow_closed?: () -> bool
             def clear_workflow_closed: () -> void
 
-            attr_reader variant(): ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed?
+            attr_accessor update_workflow_execution_completed(): ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted?
+            def has_update_workflow_execution_completed?: () -> bool
+            def clear_update_workflow_execution_completed: () -> void
+
+            attr_reader variant(): (::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed | ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted)?
             def has_variant?: () -> bool
             def clear_variant: () -> void
 
             type init_map = {
               workflow_closed: (::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed | ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed::init_map)?,
               "workflow_closed" => (::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed | ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed::init_map)?,
+              update_workflow_execution_completed: (::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted | ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted::init_map)?,
+              "update_workflow_execution_completed" => (::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted | ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
 
             def []:
                 ("workflow_closed" name) -> ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed?
+              | ("update_workflow_execution_completed" name) -> ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted?
 
             def []=:
                 ("workflow_closed" name, ::Temporalio::Api::Workflow::V1::CallbackInfo::WorkflowClosed? value) -> void
+              | ("update_workflow_execution_completed" name, ::Temporalio::Api::Workflow::V1::CallbackInfo::UpdateWorkflowExecutionCompleted? value) -> void
           end
 
           # Information on how this callback should be invoked (e.g. its URL and type).

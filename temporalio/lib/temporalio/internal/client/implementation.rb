@@ -217,7 +217,7 @@ module Temporalio
             end
 
             # If the user wants to wait until completed, we must poll until outcome if not already there
-            if input.wait_for_stage == Temporalio::Client::WorkflowUpdateWaitStage::COMPLETED && update_resp.outcome
+            if input.wait_for_stage == Temporalio::Client::WorkflowUpdateWaitStage::COMPLETED && !update_resp.outcome
               update_resp.outcome = @client._impl.poll_workflow_update(
                 Temporalio::Client::Interceptor::PollWorkflowUpdateInput.new(
                   workflow_id: start_options.id,
@@ -965,6 +965,7 @@ module Temporalio
           if input.schedule_to_close_timeout.nil? && input.start_to_close_timeout.nil?
             raise ArgumentError, 'either schedule_to_close_timeout or start_to_close_timeout is required'
           end
+          raise ArgumentError, 'start_delay must be non-negative' if input.start_delay&.negative?
 
           req = Api::WorkflowService::V1::StartActivityExecutionRequest.new(
             namespace: @client.namespace,
@@ -986,7 +987,8 @@ module Temporalio
               input.static_summary, input.static_details, @client.data_converter
             ),
             header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
-            priority: input.priority._to_proto
+            priority: input.priority._to_proto,
+            start_delay: ProtoUtils.seconds_to_duration(input.start_delay)
           )
 
           begin

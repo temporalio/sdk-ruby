@@ -9,6 +9,8 @@ module Temporalio
   class Client
     # Handle for interacting with a standalone activity. Usually created via {Client.activity_handle}
     # or {Client#start_activity}.
+    #
+    # WARNING: Standalone Activities are experimental.
     class ActivityHandle
       # @return [String] ID for the activity.
       attr_reader :id

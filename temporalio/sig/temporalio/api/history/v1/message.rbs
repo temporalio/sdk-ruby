@@ -3302,6 +3302,44 @@ module Temporalio
         end
 
         class WorkflowExecutionOptionsUpdatedEventAttributes < ::Google::Protobuf::AbstractMessage
+          class WorkflowUpdateOptionsUpdate < ::Google::Protobuf::AbstractMessage
+
+            # The ID of the workflow update this update options update corresponds to.
+            attr_reader update_id(): ::String
+            attr_writer update_id(): ::String | ::Symbol
+            def clear_update_id: () -> void
+
+            # Request ID attached to the running workflow update so that subsequent requests with same
+            # request ID will be deduped
+            attr_reader attached_request_id(): ::String
+            attr_writer attached_request_id(): ::String | ::Symbol
+            def clear_attached_request_id: () -> void
+
+            # Completion callbacks attached to the running workflow update.
+            attr_accessor attached_completion_callbacks(): ::Google::Protobuf::RepeatedField
+            def clear_attached_completion_callbacks: () -> void
+
+            type init_map = {
+              update_id: (::String | ::Symbol)?,
+              "update_id" => (::String | ::Symbol)?,
+              attached_request_id: (::String | ::Symbol)?,
+              "attached_request_id" => (::String | ::Symbol)?,
+              attached_completion_callbacks: ::Array[::Temporalio::Api::Common::V1::Callback]?,
+              "attached_completion_callbacks" => ::Array[::Temporalio::Api::Common::V1::Callback]?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("update_id" name) -> ::String
+              | ("attached_request_id" name) -> ::String
+              | ("attached_completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
+
+            def []=:
+                ("update_id" name, (::String | ::Symbol) value) -> void
+              | ("attached_request_id" name, (::String | ::Symbol) value) -> void
+              | ("attached_completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
+          end
 
           # Versioning override upserted in this event.
           # Ignored if nil or if unset_versioning_override is true.
@@ -3339,6 +3377,10 @@ module Temporalio
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
+          # Updates to workflow updates options.
+          attr_accessor workflow_update_options(): ::Google::Protobuf::RepeatedField
+          def clear_workflow_update_options: () -> void
+
           type init_map = {
             versioning_override: (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
             "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
@@ -3354,6 +3396,8 @@ module Temporalio
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
             "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            workflow_update_options: ::Array[::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate]?,
+            "workflow_update_options" => ::Array[::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate]?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -3366,6 +3410,7 @@ module Temporalio
             | ("identity" name) -> ::String
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
             | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("workflow_update_options" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
               ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
@@ -3375,6 +3420,7 @@ module Temporalio
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
             | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("workflow_update_options" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         # Not used anywhere. Use case is replaced by WorkflowExecutionOptionsUpdatedEventAttributes

@@ -51,7 +51,8 @@ module Temporalio
       ?http_connect_proxy: Connection::HTTPConnectProxyOptions?,
       ?runtime: Runtime,
       ?lazy_connect: bool,
-      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?
+      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?,
+      ?grpc_compression: Connection::GrpcCompressionOptions::Gzip | Connection::GrpcCompressionOptions::None
     ) -> Client
 
     def self._validate_plugins!: (Array[Plugin] plugins) -> void
@@ -154,6 +155,7 @@ module Temporalio
       ?static_summary: String?,
       ?static_details: String?,
       ?priority: Priority,
+      ?start_delay: duration?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?,
       ?rpc_options: RPCOptions?
@@ -175,6 +177,7 @@ module Temporalio
       ?static_summary: String?,
       ?static_details: String?,
       ?priority: Priority,
+      ?start_delay: duration?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?,
       ?rpc_options: RPCOptions?

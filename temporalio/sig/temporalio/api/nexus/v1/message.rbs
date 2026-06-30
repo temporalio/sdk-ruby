@@ -996,6 +996,11 @@ module Temporalio
           attr_writer identity(): ::String | ::Symbol
           def clear_identity: () -> void
 
+          # Updated once on scheduled and once on terminal status.
+          attr_reader state_size_bytes(): ::Integer
+          attr_writer state_size_bytes(): ::Integer | ::Float
+          def clear_state_size_bytes: () -> void
+
           type init_map = {
             operation_id: (::String | ::Symbol)?,
             "operation_id" => (::String | ::Symbol)?,
@@ -1053,6 +1058,8 @@ module Temporalio
             "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
             identity: (::String | ::Symbol)?,
             "identity" => (::String | ::Symbol)?,
+            state_size_bytes: (::Integer | ::Float)?,
+            "state_size_bytes" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1086,6 +1093,7 @@ module Temporalio
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
             | ("links" name) -> ::Google::Protobuf::RepeatedField
             | ("identity" name) -> ::String
+            | ("state_size_bytes" name) -> ::Integer
 
           def []=:
               ("operation_id" name, (::String | ::Symbol) value) -> void
@@ -1116,6 +1124,7 @@ module Temporalio
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
+            | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
         end
 
         # Limited Nexus operation information returned in the list response.
@@ -1183,6 +1192,11 @@ module Temporalio
           def has_execution_duration?: () -> bool
           def clear_execution_duration: () -> void
 
+          # Updated once on scheduled and once on terminal status.
+          attr_reader state_size_bytes(): ::Integer
+          attr_writer state_size_bytes(): ::Integer | ::Float
+          def clear_state_size_bytes: () -> void
+
           type init_map = {
             operation_id: (::String | ::Symbol)?,
             "operation_id" => (::String | ::Symbol)?,
@@ -1206,6 +1220,8 @@ module Temporalio
             "state_transition_count" => (::Integer | ::Float)?,
             execution_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             "execution_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            state_size_bytes: (::Integer | ::Float)?,
+            "state_size_bytes" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1222,6 +1238,7 @@ module Temporalio
             | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | ("state_transition_count" name) -> ::Integer
             | ("execution_duration" name) -> ::Google::Protobuf::Duration?
+            | ("state_size_bytes" name) -> ::Integer
 
           def []=:
               ("operation_id" name, (::String | ::Symbol) value) -> void
@@ -1235,6 +1252,7 @@ module Temporalio
             | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
             | ("state_transition_count" name, (::Integer | ::Float) value) -> void
             | ("execution_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
         end
       end
     end

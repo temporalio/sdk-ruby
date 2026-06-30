@@ -99,6 +99,9 @@ module Temporalio
     # @param dns_load_balancing [Connection::DnsLoadBalancingOptions, nil] DNS load balancing options for the
     #   connection. Default is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are
     #   mutually exclusive.
+    # @param grpc_compression [Connection::GrpcCompressionOptions::Gzip, Connection::GrpcCompressionOptions::None]
+    #   Transport-level gRPC compression. Defaults to gzip. Set to {Connection::GrpcCompressionOptions::None} to opt
+    #   out.
     #
     # @return [Client] Connected client.
     #
@@ -121,7 +124,8 @@ module Temporalio
       http_connect_proxy: nil,
       runtime: Runtime.default,
       lazy_connect: false,
-      dns_load_balancing: nil
+      dns_load_balancing: nil,
+      grpc_compression: Connection::GrpcCompressionOptions::Gzip.new
     )
       # Prepare connection. The connection var is needed here so it can be used in callback for plugin.
       base_connection = nil
@@ -168,6 +172,7 @@ module Temporalio
         runtime:,
         lazy_connect:,
         dns_load_balancing:,
+        grpc_compression:,
         around_connect: # steep:ignore
       )
 
@@ -482,6 +487,8 @@ module Temporalio
     # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
     # (a different process, or by another client) and you have only its ID.
     #
+    # WARNING: Standalone Activities are experimental.
+    #
     # @param activity_id [String] ID for the activity.
     # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
     #   latest run of the given activity ID.
@@ -494,6 +501,8 @@ module Temporalio
     end
 
     # Start a standalone activity execution and return its handle.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
@@ -514,7 +523,10 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity.
+    # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
+    #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -538,6 +550,7 @@ module Temporalio
       static_summary: nil,
       static_details: nil,
       priority: Priority.default,
+      start_delay: nil,
       arg_hints: nil,
       result_hint: nil,
       rpc_options: nil
@@ -561,6 +574,7 @@ module Temporalio
                              static_details:,
                              headers: {},
                              priority:,
+                             start_delay:,
                              arg_hints: arg_hints || defn_arg_hints,
                              result_hint: result_hint || defn_result_hint,
                              rpc_options:
@@ -569,6 +583,8 @@ module Temporalio
 
     # Start a standalone activity execution and wait for its result. Shortcut for
     # {start_activity} + {ActivityHandle#result}.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
@@ -589,7 +605,10 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity.
+    # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
+    #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
+    #   This is currently experimental.
     # @param arg_hints [Array<Object>, nil] Argument hints.
     # @param result_hint [Object, nil] Result hint.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -614,6 +633,7 @@ module Temporalio
       static_summary: nil,
       static_details: nil,
       priority: Priority.default,
+      start_delay: nil,
       arg_hints: nil,
       result_hint: nil,
       rpc_options: nil
@@ -634,6 +654,7 @@ module Temporalio
         static_summary:,
         static_details:,
         priority:,
+        start_delay:,
         arg_hints:,
         result_hint:,
         rpc_options:
@@ -641,6 +662,8 @@ module Temporalio
     end
 
     # List standalone activities matching a visibility query.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -652,6 +675,8 @@ module Temporalio
     end
 
     # Count standalone activities matching a visibility query.
+    #
+    # WARNING: Standalone Activities are experimental.
     #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.

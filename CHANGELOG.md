@@ -1,3 +1,20 @@
+<!--
+High-level release notes.
+Loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+When your PR includes a user-facing change, add an entry below under the
+appropriate heading (create the heading if it does not yet exist). Within
+each heading content can be free-form. Feel free to include examples, links
+to docs, or any other relevant information.
+
+### Added            — new features
+### Changed          — changes in existing functionality
+### Deprecated       — soon-to-be-removed features
+### Breaking Changes — removed or backwards-incompatible features
+### Fixed            — notable bug fixes
+### Security         — notable security fixes
+-->
+
 # Changelog
 
 ## [Unreleased]
@@ -18,6 +35,8 @@ Existing workflow-only code paths are unaffected at runtime. The recommended mig
 
 ### Added
 
+- Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
+
 #### Standalone Activities
 
 Activities can now be started directly from a client, independently of any workflow. `Client#start_activity`
@@ -29,3 +48,36 @@ accepts a standalone-form `ActivityIDReference` (constructed via `ActivityIDRefe
 async completion.
 
 See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
+
+### Fixed
+
+#### `execute_update_with_start_workflow` no longer raises `RPCError NOT_FOUND` on validator rejection
+
+When a `workflow_update_validator` rejected an update sent via
+`Client#execute_update_with_start_workflow` (or `#start_update_with_start_workflow` with
+`wait_for_stage: COMPLETED`), the client polled history for an outcome that was never written
+and surfaced the failure as `Temporalio::Error::RPCError` with code `NOT_FOUND`. The caller now
+correctly receives `Temporalio::Error::WorkflowUpdateFailedError`. (#454)
+
+#### Start Delay for Standalone Activities
+
+`Client#start_activity` and `Client#execute_activity` now accept a `start_delay:` kwarg. When set, the server creates the activity immediately,
+but defers dispatch to a worker until the delay elapses. Retry attempts do not re-apply the delay.
+`ScheduleToStart` and `ScheduleToClose` timeout clocks begin counting after the delay
+elapses; `StartToClose` and `Heartbeat` are unaffected. Currently experimental.
+<!--
+High-level release notes.
+Loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+When your PR includes a user-facing change, add an entry below under the
+appropriate heading (create the heading if it does not yet exist). Within
+each heading content can be free-form. Feel free to include examples, links
+to docs, or any other relevant information.
+
+### Added            — new features
+### Changed          — changes in existing functionality
+### Deprecated       — soon-to-be-removed features
+### Breaking Changes — removed or backwards-incompatible features
+### Fixed            — notable bug fixes
+### Security         — notable security fixes
+-->

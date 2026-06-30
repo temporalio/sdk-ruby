@@ -84,15 +84,15 @@ class ProtoGen
     verify_protoc!
     verify_protoc_gen_rbi!
 
-    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/api_upstream/**/*.proto').reject do |proto|
+    generate_api_protos(Dir.glob('ext/sdk-core/crates/protos/protos/api_upstream/**/*.proto').reject do |proto|
       proto.include?('google')
     end)
     generate_openapiv2_protos
     generate_api_protos(
-      Dir.glob('ext/sdk-core/crates/common/protos/api_cloud_upstream/**/*.proto'),
-      extra_proto_paths: ['--proto_path=ext/sdk-core/crates/common/protos']
+      Dir.glob('ext/sdk-core/crates/protos/protos/api_cloud_upstream/**/*.proto'),
+      extra_proto_paths: ['--proto_path=ext/sdk-core/crates/protos/protos']
     )
-    generate_api_protos(Dir.glob('ext/sdk-core/crates/common/protos/testsrv_upstream/**/*.proto'))
+    generate_api_protos(Dir.glob('ext/sdk-core/crates/protos/protos/testsrv_upstream/**/*.proto'))
     generate_api_protos(Dir.glob('ext/additional_protos/**/*.proto'))
     generate_import_helper_files
     generate_service_files
@@ -110,9 +110,9 @@ class ProtoGen
     system(
       protoc_command,
       *google_proto_include_flags,
-      '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
-      '--proto_path=ext/sdk-core/crates/common/protos/api_cloud_upstream',
-      '--proto_path=ext/sdk-core/crates/common/protos/testsrv_upstream',
+      '--proto_path=ext/sdk-core/crates/protos/protos/api_upstream',
+      '--proto_path=ext/sdk-core/crates/protos/protos/api_cloud_upstream',
+      '--proto_path=ext/sdk-core/crates/protos/protos/testsrv_upstream',
       '--proto_path=ext/additional_protos',
       *extra_proto_paths,
       "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
@@ -132,20 +132,34 @@ class ProtoGen
         %r{^require 'protoc-gen-openapiv2/options/(.*)_pb'$},
         "require 'temporalio/api/protoc_gen_openapiv2/options/\\1'"
       )
+      content.gsub!(
+        %r{^require 'nexusannotations/(.*)_pb'$},
+        "require 'temporalio/api/nexusannotations/\\1'"
+      )
       File.write(path, content)
 
       # Remove _pb from the filename
+      FileUtils.mv(path, path.sub('_pb', ''))
+    end
+    Dir.glob('tmp-proto/ruby/nexusannotations/**/*.rb') do |path|
       FileUtils.mv(path, path.sub('_pb', ''))
     end
 
     # Move from temp dir and remove temp dir
     Dir.glob('tmp-proto/rbi/temporal/api/**/*.rbi') { |path| normalize_generated_rbi!(path) }
     Dir.glob('tmp-proto/rbs/temporal/api/**/*.rbs') { |path| normalize_generated_rbs!(path) }
+    Dir.glob('tmp-proto/rbs/nexusannotations/**/*.rbs') { |path| normalize_generated_rbs!(path) }
     FileUtils.cp_r('tmp-proto/ruby/temporal/api', 'lib/temporalio')
     FileUtils.mkdir_p('rbi/temporalio')
     FileUtils.cp_r('tmp-proto/rbi/temporal/api', 'rbi/temporalio')
+    if File.directory?('tmp-proto/ruby/nexusannotations')
+      FileUtils.cp_r('tmp-proto/ruby/nexusannotations', 'lib/temporalio/api')
+    end
     FileUtils.mkdir_p('sig/temporalio')
     FileUtils.cp_r('tmp-proto/rbs/temporal/api', 'sig/temporalio')
+    if File.directory?('tmp-proto/rbs/nexusannotations')
+      FileUtils.cp_r('tmp-proto/rbs/nexusannotations', 'sig/temporalio/api')
+    end
     FileUtils.rm_rf('tmp-proto')
   end
 
@@ -155,12 +169,12 @@ class ProtoGen
     system(
       protoc_command,
       *google_proto_include_flags,
-      '--proto_path=ext/sdk-core/crates/common/protos',
+      '--proto_path=ext/sdk-core/crates/protos/protos',
       "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
       '--rbi_out=grpc=false:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
-      *Dir.glob('ext/sdk-core/crates/common/protos/protoc-gen-openapiv2/**/*.proto'),
+      *Dir.glob('ext/sdk-core/crates/protos/protos/protoc-gen-openapiv2/**/*.proto'),
       exception: true
     )
     Dir.glob('tmp-proto/ruby/protoc-gen-openapiv2/**/*.rb') do |path|
@@ -449,13 +463,13 @@ class ProtoGen
     system(
       protoc_command,
       *google_proto_include_flags,
-      '--proto_path=ext/sdk-core/crates/common/protos/api_upstream',
-      '--proto_path=ext/sdk-core/crates/common/protos/local',
+      '--proto_path=ext/sdk-core/crates/protos/protos/api_upstream',
+      '--proto_path=ext/sdk-core/crates/protos/protos/local',
       "--plugin=protoc-gen-rbi=#{protoc_gen_rbi_command}",
       '--rbi_out=grpc=false:tmp-proto/rbi',
       '--ruby_out=tmp-proto/ruby',
       '--rbs_out=tmp-proto/rbs',
-      *Dir.glob('ext/sdk-core/crates/common/protos/local/**/*.proto'),
+      *Dir.glob('ext/sdk-core/crates/protos/protos/local/**/*.proto'),
       exception: true
     )
     # Walk all generated Ruby files and cleanup content and filename

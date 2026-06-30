@@ -1035,6 +1035,126 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls CloudService.GetCustomRoles API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse] API response.
+        def get_custom_roles(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_custom_roles',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetCustomRole API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse] API response.
+        def get_custom_role(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_custom_role',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetCustomRoleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateCustomRole API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse] API response.
+        def create_custom_role(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_custom_role',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateCustomRoleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateCustomRole API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse] API response.
+        def update_custom_role(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_custom_role',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateCustomRoleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteCustomRole API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse] API response.
+        def delete_custom_role(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_custom_role',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUserNamespaceAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse] API response.
+        def get_user_namespace_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_user_namespace_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetServiceAccountNamespaceAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse] API response.
+        def get_service_account_namespace_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_service_account_namespace_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountNamespaceAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUserGroupNamespaceAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse] API response.
+        def get_user_group_namespace_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_user_group_namespace_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end

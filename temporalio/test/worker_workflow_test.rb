@@ -551,7 +551,8 @@ class WorkerWorkflowTest < Test
       raise Temporalio::Workflow::ContinueAsNewError.new(
         past_run_ids,
         memo: { past_run_id_count: past_run_ids.size },
-        retry_policy: Temporalio::RetryPolicy.new(max_attempts: past_run_ids.size + 1000)
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: past_run_ids.size + 1000),
+        backoff_start_interval: 0.001
       )
     end
   end
@@ -567,6 +568,15 @@ class WorkerWorkflowTest < Test
       result = handle.result #: Array[String]
       assert_equal 5, result.size
       assert_equal handle.result_run_id, result.first
+      first_run_handle = env.client.workflow_handle(handle.id, run_id: handle.result_run_id)
+      continued = first_run_handle.fetch_history.events
+                                  .map(&:workflow_execution_continued_as_new_event_attributes)
+                                  .compact
+      refute_empty continued
+      assert_equal(
+        0.001,
+        Temporalio::Internal::ProtoUtils.duration_to_seconds(continued.first.backoff_start_interval)
+      )
     end
   end
 

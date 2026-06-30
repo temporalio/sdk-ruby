@@ -162,7 +162,7 @@ class Test < Minitest::Test
       if target_host.empty?
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
-          dev_server_download_version: 'v1.7.0',
+          dev_server_download_version: 'v1.7.1-standalone-nexus-operations',
           dev_server_extra_args: [
             # Allow continue as new to be immediate
             '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
@@ -171,7 +171,9 @@ class Test < Minitest::Test
             '--dynamic-config-value', 'frontend.enableCancelWorkerPollsOnShutdown=true',
             '--dynamic-config-value', 'system.enableDeploymentVersions=true',
             # Enable activity pause
-            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true'
+            '--dynamic-config-value', 'frontend.activityAPIsEnabled=true',
+            # Enable standalone-activity start delay
+            '--dynamic-config-value', 'activity.startDelayEnabled=true'
           ]
         )
         Minitest.after_run do

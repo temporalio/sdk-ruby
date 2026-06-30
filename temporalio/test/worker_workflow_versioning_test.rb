@@ -138,6 +138,7 @@ class WorkerWorkflowVersioningTest < Test
         # Wait for worker v1 to be visible and set as current
         describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
         set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+        wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
 
         # Start workflow 1 which will use the 1.0 worker on auto-upgrade
         handle1 = env.client.start_workflow(
@@ -150,6 +151,7 @@ class WorkerWorkflowVersioningTest < Test
         # Set v2 as current deployment
         describe_resp2 = wait_until_worker_deployment_visible(env.client, worker_v2)
         set_current_deployment_version(env.client, describe_resp2.conflict_token, worker_v2)
+        wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v2.build_id)
 
         # Start workflow 2 which will use the 2.0 worker on pinned
         handle2 = env.client.start_workflow(
@@ -162,6 +164,7 @@ class WorkerWorkflowVersioningTest < Test
         # Set v3 as current deployment
         describe_resp3 = wait_until_worker_deployment_visible(env.client, worker_v3)
         set_current_deployment_version(env.client, describe_resp3.conflict_token, worker_v3)
+        wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v3.build_id)
 
         # Start workflow 3 which will use the 3.0 worker on auto-upgrade
         handle3 = env.client.start_workflow(
@@ -242,6 +245,13 @@ class WorkerWorkflowVersioningTest < Test
           worker_v2,
           100.0
         ).conflict_token
+        wait_for_worker_deployment_routing_config_propagation(
+          env.client,
+          deployment_name,
+          worker_v1.build_id,
+          worker_v2.build_id,
+          100.0
+        )
 
         # Run workflows and verify they run on v2
         3.times do |i|
@@ -261,6 +271,13 @@ class WorkerWorkflowVersioningTest < Test
           worker_v2,
           0.0
         ).conflict_token
+        wait_for_worker_deployment_routing_config_propagation(
+          env.client,
+          deployment_name,
+          worker_v1.build_id,
+          worker_v2.build_id,
+          0.0
+        )
 
         3.times do |i|
           handle = env.client.start_workflow(
@@ -274,6 +291,13 @@ class WorkerWorkflowVersioningTest < Test
 
         # Set ramp to 50 and eventually verify workflows run on both versions
         set_ramping_version(env.client, conflict_token, worker_v2, 50.0)
+        wait_for_worker_deployment_routing_config_propagation(
+          env.client,
+          deployment_name,
+          worker_v1.build_id,
+          worker_v2.build_id,
+          50.0
+        )
         seen_results = Set.new
 
         # Keep running workflows until we've seen both versions
@@ -350,6 +374,7 @@ class WorkerWorkflowVersioningTest < Test
     worker.run do
       describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
       set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
 
       handle = env.client.start_workflow(
         'cooldynamicworkflow',
@@ -435,6 +460,7 @@ class WorkerWorkflowVersioningTest < Test
     worker.run do
       describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
       set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
 
       handle = env.client.start_workflow(
         NoVersioningAnnotationWorkflow,
@@ -597,6 +623,7 @@ class WorkerWorkflowVersioningTest < Test
       describe_resp = wait_until_worker_deployment_visible(env.client, worker_v1)
       # Set current deployment version
       set_current_deployment_version(env.client, describe_resp.conflict_token, worker_v1)
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, worker_v1.build_id)
 
       # Start workflow with pinned versioning override
       handle = env.client.start_workflow(
@@ -798,7 +825,8 @@ class WorkerWorkflowVersioningTest < Test
         env.client,
         deployment_name,
         worker_v1.build_id,
-        worker_v2.build_id
+        worker_v2.build_id,
+        0.0
       )
 
       handle.signal(CanRampingVersionWorkflowV1.do_continue_as_new)
@@ -821,7 +849,8 @@ class WorkerWorkflowVersioningTest < Test
   end
 
   def wait_for_worker_deployment_routing_config_propagation(
-    client, deployment_name, expected_current_build_id, expected_ramping_build_id = ''
+    client, deployment_name, expected_current_build_id, expected_ramping_build_id = '',
+    expected_ramping_percentage = nil
   )
     assert_eventually do
       res = client.workflow_service.describe_worker_deployment(
@@ -839,6 +868,11 @@ class WorkerWorkflowVersioningTest < Test
 
       assert_equal expected_ramping_build_id,
                    routing_config.ramping_deployment_version&.build_id.to_s
+
+      unless expected_ramping_percentage.nil?
+        assert_equal expected_ramping_percentage,
+                     routing_config.ramping_version_percentage
+      end
 
       state = info.routing_config_update_state
       assert(

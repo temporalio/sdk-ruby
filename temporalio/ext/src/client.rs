@@ -2,8 +2,8 @@ use std::{collections::HashMap, future::Future, marker::PhantomData, time::Durat
 
 use temporalio_client::{
     ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
-    DnsLoadBalancingOptions, HttpConnectProxyOptions, RetryOptions, TlsOptions,
-    errors::ClientConnectError,
+    DnsLoadBalancingOptions, GrpcCompression as CoreGrpcCompression, HttpConnectProxyOptions,
+    RetryOptions, TlsOptions, errors::ClientConnectError,
 };
 
 use magnus::{
@@ -98,6 +98,16 @@ impl Client {
             .child(id!("rpc_retry"))?
             .ok_or_else(|| error!("Missing rpc_retry"))?;
         let tls = options.child(id!("tls"))?;
+        let grpc_compression = match options
+            .child(id!("grpc_compression"))?
+            .ok_or_else(|| error!("Missing grpc_compression"))?
+            .member::<String>(id!("codec"))?
+            .as_str()
+        {
+            "gzip" => CoreGrpcCompression::Gzip,
+            "none" => CoreGrpcCompression::None,
+            codec => return Err(error!("Invalid grpc compression codec: {}", codec)),
+        };
         let metrics_meter = runtime.handle.core.telemetry().get_temporal_metric_meter();
         let opts = ConnectionOptions::new(
             Url::parse(
@@ -112,6 +122,7 @@ impl Client {
         )
         .client_name(options.member::<String>(id!("client_name"))?)
         .client_version(options.member::<String>(id!("client_version"))?)
+        .grpc_compression(grpc_compression)
         .headers(headers.headers)
         .binary_headers(headers.binary_headers)
         .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
@@ -138,6 +149,7 @@ impl Client {
                     .member::<Option<RString>>(id!("server_root_ca_cert"))?
                     .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
                 domain: tls.member(id!("domain"))?,
+                server_cert_verifier: None,
             })
         } else {
             None

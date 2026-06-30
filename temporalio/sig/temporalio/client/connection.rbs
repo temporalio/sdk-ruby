@@ -13,6 +13,7 @@ module Temporalio
         attr_reader runtime: Runtime
         attr_reader lazy_connect: bool
         attr_reader dns_load_balancing: DnsLoadBalancingOptions?
+        attr_reader grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None
 
         def initialize: (
           target_host: String,
@@ -25,7 +26,8 @@ module Temporalio
           http_connect_proxy: HTTPConnectProxyOptions?,
           runtime: Runtime,
           lazy_connect: bool,
-          dns_load_balancing: DnsLoadBalancingOptions?
+          dns_load_balancing: DnsLoadBalancingOptions?,
+          grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None
         ) -> void
 
         def to_h: -> Hash[Symbol, untyped]
@@ -95,6 +97,16 @@ module Temporalio
         ) -> void
       end
 
+      module GrpcCompressionOptions
+        class Gzip
+          def codec: -> :gzip
+        end
+
+        class None
+          def codec: -> :none
+        end
+      end
+
       attr_reader options: Options
 
       attr_reader workflow_service: WorkflowService
@@ -113,6 +125,7 @@ module Temporalio
         ?runtime: Runtime,
         ?lazy_connect: bool,
         ?dns_load_balancing: DnsLoadBalancingOptions?,
+        ?grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None,
         ?around_connect: nil | ^(Options) { (Options) -> void } -> void
       ) -> void
 
