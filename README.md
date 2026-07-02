@@ -1489,6 +1489,20 @@ Now can run `steep`:
 
     bundle exec rake steep
 
+### Type Signatures (Experimental)
+
+The SDK ships two sets of type signatures:
+
+* **RBS**: Maintained throughout development of the SDK, but only recently made public.
+* **RBI**: Sorbet types maintained in parallel with the RBS signatures.
+
+We leverage `protoc` and the `protoc-gen-rbi` plugin to generate RBS and RBI types for all of our Protobuf messages and services.
+
+The RBI signatures are validated at runtime by running the test suite with `TEMPORAL_SORBET_RUNTIME_CHECK=1`, which applies every RBI
+signature to the real implementation at runtime via `SigApplicator`.
+
+This is yet another reason to ensure any changes you make have test coverage.
+
 ### Proto Generation
 
 Run:
@@ -1497,3 +1511,9 @@ Run:
 
 `proto:generate` now requires `protoc >= 34.0` because we generate RBS alongside the generated Ruby
 protobuf files.
+
+We use `protoc-gen-rbi` to generated protobuf RBI.
+
+It can be installed via `go install`:
+
+    go install github.com/coinbase/protoc-gen-rbi@$(cat ../.protoc-gen-rbi-version)
