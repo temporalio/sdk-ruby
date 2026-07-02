@@ -179,7 +179,7 @@ module Worker
     private
 
     def new_scheduler
-      Temporalio::Internal::Worker::WorkflowInstance::Scheduler.new(FakeWorkflowInstance.new)
+      Temporalio::Internal::Worker::WorkflowInstance::Scheduler.new(FakeWorkflowInstance.new) # steep:ignore
     end
 
     def held_mutex
@@ -206,7 +206,7 @@ module Worker
     end
 
     def assert_thread_blocking_fiber_count(scheduler, expected_count)
-      assert_eventually(timeout: 2, interval: 0.01) do
+      assert_eventually(timeout: 2.0, interval: 0.01) do
         assert_equal expected_count, thread_blocking_fiber_count(scheduler)
       end
     end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'securerandom'
 require 'google/protobuf'
+require 'securerandom'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'temporalio/workflow'
@@ -164,47 +164,49 @@ class DeadlockTest < Test
   end
 
   def test_protobuf_object_cache_mutex_does_not_complete_workflow_task_while_blocked
+    # @type var release_mutex: (^() -> void)?
     release_mutex = nil
     execute_workflow(
       ProtobufObjectCacheMutexWorkflow,
       activities: [BasicActivity]
     ) do |handle|
+      Timeout.timeout(10) { ProtobufObjectCacheMutexWorkflow::REACHED_PROTOBUF_CACHE.pop }
+      release_mutex = hold_protobuf_object_cache_mutex
+      ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
+      wait_for_protobuf_object_cache_mutex_waiter
+      (release_mutex || raise).call
+      release_mutex = nil
+
+      # @type var events: Array[untyped]
+      events = []
+      assert_eventually(timeout: 10.0) do
+        events = handle.fetch_history_events.to_a
+        assert events.any?(&:workflow_task_completed_event_attributes)
+      end
+
+      workflow_task_completed = events.find(&:workflow_task_completed_event_attributes)
+      activity_scheduled = events.find(&:activity_task_scheduled_event_attributes)
+      refute_nil(
+        activity_scheduled,
+        'Workflow task completed while a workflow fiber was blocked on the protobuf ObjectCache mutex'
+      )
+      assert_equal workflow_task_completed.event_id + 1, activity_scheduled.event_id
+    ensure
+      ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
+      release_mutex&.call
       begin
-        Timeout.timeout(10) { ProtobufObjectCacheMutexWorkflow::REACHED_PROTOBUF_CACHE.pop }
-        release_mutex = hold_protobuf_object_cache_mutex
-        ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
-        wait_for_protobuf_object_cache_mutex_waiter
-        release_mutex.call
-        release_mutex = nil
-
-        events = nil
-        assert_eventually(timeout: 10) do
-          events = handle.fetch_history_events.to_a
-          assert events.any?(&:workflow_task_completed_event_attributes)
-        end
-
-        workflow_task_completed = events.find(&:workflow_task_completed_event_attributes)
-        activity_scheduled = events.find(&:activity_task_scheduled_event_attributes)
-        refute_nil(
-          activity_scheduled,
-          'Workflow task completed while a workflow fiber was blocked on the protobuf ObjectCache mutex'
-        )
-        assert_equal workflow_task_completed.event_id + 1, activity_scheduled.event_id
-      ensure
-        ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
-        release_mutex&.call
-        begin
-          handle.terminate
-        rescue Temporalio::Error::RPCError
-          # Ignore cleanup races if the workflow closed before terminate arrived.
-        end
+        handle.terminate
+      rescue Temporalio::Error::RPCError
+        # Ignore cleanup races if the workflow closed before terminate arrived.
       end
     end
   end
 
   def test_protobuf_object_cache_mutex_does_not_emit_partial_command_batch
     task_queue = "tq-#{SecureRandom.uuid}"
+    # @type var release_mutex: (^() -> void)?
     release_mutex = nil
+    # @type var handle: untyped
     handle = nil
     scheduler_drained = Queue.new
     SchedulerDrainProbe.queue = scheduler_drained
@@ -217,54 +219,54 @@ class DeadlockTest < Test
     )
 
     worker.run do
-      begin
-        handle = env.client.start_workflow(
-          ProtobufObjectCachePartialCommandsWorkflow,
-          id: "wf-#{SecureRandom.uuid}",
-          task_queue:
+      handle = env.client.start_workflow(
+        ProtobufObjectCachePartialCommandsWorkflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      Timeout.timeout(10) { ProtobufObjectCachePartialCommandsWorkflow::REACHED_PROTOBUF_CACHE.pop }
+      release_mutex = hold_protobuf_object_cache_mutex
+      ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
+      wait_for_protobuf_object_cache_mutex_waiter
+      Timeout.timeout(10.0) { scheduler_drained.pop }
+      (release_mutex || raise).call
+      release_mutex = nil
+
+      # @type var events: Array[untyped]
+      events = []
+      assert_eventually(timeout: 10.0) do
+        events = handle.fetch_history_events.to_a
+        assert(events.any? do |event|
+          %i[
+            EVENT_TYPE_WORKFLOW_TASK_COMPLETED
+            EVENT_TYPE_WORKFLOW_TASK_FAILED
+          ].include?(event.event_type)
+        end)
+      end
+
+      first_completed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_COMPLETED }
+      first_failed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_FAILED }
+      unless first_failed_index && (!first_completed_index || first_failed_index < first_completed_index)
+        refute_nil first_completed_index, "History event types: #{events.map(&:event_type).inspect}"
+        completed_index = first_completed_index || raise
+        scheduled_count = (events[(completed_index + 1)..] || []).take_while do |event|
+          event.event_type == :EVENT_TYPE_ACTIVITY_TASK_SCHEDULED
+        end.size
+        assert_equal(
+          ProtobufObjectCachePartialCommandsWorkflow::ACTIVITY_COUNT,
+          scheduled_count,
+          'Workflow task completed with a partial activity schedule command batch while a workflow fiber was ' \
+          'blocked on the protobuf ObjectCache mutex'
         )
-        Timeout.timeout(10) { ProtobufObjectCachePartialCommandsWorkflow::REACHED_PROTOBUF_CACHE.pop }
-        release_mutex = hold_protobuf_object_cache_mutex
-        ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
-        wait_for_protobuf_object_cache_mutex_waiter
-        Timeout.timeout(10) { scheduler_drained.pop }
-        release_mutex.call
-        release_mutex = nil
-
-        events = nil
-        assert_eventually(timeout: 10) do
-          events = handle.fetch_history_events.to_a
-          assert(events.any? do |event|
-            %i[
-              EVENT_TYPE_WORKFLOW_TASK_COMPLETED
-              EVENT_TYPE_WORKFLOW_TASK_FAILED
-            ].include?(event.event_type)
-          end)
-        end
-
-        first_completed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_COMPLETED }
-        first_failed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_FAILED }
-        unless first_failed_index && (!first_completed_index || first_failed_index < first_completed_index)
-          refute_nil first_completed_index, "History event types: #{events.map(&:event_type).inspect}"
-          scheduled_count = (events[(first_completed_index + 1)..] || []).take_while do |event|
-            event.event_type == :EVENT_TYPE_ACTIVITY_TASK_SCHEDULED
-          end.size
-          assert_equal(
-            ProtobufObjectCachePartialCommandsWorkflow::ACTIVITY_COUNT,
-            scheduled_count,
-            'Workflow task completed with a partial activity schedule command batch while a workflow fiber was ' \
-            'blocked on the protobuf ObjectCache mutex'
-          )
-        end
-      ensure
-        SchedulerDrainProbe.queue = nil
-        ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
-        release_mutex&.call
-        begin
-          handle&.terminate
-        rescue Temporalio::Error::RPCError
-          # Ignore cleanup races if the workflow closed before terminate arrived.
-        end
+      end
+    ensure
+      SchedulerDrainProbe.queue = nil
+      ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
+      release_mutex&.call
+      begin
+        handle&.terminate
+      rescue Temporalio::Error::RPCError
+        # Ignore cleanup races if the workflow closed before terminate arrived.
       end
     end
   end
@@ -292,7 +294,7 @@ class DeadlockTest < Test
   end
 
   def wait_for_protobuf_object_cache_mutex_waiter
-    assert_eventually(timeout: 10, interval: 0.01) do
+    assert_eventually(timeout: 10.0, interval: 0.01) do
       assert(
         Thread.list.any? do |thread|
           next false if thread == Thread.current
