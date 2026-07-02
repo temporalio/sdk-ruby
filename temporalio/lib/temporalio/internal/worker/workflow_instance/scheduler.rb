@@ -38,6 +38,10 @@ module Temporalio
                 fiber.resume
               end
 
+              # Thread-blocking fibers are not durable workflow yields. Wait for them to unblock before satisfying any
+              # wait condition so the condition sees the workflow after all runnable work has settled.
+              next if wait_for_thread_blocking_fiber
+
               # Find the _first_ resolvable wait condition and if there, resolve it, and loop again, otherwise return.
               # It is important that we both let fibers get all settled _before_ this and only allow a _single_ wait
               # condition to be satisfied before looping. This allows wait condition users to trust that the line of
@@ -57,11 +61,7 @@ module Temporalio
                 cond_fiber = deleted_cond.last
                 break
               end
-              unless cond_fiber
-                next if wait_for_thread_blocking_fiber
-
-                return
-              end
+              return unless cond_fiber
 
               cond_fiber.resume(cond_result)
             end
@@ -234,6 +234,7 @@ module Temporalio
 
           def wait_for_thread_blocking_fiber
             synchronize_thread_blocking_fibers do
+              return true unless @ready.empty?
               return false if @thread_blocking_fibers.empty?
 
               @thread_blocking_condition.wait(@thread_blocking_mutex) while @ready.empty? &&
