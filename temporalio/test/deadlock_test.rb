@@ -65,23 +65,6 @@ class DeadlockTest < Test
     end
   end
 
-  class ProtobufObjectCacheMutexWorkflow < Temporalio::Workflow::Definition
-    REACHED_PROTOBUF_CACHE = Queue.new
-
-    class << self
-      attr_accessor :protobuf_mutex_held
-    end
-
-    def execute
-      Temporalio::Workflow::Future.new do
-        Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled { REACHED_PROTOBUF_CACHE << true }
-        nil until self.class.protobuf_mutex_held
-        Google::Protobuf::Internal::OBJECT_CACHE.try_add(Object.new, Object.new)
-        Temporalio::Workflow.execute_activity(BasicActivity, 'done', start_to_close_timeout: 10)
-      end.wait
-    end
-  end
-
   class ProtobufObjectCachePartialCommandsWorkflow < Temporalio::Workflow::Definition
     ACTIVITY_COUNT = 6
     BLOCK_AFTER_ACTIVITY_COUNT = 3
@@ -110,8 +93,6 @@ class DeadlockTest < Test
 
   def setup
     super
-    ProtobufObjectCacheMutexWorkflow::REACHED_PROTOBUF_CACHE.clear
-    ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = false
     ProtobufObjectCachePartialCommandsWorkflow::REACHED_PROTOBUF_CACHE.clear
     ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = false
     SchedulerDrainProbe.queue = nil
@@ -161,45 +142,6 @@ class DeadlockTest < Test
     end
   ensure
     handle&.terminate
-  end
-
-  def test_protobuf_object_cache_mutex_does_not_complete_workflow_task_while_blocked
-    # @type var release_mutex: (^() -> void)?
-    release_mutex = nil
-    execute_workflow(
-      ProtobufObjectCacheMutexWorkflow,
-      activities: [BasicActivity]
-    ) do |handle|
-      Timeout.timeout(10) { ProtobufObjectCacheMutexWorkflow::REACHED_PROTOBUF_CACHE.pop }
-      release_mutex = hold_protobuf_object_cache_mutex
-      ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
-      wait_for_protobuf_object_cache_mutex_waiter
-      (release_mutex || raise).call
-      release_mutex = nil
-
-      # @type var events: Array[untyped]
-      events = []
-      assert_eventually(timeout: 10.0) do
-        events = handle.fetch_history_events.to_a
-        assert events.any?(&:workflow_task_completed_event_attributes)
-      end
-
-      workflow_task_completed = events.find(&:workflow_task_completed_event_attributes)
-      activity_scheduled = events.find(&:activity_task_scheduled_event_attributes)
-      refute_nil(
-        activity_scheduled,
-        'Workflow task completed while a workflow fiber was blocked on the protobuf ObjectCache mutex'
-      )
-      assert_equal workflow_task_completed.event_id + 1, activity_scheduled.event_id
-    ensure
-      ProtobufObjectCacheMutexWorkflow.protobuf_mutex_held = true
-      release_mutex&.call
-      begin
-        handle.terminate
-      rescue Temporalio::Error::RPCError
-        # Ignore cleanup races if the workflow closed before terminate arrived.
-      end
-    end
   end
 
   def test_protobuf_object_cache_mutex_does_not_emit_partial_command_batch

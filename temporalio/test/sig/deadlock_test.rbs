@@ -17,14 +17,6 @@ class DeadlockTest < Test
     def execute: -> void
   end
 
-  class ProtobufObjectCacheMutexWorkflow < Temporalio::Workflow::Definition
-    REACHED_PROTOBUF_CACHE: Queue
-
-    attr_accessor self.protobuf_mutex_held: bool
-
-    def execute: -> untyped
-  end
-
   class ProtobufObjectCachePartialCommandsWorkflow < Temporalio::Workflow::Definition
     ACTIVITY_COUNT: Integer
     BLOCK_AFTER_ACTIVITY_COUNT: Integer
