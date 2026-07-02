@@ -179,7 +179,14 @@ module Worker
     private
 
     def new_scheduler
-      Temporalio::Internal::Worker::WorkflowInstance::Scheduler.new(FakeWorkflowInstance.new) # steep:ignore
+      block = proc do
+        Temporalio::Internal::Worker::WorkflowInstance::Scheduler.new(FakeWorkflowInstance.new) # steep:ignore
+      end
+      if defined?(SigApplicator)
+        SigApplicator.suppress_errors { block.call }
+      else
+        block.call
+      end
     end
 
     def held_mutex
