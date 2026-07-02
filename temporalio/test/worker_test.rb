@@ -417,7 +417,9 @@ class WorkerTest < Test
     end
 
     # Confirm we canceled all waiting reservations
-    assert_equal waiting_contexts.size, supplier.canceled_contexts.size
+    assert_eventually do
+      assert_equal waiting_contexts.size, (supplier.canceled_contexts || []).size
+    end
     waiting_contexts.each { |w| assert_includes supplier.canceled_contexts, w }
   end
 
