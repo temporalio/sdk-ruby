@@ -82,6 +82,42 @@ module Worker
       scheduler_thread&.stop
     end
 
+    def test_thread_blocking_fiber_settles_before_wait_condition_resolution
+      scheduler = new_scheduler
+      scheduler_thread = SchedulerThread.new(scheduler)
+      mutex, release_mutex = held_mutex
+      events = Queue.new
+
+      scheduler_thread.call do
+        scheduler.fiber do
+          ProtobufSchedulerMutexWait.synchronize(mutex) { events << :protobuf_unblocked }
+        end
+        scheduler.fiber do
+          scheduler.wait_condition(cancellation: nil) { true }
+          events << :wait_condition_resumed
+        end
+      end
+
+      drain_result = scheduler_thread.async_call do
+        scheduler.run_until_all_yielded
+      end
+      assert_thread_blocking_fiber_count(scheduler, 1)
+      assert_empty drain_queue(events)
+      assert_empty drain_result
+
+      blocked_fiber = thread_blocking_fibers(scheduler).first
+      release_mutex.call
+      scheduler.unblock(mutex, blocked_fiber)
+      scheduler_thread.wait_result(drain_result)
+
+      assert_equal %i[protobuf_unblocked wait_condition_resumed], drain_queue(events)
+      assert_thread_blocking_fiber_count(scheduler, 0)
+    ensure
+      release_mutex&.call
+      unblock_thread_blocking_fibers(scheduler) if scheduler
+      scheduler_thread&.stop
+    end
+
     class SchedulerThread
       def initialize(scheduler)
         @scheduler = scheduler
@@ -188,6 +224,12 @@ module Worker
 
     def unblock_thread_blocking_fibers(scheduler)
       thread_blocking_fibers(scheduler).each { |fiber| scheduler.unblock(nil, fiber) }
+    end
+
+    def drain_queue(queue)
+      values = []
+      values << queue.pop(true) until queue.empty?
+      values
     end
   end
 end
