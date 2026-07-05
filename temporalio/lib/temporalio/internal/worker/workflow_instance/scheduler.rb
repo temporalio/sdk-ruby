@@ -3,6 +3,7 @@
 require 'temporalio'
 require 'temporalio/cancellation'
 require 'temporalio/error'
+require 'temporalio/internal/google_protobuf'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/workflow'
 require 'timeout'
@@ -19,6 +20,10 @@ module Temporalio
             @ready = []
             @wait_conditions = {}
             @wait_condition_counter = 0
+            @thread_blocking_fibers = {}
+            @thread_blocking_mutex = Mutex.new
+            @thread_blocking_condition = ConditionVariable.new
+            @workflow_thread = nil
           end
 
           def context
@@ -26,11 +31,16 @@ module Temporalio
           end
 
           def run_until_all_yielded
+            @workflow_thread = Thread.current
             loop do
               # Run all fibers until all yielded
               while (fiber = @ready.shift)
                 fiber.resume
               end
+
+              # Thread-blocking fibers are not durable workflow yields. Wait for them to unblock before satisfying any
+              # wait condition so the condition sees the workflow after all runnable work has settled.
+              next if wait_for_thread_blocking_fiber
 
               # Find the _first_ resolvable wait condition and if there, resolve it, and loop again, otherwise return.
               # It is important that we both let fibers get all settled _before_ this and only allow a _single_ wait
@@ -55,6 +65,8 @@ module Temporalio
 
               cond_fiber.resume(cond_result)
             end
+          ensure
+            @workflow_thread = nil
           end
 
           def wait_condition(cancellation:, &block)
@@ -110,8 +122,25 @@ module Temporalio
           # work inside of workflows. So we only implement the bare minimum.
           ###
 
-          def block(_blocker, timeout = nil)
+          def block(blocker, timeout = nil)
             # TODO(cretz): Make the blocker visible in the stack trace?
+
+            # Protobuf's object cache uses a process-local Mutex. We allowlist that Mutex use, but it is not a durable
+            # workflow yield: if it blocks the only runnable workflow fiber, the workflow task must remain blocked so
+            # deadlock detection can fail it instead of completing a partial command set.
+            if timeout.nil? && thread_blocking_protobuf_mutex_wait?(blocker)
+              fiber = Fiber.current
+              synchronize_thread_blocking_fibers { @thread_blocking_fibers[fiber] = true }
+              begin
+                Fiber.yield
+                return true
+              ensure
+                synchronize_thread_blocking_fibers do
+                  @thread_blocking_fibers.delete(fiber)
+                  @thread_blocking_condition.broadcast
+                end
+              end
+            end
 
             # We just yield because unblock will resume this. We will just wrap in timeout if needed.
             if timeout
@@ -189,7 +218,49 @@ module Temporalio
           end
 
           def unblock(_blocker, fiber)
-            @ready << fiber
+            synchronize_thread_blocking_fibers do
+              @thread_blocking_fibers.delete(fiber)
+              @ready << fiber
+              @thread_blocking_condition.broadcast
+            end
+          end
+
+          private
+
+          def thread_blocking_protobuf_mutex_wait?(blocker)
+            blocker.is_a?(::Mutex) &&
+              ::Temporalio::Internal::GoogleProtobuf.in_call_stack?(caller_locations)
+          end
+
+          def wait_for_thread_blocking_fiber
+            synchronize_thread_blocking_fibers do
+              return true unless @ready.empty?
+              return false if @thread_blocking_fibers.empty?
+
+              @thread_blocking_condition.wait(@thread_blocking_mutex) while @ready.empty? &&
+                                                                            !@thread_blocking_fibers.empty?
+              true
+            end
+          end
+
+          def synchronize_thread_blocking_fibers(&)
+            if Thread.current == @workflow_thread
+              with_workflow_scheduler_disabled do
+                @thread_blocking_mutex.synchronize(&)
+              end
+            else
+              @thread_blocking_mutex.synchronize(&)
+            end
+          end
+
+          def with_workflow_scheduler_disabled
+            previous_scheduler = Fiber.scheduler
+            @instance.illegal_call_tracing_disabled do
+              Fiber.set_scheduler(nil)
+              yield
+            ensure
+              Fiber.set_scheduler(previous_scheduler)
+            end
           end
         end
       end

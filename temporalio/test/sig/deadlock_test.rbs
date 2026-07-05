@@ -1,0 +1,33 @@
+class DeadlockTest < Test
+  module SchedulerDrainProbe
+    attr_accessor self.queue: Queue?
+
+    def run_until_all_yielded: -> void
+  end
+
+  class BasicActivity < Temporalio::Activity::Definition
+    def execute: (untyped value) -> untyped
+  end
+
+  class DeadlockTimeoutOverrideExecutor < Temporalio::Worker::WorkflowExecutor::ThreadPool
+    def initialize: (Float deadlock_timeout) -> void
+  end
+
+  class DeadlockTimeoutInFutureWorkflow < Temporalio::Workflow::Definition
+    def execute: -> void
+  end
+
+  class ProtobufObjectCachePartialCommandsWorkflow < Temporalio::Workflow::Definition
+    ACTIVITY_COUNT: Integer
+    BLOCK_AFTER_ACTIVITY_COUNT: Integer
+    REACHED_PROTOBUF_CACHE: Queue
+
+    attr_accessor self.protobuf_mutex_held: bool
+
+    def execute: -> untyped
+  end
+
+  def hold_protobuf_object_cache_mutex: -> ^() -> void
+
+  def wait_for_protobuf_object_cache_mutex_waiter: -> void
+end

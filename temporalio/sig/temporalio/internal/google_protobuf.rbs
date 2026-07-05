@@ -1,0 +1,7 @@
+module Temporalio
+  module Internal
+    module GoogleProtobuf
+      def self.in_call_stack?: (Array[Thread::Backtrace::Location] | nil locations) -> bool
+    end
+  end
+end
