@@ -75,7 +75,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
       activation_completion: Object,
       encoded: T::Boolean,
       completion_complete_queue: Queue
-    ).void
+    ).returns(T::Boolean)
   end
   def handle_activation_complete(runner:, activation_completion:, encoded:, completion_complete_queue:); end
 
