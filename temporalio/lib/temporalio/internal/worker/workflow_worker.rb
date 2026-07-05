@@ -154,10 +154,12 @@ module Temporalio
                 encode_activation_completion(runner, activation_completion)
               end
             end
+            false
           else
             @state.bridge_worker.async_complete_workflow_activation(
               activation_completion.run_id, activation_completion.to_proto, completion_complete_queue
             )
+            true
           end
         end
 

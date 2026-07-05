@@ -31,6 +31,10 @@ Workflow activations containing continue-as-new suggestion reasons previously fa
 worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now 
 converted from bridge enum symbols to `Temporalio::SuggestContinueAsNewReason` integer enum values before being exposed to workflows.
 
+### Removed shutdown race in `replay_workflow`
+
+Fixed a race in `replay_workflow` where if a NDE was hit, worker shutdown could panic if it happens before async activation completion completes.
+
 ## [v1.5.0] - 2026-06-11
 
 ### Breaking Changes
