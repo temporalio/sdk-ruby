@@ -144,4 +144,9 @@ class Temporalio::Worker::WorkflowReplayer::ReplayWorker
     ).returns(Temporalio::Worker::WorkflowReplayer::ReplayResult)
   end
   def replay_workflow(history, raise_on_replay_failure: T.unsafe(nil)); end
+
+  private
+
+  sig { returns(T::Boolean) }
+  def workflow_activation_work_drained?; end
 end

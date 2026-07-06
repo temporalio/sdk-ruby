@@ -271,6 +271,8 @@ module Temporalio
 
           # Create the runner
           @runner = Internal::Worker::MultiRunner.new(workers: [self], shutdown_signals: [])
+          @pending_workflow_activations = 0
+          @pending_workflow_activation_completions = 0
         end
 
         # Replay a workflow history.
@@ -295,11 +297,12 @@ module Temporalio
               history.workflow_id, Api::History::V1::History.new(events: history.events).to_proto
             )
 
-            # Process events until workflow complete
-            until @last_workflow_remove_job
+            # Process events until workflow complete and all completions submitted to core have finished.
+            until @last_workflow_remove_job && workflow_activation_work_drained?
               event = @runner.next_event
               case event
               when Internal::Worker::MultiRunner::Event::PollSuccess
+                @pending_workflow_activations += 1
                 @workflow_worker.handle_activation(
                   runner: @runner,
                   activation: Internal::Bridge::Api::WorkflowActivation::WorkflowActivation.decode(event.bytes),
@@ -308,14 +311,17 @@ module Temporalio
               when Internal::Worker::MultiRunner::Event::WorkflowActivationDecoded
                 @workflow_worker.handle_activation(runner: @runner, activation: event.activation, decoded: true)
               when Internal::Worker::MultiRunner::Event::WorkflowActivationComplete
-                @workflow_worker.handle_activation_complete(
+                if @workflow_worker.handle_activation_complete(
                   runner: @runner,
                   activation_completion: event.activation_completion,
                   encoded: event.encoded,
                   completion_complete_queue: event.completion_complete_queue
                 )
+                  @pending_workflow_activations -= 1
+                  @pending_workflow_activation_completions += 1
+                end
               when Internal::Worker::MultiRunner::Event::WorkflowActivationCompletionComplete
-              # Ignore
+                @pending_workflow_activation_completions -= 1
               else
                 raise "Unexpected event: #{event}"
               end
@@ -364,6 +370,12 @@ module Temporalio
         # @!visibility private
         def _wait_all_complete
           # Do nothing
+        end
+
+        private
+
+        def workflow_activation_work_drained?
+          @pending_workflow_activations.zero? && @pending_workflow_activation_completions.zero?
         end
       end
     end

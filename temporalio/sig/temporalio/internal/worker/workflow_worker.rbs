@@ -43,7 +43,7 @@ module Temporalio
           activation_completion: untyped,
           encoded: bool,
           completion_complete_queue: Queue
-        ) -> void
+        ) -> bool
 
         def on_shutdown_complete: -> void
 
