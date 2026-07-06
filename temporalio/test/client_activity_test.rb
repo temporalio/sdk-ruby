@@ -24,8 +24,10 @@ class ClientActivityTest < Test
 
   class SlowActivity < Temporalio::Activity::Definition
     def execute
-      Temporalio::Activity::Context.current.heartbeat
-      sleep 0.1 until Temporalio::Activity::Context.current.cancellation.canceled?
+      until Temporalio::Activity::Context.current.cancellation.canceled?
+        Temporalio::Activity::Context.current.heartbeat
+        sleep 0.1
+      end
       raise Temporalio::Error::CanceledError, 'canceled'
     end
   end
