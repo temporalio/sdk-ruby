@@ -27,6 +27,7 @@ module Temporalio
           workflow_failure_exception_types: Array[singleton(Exception)],
           workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool?,
           unsafe_workflow_io_enabled: bool,
+          patch_activation_callback: Proc?,
           debug_mode: bool,
           ?on_eviction: (^(String run_id, untyped cache_remove_job) -> void)?,
           assert_valid_local_activity: ^(String) -> void
@@ -65,6 +66,7 @@ module Temporalio
           attr_reader workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
           attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
           attr_reader unsafe_workflow_io_enabled: bool
+          attr_reader patch_activation_callback: Proc?
           attr_reader assert_valid_local_activity: ^(String) -> void
 
           attr_writer on_eviction: ^(String run_id, untyped cache_remove_job) -> void
@@ -83,6 +85,7 @@ module Temporalio
             workflow_interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
             workflow_failure_exception_types: Array[singleton(Exception)],
             unsafe_workflow_io_enabled: bool,
+            patch_activation_callback: Proc?,
             assert_valid_local_activity: ^(String) -> void
           ) -> void
 

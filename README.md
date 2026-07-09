@@ -660,7 +660,8 @@ from workflows including:
 * `all_handlers_finished?` - Returns true when all signal and update handlers are done. Useful as
   `Temporalio::Workflow.wait_condition { Temporalio::Workflow.all_handlers_finished? }` for making sure not to return
   from the primary workflow method until all handlers are done.
-* `patched` and `deprecate_patch` - Support for patch-based versioning inside the workflow.
+* `patched` and `deprecate_patch` - Support for patch-based versioning inside the workflow. Workers can set
+  `patch_activation_callback:` to decide whether a newly introduced patch should activate during rolling deployments.
 * `continue_as_new_suggested` - Returns true when the server recommends performing a continue as new.
 * `current_update_info` - Returns `Temporalio::Workflow::UpdateInfo` if the current code is inside an update, or nil
   otherwise.

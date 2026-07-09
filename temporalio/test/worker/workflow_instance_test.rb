@@ -51,9 +51,11 @@ module Worker
           failure_converter: data_converter.failure_converter,
           interceptors: [],
           disable_eager_activity_execution: false,
-          illegal_calls: Temporalio::Internal::Worker::WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls({}),
+          illegal_calls:
+            Temporalio::Internal::Worker::WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls({}),
           workflow_failure_exception_types: [],
           unsafe_workflow_io_enabled: false,
+          patch_activation_callback: nil,
           assert_valid_local_activity: ->(_) {}
         )
       )

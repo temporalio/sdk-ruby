@@ -36,6 +36,7 @@ class Temporalio::Worker
       workflow_payload_codec_thread_pool: T.nilable(Temporalio::Worker::ThreadPool),
       unsafe_workflow_io_enabled: T::Boolean,
       deployment_options: Temporalio::Worker::DeploymentOptions,
+      patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
       workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior,
       activity_task_poller_behavior: Temporalio::Worker::PollerBehavior,
       debug_mode: T::Boolean
@@ -70,6 +71,7 @@ class Temporalio::Worker
     workflow_payload_codec_thread_pool: T.unsafe(nil),
     unsafe_workflow_io_enabled: T.unsafe(nil),
     deployment_options: T.unsafe(nil),
+    patch_activation_callback: T.unsafe(nil),
     workflow_task_poller_behavior: T.unsafe(nil),
     activity_task_poller_behavior: T.unsafe(nil),
     debug_mode: T.unsafe(nil)
@@ -134,6 +136,22 @@ class Temporalio::Worker
     sig { returns(T::Hash[String, T.any(Symbol, T::Array[T.any(Symbol, IllegalWorkflowCallValidator)], IllegalWorkflowCallValidator)]) }
     def default_illegal_workflow_calls; end
   end
+end
+
+class Temporalio::Worker::PatchActivationInput < ::Data
+  extend T::Sig
+
+  sig { returns(Temporalio::Workflow::Info) }
+  def workflow_info; end
+
+  sig { returns(String) }
+  def patch_id; end
+
+  sig { params(workflow_info: Temporalio::Workflow::Info, patch_id: String).void }
+  def initialize(workflow_info:, patch_id:); end
+
+  sig { params(kwargs: T.untyped).returns(Temporalio::Worker::PatchActivationInput) }
+  def with(**kwargs); end
 end
 
 class Temporalio::Worker::Options < ::Data
@@ -219,6 +237,9 @@ class Temporalio::Worker::Options < ::Data
 
   sig { returns(T::Boolean) }
   def unsafe_workflow_io_enabled; end
+
+  sig { returns(T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean))) }
+  def patch_activation_callback; end
 
   sig { returns(Temporalio::Worker::PollerBehavior) }
   def workflow_task_poller_behavior; end

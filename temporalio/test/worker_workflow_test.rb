@@ -1626,6 +1626,64 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  class PatchActivationWorkflow < Temporalio::Workflow::Definition
+    def execute(patch_id, sleep_after_first)
+      first = Temporalio::Workflow.patched(patch_id)
+      Temporalio::Workflow.sleep(0.001) if sleep_after_first
+      second = Temporalio::Workflow.patched(patch_id)
+      [first, second]
+    end
+  end
+
+  class PatchActivationDeprecateWorkflow < Temporalio::Workflow::Definition
+    def execute(patch_id)
+      Temporalio::Workflow.deprecate_patch(patch_id)
+      Temporalio::Workflow.patched(patch_id)
+    end
+  end
+
+  class PatchActivationRolloutWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :state
+
+    def initialize
+      @releases = 0
+      @state = 'new-0'
+    end
+
+    def execute
+      Temporalio::Workflow.patched('rollout-patch')
+      Temporalio::Workflow.wait_condition { @releases >= 1 }
+      @state = 'new-1'
+      Temporalio::Workflow.patched('rollout-patch') ? 'new' : 'old'
+    end
+
+    workflow_signal
+    def release
+      @releases += 1
+    end
+  end
+
+  class PatchActivationOldRolloutWorkflow < Temporalio::Workflow::Definition
+    workflow_name :PatchActivationRolloutWorkflow
+    workflow_query_attr_reader :state
+
+    def initialize
+      @releases = 0
+      @state = 'old-0'
+    end
+
+    def execute
+      Temporalio::Workflow.wait_condition { @releases >= 1 }
+      @state = 'old-1'
+      'old'
+    end
+
+    workflow_signal
+    def release
+      @releases += 1
+    end
+  end
+
   def test_patch
     task_queue = "tq-#{SecureRandom.uuid}"
     activities = [PatchPreActivity, PatchPostActivity]
@@ -1671,6 +1729,216 @@ class WorkerWorkflowTest < Test
         env.client.workflow_handle(patched_id).query(PatchWorkflow.activity_result)
       end
       assert_includes err.message, 'Nondeterminism'
+    end
+  end
+
+  def test_patch_activation_callback
+    workflow_id = "wf-#{SecureRandom.uuid}"
+    calls = []
+    result = execute_workflow(
+      PatchActivationWorkflow,
+      :my_patch,
+      false,
+      id: workflow_id,
+      patch_activation_callback: proc do |input|
+        calls << input
+        true
+      end
+    )
+
+    assert_equal [true, true], result
+    assert_equal 1, calls.size
+    assert_equal workflow_id, calls.first.workflow_info.workflow_id
+    assert_equal 'my_patch', calls.first.patch_id
+  end
+
+  def test_patch_activation_callback_can_decline_patch
+    calls = 0
+    execute_workflow(
+      PatchActivationWorkflow,
+      'my-patch',
+      false,
+      patch_activation_callback: proc do |_input|
+        calls += 1
+        false
+      end
+    ) do |handle|
+      assert_equal [false, false], handle.result
+      assert_equal 1, calls
+      assert_empty handle.fetch_history_events.select(&:marker_recorded_event_attributes)
+    end
+  end
+
+  def test_patch_activation_default_still_activates_patch
+    execute_workflow(PatchActivationWorkflow, 'my-patch', false) do |handle|
+      assert_equal [true, true], handle.result
+      refute_empty handle.fetch_history_events.select(&:marker_recorded_event_attributes)
+    end
+  end
+
+  def test_patch_activation_callback_not_called_on_replay_or_after_memoization
+    calls = 0
+    result = execute_workflow(
+      PatchActivationWorkflow,
+      'my-patch',
+      true,
+      max_cached_workflows: 0,
+      patch_activation_callback: proc do |_input|
+        calls += 1
+        false
+      end
+    )
+
+    assert_equal [false, false], result
+    assert_equal 1, calls
+  end
+
+  def test_patch_activation_callback_not_called_for_deprecate_patch
+    result = execute_workflow(
+      PatchActivationDeprecateWorkflow,
+      'my-patch',
+      patch_activation_callback: proc { |_input| raise 'unexpected patch activation callback' }
+    )
+
+    assert_equal true, result
+  end
+
+  def test_patch_activation_callback_must_return_boolean
+    execute_workflow(
+      PatchActivationWorkflow,
+      'my-patch',
+      false,
+      patch_activation_callback: proc { |_input| }
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Patch activation callback must return true or false')
+    end
+  end
+
+  def test_patch_activation_callback_runs_in_frozen_context
+    execute_workflow(
+      PatchActivationWorkflow,
+      'make_command',
+      false,
+      patch_activation_callback: proc do |_input|
+        Temporalio::Workflow.upsert_memo({ foo: 'bar' })
+        true
+      end
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot add commands in this context')
+    end
+
+    execute_workflow(
+      PatchActivationWorkflow,
+      'fiber_schedule',
+      false,
+      patch_activation_callback: proc do |_input|
+        Fiber.schedule { 'foo' }
+        true
+      end
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot schedule fibers in this context')
+    end
+
+    execute_workflow(
+      PatchActivationWorkflow,
+      'wait_condition',
+      false,
+      patch_activation_callback: proc do |_input|
+        Temporalio::Workflow.wait_condition { true }
+        true
+      end
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot wait in this context')
+    end
+
+    execute_workflow(
+      PatchActivationWorkflow,
+      'random',
+      false,
+      patch_activation_callback: proc do |_input|
+        Temporalio::Workflow.random.rand
+        true
+      end
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot use random in this context')
+    end
+  end
+
+  def test_unactivated_patch_can_roll_out_to_old_worker
+    task_queue = "tq-#{SecureRandom.uuid}"
+    workflow_id = "wf-#{SecureRandom.uuid}"
+    callback_calls = 0
+    handle = nil
+
+    new_worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [PatchActivationRolloutWorkflow],
+      patch_activation_callback: proc do |_input|
+        callback_calls += 1
+        false
+      end
+    )
+    new_worker.run do
+      started_handle = env.client.start_workflow(PatchActivationRolloutWorkflow, id: workflow_id, task_queue:)
+      handle = started_handle
+      assert_eventually { assert_equal 1, callback_calls }
+      assert_equal 'new-0', started_handle.query(PatchActivationRolloutWorkflow.state)
+    end
+
+    raise unless handle
+
+    workflow_handle = handle #: Temporalio::Client::WorkflowHandle
+    old_worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [PatchActivationOldRolloutWorkflow]
+    )
+    old_worker.run do
+      workflow_handle.signal(PatchActivationOldRolloutWorkflow.release)
+      assert_equal 'old', workflow_handle.result
+    end
+  end
+
+  def test_activated_patch_replays_on_unactivated_new_worker
+    task_queue = "tq-#{SecureRandom.uuid}"
+    workflow_id = "wf-#{SecureRandom.uuid}"
+    activated_calls = 0
+    unactivated_calls = 0
+    handle = nil
+
+    activated_worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [PatchActivationRolloutWorkflow],
+      patch_activation_callback: proc do |_input|
+        activated_calls += 1
+        true
+      end
+    )
+    activated_worker.run do
+      started_handle = env.client.start_workflow(PatchActivationRolloutWorkflow, id: workflow_id, task_queue:)
+      handle = started_handle
+      assert_eventually { assert_equal 1, activated_calls }
+      assert_equal 'new-0', started_handle.query(PatchActivationRolloutWorkflow.state)
+    end
+
+    raise unless handle
+
+    workflow_handle = handle #: Temporalio::Client::WorkflowHandle
+    unactivated_worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [PatchActivationRolloutWorkflow],
+      patch_activation_callback: proc do |_input|
+        unactivated_calls += 1
+        false
+      end
+    )
+    unactivated_worker.run do
+      workflow_handle.signal(PatchActivationRolloutWorkflow.release)
+      assert_equal 'new', workflow_handle.result
+      assert_equal 0, unactivated_calls
     end
   end
 
@@ -2700,7 +2968,10 @@ class WorkerWorkflowTest < Test
 
       return 'Done' if info.attempt != 1
 
-      raise Temporalio::Error::ApplicationError.new('Intentional failure', category: Temporalio::Error::ApplicationError::Category::BENIGN)
+      raise Temporalio::Error::ApplicationError.new(
+        'Intentional failure',
+        category: Temporalio::Error::ApplicationError::Category::BENIGN
+      )
     end
   end
 

@@ -248,6 +248,8 @@ module Temporalio
           end
 
           def random
+            raise Workflow::InvalidWorkflowStateError, 'Cannot use random in this context' if @instance.random_disabled
+
             @instance.random
           end
 

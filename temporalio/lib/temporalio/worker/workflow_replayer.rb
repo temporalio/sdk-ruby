@@ -264,6 +264,7 @@ module Temporalio
             workflow_failure_exception_types: options.workflow_failure_exception_types,
             workflow_payload_codec_thread_pool: options.workflow_payload_codec_thread_pool,
             unsafe_workflow_io_enabled: options.unsafe_workflow_io_enabled,
+            patch_activation_callback: nil,
             debug_mode: options.debug_mode,
             on_eviction: proc { |_, remove_job| @last_workflow_remove_job = remove_job }, # steep:ignore
             assert_valid_local_activity: ->(_) {}

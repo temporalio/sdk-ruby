@@ -39,6 +39,8 @@ module Temporalio
         attr_reader context_frozen: bool
         attr_reader assert_valid_local_activity: ^(String) -> void
         attr_reader in_query_or_validator: bool
+        attr_reader random_disabled: bool
+        attr_reader patch_activation_callback: Proc?
 
         attr_accessor io_enabled: bool
         attr_accessor current_details: String?
@@ -61,6 +63,8 @@ module Temporalio
 
         def patch: (patch_id: Symbol | String, deprecated: bool) -> bool
 
+        def patch_activated?: (String patch_id) -> bool
+
         def metric_meter: -> Temporalio::Metric::Meter
 
         def create_instance: -> Temporalio::Workflow::Definition
@@ -81,7 +85,7 @@ module Temporalio
 
         def failure_exception?: (Exception err) -> bool
 
-        def with_context_frozen: [T] (in_query_or_validator: bool) { -> T } -> T
+        def with_context_frozen: [T] (in_query_or_validator: bool, ?random_disabled: bool) { -> T } -> T
 
         def convert_handler_args: (
           payload_array: Array[untyped],
