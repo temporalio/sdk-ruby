@@ -12,11 +12,10 @@ group :development do
   gem 'googleapis-common-protos-types'
   gem 'irb'
   gem 'minitest'
-  # Have to explicitly depend on openssl for macos issue in GH CI described at
-  # https://github.com/rails/rails/issues/55886 until 3.4.8 is released
-  gem 'openssl' if RUBY_PLATFORM.include?('darwin')
-  # We are intentionally not pinning OTel versions here so that CI tests the latest. This also means that the OTel
-  # contrib library also does not require specific versions, we are relying on the compatibility rigor of OTel.
+  gem 'openssl'
+  # We are intentionally not pinning OTel versions here so that upon lockfile upgrades we test the latest. This also
+  # means that the OTel contrib library also does not require specific versions, we are relying on the compatibility
+  # rigor of OTel.
   gem 'opentelemetry-api'
   gem 'opentelemetry-sdk'
   gem 'rake'
