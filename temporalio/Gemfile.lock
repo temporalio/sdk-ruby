@@ -45,7 +45,7 @@ GEM
     csv (3.3.5)
     date (3.5.1)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
     fiber-annotation (0.2.0)
@@ -227,7 +227,7 @@ CHECKSUMS
   csv (3.3.5) sha256=6e5134ac3383ef728b7f02725d9872934f523cb40b961479f69cf3afa6c8e73f
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
-  erb (6.0.2) sha256=9fe6264d44f79422c87490a1558479bd0e7dad4dd0e317656e67ea3077b5242b
+  erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
   ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
   fiber-annotation (0.2.0) sha256=7abfadf1d119f508867d4103bf231c0354d019cc39a5738945dec2edadaf6c03
