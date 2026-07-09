@@ -100,7 +100,9 @@ module Temporalio
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
+          @context_frozen = false
           @in_query_or_validator = false
+          @random_disabled = false
           @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
             details.definition.signals,
