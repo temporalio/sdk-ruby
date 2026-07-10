@@ -1,0 +1,157 @@
+module Contrib
+  module Aws
+    class LambdaWorkerTest < Test
+      def base_options: (**untyped) -> Temporalio::Contrib::Aws::LambdaWorker::Options
+
+      def define_handler: (
+        untyped version,
+        untyped options,
+        ?env: Hash[String, String],
+        ?readable_paths: untyped,
+        ?selected_paths: Array[untyped],
+        ?events: Array[Symbol],
+        ?worker_error: Exception?,
+        ?cleanup_error: Exception?,
+        ?timer_calls_block: bool,
+        ?record_invocation_order: bool,
+        ?loaded_client_options: Hash[Symbol, untyped]
+      ) -> [^(Object event, Object context) -> void, Hash[Symbol, untyped]]
+
+      class FakeContext
+        attr_reader aws_request_id: String
+        attr_reader invoked_function_arn: String
+
+        def initialize: (
+          ?remaining_millis: Numeric,
+          ?aws_request_id: String,
+          ?invoked_function_arn: String
+        ) -> void
+
+        def get_remaining_time_in_millis: -> Numeric
+      end
+
+      class FakeLogger < Logger
+        attr_reader warnings: Array[String]
+        attr_reader errors: Array[String]
+
+        def initialize: -> void
+        def warn: (String message) -> void
+        def error: (String message) -> void
+      end
+
+      class FakeTimer
+        attr_reader cancelled: bool?
+
+        def cancel: -> void
+      end
+
+      class FakeClient
+        attr_reader closed: bool?
+
+        def close: -> void
+      end
+
+      class FakeSdkConnection
+        attr_reader closed: bool?
+
+        def _close: -> void
+      end
+
+      class FakeSdkClient
+        attr_reader connection: FakeSdkConnection
+
+        def initialize: -> void
+      end
+
+      class FakeWorker
+        attr_reader cancellation: untyped
+        attr_reader closed: bool?
+
+        def initialize: (events: Array[Symbol], ?error: Exception?) -> void
+        def run: (cancellation: untyped) -> void
+        def _close: -> void
+      end
+
+      class PluginActivity < Temporalio::Activity::Definition
+        def execute: -> void
+      end
+
+      class DeploymentOptionsCarrier
+        attr_reader deployment_options: Temporalio::Worker::DeploymentOptions
+        attr_reader identity: String?
+        attr_reader disable_eager_activity_execution: bool
+
+        def initialize: (
+          deployment_options: Temporalio::Worker::DeploymentOptions,
+          ?identity: String?,
+          ?disable_eager_activity_execution: bool
+        ) -> void
+        def with: (
+          ?deployment_options: Temporalio::Worker::DeploymentOptions,
+          ?identity: String?,
+          ?disable_eager_activity_execution: bool
+        ) -> DeploymentOptionsCarrier
+      end
+
+      class IncompleteCombinedPlugin
+        include Temporalio::Client::Plugin
+        include Temporalio::Worker::Plugin
+
+        def name: -> String
+        def configure_client: (Temporalio::Client::Options options) -> Temporalio::Client::Options
+        def connect_client: (
+          Temporalio::Client::Connection::Options options,
+          ^(Temporalio::Client::Connection::Options) -> Temporalio::Client::Connection next_call
+        ) -> Temporalio::Client::Connection
+      end
+
+      class IdentityOverridePlugin
+        include Temporalio::Client::Plugin
+
+        def name: -> String
+        def configure_client: (Temporalio::Client::Options options) -> Temporalio::Client::Options
+        def connect_client: (
+          Temporalio::Client::Connection::Options options,
+          ^(Temporalio::Client::Connection::Options) -> Temporalio::Client::Connection next_call
+        ) -> Temporalio::Client::Connection
+      end
+
+      class DeploymentOverridePlugin
+        include Temporalio::Worker::Plugin
+
+        def initialize: (Temporalio::Worker::DeploymentOptions deployment_options) -> void
+        def name: -> String
+        def configure_worker: (Temporalio::Worker::Options options) -> Temporalio::Worker::Options
+        def run_worker: (
+          Temporalio::Worker::Plugin::RunWorkerOptions options,
+          ^(Temporalio::Worker::Plugin::RunWorkerOptions) -> untyped next_call
+        ) -> untyped
+        def configure_workflow_replayer: (
+          Temporalio::Worker::WorkflowReplayer::Options options
+        ) -> Temporalio::Worker::WorkflowReplayer::Options
+        def with_workflow_replay_worker: (
+          Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+          ^(Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+        ) -> untyped
+      end
+
+      class RunFailurePlugin
+        include Temporalio::Worker::Plugin
+
+        def name: -> String
+        def configure_worker: (Temporalio::Worker::Options options) -> Temporalio::Worker::Options
+        def run_worker: (
+          Temporalio::Worker::Plugin::RunWorkerOptions options,
+          ^(Temporalio::Worker::Plugin::RunWorkerOptions) -> untyped next_call
+        ) -> untyped
+        def configure_workflow_replayer: (
+          Temporalio::Worker::WorkflowReplayer::Options options
+        ) -> Temporalio::Worker::WorkflowReplayer::Options
+        def with_workflow_replay_worker: (
+          Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+          ^(Temporalio::Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+        ) -> untyped
+      end
+    end
+  end
+end

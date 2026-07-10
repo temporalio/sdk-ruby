@@ -129,6 +129,8 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added `Temporalio::Contrib::Aws::LambdaWorker` for running a Temporal worker during a single AWS Lambda invocation,
+  including optional ADOT tracing and OTLP metrics through `LambdaWorker::OpenTelemetry::Plugin`.
 - Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
 - Added the experimental `Temporalio::Worker` `patch_activation_callback:` option, allowing workers to decide whether a first non-replay `Temporalio::Workflow.patched` call should activate a patch during rolling deployments.
 

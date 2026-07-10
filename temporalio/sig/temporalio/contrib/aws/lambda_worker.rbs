@@ -1,0 +1,136 @@
+module Temporalio
+  module Contrib
+    module Aws
+      class LambdaWorker
+        DEFAULT_ACTIVITY_SLOTS: Integer
+        DEFAULT_LOCAL_ACTIVITY_SLOTS: Integer
+        DEFAULT_WORKFLOW_SLOTS: Integer
+        DEFAULT_MAX_CACHED_WORKFLOWS: Integer
+        DEFAULT_GRACEFUL_SHUTDOWN_PERIOD: Integer
+        DEFAULT_SHUTDOWN_BUFFER: Integer
+        DEFAULT_WORKER_OPTIONS: Hash[Symbol, untyped]
+        DEFAULT_LOGGER: Logger
+
+        class Options
+          attr_reader task_queue: String?
+          attr_reader activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info]
+          attr_reader workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
+          attr_reader client_options: Hash[Symbol, untyped]
+          attr_reader worker_options: Hash[Symbol, untyped]
+          attr_reader shutdown_buffer: Numeric
+          attr_reader shutdown_hooks: Array[^() -> void]
+          attr_reader plugins: Array[Client::Plugin | Worker::Plugin]
+
+          def initialize: (
+            ?task_queue: String?,
+            ?activities: Array[Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info],
+            ?workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info],
+            ?client_options: Hash[Symbol, untyped]?,
+            ?client_connect_options: Hash[Symbol, untyped]?,
+            ?worker_options: Hash[Symbol, untyped],
+            ?shutdown_buffer: Numeric,
+            ?shutdown_hooks: Array[^() -> void],
+            ?plugins: Array[Client::Plugin | Worker::Plugin]
+          ) -> void
+
+          def client_connect_options: -> Hash[Symbol, untyped]
+          def to_h: -> Hash[Symbol, untyped]
+          def with: (**untyped) -> Options
+        end
+
+        class Definition
+          attr_reader version: WorkerDeploymentVersion
+          attr_reader options: Options
+          attr_reader client_connect_args: [String, String]
+          attr_reader client_connect_options: Hash[Symbol, untyped]
+          attr_reader client_plugins: Array[Client::Plugin]
+          attr_reader worker_plugins: Array[Worker::Plugin]
+          attr_reader deployment_options: Worker::DeploymentOptions
+          attr_reader logger: Logger
+
+          def initialize: (
+            version: WorkerDeploymentVersion,
+            options: Options,
+            client_connect_args: [String, String],
+            client_connect_options: Hash[Symbol, untyped],
+            client_plugins: Array[Client::Plugin],
+            worker_plugins: Array[Worker::Plugin],
+            deployment_options: Worker::DeploymentOptions,
+            logger: Logger
+          ) -> void
+        end
+
+        class EnforcementPlugin
+          include Worker::Plugin
+
+          def initialize: (Worker::DeploymentOptions deployment_options, String identity) -> void
+          def name: -> String
+          def configure_worker: (Worker::Options options) -> Worker::Options
+          def run_worker: (
+            Worker::Plugin::RunWorkerOptions options,
+            ^(Worker::Plugin::RunWorkerOptions) -> untyped next_call
+          ) -> untyped
+          def configure_workflow_replayer: (
+            Worker::WorkflowReplayer::Options options
+          ) -> Worker::WorkflowReplayer::Options
+          def with_workflow_replay_worker: (
+            Worker::Plugin::WithWorkflowReplayWorkerOptions options,
+            ^(Worker::Plugin::WithWorkflowReplayWorkerOptions) -> untyped next_call
+          ) -> untyped
+        end
+
+        class ConnectionIdentityPlugin
+          include Client::Plugin
+
+          def initialize: (String identity) -> void
+          def name: -> String
+          def configure_client: (Client::Options options) -> Client::Options
+          def connect_client: (
+            Client::Connection::Options options,
+            ^(Client::Connection::Options) -> Client::Connection next_call
+          ) -> Client::Connection
+        end
+
+        def self.define: (
+          WorkerDeploymentVersion version,
+          options: Options
+        ) -> ^(Object event, Object context) -> void
+
+        def self._define: (
+          WorkerDeploymentVersion version,
+          options: Options,
+          dependencies: Hash[Symbol, untyped]
+        ) -> ^(Object event, Object context) -> void
+
+        def self._immutable_copy: (untyped value) -> untyped
+
+        private
+
+        def self._materialize_options: (Options options, dependencies: Hash[Symbol, untyped]) -> Options
+        def self._materialize_client_options: (
+          Options options,
+          dependencies: Hash[Symbol, untyped]
+        ) -> [[String, String], Hash[Symbol, untyped]]
+        def self._config_path: (dependencies: Hash[Symbol, untyped]) -> String?
+        def self._partition_plugins: (
+          Array[Client::Plugin | Worker::Plugin] plugins
+        ) -> [Array[Client::Plugin], Array[Worker::Plugin]]
+        def self._validate_version!: (untyped version) -> void
+        def self._invoke: (
+          Definition definition,
+          untyped context,
+          dependencies: Hash[Symbol, untyped]
+        ) -> void
+        def self._identity_from_context: (untyped context) -> String
+        def self._work_time: (untyped context, Numeric shutdown_buffer, Logger logger) -> Float
+        def self._run_shutdown_hooks: (Array[^() -> void] hooks, Logger logger) -> void
+        def self._cleanup_worker: (untyped worker, dependencies: Hash[Symbol, untyped], logger: Logger) -> void
+        def self._cleanup_client: (untyped client, dependencies: Hash[Symbol, untyped], logger: Logger) -> void
+        def self._cancel_shutdown_timer: (untyped timer) -> void
+        def self._log_exception: (Logger logger, String message, StandardError error) -> void
+        def self._log: (Logger logger, Symbol level, untyped message) -> void
+        def self._default_dependencies: -> Hash[Symbol, untyped]
+      end
+    end
+  end
+end
