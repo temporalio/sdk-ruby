@@ -1,5 +1,12 @@
 module Temporalio
   class Worker
+    class PatchActivationInput
+      attr_reader workflow_info: Workflow::Info
+      attr_reader patch_id: String
+
+      def initialize: (workflow_info: Workflow::Info, patch_id: String) -> void
+      def with: (**Object kwargs) -> PatchActivationInput
+    end
 
     class Options
       attr_reader client: Client
@@ -32,6 +39,7 @@ module Temporalio
       attr_reader workflow_task_poller_behavior: PollerBehavior
       attr_reader activity_task_poller_behavior: PollerBehavior
       attr_reader deployment_options: Worker::DeploymentOptions
+      attr_reader patch_activation_callback: Proc?
       attr_reader debug_mode: bool
 
       def initialize: (
@@ -65,6 +73,7 @@ module Temporalio
         workflow_task_poller_behavior: PollerBehavior,
         activity_task_poller_behavior: PollerBehavior,
         deployment_options: Worker::DeploymentOptions,
+        patch_activation_callback: Proc?,
         debug_mode: bool
       ) -> void
 
@@ -128,6 +137,7 @@ module Temporalio
       ?workflow_task_poller_behavior: PollerBehavior,
       ?activity_task_poller_behavior: PollerBehavior,
       ?deployment_options: Worker::DeploymentOptions,
+      ?patch_activation_callback: Proc?,
       ?debug_mode: bool
     ) -> void
 

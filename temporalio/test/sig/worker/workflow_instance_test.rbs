@@ -1,0 +1,7 @@
+module Worker
+  class WorkflowInstanceTest < Test
+    private
+
+    def workflow_instance: -> Temporalio::Internal::Worker::WorkflowInstance
+  end
+end

@@ -20,43 +20,8 @@ module Worker
     end
 
     def test_continue_as_new_suggestion_reasons_are_visible_as_workflow_enum_ints
+      instance = workflow_instance
       data_converter = Temporalio::Converters::DataConverter.default
-      initial_activation = Temporalio::Internal::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
-        run_id: 'run-id',
-        timestamp: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
-        history_length: 1,
-        history_size_bytes: 1,
-        jobs: [
-          Temporalio::Internal::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
-            initialize_workflow: Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow.new(
-              workflow_type: 'ContinueAsNewSuggestionWorkflow',
-              workflow_id: 'workflow-id',
-              randomness_seed: 1,
-              start_time: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
-              workflow_task_timeout: Google::Protobuf::Duration.new(seconds: 10)
-            )
-          )
-        ]
-      )
-
-      instance = Temporalio::Internal::Worker::WorkflowInstance.new(
-        Temporalio::Internal::Worker::WorkflowInstance::Details.new(
-          namespace: 'namespace',
-          task_queue: 'task-queue',
-          definition: Temporalio::Workflow::Definition::Info.from_class(ContinueAsNewSuggestionWorkflow),
-          initial_activation:,
-          logger: Logger.new(nil),
-          metric_meter: Temporalio::Runtime.default.metric_meter,
-          payload_converter: data_converter.payload_converter,
-          failure_converter: data_converter.failure_converter,
-          interceptors: [],
-          disable_eager_activity_execution: false,
-          illegal_calls: Temporalio::Internal::Worker::WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls({}),
-          workflow_failure_exception_types: [],
-          unsafe_workflow_io_enabled: false,
-          assert_valid_local_activity: ->(_) {}
-        )
-      )
 
       completion = instance.activate(
         Temporalio::Internal::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
@@ -83,6 +48,69 @@ module Worker
           Temporalio::SuggestContinueAsNewReason::TOO_MANY_HISTORY_EVENTS
         ]
       ], result
+    end
+
+    def test_frozen_context_flags_are_initialized_and_restored
+      instance = workflow_instance
+
+      assert_equal false, instance.context_frozen
+      assert_equal false, instance.random_disabled
+      instance.send(:with_context_frozen, in_query_or_validator: true, random_disabled: true) do
+        assert_equal true, instance.context_frozen
+        assert_equal true, instance.random_disabled
+        instance.send(:with_context_frozen, in_query_or_validator: false, random_disabled: false) do
+          assert_equal true, instance.context_frozen
+          assert_equal false, instance.random_disabled
+        end
+        assert_equal true, instance.context_frozen
+        assert_equal true, instance.random_disabled
+      end
+      assert_equal false, instance.context_frozen
+      assert_equal false, instance.random_disabled
+    end
+
+    private
+
+    def workflow_instance
+      data_converter = Temporalio::Converters::DataConverter.default
+      initial_activation = Temporalio::Internal::Bridge::Api::WorkflowActivation::WorkflowActivation.new(
+        run_id: 'run-id',
+        timestamp: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
+        history_length: 1,
+        history_size_bytes: 1,
+        jobs: [
+          Temporalio::Internal::Bridge::Api::WorkflowActivation::WorkflowActivationJob.new(
+            initialize_workflow: Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow.new(
+              workflow_type: 'ContinueAsNewSuggestionWorkflow',
+              workflow_id: 'workflow-id',
+              randomness_seed: 1,
+              start_time: Google::Protobuf::Timestamp.new(seconds: Time.now.to_i),
+              workflow_task_timeout: Google::Protobuf::Duration.new(seconds: 10)
+            )
+          )
+        ]
+      )
+
+      Temporalio::Internal::Worker::WorkflowInstance.new(
+        Temporalio::Internal::Worker::WorkflowInstance::Details.new(
+          namespace: 'namespace',
+          task_queue: 'task-queue',
+          definition: Temporalio::Workflow::Definition::Info.from_class(ContinueAsNewSuggestionWorkflow),
+          initial_activation:,
+          logger: Logger.new(nil),
+          metric_meter: Temporalio::Runtime.default.metric_meter,
+          payload_converter: data_converter.payload_converter,
+          failure_converter: data_converter.failure_converter,
+          interceptors: [],
+          disable_eager_activity_execution: false,
+          illegal_calls:
+            Temporalio::Internal::Worker::WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls({}),
+          workflow_failure_exception_types: [],
+          unsafe_workflow_io_enabled: false,
+          patch_activation_callback: nil,
+          assert_valid_local_activity: ->(_) {}
+        )
+      )
     end
   end
 end

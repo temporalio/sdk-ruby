@@ -28,6 +28,17 @@ module Temporalio
   # {run_all} is used for a collection of workers. These can wait until a block is complete or a {Cancellation} is
   # canceled.
   class Worker
+    # Input for the experimental `patch_activation_callback:` worker option.
+    #
+    # @!attribute [r] workflow_info
+    #   @return [Workflow::Info] Information about the workflow execution calling {Workflow.patched}.
+    # @!attribute [r] patch_id
+    #   @return [String] Patch ID passed to {Workflow.patched}.
+    PatchActivationInput = Data.define(
+      :workflow_info,
+      :patch_id
+    )
+
     Options = Data.define(
       :client,
       :task_queue,
@@ -57,6 +68,7 @@ module Temporalio
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
       :deployment_options,
+      :patch_activation_callback,
       :workflow_task_poller_behavior,
       :activity_task_poller_behavior,
       :debug_mode
@@ -430,6 +442,9 @@ module Temporalio
     #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
     #   with a block for narrower enabling of IO.
     # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
+    # @param patch_activation_callback [Proc, nil] Experimental callback to decide whether the first non-replay call to
+    #   {Workflow.patched} for a patch ID should activate that patch. The callback receives a {PatchActivationInput} and
+    #   must return `true` to activate the patch or `false` to leave it inactive.
     # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
     #   polling. Defaults to a 5-poller maximum.
     # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task
@@ -466,6 +481,7 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
+      patch_activation_callback: nil,
       workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
       activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
@@ -501,6 +517,7 @@ module Temporalio
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
         deployment_options:,
+        patch_activation_callback:,
         workflow_task_poller_behavior:,
         activity_task_poller_behavior:,
         debug_mode:
@@ -569,8 +586,10 @@ module Temporalio
       )
 
       # Collect interceptors from client and params
-      @activity_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Activity)
-      @workflow_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Workflow)
+      @activity_interceptors =
+        (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Activity)
+      @workflow_interceptors =
+        (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Workflow)
 
       # Cancellation for the whole worker
       @worker_shutdown_cancellation = Cancellation.new
@@ -596,6 +615,7 @@ module Temporalio
           workflow_failure_exception_types: @options.workflow_failure_exception_types,
           workflow_payload_codec_thread_pool: @options.workflow_payload_codec_thread_pool,
           unsafe_workflow_io_enabled: @options.unsafe_workflow_io_enabled,
+          patch_activation_callback: @options.patch_activation_callback,
           debug_mode: @options.debug_mode,
           assert_valid_local_activity: ->(activity) { _assert_valid_local_activity(activity) }
         )

@@ -35,6 +35,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       workflow_payload_codec_thread_pool: T.nilable(Temporalio::Worker::ThreadPool),
       unsafe_workflow_io_enabled: T::Boolean,
+      patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
       debug_mode: T::Boolean,
       assert_valid_local_activity: T.proc.params(arg0: String).void,
       on_eviction: T.nilable(T.proc.params(arg0: String, arg1: Object).void)
@@ -55,6 +56,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
     workflow_failure_exception_types:,
     workflow_payload_codec_thread_pool:,
     unsafe_workflow_io_enabled:,
+    patch_activation_callback:,
     debug_mode:,
     assert_valid_local_activity:,
     on_eviction: T.unsafe(nil)
@@ -136,6 +138,9 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
   sig { returns(T::Boolean) }
   attr_reader :unsafe_workflow_io_enabled
 
+  sig { returns(T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean))) }
+  attr_reader :patch_activation_callback
+
   sig { returns(T.proc.params(arg0: String).void) }
   attr_reader :assert_valid_local_activity
 
@@ -157,6 +162,7 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
       workflow_interceptors: T::Array[Temporalio::Worker::Interceptor::Workflow],
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       unsafe_workflow_io_enabled: T::Boolean,
+      patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
       assert_valid_local_activity: T.proc.params(arg0: String).void
     ).void
   end
@@ -174,6 +180,7 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
     workflow_interceptors:,
     workflow_failure_exception_types:,
     unsafe_workflow_io_enabled:,
+    patch_activation_callback:,
     assert_valid_local_activity:
   ); end
 

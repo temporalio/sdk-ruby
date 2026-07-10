@@ -60,14 +60,15 @@ class WorkerWorkflowPriorityTest < Test
       result = handle.result
       raise 'child workflow failed' unless result == 'Done!'
 
-      act_actual, act_expected, act_fairness_actual, act_fairness_expected, act_weight_actual, act_weight_expected = Temporalio::Workflow.execute_activity(
-        ActivityWithPriority,
-        5,
-        'high',
-        1.5,
-        start_to_close_timeout: 5,
-        priority: Temporalio::Priority.new(priority_key: 5, fairness_key: 'high', fairness_weight: 1.5)
-      )
+      act_actual, act_expected, act_fairness_actual, act_fairness_expected, act_weight_actual, act_weight_expected =
+        Temporalio::Workflow.execute_activity(
+          ActivityWithPriority,
+          5,
+          'high',
+          1.5,
+          start_to_close_timeout: 5,
+          priority: Temporalio::Priority.new(priority_key: 5, fairness_key: 'high', fairness_weight: 1.5)
+        )
       raise "Activity expected priority #{act_expected}, got #{act_actual}" if act_actual != act_expected
       if act_fairness_actual != act_fairness_expected
         raise "Activity expected fairness_key #{act_fairness_expected}, got #{act_fairness_actual}"

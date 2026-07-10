@@ -42,6 +42,9 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
   sig { returns(T::Boolean) }
   attr_reader :unsafe_workflow_io_enabled
 
+  sig { returns(T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean))) }
+  attr_reader :patch_activation_callback
+
   sig { returns(T.proc.params(arg0: String).void) }
   attr_reader :assert_valid_local_activity
 
@@ -60,6 +63,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
       illegal_calls: T::Hash[String, Object],
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       unsafe_workflow_io_enabled: T::Boolean,
+      patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
       assert_valid_local_activity: T.proc.params(arg0: String).void
     ).void
   end
@@ -77,6 +81,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
     illegal_calls:,
     workflow_failure_exception_types:,
     unsafe_workflow_io_enabled:,
+    patch_activation_callback:,
     assert_valid_local_activity:
   ); end
 end

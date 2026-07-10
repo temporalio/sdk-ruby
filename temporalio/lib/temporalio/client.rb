@@ -142,16 +142,16 @@ module Temporalio
 
                            # Root next call
                            next_call_called = false
-                           next_call = proc do |options|
+                           next_call = proc do |call_options|
                              raise 'next_call called more than once' if next_call_called
 
                              next_call_called = true
-                             block&.call(options)
+                             block&.call(call_options)
                              base_connection
                            end
                            # Go backwards, building up new next_call invocations on plugins
-                           next_call = plugins.reverse_each.reduce(next_call) do |next_call, plugin|
-                             proc { |options| plugin.connect_client(options, next_call) }
+                           next_call = plugins.reverse_each.reduce(next_call) do |inner_next_call, plugin|
+                             proc { |call_options| plugin.connect_client(call_options, inner_next_call) }
                            end
                            # Do call
                            final_connection = next_call.call(options)

@@ -107,6 +107,12 @@ class Temporalio::Internal::Worker::WorkflowInstance
   attr_reader :in_query_or_validator
 
   sig { returns(T::Boolean) }
+  attr_reader :random_disabled
+
+  sig { returns(T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean))) }
+  attr_reader :patch_activation_callback
+
+  sig { returns(T::Boolean) }
   attr_accessor :io_enabled
 
   sig { returns(T.nilable(String)) }
@@ -138,6 +144,9 @@ class Temporalio::Internal::Worker::WorkflowInstance
 
   sig { params(patch_id: T.any(Symbol, String), deprecated: T::Boolean).returns(T::Boolean) }
   def patch(patch_id:, deprecated:); end
+
+  sig { params(patch_id: String).returns(T::Boolean) }
+  def patch_activated?(patch_id); end
 
   sig { returns(Temporalio::Metric::Meter) }
   def metric_meter; end
@@ -179,10 +188,14 @@ class Temporalio::Internal::Worker::WorkflowInstance
 
   sig do
     type_parameters(:T)
-      .params(in_query_or_validator: T::Boolean, block: T.proc.returns(T.type_parameter(:T)))
+      .params(
+        in_query_or_validator: T::Boolean,
+        random_disabled: T::Boolean,
+        block: T.proc.returns(T.type_parameter(:T))
+      )
       .returns(T.type_parameter(:T))
   end
-  def with_context_frozen(in_query_or_validator:, &block); end
+  def with_context_frozen(in_query_or_validator:, random_disabled: T.unsafe(nil), &block); end
 
   sig do
     params(

@@ -86,7 +86,9 @@ module Converters
       # Make a new converter with all default converters except json proto so
       # that binary proto takes precedent
       converter = Temporalio::Converters::PayloadConverter::Composite.new(
-        *Temporalio::Converters::PayloadConverter.default.converters.values.grep_v(Temporalio::Converters::PayloadConverter::JSONProtobuf)
+        *Temporalio::Converters::PayloadConverter.default.converters.values.grep_v(
+          Temporalio::Converters::PayloadConverter::JSONProtobuf
+        )
       )
 
       proto = Temporalio::Api::Common::V1::WorkflowExecution.new(workflow_id: 'id1')

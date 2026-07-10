@@ -344,6 +344,9 @@ module Temporalio
     # same ID and workflow are memoized. Use {deprecate_patch} when all workflows are done and will never be queried
     # again. The old code path can be removed at that time too.
     #
+    # Workers can set `patch_activation_callback:` to delay activating a newly introduced patch during rolling
+    # deployments. That callback is only used when the patch marker would otherwise be created for the first time.
+    #
     # @param patch_id [Symbol, String] Patch ID.
     # @return [Boolean] True if this should take the newer patch, false if it should take the old path.
     def self.patched(patch_id)

@@ -61,7 +61,7 @@ module Temporalio
                     :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
                     :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity,
-                    :in_query_or_validator
+                    :in_query_or_validator, :random_disabled, :patch_activation_callback
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -77,6 +77,7 @@ module Temporalio
           @scheduler = Scheduler.new(self)
           @payload_converter = details.payload_converter
           @failure_converter = details.failure_converter
+          @patch_activation_callback = details.patch_activation_callback
           @disable_eager_activity_execution = details.disable_eager_activity_execution
           @pending_activities = {} # Keyed by sequence, value is fiber to resume with proto result
           @pending_timers = {} # Keyed by sequence, value is fiber to resume with proto result
@@ -99,7 +100,9 @@ module Temporalio
           @current_history_length = 0
           @current_history_size = 0
           @replaying = false
+          @context_frozen = false
           @in_query_or_validator = false
+          @random_disabled = false
           @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
             details.definition.signals,
@@ -292,7 +295,12 @@ module Temporalio
           patch_id = patch_id.to_s
           @patches_memoized ||= {}
           @patches_memoized.fetch(patch_id) do
-            patched = !replaying || @patches_notified.include?(patch_id)
+            # Only fresh, non-replay patches can consult rollout policy; replay and deprecation must follow history.
+            patched = if deprecated || replaying || @patches_notified.include?(patch_id)
+                        !replaying || @patches_notified.include?(patch_id)
+                      else
+                        patch_activated?(patch_id)
+                      end
             @patches_memoized[patch_id] = patched
             if patched
               add_command(
@@ -303,6 +311,20 @@ module Temporalio
             end
             patched
           end
+        end
+
+        def patch_activated?(patch_id)
+          return true unless patch_activation_callback
+
+          patched = with_context_frozen(in_query_or_validator: false, random_disabled: true) do
+            patch_activation_callback.call(Temporalio::Worker::PatchActivationInput.new(
+                                             workflow_info: info,
+                                             patch_id:
+                                           ))
+          end
+          return patched if patched == true || patched == false
+
+          raise TypeError, 'Patch activation callback must return true or false'
         end
 
         def metric_meter
@@ -686,13 +708,18 @@ module Temporalio
             @definition_options.failure_exception_types&.any? { |cls| err.is_a?(cls) }
         end
 
-        def with_context_frozen(in_query_or_validator:, &)
+        def with_context_frozen(in_query_or_validator:, random_disabled: false, &)
+          previous_context_frozen = @context_frozen
+          previous_in_query_or_validator = @in_query_or_validator
+          previous_random_disabled = @random_disabled
           @context_frozen = true
           @in_query_or_validator = in_query_or_validator
+          @random_disabled = random_disabled
           yield
         ensure
-          @context_frozen = false
-          @in_query_or_validator = false
+          @context_frozen = previous_context_frozen
+          @in_query_or_validator = previous_in_query_or_validator
+          @random_disabled = previous_random_disabled
         end
 
         def convert_handler_args(payload_array:, defn:)

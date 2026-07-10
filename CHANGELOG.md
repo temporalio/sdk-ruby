@@ -22,6 +22,7 @@ to docs, or any other relevant information.
 ### Added
 
 - Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
+- Added the experimental `Temporalio::Worker` `patch_activation_callback:` option, allowing workers to decide whether a first non-replay `Temporalio::Workflow.patched` call should activate a patch during rolling deployments.
 
 ### Fixed
 
@@ -81,4 +82,3 @@ correctly receives `Temporalio::Error::WorkflowUpdateFailedError`. (#454)
 but defers dispatch to a worker until the delay elapses. Retry attempts do not re-apply the delay.
 `ScheduleToStart` and `ScheduleToClose` timeout clocks begin counting after the delay
 elapses; `StartToClose` and `Heartbeat` are unaffected. Currently experimental.
-
