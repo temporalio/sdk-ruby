@@ -39,7 +39,8 @@ class Temporalio::Worker
       patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
       workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior,
       activity_task_poller_behavior: Temporalio::Worker::PollerBehavior,
-      debug_mode: T::Boolean
+      debug_mode: T::Boolean,
+      disable_payload_error_limit: T::Boolean
     ).void
   end
   def initialize(
@@ -74,7 +75,8 @@ class Temporalio::Worker
     patch_activation_callback: T.unsafe(nil),
     workflow_task_poller_behavior: T.unsafe(nil),
     activity_task_poller_behavior: T.unsafe(nil),
-    debug_mode: T.unsafe(nil)
+    debug_mode: T.unsafe(nil),
+    disable_payload_error_limit: T.unsafe(nil)
   ); end
 
   sig { returns(String) }
