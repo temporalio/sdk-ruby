@@ -15,6 +15,8 @@ module Temporalio
           attr_accessor http_connect_proxy: HTTPConnectProxyOptions?
           attr_accessor dns_load_balancing: DnsLoadBalancingOptions?
           attr_accessor grpc_compression: GrpcCompressionOptions?
+          attr_accessor payloads_warn_size: Integer?
+          attr_accessor memo_warn_size: Integer?
 
           def initialize: (
             target_host: String,
@@ -28,7 +30,9 @@ module Temporalio
             ?keep_alive: KeepAliveOptions?,
             ?http_connect_proxy: HTTPConnectProxyOptions?,
             ?dns_load_balancing: DnsLoadBalancingOptions?,
-            ?grpc_compression: GrpcCompressionOptions?
+            ?grpc_compression: GrpcCompressionOptions?,
+            ?payloads_warn_size: Integer?,
+            ?memo_warn_size: Integer?
           ) -> void
         end
 

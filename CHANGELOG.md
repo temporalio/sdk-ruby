@@ -19,6 +19,19 @@ to docs, or any other relevant information.
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- Payload/memo size-limit enforcement (experimental) is now on by default. Workers proactively
+  validate outbound payload/memo sizes before sending: a field over the warn threshold is logged
+  (`[TMPRL1103]` at `WARN`) but still sent, while a task completion over the error limit is failed
+  retryably (`[TMPRL1103]` at `ERROR`) instead of sent. Previously these reached the server, which
+  terminated the workflow or failed the activity non-retryably; failing retryably instead lets a
+  corrected workflow or activity be redeployed and recover. Tune warn thresholds via
+  `Temporalio::Client::Connection::PayloadLimitsOptions` (passed as the connection's
+  `payload_limits:`). If you use a proxy between the worker and server that alters the size of
+  payloads (e.g. compression, encryption, external storage), it is advised that you disable size
+  enforcement by setting `disable_payload_error_limit: true` on the worker.
+
 ### Added
 
 - Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.

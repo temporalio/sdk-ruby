@@ -569,6 +569,9 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 })
                 .collect::<HashSet<_>>(),
         )
+        .disable_payload_error_limit(
+            options.member::<bool>(id!("disable_payload_error_limit"))?,
+        )
         .build()
         .map_err(|err| error!("Invalid worker options: {}", err))
 }
