@@ -65,6 +65,10 @@ module Temporalio
             attr_accessor workflow_update_callbacks(): bool
             def clear_workflow_update_callbacks: () -> void
 
+            # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
+            attr_accessor poller_autoscaling_auto_enroll(): bool
+            def clear_poller_autoscaling_auto_enroll: () -> void
+
             type init_map = {
               eager_workflow_start: bool?,
               "eager_workflow_start" => bool?,
@@ -90,6 +94,8 @@ module Temporalio
               "standalone_nexus_operation" => bool?,
               workflow_update_callbacks: bool?,
               "workflow_update_callbacks" => bool?,
+              poller_autoscaling_auto_enroll: bool?,
+              "poller_autoscaling_auto_enroll" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -107,6 +113,7 @@ module Temporalio
               | ("worker_commands" name) -> bool
               | ("standalone_nexus_operation" name) -> bool
               | ("workflow_update_callbacks" name) -> bool
+              | ("poller_autoscaling_auto_enroll" name) -> bool
 
             def []=:
                 ("eager_workflow_start" name, bool value) -> void
@@ -121,6 +128,7 @@ module Temporalio
               | ("worker_commands" name, bool value) -> void
               | ("standalone_nexus_operation" name, bool value) -> void
               | ("workflow_update_callbacks" name, bool value) -> void
+              | ("poller_autoscaling_auto_enroll" name, bool value) -> void
           end
 
           class Limits < ::Google::Protobuf::AbstractMessage

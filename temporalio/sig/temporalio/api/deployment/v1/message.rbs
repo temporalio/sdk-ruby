@@ -532,6 +532,61 @@ module Temporalio
             | ("last_checked_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
+        # ComputeStatus represents compute-related configuration and health for a Worker Deployment Version.
+        class ComputeStatus < ::Google::Protobuf::AbstractMessage
+          # ProviderValidationStatus represents the result of the most recent
+          # connectivity check between Temporal and a customer's compute provider.
+          class ProviderValidationStatus < ::Google::Protobuf::AbstractMessage
+
+            # Human-readable error message if connectivity validation failed.
+            # An empty string means validation passed.
+            attr_reader error_message(): ::String
+            attr_writer error_message(): ::String | ::Symbol
+            def clear_error_message: () -> void
+
+            # Timestamp of the last validation check.
+            attr_reader last_check_time(): ::Google::Protobuf::Timestamp?
+            attr_writer last_check_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_last_check_time?: () -> bool
+            def clear_last_check_time: () -> void
+
+            type init_map = {
+              error_message: (::String | ::Symbol)?,
+              "error_message" => (::String | ::Symbol)?,
+              last_check_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "last_check_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("error_message" name) -> ::String
+              | ("last_check_time" name) -> ::Google::Protobuf::Timestamp?
+
+            def []=:
+                ("error_message" name, (::String | ::Symbol) value) -> void
+              | ("last_check_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
+
+          # provider_validation encapsulates the health signal for validating the compute provider.
+          attr_accessor provider_validation(): ::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus?
+          def has_provider_validation?: () -> bool
+          def clear_provider_validation: () -> void
+
+          type init_map = {
+            provider_validation: (::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus | ::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus::init_map)?,
+            "provider_validation" => (::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus | ::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("provider_validation" name) -> ::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus?
+
+          def []=:
+              ("provider_validation" name, ::Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus? value) -> void
+        end
+
         # A Worker Deployment (Deployment, for short) represents all workers serving
         # a shared set of Task Queues. Typically, a Deployment represents one service or
         # application.
@@ -622,6 +677,11 @@ module Temporalio
             def has_compute_config?: () -> bool
             def clear_compute_config: () -> void
 
+            # ComputeStatus represents compute-related configuration and healthchecks.
+            attr_accessor compute_status(): ::Temporalio::Api::Deployment::V1::ComputeStatus?
+            def has_compute_status?: () -> bool
+            def clear_compute_status: () -> void
+
             type init_map = {
               version: (::String | ::Symbol)?,
               "version" => (::String | ::Symbol)?,
@@ -649,6 +709,8 @@ module Temporalio
               "last_deactivation_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               compute_config: (::Temporalio::Api::Compute::V1::ComputeConfigSummary | ::Temporalio::Api::Compute::V1::ComputeConfigSummary::init_map)?,
               "compute_config" => (::Temporalio::Api::Compute::V1::ComputeConfigSummary | ::Temporalio::Api::Compute::V1::ComputeConfigSummary::init_map)?,
+              compute_status: (::Temporalio::Api::Deployment::V1::ComputeStatus | ::Temporalio::Api::Deployment::V1::ComputeStatus::init_map)?,
+              "compute_status" => (::Temporalio::Api::Deployment::V1::ComputeStatus | ::Temporalio::Api::Deployment::V1::ComputeStatus::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -667,6 +729,7 @@ module Temporalio
               | ("last_current_time" name) -> ::Google::Protobuf::Timestamp?
               | ("last_deactivation_time" name) -> ::Google::Protobuf::Timestamp?
               | ("compute_config" name) -> ::Temporalio::Api::Compute::V1::ComputeConfigSummary?
+              | ("compute_status" name) -> ::Temporalio::Api::Deployment::V1::ComputeStatus?
 
             def []=:
                 ("version" name, (::String | ::Symbol) value) -> void
@@ -682,6 +745,7 @@ module Temporalio
               | ("last_current_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("last_deactivation_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("compute_config" name, ::Temporalio::Api::Compute::V1::ComputeConfigSummary? value) -> void
+              | ("compute_status" name, ::Temporalio::Api::Deployment::V1::ComputeStatus? value) -> void
           end
 
           # Identifies a Worker Deployment. Must be unique within the namespace.

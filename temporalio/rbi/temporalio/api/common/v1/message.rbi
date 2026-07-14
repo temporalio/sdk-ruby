@@ -1933,6 +1933,238 @@ class Temporalio::Api::Common::V1::OnConflictOptions
   end
 end
 
+# The configuration for time skipping of a workflow execution (a chain of runs including retries, cron, continue-as-new).
+# When time skipping is enabled, virtual time advances automatically whenever there is no in-flight work.
+# In-flight work includes activities, child workflows, Nexus operations, signal/cancel external workflow operations,
+# and possibly other features added in the future.
+# User timers are not classified as in-flight work and will be skipped over; the virtual clock may also skip to the
+# time point of the registered fast forward when there is no in-flight work.
+# When time is skipped, a WorkflowExecutionTimeSkippingTransitionedEvent will be
+# added to the workflow history to capture the state changes.
+#
+# For child workflows, by default, if the parent execution is skipping time, the child execution will also skip time,
+# but a parent's fast_forward won't affect its child's execution. A flag is provided to disable propagation of the
+# "enabled" flag to child workflows; regardless of that flag, a child workflow inherits the virtual time from the
+# parent execution as its start time.
+class Temporalio::Api::Common::V1::TimeSkippingConfig
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      enabled: T.nilable(T::Boolean),
+      fast_forward: T.nilable(Google::Protobuf::Duration),
+      disable_child_propagation: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    enabled: false,
+    fast_forward: nil,
+    disable_child_propagation: false
+  )
+  end
+
+  # Enables or disables time skipping for this workflow execution.
+  sig { returns(T::Boolean) }
+  def enabled
+  end
+
+  # Enables or disables time skipping for this workflow execution.
+  sig { params(value: T::Boolean).void }
+  def enabled=(value)
+  end
+
+  # Enables or disables time skipping for this workflow execution.
+  sig { void }
+  def clear_enabled
+  end
+
+  # Optionally fast-forward the current workflow execution by this duration ahead of current workflow execution time.
+# After the fast-forward completes, time skipping is disabled, and this
+# action is recorded in the WorkflowExecutionTimeSkippingTransitionedEvent. It can be re-enabled by
+# setting `enabled` to true or setting `fast_forward` again via UpdateWorkflowExecutionOptions.
+# The current workflow execution is a chain of runs (retries, cron, continue-as-new);
+# child workflows are separate executions, so this fast_forward won't affect them.
+#
+# For a given workflow execution, only one active fast-forward is allowed at a time.
+# If a new fast-forward is set via UpdateWorkflowExecutionOptions before the previous
+# one completes, the new one will override the previous one.
+# If the fast-forward duration exceeds the remaining execution timeout, time will only
+# be fast-forwarded up to the end of the execution.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def fast_forward
+  end
+
+  # Optionally fast-forward the current workflow execution by this duration ahead of current workflow execution time.
+# After the fast-forward completes, time skipping is disabled, and this
+# action is recorded in the WorkflowExecutionTimeSkippingTransitionedEvent. It can be re-enabled by
+# setting `enabled` to true or setting `fast_forward` again via UpdateWorkflowExecutionOptions.
+# The current workflow execution is a chain of runs (retries, cron, continue-as-new);
+# child workflows are separate executions, so this fast_forward won't affect them.
+#
+# For a given workflow execution, only one active fast-forward is allowed at a time.
+# If a new fast-forward is set via UpdateWorkflowExecutionOptions before the previous
+# one completes, the new one will override the previous one.
+# If the fast-forward duration exceeds the remaining execution timeout, time will only
+# be fast-forwarded up to the end of the execution.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def fast_forward=(value)
+  end
+
+  # Optionally fast-forward the current workflow execution by this duration ahead of current workflow execution time.
+# After the fast-forward completes, time skipping is disabled, and this
+# action is recorded in the WorkflowExecutionTimeSkippingTransitionedEvent. It can be re-enabled by
+# setting `enabled` to true or setting `fast_forward` again via UpdateWorkflowExecutionOptions.
+# The current workflow execution is a chain of runs (retries, cron, continue-as-new);
+# child workflows are separate executions, so this fast_forward won't affect them.
+#
+# For a given workflow execution, only one active fast-forward is allowed at a time.
+# If a new fast-forward is set via UpdateWorkflowExecutionOptions before the previous
+# one completes, the new one will override the previous one.
+# If the fast-forward duration exceeds the remaining execution timeout, time will only
+# be fast-forwarded up to the end of the execution.
+  sig { void }
+  def clear_fast_forward
+  end
+
+  # By default, child workflows inherit the "enabled" flag when they are started.
+# This flag disables that inheritance.
+  sig { returns(T::Boolean) }
+  def disable_child_propagation
+  end
+
+  # By default, child workflows inherit the "enabled" flag when they are started.
+# This flag disables that inheritance.
+  sig { params(value: T::Boolean).void }
+  def disable_child_propagation=(value)
+  end
+
+  # By default, child workflows inherit the "enabled" flag when they are started.
+# This flag disables that inheritance.
+  sig { void }
+  def clear_disable_child_propagation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::TimeSkippingConfig) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::TimeSkippingConfig).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::TimeSkippingConfig) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::TimeSkippingConfig, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The time-skipping state that needs to be propagated from a parent workflow to a child workflow,
+# or through a chain of runs.
+class Temporalio::Api::Common::V1::TimeSkippingStatePropagation
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      initial_skipped_duration: T.nilable(Google::Protobuf::Duration),
+      fast_forward_target_time: T.nilable(Google::Protobuf::Timestamp)
+    ).void
+  end
+  def initialize(
+    initial_skipped_duration: nil,
+    fast_forward_target_time: nil
+  )
+  end
+
+  # The time skipped by the previous execution that started this workflow.
+# It can happen in child workflows and a chain of runs (CaN, cron, retry).
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def initial_skipped_duration
+  end
+
+  # The time skipped by the previous execution that started this workflow.
+# It can happen in child workflows and a chain of runs (CaN, cron, retry).
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def initial_skipped_duration=(value)
+  end
+
+  # The time skipped by the previous execution that started this workflow.
+# It can happen in child workflows and a chain of runs (CaN, cron, retry).
+  sig { void }
+  def clear_initial_skipped_duration
+  end
+
+  # If there is a fast-forward action set for the previous run in a chain of runs,
+# the target time should be propagated to the next run as well.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def fast_forward_target_time
+  end
+
+  # If there is a fast-forward action set for the previous run in a chain of runs,
+# the target time should be propagated to the next run as well.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def fast_forward_target_time=(value)
+  end
+
+  # If there is a fast-forward action set for the previous run in a chain of runs,
+# the target time should be propagated to the next run as well.
+  sig { void }
+  def clear_fast_forward_target_time
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::TimeSkippingStatePropagation) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::TimeSkippingStatePropagation).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::TimeSkippingStatePropagation) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::TimeSkippingStatePropagation, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # Describes an externally stored object referenced by this payload.
 class Temporalio::Api::Common::V1::Payload::ExternalPayloadDetails
   include ::Google::Protobuf::MessageExts
