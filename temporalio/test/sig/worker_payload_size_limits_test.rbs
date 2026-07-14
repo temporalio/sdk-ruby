@@ -1,0 +1,13 @@
+class WorkerPayloadSizeLimitsTest < Test
+  PAYLOAD_ERROR_LIMIT: Integer
+
+  class LargePayloadActivity < Temporalio::Activity::Definition
+    def execute: (untyped data) -> untyped
+  end
+
+  class LargePayloadWorkflow < Temporalio::Workflow::Definition
+    def execute: (untyped activity_input_data_size, untyped workflow_output_data_size) -> untyped
+  end
+
+  def with_payload_limited_server: [T] { (Temporalio::Testing::WorkflowEnvironment server) -> T } -> T
+end
