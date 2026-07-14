@@ -44,9 +44,7 @@ class WorkerPayloadSizeLimitsTest < Test
   end
 
   def with_payload_limited_server
-    if ENV.fetch('TEMPORAL_TEST_CLIENT_TARGET_HOST', '') != ''
-      skip('Existing server may not report payload limits')
-    end
+    skip('Existing server may not report payload limits') if ENV.fetch('TEMPORAL_TEST_CLIENT_TARGET_HOST', '') != ''
     server = Temporalio::Testing::WorkflowEnvironment.start_local(
       dev_server_extra_args: [
         '--dynamic-config-value', "limit.blobSize.error=#{PAYLOAD_ERROR_LIMIT}",
