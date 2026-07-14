@@ -733,7 +733,8 @@ module Temporalio
       # @!attribute overlap
       #   @return [OverlapPolicy] Controls what happens when an action is started while another is still running.
       # @!attribute catchup_window
-      #   @return [Float] After a Temporal server is unavailable, amount of time in the past to execute missed actions.
+      #   @return [Float, nil] After a Temporal server is unavailable, amount of time in the past to execute missed
+      #     actions. If unset, this is omitted so the Temporal server applies its default (currently one year).
       # @!attribute pause_on_failure
       #   @return [Boolean] Whether to pause the schedule if an action fails or times out. Note: For workflows, this
       #     only applies after all retries have been exhausted.
@@ -752,13 +753,14 @@ module Temporalio
         # Create a schedule policy.
         #
         # @param overlap [OverlapPolicy] Controls what happens when an action is started while another is still running.
-        # @param catchup_window [Float] After a Temporal server is unavailable, amount of time in the past to execute
-        #   missed actions.
+        # @param catchup_window [Float, nil] After a Temporal server is unavailable, amount of time in the past to
+        #   execute missed actions. If unset, this is omitted so the Temporal server applies its default (currently one
+        #   year).
         # @param pause_on_failure [Boolean] Whether to pause the schedule if an action fails or times out. Note: For
         #   workflows, this only applies after all retries have been exhausted.
         def initialize(
           overlap: OverlapPolicy::SKIP,
-          catchup_window: 365 * 24 * 60 * 60.0,
+          catchup_window: nil,
           pause_on_failure: false
         )
           super

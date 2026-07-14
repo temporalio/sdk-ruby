@@ -239,14 +239,14 @@ module Temporalio
 
       class Policy
         attr_reader overlap: OverlapPolicy::enum
-        attr_reader catchup_window: duration
+        attr_reader catchup_window: duration?
         attr_reader pause_on_failure: bool
 
         def self._from_proto: (Api::Schedule::V1::SchedulePolicies raw_policies) -> Policy
 
         def initialize: (
           ?overlap: OverlapPolicy::enum,
-          ?catchup_window: duration,
+          ?catchup_window: duration?,
           ?pause_on_failure: bool
         ) -> void
 

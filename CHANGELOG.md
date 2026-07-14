@@ -26,6 +26,8 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- Schedule policies now omit an unspecified catch-up window so the Temporal Server applies its default (currently one year).
+
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
 
 Workflow activations containing continue-as-new suggestion reasons previously failed because the

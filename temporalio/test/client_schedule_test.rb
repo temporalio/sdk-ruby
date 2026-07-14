@@ -9,6 +9,15 @@ require 'test'
 class ClientScheduleTest < Test
   also_run_all_tests_in_fiber
 
+  def test_default_catchup_window_is_omitted
+    policy = Temporalio::Client::Schedule::Policy.new
+    assert_nil policy.catchup_window
+    refute policy._to_proto.has_catchup_window?
+
+    policy = Temporalio::Client::Schedule::Policy.new(catchup_window: 5 * 60.0)
+    assert_equal 5 * 60.0, policy._to_proto.catchup_window.to_f
+  end
+
   def test_basics # rubocop:disable Metrics/AbcSize
     expected_ids = []
     assert_no_schedules
@@ -133,6 +142,8 @@ class ClientScheduleTest < Test
     handle.update { Temporalio::Client::Schedule::Update.new(schedule: new_schedule) }
     desc = handle.describe
     refute_equal expected_updated_at, desc.info.last_updated_at
+    assert_nil new_schedule.policy.catchup_window
+    assert_equal 365 * 24 * 60 * 60.0, desc.schedule.policy.catchup_window
 
     # Attempt to create duplicate
     assert_raises(Temporalio::Error::ScheduleAlreadyRunningError) do
