@@ -385,6 +385,10 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::ListWorkersRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::ListWorkersResponse
+        def count_workers: (
+          Temporalio::Api::WorkflowService::V1::CountWorkersRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::CountWorkersResponse
         def update_task_queue_config: (
           Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest request,
           ?rpc_options: RPCOptions?

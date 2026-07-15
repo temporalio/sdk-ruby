@@ -1018,6 +1018,69 @@ class Temporalio::Api::Deployment::V1::VersionDrainageInfo
   end
 end
 
+# ComputeStatus represents compute-related configuration and health for a Worker Deployment Version.
+class Temporalio::Api::Deployment::V1::ComputeStatus
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      provider_validation: T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus)
+    ).void
+  end
+  def initialize(
+    provider_validation: nil
+  )
+  end
+
+  # provider_validation encapsulates the health signal for validating the compute provider.
+  sig { returns(T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus)) }
+  def provider_validation
+  end
+
+  # provider_validation encapsulates the health signal for validating the compute provider.
+  sig { params(value: T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus)).void }
+  def provider_validation=(value)
+  end
+
+  # provider_validation encapsulates the health signal for validating the compute provider.
+  sig { void }
+  def clear_provider_validation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Deployment::V1::ComputeStatus) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Deployment::V1::ComputeStatus).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Deployment::V1::ComputeStatus) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Deployment::V1::ComputeStatus, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # A Worker Deployment (Deployment, for short) represents all workers serving
 # a shared set of Task Queues. Typically, a Deployment represents one service or
 # application.
@@ -1894,6 +1957,90 @@ class Temporalio::Api::Deployment::V1::WorkerDeploymentVersionInfo::VersionTaskQ
   end
 end
 
+# ProviderValidationStatus represents the result of the most recent
+# connectivity check between Temporal and a customer's compute provider.
+class Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      error_message: T.nilable(String),
+      last_check_time: T.nilable(Google::Protobuf::Timestamp)
+    ).void
+  end
+  def initialize(
+    error_message: "",
+    last_check_time: nil
+  )
+  end
+
+  # Human-readable error message if connectivity validation failed.
+# An empty string means validation passed.
+  sig { returns(String) }
+  def error_message
+  end
+
+  # Human-readable error message if connectivity validation failed.
+# An empty string means validation passed.
+  sig { params(value: String).void }
+  def error_message=(value)
+  end
+
+  # Human-readable error message if connectivity validation failed.
+# An empty string means validation passed.
+  sig { void }
+  def clear_error_message
+  end
+
+  # Timestamp of the last validation check.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def last_check_time
+  end
+
+  # Timestamp of the last validation check.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def last_check_time=(value)
+  end
+
+  # Timestamp of the last validation check.
+  sig { void }
+  def clear_last_check_time
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Deployment::V1::ComputeStatus::ProviderValidationStatus, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Deployment::V1::WorkerDeploymentInfo::WorkerDeploymentVersionSummary
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -1912,7 +2059,8 @@ class Temporalio::Api::Deployment::V1::WorkerDeploymentInfo::WorkerDeploymentVer
       first_activation_time: T.nilable(Google::Protobuf::Timestamp),
       last_current_time: T.nilable(Google::Protobuf::Timestamp),
       last_deactivation_time: T.nilable(Google::Protobuf::Timestamp),
-      compute_config: T.nilable(Temporalio::Api::Compute::V1::ComputeConfigSummary)
+      compute_config: T.nilable(Temporalio::Api::Compute::V1::ComputeConfigSummary),
+      compute_status: T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus)
     ).void
   end
   def initialize(
@@ -1928,7 +2076,8 @@ class Temporalio::Api::Deployment::V1::WorkerDeploymentInfo::WorkerDeploymentVer
     first_activation_time: nil,
     last_current_time: nil,
     last_deactivation_time: nil,
-    compute_config: nil
+    compute_config: nil,
+    compute_status: nil
   )
   end
 
@@ -2140,6 +2289,21 @@ class Temporalio::Api::Deployment::V1::WorkerDeploymentInfo::WorkerDeploymentVer
 
   sig { void }
   def clear_compute_config
+  end
+
+  # ComputeStatus represents compute-related configuration and healthchecks.
+  sig { returns(T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus)) }
+  def compute_status
+  end
+
+  # ComputeStatus represents compute-related configuration and healthchecks.
+  sig { params(value: T.nilable(Temporalio::Api::Deployment::V1::ComputeStatus)).void }
+  def compute_status=(value)
+  end
+
+  # ComputeStatus represents compute-related configuration and healthchecks.
+  sig { void }
+  def clear_compute_status
   end
 
   sig { params(field: String).returns(T.untyped) }

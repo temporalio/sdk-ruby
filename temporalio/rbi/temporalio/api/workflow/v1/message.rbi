@@ -3465,7 +3465,7 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
     params(
       versioning_override: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)
     ).void
   end
   def initialize(
@@ -3505,23 +3505,41 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
   def clear_priority
   end
 
-  # Time-skipping configuration for this workflow execution.
-# If not set, the time-skipping configuration is not updated by this request;
-# the existing configuration is preserved.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  # The time-skipping configuration for this workflow execution.
+# When `fast_forward` is set, time will be fast-forwarded to a future point relative
+# to the current workflow timestamp. Each call takes effect, even if
+# `fast_forward` is set to the same duration, since the target time is recalculated
+# from the current timestamp on every call.
+#
+# This field must be updated as a whole; updating individual sub-fields is not supported.
+# When setting the update mask in `UpdateWorkflowExecutionOptionsRequest`,
+# `BatchOperationUpdateWorkflowExecutionOptions`, etc., use a mask that covers the entire field.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
-  # Time-skipping configuration for this workflow execution.
-# If not set, the time-skipping configuration is not updated by this request;
-# the existing configuration is preserved.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  # The time-skipping configuration for this workflow execution.
+# When `fast_forward` is set, time will be fast-forwarded to a future point relative
+# to the current workflow timestamp. Each call takes effect, even if
+# `fast_forward` is set to the same duration, since the target time is recalculated
+# from the current timestamp on every call.
+#
+# This field must be updated as a whole; updating individual sub-fields is not supported.
+# When setting the update mask in `UpdateWorkflowExecutionOptionsRequest`,
+# `BatchOperationUpdateWorkflowExecutionOptions`, etc., use a mask that covers the entire field.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
-  # Time-skipping configuration for this workflow execution.
-# If not set, the time-skipping configuration is not updated by this request;
-# the existing configuration is preserved.
+  # The time-skipping configuration for this workflow execution.
+# When `fast_forward` is set, time will be fast-forwarded to a future point relative
+# to the current workflow timestamp. Each call takes effect, even if
+# `fast_forward` is set to the same duration, since the target time is recalculated
+# from the current timestamp on every call.
+#
+# This field must be updated as a whole; updating individual sub-fields is not supported.
+# When setting the update mask in `UpdateWorkflowExecutionOptionsRequest`,
+# `BatchOperationUpdateWorkflowExecutionOptions`, etc., use a mask that covers the entire field.
   sig { void }
   def clear_time_skipping_config
   end
@@ -3559,129 +3577,6 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
   end
 end
 
-# Configuration for time skipping during a workflow execution.
-# When enabled, virtual time advances automatically whenever there is no in-flight work.
-# In-flight work includes activities, child workflows, Nexus operations, signal/cancel external workflow operations,
-# and possibly other features added in the future.
-# User timers are not classified as in-flight work and will be skipped over.
-# When time advances, it skips to the earlier of the next user timer or the configured bound, if either exists.
-#
-# Propagation behavior of time skipping:
-# The enabled flag, bound fields, and accumulated skipped duration are propagated to related executions as follows:
-# (1) Child workflows and continue-as-new: both the configuration and the accumulated skipped duration are
-#     inherited from the current execution. The configured bound is shared between the inherited skipped
-#     duration and any additional duration skipped by the new run.
-# (2) Retry and cron: the configuration and accumulated skipped duration are inherited as recorded when the
-#     current workflow started; the accumulated skipped duration of the current run is not propagated.
-# (3) Reset: the new run retains the time-skipping configuration of the current execution. Because reset replays
-#     all events up to the reset point and re-applies any UpdateWorkflowExecutionOptions changes made after that
-#     point, the resulting run ends up with the same final time-skipping configuration as the previous run.
-class Temporalio::Api::Workflow::V1::TimeSkippingConfig
-  include ::Google::Protobuf::MessageExts
-  extend ::Google::Protobuf::MessageExts::ClassMethods
-
-  sig do
-    params(
-      enabled: T.nilable(T::Boolean),
-      max_skipped_duration: T.nilable(Google::Protobuf::Duration),
-      max_elapsed_duration: T.nilable(Google::Protobuf::Duration)
-    ).void
-  end
-  def initialize(
-    enabled: false,
-    max_skipped_duration: nil,
-    max_elapsed_duration: nil
-  )
-  end
-
-  # Enables or disables time skipping for this workflow execution.
-  sig { returns(T::Boolean) }
-  def enabled
-  end
-
-  # Enables or disables time skipping for this workflow execution.
-  sig { params(value: T::Boolean).void }
-  def enabled=(value)
-  end
-
-  # Enables or disables time skipping for this workflow execution.
-  sig { void }
-  def clear_enabled
-  end
-
-  # Maximum total virtual time that can be skipped.
-  sig { returns(T.nilable(Google::Protobuf::Duration)) }
-  def max_skipped_duration
-  end
-
-  # Maximum total virtual time that can be skipped.
-  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
-  def max_skipped_duration=(value)
-  end
-
-  # Maximum total virtual time that can be skipped.
-  sig { void }
-  def clear_max_skipped_duration
-  end
-
-  # Maximum elapsed time since time skipping was enabled.
-# This includes both skipped time and real time elapsing.
-# (-- api-linter: core::0142::time-field-names=disabled --)
-  sig { returns(T.nilable(Google::Protobuf::Duration)) }
-  def max_elapsed_duration
-  end
-
-  # Maximum elapsed time since time skipping was enabled.
-# This includes both skipped time and real time elapsing.
-# (-- api-linter: core::0142::time-field-names=disabled --)
-  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
-  def max_elapsed_duration=(value)
-  end
-
-  # Maximum elapsed time since time skipping was enabled.
-# This includes both skipped time and real time elapsing.
-# (-- api-linter: core::0142::time-field-names=disabled --)
-  sig { void }
-  def clear_max_elapsed_duration
-  end
-
-  sig { returns(T.nilable(Symbol)) }
-  def bound
-  end
-
-  sig { params(field: String).returns(T.untyped) }
-  def [](field)
-  end
-
-  sig { params(field: String, value: T.untyped).void }
-  def []=(field, value)
-  end
-
-  sig { returns(T::Hash[Symbol, T.untyped]) }
-  def to_h
-  end
-
-  sig { params(str: String).returns(Temporalio::Api::Workflow::V1::TimeSkippingConfig) }
-  def self.decode(str)
-  end
-
-  sig { params(msg: Temporalio::Api::Workflow::V1::TimeSkippingConfig).returns(String) }
-  def self.encode(msg)
-  end
-
-  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Workflow::V1::TimeSkippingConfig) }
-  def self.decode_json(str, **kw)
-  end
-
-  sig { params(msg: Temporalio::Api::Workflow::V1::TimeSkippingConfig, kw: T.untyped).returns(String) }
-  def self.encode_json(msg, **kw)
-  end
-
-  sig { returns(::Google::Protobuf::Descriptor) }
-  def self.descriptor
-  end
-end
-
 # Used to override the versioning behavior (and pinned deployment version, if applicable) of a
 # specific workflow execution. If set, this override takes precedence over worker-sent values.
 # See `WorkflowExecutionInfo.VersioningInfo` for more information.
@@ -3699,6 +3594,7 @@ class Temporalio::Api::Workflow::V1::VersioningOverride
     params(
       pinned: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride),
       auto_upgrade: T.nilable(T::Boolean),
+      one_time: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride),
       behavior: T.nilable(T.any(Symbol, String, Integer)),
       deployment: T.nilable(Temporalio::Api::Deployment::V1::Deployment),
       pinned_version: T.nilable(String)
@@ -3707,23 +3603,30 @@ class Temporalio::Api::Workflow::V1::VersioningOverride
   def initialize(
     pinned: nil,
     auto_upgrade: false,
+    one_time: nil,
     behavior: :VERSIONING_BEHAVIOR_UNSPECIFIED,
     deployment: nil,
     pinned_version: ""
   )
   end
 
-  # Override the workflow to have Pinned behavior.
+  # Override the workflow to have Pinned behavior. This is a sticky override:
+# Workflow Tasks continue to route according to this override until it is
+# explicitly removed.
   sig { returns(T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride)) }
   def pinned
   end
 
-  # Override the workflow to have Pinned behavior.
+  # Override the workflow to have Pinned behavior. This is a sticky override:
+# Workflow Tasks continue to route according to this override until it is
+# explicitly removed.
   sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride)).void }
   def pinned=(value)
   end
 
-  # Override the workflow to have Pinned behavior.
+  # Override the workflow to have Pinned behavior. This is a sticky override:
+# Workflow Tasks continue to route according to this override until it is
+# explicitly removed.
   sig { void }
   def clear_pinned
   end
@@ -3741,6 +3644,36 @@ class Temporalio::Api::Workflow::V1::VersioningOverride
   # Override the workflow to have AutoUpgrade behavior.
   sig { void }
   def clear_auto_upgrade
+  end
+
+  # Override Workflow Task routing to a specific Worker Deployment Version until
+# one Workflow Task completes there. After completion, the workflow execution's
+# Versioning Behavior and Deployment Version come from the worker's completion
+# response.
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: one_time describes one-time routing semantics, not a timestamp or duration. --)
+  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride)) }
+  def one_time
+  end
+
+  # Override Workflow Task routing to a specific Worker Deployment Version until
+# one Workflow Task completes there. After completion, the workflow execution's
+# Versioning Behavior and Deployment Version come from the worker's completion
+# response.
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: one_time describes one-time routing semantics, not a timestamp or duration. --)
+  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride)).void }
+  def one_time=(value)
+  end
+
+  # Override Workflow Task routing to a specific Worker Deployment Version until
+# one Workflow Task completes there. After completion, the workflow execution's
+# Versioning Behavior and Deployment Version come from the worker's completion
+# response.
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: one_time describes one-time routing semantics, not a timestamp or duration. --)
+  sig { void }
+  def clear_one_time
   end
 
   # Required.
@@ -4772,6 +4705,87 @@ class Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride
   end
 
   sig { params(msg: Temporalio::Api::Workflow::V1::VersioningOverride::PinnedOverride, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# Routes Workflow Tasks for this execution to `target_deployment_version`
+# until a Workflow Task completes on that version, then clears the override.
+#
+# This does not force the workflow's normal Versioning Behavior to become
+# Pinned. After the Workflow Task completes on `target_deployment_version`,
+# the workflow execution's normal Versioning Behavior and Deployment Version
+# are taken from the worker's completion response.
+#
+# Example: if an execution is one-time moved from version X to version Y, and
+# version Z later becomes current:
+# - if worker Y reports Pinned, the execution stays on Y;
+# - if worker Y reports AutoUpgrade, the execution routes to Z on a future
+#   Workflow Task;
+# - if worker Y reports Pinned and the workflow uses upgrade-on-continue-as-new,
+#   the current run stays on Y and the execution can route to Z after
+#   continue-as-new.
+#
+# If no Workflow Task completes on `target_deployment_version`, this override
+# remains pending.
+class Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      target_deployment_version: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentVersion)
+    ).void
+  end
+  def initialize(
+    target_deployment_version: nil
+  )
+  end
+
+  # Required. Worker Deployment Version to receive the one-time Workflow Task.
+  sig { returns(T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentVersion)) }
+  def target_deployment_version
+  end
+
+  # Required. Worker Deployment Version to receive the one-time Workflow Task.
+  sig { params(value: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentVersion)).void }
+  def target_deployment_version=(value)
+  end
+
+  # Required. Worker Deployment Version to receive the one-time Workflow Task.
+  sig { void }
+  def clear_target_deployment_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Workflow::V1::VersioningOverride::OneTimeOverride, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

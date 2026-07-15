@@ -621,7 +621,7 @@ module Temporalio
           def clear_eager_worker_deployment_options: () -> void
 
           # Time-skipping configuration. If not set, time skipping is disabled.
-          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
@@ -682,8 +682,8 @@ module Temporalio
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             eager_worker_deployment_options: (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             "eager_worker_deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
-            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -717,7 +717,7 @@ module Temporalio
             | ("on_conflict_options" name) -> ::Temporalio::Api::Workflow::V1::OnConflictOptions?
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
             | ("eager_worker_deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
-            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -748,7 +748,7 @@ module Temporalio
             | ("on_conflict_options" name, ::Temporalio::Api::Workflow::V1::OnConflictOptions? value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
             | ("eager_worker_deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
-            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
         end
 
         class StartWorkflowExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -3153,7 +3153,7 @@ module Temporalio
           def clear_priority: () -> void
 
           # Time-skipping configuration. If not set, time skipping is disabled.
-          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
@@ -3208,8 +3208,8 @@ module Temporalio
             "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
-            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -3240,7 +3240,7 @@ module Temporalio
             | ("links" name) -> ::Google::Protobuf::RepeatedField
             | ("versioning_override" name) -> ::Temporalio::Api::Workflow::V1::VersioningOverride?
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
-            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -3268,7 +3268,7 @@ module Temporalio
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
-            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
         end
 
         class SignalWithStartWorkflowExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -8447,18 +8447,29 @@ module Temporalio
           def has_workflow_execution_options?: () -> bool
           def clear_workflow_execution_options: () -> void
 
+          # The Workflow Execution time when the options were updated. When time skipping is
+          # enabled, this is the workflow's virtual time rather than wall-clock time.
+          attr_reader update_time(): ::Google::Protobuf::Timestamp?
+          attr_writer update_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_update_time?: () -> bool
+          def clear_update_time: () -> void
+
           type init_map = {
             workflow_execution_options: (::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions | ::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions::init_map)?,
             "workflow_execution_options" => (::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions | ::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions::init_map)?,
+            update_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "update_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
           }
 
           def initialize: (?init_map initial_value) -> void
 
           def []:
               ("workflow_execution_options" name) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions?
+            | ("update_time" name) -> ::Google::Protobuf::Timestamp?
 
           def []=:
               ("workflow_execution_options" name, ::Temporalio::Api::Workflow::V1::WorkflowExecutionOptions? value) -> void
+            | ("update_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
         # [cleanup-wv-pre-release] Pre-release deployment APIs, clean up later
@@ -10839,6 +10850,66 @@ module Temporalio
 
           def []=:
               ("worker_info" name, ::Temporalio::Api::Worker::V1::WorkerInfo? value) -> void
+        end
+
+        class CountWorkersRequest < ::Google::Protobuf::AbstractMessage
+
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          # Query to filter workers before counting.
+          # Supported filter fields are the same as in ListWorkersRequest.
+          attr_reader query(): ::String
+          attr_writer query(): ::String | ::Symbol
+          def clear_query: () -> void
+
+          # When true, the count will include system workers that are created implicitly
+          # by the server and not by the user. By default, system workers are excluded.
+          attr_accessor include_system_workers(): bool
+          def clear_include_system_workers: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            query: (::String | ::Symbol)?,
+            "query" => (::String | ::Symbol)?,
+            include_system_workers: bool?,
+            "include_system_workers" => bool?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("query" name) -> ::String
+            | ("include_system_workers" name) -> bool
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("query" name, (::String | ::Symbol) value) -> void
+            | ("include_system_workers" name, bool value) -> void
+        end
+
+        class CountWorkersResponse < ::Google::Protobuf::AbstractMessage
+
+          # Number of workers matching the query.
+          attr_reader count(): ::Integer
+          attr_writer count(): ::Integer | ::Float
+          def clear_count: () -> void
+
+          type init_map = {
+            count: (::Integer | ::Float)?,
+            "count" => (::Integer | ::Float)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("count" name) -> ::Integer
+
+          def []=:
+              ("count" name, (::Integer | ::Float) value) -> void
         end
 
         # Request to pause a workflow execution.

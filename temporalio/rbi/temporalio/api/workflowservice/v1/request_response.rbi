@@ -1105,7 +1105,7 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
       on_conflict_options: T.nilable(Temporalio::Api::Workflow::V1::OnConflictOptions),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       eager_worker_deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)
     ).void
   end
   def initialize(
@@ -1604,12 +1604,12 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   end
 
   # Time-skipping configuration. If not set, time skipping is disabled.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
   # Time-skipping configuration. If not set, time skipping is disabled.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
@@ -6791,7 +6791,7 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequ
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
       versioning_override: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)
     ).void
   end
   def initialize(
@@ -7224,12 +7224,12 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequ
   end
 
   # Time-skipping configuration. If not set, time skipping is disabled.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
   # Time-skipping configuration. If not set, time skipping is disabled.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
@@ -18438,11 +18438,13 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRespon
 
   sig do
     params(
-      workflow_execution_options: T.nilable(Temporalio::Api::Workflow::V1::WorkflowExecutionOptions)
+      workflow_execution_options: T.nilable(Temporalio::Api::Workflow::V1::WorkflowExecutionOptions),
+      update_time: T.nilable(Google::Protobuf::Timestamp)
     ).void
   end
   def initialize(
-    workflow_execution_options: nil
+    workflow_execution_options: nil,
+    update_time: nil
   )
   end
 
@@ -18459,6 +18461,24 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRespon
   # Workflow Execution options after update.
   sig { void }
   def clear_workflow_execution_options
+  end
+
+  # The Workflow Execution time when the options were updated. When time skipping is
+# enabled, this is the workflow's virtual time rather than wall-clock time.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def update_time
+  end
+
+  # The Workflow Execution time when the options were updated. When time skipping is
+# enabled, this is the workflow's virtual time rather than wall-clock time.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def update_time=(value)
+  end
+
+  # The Workflow Execution time when the options were updated. When time skipping is
+# enabled, this is the workflow's virtual time rather than wall-clock time.
+  sig { void }
+  def clear_update_time
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -24083,6 +24103,167 @@ class Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse
   end
 
   sig { params(msg: Temporalio::Api::WorkflowService::V1::DescribeWorkerResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::WorkflowService::V1::CountWorkersRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      query: T.nilable(String),
+      include_system_workers: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    query: "",
+    include_system_workers: false
+  )
+  end
+
+  sig { returns(String) }
+  def namespace
+  end
+
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  sig { void }
+  def clear_namespace
+  end
+
+  # Query to filter workers before counting.
+# Supported filter fields are the same as in ListWorkersRequest.
+  sig { returns(String) }
+  def query
+  end
+
+  # Query to filter workers before counting.
+# Supported filter fields are the same as in ListWorkersRequest.
+  sig { params(value: String).void }
+  def query=(value)
+  end
+
+  # Query to filter workers before counting.
+# Supported filter fields are the same as in ListWorkersRequest.
+  sig { void }
+  def clear_query
+  end
+
+  # When true, the count will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { returns(T::Boolean) }
+  def include_system_workers
+  end
+
+  # When true, the count will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { params(value: T::Boolean).void }
+  def include_system_workers=(value)
+  end
+
+  # When true, the count will include system workers that are created implicitly
+# by the server and not by the user. By default, system workers are excluded.
+  sig { void }
+  def clear_include_system_workers
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::CountWorkersRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::CountWorkersRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::CountWorkersRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::CountWorkersRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::WorkflowService::V1::CountWorkersResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      count: T.nilable(Integer)
+    ).void
+  end
+  def initialize(
+    count: 0
+  )
+  end
+
+  # Number of workers matching the query.
+  sig { returns(Integer) }
+  def count
+  end
+
+  # Number of workers matching the query.
+  sig { params(value: Integer).void }
+  def count=(value)
+  end
+
+  # Number of workers matching the query.
+  sig { void }
+  def clear_count
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::CountWorkersResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::CountWorkersResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::CountWorkersResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::CountWorkersResponse, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

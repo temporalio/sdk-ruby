@@ -1030,6 +1030,10 @@ module Temporalio
           def has_user_metadata?: () -> bool
           def clear_user_metadata: () -> void
 
+          # Event Group Markers attached to the command by the workflow author.
+          attr_accessor event_group_markers(): ::Google::Protobuf::RepeatedField
+          def clear_event_group_markers: () -> void
+
           attr_accessor schedule_activity_task_command_attributes(): ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
           def has_schedule_activity_task_command_attributes?: () -> bool
           def clear_schedule_activity_task_command_attributes: () -> void
@@ -1109,6 +1113,8 @@ module Temporalio
             "command_type" => (::Temporalio::Api::Enums::V1::CommandType::names | ::Temporalio::Api::Enums::V1::CommandType::strings | ::Integer | ::Float)?,
             user_metadata: (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
             "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
+            event_group_markers: ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
+            "event_group_markers" => ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
             schedule_activity_task_command_attributes: (::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes | ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes::init_map)?,
             "schedule_activity_task_command_attributes" => (::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes | ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes::init_map)?,
             start_timer_command_attributes: (::Temporalio::Api::Command::V1::StartTimerCommandAttributes | ::Temporalio::Api::Command::V1::StartTimerCommandAttributes::init_map)?,
@@ -1150,6 +1156,7 @@ module Temporalio
           def []:
               ("command_type" name) -> (::Temporalio::Api::Enums::V1::CommandType::names | ::Integer)
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
+            | ("event_group_markers" name) -> ::Google::Protobuf::RepeatedField
             | ("schedule_activity_task_command_attributes" name) -> ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes?
             | ("start_timer_command_attributes" name) -> ::Temporalio::Api::Command::V1::StartTimerCommandAttributes?
             | ("complete_workflow_execution_command_attributes" name) -> ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes?
@@ -1171,6 +1178,7 @@ module Temporalio
           def []=:
               ("command_type" name, (::Temporalio::Api::Enums::V1::CommandType::names | ::Temporalio::Api::Enums::V1::CommandType::strings | ::Integer | ::Float) value) -> void
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
+            | ("event_group_markers" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("schedule_activity_task_command_attributes" name, ::Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes? value) -> void
             | ("start_timer_command_attributes" name, ::Temporalio::Api::Command::V1::StartTimerCommandAttributes? value) -> void
             | ("complete_workflow_execution_command_attributes" name, ::Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes? value) -> void

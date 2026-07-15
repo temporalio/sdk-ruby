@@ -2297,6 +2297,7 @@ class Temporalio::Api::Command::V1::Command
     params(
       command_type: T.nilable(T.any(Symbol, String, Integer)),
       user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
+      event_group_markers: T.nilable(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]),
       schedule_activity_task_command_attributes: T.nilable(Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes),
       start_timer_command_attributes: T.nilable(Temporalio::Api::Command::V1::StartTimerCommandAttributes),
       complete_workflow_execution_command_attributes: T.nilable(Temporalio::Api::Command::V1::CompleteWorkflowExecutionCommandAttributes),
@@ -2319,6 +2320,7 @@ class Temporalio::Api::Command::V1::Command
   def initialize(
     command_type: :COMMAND_TYPE_UNSPECIFIED,
     user_metadata: nil,
+    event_group_markers: [],
     schedule_activity_task_command_attributes: nil,
     start_timer_command_attributes: nil,
     complete_workflow_execution_command_attributes: nil,
@@ -2391,6 +2393,21 @@ class Temporalio::Api::Command::V1::Command
 #    started where the summary is used to identify the timer.
   sig { void }
   def clear_user_metadata
+  end
+
+  # Event Group Markers attached to the command by the workflow author.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]) }
+  def event_group_markers
+  end
+
+  # Event Group Markers attached to the command by the workflow author.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def event_group_markers=(value)
+  end
+
+  # Event Group Markers attached to the command by the workflow author.
+  sig { void }
+  def clear_event_group_markers
   end
 
   sig { returns(T.nilable(Temporalio::Api::Command::V1::ScheduleActivityTaskCommandAttributes)) }

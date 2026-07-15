@@ -1236,6 +1236,15 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     def list_workers(request)
     end
 
+    # CountWorkers counts the number of workers in a specific namespace.
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::CountWorkersRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::CountWorkersResponse)
+    end
+    def count_workers(request)
+    end
+
     # Updates task queue configuration.
 # For the overall queue rate limit: the rate limit set by this api overrides the worker-set rate limit,
 # which uncouples the rate limit from the worker lifecycle.
