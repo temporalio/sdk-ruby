@@ -24,6 +24,27 @@ to docs, or any other relevant information.
 - Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
 - Added the experimental `Temporalio::Worker` `patch_activation_callback:` option, allowing workers to decide whether a first non-replay `Temporalio::Workflow.patched` call should activate a patch during rolling deployments.
 
+#### Experimental FIPS builds
+
+The native extension can now be built with `TEMPORALIO_FIPS=1` to use the FIPS-mode
+`aws-lc-rs` TLS backend for gRPC and OTLP metrics. This is opt-in, source-build only.
+FIPS builds use SHA-256 rather than MD5 for the default worker build ID and warn when
+the Ruby OpenSSL runtime is not itself in FIPS mode.
+
+#### Experimental RBS and RBI signatures are included in the gem
+
+Released gems now contain the SDK's maintained RBS signatures in `sig/` and Sorbet RBI
+signatures in `rbi/`, including generated types for Temporal API messages and services.
+These type signatures are subject to change in future releases as we move towards a stronger typing story.
+
+### Changed
+
+#### gRPC transport compression defaults to gzip
+
+Client connections now use gzip transport compression by default. Pass
+`grpc_compression: Temporalio::Client::Connection::GrpcCompressionOptions::None.new` to
+`Client.connect` or `Client::Connection.new` to opt out.
+
 ### Fixed
 
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
@@ -32,9 +53,36 @@ Workflow activations containing continue-as-new suggestion reasons previously fa
 worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now 
 converted from bridge enum symbols to `Temporalio::SuggestContinueAsNewReason` integer enum values before being exposed to workflows.
 
-### Removed shutdown race in `replay_workflow`
+#### Deadlock errors from workflow futures fail the current workflow task
+
+A workflow deadlock raised inside `Temporalio::Workflow::Future` is no longer deferred until the
+future is awaited. The worker fails the current workflow task immediately, preventing commands
+created before the deadlock from being recorded as a successful partial command batch.
+
+#### Scheduler waits for the Protobuf object-cache mutex
+
+The workflow scheduler no longer yields while a workflow fiber is blocked on the
+`google-protobuf` object-cache mutex. This prevents a workflow task from completing with only part
+of a command batch when Protobuf serialization blocks.
+
+#### `replay_workflow` shutdown after nondeterminism
 
 Fixed a race in `replay_workflow` where if a NDE was hit, worker shutdown could panic if it happens before async activation completion completes.
+
+#### Core updates
+
+- Retried transport-originated gRPC `CANCELLED` errors, such as a connection closure or GOAWAY,
+  using the normal RPC retry policy while continuing not to retry application-initiated
+  cancellations.
+- Resource sampling interval for worker heartbeating now matches heartbeat interval rather than every 100ms
+- Activities with a heartbeat timeout shorter than their start-to-close timeout now still enforce
+  the start-to-close timeout while heartbeats succeed.
+- Local activity completion after workflow eviction no longer risks a Core panic or dispatching a
+  stale local activity.
+- Corrected the `worker_task_slots_used` gauge so it does not count a slot that is currently being
+  released.
+- OTLP metric export failures are now emitted through Core telemetry, making them visible through
+  the SDK logger.
 
 ## [v1.5.0] - 2026-06-11
 
