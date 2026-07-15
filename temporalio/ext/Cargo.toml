@@ -17,9 +17,9 @@ magnus = "0.8"
 parking_lot = "0.12"
 prost = { workspace = true }
 rb-sys = "0.9"
-temporalio-client = { version = "0.4.0", path = "./sdk-core/crates/client", default-features = false, features = ["envconfig"] }
-temporalio-common = { version = "0.4.0", path = "./sdk-core/crates/common", features = ["envconfig", "prometheus"] }
-temporalio-sdk-core = { version = "0.4.0", path = "./sdk-core/crates/sdk-core", default-features = false, features = ["ephemeral-server"] }
+temporalio-client = { version = "0.5.0", path = "./sdk-core/crates/client", default-features = false, features = ["envconfig"] }
+temporalio-common = { version = "0.5.0", path = "./sdk-core/crates/common", features = ["envconfig", "prometheus"] }
+temporalio-sdk-core = { version = "0.5.0", path = "./sdk-core/crates/sdk-core", default-features = false, features = ["ephemeral-server"] }
 tokio = "1.47"
 tokio-stream = "0.1"
 tokio-util = "0.7"
