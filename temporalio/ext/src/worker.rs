@@ -25,12 +25,15 @@ use magnus::{
     value::{Lazy, LazyId},
 };
 use prost::Message;
-use temporalio_common::protos::coresdk::{
-    ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
-    NexusSlotInfo, WorkflowSlotInfo,
-};
 use temporalio_common::protos::temporal::api::history::v1::History;
 use temporalio_common::protos::temporal::api::worker::v1::PluginInfo;
+use temporalio_common::protos::{
+    coresdk::{
+        ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
+        NexusSlotInfo, WorkflowSlotInfo,
+    },
+    temporal::api::enums::v1::VersioningBehavior,
+};
 use temporalio_common::{
     protos::coresdk::workflow_completion::WorkflowActivationCompletion,
     worker::{WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerTaskTypes},
@@ -487,9 +490,13 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                         if val == 0 {
                             None
                         } else {
-                            Some(val.try_into().map_err(|_| {
-                                error!("Unknown default versioning behavior: {}", val)
-                            })?)
+                            Some(
+                                VersioningBehavior::try_from(val)
+                                    .map_err(|_| {
+                                        error!("Unknown default versioning behavior: {}", val)
+                                    })?
+                                    .into(),
+                            )
                         }
                     },
                 })
