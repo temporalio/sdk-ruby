@@ -19,6 +19,8 @@ to docs, or any other relevant information.
 
 ## [Unreleased]
 
+## [v1.6.0] - 2026-07-16
+
 ### Added
 
 - Exposed `Temporalio::Workflow::ContinueAsNewError#backoff_start_interval`, to allow the new workflow to start after a delay.
