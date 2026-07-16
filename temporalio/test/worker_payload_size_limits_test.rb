@@ -66,7 +66,8 @@ class WorkerPayloadSizeLimitsTest < Test
         activities: [LargePayloadActivity],
         workflows: [LargePayloadWorkflow]
       )
-      # Core repeatedly fails the workflow task (PAYLOADS_TOO_LARGE) for the oversized result.
+      # Rather than send the oversized workflow result, core proactively fails the workflow task with a
+      # PAYLOADS_TOO_LARGE cause. The task keeps failing, so the workflow ultimately fails by execution timeout.
       worker.run do
         handle = server.client.start_workflow(
           LargePayloadWorkflow, 0, PAYLOAD_ERROR_LIMIT + 1024,
@@ -75,6 +76,14 @@ class WorkerPayloadSizeLimitsTest < Test
           execution_timeout: 3
         )
         assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+
+        # Confirm the driving cause: the worker reported a workflow task failure with PAYLOADS_TOO_LARGE.
+        # @type var events: Array[untyped]
+        events = handle.fetch_history_events.to_a
+        assert(events.any? do |event|
+          event.event_type == :EVENT_TYPE_WORKFLOW_TASK_FAILED &&
+            event.workflow_task_failed_event_attributes.cause == :WORKFLOW_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE
+        end)
       end
     end
   end
