@@ -487,6 +487,12 @@ sig { params(value: Object).void }
   def api_schedule_v1_schedule_list_entry(value); end
   
   sig { params(value: Object).void }
+  def api_sdk_v1_event_group_marker(value); end
+  
+  sig { params(value: Object).void }
+  def api_sdk_v1_event_group_marker_label(value); end
+  
+  sig { params(value: Object).void }
   def api_sdk_v1_user_metadata(value); end
   
   sig { params(value: Object).void }

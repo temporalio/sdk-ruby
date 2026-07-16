@@ -697,7 +697,8 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
       poller_autoscaling: T.nilable(T::Boolean),
       worker_commands: T.nilable(T::Boolean),
       standalone_nexus_operation: T.nilable(T::Boolean),
-      workflow_update_callbacks: T.nilable(T::Boolean)
+      workflow_update_callbacks: T.nilable(T::Boolean),
+      poller_autoscaling_auto_enroll: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -712,7 +713,8 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
     poller_autoscaling: false,
     worker_commands: false,
     standalone_nexus_operation: false,
-    workflow_update_callbacks: false
+    workflow_update_callbacks: false,
+    poller_autoscaling_auto_enroll: false
   )
   end
 
@@ -906,6 +908,21 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
   # True if the namespace supports attaching callbacks on workflow updates
   sig { void }
   def clear_workflow_update_callbacks
+  end
+
+  # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
+  sig { returns(T::Boolean) }
+  def poller_autoscaling_auto_enroll
+  end
+
+  # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
+  sig { params(value: T::Boolean).void }
+  def poller_autoscaling_auto_enroll=(value)
+  end
+
+  # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
+  sig { void }
+  def clear_poller_autoscaling_auto_enroll
   end
 
   sig { params(field: String).returns(T.untyped) }

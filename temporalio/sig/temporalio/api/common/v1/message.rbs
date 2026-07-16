@@ -1127,6 +1127,103 @@ module Temporalio
             | ("attach_completion_callbacks" name, bool value) -> void
             | ("attach_links" name, bool value) -> void
         end
+
+        # The configuration for time skipping of a workflow execution (a chain of runs including retries, cron, continue-as-new).
+        # When time skipping is enabled, virtual time advances automatically whenever there is no in-flight work.
+        # In-flight work includes activities, child workflows, Nexus operations, signal/cancel external workflow operations,
+        # and possibly other features added in the future.
+        # User timers are not classified as in-flight work and will be skipped over; the virtual clock may also skip to the
+        # time point of the registered fast forward when there is no in-flight work.
+        # When time is skipped, a WorkflowExecutionTimeSkippingTransitionedEvent will be
+        # added to the workflow history to capture the state changes.
+        # For child workflows, by default, if the parent execution is skipping time, the child execution will also skip time,
+        # but a parent's fast_forward won't affect its child's execution. A flag is provided to disable propagation of the
+        # "enabled" flag to child workflows; regardless of that flag, a child workflow inherits the virtual time from the
+        # parent execution as its start time.
+        class TimeSkippingConfig < ::Google::Protobuf::AbstractMessage
+
+          # Enables or disables time skipping for this workflow execution.
+          attr_accessor enabled(): bool
+          def clear_enabled: () -> void
+
+          # Optionally fast-forward the current workflow execution by this duration ahead of current workflow execution time.
+          # After the fast-forward completes, time skipping is disabled, and this
+          # action is recorded in the WorkflowExecutionTimeSkippingTransitionedEvent. It can be re-enabled by
+          # setting `enabled` to true or setting `fast_forward` again via UpdateWorkflowExecutionOptions.
+          # The current workflow execution is a chain of runs (retries, cron, continue-as-new);
+          # child workflows are separate executions, so this fast_forward won't affect them.
+          # For a given workflow execution, only one active fast-forward is allowed at a time.
+          # If a new fast-forward is set via UpdateWorkflowExecutionOptions before the previous
+          # one completes, the new one will override the previous one.
+          # If the fast-forward duration exceeds the remaining execution timeout, time will only
+          # be fast-forwarded up to the end of the execution.
+          attr_reader fast_forward(): ::Google::Protobuf::Duration?
+          attr_writer fast_forward(): (::Google::Protobuf::Duration | ::int)?
+          def has_fast_forward?: () -> bool
+          def clear_fast_forward: () -> void
+
+          # By default, child workflows inherit the "enabled" flag when they are started.
+          # This flag disables that inheritance.
+          attr_accessor disable_child_propagation(): bool
+          def clear_disable_child_propagation: () -> void
+
+          type init_map = {
+            enabled: bool?,
+            "enabled" => bool?,
+            fast_forward: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "fast_forward" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            disable_child_propagation: bool?,
+            "disable_child_propagation" => bool?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("enabled" name) -> bool
+            | ("fast_forward" name) -> ::Google::Protobuf::Duration?
+            | ("disable_child_propagation" name) -> bool
+
+          def []=:
+              ("enabled" name, bool value) -> void
+            | ("fast_forward" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("disable_child_propagation" name, bool value) -> void
+        end
+
+        # The time-skipping state that needs to be propagated from a parent workflow to a child workflow,
+        # or through a chain of runs.
+        class TimeSkippingStatePropagation < ::Google::Protobuf::AbstractMessage
+
+          # The time skipped by the previous execution that started this workflow.
+          # It can happen in child workflows and a chain of runs (CaN, cron, retry).
+          attr_reader initial_skipped_duration(): ::Google::Protobuf::Duration?
+          attr_writer initial_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_initial_skipped_duration?: () -> bool
+          def clear_initial_skipped_duration: () -> void
+
+          # If there is a fast-forward action set for the previous run in a chain of runs,
+          # the target time should be propagated to the next run as well.
+          attr_reader fast_forward_target_time(): ::Google::Protobuf::Timestamp?
+          attr_writer fast_forward_target_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_fast_forward_target_time?: () -> bool
+          def clear_fast_forward_target_time: () -> void
+
+          type init_map = {
+            initial_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "initial_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            fast_forward_target_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "fast_forward_target_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("initial_skipped_duration" name) -> ::Google::Protobuf::Duration?
+            | ("fast_forward_target_time" name) -> ::Google::Protobuf::Timestamp?
+
+          def []=:
+              ("initial_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("fast_forward_target_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        end
       end
     end
   end

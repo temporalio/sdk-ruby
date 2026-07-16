@@ -48,8 +48,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
       inherited_auto_upgrade_info: T.nilable(Temporalio::Api::Deployment::V1::InheritedAutoUpgradeInfo),
       eager_execution_accepted: T.nilable(T::Boolean),
       declined_target_version_upgrade: T.nilable(Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig),
-      initial_skipped_duration: T.nilable(Google::Protobuf::Duration)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
+      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)
     ).void
   end
   def initialize(
@@ -93,7 +93,7 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
     eager_execution_accepted: false,
     declined_target_version_upgrade: nil,
     time_skipping_config: nil,
-    initial_skipped_duration: nil
+    time_skipping_state_propagation: nil
   )
   end
 
@@ -928,7 +928,7 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
 #
 # The configuration may be updated after start via UpdateWorkflowExecutionOptions, which
 # will be reflected in the WorkflowExecutionOptionsUpdatedEvent.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
@@ -938,7 +938,7 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
 #
 # The configuration may be updated after start via UpdateWorkflowExecutionOptions, which
 # will be reflected in the WorkflowExecutionOptionsUpdatedEvent.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
@@ -952,22 +952,22 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
   def clear_time_skipping_config
   end
 
-  # The time skipped by the previous execution that started this workflow.
-# It can happen in cases of child workflows and continue-as-new workflows.
-  sig { returns(T.nilable(Google::Protobuf::Duration)) }
-  def initial_skipped_duration
+  # The time-skipping state propagated from a previous run of this workflow. This can be nil
+# if no time skipping has occurred or there is no previous run.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)) }
+  def time_skipping_state_propagation
   end
 
-  # The time skipped by the previous execution that started this workflow.
-# It can happen in cases of child workflows and continue-as-new workflows.
-  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
-  def initial_skipped_duration=(value)
+  # The time-skipping state propagated from a previous run of this workflow. This can be nil
+# if no time skipping has occurred or there is no previous run.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)).void }
+  def time_skipping_state_propagation=(value)
   end
 
-  # The time skipped by the previous execution that started this workflow.
-# It can happen in cases of child workflows and continue-as-new workflows.
+  # The time-skipping state propagated from a previous run of this workflow. This can be nil
+# if no time skipping has occurred or there is no previous run.
   sig { void }
-  def clear_initial_skipped_duration
+  def clear_time_skipping_state_propagation
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -5759,8 +5759,8 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       inherit_build_id: T.nilable(T::Boolean),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig),
-      initial_skipped_duration: T.nilable(Google::Protobuf::Duration)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
+      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)
     ).void
   end
   def initialize(
@@ -5785,7 +5785,7 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
     inherit_build_id: false,
     priority: nil,
     time_skipping_config: nil,
-    initial_skipped_duration: nil
+    time_skipping_state_propagation: nil
   )
   end
 
@@ -6072,12 +6072,12 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
   end
 
   # The propagated time-skipping configuration for the child workflow.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
   # The propagated time-skipping configuration for the child workflow.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
@@ -6086,19 +6086,22 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
   def clear_time_skipping_config
   end
 
-  # Propagate the duration skipped to the child workflow.
-  sig { returns(T.nilable(Google::Protobuf::Duration)) }
-  def initial_skipped_duration
+  # The time-skipping state propagated from the parent workflow. This can be nil if no time skipping
+# has occurred or there is no previous run.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)) }
+  def time_skipping_state_propagation
   end
 
-  # Propagate the duration skipped to the child workflow.
-  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
-  def initial_skipped_duration=(value)
+  # The time-skipping state propagated from the parent workflow. This can be nil if no time skipping
+# has occurred or there is no previous run.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)).void }
+  def time_skipping_state_propagation=(value)
   end
 
-  # Propagate the duration skipped to the child workflow.
+  # The time-skipping state propagated from the parent workflow. This can be nil if no time skipping
+# has occurred or there is no previous run.
   sig { void }
-  def clear_initial_skipped_duration
+  def clear_time_skipping_state_propagation
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -7231,7 +7234,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
       attached_completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
       identity: T.nilable(String),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      time_skipping_config: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig),
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
+      time_skipping_config_updated: T.nilable(T::Boolean),
       workflow_update_options: T.nilable(T::Array[T.nilable(Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate)])
     ).void
   end
@@ -7243,6 +7247,7 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
     identity: "",
     priority: nil,
     time_skipping_config: nil,
+    time_skipping_config_updated: false,
     workflow_update_options: []
   )
   end
@@ -7346,19 +7351,37 @@ class Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttribut
   def clear_priority
   end
 
-  # If set, the time-skipping configuration was changed. Contains the full updated configuration.
-  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)) }
+  # TimeSkippingConfig override upserted in this event. Represents the full config.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
-  # If set, the time-skipping configuration was changed. Contains the full updated configuration.
-  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::TimeSkippingConfig)).void }
+  # TimeSkippingConfig override upserted in this event. Represents the full config.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
-  # If set, the time-skipping configuration was changed. Contains the full updated configuration.
+  # TimeSkippingConfig override upserted in this event. Represents the full config.
   sig { void }
   def clear_time_skipping_config
+  end
+
+  # Indicates the time skipping config was updated by the recent call to update
+# workflow execution options.
+  sig { returns(T::Boolean) }
+  def time_skipping_config_updated
+  end
+
+  # Indicates the time skipping config was updated by the recent call to update
+# workflow execution options.
+  sig { params(value: T::Boolean).void }
+  def time_skipping_config_updated=(value)
+  end
+
+  # Indicates the time skipping config was updated by the recent call to update
+# workflow execution options.
+  sig { void }
+  def clear_time_skipping_config_updated
   end
 
   # Updates to workflow updates options.
@@ -8253,7 +8276,7 @@ class Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes
 end
 
 # Attributes for an event indicating that time skipping state changed for a workflow execution,
-# either time was advanced or time skipping was disabled automatically due to a bound being reached.
+# either time was advanced or time skipping was disabled automatically due to the fast_forward completing.
 # The worker_may_ignore field in HistoryEvent should always be set true for this event.
 class Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes
   include ::Google::Protobuf::MessageExts
@@ -8262,51 +8285,51 @@ class Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEve
   sig do
     params(
       target_time: T.nilable(Google::Protobuf::Timestamp),
-      disabled_after_bound: T.nilable(T::Boolean),
+      disabled_after_fast_forward: T.nilable(T::Boolean),
       wall_clock_time: T.nilable(Google::Protobuf::Timestamp)
     ).void
   end
   def initialize(
     target_time: nil,
-    disabled_after_bound: false,
+    disabled_after_fast_forward: false,
     wall_clock_time: nil
   )
   end
 
-  # The virtual time after time skipping was applied.
+  # The virtual time point that time skipping advanced to.
   sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
   def target_time
   end
 
-  # The virtual time after time skipping was applied.
+  # The virtual time point that time skipping advanced to.
   sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
   def target_time=(value)
   end
 
-  # The virtual time after time skipping was applied.
+  # The virtual time point that time skipping advanced to.
   sig { void }
   def clear_target_time
   end
 
-  # when true, time skipping was disabled automatically due to a bound being reached.
+  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { returns(T::Boolean) }
-  def disabled_after_bound
+  def disabled_after_fast_forward
   end
 
-  # when true, time skipping was disabled automatically due to a bound being reached.
+  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { params(value: T::Boolean).void }
-  def disabled_after_bound=(value)
+  def disabled_after_fast_forward=(value)
   end
 
-  # when true, time skipping was disabled automatically due to a bound being reached.
+  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { void }
-  def clear_disabled_after_bound
+  def clear_disabled_after_fast_forward
   end
 
   # The wall-clock time when the time-skipping state changed event was generated.
@@ -9481,6 +9504,7 @@ class Temporalio::Api::History::V1::HistoryEvent
       user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
       principal: T.nilable(Temporalio::Api::Common::V1::Principal),
+      event_group_markers: T.nilable(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]),
       workflow_execution_started_event_attributes: T.nilable(Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes),
       workflow_execution_completed_event_attributes: T.nilable(Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes),
       workflow_execution_failed_event_attributes: T.nilable(Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes),
@@ -9553,6 +9577,7 @@ class Temporalio::Api::History::V1::HistoryEvent
     user_metadata: nil,
     links: [],
     principal: nil,
+    event_group_markers: [],
     workflow_execution_started_event_attributes: nil,
     workflow_execution_completed_event_attributes: nil,
     workflow_execution_failed_event_attributes: nil,
@@ -9779,6 +9804,21 @@ class Temporalio::Api::History::V1::HistoryEvent
   # Server-computed authenticated caller identity associated with this event.
   sig { void }
   def clear_principal
+  end
+
+  # Event group markers attached to this event.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]) }
+  def event_group_markers
+  end
+
+  # Event group markers attached to this event.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def event_group_markers=(value)
+  end
+
+  # Event group markers attached to this event.
+  sig { void }
+  def clear_event_group_markers
   end
 
   sig { returns(T.nilable(Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes)) }

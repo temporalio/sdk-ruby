@@ -294,6 +294,9 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
   sig { params(request: Temporalio::Api::WorkflowService::V1::ListWorkersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::ListWorkersResponse) }
   def list_workers(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::WorkflowService::V1::CountWorkersRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::CountWorkersResponse) }
+  def count_workers(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigResponse) }
   def update_task_queue_config(request, rpc_options: T.unsafe(nil)); end
 

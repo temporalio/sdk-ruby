@@ -289,16 +289,15 @@ module Temporalio
           # parent/previous execution.
           # The configuration may be updated after start via UpdateWorkflowExecutionOptions, which
           # will be reflected in the WorkflowExecutionOptionsUpdatedEvent.
-          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
-          # The time skipped by the previous execution that started this workflow.
-          # It can happen in cases of child workflows and continue-as-new workflows.
-          attr_reader initial_skipped_duration(): ::Google::Protobuf::Duration?
-          attr_writer initial_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
-          def has_initial_skipped_duration?: () -> bool
-          def clear_initial_skipped_duration: () -> void
+          # The time-skipping state propagated from a previous run of this workflow. This can be nil
+          # if no time skipping has occurred or there is no previous run.
+          attr_accessor time_skipping_state_propagation(): ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
+          def has_time_skipping_state_propagation?: () -> bool
+          def clear_time_skipping_state_propagation: () -> void
 
           type init_map = {
             workflow_type: (::Temporalio::Api::Common::V1::WorkflowType | ::Temporalio::Api::Common::V1::WorkflowType::init_map)?,
@@ -379,10 +378,10 @@ module Temporalio
             "eager_execution_accepted" => bool?,
             declined_target_version_upgrade: (::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade | ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade::init_map)?,
             "declined_target_version_upgrade" => (::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade | ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade::init_map)?,
-            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            initial_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
-            "initial_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_state_propagation: (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
+            "time_skipping_state_propagation" => (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -427,8 +426,8 @@ module Temporalio
             | ("inherited_auto_upgrade_info" name) -> ::Temporalio::Api::Deployment::V1::InheritedAutoUpgradeInfo?
             | ("eager_execution_accepted" name) -> bool
             | ("declined_target_version_upgrade" name) -> ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade?
-            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
-            | ("initial_skipped_duration" name) -> ::Google::Protobuf::Duration?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
+            | ("time_skipping_state_propagation" name) -> ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
 
           def []=:
               ("workflow_type" name, ::Temporalio::Api::Common::V1::WorkflowType? value) -> void
@@ -470,8 +469,8 @@ module Temporalio
             | ("inherited_auto_upgrade_info" name, ::Temporalio::Api::Deployment::V1::InheritedAutoUpgradeInfo? value) -> void
             | ("eager_execution_accepted" name, bool value) -> void
             | ("declined_target_version_upgrade" name, ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade? value) -> void
-            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
-            | ("initial_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_state_propagation" name, ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation? value) -> void
         end
 
         # Wrapper for a target deployment version that the SDK declined to upgrade to.
@@ -2685,15 +2684,15 @@ module Temporalio
           def clear_priority: () -> void
 
           # The propagated time-skipping configuration for the child workflow.
-          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
-          # Propagate the duration skipped to the child workflow.
-          attr_reader initial_skipped_duration(): ::Google::Protobuf::Duration?
-          attr_writer initial_skipped_duration(): (::Google::Protobuf::Duration | ::int)?
-          def has_initial_skipped_duration?: () -> bool
-          def clear_initial_skipped_duration: () -> void
+          # The time-skipping state propagated from the parent workflow. This can be nil if no time skipping
+          # has occurred or there is no previous run.
+          attr_accessor time_skipping_state_propagation(): ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
+          def has_time_skipping_state_propagation?: () -> bool
+          def clear_time_skipping_state_propagation: () -> void
 
           type init_map = {
             namespace: (::String | ::Symbol)?,
@@ -2736,10 +2735,10 @@ module Temporalio
             "inherit_build_id" => bool?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
-            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            initial_skipped_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
-            "initial_skipped_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_state_propagation: (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
+            "time_skipping_state_propagation" => (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2765,8 +2764,8 @@ module Temporalio
             | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | ("inherit_build_id" name) -> bool
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
-            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
-            | ("initial_skipped_duration" name) -> ::Google::Protobuf::Duration?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
+            | ("time_skipping_state_propagation" name) -> ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -2789,8 +2788,8 @@ module Temporalio
             | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
             | ("inherit_build_id" name, bool value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
-            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
-            | ("initial_skipped_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_state_propagation" name, ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation? value) -> void
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Google::Protobuf::AbstractMessage
@@ -3372,10 +3371,15 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
-          # If set, the time-skipping configuration was changed. Contains the full updated configuration.
-          attr_accessor time_skipping_config(): ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+          # TimeSkippingConfig override upserted in this event. Represents the full config.
+          attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
+
+          # Indicates the time skipping config was updated by the recent call to update
+          # workflow execution options.
+          attr_accessor time_skipping_config_updated(): bool
+          def clear_time_skipping_config_updated: () -> void
 
           # Updates to workflow updates options.
           attr_accessor workflow_update_options(): ::Google::Protobuf::RepeatedField
@@ -3394,8 +3398,10 @@ module Temporalio
             "identity" => (::String | ::Symbol)?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
-            time_skipping_config: (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
-            "time_skipping_config" => (::Temporalio::Api::Workflow::V1::TimeSkippingConfig | ::Temporalio::Api::Workflow::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            time_skipping_config_updated: bool?,
+            "time_skipping_config_updated" => bool?,
             workflow_update_options: ::Array[::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate]?,
             "workflow_update_options" => ::Array[::Temporalio::Api::History::V1::WorkflowExecutionOptionsUpdatedEventAttributes::WorkflowUpdateOptionsUpdate]?,
           }
@@ -3409,7 +3415,8 @@ module Temporalio
             | ("attached_completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
             | ("identity" name) -> ::String
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
-            | ("time_skipping_config" name) -> ::Temporalio::Api::Workflow::V1::TimeSkippingConfig?
+            | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
+            | ("time_skipping_config_updated" name) -> bool
             | ("workflow_update_options" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
@@ -3419,7 +3426,8 @@ module Temporalio
             | ("attached_completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
-            | ("time_skipping_config" name, ::Temporalio::Api::Workflow::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
+            | ("time_skipping_config_updated" name, bool value) -> void
             | ("workflow_update_options" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
@@ -3777,21 +3785,21 @@ module Temporalio
         end
 
         # Attributes for an event indicating that time skipping state changed for a workflow execution,
-        # either time was advanced or time skipping was disabled automatically due to a bound being reached.
+        # either time was advanced or time skipping was disabled automatically due to the fast_forward completing.
         # The worker_may_ignore field in HistoryEvent should always be set true for this event.
         class WorkflowExecutionTimeSkippingTransitionedEventAttributes < ::Google::Protobuf::AbstractMessage
 
-          # The virtual time after time skipping was applied.
+          # The virtual time point that time skipping advanced to.
           attr_reader target_time(): ::Google::Protobuf::Timestamp?
           attr_writer target_time(): (::Google::Protobuf::Timestamp | ::Time)?
           def has_target_time?: () -> bool
           def clear_target_time: () -> void
 
-          # when true, time skipping was disabled automatically due to a bound being reached.
+          # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
           # (-- api-linter: core::0140::prepositions=disabled
           #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
-          attr_accessor disabled_after_bound(): bool
-          def clear_disabled_after_bound: () -> void
+          attr_accessor disabled_after_fast_forward(): bool
+          def clear_disabled_after_fast_forward: () -> void
 
           # The wall-clock time when the time-skipping state changed event was generated.
           attr_reader wall_clock_time(): ::Google::Protobuf::Timestamp?
@@ -3802,8 +3810,8 @@ module Temporalio
           type init_map = {
             target_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             "target_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
-            disabled_after_bound: bool?,
-            "disabled_after_bound" => bool?,
+            disabled_after_fast_forward: bool?,
+            "disabled_after_fast_forward" => bool?,
             wall_clock_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             "wall_clock_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
           }
@@ -3812,12 +3820,12 @@ module Temporalio
 
           def []:
               ("target_time" name) -> ::Google::Protobuf::Timestamp?
-            | ("disabled_after_bound" name) -> bool
+            | ("disabled_after_fast_forward" name) -> bool
             | ("wall_clock_time" name) -> ::Google::Protobuf::Timestamp?
 
           def []=:
               ("target_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
-            | ("disabled_after_bound" name, bool value) -> void
+            | ("disabled_after_fast_forward" name, bool value) -> void
             | ("wall_clock_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
@@ -4349,6 +4357,10 @@ module Temporalio
           def has_principal?: () -> bool
           def clear_principal: () -> void
 
+          # Event group markers attached to this event.
+          attr_accessor event_group_markers(): ::Google::Protobuf::RepeatedField
+          def clear_event_group_markers: () -> void
+
           attr_accessor workflow_execution_started_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes?
           def has_workflow_execution_started_event_attributes?: () -> bool
           def clear_workflow_execution_started_event_attributes: () -> void
@@ -4613,6 +4625,8 @@ module Temporalio
             "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
             principal: (::Temporalio::Api::Common::V1::Principal | ::Temporalio::Api::Common::V1::Principal::init_map)?,
             "principal" => (::Temporalio::Api::Common::V1::Principal | ::Temporalio::Api::Common::V1::Principal::init_map)?,
+            event_group_markers: ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
+            "event_group_markers" => ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
             workflow_execution_started_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init_map)?,
             "workflow_execution_started_event_attributes" => (::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes::init_map)?,
             workflow_execution_completed_event_attributes: (::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes | ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes::init_map)?,
@@ -4747,6 +4761,7 @@ module Temporalio
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
             | ("links" name) -> ::Google::Protobuf::RepeatedField
             | ("principal" name) -> ::Temporalio::Api::Common::V1::Principal?
+            | ("event_group_markers" name) -> ::Google::Protobuf::RepeatedField
             | ("workflow_execution_started_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes?
             | ("workflow_execution_completed_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes?
             | ("workflow_execution_failed_event_attributes" name) -> ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes?
@@ -4818,6 +4833,7 @@ module Temporalio
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("principal" name, ::Temporalio::Api::Common::V1::Principal? value) -> void
+            | ("event_group_markers" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("workflow_execution_started_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes? value) -> void
             | ("workflow_execution_completed_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionCompletedEventAttributes? value) -> void
             | ("workflow_execution_failed_event_attributes" name, ::Temporalio::Api::History::V1::WorkflowExecutionFailedEventAttributes? value) -> void
