@@ -15,6 +15,7 @@ class Temporalio::Client::Connection
       lazy_connect: T::Boolean,
       dns_load_balancing: T.nilable(Temporalio::Client::Connection::DnsLoadBalancingOptions),
       grpc_compression: T.any(Temporalio::Client::Connection::GrpcCompressionOptions::Gzip, Temporalio::Client::Connection::GrpcCompressionOptions::None),
+      payload_limits: Temporalio::Client::Connection::PayloadLimitsOptions,
       around_connect: T.nilable(T.proc.params(arg0: Temporalio::Client::Connection::Options, arg1: T.proc.params(arg0: Temporalio::Client::Connection::Options).void).void)
     ).void
   end
@@ -31,6 +32,7 @@ class Temporalio::Client::Connection
     lazy_connect: T.unsafe(nil),
     dns_load_balancing: T.unsafe(nil),
     grpc_compression: T.unsafe(nil),
+    payload_limits: T.unsafe(nil),
     around_connect: T.unsafe(nil)
   ); end
 

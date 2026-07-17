@@ -26,7 +26,8 @@ module Temporalio
         :runtime,
         :lazy_connect,
         :dns_load_balancing,
-        :grpc_compression
+        :grpc_compression,
+        :payload_limits
       )
 
       # Options as returned from {options} for +**to_h+ splat use in {initialize}. See {initialize} for details.
@@ -169,6 +170,28 @@ module Temporalio
         end
       end
 
+      PayloadLimitsOptions = Data.define(
+        :payloads_warn_size,
+        :memo_warn_size
+      )
+
+      # Payload size-limit options for client connections.
+      #
+      # @note WARNING: Payload size-limit enforcement is experimental and the API may change in the future.
+      #
+      # @!attribute payloads_warn_size
+      #   @return [Integer] Warning threshold, in bytes, for the size of an outbound payload-bearing field.
+      #     Over-threshold fields are logged but still sent to the server. Defaults to 512 KiB; +0+ disables the
+      #     warning.
+      # @!attribute memo_warn_size
+      #   @return [Integer] Warning threshold, in bytes, for outbound memo size. Over-threshold memos are logged
+      #     but still sent to the server. Defaults to 2 KiB; +0+ disables the warning.
+      class PayloadLimitsOptions
+        def initialize(payloads_warn_size: 512 * 1024, memo_warn_size: 2 * 1024)
+          super
+        end
+      end
+
       # @return [Options] Frozen options for this client which has the same attributes as {initialize}. Note that if
       #   {api_key=} or {rpc_metadata=} are updated, the options object is replaced with those changes (it is not
       #   mutated in place).
@@ -210,6 +233,9 @@ module Temporalio
       #   is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are mutually exclusive.
       # @param grpc_compression [GrpcCompressionOptions::Gzip, GrpcCompressionOptions::None] Transport-level gRPC
       #   compression. Defaults to gzip. Set to {GrpcCompressionOptions::None} to opt out.
+      # @param payload_limits [PayloadLimitsOptions] Payload size-limit options for this connection. Defaults to a
+      #   {PayloadLimitsOptions} with the standard warning thresholds; see that type for the defaults and how to disable
+      #   a warning. WARNING: This is experimental and may change in the future.
       # @param around_connect [Proc, nil] If present, this proc accepts two values: options and a block. The block must
       #   be yielded to only once with the options. The block does not return a meaningful value, nor should
       #   around_connect.
@@ -228,6 +254,7 @@ module Temporalio
         lazy_connect: false,
         dns_load_balancing: nil,
         grpc_compression: GrpcCompressionOptions::Gzip.new,
+        payload_limits: PayloadLimitsOptions.new,
         around_connect: nil
       )
         @options = Options.new(
@@ -242,7 +269,8 @@ module Temporalio
           runtime:,
           lazy_connect:,
           dns_load_balancing:,
-          grpc_compression:
+          grpc_compression:,
+          payload_limits:
         ).freeze
         @core_client_mutex = Mutex.new
         # Create core client now if not lazy, applying around_connect if present
@@ -344,7 +372,9 @@ module Temporalio
             max_elapsed_time: @options.rpc_retry.max_elapsed_time,
             max_retries: @options.rpc_retry.max_retries
           ),
-          identity: @options.identity || "#{Process.pid}@#{Socket.gethostname}"
+          identity: @options.identity || "#{Process.pid}@#{Socket.gethostname}",
+          payloads_warn_size: @options.payload_limits.payloads_warn_size,
+          memo_warn_size: @options.payload_limits.memo_warn_size
         )
         grpc_compression_codec = case @options.grpc_compression
                                  when GrpcCompressionOptions::Gzip

@@ -14,6 +14,7 @@ module Temporalio
         attr_reader lazy_connect: bool
         attr_reader dns_load_balancing: DnsLoadBalancingOptions?
         attr_reader grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None
+        attr_reader payload_limits: PayloadLimitsOptions
 
         def initialize: (
           target_host: String,
@@ -27,7 +28,8 @@ module Temporalio
           runtime: Runtime,
           lazy_connect: bool,
           dns_load_balancing: DnsLoadBalancingOptions?,
-          grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None
+          grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None,
+          payload_limits: PayloadLimitsOptions
         ) -> void
 
         def to_h: -> Hash[Symbol, untyped]
@@ -107,6 +109,16 @@ module Temporalio
         end
       end
 
+      class PayloadLimitsOptions
+        attr_reader payloads_warn_size: Integer?
+        attr_reader memo_warn_size: Integer?
+
+        def initialize: (
+          ?payloads_warn_size: Integer?,
+          ?memo_warn_size: Integer?
+        ) -> void
+      end
+
       attr_reader options: Options
 
       attr_reader workflow_service: WorkflowService
@@ -126,6 +138,7 @@ module Temporalio
         ?lazy_connect: bool,
         ?dns_load_balancing: DnsLoadBalancingOptions?,
         ?grpc_compression: GrpcCompressionOptions::Gzip | GrpcCompressionOptions::None,
+        ?payload_limits: PayloadLimitsOptions,
         ?around_connect: nil | ^(Options) { (Options) -> void } -> void
       ) -> void
 

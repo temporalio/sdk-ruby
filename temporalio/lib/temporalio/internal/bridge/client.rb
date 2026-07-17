@@ -18,7 +18,9 @@ module Temporalio
           :keep_alive, # Optional
           :http_connect_proxy, # Optional
           :dns_load_balancing, # Optional
-          :grpc_compression
+          :grpc_compression,
+          :payloads_warn_size,
+          :memo_warn_size
         )
 
         TLSOptions = Struct.new(

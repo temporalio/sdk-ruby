@@ -71,7 +71,8 @@ module Temporalio
       :patch_activation_callback,
       :workflow_task_poller_behavior,
       :activity_task_poller_behavior,
-      :debug_mode
+      :debug_mode,
+      :disable_payload_error_limit
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
@@ -452,6 +453,9 @@ module Temporalio
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
+    # @param disable_payload_error_limit [Boolean] If true, the worker will not proactively fail workflow/activity
+    #   tasks whose payloads exceed the namespace error limits; oversized payloads are sent to the server, which
+    #   enforces the limit. Defaults to false (the worker fails such tasks before sending).
     def initialize(
       client:,
       task_queue:,
@@ -484,7 +488,8 @@ module Temporalio
       patch_activation_callback: nil,
       workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
       activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
-      debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
+      debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase),
+      disable_payload_error_limit: false
     )
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
@@ -520,7 +525,8 @@ module Temporalio
         patch_activation_callback:,
         workflow_task_poller_behavior:,
         activity_task_poller_behavior:,
-        debug_mode:
+        debug_mode:,
+        disable_payload_error_limit:
       ).freeze
       # Collect applicable client plugins and worker plugins, then validate and apply to options
       @plugins = client.options.plugins.grep(Plugin) + plugins
@@ -581,7 +587,8 @@ module Temporalio
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
           deployment_options: @options.deployment_options._to_bridge_options,
-          plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort
+          plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort,
+          disable_payload_error_limit: @options.disable_payload_error_limit
         )
       )
 

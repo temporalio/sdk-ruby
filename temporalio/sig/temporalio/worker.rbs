@@ -41,6 +41,7 @@ module Temporalio
       attr_reader deployment_options: Worker::DeploymentOptions
       attr_reader patch_activation_callback: Proc?
       attr_reader debug_mode: bool
+      attr_reader disable_payload_error_limit: bool
 
       def initialize: (
         client: Client,
@@ -74,7 +75,8 @@ module Temporalio
         activity_task_poller_behavior: PollerBehavior,
         deployment_options: Worker::DeploymentOptions,
         patch_activation_callback: Proc?,
-        debug_mode: bool
+        debug_mode: bool,
+        disable_payload_error_limit: bool
       ) -> void
 
       def with: (**Object kwargs) -> Options
@@ -138,7 +140,8 @@ module Temporalio
       ?activity_task_poller_behavior: PollerBehavior,
       ?deployment_options: Worker::DeploymentOptions,
       ?patch_activation_callback: Proc?,
-      ?debug_mode: bool
+      ?debug_mode: bool,
+      ?disable_payload_error_limit: bool
     ) -> void
 
     def _initialize_from_options: -> void

@@ -28,7 +28,8 @@ module Temporalio
           :nondeterminism_as_workflow_fail,
           :nondeterminism_as_workflow_fail_for_types,
           :deployment_options,
-          :plugins
+          :plugins,
+          :disable_payload_error_limit
         )
 
         TunerOptions = Struct.new(

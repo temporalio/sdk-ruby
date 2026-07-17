@@ -3,7 +3,7 @@ use std::{collections::HashMap, future::Future, marker::PhantomData, time::Durat
 use temporalio_client::{
     ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
     DnsLoadBalancingOptions, GrpcCompression as CoreGrpcCompression, HttpConnectProxyOptions,
-    RetryOptions, TlsOptions, errors::ClientConnectError,
+    PayloadLimitsOptions, RetryOptions, TlsOptions, errors::ClientConnectError,
 };
 
 use magnus::{
@@ -205,6 +205,12 @@ impl Client {
             Some(opts)
         } else {
             None
+        })
+        // The connection layer always supplies concrete thresholds (512 KiB / 2 KiB by default);
+        // `0` disables that warning.
+        .payload_limits(PayloadLimitsOptions {
+            payloads_warn_size: options.member::<u64>(id!("payloads_warn_size"))?,
+            memo_warn_size: options.member::<u64>(id!("memo_warn_size"))?,
         })
         .maybe_metrics_meter(metrics_meter)
         .build();
