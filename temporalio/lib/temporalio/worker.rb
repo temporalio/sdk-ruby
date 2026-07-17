@@ -455,8 +455,7 @@ module Temporalio
     #   `true` or `1`.
     # @param disable_payload_error_limit [Boolean] If true, the worker will not proactively fail workflow/activity
     #   tasks whose payloads exceed the namespace error limits; oversized payloads are sent to the server, which
-    #   enforces the limit. Defaults to false (the worker fails such tasks before sending). WARNING: Payload
-    #   size-limit enforcement is experimental and may change in the future.
+    #   enforces the limit. Defaults to false (the worker fails such tasks before sending).
     def initialize(
       client:,
       task_queue:,
