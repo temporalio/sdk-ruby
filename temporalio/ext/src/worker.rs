@@ -39,10 +39,11 @@ use temporalio_common::{
     worker::{WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerTaskTypes},
 };
 use temporalio_sdk_core::{
-    PollError, PollerBehavior, ResourceBasedSlotsOptions, ResourceSlotOptions, SlotInfo,
-    SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext, SlotReleaseContext,
-    SlotReservationContext, SlotSupplier, SlotSupplierOptions, SlotSupplierPermit, TunerHolder,
-    TunerHolderOptions, WorkerConfig, WorkerVersioningStrategy, WorkflowErrorType,
+    PollError, PollerBehavior, ResourceBasedSlotsOptions, ResourceBasedTunerConfig,
+    ResourceSlotOptions, SlotInfo, SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext,
+    SlotReleaseContext, SlotReservationContext, SlotSupplier, SlotSupplierOptions,
+    SlotSupplierPermit, TunerHolder, TunerHolderOptions, WorkerConfig, WorkerVersioningStrategy,
+    WorkflowErrorType,
     replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use tokio::sync::mpsc::{Sender, UnboundedSender, channel, unbounded_channel};
@@ -617,7 +618,7 @@ fn build_tuner(options: Struct, runtime_handle: &RuntimeHandle) -> Result<TunerH
     )?;
 
     TunerHolderOptions::builder()
-        .maybe_resource_based_options(resource_slot_options)
+        .maybe_resource_based_config(resource_slot_options.map(ResourceBasedTunerConfig::Options))
         .workflow_slot_options(workflow_slot_options)
         .activity_slot_options(activity_slot_options)
         .local_activity_slot_options(local_activity_slot_options)
