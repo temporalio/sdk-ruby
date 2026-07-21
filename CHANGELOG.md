@@ -32,6 +32,11 @@ to docs, or any other relevant information.
   payloads (e.g. compression, encryption, external storage), it is advised that you disable size
   enforcement by setting `disable_payload_error_limit: true` on the worker.
 
+### Changed
+
+- User metadata fields (static_summary, static_details, current_details, activity summary, timer
+  summary) are no longer marked as experimental.
+
 ## [v1.6.0] - 2026-07-16
 
 ### Added
