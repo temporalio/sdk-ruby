@@ -287,11 +287,10 @@ module Temporalio
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
     # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
-    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    #   CLI/UI. This can be in single-line Temporal markdown format.
     # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
     #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
-    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
-    #   experimental.
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
@@ -380,11 +379,10 @@ module Temporalio
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
     # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
-    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    #   CLI/UI. This can be in single-line Temporal markdown format.
     # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
     #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
-    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
-    #   experimental.
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
