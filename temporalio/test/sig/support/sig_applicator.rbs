@@ -46,6 +46,7 @@ module SigApplicator
   def self.register_summary_hook!: -> void
   def self.raise_recorded_type_errors!: -> void
   def self.raise_instrumentation_errors!: (Accumulator acc) -> void
+  def self.valid_rbi_signatures?: (untyped node, Accumulator acc) -> bool
   def self.apply_scope: (untyped node, Accumulator acc) -> void
   def self.apply_method_sig: (
     Module target,
