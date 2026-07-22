@@ -42,6 +42,21 @@ module Temporalio
     end
     alias log add
 
+    # returns the logger log level as an integer.
+    def level
+      lvl = super
+
+      return lvl if lvl.is_a?(Integer)
+
+      return Logger::UNKNOWN unless lvl.respond_to?(:upcase)
+
+      if Logger::Severity.const_defined?(lvl.upcase, false)
+        Logger::Severity.const_get(lvl.upcase, false)
+      else
+        Logger::UNKNOWN
+      end
+    end
+
     # @see Logger.debug
     def debug(progname = nil, &)
       add(Logger::DEBUG, nil, progname, &)
