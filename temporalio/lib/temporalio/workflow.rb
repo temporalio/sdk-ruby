@@ -68,7 +68,7 @@ module Temporalio
 
     # Get current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value
     # can be updated throughout the life of the workflow. This can be in Temporal markdown format and can span multiple
-    # lines. This is currently experimental.
+    # lines.
     #
     # @return [String] Current details. Default is empty string.
     def self.current_details
@@ -77,7 +77,7 @@ module Temporalio
 
     # Set current details for this workflow that may appear in UI/CLI. Unlike static details set at start, this value
     # can be updated throughout the life of the workflow. This can be in Temporal markdown format and can span multiple
-    # lines. This is currently experimental.
+    # lines.
     #
     # @param details [String] Current details. Can use empty string to unset.
     def self.current_details=(details)
@@ -136,7 +136,7 @@ module Temporalio
     # @param args [Array<Object>] Arguments to the activity.
     # @param task_queue [String] Task queue to run the activity on. Defaults to the current workflow's task queue.
     # @param summary [String, nil] Single-line summary for this activity that may appear in CLI/UI. This can be in
-    #   single-line Temporal markdown format. This is currently experimental.
+    #   single-line Temporal markdown format.
     # @param schedule_to_close_timeout [Float, nil] Max amount of time the activity can take from first being scheduled
     #   to being completed before it times out. This is inclusive of all retries.
     # @param schedule_to_start_timeout [Float, nil] Max amount of time the activity can take to be started from first
@@ -235,7 +235,7 @@ module Temporalio
     # @param activity [Class<Activity::Definition>, Symbol, String] Activity definition class or name.
     # @param args [Array<Object>] Arguments to the activity.
     # @param summary [String, nil] Single-line summary for this activity that may appear in CLI/UI. This can be in
-    #   single-line Temporal markdown format. This is currently experimental.
+    #   single-line Temporal markdown format.
     # @param schedule_to_close_timeout [Float, nil] Max amount of time the activity can take from first being scheduled
     #   to being completed before it times out. This is inclusive of all retries.
     # @param schedule_to_start_timeout [Float, nil] Max amount of time the activity can take to be started from first
@@ -393,7 +393,7 @@ module Temporalio
     #   value cannot be negative. Since Temporal timers are server-side, timer resolution may not end up as precise as
     #   system timers.
     # @param summary [String, nil] A simple string identifying this timer that may be visible in UI/CLI. While it can be
-    #   normal text, it is best to treat as a timer ID. This is currently experimental.
+    #   normal text, it is best to treat as a timer ID.
     # @param cancellation [Cancellation] Cancellation for this timer.
     # @raise [Error::CanceledError] Sleep canceled.
     def self.sleep(duration, summary: nil, cancellation: Workflow.cancellation)
@@ -407,11 +407,10 @@ module Temporalio
     # @param id [String] Unique identifier for the workflow execution. Defaults to a new UUID from {random}.
     # @param task_queue [String] Task queue to run the workflow on. Defaults to the current workflow's task queue.
     # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
-    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    #   CLI/UI. This can be in single-line Temporal markdown format.
     # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
     #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
-    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
-    #   experimental.
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow.
     # @param cancellation [Cancellation] Cancellation to apply to the child workflow. How cancellation is treated is
     #   based on `cancellation_type`. This defaults to the workflow's cancellation.
     # @param cancellation_type [ChildWorkflowCancellationType] How the child workflow will react to cancellation.
@@ -480,7 +479,7 @@ module Temporalio
     # @param message [String] Message to use for timeout exception. Defaults to "execution expired" like
     #   {::Timeout.timeout}.
     # @param summary [String] Timer summary for the timer created by this timeout. This is backed by {sleep} so see that
-    #   method for details. This is currently experimental.
+    #   method for details.
     #
     # @yield Block to run with a timeout.
     # @return [Object] The result of the block.
