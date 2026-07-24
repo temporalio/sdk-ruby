@@ -11,14 +11,16 @@ class Temporalio::Api::Batch::V1::BatchOperationInfo
       job_id: T.nilable(String),
       state: T.nilable(T.any(Symbol, String, Integer)),
       start_time: T.nilable(Google::Protobuf::Timestamp),
-      close_time: T.nilable(Google::Protobuf::Timestamp)
+      close_time: T.nilable(Google::Protobuf::Timestamp),
+      operation_type: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
     job_id: "",
     state: :BATCH_OPERATION_STATE_UNSPECIFIED,
     start_time: nil,
-    close_time: nil
+    close_time: nil,
+    operation_type: :BATCH_OPERATION_TYPE_UNSPECIFIED
   )
   end
 
@@ -80,6 +82,21 @@ class Temporalio::Api::Batch::V1::BatchOperationInfo
   # Batch operation close time
   sig { void }
   def clear_close_time
+  end
+
+  # Operation type
+  sig { returns(T.any(Symbol, Integer)) }
+  def operation_type
+  end
+
+  # Operation type
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def operation_type=(value)
+  end
+
+  # Operation type
+  sig { void }
+  def clear_operation_type
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -189,6 +206,90 @@ class Temporalio::Api::Batch::V1::BatchOperationTermination
   end
 
   sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationTermination, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# BatchOperationTerminateActivities sends terminate requests to a batch of activities.
+# Keep the parameter in sync with temporal.api.workflowservice.v1.TerminateActivityExecutionRequest.
+class Temporalio::Api::Batch::V1::BatchOperationTerminateActivities
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      identity: T.nilable(String),
+      reason: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    identity: "",
+    reason: ""
+  )
+  end
+
+  # The identity of the worker/client
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the worker/client
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the worker/client
+  sig { void }
+  def clear_identity
+  end
+
+  # Reason for requesting the termination, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { returns(String) }
+  def reason
+  end
+
+  # Reason for requesting the termination, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  # Reason for requesting the termination, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { void }
+  def clear_reason
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Batch::V1::BatchOperationTerminateActivities) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationTerminateActivities).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Batch::V1::BatchOperationTerminateActivities) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationTerminateActivities, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -380,6 +481,90 @@ class Temporalio::Api::Batch::V1::BatchOperationCancellation
   end
 end
 
+# BatchOperationCancelActivities sends cancel requests to a batch of activities.
+# Keep the parameter in sync with temporal.api.workflowservice.v1.RequestCancelActivityExecutionRequest.
+class Temporalio::Api::Batch::V1::BatchOperationCancelActivities
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      identity: T.nilable(String),
+      reason: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    identity: "",
+    reason: ""
+  )
+  end
+
+  # The identity of the worker/client
+  sig { returns(String) }
+  def identity
+  end
+
+  # The identity of the worker/client
+  sig { params(value: String).void }
+  def identity=(value)
+  end
+
+  # The identity of the worker/client
+  sig { void }
+  def clear_identity
+  end
+
+  # Reason for requesting the cancellation, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { returns(String) }
+  def reason
+  end
+
+  # Reason for requesting the cancellation, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  # Reason for requesting the cancellation, recorded and available via the PollActivityExecution API.
+# Not propagated to a worker if an activity attempt is currently running.
+  sig { void }
+  def clear_reason
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Batch::V1::BatchOperationCancelActivities) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationCancelActivities).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Batch::V1::BatchOperationCancelActivities) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationCancelActivities, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # BatchOperationDeletion sends deletion requests to batch workflows.
 # Keep the parameter in sync with temporal.api.workflowservice.v1.DeleteWorkflowExecutionRequest.
 class Temporalio::Api::Batch::V1::BatchOperationDeletion
@@ -436,6 +621,48 @@ class Temporalio::Api::Batch::V1::BatchOperationDeletion
   end
 
   sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationDeletion, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# BatchOperationDeleteActivities sends deletion requests to a batch of activities.
+# Keep the parameter in sync with temporal.api.workflowservice.v1.DeleteActivityExecutionRequest.
+class Temporalio::Api::Batch::V1::BatchOperationDeleteActivities
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Batch::V1::BatchOperationDeleteActivities) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationDeleteActivities).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Batch::V1::BatchOperationDeleteActivities) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Batch::V1::BatchOperationDeleteActivities, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

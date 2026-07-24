@@ -5,14 +5,23 @@
 module Temporalio::Api::Enums::V1::BatchOperationType
   self::BATCH_OPERATION_TYPE_UNSPECIFIED = T.let(0, Integer)
   self::BATCH_OPERATION_TYPE_TERMINATE = T.let(1, Integer)
+  self::BATCH_OPERATION_TYPE_TERMINATE_WORKFLOW = T.let(13, Integer)
   self::BATCH_OPERATION_TYPE_CANCEL = T.let(2, Integer)
+  self::BATCH_OPERATION_TYPE_CANCEL_WORKFLOW = T.let(14, Integer)
   self::BATCH_OPERATION_TYPE_SIGNAL = T.let(3, Integer)
+  self::BATCH_OPERATION_TYPE_SIGNAL_WORKFLOW = T.let(15, Integer)
   self::BATCH_OPERATION_TYPE_DELETE = T.let(4, Integer)
+  self::BATCH_OPERATION_TYPE_DELETE_WORKFLOW = T.let(16, Integer)
   self::BATCH_OPERATION_TYPE_RESET = T.let(5, Integer)
+  self::BATCH_OPERATION_TYPE_RESET_WORKFLOW = T.let(17, Integer)
   self::BATCH_OPERATION_TYPE_UPDATE_EXECUTION_OPTIONS = T.let(6, Integer)
+  self::BATCH_OPERATION_TYPE_UPDATE_WORKFLOW_EXECUTION_OPTIONS = T.let(18, Integer)
   self::BATCH_OPERATION_TYPE_UNPAUSE_ACTIVITY = T.let(7, Integer)
   self::BATCH_OPERATION_TYPE_UPDATE_ACTIVITY_OPTIONS = T.let(8, Integer)
   self::BATCH_OPERATION_TYPE_RESET_ACTIVITY = T.let(9, Integer)
+  self::BATCH_OPERATION_TYPE_TERMINATE_ACTIVITY = T.let(10, Integer)
+  self::BATCH_OPERATION_TYPE_CANCEL_ACTIVITY = T.let(11, Integer)
+  self::BATCH_OPERATION_TYPE_DELETE_ACTIVITY = T.let(12, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

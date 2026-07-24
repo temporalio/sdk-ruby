@@ -257,6 +257,29 @@ module Temporalio
 
           type numbers = 0 | 1 | 2 | 3
         end
+
+        module ExecutionType
+
+          EXECUTION_TYPE_UNSPECIFIED: 0
+
+          # A workflow execution archetype. 
+          EXECUTION_TYPE_WORKFLOW: 1
+
+          # An activity execution archetype. This is reserved for standalone activities.
+          EXECUTION_TYPE_ACTIVITY: 2
+
+          def self.lookup: (::Integer number) -> ::Symbol
+
+
+          def self.resolve: (::Symbol name) -> ::Integer
+
+
+          type names = :EXECUTION_TYPE_UNSPECIFIED | :EXECUTION_TYPE_WORKFLOW | :EXECUTION_TYPE_ACTIVITY
+
+          type strings = "EXECUTION_TYPE_UNSPECIFIED" | "EXECUTION_TYPE_WORKFLOW" | "EXECUTION_TYPE_ACTIVITY"
+
+          type numbers = 0 | 1 | 2
+        end
       end
     end
   end

@@ -10,8 +10,8 @@ module Temporalio
     module Enums
       module V1
         # Status of a standalone activity.
-        # The status is updated once, when the activity is originally scheduled, and again when the activity reaches a terminal
-        # status.
+        # The status is updated when the activity is originally scheduled, paused, unpaused, and when the
+        # activity reaches a terminal state.
         # (-- api-linter: core::0216::synonyms=disabled
         #     aip.dev/not-precedent: Named consistently with WorkflowExecutionStatus. --)
         module ActivityExecutionStatus
@@ -51,17 +51,21 @@ module Temporalio
           #   SCHEDULE_TO_CLOSE would be exceeded, or cancellation has been requested).
           ACTIVITY_EXECUTION_STATUS_TIMED_OUT: 6
 
+          # The activity is paused. Paused state is only reachable after calling
+          # PauseActivityExecution on a standalone activity.
+          ACTIVITY_EXECUTION_STATUS_PAUSED: 7
+
           def self.lookup: (::Integer number) -> ::Symbol
 
 
           def self.resolve: (::Symbol name) -> ::Integer
 
 
-          type names = :ACTIVITY_EXECUTION_STATUS_UNSPECIFIED | :ACTIVITY_EXECUTION_STATUS_RUNNING | :ACTIVITY_EXECUTION_STATUS_COMPLETED | :ACTIVITY_EXECUTION_STATUS_FAILED | :ACTIVITY_EXECUTION_STATUS_CANCELED | :ACTIVITY_EXECUTION_STATUS_TERMINATED | :ACTIVITY_EXECUTION_STATUS_TIMED_OUT
+          type names = :ACTIVITY_EXECUTION_STATUS_UNSPECIFIED | :ACTIVITY_EXECUTION_STATUS_RUNNING | :ACTIVITY_EXECUTION_STATUS_COMPLETED | :ACTIVITY_EXECUTION_STATUS_FAILED | :ACTIVITY_EXECUTION_STATUS_CANCELED | :ACTIVITY_EXECUTION_STATUS_TERMINATED | :ACTIVITY_EXECUTION_STATUS_TIMED_OUT | :ACTIVITY_EXECUTION_STATUS_PAUSED
 
-          type strings = "ACTIVITY_EXECUTION_STATUS_UNSPECIFIED" | "ACTIVITY_EXECUTION_STATUS_RUNNING" | "ACTIVITY_EXECUTION_STATUS_COMPLETED" | "ACTIVITY_EXECUTION_STATUS_FAILED" | "ACTIVITY_EXECUTION_STATUS_CANCELED" | "ACTIVITY_EXECUTION_STATUS_TERMINATED" | "ACTIVITY_EXECUTION_STATUS_TIMED_OUT"
+          type strings = "ACTIVITY_EXECUTION_STATUS_UNSPECIFIED" | "ACTIVITY_EXECUTION_STATUS_RUNNING" | "ACTIVITY_EXECUTION_STATUS_COMPLETED" | "ACTIVITY_EXECUTION_STATUS_FAILED" | "ACTIVITY_EXECUTION_STATUS_CANCELED" | "ACTIVITY_EXECUTION_STATUS_TERMINATED" | "ACTIVITY_EXECUTION_STATUS_TIMED_OUT" | "ACTIVITY_EXECUTION_STATUS_PAUSED"
 
-          type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6
+          type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
         end
 
         # Defines whether to allow re-using an activity ID from a previously *closed* activity.
