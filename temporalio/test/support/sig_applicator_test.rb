@@ -237,6 +237,29 @@ module Support
       end
     end
 
+    def test_apply_all_rejects_mismatched_params_in_skipped_class
+      tree = RBI::Parser.parse_string(<<~RBI)
+        class Temporalio::Workflow::Future
+          sig { params(block: T.nilable(T.proc.void)).void }
+          def initialize(&); end
+        end
+      RBI
+
+      parser = RBI::Parser.singleton_class
+      original_parse_file = RBI::Parser.method(:parse_file)
+      parser.send(:define_method, :parse_file) { |_path| tree }
+
+      error = assert_raises(RuntimeError) do
+        with_sig_applicator_rbi_paths(['test.rbi']) { SigApplicator.apply_all! }
+      end
+      assert_includes error.message, 'SigApplicator: 1 methods could not be instrumented:'
+      assert_includes error.message,
+                      'Temporalio::Workflow::Future#initialize: signature parameters ["block"] ' \
+                      'do not match method parameters ["&block"]'
+    ensure
+      parser.send(:define_method, :parse_file, original_parse_file)
+    end
+
     def test_apply_all_reads_all_rbi_paths
       test_class = Class.new do
         def self.foo(value)

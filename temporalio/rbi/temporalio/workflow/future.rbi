@@ -13,7 +13,7 @@ class Temporalio::Workflow::Future
   attr_reader :failure
 
   sig { params(block: T.nilable(T.proc.returns(Elem))).void }
-  def initialize(&); end
+  def initialize(&block); end
 
   sig { returns(T::Boolean) }
   def done?; end

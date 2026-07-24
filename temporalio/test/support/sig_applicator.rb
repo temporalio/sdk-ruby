@@ -116,6 +116,8 @@ module SigApplicator
 
       rbi_paths.each do |path|
         tree = RBI::Parser.parse_file(path)
+        next unless valid_rbi_signatures?(tree, acc)
+
         tree.nodes.each do |node|
           apply_scope(node, acc)
         end
@@ -207,6 +209,33 @@ module SigApplicator
       acc.errors.each { |error| summary << "  #{error}\n" }
       summary << "#{acc.missing} methods missing a signature" if acc.missing.positive?
       raise summary.chomp
+    end
+
+    def valid_rbi_signatures?(node, acc)
+      valid = true
+
+      if node.is_a?(RBI::Method)
+        method_param_names = node.params.map(&:name).sort
+        node.sigs.each do |sig|
+          sig_param_names = sig.params.map(&:name).sort
+          next if sig_param_names == method_param_names
+
+          valid = false
+          method_name = node.fully_qualified_name.delete_prefix('::')
+          method_name = method_name.sub(/::([^:]+)\z/, '.\1') if node.is_singleton
+          method_name = method_name.sub('::<self>#', '.')
+          acc.error "#{method_name}: signature parameters #{sig_param_names.inspect} " \
+                    "do not match method parameters #{method_param_names.inspect}"
+        end
+      end
+
+      if node.respond_to?(:nodes)
+        node.nodes.each do |child|
+          valid = false unless valid_rbi_signatures?(child, acc)
+        end
+      end
+
+      valid
     end
 
     def apply_scope(node, acc)
