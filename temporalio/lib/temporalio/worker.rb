@@ -61,6 +61,7 @@ module Temporalio
       :default_heartbeat_throttle_interval,
       :max_activities_per_second,
       :max_task_queue_activities_per_second,
+      :max_eager_activity_reservations_per_workflow_task,
       :graceful_shutdown_period,
       :disable_eager_activity_execution,
       :illegal_workflow_calls,
@@ -416,6 +417,9 @@ module Temporalio
     # @param max_task_queue_activities_per_second [Float, nil] Sets the maximum number of activities per second the task
     #   queue will dispatch, controlled server-side. Note that this only takes effect upon an activity poll request. If
     #   multiple workers on the same queue have different values set, they will thrash with the last poller winning.
+    # @param max_eager_activity_reservations_per_workflow_task [Integer] Maximum number of activity slots that may be
+    #   reserved for eager execution when completing a workflow task. Defaults to 3 and must be positive. To disable
+    #   eager activity execution, set `disable_eager_activity_execution: true`.
     # @param graceful_shutdown_period [Float] Amount of time after shutdown is called that activities are given to
     #   complete before their tasks are canceled.
     # @param disable_eager_activity_execution [Boolean] If true, disables eager activity execution. Eager activity
@@ -478,6 +482,7 @@ module Temporalio
       default_heartbeat_throttle_interval: 30,
       max_activities_per_second: nil,
       max_task_queue_activities_per_second: nil,
+      max_eager_activity_reservations_per_workflow_task: 3,
       graceful_shutdown_period: 0,
       disable_eager_activity_execution: false,
       illegal_workflow_calls: Worker.default_illegal_workflow_calls,
@@ -515,6 +520,7 @@ module Temporalio
         default_heartbeat_throttle_interval:,
         max_activities_per_second:,
         max_task_queue_activities_per_second:,
+        max_eager_activity_reservations_per_workflow_task:,
         graceful_shutdown_period:,
         disable_eager_activity_execution:,
         illegal_workflow_calls:,
@@ -546,6 +552,11 @@ module Temporalio
          @options.deployment_options.default_versioning_behavior != VersioningBehavior::UNSPECIFIED
         raise ArgumentError,
               'default_versioning_behavior must be UNSPECIFIED when use_worker_versioning is false'
+      end
+      unless @options.max_eager_activity_reservations_per_workflow_task.positive?
+        raise ArgumentError,
+              'max_eager_activity_reservations_per_workflow_task must be positive; ' \
+              'use disable_eager_activity_execution: true to disable eager activity execution'
       end
 
       should_enforce_versioning_behavior =
@@ -583,6 +594,8 @@ module Temporalio
           default_heartbeat_throttle_interval: @options.default_heartbeat_throttle_interval,
           max_worker_activities_per_second: @options.max_activities_per_second,
           max_task_queue_activities_per_second: @options.max_task_queue_activities_per_second,
+          max_eager_activity_reservations_per_workflow_task:
+            @options.max_eager_activity_reservations_per_workflow_task,
           graceful_shutdown_period: @options.graceful_shutdown_period,
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
