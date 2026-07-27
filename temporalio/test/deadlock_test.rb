@@ -65,6 +65,22 @@ class DeadlockTest < Test
     end
   end
 
+  module ValidatorInterruptProbe
+    def self.probe; end
+  end
+
+  class DeadlockDuringValidatorWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow::Future.new do
+        ValidatorInterruptProbe.probe
+        Temporalio::Workflow.execute_activity(BasicActivity, 1, start_to_close_timeout: 10)
+      end
+      # Future intentionally not waited (mirrors a fanout blocked on all_of with other
+      # futures pending) so a stored failure would never surface
+      Temporalio::Workflow.wait_condition { false }
+    end
+  end
+
   class ProtobufObjectCachePartialCommandsWorkflow < Temporalio::Workflow::Definition
     ACTIVITY_COUNT = 6
     BLOCK_AFTER_ACTIVITY_COUNT = 3
@@ -139,6 +155,48 @@ class DeadlockTest < Test
         end
         assert_operator events.count(&:workflow_task_completed_event_attributes), :>, completed_workflow_tasks
       end
+    end
+  ensure
+    handle&.terminate
+  end
+
+  def test_deadlock_during_illegal_call_validator_fails_workflow_task
+    task_queue = "tq-#{SecureRandom.uuid}"
+    # Simulates the deadlock watchdog's async raise landing while an illegal call
+    # validator block is executing (e.g. Thread::Mutex#synchronize inside protobuf's
+    # ObjectCache during ScheduleActivity arg serialization)
+    illegal_calls = Temporalio::Worker.default_illegal_workflow_calls.merge(
+      'DeadlockTest::ValidatorInterruptProbe' => [
+        Temporalio::Worker::IllegalWorkflowCallValidator.new(method_name: :probe) do |_info|
+          raise Temporalio::Worker::WorkflowExecutor::ThreadPool::DeadlockError,
+                '[TMPRL1101] Potential deadlock detected: simulated async deadlock raise'
+        end
+      ]
+    )
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [DeadlockDuringValidatorWorkflow],
+      activities: [BasicActivity],
+      illegal_workflow_calls: illegal_calls
+    )
+    # @type var handle: untyped
+    handle = nil
+    worker.run do
+      handle = env.client.start_workflow(
+        DeadlockDuringValidatorWorkflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      assert_eventually_task_fail(handle:, message_contains: 'Potential deadlock detected')
+      # The DeadlockError class must survive the tracer. A laundered
+      # NondeterminismError would read "Cannot access ..." and, when raised inside a
+      # future, be stored instead of failing the task at all
+      failure_messages = handle.fetch_history_events.filter_map do |event|
+        event.workflow_task_failed_event_attributes&.failure&.message
+      end
+      refute_empty(failure_messages)
+      failure_messages.each { |message| refute_includes(message, 'Cannot access') }
     end
   ensure
     handle&.terminate
