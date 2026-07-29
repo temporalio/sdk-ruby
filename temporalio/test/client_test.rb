@@ -140,6 +140,30 @@ class ClientTest < Test
     end
   end
 
+  class EmptyFirstHistoryEventsInterceptor
+    include Temporalio::Client::Interceptor
+
+    def intercept_client(next_interceptor)
+      Outbound.new(next_interceptor)
+    end
+
+    class Outbound < Temporalio::Client::Interceptor::Outbound
+      def initialize(next_interceptor)
+        super
+        @first_history_fetch = true
+      end
+
+      def fetch_workflow_history_events(input)
+        if @first_history_fetch
+          @first_history_fetch = false
+          return Enumerator.new { |_yielder| nil }
+        end
+
+        super
+      end
+    end
+  end
+
   def test_interceptor
     # Create client with interceptor
     track = TrackCallsInterceptor.new
@@ -186,6 +210,23 @@ class ClientTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
+    end
+  end
+
+  def test_result_retries_when_history_fetch_returns_no_events
+    client = Temporalio::Client.new(
+      **env.client.options.with(interceptors: [EmptyFirstHistoryEventsInterceptor.new]).to_h
+    ) # steep:ignore
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    Temporalio::Worker.new(client:, task_queue:, workflows: [SimpleWorkflow]).run do
+      handle = client.start_workflow(
+        SimpleWorkflow,
+        'Temporal',
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      assert_equal 'Hello, Temporal!', handle.result
     end
   end
 
