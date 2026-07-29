@@ -544,6 +544,9 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         .maybe_max_task_queue_activities_per_second(
             options.member::<Option<f64>>(id!("max_task_queue_activities_per_second"))?,
         )
+        .max_eager_activity_reservations_per_workflow_task(
+            options.member(id!("max_eager_activity_reservations_per_workflow_task"))?,
+        )
         .graceful_shutdown_period(Duration::from_secs_f64(
             options.member(id!("graceful_shutdown_period"))?,
         ))

@@ -82,12 +82,14 @@ class Temporalio::Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure
   sig do
     params(
       start_request_id: T.nilable(String),
-      run_id: T.nilable(String)
+      run_id: T.nilable(String),
+      first_execution_run_id: T.nilable(String)
     ).void
   end
   def initialize(
     start_request_id: "",
-    run_id: ""
+    run_id: "",
+    first_execution_run_id: ""
   )
   end
 
@@ -113,6 +115,18 @@ class Temporalio::Api::ErrorDetails::V1::WorkflowExecutionAlreadyStartedFailure
 
   sig { void }
   def clear_run_id
+  end
+
+  sig { returns(String) }
+  def first_execution_run_id
+  end
+
+  sig { params(value: String).void }
+  def first_execution_run_id=(value)
+  end
+
+  sig { void }
+  def clear_first_execution_run_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1288,6 +1302,49 @@ class Temporalio::Api::ErrorDetails::V1::NexusOperationExecutionAlreadyStartedFa
   end
 
   sig { params(msg: Temporalio::Api::ErrorDetails::V1::NexusOperationExecutionAlreadyStartedFailure, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# An error indicating that the server lost the buffered pages of a paginated workflow task
+# completion. This is a transient error: the workflow task is still valid, and the client
+# should resend all pages from page 0 using the same task token.
+class Temporalio::Api::ErrorDetails::V1::WorkflowTaskCompletionBufferLostFailure
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::ErrorDetails::V1::WorkflowTaskCompletionBufferLostFailure) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::ErrorDetails::V1::WorkflowTaskCompletionBufferLostFailure).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::ErrorDetails::V1::WorkflowTaskCompletionBufferLostFailure) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::ErrorDetails::V1::WorkflowTaskCompletionBufferLostFailure, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

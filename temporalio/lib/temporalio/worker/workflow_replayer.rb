@@ -240,6 +240,7 @@ module Temporalio
               default_heartbeat_throttle_interval: 1.0,
               max_worker_activities_per_second: nil,
               max_task_queue_activities_per_second: nil,
+              max_eager_activity_reservations_per_workflow_task: 3,
               graceful_shutdown_period: 0.0,
               nondeterminism_as_workflow_fail:,
               nondeterminism_as_workflow_fail_for_types:,

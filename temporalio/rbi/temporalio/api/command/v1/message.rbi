@@ -1593,7 +1593,8 @@ class Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes
       memo: T.nilable(Temporalio::Api::Common::V1::Memo),
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       inherit_build_id: T.nilable(T::Boolean),
-      priority: T.nilable(Temporalio::Api::Common::V1::Priority)
+      priority: T.nilable(Temporalio::Api::Common::V1::Priority),
+      versioning_override: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)
     ).void
   end
   def initialize(
@@ -1614,7 +1615,8 @@ class Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes
     memo: nil,
     search_attributes: nil,
     inherit_build_id: false,
-    priority: nil
+    priority: nil,
+    versioning_override: nil
   )
   end
 
@@ -1868,6 +1870,24 @@ class Temporalio::Api::Command::V1::StartChildWorkflowExecutionCommandAttributes
 # present, they inherit the values from the workflow.
   sig { void }
   def clear_priority
+  end
+
+  # Versioning override for the child workflow. If present, this explicit override takes
+# precedence over versioning behavior inherited from the parent workflow.
+  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)) }
+  def versioning_override
+  end
+
+  # Versioning override for the child workflow. If present, this explicit override takes
+# precedence over versioning behavior inherited from the parent workflow.
+  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)).void }
+  def versioning_override=(value)
+  end
+
+  # Versioning override for the child workflow. If present, this explicit override takes
+# precedence over versioning behavior inherited from the parent workflow.
+  sig { void }
+  def clear_versioning_override
   end
 
   sig { params(field: String).returns(T.untyped) }

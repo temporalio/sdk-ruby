@@ -29,6 +29,7 @@ class Temporalio::Worker
       default_heartbeat_throttle_interval: Numeric,
       max_activities_per_second: T.nilable(Numeric),
       max_task_queue_activities_per_second: T.nilable(Numeric),
+      max_eager_activity_reservations_per_workflow_task: Integer,
       graceful_shutdown_period: Numeric,
       disable_eager_activity_execution: T::Boolean,
       illegal_workflow_calls: T::Hash[String, T.any(Symbol, T::Array[T.any(Symbol, Temporalio::Worker::IllegalWorkflowCallValidator)], Temporalio::Worker::IllegalWorkflowCallValidator)],
@@ -65,6 +66,7 @@ class Temporalio::Worker
     default_heartbeat_throttle_interval: T.unsafe(nil),
     max_activities_per_second: T.unsafe(nil),
     max_task_queue_activities_per_second: T.unsafe(nil),
+    max_eager_activity_reservations_per_workflow_task: T.unsafe(nil),
     graceful_shutdown_period: T.unsafe(nil),
     disable_eager_activity_execution: T.unsafe(nil),
     illegal_workflow_calls: T.unsafe(nil),
@@ -221,6 +223,9 @@ class Temporalio::Worker::Options < ::Data
 
   sig { returns(T.nilable(Numeric)) }
   def max_task_queue_activities_per_second; end
+
+  sig { returns(Integer) }
+  def max_eager_activity_reservations_per_workflow_task; end
 
   sig { returns(Numeric) }
   def graceful_shutdown_period; end

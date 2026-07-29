@@ -634,14 +634,16 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueStats
       approximate_backlog_count: T.nilable(Integer),
       approximate_backlog_age: T.nilable(Google::Protobuf::Duration),
       tasks_add_rate: T.nilable(Float),
-      tasks_dispatch_rate: T.nilable(Float)
+      tasks_dispatch_rate: T.nilable(Float),
+      rate_limiting_active: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
     approximate_backlog_count: 0,
     approximate_backlog_age: nil,
     tasks_add_rate: 0.0,
-    tasks_dispatch_rate: 0.0
+    tasks_dispatch_rate: 0.0,
+    rate_limiting_active: false
   )
   end
 
@@ -811,6 +813,30 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueStats
 #   worker instance.
   sig { void }
   def clear_tasks_dispatch_rate
+  end
+
+  # Whether rate limiting blocked any dispatches within the recent observation window (approximately
+# 30 seconds). When true, adding more workers will not increase throughput — the bottleneck is the
+# rate limit, not worker count. This field is useful for auto-scaling systems to avoid unnecessary
+# scale-up.
+  sig { returns(T::Boolean) }
+  def rate_limiting_active
+  end
+
+  # Whether rate limiting blocked any dispatches within the recent observation window (approximately
+# 30 seconds). When true, adding more workers will not increase throughput — the bottleneck is the
+# rate limit, not worker count. This field is useful for auto-scaling systems to avoid unnecessary
+# scale-up.
+  sig { params(value: T::Boolean).void }
+  def rate_limiting_active=(value)
+  end
+
+  # Whether rate limiting blocked any dispatches within the recent observation window (approximately
+# 30 seconds). When true, adding more workers will not increase throughput — the bottleneck is the
+# rate limit, not worker count. This field is useful for auto-scaling systems to avoid unnecessary
+# scale-up.
+  sig { void }
+  def clear_rate_limiting_active
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2042,6 +2068,91 @@ class Temporalio::Api::TaskQueue::V1::PollerGroupInfo
   end
 
   sig { params(msg: Temporalio::Api::TaskQueue::V1::PollerGroupInfo, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# A versioned snapshot of the poller groups the client should use for future polls to a task
+# queue. The version is monotonically increasing so that a client can ignore a snapshot that is
+# older than the one it has already applied.
+class Temporalio::Api::TaskQueue::V1::PollerGroupsInfo
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      version: T.nilable(Integer),
+      poller_groups: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
+    ).void
+  end
+  def initialize(
+    version: 0,
+    poller_groups: []
+  )
+  end
+
+  # Monotonically increasing version of this snapshot. A client should ignore any snapshot whose
+# version is not greater than the one it last applied.
+  sig { returns(Integer) }
+  def version
+  end
+
+  # Monotonically increasing version of this snapshot. A client should ignore any snapshot whose
+# version is not greater than the one it last applied.
+  sig { params(value: Integer).void }
+  def version=(value)
+  end
+
+  # Monotonically increasing version of this snapshot. A client should ignore any snapshot whose
+# version is not greater than the one it last applied.
+  sig { void }
+  def clear_version
+  end
+
+  # The weighted list of poller groups the client should use for future polls to this task queue.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]) }
+  def poller_groups
+  end
+
+  # The weighted list of poller groups the client should use for future polls to this task queue.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def poller_groups=(value)
+  end
+
+  # The weighted list of poller groups the client should use for future polls to this task queue.
+  sig { void }
+  def clear_poller_groups
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::PollerGroupsInfo).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::PollerGroupsInfo, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

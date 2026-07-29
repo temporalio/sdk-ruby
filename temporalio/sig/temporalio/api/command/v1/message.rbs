@@ -773,6 +773,12 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Versioning override for the child workflow. If present, this explicit override takes
+          # precedence over versioning behavior inherited from the parent workflow.
+          attr_accessor versioning_override(): ::Temporalio::Api::Workflow::V1::VersioningOverride?
+          def has_versioning_override?: () -> bool
+          def clear_versioning_override: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -810,6 +816,8 @@ module Temporalio
             "inherit_build_id" => bool?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+            versioning_override: (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
+            "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -833,6 +841,7 @@ module Temporalio
             | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | ("inherit_build_id" name) -> bool
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+            | ("versioning_override" name) -> ::Temporalio::Api::Workflow::V1::VersioningOverride?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -853,6 +862,7 @@ module Temporalio
             | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
             | ("inherit_build_id" name, bool value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+            | ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
         end
 
         class ProtocolMessageCommandAttributes < ::Google::Protobuf::AbstractMessage

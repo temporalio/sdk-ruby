@@ -47,11 +47,17 @@ module Temporalio
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
 
+          attr_reader first_execution_run_id(): ::String
+          attr_writer first_execution_run_id(): ::String | ::Symbol
+          def clear_first_execution_run_id: () -> void
+
           type init_map = {
             start_request_id: (::String | ::Symbol)?,
             "start_request_id" => (::String | ::Symbol)?,
             run_id: (::String | ::Symbol)?,
             "run_id" => (::String | ::Symbol)?,
+            first_execution_run_id: (::String | ::Symbol)?,
+            "first_execution_run_id" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -59,10 +65,12 @@ module Temporalio
           def []:
               ("start_request_id" name) -> ::String
             | ("run_id" name) -> ::String
+            | ("first_execution_run_id" name) -> ::String
 
           def []=:
               ("start_request_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("first_execution_run_id" name, (::String | ::Symbol) value) -> void
         end
 
         class NamespaceNotActiveFailure < ::Google::Protobuf::AbstractMessage
@@ -517,6 +525,17 @@ module Temporalio
           def []=:
               ("start_request_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        # An error indicating that the server lost the buffered pages of a paginated workflow task
+        # completion. This is a transient error: the workflow task is still valid, and the client 
+        # should resend all pages from page 0 using the same task token.
+        class WorkflowTaskCompletionBufferLostFailure < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
         end
       end
     end

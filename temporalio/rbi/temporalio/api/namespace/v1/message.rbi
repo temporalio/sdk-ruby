@@ -698,7 +698,11 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
       worker_commands: T.nilable(T::Boolean),
       standalone_nexus_operation: T.nilable(T::Boolean),
       workflow_update_callbacks: T.nilable(T::Boolean),
-      poller_autoscaling_auto_enroll: T.nilable(T::Boolean)
+      poller_autoscaling_auto_enroll: T.nilable(T::Boolean),
+      workflow_task_completion_pagination: T.nilable(T::Boolean),
+      standalone_activity_start_delay: T.nilable(T::Boolean),
+      standalone_activity_batch_operations: T.nilable(T::Boolean),
+      standalone_activity_operator_commands: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -714,7 +718,11 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
     worker_commands: false,
     standalone_nexus_operation: false,
     workflow_update_callbacks: false,
-    poller_autoscaling_auto_enroll: false
+    poller_autoscaling_auto_enroll: false,
+    workflow_task_completion_pagination: false,
+    standalone_activity_start_delay: false,
+    standalone_activity_batch_operations: false,
+    standalone_activity_operator_commands: false
   )
   end
 
@@ -923,6 +931,66 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Capabilities
   # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
   sig { void }
   def clear_poller_autoscaling_auto_enroll
+  end
+
+  # True if the namespace supports pagination of `RespondWorkflowTaskCompleted` request.
+  sig { returns(T::Boolean) }
+  def workflow_task_completion_pagination
+  end
+
+  # True if the namespace supports pagination of `RespondWorkflowTaskCompleted` request.
+  sig { params(value: T::Boolean).void }
+  def workflow_task_completion_pagination=(value)
+  end
+
+  # True if the namespace supports pagination of `RespondWorkflowTaskCompleted` request.
+  sig { void }
+  def clear_workflow_task_completion_pagination
+  end
+
+  # True if the namespace supports start delay for standalone activities.
+  sig { returns(T::Boolean) }
+  def standalone_activity_start_delay
+  end
+
+  # True if the namespace supports start delay for standalone activities.
+  sig { params(value: T::Boolean).void }
+  def standalone_activity_start_delay=(value)
+  end
+
+  # True if the namespace supports start delay for standalone activities.
+  sig { void }
+  def clear_standalone_activity_start_delay
+  end
+
+  # True if the namespace supports batch operations for standalone activities.
+  sig { returns(T::Boolean) }
+  def standalone_activity_batch_operations
+  end
+
+  # True if the namespace supports batch operations for standalone activities.
+  sig { params(value: T::Boolean).void }
+  def standalone_activity_batch_operations=(value)
+  end
+
+  # True if the namespace supports batch operations for standalone activities.
+  sig { void }
+  def clear_standalone_activity_batch_operations
+  end
+
+  # True if the namespace supports standalone activity operator commands.
+  sig { returns(T::Boolean) }
+  def standalone_activity_operator_commands
+  end
+
+  # True if the namespace supports standalone activity operator commands.
+  sig { params(value: T::Boolean).void }
+  def standalone_activity_operator_commands=(value)
+  end
+
+  # True if the namespace supports standalone activity operator commands.
+  sig { void }
+  def clear_standalone_activity_operator_commands
   end
 
   sig { params(field: String).returns(T.untyped) }

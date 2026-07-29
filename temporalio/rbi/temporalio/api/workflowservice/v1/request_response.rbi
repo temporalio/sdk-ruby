@@ -549,7 +549,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
       failover_version: T.nilable(Integer),
       is_global_namespace: T.nilable(T::Boolean),
       failover_history: T.nilable(T::Array[T.nilable(Temporalio::Api::Replication::V1::FailoverStatus)]),
-      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
+      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]),
+      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)
     ).void
   end
   def initialize(
@@ -559,7 +560,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
     failover_version: 0,
     is_global_namespace: false,
     failover_history: [],
-    poller_group_infos: []
+    poller_group_infos: [],
+    poller_groups_info: nil
   )
   end
 
@@ -641,25 +643,52 @@ class Temporalio::Api::WorkflowService::V1::DescribeNamespaceResponse
   def clear_failover_history
   end
 
-  # The initial info that client should use for poller group assignment. This information is
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The initial info that client should use for poller group assignment. This information is
 # updated through poll response. Client is supposed to use the info received in the latest
 # poll response.
   sig { returns(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]) }
   def poller_group_infos
   end
 
-  # The initial info that client should use for poller group assignment. This information is
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The initial info that client should use for poller group assignment. This information is
 # updated through poll response. Client is supposed to use the info received in the latest
 # poll response.
   sig { params(value: ::Google::Protobuf::RepeatedField).void }
   def poller_group_infos=(value)
   end
 
-  # The initial info that client should use for poller group assignment. This information is
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The initial info that client should use for poller group assignment. This information is
 # updated through poll response. Client is supposed to use the info received in the latest
 # poll response.
   sig { void }
   def clear_poller_group_infos
+  end
+
+  # The initial, versioned info that client should use for poller group assignment. This
+# information is updated through poll responses. Client is supposed to use the info with the
+# highest version it has received.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)) }
+  def poller_groups_info
+  end
+
+  # The initial, versioned info that client should use for poller group assignment. This
+# information is updated through poll responses. Client is supposed to use the info with the
+# highest version it has received.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)).void }
+  def poller_groups_info=(value)
+  end
+
+  # The initial, versioned info that client should use for poller group assignment. This
+# information is updated through poll responses. Client is supposed to use the info with the
+# highest version it has received.
+  sig { void }
+  def clear_poller_groups_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1453,22 +1482,22 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   def clear_last_completion_result
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
-# If the workflow gets a signal before the delay, a workflow task will be dispatched and the rest
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
+# If the workflow gets a signal before the delay, a workflow task will be made available for dispatch and the rest
 # of the delay will be ignored.
   sig { returns(T.nilable(Google::Protobuf::Duration)) }
   def workflow_start_delay
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
-# If the workflow gets a signal before the delay, a workflow task will be dispatched and the rest
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
+# If the workflow gets a signal before the delay, a workflow task will be made available for dispatch and the rest
 # of the delay will be ignored.
   sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
   def workflow_start_delay=(value)
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
-# If the workflow gets a signal before the delay, a workflow task will be dispatched and the rest
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
+# If the workflow gets a signal before the delay, a workflow task will be made available for dispatch and the rest
 # of the delay will be ignored.
   sig { void }
   def clear_workflow_start_delay
@@ -1658,6 +1687,7 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse
   sig do
     params(
       run_id: T.nilable(String),
+      first_execution_run_id: T.nilable(String),
       started: T.nilable(T::Boolean),
       status: T.nilable(T.any(Symbol, String, Integer)),
       eager_workflow_task: T.nilable(Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse),
@@ -1666,6 +1696,7 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse
   end
   def initialize(
     run_id: "",
+    first_execution_run_id: "",
     started: false,
     status: :WORKFLOW_EXECUTION_STATUS_UNSPECIFIED,
     eager_workflow_task: nil,
@@ -1686,6 +1717,21 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionResponse
   # The run id of the workflow that was started - or used (via WorkflowIdConflictPolicy USE_EXISTING).
   sig { void }
   def clear_run_id
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { returns(String) }
+  def first_execution_run_id
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { params(value: String).void }
+  def first_execution_run_id=(value)
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { void }
+  def clear_first_execution_run_id
   end
 
   # If true, a new workflow was started.
@@ -2480,7 +2526,8 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
       messages: T.nilable(T::Array[T.nilable(Temporalio::Api::Protocol::V1::Message)]),
       poller_scaling_decision: T.nilable(Temporalio::Api::TaskQueue::V1::PollerScalingDecision),
       poller_group_id: T.nilable(String),
-      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
+      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]),
+      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)
     ).void
   end
   def initialize(
@@ -2501,7 +2548,8 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
     messages: [],
     poller_scaling_decision: nil,
     poller_group_id: "",
-    poller_group_infos: []
+    poller_group_infos: [],
+    poller_groups_info: nil
   )
   end
 
@@ -2820,7 +2868,9 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
   def clear_poller_group_id
   end
 
-  # The weighted list of poller groups IDs that client should use for future polls to this task
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The weighted list of poller groups IDs that client should use for future polls to this task
 # queue. Client is expected to:
 #   1. Maintain minimum number of pollers no less than the number of groups.
 #   2. Try to assign the next poll to a group without any pending polls,
@@ -2830,7 +2880,9 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
   def poller_group_infos
   end
 
-  # The weighted list of poller groups IDs that client should use for future polls to this task
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The weighted list of poller groups IDs that client should use for future polls to this task
 # queue. Client is expected to:
 #   1. Maintain minimum number of pollers no less than the number of groups.
 #   2. Try to assign the next poll to a group without any pending polls,
@@ -2840,7 +2892,9 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
   def poller_group_infos=(value)
   end
 
-  # The weighted list of poller groups IDs that client should use for future polls to this task
+  # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+# ignore stale updates.
+# The weighted list of poller groups IDs that client should use for future polls to this task
 # queue. Client is expected to:
 #   1. Maintain minimum number of pollers no less than the number of groups.
 #   2. Try to assign the next poll to a group without any pending polls,
@@ -2848,6 +2902,39 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse
 #     according to the weights.
   sig { void }
   def clear_poller_group_infos
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)) }
+  def poller_groups_info
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)).void }
+  def poller_groups_info=(value)
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { void }
+  def clear_poller_groups_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2908,7 +2995,9 @@ class Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest
       versioning_behavior: T.nilable(T.any(Symbol, String, Integer)),
       deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
       worker_instance_key: T.nilable(String),
-      worker_control_task_queue: T.nilable(String)
+      worker_control_task_queue: T.nilable(String),
+      page_number: T.nilable(Integer),
+      intermediate_page: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -2931,7 +3020,9 @@ class Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest
     versioning_behavior: :VERSIONING_BEHAVIOR_UNSPECIFIED,
     deployment_options: nil,
     worker_instance_key: "",
-    worker_control_task_queue: ""
+    worker_control_task_queue: "",
+    page_number: 0,
+    intermediate_page: false
   )
   end
 
@@ -3275,6 +3366,48 @@ class Temporalio::Api::WorkflowService::V1::RespondWorkflowTaskCompletedRequest
 # tasks (e.g. activity cancellation) to this specific worker instance.
   sig { void }
   def clear_worker_control_task_queue
+  end
+
+  # 0-indexed page number when the workflow task completion is split across multiple
+# requests ("pages"). 0 for single-page requests. May only be set to non-zero value
+# when the namespace capability workflow_task_completion_pagination is true.
+  sig { returns(Integer) }
+  def page_number
+  end
+
+  # 0-indexed page number when the workflow task completion is split across multiple
+# requests ("pages"). 0 for single-page requests. May only be set to non-zero value
+# when the namespace capability workflow_task_completion_pagination is true.
+  sig { params(value: Integer).void }
+  def page_number=(value)
+  end
+
+  # 0-indexed page number when the workflow task completion is split across multiple
+# requests ("pages"). 0 for single-page requests. May only be set to non-zero value
+# when the namespace capability workflow_task_completion_pagination is true.
+  sig { void }
+  def clear_page_number
+  end
+
+  # True for non-final pages of a paginated workflow task completion. The final page's
+# `page_number` tells the server how many intermediate pages (0..page_number-1) preceded it.
+# May only be used when the namespace capability workflow_task_completion_pagination is true.
+  sig { returns(T::Boolean) }
+  def intermediate_page
+  end
+
+  # True for non-final pages of a paginated workflow task completion. The final page's
+# `page_number` tells the server how many intermediate pages (0..page_number-1) preceded it.
+# May only be used when the namespace capability workflow_task_completion_pagination is true.
+  sig { params(value: T::Boolean).void }
+  def intermediate_page=(value)
+  end
+
+  # True for non-final pages of a paginated workflow task completion. The final page's
+# `page_number` tells the server how many intermediate pages (0..page_number-1) preceded it.
+# May only be used when the namespace capability workflow_task_completion_pagination is true.
+  sig { void }
+  def clear_intermediate_page
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -3938,7 +4071,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
       poller_scaling_decision: T.nilable(Temporalio::Api::TaskQueue::V1::PollerScalingDecision),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       activity_run_id: T.nilable(String),
-      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
+      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]),
+      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)
     ).void
   end
   def initialize(
@@ -3962,7 +4096,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
     poller_scaling_decision: nil,
     priority: nil,
     activity_run_id: "",
-    poller_group_infos: []
+    poller_group_infos: [],
+    poller_groups_info: nil
   )
   end
 
@@ -4336,6 +4471,39 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
 #     according to the weights.
   sig { void }
   def clear_poller_group_infos
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)) }
+  def poller_groups_info
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)).void }
+  def poller_groups_info=(value)
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { void }
+  def clear_poller_groups_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -7127,27 +7295,27 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequ
   def clear_header
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
 # Note that the signal will be delivered with the first workflow task. If the workflow gets
-# another SignalWithStartWorkflow before the delay a workflow task will be dispatched immediately
+# another SignalWithStartWorkflow before the delay a workflow task will be made available for dispatch immediately
 # and the rest of the delay period will be ignored, even if that request also had a delay.
 # Signal via SignalWorkflowExecution will not unblock the workflow.
   sig { returns(T.nilable(Google::Protobuf::Duration)) }
   def workflow_start_delay
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
 # Note that the signal will be delivered with the first workflow task. If the workflow gets
-# another SignalWithStartWorkflow before the delay a workflow task will be dispatched immediately
+# another SignalWithStartWorkflow before the delay a workflow task will be made available for dispatch immediately
 # and the rest of the delay period will be ignored, even if that request also had a delay.
 # Signal via SignalWorkflowExecution will not unblock the workflow.
   sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
   def workflow_start_delay=(value)
   end
 
-  # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
+  # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
 # Note that the signal will be delivered with the first workflow task. If the workflow gets
-# another SignalWithStartWorkflow before the delay a workflow task will be dispatched immediately
+# another SignalWithStartWorkflow before the delay a workflow task will be made available for dispatch immediately
 # and the rest of the delay period will be ignored, even if that request also had a delay.
 # Signal via SignalWorkflowExecution will not unblock the workflow.
   sig { void }
@@ -7278,12 +7446,14 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionResp
   sig do
     params(
       run_id: T.nilable(String),
+      first_execution_run_id: T.nilable(String),
       started: T.nilable(T::Boolean),
       signal_link: T.nilable(Temporalio::Api::Common::V1::Link)
     ).void
   end
   def initialize(
     run_id: "",
+    first_execution_run_id: "",
     started: false,
     signal_link: nil
   )
@@ -7302,6 +7472,21 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionResp
   # The run id of the workflow that was started - or just signaled, if it was already running.
   sig { void }
   def clear_run_id
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { returns(String) }
+  def first_execution_run_id
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { params(value: String).void }
+  def first_execution_run_id=(value)
+  end
+
+  # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+  sig { void }
+  def clear_first_execution_run_id
   end
 
   # If true, a new workflow was started.
@@ -14170,6 +14355,7 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
       job_id: T.nilable(String),
       reason: T.nilable(String),
       executions: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::WorkflowExecution)]),
+      target_executions: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Execution)]),
       max_operations_per_second: T.nilable(Float),
       termination_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationTermination),
       signal_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationSignal),
@@ -14179,7 +14365,10 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
       update_workflow_options_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationUpdateWorkflowExecutionOptions),
       unpause_activities_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationUnpauseActivities),
       reset_activities_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationResetActivities),
-      update_activity_options_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions)
+      update_activity_options_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions),
+      cancel_activities_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationCancelActivities),
+      terminate_activities_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationTerminateActivities),
+      delete_activities_operation: T.nilable(Temporalio::Api::Batch::V1::BatchOperationDeleteActivities)
     ).void
   end
   def initialize(
@@ -14188,6 +14377,7 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
     job_id: "",
     reason: "",
     executions: [],
+    target_executions: [],
     max_operations_per_second: 0.0,
     termination_operation: nil,
     signal_operation: nil,
@@ -14197,7 +14387,10 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
     update_workflow_options_operation: nil,
     unpause_activities_operation: nil,
     reset_activities_operation: nil,
-    update_activity_options_operation: nil
+    update_activity_options_operation: nil,
+    cancel_activities_operation: nil,
+    terminate_activities_operation: nil,
+    delete_activities_operation: nil
   )
   end
 
@@ -14266,20 +14459,41 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
 
   # Executions to apply the batch operation
 # This field and `visibility_query` are mutually exclusive
+# DEPRECATED: Use `target_executions` instead.
   sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::WorkflowExecution)]) }
   def executions
   end
 
   # Executions to apply the batch operation
 # This field and `visibility_query` are mutually exclusive
+# DEPRECATED: Use `target_executions` instead.
   sig { params(value: ::Google::Protobuf::RepeatedField).void }
   def executions=(value)
   end
 
   # Executions to apply the batch operation
 # This field and `visibility_query` are mutually exclusive
+# DEPRECATED: Use `target_executions` instead.
   sig { void }
   def clear_executions
+  end
+
+  # Target executions to apply the batch operation. This field and `visibility_query`
+# are mutually exclusive.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Execution)]) }
+  def target_executions
+  end
+
+  # Target executions to apply the batch operation. This field and `visibility_query`
+# are mutually exclusive.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def target_executions=(value)
+  end
+
+  # Target executions to apply the batch operation. This field and `visibility_query`
+# are mutually exclusive.
+  sig { void }
+  def clear_target_executions
   end
 
   # Limit for the number of operations processed per second within this batch.
@@ -14418,6 +14632,42 @@ class Temporalio::Api::WorkflowService::V1::StartBatchOperationRequest
 
   sig { void }
   def clear_update_activity_options_operation
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Batch::V1::BatchOperationCancelActivities)) }
+  def cancel_activities_operation
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Batch::V1::BatchOperationCancelActivities)).void }
+  def cancel_activities_operation=(value)
+  end
+
+  sig { void }
+  def clear_cancel_activities_operation
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Batch::V1::BatchOperationTerminateActivities)) }
+  def terminate_activities_operation
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Batch::V1::BatchOperationTerminateActivities)).void }
+  def terminate_activities_operation=(value)
+  end
+
+  sig { void }
+  def clear_terminate_activities_operation
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Batch::V1::BatchOperationDeleteActivities)) }
+  def delete_activities_operation
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Batch::V1::BatchOperationDeleteActivities)).void }
+  def delete_activities_operation=(value)
+  end
+
+  sig { void }
+  def clear_delete_activities_operation
   end
 
   sig { returns(T.nilable(Symbol)) }
@@ -14744,7 +14994,9 @@ class Temporalio::Api::WorkflowService::V1::DescribeBatchOperationResponse
       complete_operation_count: T.nilable(Integer),
       failure_operation_count: T.nilable(Integer),
       identity: T.nilable(String),
-      reason: T.nilable(String)
+      reason: T.nilable(String),
+      query: T.nilable(String),
+      executions: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Execution)])
     ).void
   end
   def initialize(
@@ -14757,7 +15009,9 @@ class Temporalio::Api::WorkflowService::V1::DescribeBatchOperationResponse
     complete_operation_count: 0,
     failure_operation_count: 0,
     identity: "",
-    reason: ""
+    reason: "",
+    query: "",
+    executions: []
   )
   end
 
@@ -14909,6 +15163,36 @@ class Temporalio::Api::WorkflowService::V1::DescribeBatchOperationResponse
   # Reason indicates the reason to stop a operation
   sig { void }
   def clear_reason
+  end
+
+  # Query is the visibility query that defines the group of workflow to apply the batch operation
+  sig { returns(String) }
+  def query
+  end
+
+  # Query is the visibility query that defines the group of workflow to apply the batch operation
+  sig { params(value: String).void }
+  def query=(value)
+  end
+
+  # Query is the visibility query that defines the group of workflow to apply the batch operation
+  sig { void }
+  def clear_query
+  end
+
+  # Executions is the list of workflow OR standalone activity executions to apply the batch operation
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Execution)]) }
+  def executions
+  end
+
+  # Executions is the list of workflow OR standalone activity executions to apply the batch operation
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def executions=(value)
+  end
+
+  # Executions is the list of workflow OR standalone activity executions to apply the batch operation
+  sig { void }
+  def clear_executions
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -15573,7 +15857,8 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse
       request: T.nilable(Temporalio::Api::Nexus::V1::Request),
       poller_scaling_decision: T.nilable(Temporalio::Api::TaskQueue::V1::PollerScalingDecision),
       poller_group_id: T.nilable(String),
-      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)])
+      poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]),
+      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)
     ).void
   end
   def initialize(
@@ -15581,7 +15866,8 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse
     request: nil,
     poller_scaling_decision: nil,
     poller_group_id: "",
-    poller_group_infos: []
+    poller_group_infos: [],
+    poller_groups_info: nil
   )
   end
 
@@ -15682,6 +15968,39 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueResponse
 #     according to the weights.
   sig { void }
   def clear_poller_group_infos
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)) }
+  def poller_groups_info
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)).void }
+  def poller_groups_info=(value)
+  end
+
+  # The weighted, versioned list of poller groups IDs that client should use for future polls to
+# this task queue. Client should ignore this if it has already applied a snapshot with a
+# version greater than or equal to `poller_groups_info.version`. Client is expected to:
+#   1. Maintain minimum number of pollers no less than the number of groups.
+#   2. Try to assign the next poll to a group without any pending polls,
+#   3. If every group has some pending polls, assign the next poll to a group randomly
+#     according to the weights.
+  sig { void }
+  def clear_poller_groups_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -17990,7 +18309,6 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
       activity_id: T.nilable(String),
       run_id: T.nilable(String),
       identity: T.nilable(String),
-      reset_heartbeat: T.nilable(T::Boolean),
       keep_paused: T.nilable(T::Boolean),
       jitter: T.nilable(Google::Protobuf::Duration),
       restore_original_options: T.nilable(T::Boolean),
@@ -18003,7 +18321,6 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
     activity_id: "",
     run_id: "",
     identity: "",
-    reset_heartbeat: false,
     keep_paused: false,
     jitter: nil,
     restore_original_options: false,
@@ -18087,24 +18404,6 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
   # The identity of the client who initiated this request.
   sig { void }
   def clear_identity
-  end
-
-  # Indicates that activity should reset heartbeat details.
-# This flag will be applied only to the new instance of the activity.
-  sig { returns(T::Boolean) }
-  def reset_heartbeat
-  end
-
-  # Indicates that activity should reset heartbeat details.
-# This flag will be applied only to the new instance of the activity.
-  sig { params(value: T::Boolean).void }
-  def reset_heartbeat=(value)
-  end
-
-  # Indicates that activity should reset heartbeat details.
-# This flag will be applied only to the new instance of the activity.
-  sig { void }
-  def clear_reset_heartbeat
   end
 
   # If activity is paused, it will remain paused after reset
@@ -25077,17 +25376,17 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest
   def clear_on_conflict_options
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { returns(T.nilable(Google::Protobuf::Duration)) }
   def start_delay
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
   def start_delay=(value)
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { void }
   def clear_start_delay
   end
@@ -28744,7 +29043,8 @@ class Temporalio::Api::WorkflowService::V1::GetSystemInfoResponse::Capabilities
       sdk_metadata: T.nilable(T::Boolean),
       count_group_by_execution_status: T.nilable(T::Boolean),
       nexus: T.nilable(T::Boolean),
-      server_scaled_deployments: T.nilable(T::Boolean)
+      server_scaled_deployments: T.nilable(T::Boolean),
+      server_scaled_provider_cloud_run: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -28759,7 +29059,8 @@ class Temporalio::Api::WorkflowService::V1::GetSystemInfoResponse::Capabilities
     sdk_metadata: false,
     count_group_by_execution_status: false,
     nexus: false,
-    server_scaled_deployments: false
+    server_scaled_deployments: false,
+    server_scaled_provider_cloud_run: false
   )
   end
 
@@ -28974,6 +29275,27 @@ class Temporalio::Api::WorkflowService::V1::GetSystemInfoResponse::Capabilities
 # to be enabled via server configuration.
   sig { void }
   def clear_server_scaled_deployments
+  end
+
+  # True if the server supports the Cloud Run compute provider for
+# server-scaled deployments. Dependent on server version and the
+# provider being enabled via server configuration.
+  sig { returns(T::Boolean) }
+  def server_scaled_provider_cloud_run
+  end
+
+  # True if the server supports the Cloud Run compute provider for
+# server-scaled deployments. Dependent on server version and the
+# provider being enabled via server configuration.
+  sig { params(value: T::Boolean).void }
+  def server_scaled_provider_cloud_run=(value)
+  end
+
+  # True if the server supports the Cloud Run compute provider for
+# server-scaled deployments. Dependent on server version and the
+# provider being enabled via server configuration.
+  sig { void }
+  def clear_server_scaled_provider_cloud_run
   end
 
   sig { params(field: String).returns(T.untyped) }

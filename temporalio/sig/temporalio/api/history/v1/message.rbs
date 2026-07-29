@@ -2694,6 +2694,12 @@ module Temporalio
           def has_time_skipping_state_propagation?: () -> bool
           def clear_time_skipping_state_propagation: () -> void
 
+          # Versioning override requested for the child workflow. If present, this explicit override
+          # takes precedence over versioning behavior inherited from the parent workflow.
+          attr_accessor versioning_override(): ::Temporalio::Api::Workflow::V1::VersioningOverride?
+          def has_versioning_override?: () -> bool
+          def clear_versioning_override: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -2739,6 +2745,8 @@ module Temporalio
             "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
             time_skipping_state_propagation: (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
             "time_skipping_state_propagation" => (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
+            versioning_override: (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
+            "versioning_override" => (::Temporalio::Api::Workflow::V1::VersioningOverride | ::Temporalio::Api::Workflow::V1::VersioningOverride::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2766,6 +2774,7 @@ module Temporalio
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
             | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
             | ("time_skipping_state_propagation" name) -> ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
+            | ("versioning_override" name) -> ::Temporalio::Api::Workflow::V1::VersioningOverride?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -2790,6 +2799,7 @@ module Temporalio
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
             | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
             | ("time_skipping_state_propagation" name, ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation? value) -> void
+            | ("versioning_override" name, ::Temporalio::Api::Workflow::V1::VersioningOverride? value) -> void
         end
 
         class StartChildWorkflowExecutionFailedEventAttributes < ::Google::Protobuf::AbstractMessage
