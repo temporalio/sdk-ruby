@@ -180,14 +180,12 @@ class DeadlockTest < Test
       activities: [BasicActivity],
       illegal_workflow_calls: illegal_calls
     )
-    # @type var handle: untyped
-    handle = nil
+    handle = env.client.start_workflow(
+      DeadlockDuringValidatorWorkflow,
+      id: "wf-#{SecureRandom.uuid}",
+      task_queue:
+    )
     worker.run do
-      handle = env.client.start_workflow(
-        DeadlockDuringValidatorWorkflow,
-        id: "wf-#{SecureRandom.uuid}",
-        task_queue:
-      )
       assert_eventually_task_fail(handle:, message_contains: 'Potential deadlock detected')
       # The DeadlockError class must survive the tracer. A laundered
       # NondeterminismError would read "Cannot access ..." and, when raised inside a
