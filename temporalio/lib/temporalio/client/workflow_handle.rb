@@ -86,13 +86,17 @@ module Temporalio
         hist_run_id = result_run_id
         loop do
           # Get close event
-          event = fetch_history_events(
-            wait_new_event: true,
-            event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
-            skip_archival: true,
-            specific_run_id: hist_run_id,
-            rpc_options:
-          ).next
+          event = begin
+            fetch_history_events(
+              wait_new_event: true,
+              event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
+              skip_archival: true,
+              specific_run_id: hist_run_id,
+              rpc_options:
+            ).next
+          rescue StopIteration
+            next
+          end
 
           # Check each close type'
           case event.event_type
