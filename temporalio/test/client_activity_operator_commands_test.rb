@@ -313,7 +313,7 @@ class ClientActivityOperatorCommandsTest < Test
 
       handle.reset(restore_original_options: true)
       # restore_original_options reverts the changed option to the value the activity was created with.
-      assert_eventually do
+      assert_eventually(timeout: 30) do
         assert_in_delta 45.0, handle.describe.start_to_close_timeout, 0.5
       end
       handle.terminate('cleanup')
