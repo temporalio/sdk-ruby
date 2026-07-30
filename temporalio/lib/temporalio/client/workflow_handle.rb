@@ -95,6 +95,8 @@ module Temporalio
               rpc_options:
             ).next
           rescue StopIteration
+            # Timeskipping server can return empty events with no continuation token, this will surface as an empty
+            # iterator.
             next
           end
 

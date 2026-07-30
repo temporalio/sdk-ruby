@@ -37,6 +37,11 @@ to docs, or any other relevant information.
 - User metadata fields (static_summary, static_details, current_details, activity summary, timer
   summary) are no longer marked as experimental.
 
+### Fixed
+
+- `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
+  running when a history long poll expires without returning an event.
+
 ## [v1.6.0] - 2026-07-16
 
 ### Added
