@@ -96,12 +96,12 @@ module Temporalio
           @data_converter = data_converter
         end
 
-        # @return [String, nil] Static summary configured on the workflow. This is currently experimental.
+        # @return [String, nil] Static summary configured on the workflow.
         def static_summary
           user_metadata.first
         end
 
-        # @return [String, nil] Static details configured on the workflow. This is currently experimental.
+        # @return [String, nil] Static details configured on the workflow.
         def static_details
           user_metadata.last
         end

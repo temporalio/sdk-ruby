@@ -17,7 +17,10 @@ module Temporalio
           :rpc_retry,
           :keep_alive, # Optional
           :http_connect_proxy, # Optional
-          :dns_load_balancing # Optional
+          :dns_load_balancing, # Optional
+          :grpc_compression,
+          :payloads_warn_size,
+          :memo_warn_size
         )
 
         TLSOptions = Struct.new(
@@ -49,6 +52,10 @@ module Temporalio
 
         DnsLoadBalancingOptions = Struct.new(
           :resolution_interval
+        )
+
+        GrpcCompressionOptions = Struct.new(
+          :codec
         )
 
         def self.new(runtime, options)

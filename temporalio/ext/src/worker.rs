@@ -25,21 +25,25 @@ use magnus::{
     value::{Lazy, LazyId},
 };
 use prost::Message;
-use temporalio_common::protos::coresdk::{
-    ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
-    NexusSlotInfo, WorkflowSlotInfo,
-};
 use temporalio_common::protos::temporal::api::history::v1::History;
 use temporalio_common::protos::temporal::api::worker::v1::PluginInfo;
+use temporalio_common::protos::{
+    coresdk::{
+        ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
+        NexusSlotInfo, WorkflowSlotInfo,
+    },
+    temporal::api::enums::v1::VersioningBehavior,
+};
 use temporalio_common::{
     protos::coresdk::workflow_completion::WorkflowActivationCompletion,
     worker::{WorkerDeploymentOptions, WorkerDeploymentVersion, WorkerTaskTypes},
 };
 use temporalio_sdk_core::{
-    PollError, PollerBehavior, ResourceBasedSlotsOptions, ResourceSlotOptions, SlotInfo,
-    SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext, SlotReleaseContext,
-    SlotReservationContext, SlotSupplier, SlotSupplierOptions, SlotSupplierPermit, TunerHolder,
-    TunerHolderOptions, WorkerConfig, WorkerVersioningStrategy, WorkflowErrorType,
+    PollError, PollerBehavior, ResourceBasedSlotsOptions, ResourceBasedTunerConfig,
+    ResourceSlotOptions, SlotInfo, SlotInfoTrait, SlotKind, SlotKindType, SlotMarkUsedContext,
+    SlotReleaseContext, SlotReservationContext, SlotSupplier, SlotSupplierOptions,
+    SlotSupplierPermit, TunerHolder, TunerHolderOptions, WorkerConfig, WorkerVersioningStrategy,
+    WorkflowErrorType,
     replay::{HistoryForReplay, ReplayWorkerInput},
 };
 use tokio::sync::mpsc::{Sender, UnboundedSender, channel, unbounded_channel};
@@ -487,9 +491,13 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                         if val == 0 {
                             None
                         } else {
-                            Some(val.try_into().map_err(|_| {
-                                error!("Unknown default versioning behavior: {}", val)
-                            })?)
+                            Some(
+                                VersioningBehavior::try_from(val)
+                                    .map_err(|_| {
+                                        error!("Unknown default versioning behavior: {}", val)
+                                    })?
+                                    .into(),
+                            )
                         }
                     },
                 })
@@ -536,6 +544,9 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         .maybe_max_task_queue_activities_per_second(
             options.member::<Option<f64>>(id!("max_task_queue_activities_per_second"))?,
         )
+        .max_eager_activity_reservations_per_workflow_task(
+            options.member(id!("max_eager_activity_reservations_per_workflow_task"))?,
+        )
         .graceful_shutdown_period(Duration::from_secs_f64(
             options.member(id!("graceful_shutdown_period"))?,
         ))
@@ -569,6 +580,7 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 })
                 .collect::<HashSet<_>>(),
         )
+        .disable_payload_error_limit(options.member::<bool>(id!("disable_payload_error_limit"))?)
         .build()
         .map_err(|err| error!("Invalid worker options: {}", err))
 }
@@ -609,7 +621,7 @@ fn build_tuner(options: Struct, runtime_handle: &RuntimeHandle) -> Result<TunerH
     )?;
 
     TunerHolderOptions::builder()
-        .maybe_resource_based_options(resource_slot_options)
+        .maybe_resource_based_config(resource_slot_options.map(ResourceBasedTunerConfig::Options))
         .workflow_slot_options(workflow_slot_options)
         .activity_slot_options(activity_slot_options)
         .local_activity_slot_options(local_activity_slot_options)

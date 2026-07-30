@@ -20,11 +20,13 @@ module Temporalio
           attr_accessor default_heartbeat_throttle_interval: Float
           attr_accessor max_worker_activities_per_second: Float?
           attr_accessor max_task_queue_activities_per_second: Float?
+          attr_accessor max_eager_activity_reservations_per_workflow_task: Integer
           attr_accessor graceful_shutdown_period: Float
           attr_accessor nondeterminism_as_workflow_fail: bool
           attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
           attr_accessor deployment_options: DeploymentOptions?
           attr_accessor plugins: Array[String]
+          attr_accessor disable_payload_error_limit: bool
 
           def initialize: (
             namespace: String,
@@ -44,11 +46,13 @@ module Temporalio
             default_heartbeat_throttle_interval: Float,
             max_worker_activities_per_second: Float?,
             max_task_queue_activities_per_second: Float?,
+            max_eager_activity_reservations_per_workflow_task: Integer,
             graceful_shutdown_period: Float,
             nondeterminism_as_workflow_fail: bool,
             nondeterminism_as_workflow_fail_for_types: Array[String],
             deployment_options: DeploymentOptions?,
-            plugins: Array[String]
+            plugins: Array[String],
+            disable_payload_error_limit: bool
           ) -> void
         end
 

@@ -31,6 +31,7 @@ module WorkflowUtils
     interceptors: [],
     on_worker_run: nil,
     unsafe_workflow_io_enabled: false,
+    patch_activation_callback: nil,
     priority: Temporalio::Priority.default,
     start_workflow_client: client,
     tuner: Temporalio::Worker::Tuner.create_fixed
@@ -47,6 +48,7 @@ module WorkflowUtils
       max_heartbeat_throttle_interval:,
       interceptors:,
       unsafe_workflow_io_enabled:,
+      patch_activation_callback:,
       tuner:
     )
     worker.run do

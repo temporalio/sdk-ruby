@@ -74,6 +74,7 @@ module Temporalio
           workflow_failure_exception_types:,
           workflow_payload_codec_thread_pool:,
           unsafe_workflow_io_enabled:,
+          patch_activation_callback:,
           debug_mode:,
           assert_valid_local_activity:, on_eviction: nil
         )
@@ -118,6 +119,7 @@ module Temporalio
               t
             end.freeze,
             unsafe_workflow_io_enabled:,
+            patch_activation_callback:,
             assert_valid_local_activity:
           )
           @state.on_eviction = on_eviction if on_eviction
@@ -145,6 +147,8 @@ module Temporalio
           @state.logger.error(e)
         end
 
+        # Returns whether completion was submitted to the bridge
+        # rubocop:disable Naming/PredicateMethod
         def handle_activation_complete(runner:, activation_completion:, encoded:, completion_complete_queue:)
           if @payload_encoding_visitor && !encoded
             if Fiber.current_scheduler
@@ -154,12 +158,15 @@ module Temporalio
                 encode_activation_completion(runner, activation_completion)
               end
             end
+            false
           else
             @state.bridge_worker.async_complete_workflow_activation(
               activation_completion.run_id, activation_completion.to_proto, completion_complete_queue
             )
+            true
           end
         end
+        # rubocop:enable Naming/PredicateMethod
 
         def on_shutdown_complete
           @state.evict_all
@@ -194,7 +201,7 @@ module Temporalio
           attr_reader :workflow_definitions, :bridge_worker, :logger, :metric_meter, :data_converter, :deadlock_timeout,
                       :illegal_calls, :namespace, :task_queue, :disable_eager_activity_execution,
                       :workflow_interceptors, :workflow_failure_exception_types, :unsafe_workflow_io_enabled,
-                      :assert_valid_local_activity
+                      :patch_activation_callback, :assert_valid_local_activity
 
           attr_writer :on_eviction
 
@@ -202,7 +209,7 @@ module Temporalio
             workflow_definitions:, bridge_worker:, logger:, metric_meter:, data_converter:, deadlock_timeout:,
             illegal_calls:, namespace:, task_queue:, disable_eager_activity_execution:,
             workflow_interceptors:, workflow_failure_exception_types:, unsafe_workflow_io_enabled:,
-            assert_valid_local_activity:
+            patch_activation_callback:, assert_valid_local_activity:
           )
             @workflow_definitions = workflow_definitions
             @bridge_worker = bridge_worker
@@ -217,6 +224,7 @@ module Temporalio
             @workflow_interceptors = workflow_interceptors
             @workflow_failure_exception_types = workflow_failure_exception_types
             @unsafe_workflow_io_enabled = unsafe_workflow_io_enabled
+            @patch_activation_callback = patch_activation_callback
             @assert_valid_local_activity = assert_valid_local_activity
 
             @running_workflows = {}

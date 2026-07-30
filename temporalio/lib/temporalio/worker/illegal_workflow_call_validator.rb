@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/google_protobuf'
+
 module Temporalio
   class Worker
     # Custom validator for validating illegal workflow calls.
@@ -44,7 +46,7 @@ module Temporalio
       def self.known_safe_mutex_validator
         @known_safe_mutex_validator ||= IllegalWorkflowCallValidator.new do
           # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location path has protobuf
-          raise 'disallowed' unless caller_locations&.any? { |loc| loc.path&.include?('google/protobuf/') }
+          raise 'disallowed' unless ::Temporalio::Internal::GoogleProtobuf.in_call_stack?(caller_locations)
         end
       end
 

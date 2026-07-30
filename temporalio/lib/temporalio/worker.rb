@@ -28,6 +28,17 @@ module Temporalio
   # {run_all} is used for a collection of workers. These can wait until a block is complete or a {Cancellation} is
   # canceled.
   class Worker
+    # Input for the experimental `patch_activation_callback:` worker option.
+    #
+    # @!attribute [r] workflow_info
+    #   @return [Workflow::Info] Information about the workflow execution calling {Workflow.patched}.
+    # @!attribute [r] patch_id
+    #   @return [String] Patch ID passed to {Workflow.patched}.
+    PatchActivationInput = Data.define(
+      :workflow_info,
+      :patch_id
+    )
+
     Options = Data.define(
       :client,
       :task_queue,
@@ -50,6 +61,7 @@ module Temporalio
       :default_heartbeat_throttle_interval,
       :max_activities_per_second,
       :max_task_queue_activities_per_second,
+      :max_eager_activity_reservations_per_workflow_task,
       :graceful_shutdown_period,
       :disable_eager_activity_execution,
       :illegal_workflow_calls,
@@ -57,9 +69,11 @@ module Temporalio
       :workflow_payload_codec_thread_pool,
       :unsafe_workflow_io_enabled,
       :deployment_options,
+      :patch_activation_callback,
       :workflow_task_poller_behavior,
       :activity_task_poller_behavior,
-      :debug_mode
+      :debug_mode,
+      :disable_payload_error_limit
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
@@ -403,6 +417,9 @@ module Temporalio
     # @param max_task_queue_activities_per_second [Float, nil] Sets the maximum number of activities per second the task
     #   queue will dispatch, controlled server-side. Note that this only takes effect upon an activity poll request. If
     #   multiple workers on the same queue have different values set, they will thrash with the last poller winning.
+    # @param max_eager_activity_reservations_per_workflow_task [Integer] Maximum number of activity slots that may be
+    #   reserved for eager execution when completing a workflow task. Defaults to 3 and must be positive. To disable
+    #   eager activity execution, set `disable_eager_activity_execution: true`.
     # @param graceful_shutdown_period [Float] Amount of time after shutdown is called that activities are given to
     #   complete before their tasks are canceled.
     # @param disable_eager_activity_execution [Boolean] If true, disables eager activity execution. Eager activity
@@ -430,6 +447,9 @@ module Temporalio
     #   scheduler will fail. Instead of setting this to true, users are encouraged to use {Workflow::Unsafe.io_enabled}
     #   with a block for narrower enabling of IO.
     # @param deployment_options [DeploymentOptions, nil] Deployment options for the worker.
+    # @param patch_activation_callback [Proc, nil] Experimental callback to decide whether the first non-replay call to
+    #   {Workflow.patched} for a patch ID should activate that patch. The callback receives a {PatchActivationInput} and
+    #   must return `true` to activate the patch or `false` to leave it inactive.
     # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
     #   polling. Defaults to a 5-poller maximum.
     # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task
@@ -437,6 +457,9 @@ module Temporalio
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
+    # @param disable_payload_error_limit [Boolean] If true, the worker will not proactively fail workflow/activity
+    #   tasks whose payloads exceed the namespace error limits; oversized payloads are sent to the server, which
+    #   enforces the limit. Defaults to false (the worker fails such tasks before sending).
     def initialize(
       client:,
       task_queue:,
@@ -459,6 +482,7 @@ module Temporalio
       default_heartbeat_throttle_interval: 30,
       max_activities_per_second: nil,
       max_task_queue_activities_per_second: nil,
+      max_eager_activity_reservations_per_workflow_task: 3,
       graceful_shutdown_period: 0,
       disable_eager_activity_execution: false,
       illegal_workflow_calls: Worker.default_illegal_workflow_calls,
@@ -466,9 +490,11 @@ module Temporalio
       workflow_payload_codec_thread_pool: nil,
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
+      patch_activation_callback: nil,
       workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
       activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
-      debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase)
+      debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase),
+      disable_payload_error_limit: false
     )
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
@@ -494,6 +520,7 @@ module Temporalio
         default_heartbeat_throttle_interval:,
         max_activities_per_second:,
         max_task_queue_activities_per_second:,
+        max_eager_activity_reservations_per_workflow_task:,
         graceful_shutdown_period:,
         disable_eager_activity_execution:,
         illegal_workflow_calls:,
@@ -501,9 +528,11 @@ module Temporalio
         workflow_payload_codec_thread_pool:,
         unsafe_workflow_io_enabled:,
         deployment_options:,
+        patch_activation_callback:,
         workflow_task_poller_behavior:,
         activity_task_poller_behavior:,
-        debug_mode:
+        debug_mode:,
+        disable_payload_error_limit:
       ).freeze
       # Collect applicable client plugins and worker plugins, then validate and apply to options
       @plugins = client.options.plugins.grep(Plugin) + plugins
@@ -523,6 +552,11 @@ module Temporalio
          @options.deployment_options.default_versioning_behavior != VersioningBehavior::UNSPECIFIED
         raise ArgumentError,
               'default_versioning_behavior must be UNSPECIFIED when use_worker_versioning is false'
+      end
+      unless @options.max_eager_activity_reservations_per_workflow_task.positive?
+        raise ArgumentError,
+              'max_eager_activity_reservations_per_workflow_task must be positive; ' \
+              'use disable_eager_activity_execution: true to disable eager activity execution'
       end
 
       should_enforce_versioning_behavior =
@@ -560,17 +594,22 @@ module Temporalio
           default_heartbeat_throttle_interval: @options.default_heartbeat_throttle_interval,
           max_worker_activities_per_second: @options.max_activities_per_second,
           max_task_queue_activities_per_second: @options.max_task_queue_activities_per_second,
+          max_eager_activity_reservations_per_workflow_task:
+            @options.max_eager_activity_reservations_per_workflow_task,
           graceful_shutdown_period: @options.graceful_shutdown_period,
           nondeterminism_as_workflow_fail:,
           nondeterminism_as_workflow_fail_for_types:,
           deployment_options: @options.deployment_options._to_bridge_options,
-          plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort
+          plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort,
+          disable_payload_error_limit: @options.disable_payload_error_limit
         )
       )
 
       # Collect interceptors from client and params
-      @activity_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Activity)
-      @workflow_interceptors = (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Workflow)
+      @activity_interceptors =
+        (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Activity)
+      @workflow_interceptors =
+        (@options.client.options.interceptors + @options.interceptors).grep(Interceptor::Workflow)
 
       # Cancellation for the whole worker
       @worker_shutdown_cancellation = Cancellation.new
@@ -596,6 +635,7 @@ module Temporalio
           workflow_failure_exception_types: @options.workflow_failure_exception_types,
           workflow_payload_codec_thread_pool: @options.workflow_payload_codec_thread_pool,
           unsafe_workflow_io_enabled: @options.unsafe_workflow_io_enabled,
+          patch_activation_callback: @options.patch_activation_callback,
           debug_mode: @options.debug_mode,
           assert_valid_local_activity: ->(activity) { _assert_valid_local_activity(activity) }
         )

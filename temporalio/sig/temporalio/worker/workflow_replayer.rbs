@@ -95,6 +95,10 @@ module Temporalio
         def _bridge_worker: -> Internal::Bridge::Worker
         def _initiate_shutdown: -> void
         def _wait_all_complete: -> void
+
+        private
+
+        def workflow_activation_work_drained?: -> bool
       end
     end
   end

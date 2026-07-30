@@ -20,7 +20,7 @@ module Temporalio
         end
 
         # @see ActivityExecutor.execute_activity
-        def execute_activity(_defn, &)
+        def execute_activity(defn, &) # rubocop:disable Lint/UnusedMethodArgument
           @thread_pool.execute(&)
         end
 

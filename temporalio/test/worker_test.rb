@@ -14,6 +14,32 @@ class WorkerTest < Test
     end
   end
 
+  def test_max_eager_activity_reservations_per_workflow_task
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      activities: [SimpleActivity],
+      max_eager_activity_reservations_per_workflow_task: 7
+    )
+    assert_equal 7, worker.options.max_eager_activity_reservations_per_workflow_task
+
+    [0, -1].each do |value|
+      error = assert_raises(ArgumentError) do
+        Temporalio::Worker.new(
+          client: env.client,
+          task_queue: "tq-#{SecureRandom.uuid}",
+          activities: [SimpleActivity],
+          max_eager_activity_reservations_per_workflow_task: value
+        )
+      end
+      assert_equal(
+        'max_eager_activity_reservations_per_workflow_task must be positive; ' \
+        'use disable_eager_activity_execution: true to disable eager activity execution',
+        error.message
+      )
+    end
+  end
+
   def test_run_with_cancellation
     worker = Temporalio::Worker.new(
       client: env.client,
@@ -417,7 +443,9 @@ class WorkerTest < Test
     end
 
     # Confirm we canceled all waiting reservations
-    assert_equal waiting_contexts.size, supplier.canceled_contexts.size
+    assert_eventually do
+      assert_equal waiting_contexts.size, (supplier.canceled_contexts || []).size
+    end
     waiting_contexts.each { |w| assert_includes supplier.canceled_contexts, w }
   end
 

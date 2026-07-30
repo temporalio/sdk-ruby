@@ -2,8 +2,8 @@ use std::{collections::HashMap, future::Future, marker::PhantomData, time::Durat
 
 use temporalio_client::{
     ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
-    DnsLoadBalancingOptions, HttpConnectProxyOptions, RetryOptions, TlsOptions,
-    errors::ClientConnectError,
+    DnsLoadBalancingOptions, GrpcCompression as CoreGrpcCompression, HttpConnectProxyOptions,
+    PayloadLimitsOptions, RetryOptions, TlsOptions, errors::ClientConnectError,
 };
 
 use magnus::{
@@ -98,6 +98,16 @@ impl Client {
             .child(id!("rpc_retry"))?
             .ok_or_else(|| error!("Missing rpc_retry"))?;
         let tls = options.child(id!("tls"))?;
+        let grpc_compression = match options
+            .child(id!("grpc_compression"))?
+            .ok_or_else(|| error!("Missing grpc_compression"))?
+            .member::<String>(id!("codec"))?
+            .as_str()
+        {
+            "gzip" => CoreGrpcCompression::Gzip,
+            "none" => CoreGrpcCompression::None,
+            codec => return Err(error!("Invalid grpc compression codec: {}", codec)),
+        };
         let metrics_meter = runtime.handle.core.telemetry().get_temporal_metric_meter();
         let opts = ConnectionOptions::new(
             Url::parse(
@@ -112,6 +122,7 @@ impl Client {
         )
         .client_name(options.member::<String>(id!("client_name"))?)
         .client_version(options.member::<String>(id!("client_version"))?)
+        .grpc_compression(grpc_compression)
         .headers(headers.headers)
         .binary_headers(headers.binary_headers)
         .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
@@ -194,6 +205,12 @@ impl Client {
             Some(opts)
         } else {
             None
+        })
+        // The connection layer always supplies concrete thresholds (512 KiB / 2 KiB by default);
+        // `0` disables that warning.
+        .payload_limits(PayloadLimitsOptions {
+            payloads_warn_size: options.member::<u64>(id!("payloads_warn_size"))?,
+            memo_warn_size: options.member::<u64>(id!("memo_warn_size"))?,
         })
         .maybe_metrics_meter(metrics_meter)
         .build();

@@ -38,23 +38,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           submodules: recursive
 
       - name: Read protoc version
         shell: bash
         run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
-
-      # This is a temporary fix until Ruby 3.4.8 comes out.
-      #
-      # Per https://github.com/ruby/openssl/issues/949 (by way of
-      # https://github.com/rails/rails/issues/55886), newer Ruby + OpenSSL has an
-      # issue on macOS. This works around it until next Ruby release.
-      - name: Fixate OpenSSL (macos + 3.4 only)
-        if: ${{ matrix.os == 'macos-latest' && matrix.rubyVersion == '3.4' }}
-        shell: bash
-        run: echo "RUBY_CONFIGURE_OPTS=--with-openssl-dir=$(brew --prefix openssl@3.5)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
@@ -66,9 +56,15 @@ jobs:
 
       # Needed for tests currently
       - name: Install Go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
           go-version: stable
+
+      - name: Install protoc-gen-rbi
+        shell: bash
+        run: |
+          go install "github.com/coinbase/protoc-gen-rbi@$(tr -d '\n' < .protoc-gen-rbi-version)"
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Install protoc
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
@@ -135,6 +131,35 @@ jobs:
           TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
 
         run: bundle exec rake TESTOPTS="--verbose"
+
+      - name: Test Ruby with Sorbet runtime assertions
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        working-directory: ./temporalio
+        # Timeout just in case there's a hanging part in rake
+        timeout-minutes: 10
+        # Set env vars for cloud tests. If secrets aren't present, tests will be skipped.
+        env:
+          # For mTLS tests
+          TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}.tmprl.cloud:7233
+          TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT: ${{ secrets.TEMPORAL_CLIENT_CERT }}
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY: ${{ secrets.TEMPORAL_CLIENT_KEY }}
+
+          # For API key tests
+          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: ca-central-1.aws.api.temporal.io:7233
+          TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+
+          # For cloud ops tests
+          TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST: saas-api.tmprl.cloud:443
+          TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+          TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+          TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
+
+          # Enable Sorbet runtime type checking to verify RBI accuracy.
+          TEMPORAL_SORBET_RUNTIME_CHECK: "1"
+
+        run: bundle exec rake test TESTOPTS="--verbose"
 
       - name: Deploy docs
         # Only deploy on main merge, not in PRs

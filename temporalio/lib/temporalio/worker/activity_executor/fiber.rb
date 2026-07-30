@@ -23,7 +23,7 @@ module Temporalio
         end
 
         # @see ActivityExecutor.initialize_activity
-        def execute_activity(_defn, &)
+        def execute_activity(defn, &) # rubocop:disable Lint/UnusedMethodArgument
           ::Fiber.schedule(&)
         end
 

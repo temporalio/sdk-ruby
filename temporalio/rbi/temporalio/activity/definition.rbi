@@ -1,0 +1,74 @@
+# typed: true
+
+class Temporalio::Activity::Definition
+  sig { params(args: Object).returns(Object) }
+  def execute(*args); end
+
+  class << self
+    protected
+
+    sig { params(name: T.any(String, Symbol)).void }
+    def activity_name(name); end
+
+    sig { params(executor_name: Symbol).void }
+    def activity_executor(executor_name); end
+
+    sig { params(cancel_raise: T::Boolean).void }
+    def activity_cancel_raise(cancel_raise); end
+
+    sig { params(value: T::Boolean).void }
+    def activity_dynamic(value = true); end
+
+    sig { params(value: T::Boolean).void }
+    def activity_raw_args(value = true); end
+
+    sig { params(hints: Object).void }
+    def activity_arg_hint(*hints); end
+
+    sig { params(hint: T.nilable(Object)).void }
+    def activity_result_hint(hint); end
+  end
+end
+
+class Temporalio::Activity::Definition::Info
+  sig do
+    params(
+      name: T.nilable(T.any(String, Symbol)),
+      instance: T.nilable(T.any(Object, Proc)),
+      executor: Symbol,
+      cancel_raise: T::Boolean,
+      raw_args: T::Boolean,
+      arg_hints: T.nilable(T::Array[Object]),
+      result_hint: T.nilable(Object),
+      block: T.nilable(T.proc.params(arg0: Object).returns(Object))
+    ).void
+  end
+  def initialize(name:, instance: nil, executor: :default, cancel_raise: true, raw_args: false, arg_hints: nil, result_hint: nil, &block); end
+
+  sig { params(activity: T.any(Temporalio::Activity::Definition, T.class_of(Temporalio::Activity::Definition), Temporalio::Activity::Definition::Info)).returns(Temporalio::Activity::Definition::Info) }
+  def self.from_activity(activity); end
+
+  sig { returns(T.nilable(T.any(String, Symbol))) }
+  attr_reader :name
+
+  sig { returns(T.nilable(T.any(Object, Proc))) }
+  attr_reader :instance
+
+  sig { returns(Proc) }
+  attr_reader :proc
+
+  sig { returns(Symbol) }
+  attr_reader :executor
+
+  sig { returns(T::Boolean) }
+  attr_reader :cancel_raise
+
+  sig { returns(T::Boolean) }
+  attr_reader :raw_args
+
+  sig { returns(T.nilable(T::Array[Object])) }
+  attr_reader :arg_hints
+
+  sig { returns(T.nilable(Object)) }
+  attr_reader :result_hint
+end

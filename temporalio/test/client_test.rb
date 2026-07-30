@@ -49,6 +49,21 @@ class ClientTest < Test
     assert_in_delta 30.0, opts.resolution_interval
   end
 
+  def test_grpc_compression_defaults_to_gzip
+    client = Temporalio::Client.connect('localhost:7233', 'default', lazy_connect: true)
+    assert_instance_of Temporalio::Client::Connection::GrpcCompressionOptions::Gzip,
+                       client.connection.options.grpc_compression
+    assert_equal :gzip, client.connection.options.grpc_compression.codec
+  end
+
+  def test_grpc_compression_none_preserved
+    compression_opts = Temporalio::Client::Connection::GrpcCompressionOptions::None.new
+    client = Temporalio::Client.connect(
+      'localhost:7233', 'default', lazy_connect: true, grpc_compression: compression_opts
+    )
+    assert_equal compression_opts, client.connection.options.grpc_compression
+  end
+
   class TrackCallsInterceptor
     include Temporalio::Client::Interceptor
 
@@ -171,6 +186,39 @@ class ClientTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"
+    end
+  end
+
+  def test_result_retries_when_history_long_poll_returns_no_events
+    workflow_service = env.client.workflow_service
+    original_fetch = workflow_service.method(:get_workflow_execution_history)
+    empty_responses_remaining = 2
+    history_fetch_count = 0
+    workflow_service.define_singleton_method(:get_workflow_execution_history) do |request, **kwargs|
+      history_fetch_count += 1
+      if empty_responses_remaining.positive?
+        empty_responses_remaining -= 1
+        Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new
+      else
+        original_fetch.call(request, **kwargs)
+      end
+    end
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    begin
+      Temporalio::Worker.new(client: env.client, task_queue:, workflows: [SimpleWorkflow]).run do
+        handle = env.client.start_workflow(
+          SimpleWorkflow,
+          'Temporal',
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue:
+        )
+        assert_equal 'Hello, Temporal!', handle.result
+      end
+      assert_equal 0, empty_responses_remaining
+      assert_operator history_fetch_count, :>=, 3
+    ensure
+      workflow_service.singleton_class.send(:remove_method, :get_workflow_execution_history)
     end
   end
 

@@ -1,6 +1,5 @@
 tmp/
 target/
-Gemfile.lock
 .gem_rbs_collection
 *.so
 temporalio/test/golangworker/golangworker

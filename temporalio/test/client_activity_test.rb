@@ -24,8 +24,10 @@ class ClientActivityTest < Test
 
   class SlowActivity < Temporalio::Activity::Definition
     def execute
-      Temporalio::Activity::Context.current.heartbeat
-      sleep 0.1 until Temporalio::Activity::Context.current.cancellation.canceled?
+      until Temporalio::Activity::Context.current.cancellation.canceled?
+        Temporalio::Activity::Context.current.heartbeat
+        sleep 0.1
+      end
       raise Temporalio::Error::CanceledError, 'canceled'
     end
   end
@@ -170,13 +172,20 @@ class ClientActivityTest < Test
   end
 
   def test_start_activity_rejects_junk_param
-    err = assert_raises(ArgumentError) do
+    block = proc do
       env.client.start_activity(
         42, # steep:ignore
         id: "act-#{SecureRandom.uuid}",
         task_queue: 'unreached-tq',
         start_to_close_timeout: 10
       )
+    end
+    err = assert_raises(ArgumentError) do
+      if defined?(SigApplicator)
+        SigApplicator.suppress_errors { block.call }
+      else
+        block.call
+      end
     end
     assert_match(/not an activity/i, err.message)
   end

@@ -1,0 +1,52 @@
+module Worker
+  class WorkflowInstanceSchedulerTest < Test
+    class FakeWorkflowInstance
+      attr_reader context: Object
+
+      def initialize: -> void
+
+      def context_frozen: -> false
+
+      def illegal_call_tracing_disabled: [T] () { -> T } -> T
+    end
+
+    class SchedulerThread
+      def initialize: (Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler) -> void
+
+      def call: [T] () { -> T } -> T
+
+      def async_call: [T] () { -> T } -> Queue
+
+      def wait_result: (Queue result) -> untyped
+
+      def stop: -> untyped
+
+      def scheduler_state: -> String
+    end
+
+    private
+
+    def new_scheduler: -> Temporalio::Internal::Worker::WorkflowInstance::Scheduler
+
+    def held_mutex: -> [Mutex, ^() -> void]
+
+    def assert_thread_blocking_fiber_count: (
+      Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler,
+      Integer expected_count
+    ) -> void
+
+    def thread_blocking_fiber_count: (
+      Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler
+    ) -> Integer
+
+    def thread_blocking_fibers: (
+      Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler
+    ) -> Array[Fiber]
+
+    def unblock_thread_blocking_fibers: (
+      Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler
+    ) -> void
+
+    def drain_queue: (Queue queue) -> Array[untyped]
+  end
+end

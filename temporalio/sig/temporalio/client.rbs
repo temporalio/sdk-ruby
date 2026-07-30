@@ -51,7 +51,8 @@ module Temporalio
       ?http_connect_proxy: Connection::HTTPConnectProxyOptions?,
       ?runtime: Runtime,
       ?lazy_connect: bool,
-      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?
+      ?dns_load_balancing: Connection::DnsLoadBalancingOptions?,
+      ?grpc_compression: Connection::GrpcCompressionOptions::Gzip | Connection::GrpcCompressionOptions::None
     ) -> Client
 
     def self._validate_plugins!: (Array[Plugin] plugins) -> void
@@ -139,7 +140,7 @@ module Temporalio
     ) -> ActivityHandle
 
     def start_activity: (
-      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      singleton(Activity::Definition) | Activity::Definition | Activity::Definition::Info | Symbol | String activity,
       *Object? args,
       id: String,
       task_queue: String,
@@ -161,7 +162,7 @@ module Temporalio
     ) -> ActivityHandle
 
     def execute_activity: (
-      singleton(Activity::Definition) | Activity::Definition::Info | Symbol | String activity,
+      singleton(Activity::Definition) | Activity::Definition | Activity::Definition::Info | Symbol | String activity,
       *Object? args,
       id: String,
       task_queue: String,

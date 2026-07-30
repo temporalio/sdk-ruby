@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'google/protobuf'
 require 'securerandom'
 require 'temporalio/testing'
 require 'temporalio/worker'
@@ -7,6 +8,23 @@ require 'temporalio/workflow'
 require 'test'
 
 class DeadlockTest < Test
+  module SchedulerDrainProbe
+    class << self
+      attr_accessor :queue
+    end
+
+    def run_until_all_yielded
+      super
+    ensure
+      queue = SchedulerDrainProbe.queue
+      @instance.illegal_call_tracing_disabled { queue << true } if queue
+    end
+  end
+
+  unless Temporalio::Internal::Worker::WorkflowInstance::Scheduler.ancestors.include?(SchedulerDrainProbe)
+    Temporalio::Internal::Worker::WorkflowInstance::Scheduler.prepend(SchedulerDrainProbe)
+  end
+
   class BasicActivity < Temporalio::Activity::Definition
     def execute(value)
       value
@@ -45,6 +63,55 @@ class DeadlockTest < Test
       Temporalio::Workflow.sleep(0.1)
       Temporalio::Workflow.wait_condition { false }
     end
+  end
+
+  module ValidatorInterruptProbe
+    def self.probe; end
+  end
+
+  class DeadlockDuringValidatorWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow::Future.new do
+        ValidatorInterruptProbe.probe
+        Temporalio::Workflow.execute_activity(BasicActivity, 1, start_to_close_timeout: 10)
+      end
+      # Future intentionally not waited (mirrors a fanout blocked on all_of with other
+      # futures pending) so a stored failure would never surface
+      Temporalio::Workflow.wait_condition { false }
+    end
+  end
+
+  class ProtobufObjectCachePartialCommandsWorkflow < Temporalio::Workflow::Definition
+    ACTIVITY_COUNT = 6
+    BLOCK_AFTER_ACTIVITY_COUNT = 3
+    REACHED_PROTOBUF_CACHE = Queue.new
+
+    class << self
+      attr_accessor :protobuf_mutex_held
+    end
+
+    def execute
+      futures = []
+      ACTIVITY_COUNT.times do |index|
+        if index == BLOCK_AFTER_ACTIVITY_COUNT
+          Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled { REACHED_PROTOBUF_CACHE << true }
+          Temporalio::Workflow.wait_condition(cancellation: nil) { true }
+          nil until self.class.protobuf_mutex_held
+          Google::Protobuf::Internal::OBJECT_CACHE.try_add(Object.new, Object.new)
+        end
+        futures << Temporalio::Workflow::Future.new do
+          Temporalio::Workflow.execute_activity(BasicActivity, index, start_to_close_timeout: 10)
+        end
+      end
+      Temporalio::Workflow::Future.all_of(*futures).wait
+    end
+  end
+
+  def setup
+    super
+    ProtobufObjectCachePartialCommandsWorkflow::REACHED_PROTOBUF_CACHE.clear
+    ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = false
+    SchedulerDrainProbe.queue = nil
   end
 
   def test_deadlock_in_future_fails_workflow_task_and_replays_on_new_worker
@@ -91,5 +158,152 @@ class DeadlockTest < Test
     end
   ensure
     handle&.terminate
+  end
+
+  def test_deadlock_during_illegal_call_validator_fails_workflow_task
+    task_queue = "tq-#{SecureRandom.uuid}"
+    # Simulates the deadlock watchdog's async raise landing while an illegal call
+    # validator block is executing (e.g. Thread::Mutex#synchronize inside protobuf's
+    # ObjectCache during ScheduleActivity arg serialization)
+    illegal_calls = Temporalio::Worker.default_illegal_workflow_calls.merge(
+      'DeadlockTest::ValidatorInterruptProbe' => [
+        Temporalio::Worker::IllegalWorkflowCallValidator.new(method_name: :probe) do |_info|
+          raise Temporalio::Worker::WorkflowExecutor::ThreadPool::DeadlockError,
+                '[TMPRL1101] Potential deadlock detected: simulated async deadlock raise'
+        end
+      ]
+    )
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [DeadlockDuringValidatorWorkflow],
+      activities: [BasicActivity],
+      illegal_workflow_calls: illegal_calls
+    )
+    handle = env.client.start_workflow(
+      DeadlockDuringValidatorWorkflow,
+      id: "wf-#{SecureRandom.uuid}",
+      task_queue:
+    )
+    worker.run do
+      assert_eventually_task_fail(handle:, message_contains: 'Potential deadlock detected')
+      # The DeadlockError class must survive the tracer. A laundered
+      # NondeterminismError would read "Cannot access ..." and, when raised inside a
+      # future, be stored instead of failing the task at all
+      failure_messages = handle.fetch_history_events.filter_map do |event|
+        event.workflow_task_failed_event_attributes&.failure&.message
+      end
+      refute_empty(failure_messages)
+      failure_messages.each { |message| refute_includes(message, 'Cannot access') }
+    end
+  ensure
+    handle&.terminate
+  end
+
+  def test_protobuf_object_cache_mutex_does_not_emit_partial_command_batch
+    task_queue = "tq-#{SecureRandom.uuid}"
+    # @type var release_mutex: (^() -> void)?
+    release_mutex = nil
+    # @type var handle: untyped
+    handle = nil
+    scheduler_drained = Queue.new
+    SchedulerDrainProbe.queue = scheduler_drained
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [ProtobufObjectCachePartialCommandsWorkflow],
+      activities: [BasicActivity],
+      workflow_executor: Temporalio::Worker::WorkflowExecutor::ThreadPool.new(max_threads: 1)
+    )
+
+    worker.run do
+      handle = env.client.start_workflow(
+        ProtobufObjectCachePartialCommandsWorkflow,
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      Timeout.timeout(10) { ProtobufObjectCachePartialCommandsWorkflow::REACHED_PROTOBUF_CACHE.pop }
+      release_mutex = hold_protobuf_object_cache_mutex
+      ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
+      wait_for_protobuf_object_cache_mutex_waiter
+      Timeout.timeout(10.0) { scheduler_drained.pop }
+      (release_mutex || raise).call
+      release_mutex = nil
+
+      # @type var events: Array[untyped]
+      events = []
+      assert_eventually(timeout: 10.0) do
+        events = handle.fetch_history_events.to_a
+        assert(events.any? do |event|
+          %i[
+            EVENT_TYPE_WORKFLOW_TASK_COMPLETED
+            EVENT_TYPE_WORKFLOW_TASK_FAILED
+          ].include?(event.event_type)
+        end)
+      end
+
+      first_completed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_COMPLETED }
+      first_failed_index = events.index { |event| event.event_type == :EVENT_TYPE_WORKFLOW_TASK_FAILED }
+      unless first_failed_index && (!first_completed_index || first_failed_index < first_completed_index)
+        refute_nil first_completed_index, "History event types: #{events.map(&:event_type).inspect}"
+        completed_index = first_completed_index || raise
+        scheduled_count = (events[(completed_index + 1)..] || []).take_while do |event|
+          event.event_type == :EVENT_TYPE_ACTIVITY_TASK_SCHEDULED
+        end.size
+        assert_equal(
+          ProtobufObjectCachePartialCommandsWorkflow::ACTIVITY_COUNT,
+          scheduled_count,
+          'Workflow task completed with a partial activity schedule command batch while a workflow fiber was ' \
+          'blocked on the protobuf ObjectCache mutex'
+        )
+      end
+    ensure
+      SchedulerDrainProbe.queue = nil
+      ProtobufObjectCachePartialCommandsWorkflow.protobuf_mutex_held = true
+      release_mutex&.call
+      begin
+        handle&.terminate
+      rescue Temporalio::Error::RPCError
+        # Ignore cleanup races if the workflow closed before terminate arrived.
+      end
+    end
+  end
+
+  def hold_protobuf_object_cache_mutex
+    mutex = Google::Protobuf::Internal::OBJECT_CACHE.instance_variable_get(:@mutex)
+    acquired = Queue.new
+    release = Queue.new
+    released = false
+    holder = Thread.new do
+      mutex.synchronize do
+        acquired << true
+        release.pop
+      end
+    end
+    acquired.pop
+
+    lambda do
+      unless released
+        released = true
+        release << true
+      end
+      holder.join
+    end
+  end
+
+  def wait_for_protobuf_object_cache_mutex_waiter
+    assert_eventually(timeout: 10.0, interval: 0.01) do
+      assert(
+        Thread.list.any? do |thread|
+          next false if thread == Thread.current
+
+          thread.backtrace_locations&.any? do |location|
+            location.path.end_with?('/google/protobuf/internal/object_cache.rb') &&
+              location.label.include?('synchronize')
+          end
+        end,
+        'Expected a workflow thread to block on protobuf ObjectCache mutex'
+      )
+    end
   end
 end

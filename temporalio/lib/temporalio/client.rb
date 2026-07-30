@@ -99,6 +99,9 @@ module Temporalio
     # @param dns_load_balancing [Connection::DnsLoadBalancingOptions, nil] DNS load balancing options for the
     #   connection. Default is +nil+ (disabled). Silently disabled when +http_connect_proxy+ is set, since the two are
     #   mutually exclusive.
+    # @param grpc_compression [Connection::GrpcCompressionOptions::Gzip, Connection::GrpcCompressionOptions::None]
+    #   Transport-level gRPC compression. Defaults to gzip. Set to {Connection::GrpcCompressionOptions::None} to opt
+    #   out.
     #
     # @return [Client] Connected client.
     #
@@ -121,7 +124,8 @@ module Temporalio
       http_connect_proxy: nil,
       runtime: Runtime.default,
       lazy_connect: false,
-      dns_load_balancing: nil
+      dns_load_balancing: nil,
+      grpc_compression: Connection::GrpcCompressionOptions::Gzip.new
     )
       # Prepare connection. The connection var is needed here so it can be used in callback for plugin.
       base_connection = nil
@@ -138,16 +142,16 @@ module Temporalio
 
                            # Root next call
                            next_call_called = false
-                           next_call = proc do |options|
+                           next_call = proc do |call_options|
                              raise 'next_call called more than once' if next_call_called
 
                              next_call_called = true
-                             block&.call(options)
+                             block&.call(call_options)
                              base_connection
                            end
                            # Go backwards, building up new next_call invocations on plugins
-                           next_call = plugins.reverse_each.reduce(next_call) do |next_call, plugin|
-                             proc { |options| plugin.connect_client(options, next_call) }
+                           next_call = plugins.reverse_each.reduce(next_call) do |inner_next_call, plugin|
+                             proc { |call_options| plugin.connect_client(call_options, inner_next_call) }
                            end
                            # Do call
                            final_connection = next_call.call(options)
@@ -168,6 +172,7 @@ module Temporalio
         runtime:,
         lazy_connect:,
         dns_load_balancing:,
+        grpc_compression:,
         around_connect: # steep:ignore
       )
 
@@ -282,11 +287,10 @@ module Temporalio
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
     # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
-    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    #   CLI/UI. This can be in single-line Temporal markdown format.
     # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
     #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
-    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
-    #   experimental.
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
@@ -375,11 +379,10 @@ module Temporalio
     # @param id [String] Unique identifier for the workflow execution.
     # @param task_queue [String] Task queue to run the workflow on.
     # @param static_summary [String, nil] Fixed single-line summary for this workflow execution that may appear in
-    #   CLI/UI. This can be in single-line Temporal markdown format. This is currently experimental.
+    #   CLI/UI. This can be in single-line Temporal markdown format.
     # @param static_details [String, nil] Fixed details for this workflow execution that may appear in CLI/UI. This can
     #   be in Temporal markdown format and can be multiple lines. This is a fixed value on the workflow that cannot be
-    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow. This is currently
-    #   experimental.
+    #   updated. For details that can be updated, use {Workflow.current_details=} within the workflow.
     # @param execution_timeout [Float, nil] Total workflow execution timeout in seconds including retries and continue
     #   as new.
     # @param run_timeout [Float, nil] Timeout of a single workflow run in seconds.
