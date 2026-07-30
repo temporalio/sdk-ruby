@@ -182,12 +182,11 @@ module Temporalio
         nil
       end
 
-      # Reset the activity. Resetting sets the attempt count back to the start and resets the
-      # activity's timeouts.
+      # Reset the activity. Resetting sets the attempt count back to the start, resets the activity's
+      # timeouts, and clears any recorded heartbeat details.
       #
       # WARNING: Standalone Activities are experimental.
       #
-      # @param reset_heartbeat [Boolean] If true, reset the activity's heartbeat details.
       # @param keep_paused [Boolean] If true and the activity is paused, it remains paused after reset.
       # @param jitter [Float, nil] If set and the activity is in backoff, it will start at a random
       #   time within this duration (in seconds).
@@ -195,13 +194,11 @@ module Temporalio
       #   originals it was created with.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [Error::RPCError] RPC error from call.
-      def reset(reset_heartbeat: false, keep_paused: false, jitter: nil, restore_original_options: false,
-                rpc_options: nil)
+      def reset(keep_paused: false, jitter: nil, restore_original_options: false, rpc_options: nil)
         @client._impl.reset_activity(
           Interceptor::ResetActivityInput.new(
             activity_id: id,
             activity_run_id: run_id,
-            reset_heartbeat:,
             keep_paused:,
             jitter:,
             restore_original_options:,

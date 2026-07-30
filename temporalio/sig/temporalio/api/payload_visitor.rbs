@@ -164,6 +164,8 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_schedule_v1_schedule: (untyped value) -> void
       def api_schedule_v1_schedule_action: (untyped value) -> void
       def api_schedule_v1_schedule_list_entry: (untyped value) -> void
+      def api_sdk_v1_event_group_marker: (untyped value) -> void
+      def api_sdk_v1_event_group_marker_label: (untyped value) -> void
       def api_sdk_v1_user_metadata: (untyped value) -> void
       def api_update_v1_input: (untyped value) -> void
       def api_update_v1_outcome: (untyped value) -> void

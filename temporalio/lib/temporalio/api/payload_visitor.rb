@@ -445,6 +445,7 @@ module Temporalio
       def api_command_v1_command(value)
         @on_enter&.call(value)
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.event_group_markers.each { |v| api_sdk_v1_event_group_marker(v) }
         api_command_v1_schedule_activity_task_command_attributes(value.schedule_activity_task_command_attributes) if value.has_schedule_activity_task_command_attributes?
         api_command_v1_complete_workflow_execution_command_attributes(value.complete_workflow_execution_command_attributes) if value.has_complete_workflow_execution_command_attributes?
         api_command_v1_fail_workflow_execution_command_attributes(value.fail_workflow_execution_command_attributes) if value.has_fail_workflow_execution_command_attributes?
@@ -729,6 +730,7 @@ module Temporalio
       def api_history_v1_history_event(value)
         @on_enter&.call(value)
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.event_group_markers.each { |v| api_sdk_v1_event_group_marker(v) }
         api_history_v1_workflow_execution_started_event_attributes(value.workflow_execution_started_event_attributes) if value.has_workflow_execution_started_event_attributes?
         api_history_v1_workflow_execution_completed_event_attributes(value.workflow_execution_completed_event_attributes) if value.has_workflow_execution_completed_event_attributes?
         api_history_v1_workflow_execution_failed_event_attributes(value.workflow_execution_failed_event_attributes) if value.has_workflow_execution_failed_event_attributes?
@@ -1064,6 +1066,18 @@ module Temporalio
         @on_enter&.call(value)
         api_common_v1_memo(value.memo) if value.has_memo?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
+        @on_exit&.call(value)
+      end
+      
+      def api_sdk_v1_event_group_marker(value)
+        @on_enter&.call(value)
+        api_sdk_v1_event_group_marker_label(value.label) if value.has_label?
+        @on_exit&.call(value)
+      end
+      
+      def api_sdk_v1_event_group_marker_label(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.label) if value.has_label?
         @on_exit&.call(value)
       end
       

@@ -313,6 +313,13 @@ module Temporalio
           attr_writer tasks_dispatch_rate(): ::Float | ::Integer
           def clear_tasks_dispatch_rate: () -> void
 
+          # Whether rate limiting blocked any dispatches within the recent observation window (approximately
+          # 30 seconds). When true, adding more workers will not increase throughput — the bottleneck is the
+          # rate limit, not worker count. This field is useful for auto-scaling systems to avoid unnecessary
+          # scale-up.
+          attr_accessor rate_limiting_active(): bool
+          def clear_rate_limiting_active: () -> void
+
           type init_map = {
             approximate_backlog_count: (::Integer | ::Float)?,
             "approximate_backlog_count" => (::Integer | ::Float)?,
@@ -322,6 +329,8 @@ module Temporalio
             "tasks_add_rate" => (::Float | ::Integer)?,
             tasks_dispatch_rate: (::Float | ::Integer)?,
             "tasks_dispatch_rate" => (::Float | ::Integer)?,
+            rate_limiting_active: bool?,
+            "rate_limiting_active" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -331,12 +340,14 @@ module Temporalio
             | ("approximate_backlog_age" name) -> ::Google::Protobuf::Duration?
             | ("tasks_add_rate" name) -> ::Float
             | ("tasks_dispatch_rate" name) -> ::Float
+            | ("rate_limiting_active" name) -> bool
 
           def []=:
               ("approximate_backlog_count" name, (::Integer | ::Float) value) -> void
             | ("approximate_backlog_age" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("tasks_add_rate" name, (::Float | ::Integer) value) -> void
             | ("tasks_dispatch_rate" name, (::Float | ::Integer) value) -> void
+            | ("rate_limiting_active" name, bool value) -> void
         end
 
         # Deprecated. Use `InternalTaskQueueStatus`. This is kept until `DescribeTaskQueue` supports legacy behavior.
@@ -843,6 +854,39 @@ module Temporalio
           def []=:
               ("id" name, (::String | ::Symbol) value) -> void
             | ("weight" name, (::Float | ::Integer) value) -> void
+        end
+
+        # A versioned snapshot of the poller groups the client should use for future polls to a task
+        # queue. The version is monotonically increasing so that a client can ignore a snapshot that is
+        # older than the one it has already applied.
+        class PollerGroupsInfo < ::Google::Protobuf::AbstractMessage
+
+          # Monotonically increasing version of this snapshot. A client should ignore any snapshot whose
+          # version is not greater than the one it last applied.
+          attr_reader version(): ::Integer
+          attr_writer version(): ::Integer | ::Float
+          def clear_version: () -> void
+
+          # The weighted list of poller groups the client should use for future polls to this task queue.
+          attr_accessor poller_groups(): ::Google::Protobuf::RepeatedField
+          def clear_poller_groups: () -> void
+
+          type init_map = {
+            version: (::Integer | ::Float)?,
+            "version" => (::Integer | ::Float)?,
+            poller_groups: ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+            "poller_groups" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("version" name) -> ::Integer
+            | ("poller_groups" name) -> ::Google::Protobuf::RepeatedField
+
+          def []=:
+              ("version" name, (::Integer | ::Float) value) -> void
+            | ("poller_groups" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         # Attached to task responses to give hints to the SDK about how it may adjust its number of

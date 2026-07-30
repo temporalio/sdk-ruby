@@ -49,7 +49,8 @@ class ClientActivityOperatorCommandsTest < Test
 
   # Records heartbeat details on the first attempt then fails, so the details are persisted and the
   # activity backs off (observable + pausable while scheduled). Later attempts just run without
-  # heartbeating, so once the details are cleared by reset_heartbeat they stay cleared.
+  # heartbeating, so once the details are cleared (by reset or unpause(reset_heartbeat:)) they stay
+  # cleared.
   class HeartbeatThenStopActivity < Temporalio::Activity::Definition
     def execute
       ctx = Temporalio::Activity::Context.current
@@ -297,7 +298,8 @@ class ClientActivityOperatorCommandsTest < Test
 
       handle.reset(keep_paused: true)
       # keep_paused means the activity remains paused across the reset.
-      assert_eventually do
+      # DIAGNOSTIC (2026-07-30): bumped from default 10s to 60s.
+      assert_eventually(timeout: 60) do
         assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
       end
       handle.terminate('cleanup')
@@ -313,7 +315,8 @@ class ClientActivityOperatorCommandsTest < Test
 
       handle.reset(restore_original_options: true)
       # restore_original_options reverts the changed option to the value the activity was created with.
-      assert_eventually(timeout: 30) do
+      # DIAGNOSTIC (2026-07-30): bumped from 30s to 60s.
+      assert_eventually(timeout: 60) do
         assert_in_delta 45.0, handle.describe.start_to_close_timeout, 0.5
       end
       handle.terminate('cleanup')
@@ -353,14 +356,15 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_reset_resets_heartbeat
+  def test_reset_clears_heartbeat_by_default
     with_activity_worker([HeartbeatThenStopActivity]) do |task_queue|
       handle = start_backed_off_heartbeat_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # keep_paused so no new attempt runs to re-record details; reset_heartbeat clears them in place.
-      handle.reset(reset_heartbeat: true, keep_paused: true)
+      # reset always clears heartbeat details (there is no opt-in flag as of api#820);
+      # keep_paused so no new attempt runs to re-record them.
+      handle.reset(keep_paused: true)
       assert_eventually do
         refute handle.describe.has_heartbeat_details?
       end

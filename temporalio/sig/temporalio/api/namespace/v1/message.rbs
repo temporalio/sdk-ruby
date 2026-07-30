@@ -65,6 +65,26 @@ module Temporalio
             attr_accessor workflow_update_callbacks(): bool
             def clear_workflow_update_callbacks: () -> void
 
+            # When true, workers should use poller autoscaling by default unless explicitly configured otherwise.
+            attr_accessor poller_autoscaling_auto_enroll(): bool
+            def clear_poller_autoscaling_auto_enroll: () -> void
+
+            # True if the namespace supports pagination of `RespondWorkflowTaskCompleted` request.
+            attr_accessor workflow_task_completion_pagination(): bool
+            def clear_workflow_task_completion_pagination: () -> void
+
+            # True if the namespace supports start delay for standalone activities.
+            attr_accessor standalone_activity_start_delay(): bool
+            def clear_standalone_activity_start_delay: () -> void
+
+            # True if the namespace supports batch operations for standalone activities.
+            attr_accessor standalone_activity_batch_operations(): bool
+            def clear_standalone_activity_batch_operations: () -> void
+
+            # True if the namespace supports standalone activity operator commands.
+            attr_accessor standalone_activity_operator_commands(): bool
+            def clear_standalone_activity_operator_commands: () -> void
+
             type init_map = {
               eager_workflow_start: bool?,
               "eager_workflow_start" => bool?,
@@ -90,6 +110,16 @@ module Temporalio
               "standalone_nexus_operation" => bool?,
               workflow_update_callbacks: bool?,
               "workflow_update_callbacks" => bool?,
+              poller_autoscaling_auto_enroll: bool?,
+              "poller_autoscaling_auto_enroll" => bool?,
+              workflow_task_completion_pagination: bool?,
+              "workflow_task_completion_pagination" => bool?,
+              standalone_activity_start_delay: bool?,
+              "standalone_activity_start_delay" => bool?,
+              standalone_activity_batch_operations: bool?,
+              "standalone_activity_batch_operations" => bool?,
+              standalone_activity_operator_commands: bool?,
+              "standalone_activity_operator_commands" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -107,6 +137,11 @@ module Temporalio
               | ("worker_commands" name) -> bool
               | ("standalone_nexus_operation" name) -> bool
               | ("workflow_update_callbacks" name) -> bool
+              | ("poller_autoscaling_auto_enroll" name) -> bool
+              | ("workflow_task_completion_pagination" name) -> bool
+              | ("standalone_activity_start_delay" name) -> bool
+              | ("standalone_activity_batch_operations" name) -> bool
+              | ("standalone_activity_operator_commands" name) -> bool
 
             def []=:
                 ("eager_workflow_start" name, bool value) -> void
@@ -121,6 +156,11 @@ module Temporalio
               | ("worker_commands" name, bool value) -> void
               | ("standalone_nexus_operation" name, bool value) -> void
               | ("workflow_update_callbacks" name, bool value) -> void
+              | ("poller_autoscaling_auto_enroll" name, bool value) -> void
+              | ("workflow_task_completion_pagination" name, bool value) -> void
+              | ("standalone_activity_start_delay" name, bool value) -> void
+              | ("standalone_activity_batch_operations" name, bool value) -> void
+              | ("standalone_activity_operator_commands" name, bool value) -> void
           end
 
           class Limits < ::Google::Protobuf::AbstractMessage
@@ -137,11 +177,20 @@ module Temporalio
             attr_writer memo_size_limit_error(): ::Integer | ::Float
             def clear_memo_size_limit_error: () -> void
 
+            # Maximum total size in bytes of a single RespondWorkflowTaskCompleted request.
+            # Requests exceeding this fail the workflow task with
+            # WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE. 0 means no explicit limit.
+            attr_reader workflow_task_completion_size_limit_error(): ::Integer
+            attr_writer workflow_task_completion_size_limit_error(): ::Integer | ::Float
+            def clear_workflow_task_completion_size_limit_error: () -> void
+
             type init_map = {
               blob_size_limit_error: (::Integer | ::Float)?,
               "blob_size_limit_error" => (::Integer | ::Float)?,
               memo_size_limit_error: (::Integer | ::Float)?,
               "memo_size_limit_error" => (::Integer | ::Float)?,
+              workflow_task_completion_size_limit_error: (::Integer | ::Float)?,
+              "workflow_task_completion_size_limit_error" => (::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -149,10 +198,12 @@ module Temporalio
             def []:
                 ("blob_size_limit_error" name) -> ::Integer
               | ("memo_size_limit_error" name) -> ::Integer
+              | ("workflow_task_completion_size_limit_error" name) -> ::Integer
 
             def []=:
                 ("blob_size_limit_error" name, (::Integer | ::Float) value) -> void
               | ("memo_size_limit_error" name, (::Integer | ::Float) value) -> void
+              | ("workflow_task_completion_size_limit_error" name, (::Integer | ::Float) value) -> void
           end
 
           attr_reader name(): ::String

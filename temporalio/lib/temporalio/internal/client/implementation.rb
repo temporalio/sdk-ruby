@@ -1084,6 +1084,7 @@ module Temporalio
               activity_id: input.activity_id,
               run_id: input.activity_run_id || '',
               identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
               reason: input.reason || '',
               reset_attempts: input.reset_attempts,
               reset_heartbeat: input.reset_heartbeat,
@@ -1101,7 +1102,7 @@ module Temporalio
               activity_id: input.activity_id,
               run_id: input.activity_run_id || '',
               identity: @client.connection.identity,
-              reset_heartbeat: input.reset_heartbeat,
+              request_id: SecureRandom.uuid,
               keep_paused: input.keep_paused,
               jitter: ProtoUtils.seconds_to_duration(input.jitter),
               restore_original_options: input.restore_original_options
@@ -1118,6 +1119,7 @@ module Temporalio
               activity_id: input.activity_id,
               run_id: input.activity_run_id || '',
               identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
               activity_options: input.activity_options,
               update_mask: input.update_mask,
               restore_original: input.restore_original

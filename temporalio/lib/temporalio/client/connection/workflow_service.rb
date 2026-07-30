@@ -1441,6 +1441,21 @@ module Temporalio
           )
         end
 
+        # Calls WorkflowService.CountWorkers API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::CountWorkersRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::CountWorkersResponse] API response.
+        def count_workers(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'count_workers',
+            request_class: Temporalio::Api::WorkflowService::V1::CountWorkersRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::CountWorkersResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls WorkflowService.UpdateTaskQueueConfig API call.
         #
         # @param request [Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest] API request.

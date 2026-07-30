@@ -311,6 +311,11 @@ module Temporalio
           attr_accessor drivers(): ::Google::Protobuf::RepeatedField
           def clear_drivers: () -> void
 
+          # Information about the environment this SDK is running in.
+          attr_accessor environment(): ::Temporalio::Api::Worker::V1::EnvironmentInfo?
+          def has_environment?: () -> bool
+          def clear_environment: () -> void
+
           type init_map = {
             worker_instance_key: (::String | ::Symbol)?,
             "worker_instance_key" => (::String | ::Symbol)?,
@@ -360,6 +365,8 @@ module Temporalio
             "plugins" => ::Array[::Temporalio::Api::Worker::V1::PluginInfo]?,
             drivers: ::Array[::Temporalio::Api::Worker::V1::StorageDriverInfo]?,
             "drivers" => ::Array[::Temporalio::Api::Worker::V1::StorageDriverInfo]?,
+            environment: (::Temporalio::Api::Worker::V1::EnvironmentInfo | ::Temporalio::Api::Worker::V1::EnvironmentInfo::init_map)?,
+            "environment" => (::Temporalio::Api::Worker::V1::EnvironmentInfo | ::Temporalio::Api::Worker::V1::EnvironmentInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -389,6 +396,7 @@ module Temporalio
             | ("current_sticky_cache_size" name) -> ::Integer
             | ("plugins" name) -> ::Google::Protobuf::RepeatedField
             | ("drivers" name) -> ::Google::Protobuf::RepeatedField
+            | ("environment" name) -> ::Temporalio::Api::Worker::V1::EnvironmentInfo?
 
           def []=:
               ("worker_instance_key" name, (::String | ::Symbol) value) -> void
@@ -415,6 +423,7 @@ module Temporalio
             | ("current_sticky_cache_size" name, (::Integer | ::Float) value) -> void
             | ("plugins" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("drivers" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("environment" name, ::Temporalio::Api::Worker::V1::EnvironmentInfo? value) -> void
         end
 
         # Detailed worker information.
@@ -621,6 +630,407 @@ module Temporalio
 
           def []=:
               ("type" name, (::String | ::Symbol) value) -> void
+        end
+
+        class EnvironmentInfo < ::Google::Protobuf::AbstractMessage
+          class Runtime < ::Google::Protobuf::AbstractMessage
+            module RuntimeType
+
+              # Should never actually be set, exists to follow convention of having a default.
+              # SDKs should just leave `runtimes` empty if none can be determined.
+              RUNTIME_TYPE_UNSPECIFIED: 0
+
+              RUNTIME_TYPE_JVM: 1
+
+              RUNTIME_TYPE_CPYTHON: 2
+
+              RUNTIME_TYPE_NODE: 3
+
+              RUNTIME_TYPE_BUN: 4
+
+              RUNTIME_TYPE_CRUBY: 5
+
+              RUNTIME_TYPE_GO: 6
+
+              RUNTIME_TYPE_DOTNET_FRAMEWORK: 7
+
+              RUNTIME_TYPE_DOTNET_CORE: 8
+
+              RUNTIME_TYPE_NATIVE: 9
+
+              RUNTIME_TYPE_ROADRUNNER: 10
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :RUNTIME_TYPE_UNSPECIFIED | :RUNTIME_TYPE_JVM | :RUNTIME_TYPE_CPYTHON | :RUNTIME_TYPE_NODE | :RUNTIME_TYPE_BUN | :RUNTIME_TYPE_CRUBY | :RUNTIME_TYPE_GO | :RUNTIME_TYPE_DOTNET_FRAMEWORK | :RUNTIME_TYPE_DOTNET_CORE | :RUNTIME_TYPE_NATIVE | :RUNTIME_TYPE_ROADRUNNER
+
+              type strings = "RUNTIME_TYPE_UNSPECIFIED" | "RUNTIME_TYPE_JVM" | "RUNTIME_TYPE_CPYTHON" | "RUNTIME_TYPE_NODE" | "RUNTIME_TYPE_BUN" | "RUNTIME_TYPE_CRUBY" | "RUNTIME_TYPE_GO" | "RUNTIME_TYPE_DOTNET_FRAMEWORK" | "RUNTIME_TYPE_DOTNET_CORE" | "RUNTIME_TYPE_NATIVE" | "RUNTIME_TYPE_ROADRUNNER"
+
+              type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+            end
+
+            # The type of the runtime.
+            attr_reader type(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Integer
+            attr_writer type(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::strings | ::Integer | ::Float
+            attr_reader type_const(): ::Integer
+            def clear_type: () -> void
+
+            # The version of the runtime, if obtainable.
+            attr_reader version(): ::String
+            attr_writer version(): ::String | ::Symbol
+            def clear_version: () -> void
+
+            type init_map = {
+              type: (::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::strings | ::Integer | ::Float)?,
+              "type" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::strings | ::Integer | ::Float)?,
+              version: (::String | ::Symbol)?,
+              "version" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("type" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Integer)
+              | ("version" name) -> ::String
+
+            def []=:
+                ("type" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType::strings | ::Integer | ::Float) value) -> void
+              | ("version" name, (::String | ::Symbol) value) -> void
+          end
+
+          class HostingEnvironment < ::Google::Protobuf::AbstractMessage
+            # What kind of hosting environment we're running in. This list is about what can actually be
+            # detected reliably and is unrelated to what SDKs can actually run in.
+            module HostingEnvironmentType
+
+              # Should never actually be set, exists to follow convention of having a default.
+              # SDKs should just leave `hosting_environments` empty if none can be determined.
+              HOSTING_ENVIRONMENT_TYPE_UNSPECIFIED: 0
+
+              # Should always be in the list if we're running inside a docker container
+              HOSTING_ENVIRONMENT_TYPE_DOCKER: 1
+
+              # Should always be in the list if we're running inside any k8s environment
+              HOSTING_ENVIRONMENT_TYPE_K8S: 2
+
+              # Detect via `AWS_LAMBDA_FUNCTION_NAME`
+              HOSTING_ENVIRONMENT_TYPE_AWS_LAMBDA: 3
+
+              # Detect via `ECS_CONTAINER_METADATA_URI_V4` or `ECS_CONTAINER_METADATA_URI`
+              HOSTING_ENVIRONMENT_TYPE_AWS_ECS: 4
+
+              # Detect via `K_SERVICE`
+              HOSTING_ENVIRONMENT_TYPE_GOOGLE_CLOUD_RUN: 6
+
+              # Detect via `GAE_SERVICE`
+              HOSTING_ENVIRONMENT_TYPE_GOOGLE_APP_ENGINE: 7
+
+              # Detect via `WEBSITE_SITE_NAME`
+              HOSTING_ENVIRONMENT_TYPE_AZURE_APP_SERVICE: 8
+
+              # Detect via `FUNCTIONS_EXTENSION_VERSION`
+              HOSTING_ENVIRONMENT_TYPE_AZURE_FUNCTIONS: 9
+
+              # Detect via `CONTAINER_APP_NAME`
+              HOSTING_ENVIRONMENT_TYPE_AZURE_CONTAINER_APPS: 10
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :HOSTING_ENVIRONMENT_TYPE_UNSPECIFIED | :HOSTING_ENVIRONMENT_TYPE_DOCKER | :HOSTING_ENVIRONMENT_TYPE_K8S | :HOSTING_ENVIRONMENT_TYPE_AWS_LAMBDA | :HOSTING_ENVIRONMENT_TYPE_AWS_ECS | :HOSTING_ENVIRONMENT_TYPE_GOOGLE_CLOUD_RUN | :HOSTING_ENVIRONMENT_TYPE_GOOGLE_APP_ENGINE | :HOSTING_ENVIRONMENT_TYPE_AZURE_APP_SERVICE | :HOSTING_ENVIRONMENT_TYPE_AZURE_FUNCTIONS | :HOSTING_ENVIRONMENT_TYPE_AZURE_CONTAINER_APPS
+
+              type strings = "HOSTING_ENVIRONMENT_TYPE_UNSPECIFIED" | "HOSTING_ENVIRONMENT_TYPE_DOCKER" | "HOSTING_ENVIRONMENT_TYPE_K8S" | "HOSTING_ENVIRONMENT_TYPE_AWS_LAMBDA" | "HOSTING_ENVIRONMENT_TYPE_AWS_ECS" | "HOSTING_ENVIRONMENT_TYPE_GOOGLE_CLOUD_RUN" | "HOSTING_ENVIRONMENT_TYPE_GOOGLE_APP_ENGINE" | "HOSTING_ENVIRONMENT_TYPE_AZURE_APP_SERVICE" | "HOSTING_ENVIRONMENT_TYPE_AZURE_FUNCTIONS" | "HOSTING_ENVIRONMENT_TYPE_AZURE_CONTAINER_APPS"
+
+              type numbers = 0 | 1 | 2 | 3 | 4 | 6 | 7 | 8 | 9 | 10
+            end
+
+            # The type of hosting environment.
+            attr_reader type(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Integer
+            attr_writer type(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::strings | ::Integer | ::Float
+            attr_reader type_const(): ::Integer
+            def clear_type: () -> void
+
+            # The version of the hosting environment, if obtainable.
+            attr_reader version(): ::String
+            attr_writer version(): ::String | ::Symbol
+            def clear_version: () -> void
+
+            type init_map = {
+              type: (::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::strings | ::Integer | ::Float)?,
+              "type" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::strings | ::Integer | ::Float)?,
+              version: (::String | ::Symbol)?,
+              "version" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("type" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Integer)
+              | ("version" name) -> ::String
+
+            def []=:
+                ("type" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType::strings | ::Integer | ::Float) value) -> void
+              | ("version" name, (::String | ::Symbol) value) -> void
+          end
+
+          class Platform < ::Google::Protobuf::AbstractMessage
+
+            attr_accessor linux(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform?
+            def has_linux?: () -> bool
+            def clear_linux: () -> void
+
+            attr_accessor macos(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform?
+            def has_macos?: () -> bool
+            def clear_macos: () -> void
+
+            attr_accessor windows(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform?
+            def has_windows?: () -> bool
+            def clear_windows: () -> void
+
+            attr_reader variant(): (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform)?
+            def has_variant?: () -> bool
+            def clear_variant: () -> void
+
+            type init_map = {
+              linux: (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::init_map)?,
+              "linux" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::init_map)?,
+              macos: (::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform::init_map)?,
+              "macos" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform::init_map)?,
+              windows: (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::init_map)?,
+              "windows" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("linux" name) -> ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform?
+              | ("macos" name) -> ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform?
+              | ("windows" name) -> ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform?
+
+            def []=:
+                ("linux" name, ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform? value) -> void
+              | ("macos" name, ::Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform? value) -> void
+              | ("windows" name, ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform? value) -> void
+          end
+
+          class LinuxPlatform < ::Google::Protobuf::AbstractMessage
+            module Libc
+
+              LIBC_UNSPECIFIED: 0
+
+              LIBC_GLIBC: 1
+
+              LIBC_MUSL: 2
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :LIBC_UNSPECIFIED | :LIBC_GLIBC | :LIBC_MUSL
+
+              type strings = "LIBC_UNSPECIFIED" | "LIBC_GLIBC" | "LIBC_MUSL"
+
+              type numbers = 0 | 1 | 2
+            end
+
+            # The Linux kernel or distribution version, if obtainable.
+            attr_reader version(): ::String
+            attr_writer version(): ::String | ::Symbol
+            def clear_version: () -> void
+
+            # The architecture of the worker process.
+            attr_reader architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer
+            attr_writer architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float
+            attr_reader architecture_const(): ::Integer
+            def clear_architecture: () -> void
+
+            # The libc used by the worker process.
+            attr_reader libc(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Integer
+            attr_writer libc(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::strings | ::Integer | ::Float
+            attr_reader libc_const(): ::Integer
+            def clear_libc: () -> void
+
+            type init_map = {
+              version: (::String | ::Symbol)?,
+              "version" => (::String | ::Symbol)?,
+              architecture: (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+              "architecture" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+              libc: (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::strings | ::Integer | ::Float)?,
+              "libc" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::strings | ::Integer | ::Float)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("version" name) -> ::String
+              | ("architecture" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer)
+              | ("libc" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Integer)
+
+            def []=:
+                ("version" name, (::String | ::Symbol) value) -> void
+              | ("architecture" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float) value) -> void
+              | ("libc" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc::strings | ::Integer | ::Float) value) -> void
+          end
+
+          class MacOSPlatform < ::Google::Protobuf::AbstractMessage
+
+            # The macOS version, if obtainable.
+            attr_reader version(): ::String
+            attr_writer version(): ::String | ::Symbol
+            def clear_version: () -> void
+
+            # The architecture of the worker process.
+            attr_reader architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer
+            attr_writer architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float
+            attr_reader architecture_const(): ::Integer
+            def clear_architecture: () -> void
+
+            type init_map = {
+              version: (::String | ::Symbol)?,
+              "version" => (::String | ::Symbol)?,
+              architecture: (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+              "architecture" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("version" name) -> ::String
+              | ("architecture" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer)
+
+            def []=:
+                ("version" name, (::String | ::Symbol) value) -> void
+              | ("architecture" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float) value) -> void
+          end
+
+          class WindowsPlatform < ::Google::Protobuf::AbstractMessage
+            module Crt
+
+              CRT_UNSPECIFIED: 0
+
+              CRT_UCRT: 1
+
+              CRT_MSVCRT: 2
+
+              CRT_MINGW: 3
+
+              CRT_CYGWIN: 4
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :CRT_UNSPECIFIED | :CRT_UCRT | :CRT_MSVCRT | :CRT_MINGW | :CRT_CYGWIN
+
+              type strings = "CRT_UNSPECIFIED" | "CRT_UCRT" | "CRT_MSVCRT" | "CRT_MINGW" | "CRT_CYGWIN"
+
+              type numbers = 0 | 1 | 2 | 3 | 4
+            end
+
+            # The Windows version, if obtainable.
+            attr_reader version(): ::String
+            attr_writer version(): ::String | ::Symbol
+            def clear_version: () -> void
+
+            # The architecture of the worker process.
+            attr_reader architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer
+            attr_writer architecture(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float
+            attr_reader architecture_const(): ::Integer
+            def clear_architecture: () -> void
+
+            # The C runtime used by the worker process, if obtainable.
+            attr_reader crt(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Integer
+            attr_writer crt(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::strings | ::Integer | ::Float
+            attr_reader crt_const(): ::Integer
+            def clear_crt: () -> void
+
+            type init_map = {
+              version: (::String | ::Symbol)?,
+              "version" => (::String | ::Symbol)?,
+              architecture: (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+              "architecture" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float)?,
+              crt: (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::strings | ::Integer | ::Float)?,
+              "crt" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::strings | ::Integer | ::Float)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("version" name) -> ::String
+              | ("architecture" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Integer)
+              | ("crt" name) -> (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Integer)
+
+            def []=:
+                ("version" name, (::String | ::Symbol) value) -> void
+              | ("architecture" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture::strings | ::Integer | ::Float) value) -> void
+              | ("crt" name, (::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::names | ::Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt::strings | ::Integer | ::Float) value) -> void
+          end
+
+          module Architecture
+
+            ARCHITECTURE_UNSPECIFIED: 0
+
+            ARCHITECTURE_AMD64: 1
+
+            ARCHITECTURE_ARM64: 2
+
+            def self.lookup: (::Integer number) -> ::Symbol
+
+
+            def self.resolve: (::Symbol name) -> ::Integer
+
+
+            type names = :ARCHITECTURE_UNSPECIFIED | :ARCHITECTURE_AMD64 | :ARCHITECTURE_ARM64
+
+            type strings = "ARCHITECTURE_UNSPECIFIED" | "ARCHITECTURE_AMD64" | "ARCHITECTURE_ARM64"
+
+            type numbers = 0 | 1 | 2
+          end
+
+          # The runtime(s) the SDK is operating in.
+          attr_accessor runtimes(): ::Google::Protobuf::RepeatedField
+          def clear_runtimes: () -> void
+
+          # The hosting environment(s) the SDK is operating in. Repeated to allow for layering (ex: Docker inside k8s).
+          attr_accessor hosting_environments(): ::Google::Protobuf::RepeatedField
+          def clear_hosting_environments: () -> void
+
+          # The platform the SDK is operating on.
+          attr_accessor platform(): ::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform?
+          def has_platform?: () -> bool
+          def clear_platform: () -> void
+
+          type init_map = {
+            runtimes: ::Array[::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime]?,
+            "runtimes" => ::Array[::Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime]?,
+            hosting_environments: ::Array[::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment]?,
+            "hosting_environments" => ::Array[::Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment]?,
+            platform: (::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform::init_map)?,
+            "platform" => (::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform | ::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("runtimes" name) -> ::Google::Protobuf::RepeatedField
+            | ("hosting_environments" name) -> ::Google::Protobuf::RepeatedField
+            | ("platform" name) -> ::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform?
+
+          def []=:
+              ("runtimes" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("hosting_environments" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("platform" name, ::Temporalio::Api::Worker::V1::EnvironmentInfo::Platform? value) -> void
         end
 
         # A command sent from the server to a worker.

@@ -343,7 +343,6 @@ module Temporalio
       ResetActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
-        :reset_heartbeat,
         :keep_paused,
         :jitter,
         :restore_original_options,

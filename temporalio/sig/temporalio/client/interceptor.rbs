@@ -555,7 +555,6 @@ module Temporalio
       class ResetActivityInput
         attr_reader activity_id: String
         attr_reader activity_run_id: String?
-        attr_reader reset_heartbeat: bool
         attr_reader keep_paused: bool
         attr_reader jitter: Float?
         attr_reader restore_original_options: bool
@@ -564,7 +563,6 @@ module Temporalio
         def initialize: (
           activity_id: String,
           activity_run_id: String?,
-          reset_heartbeat: bool,
           keep_paused: bool,
           jitter: Float?,
           restore_original_options: bool,

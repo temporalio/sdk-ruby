@@ -42,6 +42,14 @@ impl Client {
                     workflow_service,
                     count_schedules
                 ),
+                "count_workers" => rpc_call!(
+                    self,
+                    callback,
+                    call,
+                    WorkflowService,
+                    workflow_service,
+                    count_workers
+                ),
                 "count_workflow_executions" => rpc_call!(
                     self,
                     callback,
