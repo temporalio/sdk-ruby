@@ -189,6 +189,39 @@ class ClientTest < Test
     end
   end
 
+  def test_result_retries_when_history_long_poll_returns_no_events
+    workflow_service = env.client.workflow_service
+    original_fetch = workflow_service.method(:get_workflow_execution_history)
+    empty_responses_remaining = 2
+    history_fetch_count = 0
+    workflow_service.define_singleton_method(:get_workflow_execution_history) do |request, **kwargs|
+      history_fetch_count += 1
+      if empty_responses_remaining.positive?
+        empty_responses_remaining -= 1
+        Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse.new
+      else
+        original_fetch.call(request, **kwargs)
+      end
+    end
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    begin
+      Temporalio::Worker.new(client: env.client, task_queue:, workflows: [SimpleWorkflow]).run do
+        handle = env.client.start_workflow(
+          SimpleWorkflow,
+          'Temporal',
+          id: "wf-#{SecureRandom.uuid}",
+          task_queue:
+        )
+        assert_equal 'Hello, Temporal!', handle.result
+      end
+      assert_equal 0, empty_responses_remaining
+      assert_operator history_fetch_count, :>=, 3
+    ensure
+      workflow_service.singleton_class.send(:remove_method, :get_workflow_execution_history)
+    end
+  end
+
   def test_fork
     # Cannot use client on other side of fork from where created
     pre_fork_client = env.client
