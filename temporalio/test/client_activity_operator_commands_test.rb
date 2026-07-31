@@ -187,7 +187,8 @@ class ClientActivityOperatorCommandsTest < Test
         start_to_close_timeout: 90.0,
         heartbeat_timeout: 25.0,
         retry_policy: Temporalio::RetryPolicy.new(initial_interval: 1.0, backoff_coefficient: 2.0, max_attempts: 7),
-        priority: Temporalio::Priority.new(priority_key: 3)
+        priority: Temporalio::Priority.new(priority_key: 3),
+        start_delay: 500.0
       )
 
       # Every field is settable and lands: the returned options reflect each new value.
@@ -198,6 +199,7 @@ class ClientActivityOperatorCommandsTest < Test
       assert_in_delta 25.0, updated.heartbeat_timeout, 0.5
       assert_equal 7, updated.retry_policy&.max_attempts
       assert_equal 3, updated.priority.priority_key
+      assert_in_delta 500.0, updated.start_delay, 0.5
 
       # And describe reflects them server-side.
       desc = handle.describe
@@ -208,6 +210,10 @@ class ClientActivityOperatorCommandsTest < Test
       assert_in_delta 25.0, desc.heartbeat_timeout, 0.5
       assert_equal 7, desc.retry_policy&.max_attempts
       assert_equal 3, desc.priority.priority_key
+      # start_delay isn't surfaced by the SDK's describe wrapper yet; read via raw_info.
+      assert_in_delta 500.0,
+                      Temporalio::Internal::ProtoUtils.duration_to_seconds(desc.raw_info.start_delay),
+                      0.5
 
       handle.terminate('cleanup')
     end

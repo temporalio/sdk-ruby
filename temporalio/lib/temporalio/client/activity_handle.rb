@@ -30,7 +30,8 @@ module Temporalio
         :start_to_close_timeout,
         :heartbeat_timeout,
         :retry_policy,
-        :priority
+        :priority,
+        :start_delay
       ) do
         # @!visibility private
         def self._from_proto(options)
@@ -41,7 +42,8 @@ module Temporalio
             start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(options.start_to_close_timeout),
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(options.heartbeat_timeout),
             retry_policy: options.retry_policy ? RetryPolicy._from_proto(options.retry_policy) : nil,
-            priority: Priority._from_proto(options.priority)
+            priority: Priority._from_proto(options.priority),
+            start_delay: Internal::ProtoUtils.duration_to_seconds(options.start_delay)
           )
         end
       end
@@ -236,6 +238,7 @@ module Temporalio
         heartbeat_timeout: UNSET,
         retry_policy: UNSET,
         priority: UNSET,
+        start_delay: UNSET,
         restore_original: false,
         rpc_options: nil
       )
@@ -269,6 +272,10 @@ module Temporalio
         unless UNSET.equal?(priority)
           paths << 'priority'
           options.priority = priority&._to_proto
+        end
+        unless UNSET.equal?(start_delay)
+          paths << 'start_delay'
+          options.start_delay = Internal::ProtoUtils.seconds_to_duration(start_delay)
         end
 
         if restore_original && !paths.empty?
