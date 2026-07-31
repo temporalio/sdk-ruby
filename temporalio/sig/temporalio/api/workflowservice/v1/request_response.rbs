@@ -8641,6 +8641,8 @@ module Temporalio
 
           # The Workflow Execution time when the options were updated. When time skipping is
           # enabled, this is the workflow's virtual time rather than wall-clock time.
+          # This timestamp cannot be used for time-skipping fast-forward verification,
+          # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
           attr_reader update_time(): ::Google::Protobuf::Timestamp?
           attr_writer update_time(): (::Google::Protobuf::Timestamp | ::Time)?
           def has_update_time?: () -> bool
@@ -12546,7 +12548,6 @@ module Temporalio
           def clear_activity_id: () -> void
 
           # Activity run ID. If empty, targets the latest run.
-          # Specify a run ID to avoid retrying a different execution when the activity ID is reused.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -12620,7 +12621,6 @@ module Temporalio
           def clear_activity_id: () -> void
 
           # Activity run ID. If empty, targets the latest run.
-          # Specify a run ID to avoid retrying a different execution when the activity ID is reused.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -12914,6 +12914,89 @@ module Temporalio
           }
 
           def initialize: (?init_map initial_value) -> void
+        end
+
+        # A long-poll request that blocks according to a time-skipping waiting policy on the workflow
+        # execution. Currently the only supported policy is waiting for completion of the fast-forward
+        # identified by `fast_forward_id`; the poll also returns once anything else settles that outcome
+        # (e.g. the execution ends or time skipping is disabled).
+        class PollWorkflowExecutionTimeSkippingRequest < ::Google::Protobuf::AbstractMessage
+
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def has_workflow_execution?: () -> bool
+          def clear_workflow_execution: () -> void
+
+          # Required. Identifies the fast-forward whose completion the caller wants to wait for.
+          # Must match the `fast_forward_id` set in the execution's TimeSkippingConfig.
+          attr_reader fast_forward_id(): ::String
+          attr_writer fast_forward_id(): ::String | ::Symbol
+          def clear_fast_forward_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_execution: (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
+            "workflow_execution" => (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
+            fast_forward_id: (::String | ::Symbol)?,
+            "fast_forward_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_execution" name) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+            | ("fast_forward_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_execution" name, ::Temporalio::Api::Common::V1::WorkflowExecution? value) -> void
+            | ("fast_forward_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class PollWorkflowExecutionTimeSkippingResponse < ::Google::Protobuf::AbstractMessage
+
+          # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.
+          attr_reader fast_forward_polling_result(): ::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Integer
+          attr_writer fast_forward_polling_result(): ::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float
+          attr_reader fast_forward_polling_result_const(): ::Integer
+          def clear_fast_forward_polling_result: () -> void
+
+          # Set only when the result is FAST_FORWARD_POLLING_RESULT_FAST_FORWARD_FAILED; explains why
+          # the fast-forward can no longer complete.
+          attr_reader failed_reason(): ::String
+          attr_writer failed_reason(): ::String | ::Symbol
+          def clear_failed_reason: () -> void
+
+          # The execution's current fast-forward, if any.
+          attr_accessor fast_forward_info(): ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo?
+          def has_fast_forward_info?: () -> bool
+          def clear_fast_forward_info: () -> void
+
+          type init_map = {
+            fast_forward_polling_result: (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float)?,
+            "fast_forward_polling_result" => (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float)?,
+            failed_reason: (::String | ::Symbol)?,
+            "failed_reason" => (::String | ::Symbol)?,
+            fast_forward_info: (::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo | ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo::init_map)?,
+            "fast_forward_info" => (::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo | ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("fast_forward_polling_result" name) -> (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Integer)
+            | ("failed_reason" name) -> ::String
+            | ("fast_forward_info" name) -> ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo?
+
+          def []=:
+              ("fast_forward_polling_result" name, (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float) value) -> void
+            | ("failed_reason" name, (::String | ::Symbol) value) -> void
+            | ("fast_forward_info" name, ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo? value) -> void
         end
       end
     end

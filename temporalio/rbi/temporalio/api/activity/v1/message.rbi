@@ -10,12 +10,14 @@ class Temporalio::Api::Activity::V1::ActivityExecutionOutcome
   sig do
     params(
       result: T.nilable(Temporalio::Api::Common::V1::Payloads),
-      failure: T.nilable(Temporalio::Api::Failure::V1::Failure)
+      failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
+      retry_state: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
     result: nil,
-    failure: nil
+    failure: nil,
+    retry_state: :RETRY_STATE_UNSPECIFIED
   )
   end
 
@@ -47,6 +49,24 @@ class Temporalio::Api::Activity::V1::ActivityExecutionOutcome
   # The failure if the activity completed unsuccessfully.
   sig { void }
   def clear_failure
+  end
+
+  # The retry state associated with an unsuccessful activity execution.
+# This field is only meaningful when `failure` is set.
+  sig { returns(T.any(Symbol, Integer)) }
+  def retry_state
+  end
+
+  # The retry state associated with an unsuccessful activity execution.
+# This field is only meaningful when `failure` is set.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def retry_state=(value)
+  end
+
+  # The retry state associated with an unsuccessful activity execution.
+# This field is only meaningful when `failure` is set.
+  sig { void }
+  def clear_retry_state
   end
 
   sig { returns(T.nilable(Symbol)) }

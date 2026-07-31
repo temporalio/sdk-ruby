@@ -331,6 +331,12 @@ module Temporalio
           def has_pause_info?: () -> bool
           def clear_pause_info: () -> void
 
+          # Information about time skipping of the workflow execution.
+          # If the execution has never enabled time skipping, it will be nil.
+          attr_accessor time_skipping_info(): ::Temporalio::Api::Common::V1::TimeSkippingInfo?
+          def has_time_skipping_info?: () -> bool
+          def clear_time_skipping_info: () -> void
+
           type init_map = {
             execution_expiration_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             "execution_expiration_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
@@ -348,6 +354,8 @@ module Temporalio
             "request_id_infos" => ::Hash[::String | ::Symbol, ::Temporalio::Api::Workflow::V1::RequestIdInfo]?,
             pause_info: (::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo | ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo::init_map)?,
             "pause_info" => (::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo | ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo::init_map)?,
+            time_skipping_info: (::Temporalio::Api::Common::V1::TimeSkippingInfo | ::Temporalio::Api::Common::V1::TimeSkippingInfo::init_map)?,
+            "time_skipping_info" => (::Temporalio::Api::Common::V1::TimeSkippingInfo | ::Temporalio::Api::Common::V1::TimeSkippingInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -361,6 +369,7 @@ module Temporalio
             | ("reset_run_id" name) -> ::String
             | ("request_id_infos" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Workflow::V1::RequestIdInfo])
             | ("pause_info" name) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo?
+            | ("time_skipping_info" name) -> ::Temporalio::Api::Common::V1::TimeSkippingInfo?
 
           def []=:
               ("execution_expiration_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
@@ -371,6 +380,7 @@ module Temporalio
             | ("reset_run_id" name, (::String | ::Symbol) value) -> void
             | ("request_id_infos" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Workflow::V1::RequestIdInfo]) value) -> void
             | ("pause_info" name, ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo? value) -> void
+            | ("time_skipping_info" name, ::Temporalio::Api::Common::V1::TimeSkippingInfo? value) -> void
         end
 
         # Holds all the information about worker versioning for a particular workflow execution.

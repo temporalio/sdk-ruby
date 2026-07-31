@@ -18832,18 +18832,27 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRespon
 
   # The Workflow Execution time when the options were updated. When time skipping is
 # enabled, this is the workflow's virtual time rather than wall-clock time.
+#
+# This timestamp cannot be used for time-skipping fast-forward verification,
+# use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
   def update_time
   end
 
   # The Workflow Execution time when the options were updated. When time skipping is
 # enabled, this is the workflow's virtual time rather than wall-clock time.
+#
+# This timestamp cannot be used for time-skipping fast-forward verification,
+# use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
   def update_time=(value)
   end
 
   # The Workflow Execution time when the options were updated. When time skipping is
 # enabled, this is the workflow's virtual time rather than wall-clock time.
+#
+# This timestamp cannot be used for time-skipping fast-forward verification,
+# use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { void }
   def clear_update_time
   end
@@ -27916,19 +27925,16 @@ class Temporalio::Api::WorkflowService::V1::RequestCancelActivityExecutionReques
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { returns(String) }
   def run_id
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { params(value: String).void }
   def run_id=(value)
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { void }
   def clear_run_id
   end
@@ -28103,19 +28109,16 @@ class Temporalio::Api::WorkflowService::V1::TerminateActivityExecutionRequest
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { returns(String) }
   def run_id
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { params(value: String).void }
   def run_id=(value)
   end
 
   # Activity run ID. If empty, targets the latest run.
-# Specify a run ID to avoid retrying a different execution when the activity ID is reused.
   sig { void }
   def clear_run_id
   end
@@ -28852,6 +28855,202 @@ class Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRespons
   end
 
   sig { params(msg: Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# A long-poll request that blocks according to a time-skipping waiting policy on the workflow
+# execution. Currently the only supported policy is waiting for completion of the fast-forward
+# identified by `fast_forward_id`; the poll also returns once anything else settles that outcome
+# (e.g. the execution ends or time skipping is disabled).
+class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      workflow_execution: T.nilable(Temporalio::Api::Common::V1::WorkflowExecution),
+      fast_forward_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    workflow_execution: nil,
+    fast_forward_id: ""
+  )
+  end
+
+  sig { returns(String) }
+  def namespace
+  end
+
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::WorkflowExecution)) }
+  def workflow_execution
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::WorkflowExecution)).void }
+  def workflow_execution=(value)
+  end
+
+  sig { void }
+  def clear_workflow_execution
+  end
+
+  # Required. Identifies the fast-forward whose completion the caller wants to wait for.
+# Must match the `fast_forward_id` set in the execution's TimeSkippingConfig.
+  sig { returns(String) }
+  def fast_forward_id
+  end
+
+  # Required. Identifies the fast-forward whose completion the caller wants to wait for.
+# Must match the `fast_forward_id` set in the execution's TimeSkippingConfig.
+  sig { params(value: String).void }
+  def fast_forward_id=(value)
+  end
+
+  # Required. Identifies the fast-forward whose completion the caller wants to wait for.
+# Must match the `fast_forward_id` set in the execution's TimeSkippingConfig.
+  sig { void }
+  def clear_fast_forward_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      fast_forward_polling_result: T.nilable(T.any(Symbol, String, Integer)),
+      failed_reason: T.nilable(String),
+      fast_forward_info: T.nilable(Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo)
+    ).void
+  end
+  def initialize(
+    fast_forward_polling_result: :FAST_FORWARD_POLLING_RESULT_UNSPECIFIED,
+    failed_reason: "",
+    fast_forward_info: nil
+  )
+  end
+
+  # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.
+  sig { returns(T.any(Symbol, Integer)) }
+  def fast_forward_polling_result
+  end
+
+  # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def fast_forward_polling_result=(value)
+  end
+
+  # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.
+  sig { void }
+  def clear_fast_forward_polling_result
+  end
+
+  # Set only when the result is FAST_FORWARD_POLLING_RESULT_FAST_FORWARD_FAILED; explains why
+# the fast-forward can no longer complete.
+  sig { returns(String) }
+  def failed_reason
+  end
+
+  # Set only when the result is FAST_FORWARD_POLLING_RESULT_FAST_FORWARD_FAILED; explains why
+# the fast-forward can no longer complete.
+  sig { params(value: String).void }
+  def failed_reason=(value)
+  end
+
+  # Set only when the result is FAST_FORWARD_POLLING_RESULT_FAST_FORWARD_FAILED; explains why
+# the fast-forward can no longer complete.
+  sig { void }
+  def clear_failed_reason
+  end
+
+  # The execution's current fast-forward, if any.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo)) }
+  def fast_forward_info
+  end
+
+  # The execution's current fast-forward, if any.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo)).void }
+  def fast_forward_info=(value)
+  end
+
+  # The execution's current fast-forward, if any.
+  sig { void }
+  def clear_fast_forward_info
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

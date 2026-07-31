@@ -46,6 +46,12 @@ module Temporalio
         Internal::ProtoUtils.timestamp_to_time(@raw_info.schedule_time)
       end
 
+      # @return [Time, nil] When the first activity task was made available for dispatch. Equals
+      #   schedule_time + start_delay; equal to schedule_time when no start delay is set.
+      def execution_time
+        Internal::ProtoUtils.timestamp_to_time(@raw_info.execution_time)
+      end
+
       # @return [Time, nil] When the activity reached a terminal state.
       def close_time
         Internal::ProtoUtils.timestamp_to_time(@raw_info.close_time)
