@@ -1025,7 +1025,10 @@ module Temporalio
             Api::WorkflowService::V1::DescribeActivityExecutionRequest.new(
               namespace: @client.namespace,
               activity_id: input.activity_id,
-              run_id: input.activity_run_id || ''
+              run_id: input.activity_run_id || '',
+              # As of api#792, heartbeat_details / last_failure are opt-in on the request.
+              include_heartbeat_details: true,
+              include_last_failure: true
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )

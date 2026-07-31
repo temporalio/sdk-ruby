@@ -47,17 +47,14 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Records heartbeat details on the first attempt then fails, so the details are persisted and the
-  # activity backs off (observable + pausable while scheduled). Later attempts just run without
-  # heartbeating, so once the details are cleared (by reset or unpause(reset_heartbeat:)) they stay
-  # cleared.
-  class HeartbeatThenStopActivity < Temporalio::Activity::Definition
+  # Records heartbeat details on attempt 1, then blocks waiting for cancellation. The heartbeat
+  # runs on its own — not adjacent to any completion RPC — so the details reliably persist and are
+  # observable via describe. Later attempts (after a reset or an unpause that spawns a new attempt)
+  # do not heartbeat, so any operator-driven clearing of the details stays observable.
+  class HeartbeatOnceActivity < Temporalio::Activity::Definition
     def execute
       ctx = Temporalio::Activity::Context.current
-      if ctx.info.attempt == 1
-        ctx.heartbeat('hb-details')
-        raise Temporalio::Error::ApplicationError, 'force retry'
-      end
+      ctx.heartbeat('hb-details') if ctx.info.attempt == 1
       sleep 0.1 until ctx.cancellation.canceled?
       raise Temporalio::Error::CanceledError, 'canceled'
     end
@@ -323,16 +320,15 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Start a HeartbeatThenStopActivity and wait until its first attempt has recorded heartbeat details
-  # and the activity is backing off (scheduled), so it can be paused into a true PAUSED state.
-  def start_backed_off_heartbeat_activity(task_queue)
+  # Start a HeartbeatOnceActivity and wait until its first attempt has recorded heartbeat details.
+  # The activity keeps running (sleeping until cancellation) once heartbeat has fired, so pause
+  # transitions the activity through PAUSE_REQUESTED to PAUSED — assert_eventually_paused tolerates
+  # both.
+  def start_heartbeat_ready_activity(task_queue)
     activity_id = "act-#{SecureRandom.uuid}"
     handle = env.client.start_activity(
-      HeartbeatThenStopActivity,
-      id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, heartbeat_timeout: 30,
-      retry_policy: Temporalio::RetryPolicy.new(
-        initial_interval: 10.0, backoff_coefficient: 1.0, max_interval: 10.0, max_attempts: 50
-      )
+      HeartbeatOnceActivity,
+      id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, heartbeat_timeout: 30
     )
     assert_eventually do
       assert handle.describe.has_heartbeat_details?
@@ -340,16 +336,44 @@ class ClientActivityOperatorCommandsTest < Test
     handle
   end
 
-  def test_unpause_resets_heartbeat
-    with_activity_worker([HeartbeatThenStopActivity]) do |task_queue|
-      handle = start_backed_off_heartbeat_activity(task_queue)
+  def test_pause_preserves_heartbeat
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
+      handle.pause('hold')
+      assert_eventually_paused(handle)
+      # Pause never touches heartbeat details — they persist across the transition.
+      assert handle.describe.has_heartbeat_details?
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_unpause_preserves_heartbeat_by_default
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # Unpause re-dispatches the next attempt with heartbeat details cleared; that attempt does not
-      # heartbeat, so the details stay cleared and are observable.
-      handle.unpause(reset_heartbeat: true)
+      # Default unpause (no reset_heartbeat flag) preserves details. The re-dispatched attempt
+      # doesn't heartbeat (only attempt 1 does), so the persisted details are stable and observable.
+      handle.unpause
       assert_eventually do
+        assert handle.describe.has_heartbeat_details?
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_unpause_resets_heartbeat
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
+      handle.pause('hold')
+      assert_eventually_paused(handle)
+
+      # Opt-in flag clears details. The re-dispatched attempt doesn't heartbeat, so cleared stays
+      # cleared and is observable. 30s (vs default 10s) to match Java's window; server may take
+      # several seconds to reflect the clear on a running activity.
+      handle.unpause(reset_heartbeat: true)
+      assert_eventually(timeout: 30) do
         refute handle.describe.has_heartbeat_details?
       end
       handle.terminate('cleanup')
@@ -357,17 +381,31 @@ class ClientActivityOperatorCommandsTest < Test
   end
 
   def test_reset_clears_heartbeat_by_default
-    with_activity_worker([HeartbeatThenStopActivity]) do |task_queue|
-      handle = start_backed_off_heartbeat_activity(task_queue)
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # reset always clears heartbeat details (there is no opt-in flag as of api#820);
-      # keep_paused so no new attempt runs to re-record them.
+      # Reset always clears heartbeat details (there is no opt-in flag as of api#820);
+      # keep_paused so no new attempt runs to re-record them. 30s (vs default 10s) to match Java's
+      # window; server may take several seconds to reflect the clear on a running activity.
       handle.reset(keep_paused: true)
-      assert_eventually do
+      assert_eventually(timeout: 30) do
         refute handle.describe.has_heartbeat_details?
       end
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_update_options_preserves_heartbeat
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
+      handle.pause('hold')
+      assert_eventually_paused(handle)
+
+      # UpdateOptions changes activity options only; it never touches heartbeat details.
+      handle.update_options(start_to_close_timeout: 90.0)
+      assert handle.describe.has_heartbeat_details?
       handle.terminate('cleanup')
     end
   end
