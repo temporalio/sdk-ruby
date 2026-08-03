@@ -1,5 +1,5 @@
 name: Gems Publish
-run-name: Gems Publish (stub — real logic on a feature branch)
+run-name: Gems Publish (stub)
 
 on:
   workflow_call:

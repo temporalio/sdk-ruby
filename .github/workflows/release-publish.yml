@@ -1,6 +1,5 @@
 name: Release Publish
-run-name: Release Publish (stub — real logic on a feature branch)
-
+run-name: Release Publish (stub)
 
 on:
   workflow_dispatch: {}
