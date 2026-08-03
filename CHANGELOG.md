@@ -20,6 +20,13 @@ to docs, or any other relevant information.
 ## [Unreleased]
 
 ### :boom: Breaking Changes
+### Added
+
+- Added the `Temporalio::Worker` `max_eager_activity_reservations_per_workflow_task:` option to
+  configure the number of activity slots reserved for eager execution per workflow task. Values
+  must be positive; use `disable_eager_activity_execution: true` to disable eager execution.
+
+### Breaking Changes
 
 - By default, workers now proactively validate outbound payload/memo sizes before sending: a field
   over the warn threshold is logged
@@ -36,6 +43,11 @@ to docs, or any other relevant information.
 
 - User metadata fields (static_summary, static_details, current_details, activity summary, timer
   summary) are no longer marked as experimental.
+
+### Fixed
+
+- `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
+  running when a history long poll expires without returning an event.
 
 ## [v1.6.0] - 2026-07-16
 

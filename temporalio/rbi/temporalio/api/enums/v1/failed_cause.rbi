@@ -41,6 +41,8 @@ module Temporalio::Api::Enums::V1::WorkflowTaskFailedCause
   self::WORKFLOW_TASK_FAILED_CAUSE_FEATURE_DISABLED = T.let(35, Integer)
   self::WORKFLOW_TASK_FAILED_CAUSE_GRPC_MESSAGE_TOO_LARGE = T.let(36, Integer)
   self::WORKFLOW_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE = T.let(37, Integer)
+  self::WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE = T.let(38, Integer)
+  self::WORKFLOW_TASK_FAILED_CAUSE_WORKFLOW_PAUSE_REQUESTED_BEFORE_TASK_STARTED = T.let(39, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)
@@ -59,6 +61,7 @@ module Temporalio::Api::Enums::V1::StartChildWorkflowExecutionFailedCause
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS = T.let(1, Integer)
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND = T.let(2, Integer)
+  self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID_VERSIONING_OVERRIDE = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

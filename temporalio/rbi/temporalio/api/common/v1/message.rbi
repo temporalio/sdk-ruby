@@ -486,6 +486,95 @@ class Temporalio::Api::Common::V1::WorkflowExecution
   end
 end
 
+# Identifies a specific execution within a namespace. This is used for standalone activities
+# executions in batch jobs currently.
+class Temporalio::Api::Common::V1::Execution
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      type: T.nilable(T.any(Symbol, String, Integer)),
+      business_id: T.nilable(String),
+      run_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    type: :EXECUTION_TYPE_UNSPECIFIED,
+    business_id: "",
+    run_id: ""
+  )
+  end
+
+  sig { returns(T.any(Symbol, Integer)) }
+  def type
+  end
+
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def type=(value)
+  end
+
+  sig { void }
+  def clear_type
+  end
+
+  sig { returns(String) }
+  def business_id
+  end
+
+  sig { params(value: String).void }
+  def business_id=(value)
+  end
+
+  sig { void }
+  def clear_business_id
+  end
+
+  sig { returns(String) }
+  def run_id
+  end
+
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  sig { void }
+  def clear_run_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::Execution) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Execution).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::Execution) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Execution, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # Represents the identifier used by a workflow author to define the workflow. Typically, the
 # name of a function. This is sometimes referred to as the workflow's "name"
 class Temporalio::Api::Common::V1::WorkflowType
@@ -1954,13 +2043,13 @@ class Temporalio::Api::Common::V1::TimeSkippingConfig
     params(
       enabled: T.nilable(T::Boolean),
       fast_forward: T.nilable(Google::Protobuf::Duration),
-      disable_child_propagation: T.nilable(T::Boolean)
+      disable_propagation: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
     enabled: false,
     fast_forward: nil,
-    disable_child_propagation: false
+    disable_propagation: false
   )
   end
 
@@ -2027,22 +2116,25 @@ class Temporalio::Api::Common::V1::TimeSkippingConfig
   def clear_fast_forward
   end
 
-  # By default, child workflows inherit the "enabled" flag when they are started.
+  # By default, executions started by another execution (e.g. a child workflow of a parent workflow or
+# a schedule with the timeskipping policy enabled), inherit the "enabled" flag and skip time when possible.
 # This flag disables that inheritance.
   sig { returns(T::Boolean) }
-  def disable_child_propagation
+  def disable_propagation
   end
 
-  # By default, child workflows inherit the "enabled" flag when they are started.
+  # By default, executions started by another execution (e.g. a child workflow of a parent workflow or
+# a schedule with the timeskipping policy enabled), inherit the "enabled" flag and skip time when possible.
 # This flag disables that inheritance.
   sig { params(value: T::Boolean).void }
-  def disable_child_propagation=(value)
+  def disable_propagation=(value)
   end
 
-  # By default, child workflows inherit the "enabled" flag when they are started.
+  # By default, executions started by another execution (e.g. a child workflow of a parent workflow or
+# a schedule with the timeskipping policy enabled), inherit the "enabled" flag and skip time when possible.
 # This flag disables that inheritance.
   sig { void }
-  def clear_disable_child_propagation
+  def clear_disable_propagation
   end
 
   sig { params(field: String).returns(T.untyped) }

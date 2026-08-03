@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/workflow_task_failure_error'
 require 'temporalio/worker/illegal_workflow_call_validator'
 require 'temporalio/workflow'
 
@@ -92,6 +93,11 @@ module Temporalio
                                     ))
                     nil
                   rescue Exception => e # rubocop:disable Lint/RescueException
+                    # Errors that invalidate the whole workflow task (e.g. an async DeadlockError landing while the
+                    # validator runs) must propagate with their class intact so they fail the task instead of being
+                    # flattened into a NondeterminismError message that futures may store
+                    raise if e.is_a?(Internal::WorkflowTaskFailureError)
+
                     ", reason: #{e}"
                   end
                 else
@@ -108,6 +114,9 @@ module Temporalio
                                             ))
                       nil
                     rescue Exception => e # rubocop:disable Lint/RescueException
+                      # See workflow-task-failure comment on the class-level validator rescue above
+                      raise if e.is_a?(Internal::WorkflowTaskFailureError)
+
                       ", reason: #{e}"
                     end
                   end

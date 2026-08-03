@@ -5760,7 +5760,8 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
       inherit_build_id: T.nilable(T::Boolean),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
-      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)
+      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation),
+      versioning_override: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)
     ).void
   end
   def initialize(
@@ -5785,7 +5786,8 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
     inherit_build_id: false,
     priority: nil,
     time_skipping_config: nil,
-    time_skipping_state_propagation: nil
+    time_skipping_state_propagation: nil,
+    versioning_override: nil
   )
   end
 
@@ -6102,6 +6104,24 @@ class Temporalio::Api::History::V1::StartChildWorkflowExecutionInitiatedEventAtt
 # has occurred or there is no previous run.
   sig { void }
   def clear_time_skipping_state_propagation
+  end
+
+  # Versioning override requested for the child workflow. If present, this explicit override
+# takes precedence over versioning behavior inherited from the parent workflow.
+  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)) }
+  def versioning_override
+  end
+
+  # Versioning override requested for the child workflow. If present, this explicit override
+# takes precedence over versioning behavior inherited from the parent workflow.
+  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)).void }
+  def versioning_override=(value)
+  end
+
+  # Versioning override requested for the child workflow. If present, this explicit override
+# takes precedence over versioning behavior inherited from the parent workflow.
+  sig { void }
+  def clear_versioning_override
   end
 
   sig { params(field: String).returns(T.untyped) }

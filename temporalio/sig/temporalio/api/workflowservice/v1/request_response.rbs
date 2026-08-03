@@ -262,11 +262,21 @@ module Temporalio
           attr_accessor failover_history(): ::Google::Protobuf::RepeatedField
           def clear_failover_history: () -> void
 
+          # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+          # ignore stale updates.
           # The initial info that client should use for poller group assignment. This information is
           # updated through poll response. Client is supposed to use the info received in the latest
           # poll response.
+          # @deprecated
           attr_accessor poller_group_infos(): ::Google::Protobuf::RepeatedField
           def clear_poller_group_infos: () -> void
+
+          # The initial, versioned info that client should use for poller group assignment. This
+          # information is updated through poll responses. Client is supposed to use the info with the
+          # highest version it has received.
+          attr_accessor poller_groups_info(): ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
+          def has_poller_groups_info?: () -> bool
+          def clear_poller_groups_info: () -> void
 
           type init_map = {
             namespace_info: (::Temporalio::Api::Namespace::V1::NamespaceInfo | ::Temporalio::Api::Namespace::V1::NamespaceInfo::init_map)?,
@@ -283,6 +293,8 @@ module Temporalio
             "failover_history" => ::Array[::Temporalio::Api::Replication::V1::FailoverStatus]?,
             poller_group_infos: ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
             "poller_group_infos" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+            poller_groups_info: (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
+            "poller_groups_info" => (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -295,6 +307,7 @@ module Temporalio
             | ("is_global_namespace" name) -> bool
             | ("failover_history" name) -> ::Google::Protobuf::RepeatedField
             | ("poller_group_infos" name) -> ::Google::Protobuf::RepeatedField
+            | ("poller_groups_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
 
           def []=:
               ("namespace_info" name, ::Temporalio::Api::Namespace::V1::NamespaceInfo? value) -> void
@@ -304,6 +317,7 @@ module Temporalio
             | ("is_global_namespace" name, bool value) -> void
             | ("failover_history" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("poller_group_infos" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("poller_groups_info" name, ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo? value) -> void
         end
 
         class UpdateNamespaceRequest < ::Google::Protobuf::AbstractMessage
@@ -571,8 +585,8 @@ module Temporalio
           def has_last_completion_result?: () -> bool
           def clear_last_completion_result: () -> void
 
-          # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
-          # If the workflow gets a signal before the delay, a workflow task will be dispatched and the rest
+          # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
+          # If the workflow gets a signal before the delay, a workflow task will be made available for dispatch and the rest
           # of the delay will be ignored.
           attr_reader workflow_start_delay(): ::Google::Protobuf::Duration?
           attr_writer workflow_start_delay(): (::Google::Protobuf::Duration | ::int)?
@@ -758,6 +772,11 @@ module Temporalio
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
 
+          # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+          attr_reader first_execution_run_id(): ::String
+          attr_writer first_execution_run_id(): ::String | ::Symbol
+          def clear_first_execution_run_id: () -> void
+
           # If true, a new workflow was started.
           attr_accessor started(): bool
           def clear_started: () -> void
@@ -784,6 +803,8 @@ module Temporalio
           type init_map = {
             run_id: (::String | ::Symbol)?,
             "run_id" => (::String | ::Symbol)?,
+            first_execution_run_id: (::String | ::Symbol)?,
+            "first_execution_run_id" => (::String | ::Symbol)?,
             started: bool?,
             "started" => bool?,
             status: (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::names | ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::strings | ::Integer | ::Float)?,
@@ -798,6 +819,7 @@ module Temporalio
 
           def []:
               ("run_id" name) -> ::String
+            | ("first_execution_run_id" name) -> ::String
             | ("started" name) -> bool
             | ("status" name) -> (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::names | ::Integer)
             | ("eager_workflow_task" name) -> ::Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse?
@@ -805,6 +827,7 @@ module Temporalio
 
           def []=:
               ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("first_execution_run_id" name, (::String | ::Symbol) value) -> void
             | ("started" name, bool value) -> void
             | ("status" name, (::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::names | ::Temporalio::Api::Enums::V1::WorkflowExecutionStatus::strings | ::Integer | ::Float) value) -> void
             | ("eager_workflow_task" name, ::Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueResponse? value) -> void
@@ -1204,14 +1227,28 @@ module Temporalio
           attr_writer poller_group_id(): ::String | ::Symbol
           def clear_poller_group_id: () -> void
 
+          # Deprecated. Use `poller_groups_info` instead, which carries a version so the client can
+          # ignore stale updates.
           # The weighted list of poller groups IDs that client should use for future polls to this task
           # queue. Client is expected to:
           #   1. Maintain minimum number of pollers no less than the number of groups.
           #   2. Try to assign the next poll to a group without any pending polls,
           #   3. If every group has some pending polls, assign the next poll to a group randomly
           #     according to the weights.
+          # @deprecated
           attr_accessor poller_group_infos(): ::Google::Protobuf::RepeatedField
           def clear_poller_group_infos: () -> void
+
+          # The weighted, versioned list of poller groups IDs that client should use for future polls to
+          # this task queue. Client should ignore this if it has already applied a snapshot with a
+          # version greater than or equal to `poller_groups_info.version`. Client is expected to:
+          #   1. Maintain minimum number of pollers no less than the number of groups.
+          #   2. Try to assign the next poll to a group without any pending polls,
+          #   3. If every group has some pending polls, assign the next poll to a group randomly
+          #     according to the weights.
+          attr_accessor poller_groups_info(): ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
+          def has_poller_groups_info?: () -> bool
+          def clear_poller_groups_info: () -> void
 
           type init_map = {
             task_token: ::String?,
@@ -1250,6 +1287,8 @@ module Temporalio
             "poller_group_id" => (::String | ::Symbol)?,
             poller_group_infos: ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
             "poller_group_infos" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+            poller_groups_info: (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
+            "poller_groups_info" => (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1273,6 +1312,7 @@ module Temporalio
             | ("poller_scaling_decision" name) -> ::Temporalio::Api::TaskQueue::V1::PollerScalingDecision?
             | ("poller_group_id" name) -> ::String
             | ("poller_group_infos" name) -> ::Google::Protobuf::RepeatedField
+            | ("poller_groups_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -1293,6 +1333,7 @@ module Temporalio
             | ("poller_scaling_decision" name, ::Temporalio::Api::TaskQueue::V1::PollerScalingDecision? value) -> void
             | ("poller_group_id" name, (::String | ::Symbol) value) -> void
             | ("poller_group_infos" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("poller_groups_info" name, ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo? value) -> void
         end
 
         class RespondWorkflowTaskCompletedRequest < ::Google::Protobuf::AbstractMessage
@@ -1433,6 +1474,19 @@ module Temporalio
           attr_writer worker_control_task_queue(): ::String | ::Symbol
           def clear_worker_control_task_queue: () -> void
 
+          # 0-indexed page number when the workflow task completion is split across multiple
+          # requests ("pages"). 0 for single-page requests. May only be set to non-zero value
+          # when the namespace capability workflow_task_completion_pagination is true.
+          attr_reader page_number(): ::Integer
+          attr_writer page_number(): ::Integer | ::Float
+          def clear_page_number: () -> void
+
+          # True for non-final pages of a paginated workflow task completion. The final page's
+          # `page_number` tells the server how many intermediate pages (0..page_number-1) preceded it.
+          # May only be used when the namespace capability workflow_task_completion_pagination is true.
+          attr_accessor intermediate_page(): bool
+          def clear_intermediate_page: () -> void
+
           type init_map = {
             task_token: ::String?,
             "task_token" => ::String?,
@@ -1474,6 +1528,10 @@ module Temporalio
             "worker_instance_key" => (::String | ::Symbol)?,
             worker_control_task_queue: (::String | ::Symbol)?,
             "worker_control_task_queue" => (::String | ::Symbol)?,
+            page_number: (::Integer | ::Float)?,
+            "page_number" => (::Integer | ::Float)?,
+            intermediate_page: bool?,
+            "intermediate_page" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1499,6 +1557,8 @@ module Temporalio
             | ("deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
             | ("worker_instance_key" name) -> ::String
             | ("worker_control_task_queue" name) -> ::String
+            | ("page_number" name) -> ::Integer
+            | ("intermediate_page" name) -> bool
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -1521,6 +1581,8 @@ module Temporalio
             | ("deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
             | ("worker_instance_key" name, (::String | ::Symbol) value) -> void
             | ("worker_control_task_queue" name, (::String | ::Symbol) value) -> void
+            | ("page_number" name, (::Integer | ::Float) value) -> void
+            | ("intermediate_page" name, bool value) -> void
         end
 
         class RespondWorkflowTaskCompletedResponse < ::Google::Protobuf::AbstractMessage
@@ -1913,8 +1975,20 @@ module Temporalio
           #   2. Try to assign the next poll to a group without any pending polls,
           #   3. If every group has some pending polls, assign the next poll to a group randomly
           #     according to the weights.
+          # @deprecated
           attr_accessor poller_group_infos(): ::Google::Protobuf::RepeatedField
           def clear_poller_group_infos: () -> void
+
+          # The weighted, versioned list of poller groups IDs that client should use for future polls to
+          # this task queue. Client should ignore this if it has already applied a snapshot with a
+          # version greater than or equal to `poller_groups_info.version`. Client is expected to:
+          #   1. Maintain minimum number of pollers no less than the number of groups.
+          #   2. Try to assign the next poll to a group without any pending polls,
+          #   3. If every group has some pending polls, assign the next poll to a group randomly
+          #     according to the weights.
+          attr_accessor poller_groups_info(): ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
+          def has_poller_groups_info?: () -> bool
+          def clear_poller_groups_info: () -> void
 
           type init_map = {
             task_token: ::String?,
@@ -1959,6 +2033,8 @@ module Temporalio
             "activity_run_id" => (::String | ::Symbol)?,
             poller_group_infos: ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
             "poller_group_infos" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+            poller_groups_info: (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
+            "poller_groups_info" => (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1985,6 +2061,7 @@ module Temporalio
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
             | ("activity_run_id" name) -> ::String
             | ("poller_group_infos" name) -> ::Google::Protobuf::RepeatedField
+            | ("poller_groups_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -2008,6 +2085,7 @@ module Temporalio
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
             | ("activity_run_id" name, (::String | ::Symbol) value) -> void
             | ("poller_group_infos" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("poller_groups_info" name, ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo? value) -> void
         end
 
         class RecordActivityTaskHeartbeatRequest < ::Google::Protobuf::AbstractMessage
@@ -3120,9 +3198,9 @@ module Temporalio
           def has_header?: () -> bool
           def clear_header: () -> void
 
-          # Time to wait before dispatching the first workflow task. Cannot be used with `cron_schedule`.
+          # Time to wait before making the first workflow task available for dispatch. Cannot be used with `cron_schedule`.
           # Note that the signal will be delivered with the first workflow task. If the workflow gets
-          # another SignalWithStartWorkflow before the delay a workflow task will be dispatched immediately
+          # another SignalWithStartWorkflow before the delay a workflow task will be made available for dispatch immediately
           # and the rest of the delay period will be ignored, even if that request also had a delay.
           # Signal via SignalWorkflowExecution will not unblock the workflow.
           attr_reader workflow_start_delay(): ::Google::Protobuf::Duration?
@@ -3278,6 +3356,11 @@ module Temporalio
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
 
+          # If the workflow was started as a result of a de-dupe, this field will contain the run id of the first execution in the chain.
+          attr_reader first_execution_run_id(): ::String
+          attr_writer first_execution_run_id(): ::String | ::Symbol
+          def clear_first_execution_run_id: () -> void
+
           # If true, a new workflow was started.
           attr_accessor started(): bool
           def clear_started: () -> void
@@ -3292,6 +3375,8 @@ module Temporalio
           type init_map = {
             run_id: (::String | ::Symbol)?,
             "run_id" => (::String | ::Symbol)?,
+            first_execution_run_id: (::String | ::Symbol)?,
+            "first_execution_run_id" => (::String | ::Symbol)?,
             started: bool?,
             "started" => bool?,
             signal_link: (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
@@ -3302,11 +3387,13 @@ module Temporalio
 
           def []:
               ("run_id" name) -> ::String
+            | ("first_execution_run_id" name) -> ::String
             | ("started" name) -> bool
             | ("signal_link" name) -> ::Temporalio::Api::Common::V1::Link?
 
           def []=:
               ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("first_execution_run_id" name, (::String | ::Symbol) value) -> void
             | ("started" name, bool value) -> void
             | ("signal_link" name, ::Temporalio::Api::Common::V1::Link? value) -> void
         end
@@ -4893,6 +4980,12 @@ module Temporalio
             attr_accessor server_scaled_deployments(): bool
             def clear_server_scaled_deployments: () -> void
 
+            # True if the server supports the Cloud Run compute provider for
+            # server-scaled deployments. Dependent on server version and the
+            # provider being enabled via server configuration.
+            attr_accessor server_scaled_provider_cloud_run(): bool
+            def clear_server_scaled_provider_cloud_run: () -> void
+
             type init_map = {
               signal_and_query_header: bool?,
               "signal_and_query_header" => bool?,
@@ -4918,6 +5011,8 @@ module Temporalio
               "nexus" => bool?,
               server_scaled_deployments: bool?,
               "server_scaled_deployments" => bool?,
+              server_scaled_provider_cloud_run: bool?,
+              "server_scaled_provider_cloud_run" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -4935,6 +5030,7 @@ module Temporalio
               | ("count_group_by_execution_status" name) -> bool
               | ("nexus" name) -> bool
               | ("server_scaled_deployments" name) -> bool
+              | ("server_scaled_provider_cloud_run" name) -> bool
 
             def []=:
                 ("signal_and_query_header" name, bool value) -> void
@@ -4949,6 +5045,7 @@ module Temporalio
               | ("count_group_by_execution_status" name, bool value) -> void
               | ("nexus" name, bool value) -> void
               | ("server_scaled_deployments" name, bool value) -> void
+              | ("server_scaled_provider_cloud_run" name, bool value) -> void
           end
 
           # Version of the server.
@@ -6572,8 +6669,15 @@ module Temporalio
 
           # Executions to apply the batch operation
           # This field and `visibility_query` are mutually exclusive
+          # DEPRECATED: Use `target_executions` instead.
+          # @deprecated
           attr_accessor executions(): ::Google::Protobuf::RepeatedField
           def clear_executions: () -> void
+
+          # Target executions to apply the batch operation. This field and `visibility_query`
+          # are mutually exclusive.
+          attr_accessor target_executions(): ::Google::Protobuf::RepeatedField
+          def clear_target_executions: () -> void
 
           # Limit for the number of operations processed per second within this batch.
           # Its purpose is to reduce the stress on the system caused by batch operations, which helps to prevent system
@@ -6621,8 +6725,20 @@ module Temporalio
           def has_update_activity_options_operation?: () -> bool
           def clear_update_activity_options_operation: () -> void
 
+          attr_accessor cancel_activities_operation(): ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities?
+          def has_cancel_activities_operation?: () -> bool
+          def clear_cancel_activities_operation: () -> void
+
+          attr_accessor terminate_activities_operation(): ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities?
+          def has_terminate_activities_operation?: () -> bool
+          def clear_terminate_activities_operation: () -> void
+
+          attr_accessor delete_activities_operation(): ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities?
+          def has_delete_activities_operation?: () -> bool
+          def clear_delete_activities_operation: () -> void
+
           # Operation input
-          attr_reader operation(): (::Temporalio::Api::Batch::V1::BatchOperationTermination | ::Temporalio::Api::Batch::V1::BatchOperationSignal | ::Temporalio::Api::Batch::V1::BatchOperationCancellation | ::Temporalio::Api::Batch::V1::BatchOperationDeletion | ::Temporalio::Api::Batch::V1::BatchOperationReset | ::Temporalio::Api::Batch::V1::BatchOperationUpdateWorkflowExecutionOptions | ::Temporalio::Api::Batch::V1::BatchOperationUnpauseActivities | ::Temporalio::Api::Batch::V1::BatchOperationResetActivities | ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions)?
+          attr_reader operation(): (::Temporalio::Api::Batch::V1::BatchOperationTermination | ::Temporalio::Api::Batch::V1::BatchOperationSignal | ::Temporalio::Api::Batch::V1::BatchOperationCancellation | ::Temporalio::Api::Batch::V1::BatchOperationDeletion | ::Temporalio::Api::Batch::V1::BatchOperationReset | ::Temporalio::Api::Batch::V1::BatchOperationUpdateWorkflowExecutionOptions | ::Temporalio::Api::Batch::V1::BatchOperationUnpauseActivities | ::Temporalio::Api::Batch::V1::BatchOperationResetActivities | ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions | ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities | ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities | ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities)?
           def has_operation?: () -> bool
           def clear_operation: () -> void
 
@@ -6637,6 +6753,8 @@ module Temporalio
             "reason" => (::String | ::Symbol)?,
             executions: ::Array[::Temporalio::Api::Common::V1::WorkflowExecution]?,
             "executions" => ::Array[::Temporalio::Api::Common::V1::WorkflowExecution]?,
+            target_executions: ::Array[::Temporalio::Api::Common::V1::Execution]?,
+            "target_executions" => ::Array[::Temporalio::Api::Common::V1::Execution]?,
             max_operations_per_second: (::Float | ::Integer)?,
             "max_operations_per_second" => (::Float | ::Integer)?,
             termination_operation: (::Temporalio::Api::Batch::V1::BatchOperationTermination | ::Temporalio::Api::Batch::V1::BatchOperationTermination::init_map)?,
@@ -6657,6 +6775,12 @@ module Temporalio
             "reset_activities_operation" => (::Temporalio::Api::Batch::V1::BatchOperationResetActivities | ::Temporalio::Api::Batch::V1::BatchOperationResetActivities::init_map)?,
             update_activity_options_operation: (::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions | ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions::init_map)?,
             "update_activity_options_operation" => (::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions | ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions::init_map)?,
+            cancel_activities_operation: (::Temporalio::Api::Batch::V1::BatchOperationCancelActivities | ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities::init_map)?,
+            "cancel_activities_operation" => (::Temporalio::Api::Batch::V1::BatchOperationCancelActivities | ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities::init_map)?,
+            terminate_activities_operation: (::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities | ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities::init_map)?,
+            "terminate_activities_operation" => (::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities | ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities::init_map)?,
+            delete_activities_operation: (::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities | ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities::init_map)?,
+            "delete_activities_operation" => (::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities | ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -6667,6 +6791,7 @@ module Temporalio
             | ("job_id" name) -> ::String
             | ("reason" name) -> ::String
             | ("executions" name) -> ::Google::Protobuf::RepeatedField
+            | ("target_executions" name) -> ::Google::Protobuf::RepeatedField
             | ("max_operations_per_second" name) -> ::Float
             | ("termination_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationTermination?
             | ("signal_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationSignal?
@@ -6677,6 +6802,9 @@ module Temporalio
             | ("unpause_activities_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationUnpauseActivities?
             | ("reset_activities_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationResetActivities?
             | ("update_activity_options_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions?
+            | ("cancel_activities_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities?
+            | ("terminate_activities_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities?
+            | ("delete_activities_operation" name) -> ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -6684,6 +6812,7 @@ module Temporalio
             | ("job_id" name, (::String | ::Symbol) value) -> void
             | ("reason" name, (::String | ::Symbol) value) -> void
             | ("executions" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("target_executions" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("max_operations_per_second" name, (::Float | ::Integer) value) -> void
             | ("termination_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationTermination? value) -> void
             | ("signal_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationSignal? value) -> void
@@ -6694,6 +6823,9 @@ module Temporalio
             | ("unpause_activities_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationUnpauseActivities? value) -> void
             | ("reset_activities_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationResetActivities? value) -> void
             | ("update_activity_options_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationUpdateActivityOptions? value) -> void
+            | ("cancel_activities_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationCancelActivities? value) -> void
+            | ("terminate_activities_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationTerminateActivities? value) -> void
+            | ("delete_activities_operation" name, ::Temporalio::Api::Batch::V1::BatchOperationDeleteActivities? value) -> void
         end
 
         class StartBatchOperationResponse < ::Google::Protobuf::AbstractMessage
@@ -6846,6 +6978,15 @@ module Temporalio
           attr_writer reason(): ::String | ::Symbol
           def clear_reason: () -> void
 
+          # Query is the visibility query that defines the group of workflow to apply the batch operation
+          attr_reader query(): ::String
+          attr_writer query(): ::String | ::Symbol
+          def clear_query: () -> void
+
+          # Executions is the list of workflow OR standalone activity executions to apply the batch operation
+          attr_accessor executions(): ::Google::Protobuf::RepeatedField
+          def clear_executions: () -> void
+
           type init_map = {
             operation_type: (::Temporalio::Api::Enums::V1::BatchOperationType::names | ::Temporalio::Api::Enums::V1::BatchOperationType::strings | ::Integer | ::Float)?,
             "operation_type" => (::Temporalio::Api::Enums::V1::BatchOperationType::names | ::Temporalio::Api::Enums::V1::BatchOperationType::strings | ::Integer | ::Float)?,
@@ -6867,6 +7008,10 @@ module Temporalio
             "identity" => (::String | ::Symbol)?,
             reason: (::String | ::Symbol)?,
             "reason" => (::String | ::Symbol)?,
+            query: (::String | ::Symbol)?,
+            "query" => (::String | ::Symbol)?,
+            executions: ::Array[::Temporalio::Api::Common::V1::Execution]?,
+            "executions" => ::Array[::Temporalio::Api::Common::V1::Execution]?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -6882,6 +7027,8 @@ module Temporalio
             | ("failure_operation_count" name) -> ::Integer
             | ("identity" name) -> ::String
             | ("reason" name) -> ::String
+            | ("query" name) -> ::String
+            | ("executions" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
               ("operation_type" name, (::Temporalio::Api::Enums::V1::BatchOperationType::names | ::Temporalio::Api::Enums::V1::BatchOperationType::strings | ::Integer | ::Float) value) -> void
@@ -6894,6 +7041,8 @@ module Temporalio
             | ("failure_operation_count" name, (::Integer | ::Float) value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("reason" name, (::String | ::Symbol) value) -> void
+            | ("query" name, (::String | ::Symbol) value) -> void
+            | ("executions" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         class ListBatchOperationsRequest < ::Google::Protobuf::AbstractMessage
@@ -7182,8 +7331,20 @@ module Temporalio
           #   2. Try to assign the next poll to a group without any pending polls,
           #   3. If every group has some pending polls, assign the next poll to a group randomly
           #     according to the weights.
+          # @deprecated
           attr_accessor poller_group_infos(): ::Google::Protobuf::RepeatedField
           def clear_poller_group_infos: () -> void
+
+          # The weighted, versioned list of poller groups IDs that client should use for future polls to
+          # this task queue. Client should ignore this if it has already applied a snapshot with a
+          # version greater than or equal to `poller_groups_info.version`. Client is expected to:
+          #   1. Maintain minimum number of pollers no less than the number of groups.
+          #   2. Try to assign the next poll to a group without any pending polls,
+          #   3. If every group has some pending polls, assign the next poll to a group randomly
+          #     according to the weights.
+          attr_accessor poller_groups_info(): ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
+          def has_poller_groups_info?: () -> bool
+          def clear_poller_groups_info: () -> void
 
           type init_map = {
             task_token: ::String?,
@@ -7196,6 +7357,8 @@ module Temporalio
             "poller_group_id" => (::String | ::Symbol)?,
             poller_group_infos: ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
             "poller_group_infos" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
+            poller_groups_info: (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
+            "poller_groups_info" => (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -7206,6 +7369,7 @@ module Temporalio
             | ("poller_scaling_decision" name) -> ::Temporalio::Api::TaskQueue::V1::PollerScalingDecision?
             | ("poller_group_id" name) -> ::String
             | ("poller_group_infos" name) -> ::Google::Protobuf::RepeatedField
+            | ("poller_groups_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -7213,6 +7377,7 @@ module Temporalio
             | ("poller_scaling_decision" name, ::Temporalio::Api::TaskQueue::V1::PollerScalingDecision? value) -> void
             | ("poller_group_id" name, (::String | ::Symbol) value) -> void
             | ("poller_group_infos" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("poller_groups_info" name, ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo? value) -> void
         end
 
         class RespondNexusTaskCompletedRequest < ::Google::Protobuf::AbstractMessage
@@ -7608,7 +7773,7 @@ module Temporalio
           attr_writer workflow_id(): ::String | ::Symbol
           def clear_workflow_id: () -> void
 
-          # The ID of the activity to target. 
+          # The ID of the activity to target.
           attr_reader activity_id(): ::String
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
@@ -7832,7 +7997,7 @@ module Temporalio
           attr_writer workflow_id(): ::String | ::Symbol
           def clear_workflow_id: () -> void
 
-          # The ID of the activity to target. 
+          # The ID of the activity to target.
           attr_reader activity_id(): ::String
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
@@ -8035,7 +8200,7 @@ module Temporalio
           attr_writer workflow_id(): ::String | ::Symbol
           def clear_workflow_id: () -> void
 
-          # The ID of the activity to target. 
+          # The ID of the activity to target.
           attr_reader activity_id(): ::String
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
@@ -8283,11 +8448,6 @@ module Temporalio
           attr_writer identity(): ::String | ::Symbol
           def clear_identity: () -> void
 
-          # Indicates that activity should reset heartbeat details.
-          # This flag will be applied only to the new instance of the activity.
-          attr_accessor reset_heartbeat(): bool
-          def clear_reset_heartbeat: () -> void
-
           # If activity is paused, it will remain paused after reset
           attr_accessor keep_paused(): bool
           def clear_keep_paused: () -> void
@@ -8321,8 +8481,6 @@ module Temporalio
             "run_id" => (::String | ::Symbol)?,
             identity: (::String | ::Symbol)?,
             "identity" => (::String | ::Symbol)?,
-            reset_heartbeat: bool?,
-            "reset_heartbeat" => bool?,
             keep_paused: bool?,
             "keep_paused" => bool?,
             jitter: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
@@ -8341,7 +8499,6 @@ module Temporalio
             | ("activity_id" name) -> ::String
             | ("run_id" name) -> ::String
             | ("identity" name) -> ::String
-            | ("reset_heartbeat" name) -> bool
             | ("keep_paused" name) -> bool
             | ("jitter" name) -> ::Google::Protobuf::Duration?
             | ("restore_original_options" name) -> bool
@@ -8353,7 +8510,6 @@ module Temporalio
             | ("activity_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
-            | ("reset_heartbeat" name, bool value) -> void
             | ("keep_paused" name, bool value) -> void
             | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("restore_original_options" name, bool value) -> void
@@ -11190,7 +11346,7 @@ module Temporalio
           def has_on_conflict_options?: () -> bool
           def clear_on_conflict_options: () -> void
 
-          # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+          # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
           attr_reader start_delay(): ::Google::Protobuf::Duration?
           attr_writer start_delay(): (::Google::Protobuf::Duration | ::int)?
           def has_start_delay?: () -> bool

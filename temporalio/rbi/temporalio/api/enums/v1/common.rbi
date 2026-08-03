@@ -179,3 +179,21 @@ module Temporalio::Api::Enums::V1::WorkerStatus
   def self.descriptor
   end
 end
+
+module Temporalio::Api::Enums::V1::ExecutionType
+  self::EXECUTION_TYPE_UNSPECIFIED = T.let(0, Integer)
+  self::EXECUTION_TYPE_WORKFLOW = T.let(1, Integer)
+  self::EXECUTION_TYPE_ACTIVITY = T.let(2, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end

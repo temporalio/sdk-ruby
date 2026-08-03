@@ -10,6 +10,7 @@ module Temporalio::Api::Enums::V1::ActivityExecutionStatus
   self::ACTIVITY_EXECUTION_STATUS_CANCELED = T.let(4, Integer)
   self::ACTIVITY_EXECUTION_STATUS_TERMINATED = T.let(5, Integer)
   self::ACTIVITY_EXECUTION_STATUS_TIMED_OUT = T.let(6, Integer)
+  self::ACTIVITY_EXECUTION_STATUS_PAUSED = T.let(7, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

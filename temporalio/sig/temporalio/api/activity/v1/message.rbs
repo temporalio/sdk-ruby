@@ -97,6 +97,14 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
+          # When updated, the time is added to the original `schedule_time`, not to the current time.
+          # If the resulting time is in the past, the task is made available for dispatch immediately.
+          attr_reader start_delay(): ::Google::Protobuf::Duration?
+          attr_writer start_delay(): (::Google::Protobuf::Duration | ::int)?
+          def has_start_delay?: () -> bool
+          def clear_start_delay: () -> void
+
           type init_map = {
             task_queue: (::Temporalio::Api::TaskQueue::V1::TaskQueue | ::Temporalio::Api::TaskQueue::V1::TaskQueue::init_map)?,
             "task_queue" => (::Temporalio::Api::TaskQueue::V1::TaskQueue | ::Temporalio::Api::TaskQueue::V1::TaskQueue::init_map)?,
@@ -112,6 +120,8 @@ module Temporalio
             "retry_policy" => (::Temporalio::Api::Common::V1::RetryPolicy | ::Temporalio::Api::Common::V1::RetryPolicy::init_map)?,
             priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
             "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+            start_delay: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "start_delay" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -124,6 +134,7 @@ module Temporalio
             | ("heartbeat_timeout" name) -> ::Google::Protobuf::Duration?
             | ("retry_policy" name) -> ::Temporalio::Api::Common::V1::RetryPolicy?
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+            | ("start_delay" name) -> ::Google::Protobuf::Duration?
 
           def []=:
               ("task_queue" name, ::Temporalio::Api::TaskQueue::V1::TaskQueue? value) -> void
@@ -133,6 +144,7 @@ module Temporalio
             | ("heartbeat_timeout" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("retry_policy" name, ::Temporalio::Api::Common::V1::RetryPolicy? value) -> void
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+            | ("start_delay" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         # Information about a standalone activity.
@@ -242,7 +254,8 @@ module Temporalio
           def has_schedule_time?: () -> bool
           def clear_schedule_time: () -> void
 
-          # Scheduled time + schedule to close timeout.
+          # The time at which the activity's Schedule-to-Close timeout expires.
+          # Calculated as `schedule_time` + `start_delay` + `schedule_to_close_timeout`.
           attr_reader expiration_time(): ::Google::Protobuf::Timestamp?
           attr_writer expiration_time(): (::Google::Protobuf::Timestamp | ::Time)?
           def has_expiration_time?: () -> bool
@@ -348,11 +361,18 @@ module Temporalio
           attr_writer sdk_version(): ::String | ::Symbol
           def clear_sdk_version: () -> void
 
-          # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+          # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
           attr_reader start_delay(): ::Google::Protobuf::Duration?
           attr_writer start_delay(): (::Google::Protobuf::Duration | ::int)?
           def has_start_delay?: () -> bool
           def clear_start_delay: () -> void
+
+          # The time at which the first activity task is made available for dispatch, computed as
+          # `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+          attr_reader execution_time(): ::Google::Protobuf::Timestamp?
+          attr_writer execution_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_execution_time?: () -> bool
+          def clear_execution_time: () -> void
 
           type init_map = {
             activity_id: (::String | ::Symbol)?,
@@ -429,6 +449,8 @@ module Temporalio
             "sdk_version" => (::String | ::Symbol)?,
             start_delay: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             "start_delay" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            execution_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "execution_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -471,6 +493,7 @@ module Temporalio
             | ("sdk_name" name) -> ::String
             | ("sdk_version" name) -> ::String
             | ("start_delay" name) -> ::Google::Protobuf::Duration?
+            | ("execution_time" name) -> ::Google::Protobuf::Timestamp?
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -510,6 +533,7 @@ module Temporalio
             | ("sdk_name" name, (::String | ::Symbol) value) -> void
             | ("sdk_version" name, (::String | ::Symbol) value) -> void
             | ("start_delay" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("execution_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
         # Limited activity information returned in the list response.
@@ -578,6 +602,13 @@ module Temporalio
           def has_execution_duration?: () -> bool
           def clear_execution_duration: () -> void
 
+          # The time at which the first activity task is made available for dispatch, computed as
+          # `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+          attr_reader execution_time(): ::Google::Protobuf::Timestamp?
+          attr_writer execution_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_execution_time?: () -> bool
+          def clear_execution_time: () -> void
+
           type init_map = {
             activity_id: (::String | ::Symbol)?,
             "activity_id" => (::String | ::Symbol)?,
@@ -601,6 +632,8 @@ module Temporalio
             "state_size_bytes" => (::Integer | ::Float)?,
             execution_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             "execution_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            execution_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "execution_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -617,6 +650,7 @@ module Temporalio
             | ("state_transition_count" name) -> ::Integer
             | ("state_size_bytes" name) -> ::Integer
             | ("execution_duration" name) -> ::Google::Protobuf::Duration?
+            | ("execution_time" name) -> ::Google::Protobuf::Timestamp?
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -630,6 +664,7 @@ module Temporalio
             | ("state_transition_count" name, (::Integer | ::Float) value) -> void
             | ("state_size_bytes" name, (::Integer | ::Float) value) -> void
             | ("execution_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("execution_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
         end
 
         # CallbackInfo contains the state of an attached activity callback.

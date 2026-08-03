@@ -98,7 +98,8 @@ class Temporalio::Api::Activity::V1::ActivityOptions
       start_to_close_timeout: T.nilable(Google::Protobuf::Duration),
       heartbeat_timeout: T.nilable(Google::Protobuf::Duration),
       retry_policy: T.nilable(Temporalio::Api::Common::V1::RetryPolicy),
-      priority: T.nilable(Temporalio::Api::Common::V1::Priority)
+      priority: T.nilable(Temporalio::Api::Common::V1::Priority),
+      start_delay: T.nilable(Google::Protobuf::Duration)
     ).void
   end
   def initialize(
@@ -108,7 +109,8 @@ class Temporalio::Api::Activity::V1::ActivityOptions
     start_to_close_timeout: nil,
     heartbeat_timeout: nil,
     retry_policy: nil,
-    priority: nil
+    priority: nil,
+    start_delay: nil
   )
   end
 
@@ -262,6 +264,27 @@ class Temporalio::Api::Activity::V1::ActivityOptions
   def clear_priority
   end
 
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
+# When updated, the time is added to the original `schedule_time`, not to the current time.
+# If the resulting time is in the past, the task is made available for dispatch immediately.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def start_delay
+  end
+
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
+# When updated, the time is added to the original `schedule_time`, not to the current time.
+# If the resulting time is in the past, the task is made available for dispatch immediately.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def start_delay=(value)
+  end
+
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
+# When updated, the time is added to the original `schedule_time`, not to the current time.
+# If the resulting time is in the past, the task is made available for dispatch immediately.
+  sig { void }
+  def clear_start_delay
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -338,7 +361,8 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
       total_heartbeat_count: T.nilable(Integer),
       sdk_name: T.nilable(String),
       sdk_version: T.nilable(String),
-      start_delay: T.nilable(Google::Protobuf::Duration)
+      start_delay: T.nilable(Google::Protobuf::Duration),
+      execution_time: T.nilable(Google::Protobuf::Timestamp)
     ).void
   end
   def initialize(
@@ -378,7 +402,8 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
     total_heartbeat_count: 0,
     sdk_name: "",
     sdk_version: "",
-    start_delay: nil
+    start_delay: nil,
+    execution_time: nil
   )
   end
 
@@ -673,17 +698,20 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
   def clear_schedule_time
   end
 
-  # Scheduled time + schedule to close timeout.
+  # The time at which the activity's Schedule-to-Close timeout expires.
+# Calculated as `schedule_time` + `start_delay` + `schedule_to_close_timeout`.
   sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
   def expiration_time
   end
 
-  # Scheduled time + schedule to close timeout.
+  # The time at which the activity's Schedule-to-Close timeout expires.
+# Calculated as `schedule_time` + `start_delay` + `schedule_to_close_timeout`.
   sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
   def expiration_time=(value)
   end
 
-  # Scheduled time + schedule to close timeout.
+  # The time at which the activity's Schedule-to-Close timeout expires.
+# Calculated as `schedule_time` + `start_delay` + `schedule_to_close_timeout`.
   sig { void }
   def clear_expiration_time
   end
@@ -979,19 +1007,37 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
   def clear_sdk_version
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { returns(T.nilable(Google::Protobuf::Duration)) }
   def start_delay
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
   def start_delay=(value)
   end
 
-  # Time to wait before dispatching the first activity task. This delay is not applied to retry attempts.
+  # Time to wait before making the first activity task available for dispatch. This delay is not applied to retry attempts.
   sig { void }
   def clear_start_delay
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def execution_time
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def execution_time=(value)
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { void }
+  def clear_execution_time
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1046,7 +1092,8 @@ class Temporalio::Api::Activity::V1::ActivityExecutionListInfo
       task_queue: T.nilable(String),
       state_transition_count: T.nilable(Integer),
       state_size_bytes: T.nilable(Integer),
-      execution_duration: T.nilable(Google::Protobuf::Duration)
+      execution_duration: T.nilable(Google::Protobuf::Duration),
+      execution_time: T.nilable(Google::Protobuf::Timestamp)
     ).void
   end
   def initialize(
@@ -1060,7 +1107,8 @@ class Temporalio::Api::Activity::V1::ActivityExecutionListInfo
     task_queue: "",
     state_transition_count: 0,
     state_size_bytes: 0,
-    execution_duration: nil
+    execution_duration: nil,
+    execution_time: nil
   )
   end
 
@@ -1233,6 +1281,24 @@ class Temporalio::Api::Activity::V1::ActivityExecutionListInfo
 # This field is only populated if the activity is closed.
   sig { void }
   def clear_execution_duration
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def execution_time
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def execution_time=(value)
+  end
+
+  # The time at which the first activity task is made available for dispatch, computed as
+# `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
+  sig { void }
+  def clear_execution_time
   end
 
   sig { params(field: String).returns(T.untyped) }
