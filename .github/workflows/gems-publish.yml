@@ -1,0 +1,115 @@
+name: Gems Publish
+
+# Reusable publish step: pushes every .gem in the given artifact to
+# rubygems.org (or another host) using Trusted Publishing (OIDC), then
+# polls until each gem's VERSION is listed on the host.
+#
+# SAFETY: The `on:` block declares ONLY `workflow_call`. This workflow
+# cannot be dispatched, cannot run on push, and cannot run on schedule.
+# The only way to invoke it is from another workflow that references it
+# with `uses:` and passes an `environment` input. That environment's
+# protection rules (required reviewers + deployment-branch policy) are
+# the human-in-the-loop gate.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: >
+          GitHub environment to run the push under. Holds the Trusted
+          Publishing scoping and any required-reviewers gate.
+        required: true
+        type: string
+      version:
+        description: "Version expected to appear on the host after push."
+        required: true
+        type: string
+      artifact-name:
+        description: "Run artifact containing the .gem files to publish."
+        required: true
+        type: string
+      host:
+        description: "Gem host to push to. Defaults to rubygems.org."
+        required: false
+        type: string
+        default: https://rubygems.org
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    permissions:
+      contents: read
+      id-token: write # Required for Trusted Publishing OIDC token issuance.
+    steps:
+      - name: Download gem artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: dist
+
+      - name: List gems to be published
+        run: ls -la dist
+
+      - uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: false
+          cargo-cache: false
+
+      # Requests a short-lived RubyGems API key via GitHub OIDC. The
+      # trust relationship must be configured on rubygems.org against
+      # (repo=temporalio/sdk-ruby, workflow=gems-publish.yml,
+      # environment=<inputs.environment>). No long-lived key is used.
+      #
+      # TODO(release-owner): pin @main to a specific commit SHA once selected.
+      - name: RubyGems login (Trusted Publishing / OIDC)
+        uses: rubygems/configure-rubygems-credentials-action@main
+
+      - name: Push gems
+        env:
+          HOST: ${{ inputs.host }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          gems=(dist/*.gem)
+          if [[ ${#gems[@]} -eq 0 ]]; then
+            echo "No .gem files found in dist/" >&2
+            exit 1
+          fi
+          for gem in "${gems[@]}"; do
+            echo "Pushing $gem to $HOST"
+            gem push --host "$HOST" "$gem"
+          done
+
+  wait:
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Wait for version to be listed
+        env:
+          VERSION: ${{ inputs.version }}
+          HOST: ${{ inputs.host }}
+        run: |
+          set -euo pipefail
+          deadline=$(( $(date +%s) + 1500 )) # 25 minutes
+          url="$HOST/api/v1/versions/temporalio.json"
+          while true; do
+            if curl -fsSL "$url" 2>/dev/null \
+                 | jq -e --arg v "$VERSION" 'map(.number) | index($v)' >/dev/null; then
+              echo "temporalio $VERSION is available on $HOST"
+              exit 0
+            fi
+            if [[ $(date +%s) -ge $deadline ]]; then
+              echo "Timed out waiting for temporalio $VERSION on $HOST" >&2
+              exit 1
+            fi
+            echo "Not yet available; sleeping 15s..."
+            sleep 15
+          done

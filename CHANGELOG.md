@@ -10,7 +10,7 @@ to docs, or any other relevant information.
 ### Added            — new features
 ### Changed          — changes in existing functionality
 ### Deprecated       — soon-to-be-removed features
-### Breaking Changes — removed or backwards-incompatible features
+### :boom: Breaking Changes — removed or backwards-incompatible features
 ### Fixed            — notable bug fixes
 ### Security         — notable security fixes
 -->
@@ -19,7 +19,7 @@ to docs, or any other relevant information.
 
 ## [Unreleased]
 
-### Breaking Changes
+### :boom: Breaking Changes
 
 - By default, workers now proactively validate outbound payload/memo sizes before sending: a field
   over the warn threshold is logged
@@ -106,7 +106,7 @@ Fixed a race in `replay_workflow` where if a NDE was hit, worker shutdown could 
 
 ## [v1.5.0] - 2026-06-11
 
-### Breaking Changes
+### :boom: Breaking Changes
 
 #### `Activity::Info` workflow fields are now nullable
 
