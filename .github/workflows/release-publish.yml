@@ -1,0 +1,37 @@
+name: Release Publish
+run-name: Release Publish (stub — real logic on a feature branch)
+
+# Stub. Registers the workflow on the default branch so that
+# `workflow_dispatch` becomes available and the full logic
+# (added on a feature branch) can be dispatched with --ref for
+# end-to-end testing before it lands on main.
+#
+# When the feature branch is merged, this file will be replaced by
+# the real release-publish pipeline.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  placeholder:
+    name: Placeholder — dispatch from a feature branch, not from main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain
+        run: |
+          cat <<'EOF'
+          This is a stub release-publish.yml.
+
+          The real release pipeline lives on a feature branch. When
+          workflow_dispatch is triggered with --ref pointing at that
+          branch, GitHub loads the workflow YAML from that ref, not
+          from main, so the branch's real pipeline runs.
+
+          If you are seeing this message, you dispatched from main
+          before the feature branch was merged. Nothing has been
+          published; this stub does not push anything.
+          EOF
+          exit 1

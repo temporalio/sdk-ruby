@@ -1,0 +1,43 @@
+name: Gems Publish
+run-name: Gems Publish (stub — real logic on a feature branch)
+
+# Stub. Reusable-workflow file that release-publish.yml references
+# via `uses: ./.github/workflows/gems-publish.yml`. Local reusable
+# references are resolved from the calling workflow's ref, so when
+# release-publish.yml is dispatched from a feature branch, the branch's
+# real gems-publish.yml is what actually runs.
+#
+# This stub only executes if a workflow on main happens to invoke it —
+# which is not intended.
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      artifact-name:
+        required: true
+        type: string
+      host:
+        required: false
+        type: string
+        default: https://rubygems.org
+
+permissions:
+  contents: read
+
+jobs:
+  placeholder:
+    name: Placeholder — real publish logic on a feature branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain
+        run: |
+          echo "Stub gems-publish.yml on main. If this ran, a caller on"
+          echo "main invoked the reusable workflow before the real logic"
+          echo "was merged. Nothing has been published."
+          exit 1
