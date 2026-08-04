@@ -19,7 +19,20 @@ to docs, or any other relevant information.
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Deprecated
+
 ### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v99.99.99] - 2026-08-04
+
 ### Added
 
 - Added the `Temporalio::Worker` `max_eager_activity_reservations_per_workflow_task:` option to
