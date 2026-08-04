@@ -196,9 +196,12 @@ module PrepareRelease
     "chore/release-#{version}"
   end
 
-  def create_release_branch(version, cwd: REPO_ROOT)
-    run(%w[git fetch origin main], cwd: cwd)
-    run(['git', 'switch', '--create', branch_name(version), 'origin/main'], cwd: cwd)
+  def create_release_branch(version, base_ref: 'origin/main', cwd: REPO_ROOT)
+    branch = base_ref.sub(%r{\Aorigin/}, '')
+    raise "base_ref must be an 'origin/...' ref, got #{base_ref.inspect}" if branch == base_ref
+
+    run(['git', 'fetch', 'origin', branch], cwd: cwd)
+    run(['git', 'switch', '--create', branch_name(version), base_ref], cwd: cwd)
   end
 
   def commit_release_changes(version, cwd: REPO_ROOT)
@@ -223,12 +226,18 @@ module PrepareRelease
   # --- main ------------------------------------------------------------------
 
   def main(argv)
-    options = { date: Date.today.iso8601, skip_lock: false, skip_git: false }
+    options = {
+      date: Date.today.iso8601,
+      skip_lock: false,
+      skip_git: false,
+      base_ref: 'origin/main'
+    }
     parser = OptionParser.new do |o|
       o.banner = 'Usage: prepare_release.rb VERSION [options]'
-      o.on('--date DATE', 'Release date in YYYY-MM-DD (default: today)') { |v| options[:date] = v }
-      o.on('--skip-lock',  'Skip refreshing Gemfile.lock (local testing only)') { options[:skip_lock] = true }
-      o.on('--skip-git',   'Skip branch/commit/push/PR (local testing only)')  { options[:skip_git] = true }
+      o.on('--date DATE',    'Release date in YYYY-MM-DD (default: today)')                     { |v| options[:date] = v }
+      o.on('--base-ref REF', 'Git ref to branch the release from (default: origin/main)')       { |v| options[:base_ref] = v }
+      o.on('--skip-lock',    'Skip refreshing Gemfile.lock (local testing only)')               { options[:skip_lock] = true }
+      o.on('--skip-git',     'Skip branch/commit/push/PR (local testing only)')                 { options[:skip_git] = true }
     end
     positional = parser.parse(argv)
     if positional.length != 1
@@ -240,7 +249,7 @@ module PrepareRelease
     release_date = parse_date(options[:date])
 
     ensure_clean_worktree unless options[:skip_git]
-    create_release_branch(version) unless options[:skip_git]
+    create_release_branch(version, base_ref: options[:base_ref]) unless options[:skip_git]
 
     changelog_path = REPO_ROOT.join('CHANGELOG.md')
     version_path   = REPO_ROOT.join('temporalio', 'lib', 'temporalio', 'version.rb')

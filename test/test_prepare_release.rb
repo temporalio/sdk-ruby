@@ -193,6 +193,30 @@ class TestPrepareRelease < Minitest::Test
     end
   end
 
+  def test_create_release_branch_with_alternate_base_ref
+    with_recorded_run do |calls|
+      PrepareRelease.create_release_branch(
+        '1.6.1',
+        base_ref: 'origin/gmt/ruby-auto-release',
+        cwd: REPO
+      )
+      assert_equal(
+        [
+          [%w[git fetch origin gmt/ruby-auto-release], REPO, true],
+          [['git', 'switch', '--create', 'chore/release-1.6.1', 'origin/gmt/ruby-auto-release'], REPO, true]
+        ],
+        calls
+      )
+    end
+  end
+
+  def test_create_release_branch_rejects_non_origin_base_ref
+    err = assert_raises(RuntimeError) do
+      PrepareRelease.create_release_branch('1.6.1', base_ref: 'main', cwd: REPO)
+    end
+    assert_match(/origin\//, err.message)
+  end
+
   def test_commit_release_changes_commits_only_release_files
     with_recorded_run do |calls|
       PrepareRelease.commit_release_changes('1.6.1', cwd: REPO)
