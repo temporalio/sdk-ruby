@@ -60,14 +60,13 @@ jobs:
           bundler-cache: false
           cargo-cache: false
 
-      # Requests a short-lived RubyGems API key via GitHub OIDC. The
-      # trust relationship must be configured on rubygems.org against
+      # Requests a short-lived RubyGems API key via GitHub OIDC and
+      # configures env vars for subsequent `gem push` calls. The trust
+      # relationship must be registered on rubygems.org against
       # (repo=temporalio/sdk-ruby, workflow=gems-publish.yml,
-      # environment=<inputs.environment>). No long-lived key is used.
-      #
-      # TODO(release-owner): pin @main to a specific commit SHA once selected.
+      # environment=<inputs.environment>). No long-lived key is stored.
       - name: RubyGems login (Trusted Publishing / OIDC)
-        uses: rubygems/configure-rubygems-credentials-action@main
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
 
       - name: Push gems
         env:
