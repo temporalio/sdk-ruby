@@ -32,9 +32,9 @@ runs:
         HOST: ${{ inputs.host }}
       run: |
         set -euo pipefail
-        # For musl Ruby the ruby-platform google-protobuf builds fail; the
-        # existing smoke_test_gem.rb has the same conditional. Kept aligned
-        # so post-publish behavior matches the pre-publish artifact test.
+        # TODO(gmt): For Linux musl, we have to install google-protobuf
+        # manually because latest versions do not work with musl. Remove
+        # this when https://github.com/protocolbuffers/protobuf/issues/16853 is resolved.
         if [[ "$(ruby -e 'puts RUBY_PLATFORM')" == *linux-musl* ]]; then
           gem install --verbose google-protobuf --platform ruby
         fi
