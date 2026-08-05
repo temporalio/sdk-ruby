@@ -1,5 +1,24 @@
 name: Release Publish
-run-name: Release Publish (stub)
+run-name: Release from ${{ github.ref_name }}
+
+# Single-dispatch release pipeline mirroring sdk-python's release-publish.yml.
+#
+# On one workflow_dispatch, the pipeline:
+#   build           → cross-compile all platform gems + source gem
+#   verify          → validate version/changelog, assemble release-dist artifact
+#   publish         → push to rubygems.org (gated by the `rubygems` GitHub
+#                     Environment: required reviewer clicks Approve here)
+#   smoke_published → install from rubygems.org and run a workflow
+#   create_draft    → open a draft GitHub Release with the changelog notes
+#
+# SAFETY: `gem push` lives only in gems-publish.yml, and gems-publish.yml
+# is workflow_call-only (cannot be dispatched, run on push, or scheduled).
+# The publish job here calls it with `environment: rubygems`; the
+# environment's required-reviewers gate + deployment-branch policy is the
+# human-in-the-loop. To rehearse this pipeline without publishing, dispatch
+# it and simply do not approve the environment prompt — the build+verify
+# jobs run first and their results are visible; nothing pushes until an
+# approver clicks Approve.
 
 on:
   workflow_dispatch: {}
@@ -7,14 +26,172 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: release-publish-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  placeholder:
-    name: placeholder
+  build:
+    name: Build all gems
+    uses: ./.github/workflows/build-gems.yml
+    permissions:
+      contents: read
+      actions: write
+
+  verify:
+    name: Verify release artifacts
+    needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      head_sha: ${{ steps.validate.outputs.sha }}
+      artifact_name: release-dist-${{ steps.validate.outputs.version }}
     steps:
-      - name: Explain
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: false
+          cargo-cache: false
+
+      - name: Validate checked-in version
+        id: validate
         run: |
-          cat <<'EOF'
-          This is a stub release-publish.yml.
-          EOF
-          exit 1
+          set -euo pipefail
+          ruby .github/scripts/release_verify.rb validate-version \
+            --sha "$(git rev-parse HEAD)" \
+            --github-output "$GITHUB_OUTPUT"
+
+      - name: Extract changelog release notes
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          ruby .github/scripts/release_verify.rb changelog-notes \
+            --version "$VERSION" \
+            --output release-notes.md
+
+      - name: Download platform + source gem artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir artifacts dist
+          gh run download "$GITHUB_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir artifacts \
+            --pattern '*-gem'
+
+          while IFS= read -r -d '' file; do
+            dest="dist/$(basename "$file")"
+            if [[ -e "$dest" ]]; then
+              echo "Duplicate gem filename across artifacts: $(basename "$file")" >&2
+              exit 1
+            fi
+            cp "$file" "$dest"
+          done < <(find artifacts -type f -name '*.gem' -print0)
+
+      - name: Verify dist set
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          ruby .github/scripts/release_verify.rb verify-dist \
+            --version "$VERSION" \
+            --dist dist
+
+      - name: Upload consolidated release-dist artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-dist-${{ steps.validate.outputs.version }}
+          path: dist
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-notes-${{ steps.validate.outputs.version }}
+          path: release-notes.md
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish to rubygems.org
+    needs: verify
+    uses: ./.github/workflows/gems-publish.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      environment: rubygems
+      version: ${{ needs.verify.outputs.version }}
+      artifact-name: ${{ needs.verify.outputs.artifact_name }}
+      host: https://rubygems.org
+
+  smoke_published:
+    name: Smoke test rubygems.org package
+    needs:
+      - verify
+      - publish
+    strategy:
+      fail-fast: false
+      # Subset of build-gems.yml's smoke matrix — enough coverage after
+      # publish without re-running the full grid the build already tested.
+      matrix:
+        include:
+          - os: ubuntu-latest
+            rubyVersion: "3.3"
+          - os: ubuntu-latest
+            rubyVersion: "4.0"
+          - os: macos-latest
+            rubyVersion: "3.4"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: ./.github/actions/release-smoke-package
+        with:
+          version: ${{ needs.verify.outputs.version }}
+          host: https://rubygems.org
+          ruby-version: ${{ matrix.rubyVersion }}
+
+  create_draft_release:
+    name: Create draft GitHub Release
+    needs:
+      - verify
+      - smoke_published
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          ref: ${{ needs.verify.outputs.head_sha }}
+          fetch-depth: 0
+
+      - name: Download release-notes artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-notes-${{ needs.verify.outputs.version }}
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ needs.verify.outputs.head_sha }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          gh release create "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$RELEASE_SHA" \
+            --title "v$VERSION" \
+            --draft \
+            --notes-file release-notes.md \
+            --generate-notes
