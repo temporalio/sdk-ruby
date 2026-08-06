@@ -1,8 +1,6 @@
 name: Release Publish
 run-name: Release from ${{ github.ref_name }}
 
-# Single-dispatch release pipeline mirroring sdk-python's release-publish.yml.
-#
 # On one workflow_dispatch, the pipeline:
 #   build           → cross-compile all platform gems + source gem
 #   verify          → validate version/changelog, assemble release-dist artifact
@@ -131,8 +129,6 @@ jobs:
       - publish
     strategy:
       fail-fast: false
-      # Subset of build-gems.yml's smoke matrix — enough coverage after
-      # publish without re-running the full grid the build already tested.
       matrix:
         include:
           - os: ubuntu-latest
