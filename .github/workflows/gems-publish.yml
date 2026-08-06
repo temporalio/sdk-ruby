@@ -76,25 +76,14 @@ jobs:
     permissions:
       contents: read
     steps:
-      # Poll rubygems.org's compact-index — the same endpoint that
-      # `gem install` uses to enumerate versions. Waiting on this
-      # endpoint (rather than the JSON /api/v1/versions/... endpoint)
-      # avoids a race where the JSON API reports the version but the
-      # compact-index cache hasn't propagated yet, causing downstream
-      # `gem install` to fail with "Could not find a valid gem".
-      #
-      # Note: hardcodes index.rubygems.org — this workflow only ever
-      # publishes to rubygems.org. If we ever needed to support a
-      # different host, the index-host derivation would need to change.
+      # Wait for gems to appear on rubygems. Uses the same endpoint that
+      # does, to avoid caching inconsistencies.
       - name: Wait for version in compact-index
         env:
           VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
           deadline=$(( $(date +%s) + 1500 )) # 25 minutes
-          # Escape dots so grep treats VERSION as a literal string;
-          # match the version at start-of-line followed by whitespace
-          # (source gem) or `-` (platform-suffixed variant).
           version_re="^${VERSION//./\\.}[ -]"
           url="https://index.rubygems.org/info/temporalio"
           while true; do
