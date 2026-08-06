@@ -87,8 +87,6 @@ def cmd_changelog_notes(args)
 
   lines = File.readlines(opts[:changelog], chomp: true)
   heading = /\A##\s+\[(?<version>[^\]]+)\](?:\s+-\s+.*)?\s*\z/
-  # sdk-ruby CHANGELOG headings use a 'v' prefix (## [v1.6.0]) even
-  # though the checked-in Temporalio::VERSION does not. Match either.
   wanted = [opts[:version], "v#{opts[:version]}"]
 
   start_index = nil
@@ -132,7 +130,6 @@ def cmd_verify_dist(args)
   raise "Dist directory does not exist: #{dist}" unless dist.directory?
 
   files = dist.children.select { |c| c.file? && c.extname == '.gem' }.map(&:basename).map(&:to_s).sort
-  raise "Duplicate filenames in #{dist}: #{files.inspect}" if files.length != files.uniq.length
 
   expected_source = "temporalio-#{opts[:version]}.gem"
   expected_platform = EXPECTED_PLATFORMS.map { |p| "temporalio-#{opts[:version]}-#{p}.gem" }

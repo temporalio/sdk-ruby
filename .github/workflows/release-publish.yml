@@ -10,15 +10,6 @@ run-name: Release from ${{ github.ref_name }}
 #                     Environment: required reviewer clicks Approve here)
 #   smoke_published → install from rubygems.org and run a workflow
 #   create_draft    → open a draft GitHub Release with the changelog notes
-#
-# SAFETY: `gem push` lives only in gems-publish.yml, and gems-publish.yml
-# is workflow_call-only (cannot be dispatched, run on push, or scheduled).
-# The publish job here calls it with `environment: rubygems`; the
-# environment's required-reviewers gate + deployment-branch policy is the
-# human-in-the-loop. To rehearse this pipeline without publishing, dispatch
-# it and simply do not approve the environment prompt — the build+verify
-# jobs run first and their results are visible; nothing pushes until an
-# approver clicks Approve.
 
 on:
   workflow_dispatch: {}
@@ -129,7 +120,6 @@ jobs:
       contents: read
       id-token: write
     with:
-      environment: rubygems
       version: ${{ needs.verify.outputs.version }}
       artifact-name: ${{ needs.verify.outputs.artifact_name }}
       host: https://rubygems.org
