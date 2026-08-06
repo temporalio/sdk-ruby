@@ -3,12 +3,10 @@
 # Prepare checked-in files for a Ruby SDK release.
 #
 # Bumps Temporalio::VERSION, rolls the CHANGELOG's [Unreleased] section
-# into a dated [vVERSION] section (re-seeding a fresh [Unreleased]),
+# into a dated [vVERSION] section (adding a fresh [Unreleased]),
 # refreshes Gemfile.lock, and — unless --skip-git is passed — creates a
 # chore/release-VERSION branch off origin/main, commits the release files,
 # pushes, and opens the release PR via `gh`.
-#
-# Mirrors sdk-python's scripts/prepare_release.py.
 
 require 'date'
 require 'optparse'
@@ -63,10 +61,9 @@ module PrepareRelease
     updated
   end
 
-  # Roll [Unreleased] into a dated [vVERSION] section, re-seed a fresh
-  # empty [Unreleased] above it. Fails if [Unreleased] is empty, if a
-  # section for the target version already exists, or if [Unreleased] is
-  # missing entirely.
+  # Roll [Unreleased] into a dated [vVERSION] section, add a fresh
+  # empty [Unreleased] above it. Fails if [Unreleased] is empty or
+  # missing, or if a section for the target version already exists.
   def finalize_changelog_release(text, version:, release_date:)
     validate_version(version)
     heading = "[v#{version}]"
