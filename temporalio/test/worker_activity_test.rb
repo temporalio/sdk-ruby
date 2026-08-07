@@ -520,6 +520,57 @@ class WorkerActivityTest < Test
     end
   end
 
+  class FiberCancellationActivity < Temporalio::Activity::Definition
+    activity_executor :fiber
+
+    attr_reader :canceled
+
+    def initialize
+      @started = Queue.new
+      @canceled = false
+    end
+
+    def execute
+      @started.push(nil)
+      # Heartbeat every 50ms waiting for cancel
+      loop do
+        sleep(0.05)
+        Temporalio::Activity::Context.current.heartbeat
+      end
+    rescue Temporalio::Error::CanceledError
+      @canceled = true
+      raise
+    end
+
+    def wait_started
+      @started.pop
+    end
+  end
+
+  def test_fiber_cancellation
+    skip_if_fibers_not_supported!
+    # Tests are doubly executed in threaded and fiber, so we start a new Async block just in case
+    Async do
+      act = FiberCancellationActivity.new
+      execute_activity(
+        act,
+        cancel_on_signal: 'cancel-activity',
+        wait_for_cancellation: true,
+        heartbeat_timeout: 0.8
+      ) do |handle|
+        # Wait for it to start
+        act.wait_started
+        # Send activity cancel
+        handle.signal('cancel-activity')
+        # The workflow can only reach a terminal state if the worker's task-dispatch fiber
+        # survived delivering the cancellation to the activity fiber
+        error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+        assert_kind_of Temporalio::Error::CanceledError, error.cause
+        assert act.canceled
+      end
+    end
+  end
+
   class WorkerShutdownActivity < Temporalio::Activity::Definition
     attr_reader :canceled
 
