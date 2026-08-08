@@ -9,6 +9,33 @@ module Converters
   class FailureConverterTest < Test
     class CustomError < StandardError; end
 
+    class FailureAttributesWrapper
+      attr_reader :attributes
+
+      def initialize(attributes)
+        @attributes = attributes
+      end
+    end
+
+    class FailureAttributesPayloadConverter < Temporalio::Converters::PayloadConverter
+      attr_reader :values
+
+      def initialize
+        @values = []
+      end
+
+      def to_payload(value, hint: nil)
+        raise 'Expected wrapped failure attributes' unless value.is_a?(FailureAttributesWrapper)
+
+        @values << value
+        Temporalio::Api::Common::V1::Payload.new
+      end
+
+      def from_payload(payload, hint: nil)
+        raise NotImplementedError
+      end
+    end
+
     def test_failure_with_causes
       # Make multiple nested errors
       orig_err = assert_raises do
@@ -87,6 +114,34 @@ module Converters
       assert_equal orig_err.cause.cause.cause.backtrace, new_err.cause.cause.cause.backtrace
       assert_equal 'Custom error class', new_err.cause.cause.cause.message
       assert_equal 'CustomError', new_err.cause.cause.cause.type
+    end
+
+    def test_process_common_attributes_before_payload_conversion
+      received_attributes = nil
+      payload_converter = FailureAttributesPayloadConverter.new
+      converter = Temporalio::Converters::DataConverter.new(
+        payload_converter:,
+        failure_converter: Temporalio::Converters::FailureConverter.new(
+          encode_common_attributes: true,
+          process_common_attributes: lambda { |attributes|
+            received_attributes = attributes
+            FailureAttributesWrapper.new(attributes)
+          }
+        )
+      )
+
+      error = StandardError.new('failure message')
+      error.set_backtrace(['first.rb:1', 'second.rb:2'])
+      failure = converter.to_failure(error)
+
+      assert_equal(
+        { message: 'failure message', stack_trace: "first.rb:1\nsecond.rb:2" },
+        received_attributes
+      )
+      assert_equal 1, payload_converter.values.length
+      assert_equal received_attributes, payload_converter.values.first.attributes
+      assert_equal 'Encoded failure', failure.message
+      assert_empty failure.stack_trace
     end
 
     # TODO(cretz): Test with encoded
