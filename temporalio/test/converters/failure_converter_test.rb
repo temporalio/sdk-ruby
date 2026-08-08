@@ -21,10 +21,11 @@ module Converters
       attr_reader :values
 
       def initialize
+        super
         @values = []
       end
 
-      def to_payload(value, hint: nil)
+      def to_payload(value, **_kwargs)
         raise 'Expected wrapped failure attributes' unless value.is_a?(FailureAttributesWrapper)
 
         @values << value
