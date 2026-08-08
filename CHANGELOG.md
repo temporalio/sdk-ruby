@@ -45,6 +45,8 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- `Temporalio::Client::WorkflowHandle#result` now preserves fiber-local `Thread.current[]` context
+  while fetching workflow history, allowing gRPC interceptors to apply request-scoped RPC options.
 - `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
   running when a history long poll expires without returning an event.
 
