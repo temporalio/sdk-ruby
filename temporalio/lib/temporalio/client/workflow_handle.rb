@@ -86,19 +86,14 @@ module Temporalio
         hist_run_id = result_run_id
         loop do
           # Get close event
-          event = begin
-            fetch_history_events(
-              wait_new_event: true,
-              event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
-              skip_archival: true,
-              specific_run_id: hist_run_id,
-              rpc_options:
-            ).next
-          rescue StopIteration
-            # Timeskipping server can return empty events with no continuation token, this will surface as an empty
-            # iterator.
-            next
-          end
+          event = fetch_history_events(
+            wait_new_event: true,
+            event_filter_type: Api::Enums::V1::HistoryEventFilterType::HISTORY_EVENT_FILTER_TYPE_CLOSE_EVENT,
+            skip_archival: true,
+            specific_run_id: hist_run_id,
+            rpc_options:
+          ).find { true }
+          next unless event
 
           # Check each close type'
           case event.event_type
