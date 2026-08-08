@@ -25,6 +25,8 @@ group :development do
   gem 'rb_sys', '~> 0.9'
   gem 'rdoc'
   gem 'rubocop'
+  # Used to verify that ScopedLogger works with loggers whose #level is not an integer.
+  gem 'semantic_logger'
   gem 'sorbet-runtime'
   gem 'sqlite3'
   gem 'steep', '~> 1.10'
