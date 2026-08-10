@@ -1,16 +1,12 @@
 name: Release package smoke test
 description: >
-  Install a published `temporalio` gem at a specific version from a given
-  host and run a minimal workflow to verify the install works.
+  Install a published `temporalio` gem at a specific version from
+  rubygems.org and run a minimal workflow to verify the install works.
 
 inputs:
   version:
     description: "Gem version to install."
     required: true
-  host:
-    description: "Gem host to install from (e.g. https://rubygems.org)."
-    required: false
-    default: https://rubygems.org
   ruby-version:
     description: "Ruby version for the install and smoke test."
     required: false
@@ -25,34 +21,10 @@ runs:
         bundler-cache: false
         cargo-cache: false
 
-    - name: Install gem
+    - name: Install gem and run workflow smoke test
       shell: bash
       env:
         VERSION: ${{ inputs.version }}
-        HOST: ${{ inputs.host }}
       run: |
         set -euo pipefail
-        # TODO(gmt): For Linux musl, we have to install google-protobuf
-        # manually because latest versions do not work with musl. Remove
-        # this when https://github.com/protocolbuffers/protobuf/issues/16853 is resolved.
-        if [[ "$(ruby -e 'puts RUBY_PLATFORM')" == *linux-musl* ]]; then
-          gem install --verbose google-protobuf --platform ruby
-        fi
-        gem install --verbose --source "$HOST" temporalio -v "$VERSION"
-
-    - name: Run workflow smoke test
-      shell: bash
-      run: |
-        set -euo pipefail
-        ruby -e '
-          require "temporalio/client"
-          require "temporalio/testing/workflow_environment"
-          Temporalio::Testing::WorkflowEnvironment.start_local do |env|
-            handle = env.client.start_workflow(
-              "MyWorkflow",
-              id: "release-smoke-#{Time.now.to_i}",
-              task_queue: "release-smoke",
-            )
-            puts "Started workflow, run ID: #{handle.result_run_id}"
-          end
-        '
+        ruby ./temporalio/smoke_test/smoke_test_gem.rb --version "$VERSION"

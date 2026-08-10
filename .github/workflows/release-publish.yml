@@ -143,7 +143,6 @@ jobs:
       - uses: ./.github/actions/release-smoke-package
         with:
           version: ${{ needs.verify.outputs.version }}
-          host: https://rubygems.org
           ruby-version: ${{ matrix.rubyVersion }}
 
   create_draft_release:
