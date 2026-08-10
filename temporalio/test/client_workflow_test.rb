@@ -26,6 +26,35 @@ class ClientWorkflowTest < Test
     end
   end
 
+  def test_result_preserves_fiber_local_context_for_history_rpc
+    context_key = :temporalio_test_result_context
+    context = :my_context
+    contexts = []
+    workflow_service = env.client.workflow_service
+    original_fetch = workflow_service.method(:get_workflow_execution_history)
+    workflow_service.define_singleton_method(:get_workflow_execution_history) do |request, **kwargs|
+      contexts << Thread.current[context_key]
+      original_fetch.call(request, **kwargs)
+    end
+    previous_context = Thread.current[context_key]
+    Thread.current[context_key] = context
+
+    env.with_kitchen_sink_worker do |task_queue|
+      handle = env.client.start_workflow(
+        'kitchen_sink',
+        { actions: [{ result: { value: 'done' } }] },
+        id: "wf-#{SecureRandom.uuid}",
+        task_queue:
+      )
+      assert_equal 'done', handle.result
+    end
+
+    assert_equal [context], contexts
+  ensure
+    workflow_service.singleton_class.send(:remove_method, :get_workflow_execution_history) if workflow_service
+    Thread.current[context_key] = previous_context
+  end
+
   def test_workflow_exists
     env.with_kitchen_sink_worker do |task_queue|
       # Create a workflow that hangs
