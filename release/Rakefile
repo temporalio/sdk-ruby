@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+# Task runner for the release-tool tests.
+#
+# Usage (from the release/ directory):
+#   bundle exec rake          # runs the test suite (default)
+#   bundle exec rake test     # same, explicit
+
+require 'rake/testtask'
+
+Rake::TestTask.new(:test) do |t|
+  t.libs << 'test'
+  t.test_files = FileList['test/test_*.rb']
+end
+
+task default: :test

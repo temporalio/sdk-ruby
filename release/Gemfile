@@ -10,6 +10,7 @@
 source 'https://rubygems.org'
 
 group :test do
+  gem 'rake'
   gem 'minitest'
   # minitest 6.x (bundled with Ruby 3.3+) extracted mock into its own gem.
   gem 'minitest-mock'
