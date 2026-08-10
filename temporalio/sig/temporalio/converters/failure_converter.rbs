@@ -3,7 +3,10 @@ module Temporalio
     class FailureConverter
       def self.default: -> FailureConverter
 
-      def initialize: (?encode_common_attributes: bool) -> void
+      def initialize: (
+        ?encode_common_attributes: bool,
+        ?process_common_attributes: ^(Hash[Symbol, String?]) -> untyped
+      ) -> void
 
       def to_failure: (Exception error, DataConverter | PayloadConverter converter) -> Api::Failure::V1::Failure
       def from_failure: (Api::Failure::V1::Failure failure, DataConverter | PayloadConverter converter) -> Exception

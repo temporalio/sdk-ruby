@@ -6,8 +6,13 @@ class Temporalio::Converters::FailureConverter
   sig { returns(Temporalio::Converters::FailureConverter) }
   def self.default; end
 
-  sig { params(encode_common_attributes: T::Boolean).void }
-  def initialize(encode_common_attributes: T.unsafe(nil)); end
+  sig do
+    params(
+      encode_common_attributes: T::Boolean,
+      process_common_attributes: T.nilable(T.proc.params(arg0: T::Hash[Symbol, T.nilable(String)]).returns(Object))
+    ).void
+  end
+  def initialize(encode_common_attributes: T.unsafe(nil), process_common_attributes: T.unsafe(nil)); end
 
   sig { returns(T::Boolean) }
   attr_reader :encode_common_attributes
