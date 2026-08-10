@@ -76,6 +76,7 @@ module Temporalio
         @done = false
         @result = nil
         @failure = nil
+        @awaited = false
         @block_given = block_given?
         return unless block_given?
 
@@ -89,6 +90,7 @@ module Temporalio
           @failure = e
         ensure
           @done = true
+          Workflow._current_or_nil&.track_future_with_failure(self) if @failure
         end
       end
 
@@ -132,12 +134,18 @@ module Temporalio
         @done = true
       end
 
+      # @return [Boolean] True if the future's result or failure has been observed via {wait} or {wait_no_raise}.
+      def awaited?
+        @awaited
+      end
+
       # Wait on the future to complete. This will return the success or raise the failure. To not raise, use
       # {wait_no_raise}.
       #
       # @return [Object] Result on success.
       # @raise [Exception] Failure if occurred.
       def wait
+        @awaited = true
         Workflow.wait_condition(cancellation: nil) { done? }
         Kernel.raise failure if failure? # steep:ignore
 
@@ -148,6 +156,7 @@ module Temporalio
       #
       # @return [Object, nil] Result on success or nil on failure.
       def wait_no_raise
+        @awaited = true
         Workflow.wait_condition(cancellation: nil) { done? }
         result
       end
