@@ -1,7 +1,7 @@
 # typed: true
 
 class Temporalio::ScopedLogger < ::SimpleDelegator
-  sig { params(obj: ::Logger).void }
+  sig { params(obj: Object).void }
   def initialize(obj); end
 
   sig { returns(T.nilable(Proc)) }
