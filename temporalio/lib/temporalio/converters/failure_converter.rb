@@ -21,8 +21,11 @@ module Temporalio
       #
       # @param encode_common_attributes [Boolean] If +true+, the message and stack trace of the failure will be moved
       #   into the encoded attribute section of the failure which can be encoded with a codec.
-      def initialize(encode_common_attributes: false)
+      # @param process_common_attributes [Proc, nil] If present, called with the message and stack trace of failure
+      #   before they are converted to a payload.
+      def initialize(encode_common_attributes: false, process_common_attributes: nil)
         @encode_common_attributes = encode_common_attributes
+        @process_common_attributes = process_common_attributes
       end
 
       # Convert a Ruby error to a Temporal failure.
@@ -104,9 +107,9 @@ module Temporalio
 
         # If encoding common attributes, move message and stack trace
         if @encode_common_attributes
-          failure.encoded_attributes = converter.to_payload(
-            { message: failure.message, stack_trace: failure.stack_trace }
-          )
+          common_attributes = { message: failure.message, stack_trace: failure.stack_trace }
+          common_attributes = @process_common_attributes.call(common_attributes) if @process_common_attributes
+          failure.encoded_attributes = converter.to_payload(common_attributes)
           failure.message = 'Encoded failure'
           failure.stack_trace = ''
         end
