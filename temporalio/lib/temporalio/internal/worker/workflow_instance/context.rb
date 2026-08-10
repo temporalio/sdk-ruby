@@ -59,6 +59,10 @@ module Temporalio
             @instance.current_deployment_version
           end
 
+          def track_future_with_failure(future)
+            @instance.track_future_with_failure(future)
+          end
+
           def current_history_length
             @instance.current_history_length
           end

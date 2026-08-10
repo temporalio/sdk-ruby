@@ -90,6 +90,7 @@ module Temporalio
           @buffered_signals = {} # Keyed by signal name, value is array of signal jobs
           # TODO(cretz): Should these be sets instead? Both should be fairly low counts.
           @in_progress_handlers = [] # Value is HandlerExecution
+          @futures_with_failures = [] # Value is Workflow::Future
           @patches_notified = []
           @definition = details.definition
           @interceptors = details.interceptors
@@ -226,6 +227,7 @@ module Temporalio
             !c.cancel_workflow_execution.nil?
           end
             warn_on_any_unfinished_handlers
+            warn_on_any_unawaited_failed_futures
           end
 
           # Return success or failure
@@ -814,6 +816,23 @@ module Temporalio
           return @scoped_logger_info unless update_info
 
           @scoped_logger_info.merge({ update_id: update_info.id, update_name: update_info.name })
+        end
+
+        def track_future_with_failure(future)
+          @futures_with_failures << future
+        end
+
+        def warn_on_any_unawaited_failed_futures
+          unawaited = @futures_with_failures.reject(&:awaited?)
+          return if unawaited.empty?
+
+          failures_str = JSON.generate(unawaited.map { |f| { type: f.failure.class.name, message: f.failure.message } })
+          warn(
+            "[TMPRL1103] Workflow #{info.workflow_id} finished with #{unawaited.size} unawaited failed " \
+            "future(s). These failures were silently swallowed because the future was never awaited with `wait` " \
+            "or `wait_no_raise`. This is usually a bug — if the failure is expected, await the future and handle " \
+            "the error. Unawaited failures: #{failures_str}"
+          )
         end
 
         def warn_on_any_unfinished_handlers
