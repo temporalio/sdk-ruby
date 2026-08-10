@@ -12,9 +12,13 @@ require 'optparse'
 
 options = { version: nil }
 parser = OptionParser.new do |o|
-  o.banner = "Usage: smoke_test_gem.rb GEM_GLOB\n" \
-             "   or: smoke_test_gem.rb --version VERSION"
-  o.on('--version V', 'Install temporalio VERSION from rubygems.org (instead of a local .gem)') { |v| options[:version] = v }
+  o.banner = <<~USAGE
+    Usage: smoke_test_gem.rb GEM_GLOB
+       or: smoke_test_gem.rb --version VERSION
+  USAGE
+  o.on('--version V', 'Install temporalio VERSION from rubygems.org') do |v|
+    options[:version] = v
+  end
 end
 positional = parser.parse(ARGV)
 
