@@ -21,6 +21,20 @@ to docs, or any other relevant information.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v1.6.1.test.only.rc3] - 2026-08-10
+
+### Added
+
 - Added the `Temporalio::Worker` `max_eager_activity_reservations_per_workflow_task:` option to
   configure the number of activity slots reserved for eager execution per workflow task. Values
   must be positive; use `disable_eager_activity_execution: true` to disable eager execution.
