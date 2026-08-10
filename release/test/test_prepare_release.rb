@@ -2,8 +2,10 @@
 
 # Unit tests for scripts/prepare_release.rb.
 #
-# Runs as a plain minitest file — no dependency on the gem's own test
-# harness or bundler. Invoke with `ruby test/test_prepare_release.rb`.
+# Uses minitest + minitest-mock, declared in the neighboring release/Gemfile.
+# From release/:
+#   bundle install
+#   bundle exec ruby test/test_prepare_release.rb
 
 require 'date'
 require 'minitest/autorun'
@@ -47,15 +49,20 @@ class TestPrepareRelease < Minitest::Test
         VERSION = '1.6.0'
       end
     RB
-    updated = PrepareRelease.replace_version_constant(text, '1.6.1')
-    assert_includes updated, "VERSION = '1.6.1'"
-    refute_includes updated, "'1.6.0'"
+    expected = <<~RB
+      # frozen_string_literal: true
+
+      module Temporalio
+        VERSION = '1.6.1'
+      end
+    RB
+    assert_equal expected, PrepareRelease.replace_version_constant(text, '1.6.1')
   end
 
   def test_replace_version_constant_double_quoted_preserves_quotes
     text = "module Temporalio\n  VERSION = \"1.6.0\"\nend\n"
-    updated = PrepareRelease.replace_version_constant(text, '1.6.1')
-    assert_includes updated, 'VERSION = "1.6.1"'
+    expected = "module Temporalio\n  VERSION = \"1.6.1\"\nend\n"
+    assert_equal expected, PrepareRelease.replace_version_constant(text, '1.6.1')
   end
 
   def test_replace_version_constant_raises_when_missing

@@ -14,7 +14,9 @@ require 'pathname'
 require 'set'
 
 module PrepareRelease
-  REPO_ROOT = Pathname.new(__dir__).parent.expand_path
+  # This file lives at release/scripts/prepare_release.rb; walk up two
+  # levels to reach the repo root, where CHANGELOG.md and temporalio/ are.
+  REPO_ROOT = Pathname.new(__dir__).parent.parent.expand_path
 
   CHANGELOG_HEADERS = [
     'Added',
