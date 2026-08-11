@@ -8233,14 +8233,6 @@ module Temporalio
           attr_writer identity(): ::String | ::Symbol
           def clear_identity: () -> void
 
-          # Providing this flag will also reset the number of attempts.
-          attr_accessor reset_attempts(): bool
-          def clear_reset_attempts: () -> void
-
-          # Providing this flag will also reset the heartbeat details.
-          attr_accessor reset_heartbeat(): bool
-          def clear_reset_heartbeat: () -> void
-
           # Reason to unpause the activity.
           attr_reader reason(): ::String
           attr_writer reason(): ::String | ::Symbol
@@ -8273,10 +8265,6 @@ module Temporalio
             "run_id" => (::String | ::Symbol)?,
             identity: (::String | ::Symbol)?,
             "identity" => (::String | ::Symbol)?,
-            reset_attempts: bool?,
-            "reset_attempts" => bool?,
-            reset_heartbeat: bool?,
-            "reset_heartbeat" => bool?,
             reason: (::String | ::Symbol)?,
             "reason" => (::String | ::Symbol)?,
             jitter: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
@@ -8295,8 +8283,6 @@ module Temporalio
             | ("activity_id" name) -> ::String
             | ("run_id" name) -> ::String
             | ("identity" name) -> ::String
-            | ("reset_attempts" name) -> bool
-            | ("reset_heartbeat" name) -> bool
             | ("reason" name) -> ::String
             | ("jitter" name) -> ::Google::Protobuf::Duration?
             | ("resource_id" name) -> ::String
@@ -8308,8 +8294,6 @@ module Temporalio
             | ("activity_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
-            | ("reset_attempts" name, bool value) -> void
-            | ("reset_heartbeat" name, bool value) -> void
             | ("reason" name, (::String | ::Symbol) value) -> void
             | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
@@ -8502,6 +8486,12 @@ module Temporalio
           attr_writer request_id(): ::String | ::Symbol
           def clear_request_id: () -> void
 
+          # Reset persisted heartbeat details.
+          # Reset always resets the attempt counter. Passing this flag causes reset to additionally
+          # discard any persisted heartbeat details.
+          attr_accessor reset_heartbeat(): bool
+          def clear_reset_heartbeat: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -8523,6 +8513,8 @@ module Temporalio
             "resource_id" => (::String | ::Symbol)?,
             request_id: (::String | ::Symbol)?,
             "request_id" => (::String | ::Symbol)?,
+            reset_heartbeat: bool?,
+            "reset_heartbeat" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -8538,6 +8530,7 @@ module Temporalio
             | ("restore_original_options" name) -> bool
             | ("resource_id" name) -> ::String
             | ("request_id" name) -> ::String
+            | ("reset_heartbeat" name) -> bool
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -8550,6 +8543,7 @@ module Temporalio
             | ("restore_original_options" name, bool value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
             | ("request_id" name, (::String | ::Symbol) value) -> void
+            | ("reset_heartbeat" name, bool value) -> void
         end
 
         # Deprecated. Use `ResetActivityExecutionRequest`.

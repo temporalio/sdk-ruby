@@ -331,8 +331,6 @@ module Temporalio
         :activity_id,
         :activity_run_id,
         :reason,
-        :reset_attempts,
-        :reset_heartbeat,
         :jitter,
         :rpc_options
       )
@@ -346,6 +344,7 @@ module Temporalio
         :keep_paused,
         :jitter,
         :restore_original_options,
+        :reset_heartbeat,
         :rpc_options
       )
 

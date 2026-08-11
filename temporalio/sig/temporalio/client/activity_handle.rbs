@@ -26,8 +26,6 @@ module Temporalio
 
       def unpause: (
         ?reason: String?,
-        ?reset_attempts: bool,
-        ?reset_heartbeat: bool,
         ?jitter: Float?,
         ?rpc_options: RPCOptions?
       ) -> void
@@ -36,6 +34,7 @@ module Temporalio
         ?keep_paused: bool,
         ?jitter: Float?,
         ?restore_original_options: bool,
+        ?reset_heartbeat: bool,
         ?rpc_options: RPCOptions?
       ) -> void
 

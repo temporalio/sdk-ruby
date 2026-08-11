@@ -17811,8 +17811,6 @@ class Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest
       activity_id: T.nilable(String),
       run_id: T.nilable(String),
       identity: T.nilable(String),
-      reset_attempts: T.nilable(T::Boolean),
-      reset_heartbeat: T.nilable(T::Boolean),
       reason: T.nilable(String),
       jitter: T.nilable(Google::Protobuf::Duration),
       resource_id: T.nilable(String),
@@ -17825,8 +17823,6 @@ class Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest
     activity_id: "",
     run_id: "",
     identity: "",
-    reset_attempts: false,
-    reset_heartbeat: false,
     reason: "",
     jitter: nil,
     resource_id: "",
@@ -17910,36 +17906,6 @@ class Temporalio::Api::WorkflowService::V1::UnpauseActivityExecutionRequest
   # The identity of the client who initiated this request.
   sig { void }
   def clear_identity
-  end
-
-  # Providing this flag will also reset the number of attempts.
-  sig { returns(T::Boolean) }
-  def reset_attempts
-  end
-
-  # Providing this flag will also reset the number of attempts.
-  sig { params(value: T::Boolean).void }
-  def reset_attempts=(value)
-  end
-
-  # Providing this flag will also reset the number of attempts.
-  sig { void }
-  def clear_reset_attempts
-  end
-
-  # Providing this flag will also reset the heartbeat details.
-  sig { returns(T::Boolean) }
-  def reset_heartbeat
-  end
-
-  # Providing this flag will also reset the heartbeat details.
-  sig { params(value: T::Boolean).void }
-  def reset_heartbeat=(value)
-  end
-
-  # Providing this flag will also reset the heartbeat details.
-  sig { void }
-  def clear_reset_heartbeat
   end
 
   # Reason to unpause the activity.
@@ -18364,7 +18330,8 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
       jitter: T.nilable(Google::Protobuf::Duration),
       restore_original_options: T.nilable(T::Boolean),
       resource_id: T.nilable(String),
-      request_id: T.nilable(String)
+      request_id: T.nilable(String),
+      reset_heartbeat: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -18377,7 +18344,8 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
     jitter: nil,
     restore_original_options: false,
     resource_id: "",
-    request_id: ""
+    request_id: "",
+    reset_heartbeat: false
   )
   end
 
@@ -18541,6 +18509,27 @@ class Temporalio::Api::WorkflowService::V1::ResetActivityExecutionRequest
   # Used to de-dupe reset requests.
   sig { void }
   def clear_request_id
+  end
+
+  # Reset persisted heartbeat details.
+# Reset always resets the attempt counter. Passing this flag causes reset to additionally
+# discard any persisted heartbeat details.
+  sig { returns(T::Boolean) }
+  def reset_heartbeat
+  end
+
+  # Reset persisted heartbeat details.
+# Reset always resets the attempt counter. Passing this flag causes reset to additionally
+# discard any persisted heartbeat details.
+  sig { params(value: T::Boolean).void }
+  def reset_heartbeat=(value)
+  end
+
+  # Reset persisted heartbeat details.
+# Reset always resets the attempt counter. Passing this flag causes reset to additionally
+# discard any persisted heartbeat details.
+  sig { void }
+  def clear_reset_heartbeat
   end
 
   sig { params(field: String).returns(T.untyped) }

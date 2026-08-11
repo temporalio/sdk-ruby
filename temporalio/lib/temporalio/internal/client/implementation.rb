@@ -1089,8 +1089,6 @@ module Temporalio
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid,
               reason: input.reason || '',
-              reset_attempts: input.reset_attempts,
-              reset_heartbeat: input.reset_heartbeat,
               jitter: ProtoUtils.seconds_to_duration(input.jitter)
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
@@ -1108,7 +1106,8 @@ module Temporalio
               request_id: SecureRandom.uuid,
               keep_paused: input.keep_paused,
               jitter: ProtoUtils.seconds_to_duration(input.jitter),
-              restore_original_options: input.restore_original_options
+              restore_original_options: input.restore_original_options,
+              reset_heartbeat: input.reset_heartbeat
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )

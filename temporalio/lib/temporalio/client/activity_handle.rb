@@ -163,20 +163,16 @@ module Temporalio
       # WARNING: Standalone Activities are experimental.
       #
       # @param reason [String, nil] Optional reason recorded on the server.
-      # @param reset_attempts [Boolean] If true, also reset the activity's attempt count.
-      # @param reset_heartbeat [Boolean] If true, also reset the activity's heartbeat details.
       # @param jitter [Float, nil] If set, the activity will start at a random time within this
       #   duration (in seconds).
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [Error::RPCError] RPC error from call.
-      def unpause(reason: nil, reset_attempts: false, reset_heartbeat: false, jitter: nil, rpc_options: nil)
+      def unpause(reason: nil, jitter: nil, rpc_options: nil)
         @client._impl.unpause_activity(
           Interceptor::UnpauseActivityInput.new(
             activity_id: id,
             activity_run_id: run_id,
             reason:,
-            reset_attempts:,
-            reset_heartbeat:,
             jitter:,
             rpc_options:
           )
@@ -194,9 +190,11 @@ module Temporalio
       #   time within this duration (in seconds).
       # @param restore_original_options [Boolean] If true, restore the activity options to the
       #   originals it was created with.
+      # @param reset_heartbeat [Boolean] If true, additionally discard any persisted heartbeat details.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       # @raise [Error::RPCError] RPC error from call.
-      def reset(keep_paused: false, jitter: nil, restore_original_options: false, rpc_options: nil)
+      def reset(keep_paused: false, jitter: nil, restore_original_options: false,
+                reset_heartbeat: false, rpc_options: nil)
         @client._impl.reset_activity(
           Interceptor::ResetActivityInput.new(
             activity_id: id,
@@ -204,6 +202,7 @@ module Temporalio
             keep_paused:,
             jitter:,
             restore_original_options:,
+            reset_heartbeat:,
             rpc_options:
           )
         )

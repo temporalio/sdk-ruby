@@ -38,15 +38,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Always fails (on every server attempt). Used to drive the attempt counter above 1 so unpause with
-  # reset_attempts can be observed pulling it back to 1.
-  class AlwaysFailActivity < Temporalio::Activity::Definition
-    def execute
-      raise Temporalio::Error::ApplicationError,
-            "fail attempt #{Temporalio::Activity::Context.current.info.attempt}"
-    end
-  end
-
   # Records heartbeat details on attempt 1, then blocks waiting for cancellation. The heartbeat
   # runs on its own — not adjacent to any completion RPC — so the details reliably persist and are
   # observable via describe. Later attempts (after a reset or an unpause that spawns a new attempt)
@@ -258,33 +249,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_unpause_resets_attempts
-    with_activity_worker([AlwaysFailActivity]) do |task_queue|
-      activity_id = "act-#{SecureRandom.uuid}"
-      handle = env.client.start_activity(
-        AlwaysFailActivity,
-        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60,
-        retry_policy: Temporalio::RetryPolicy.new(
-          initial_interval: 0.2, backoff_coefficient: 1.0, max_interval: 0.2, max_attempts: 50
-        )
-      )
-      # Wait until the activity has recorded more than one attempt (i.e. it has retried).
-      assert_eventually do
-        assert_operator handle.describe.attempt, :>, 1
-      end
-
-      handle.pause('hold')
-      assert_eventually_paused(handle)
-
-      handle.unpause(reset_attempts: true)
-      # reset_attempts pulls the attempt counter back to 1.
-      assert_eventually do
-        assert_equal 1, handle.describe.attempt
-      end
-      handle.terminate('cleanup')
-    end
-  end
-
   def test_reset_keeps_paused
     with_activity_worker([QuickActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
@@ -353,14 +317,14 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_unpause_preserves_heartbeat_by_default
+  def test_unpause_preserves_heartbeat
     with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
       handle = start_heartbeat_ready_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # Default unpause (no reset_heartbeat flag) preserves details. The re-dispatched attempt
-      # doesn't heartbeat (only attempt 1 does), so the persisted details are stable and observable.
+      # Unpause preserves heartbeat details. The re-dispatched attempt doesn't heartbeat (only
+      # attempt 1 does), so the persisted details are stable and observable.
       handle.unpause
       assert_eventually do
         assert handle.describe.has_heartbeat_details?
@@ -369,33 +333,30 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_unpause_resets_heartbeat
+  def test_reset_preserves_heartbeat_by_default
     with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
       handle = start_heartbeat_ready_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # Opt-in flag clears details. The re-dispatched attempt doesn't heartbeat, so cleared stays
-      # cleared and is observable. 30s (vs default 10s) to match Java's window; server may take
-      # several seconds to reflect the clear on a running activity.
-      handle.unpause(reset_heartbeat: true)
-      assert_eventually(timeout: 30) do
-        refute handle.describe.has_heartbeat_details?
-      end
+      # As of api#848 / temporal#11417, reset does NOT clear heartbeat details by default —
+      # you must pass reset_heartbeat: true. keep_paused so no new attempt reshapes state.
+      handle.reset(keep_paused: true)
+      # Give the server time to persist any state change, then confirm details survive.
+      sleep 2
+      assert handle.describe.has_heartbeat_details?
       handle.terminate('cleanup')
     end
   end
 
-  def test_reset_clears_heartbeat_by_default
+  def test_reset_clears_heartbeat_when_flag_set
     with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
       handle = start_heartbeat_ready_activity(task_queue)
       handle.pause('hold')
       assert_eventually_paused(handle)
 
-      # Reset always clears heartbeat details (there is no opt-in flag as of api#820);
-      # keep_paused so no new attempt runs to re-record them. 30s (vs default 10s) to match Java's
-      # window; server may take several seconds to reflect the clear on a running activity.
-      handle.reset(keep_paused: true)
+      # Opt-in flag clears details.
+      handle.reset(keep_paused: true, reset_heartbeat: true)
       assert_eventually(timeout: 30) do
         refute handle.describe.has_heartbeat_details?
       end

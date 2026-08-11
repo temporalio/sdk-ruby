@@ -536,8 +536,6 @@ module Temporalio
         attr_reader activity_id: String
         attr_reader activity_run_id: String?
         attr_reader reason: String?
-        attr_reader reset_attempts: bool
-        attr_reader reset_heartbeat: bool
         attr_reader jitter: Float?
         attr_reader rpc_options: RPCOptions?
 
@@ -545,8 +543,6 @@ module Temporalio
           activity_id: String,
           activity_run_id: String?,
           reason: String?,
-          reset_attempts: bool,
-          reset_heartbeat: bool,
           jitter: Float?,
           rpc_options: RPCOptions?
         ) -> void
@@ -558,6 +554,7 @@ module Temporalio
         attr_reader keep_paused: bool
         attr_reader jitter: Float?
         attr_reader restore_original_options: bool
+        attr_reader reset_heartbeat: bool
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
@@ -566,6 +563,7 @@ module Temporalio
           keep_paused: bool,
           jitter: Float?,
           restore_original_options: bool,
+          reset_heartbeat: bool,
           rpc_options: RPCOptions?
         ) -> void
       end
