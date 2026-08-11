@@ -76,7 +76,7 @@ jobs:
       contents: read
     steps:
       # Wait for gems to appear on rubygems. Uses the same endpoint that
-      # does, to avoid caching inconsistencies.
+      # gem install does, to avoid caching inconsistencies.
       - name: Wait for version in compact-index
         env:
           VERSION: ${{ inputs.version }}
