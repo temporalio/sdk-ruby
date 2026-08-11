@@ -1,21 +1,19 @@
 # frozen_string_literal: true
 
-# Unit tests for scripts/prepare_release.rb.
-#
-# Uses minitest + minitest-mock, declared in the neighboring release/Gemfile.
-# From release/:
-#   bundle install
-#   bundle exec ruby test/test_prepare_release.rb
+# rubocop:disable Style/Documentation, Style/DocumentationMethod
+
+# Unit tests for extra/release/scripts/prepare_release.rb.
 
 require 'date'
 require 'minitest/autorun'
 require 'minitest/mock'
 require 'pathname'
-require 'set'
 
 require_relative '../scripts/prepare_release'
 
 class TestPrepareRelease < Minitest::Test
+  REPO = Pathname.new('/repo').freeze
+
   def test_validate_version_accepts_semver_shapes
     assert_equal '1.6.0',     PrepareRelease.validate_version('1.6.0')
     assert_equal '1.30.0',    PrepareRelease.validate_version('1.30.0')
@@ -172,8 +170,6 @@ class TestPrepareRelease < Minitest::Test
   # Mirrors sdk-python's pattern: stub the subprocess wrapper to record calls
   # instead of executing them, then assert on the captured args.
 
-  REPO = Pathname.new('/repo').freeze
-
   # Run block with PrepareRelease.run stubbed. Yields the calls array; each
   # entry is [cmd, cwd, check].
   def with_recorded_run
@@ -221,7 +217,7 @@ class TestPrepareRelease < Minitest::Test
     err = assert_raises(RuntimeError) do
       PrepareRelease.create_release_branch('1.6.1', base_ref: 'main', cwd: REPO)
     end
-    assert_match(/origin\//, err.message)
+    assert_match(%r{origin/}, err.message)
   end
 
   def test_commit_release_changes_commits_only_release_files
@@ -294,3 +290,5 @@ class TestPrepareRelease < Minitest::Test
     end
   end
 end
+
+# rubocop:enable Style/Documentation, Style/DocumentationMethod

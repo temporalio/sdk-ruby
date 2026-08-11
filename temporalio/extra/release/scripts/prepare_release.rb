@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Style/Documentation, Style/DocumentationMethod
+
 # Prepare checked-in files for a Ruby SDK release.
 #
 # Bumps Temporalio::VERSION, rolls the CHANGELOG's [Unreleased] section
@@ -11,12 +13,9 @@
 require 'date'
 require 'optparse'
 require 'pathname'
-require 'set'
 
 module PrepareRelease
-  # This file lives at release/scripts/prepare_release.rb; walk up two
-  # levels to reach the repo root, where CHANGELOG.md and temporalio/ are.
-  REPO_ROOT = Pathname.new(__dir__).parent.parent.expand_path
+  REPO_ROOT = Pathname.new(__dir__).parent.parent.parent.parent.expand_path
 
   CHANGELOG_HEADERS = [
     'Added',
@@ -27,9 +26,9 @@ module PrepareRelease
     'Security'
   ].freeze
 
-  VERSION_RE = /\A[0-9]+(?:\.[0-9]+)+[A-Za-z0-9_.+\-]*\z/.freeze
-  CHANGELOG_HEADING_RE = /\A##\s+\[(?<version>[^\]]+)\](?:\s+-\s+.*)?\s*\z/.freeze
-  CHANGELOG_SUBHEADING_RE = /\A###\s+(?<header>.+?)\s*\z/.freeze
+  VERSION_RE = /\A[0-9]+(?:\.[0-9]+)+[A-Za-z0-9_.+-]*\z/
+  CHANGELOG_HEADING_RE = /\A##\s+\[(?<version>[^\]]+)\](?:\s+-\s+.*)?\s*\z/
+  CHANGELOG_SUBHEADING_RE = /\A###\s+(?<header>.+?)\s*\z/
 
   RELEASE_FILES = [
     'CHANGELOG.md',
@@ -174,7 +173,7 @@ module PrepareRelease
   end
 
   def changed_files(cwd: REPO_ROOT)
-    capture(%w[git status --porcelain], cwd: cwd).lines(chomp: true).map { |line| line[3..] }.to_set
+    capture(%w[git status --porcelain], cwd: cwd).lines(chomp: true).to_set { |line| line[3..] }
   end
 
   def ensure_clean_worktree(cwd: REPO_ROOT)
@@ -233,10 +232,18 @@ module PrepareRelease
     }
     parser = OptionParser.new do |o|
       o.banner = 'Usage: prepare_release.rb VERSION [options]'
-      o.on('--date DATE',    'Release date in YYYY-MM-DD (default: today)')                     { |v| options[:date] = v }
-      o.on('--base-ref REF', 'Git ref to branch the release from (default: origin/main)')       { |v| options[:base_ref] = v }
-      o.on('--skip-lock',    'Skip refreshing Gemfile.lock (local testing only)')               { options[:skip_lock] = true }
-      o.on('--skip-git',     'Skip branch/commit/push/PR (local testing only)')                 { options[:skip_git] = true }
+      o.on('--date DATE', 'Release date in YYYY-MM-DD (default: today)') do |v|
+        options[:date] = v
+      end
+      o.on('--base-ref REF', 'Git ref to branch the release from (default: origin/main)') do |v|
+        options[:base_ref] = v
+      end
+      o.on('--skip-lock', 'Skip refreshing Gemfile.lock (local testing only)') do
+        options[:skip_lock] = true
+      end
+      o.on('--skip-git', 'Skip branch/commit/push/PR (local testing only)') do
+        options[:skip_git] = true
+      end
     end
     positional = parser.parse(argv)
     if positional.length != 1
@@ -258,9 +265,7 @@ module PrepareRelease
     )
     version_path.write(replace_version_constant(version_path.read, version))
 
-    unless options[:skip_lock]
-      run(%w[bundle lock], cwd: REPO_ROOT.join('temporalio'))
-    end
+    run(%w[bundle lock], cwd: REPO_ROOT.join('temporalio')) unless options[:skip_lock]
 
     unless options[:skip_git]
       ensure_only_release_changes
@@ -269,8 +274,10 @@ module PrepareRelease
       create_release_pr(version)
     end
 
-    puts "Prepared release #{version} dated #{release_date.iso8601}#{options[:skip_git] ? '' : ' and opened a PR'}"
+    puts "Prepared release #{version} dated #{release_date.iso8601}#{' and opened a PR' unless options[:skip_git]}"
   end
 end
 
 PrepareRelease.main(ARGV) if $PROGRAM_NAME == __FILE__
+
+# rubocop:enable Style/Documentation, Style/DocumentationMethod
