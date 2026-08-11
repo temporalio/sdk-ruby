@@ -6,6 +6,8 @@ run-name: Release from ${{ github.ref_name }}
 #   verify          → validate version/changelog, assemble release-dist artifact
 #   publish         → push to rubygems.org (gated by the `rubygems` GitHub
 #                     Environment: required reviewer clicks Approve here)
+#   wait            → poll rubygems compact-index until the new version is
+#                     visible to `gem install`
 #   smoke_published → install from rubygems.org and run a workflow
 #   create_draft    → open a draft GitHub Release with the changelog notes
 
@@ -118,15 +120,47 @@ jobs:
       contents: read
       id-token: write
     with:
-      version: ${{ needs.verify.outputs.version }}
       artifact-name: ${{ needs.verify.outputs.artifact_name }}
       host: https://rubygems.org
+
+  wait:
+    needs:
+      - verify
+      - publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      # Wait for gems to appear on rubygems. Uses the same endpoint that
+      # gem install does, to avoid caching inconsistencies.
+      - name: Wait for version in compact-index
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          set -euo pipefail
+          deadline=$(( $(date +%s) + 1500 )) # 25 minutes
+          version_re="^${VERSION//./\\.}[ -]"
+          url="https://index.rubygems.org/info/temporalio"
+          while true; do
+            body=$(curl -fsSL "$url" 2>/dev/null || true)
+            if echo "$body" | grep -qE "$version_re"; then
+              echo "temporalio $VERSION visible in compact-index"
+              exit 0
+            fi
+            if [[ $(date +%s) -ge $deadline ]]; then
+              echo "Timed out waiting for temporalio $VERSION in compact-index" >&2
+              exit 1
+            fi
+            echo "Not yet in compact-index; sleeping 15s..."
+            sleep 15
+          done
 
   smoke_published:
     name: Smoke test rubygems.org package
     needs:
       - verify
-      - publish
+      - wait
     strategy:
       fail-fast: false
       matrix:

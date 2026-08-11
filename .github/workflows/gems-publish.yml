@@ -1,15 +1,10 @@
 name: Gems Publish
 
-# Push gems to rubygems.org (or another host) using Trusted Publishing (OIDC), then
-# polls until each gem's VERSION is listed on the host.
+# Push gems to rubygems.org (or another host) using Trusted Publishing (OIDC).
 
 on:
   workflow_call:
     inputs:
-      version:
-        description: "Version expected to appear on the host after push."
-        required: true
-        type: string
       artifact-name:
         description: "Run artifact containing the .gem files to publish."
         required: true
@@ -66,35 +61,4 @@ jobs:
           for gem in "${gems[@]}"; do
             echo "Pushing $gem to $HOST"
             gem push --host "$HOST" "$gem"
-          done
-
-  wait:
-    needs: publish
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-    steps:
-      # Wait for gems to appear on rubygems. Uses the same endpoint that
-      # gem install does, to avoid caching inconsistencies.
-      - name: Wait for version in compact-index
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          set -euo pipefail
-          deadline=$(( $(date +%s) + 1500 )) # 25 minutes
-          version_re="^${VERSION//./\\.}[ -]"
-          url="https://index.rubygems.org/info/temporalio"
-          while true; do
-            body=$(curl -fsSL "$url" 2>/dev/null || true)
-            if echo "$body" | grep -qE "$version_re"; then
-              echo "temporalio $VERSION visible in compact-index"
-              exit 0
-            fi
-            if [[ $(date +%s) -ge $deadline ]]; then
-              echo "Timed out waiting for temporalio $VERSION in compact-index" >&2
-              exit 1
-            fi
-            echo "Not yet in compact-index; sleeping 15s..."
-            sleep 15
           done
