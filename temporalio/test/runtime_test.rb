@@ -133,18 +133,20 @@ class RuntimeTest < Test
   # sdk-core to populate the runtime entry on the first worker heartbeat's EnvironmentInfo.
   def test_runtime_environment_info_default
     captured = capture_bridge_runtime_options { Temporalio::Runtime.new }
-    refute captured.disable_environment_info
-    assert_equal RUBY_VERSION, captured.runtime_version
+    refute_nil captured
+    refute captured&.disable_environment_info
+    assert_equal RUBY_VERSION, captured&.runtime_version
   end
 
   def test_runtime_disable_environment_info
     captured = capture_bridge_runtime_options do
       Temporalio::Runtime.new(disable_environment_info: true)
     end
-    assert captured.disable_environment_info
+    refute_nil captured
+    assert captured&.disable_environment_info
     # runtime_version is still populated — the flag suppresses reporting on the sdk-core side, not
     # what we hand across the bridge.
-    assert_equal RUBY_VERSION, captured.runtime_version
+    assert_equal RUBY_VERSION, captured&.runtime_version
   end
 
   # Capture the Options struct that Runtime#initialize passes to Internal::Bridge::Runtime.new
