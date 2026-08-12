@@ -21,6 +21,20 @@ to docs, or any other relevant information.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v1.6.1.test.only.rc4] - 2026-08-12
+
+### Added
+
 - Added `FailureConverter` `process_common_attributes:` to customize the value sent to the payload converter when
   encoding common failure attributes.
 
