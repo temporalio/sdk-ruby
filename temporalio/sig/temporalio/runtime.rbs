@@ -110,7 +110,8 @@ module Temporalio
 
     def initialize: (
       ?telemetry: TelemetryOptions,
-      ?worker_heartbeat_interval: Float?
+      ?worker_heartbeat_interval: Float?,
+      ?disable_environment_info: bool
     ) -> void
 
     def _core_runtime: -> Internal::Bridge::Runtime

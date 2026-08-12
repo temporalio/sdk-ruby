@@ -6,8 +6,8 @@ class Temporalio::Runtime
   sig { returns(Temporalio::Metric::Meter) }
   attr_reader :metric_meter
 
-  sig { params(telemetry: Temporalio::Runtime::TelemetryOptions, worker_heartbeat_interval: T.nilable(Float)).void }
-  def initialize(telemetry: T.unsafe(nil), worker_heartbeat_interval: T.unsafe(nil)); end
+  sig { params(telemetry: Temporalio::Runtime::TelemetryOptions, worker_heartbeat_interval: T.nilable(Float), disable_environment_info: T::Boolean).void }
+  def initialize(telemetry: T.unsafe(nil), worker_heartbeat_interval: T.unsafe(nil), disable_environment_info: T.unsafe(nil)); end
 
   class << self
     extend T::Sig

@@ -10,6 +10,9 @@ use std::str::FromStr;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Duration;
 use std::{future::Future, sync::Arc};
+use temporalio_common::protos::temporal::api::worker::v1::environment_info::{
+    Runtime as RuntimeInfo, runtime::RuntimeType,
+};
 use temporalio_common::telemetry::metrics::core::MetricCallBufferer;
 use temporalio_common::telemetry::{
     HistogramBucketOverrides, Logger, MetricTemporality, OtelCollectorOptions, OtlpProtocol,
@@ -114,6 +117,12 @@ impl Runtime {
         // Set some metrics options now, but the metrics instance is late-bound
         // after CoreRuntime created since it needs Tokio runtime
 
+        let disable_environment_info =
+            options.member::<bool>(id!("disable_environment_info"))?;
+        let runtime_version = options
+            .member::<Option<String>>(id!("runtime_version"))?
+            .unwrap_or_default();
+
         let opts = RuntimeOptions::builder()
             .telemetry_options(telemetry_opts)
             .heartbeat_interval(
@@ -121,8 +130,13 @@ impl Runtime {
                     .member::<Option<f64>>(id!("worker_heartbeat_interval"))?
                     .map(Duration::from_secs_f64),
             )
+            .disable_environment_info(disable_environment_info)
             .build()
-            .map_err(|err| error!("Invalid runtime options: {}", err))?;
+            .map_err(|err| error!("Invalid runtime options: {}", err))?
+            .with_runtimes(vec![RuntimeInfo {
+                r#type: RuntimeType::Cruby as i32,
+                version: runtime_version,
+            }]);
 
         // Create core runtime
         let mut core = CoreRuntime::new(opts, TokioRuntimeBuilder::default())
