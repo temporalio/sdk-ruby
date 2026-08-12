@@ -117,8 +117,7 @@ impl Runtime {
         // Set some metrics options now, but the metrics instance is late-bound
         // after CoreRuntime created since it needs Tokio runtime
 
-        let disable_environment_info =
-            options.member::<bool>(id!("disable_environment_info"))?;
+        let disable_environment_info = options.member::<bool>(id!("disable_environment_info"))?;
         let runtime_version = options
             .member::<Option<String>>(id!("runtime_version"))?
             .unwrap_or_default();
