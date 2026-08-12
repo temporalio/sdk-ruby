@@ -162,7 +162,10 @@ class RuntimeTest < Test
     orig_new = bridge_class.instance_method(:new)
     orig_create = meter_class.instance_method(:create_from_runtime)
 
-    bridge_class.define_method(:new) { |opts| captured = opts; shim }
+    bridge_class.define_method(:new) do |opts|
+      captured = opts
+      shim
+    end
     meter_class.define_method(:create_from_runtime) { |_runtime| nil }
 
     begin
