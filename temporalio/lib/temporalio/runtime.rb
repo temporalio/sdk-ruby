@@ -332,9 +332,12 @@ module Temporalio
     # @param telemetry [TelemetryOptions] Telemetry options to set.
     # @param worker_heartbeat_interval [Float, nil] Interval for worker heartbeats in seconds. Can be nil to disable
     #   heartbeating. Interval must be between 1s and 60s.
+    # @param disable_environment_info [Boolean] When true, worker heartbeats omit runtime, hosting, and platform
+    #   information. Defaults to false, which advertises this process as CRuby with `RUBY_VERSION`.
     def initialize(
       telemetry: TelemetryOptions.new,
-      worker_heartbeat_interval: 60
+      worker_heartbeat_interval: 60,
+      disable_environment_info: false
     )
       if !worker_heartbeat_interval.nil? && !worker_heartbeat_interval.positive?
         raise 'Worker heartbeat interval must be positive'
@@ -346,7 +349,9 @@ module Temporalio
       @core_runtime = Internal::Bridge::Runtime.new(
         Internal::Bridge::Runtime::Options.new(
           telemetry: telemetry._to_bridge,
-          worker_heartbeat_interval:
+          worker_heartbeat_interval:,
+          disable_environment_info:,
+          runtime_version: RUBY_VERSION
         )
       )
       @metric_meter = Internal::Metric::Meter.create_from_runtime(self) || Metric::Meter.null

@@ -4434,11 +4434,18 @@ module Temporalio
           def has_query_rejected?: () -> bool
           def clear_query_rejected: () -> void
 
+          # Holds the link to the Workflow execution that processed the Query. 
+          attr_accessor link(): ::Temporalio::Api::Common::V1::Link?
+          def has_link?: () -> bool
+          def clear_link: () -> void
+
           type init_map = {
             query_result: (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             "query_result" => (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             query_rejected: (::Temporalio::Api::Query::V1::QueryRejected | ::Temporalio::Api::Query::V1::QueryRejected::init_map)?,
             "query_rejected" => (::Temporalio::Api::Query::V1::QueryRejected | ::Temporalio::Api::Query::V1::QueryRejected::init_map)?,
+            link: (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
+            "link" => (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -4446,10 +4453,12 @@ module Temporalio
           def []:
               ("query_result" name) -> ::Temporalio::Api::Common::V1::Payloads?
             | ("query_rejected" name) -> ::Temporalio::Api::Query::V1::QueryRejected?
+            | ("link" name) -> ::Temporalio::Api::Common::V1::Link?
 
           def []=:
               ("query_result" name, ::Temporalio::Api::Common::V1::Payloads? value) -> void
             | ("query_rejected" name, ::Temporalio::Api::Query::V1::QueryRejected? value) -> void
+            | ("link" name, ::Temporalio::Api::Common::V1::Link? value) -> void
         end
 
         class DescribeWorkflowExecutionRequest < ::Google::Protobuf::AbstractMessage
@@ -7778,7 +7787,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Run ID of the workflow or standalone activity.
+          # Run ID of the workflow or standalone activity. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -7811,6 +7820,11 @@ module Temporalio
           attr_writer resource_id(): ::String | ::Symbol
           def clear_resource_id: () -> void
 
+          # Used to de-dupe update requests.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -7830,6 +7844,8 @@ module Temporalio
             "restore_original" => bool?,
             resource_id: (::String | ::Symbol)?,
             "resource_id" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -7844,6 +7860,7 @@ module Temporalio
             | ("update_mask" name) -> ::Google::Protobuf::FieldMask?
             | ("restore_original" name) -> bool
             | ("resource_id" name) -> ::String
+            | ("request_id" name) -> ::String
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -7855,6 +7872,7 @@ module Temporalio
             | ("update_mask" name, ::Google::Protobuf::FieldMask? value) -> void
             | ("restore_original" name, bool value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
         end
 
         # Deprecated. Use `UpdateActivityExecutionOptionsResponse`.
@@ -8002,7 +8020,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Run ID of the workflow or standalone activity.
+          # Run ID of the workflow or standalone activity. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -8205,7 +8223,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Run ID of the workflow or standalone activity.
+          # Run ID of the workflow or standalone activity. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -8214,14 +8232,6 @@ module Temporalio
           attr_reader identity(): ::String
           attr_writer identity(): ::String | ::Symbol
           def clear_identity: () -> void
-
-          # Providing this flag will also reset the number of attempts.
-          attr_accessor reset_attempts(): bool
-          def clear_reset_attempts: () -> void
-
-          # Providing this flag will also reset the heartbeat details.
-          attr_accessor reset_heartbeat(): bool
-          def clear_reset_heartbeat: () -> void
 
           # Reason to unpause the activity.
           attr_reader reason(): ::String
@@ -8239,6 +8249,11 @@ module Temporalio
           attr_writer resource_id(): ::String | ::Symbol
           def clear_resource_id: () -> void
 
+          # Used to de-dupe unpause requests.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -8250,16 +8265,14 @@ module Temporalio
             "run_id" => (::String | ::Symbol)?,
             identity: (::String | ::Symbol)?,
             "identity" => (::String | ::Symbol)?,
-            reset_attempts: bool?,
-            "reset_attempts" => bool?,
-            reset_heartbeat: bool?,
-            "reset_heartbeat" => bool?,
             reason: (::String | ::Symbol)?,
             "reason" => (::String | ::Symbol)?,
             jitter: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             "jitter" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             resource_id: (::String | ::Symbol)?,
             "resource_id" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -8270,11 +8283,10 @@ module Temporalio
             | ("activity_id" name) -> ::String
             | ("run_id" name) -> ::String
             | ("identity" name) -> ::String
-            | ("reset_attempts" name) -> bool
-            | ("reset_heartbeat" name) -> bool
             | ("reason" name) -> ::String
             | ("jitter" name) -> ::Google::Protobuf::Duration?
             | ("resource_id" name) -> ::String
+            | ("request_id" name) -> ::String
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -8282,11 +8294,10 @@ module Temporalio
             | ("activity_id" name, (::String | ::Symbol) value) -> void
             | ("run_id" name, (::String | ::Symbol) value) -> void
             | ("identity" name, (::String | ::Symbol) value) -> void
-            | ("reset_attempts" name, bool value) -> void
-            | ("reset_heartbeat" name, bool value) -> void
             | ("reason" name, (::String | ::Symbol) value) -> void
             | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
         end
 
         # Deprecated. Use `UnpauseActivityExecutionResponse`.
@@ -8438,7 +8449,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Run ID of the workflow or standalone activity.
+          # Run ID of the workflow or standalone activity. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -8470,6 +8481,17 @@ module Temporalio
           attr_writer resource_id(): ::String | ::Symbol
           def clear_resource_id: () -> void
 
+          # Used to de-dupe reset requests.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
+          # Reset persisted heartbeat details.
+          # Reset always resets the attempt counter. Passing this flag causes reset to additionally
+          # discard any persisted heartbeat details.
+          attr_accessor reset_heartbeat(): bool
+          def clear_reset_heartbeat: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -8489,6 +8511,10 @@ module Temporalio
             "restore_original_options" => bool?,
             resource_id: (::String | ::Symbol)?,
             "resource_id" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
+            reset_heartbeat: bool?,
+            "reset_heartbeat" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -8503,6 +8529,8 @@ module Temporalio
             | ("jitter" name) -> ::Google::Protobuf::Duration?
             | ("restore_original_options" name) -> bool
             | ("resource_id" name) -> ::String
+            | ("request_id" name) -> ::String
+            | ("reset_heartbeat" name) -> bool
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -8514,6 +8542,8 @@ module Temporalio
             | ("jitter" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("restore_original_options" name, bool value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
+            | ("reset_heartbeat" name, bool value) -> void
         end
 
         # Deprecated. Use `ResetActivityExecutionRequest`.
@@ -8605,6 +8635,8 @@ module Temporalio
 
           # The Workflow Execution time when the options were updated. When time skipping is
           # enabled, this is the workflow's virtual time rather than wall-clock time.
+          # This timestamp cannot be used for time-skipping fast-forward verification,
+          # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
           attr_reader update_time(): ::Google::Protobuf::Timestamp?
           attr_writer update_time(): (::Google::Protobuf::Timestamp | ::Time)?
           def has_update_time?: () -> bool
@@ -12509,7 +12541,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Activity run ID, targets the latest run if run_id is empty.
+          # Activity run ID. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -12582,7 +12614,7 @@ module Temporalio
           attr_writer activity_id(): ::String | ::Symbol
           def clear_activity_id: () -> void
 
-          # Activity run ID, targets the latest run if run_id is empty.
+          # Activity run ID. If empty, targets the latest run.
           attr_reader run_id(): ::String
           attr_writer run_id(): ::String | ::Symbol
           def clear_run_id: () -> void
@@ -12876,6 +12908,89 @@ module Temporalio
           }
 
           def initialize: (?init_map initial_value) -> void
+        end
+
+        # A long-poll request that blocks according to a time-skipping waiting policy on the workflow
+        # execution. Currently the only supported policy is waiting for completion of the fast-forward
+        # identified by `fast_forward_id`; the poll also returns once anything else settles that outcome
+        # (e.g. the execution ends or time skipping is disabled).
+        class PollWorkflowExecutionTimeSkippingRequest < ::Google::Protobuf::AbstractMessage
+
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          attr_accessor workflow_execution(): ::Temporalio::Api::Common::V1::WorkflowExecution?
+          def has_workflow_execution?: () -> bool
+          def clear_workflow_execution: () -> void
+
+          # Required. Identifies the fast-forward whose completion the caller wants to wait for.
+          # Must match the `fast_forward_id` set in the execution's TimeSkippingConfig.
+          attr_reader fast_forward_id(): ::String
+          attr_writer fast_forward_id(): ::String | ::Symbol
+          def clear_fast_forward_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            workflow_execution: (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
+            "workflow_execution" => (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
+            fast_forward_id: (::String | ::Symbol)?,
+            "fast_forward_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("workflow_execution" name) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
+            | ("fast_forward_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("workflow_execution" name, ::Temporalio::Api::Common::V1::WorkflowExecution? value) -> void
+            | ("fast_forward_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class PollWorkflowExecutionTimeSkippingResponse < ::Google::Protobuf::AbstractMessage
+
+          # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.
+          attr_reader fast_forward_polling_result(): ::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Integer
+          attr_writer fast_forward_polling_result(): ::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float
+          attr_reader fast_forward_polling_result_const(): ::Integer
+          def clear_fast_forward_polling_result: () -> void
+
+          # Set only when the result is FAST_FORWARD_POLLING_RESULT_FAST_FORWARD_FAILED; explains why
+          # the fast-forward can no longer complete.
+          attr_reader failed_reason(): ::String
+          attr_writer failed_reason(): ::String | ::Symbol
+          def clear_failed_reason: () -> void
+
+          # The execution's current fast-forward, if any.
+          attr_accessor fast_forward_info(): ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo?
+          def has_fast_forward_info?: () -> bool
+          def clear_fast_forward_info: () -> void
+
+          type init_map = {
+            fast_forward_polling_result: (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float)?,
+            "fast_forward_polling_result" => (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float)?,
+            failed_reason: (::String | ::Symbol)?,
+            "failed_reason" => (::String | ::Symbol)?,
+            fast_forward_info: (::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo | ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo::init_map)?,
+            "fast_forward_info" => (::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo | ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("fast_forward_polling_result" name) -> (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Integer)
+            | ("failed_reason" name) -> ::String
+            | ("fast_forward_info" name) -> ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo?
+
+          def []=:
+              ("fast_forward_polling_result" name, (::Temporalio::Api::Enums::V1::FastForwardPollingResult::names | ::Temporalio::Api::Enums::V1::FastForwardPollingResult::strings | ::Integer | ::Float) value) -> void
+            | ("failed_reason" name, (::String | ::Symbol) value) -> void
+            | ("fast_forward_info" name, ::Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo? value) -> void
         end
       end
     end

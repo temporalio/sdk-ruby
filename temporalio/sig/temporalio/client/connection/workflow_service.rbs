@@ -493,6 +493,10 @@ module Temporalio
           Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse
+        def poll_workflow_execution_time_skipping: (
+          Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse
       end
     end
   end

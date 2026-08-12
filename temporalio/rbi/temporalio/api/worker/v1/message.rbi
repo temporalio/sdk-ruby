@@ -453,7 +453,8 @@ class Temporalio::Api::Worker::V1::WorkerHeartbeat
       total_sticky_cache_miss: T.nilable(Integer),
       current_sticky_cache_size: T.nilable(Integer),
       plugins: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::PluginInfo)]),
-      drivers: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::StorageDriverInfo)])
+      drivers: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::StorageDriverInfo)]),
+      environment: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo)
     ).void
   end
   def initialize(
@@ -480,7 +481,8 @@ class Temporalio::Api::Worker::V1::WorkerHeartbeat
     total_sticky_cache_miss: 0,
     current_sticky_cache_size: 0,
     plugins: [],
-    drivers: []
+    drivers: [],
+    environment: nil
   )
   end
 
@@ -821,6 +823,21 @@ class Temporalio::Api::Worker::V1::WorkerHeartbeat
   # Storage drivers in use by this SDK.
   sig { void }
   def clear_drivers
+  end
+
+  # Information about the environment this SDK is running in.
+  sig { returns(T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo)) }
+  def environment
+  end
+
+  # Information about the environment this SDK is running in.
+  sig { params(value: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo)).void }
+  def environment=(value)
+  end
+
+  # Information about the environment this SDK is running in.
+  sig { void }
+  def clear_environment
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1334,6 +1351,102 @@ class Temporalio::Api::Worker::V1::StorageDriverInfo
   end
 end
 
+class Temporalio::Api::Worker::V1::EnvironmentInfo
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      runtimes: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime)]),
+      hosting_environments: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment)]),
+      platform: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::Platform)
+    ).void
+  end
+  def initialize(
+    runtimes: [],
+    hosting_environments: [],
+    platform: nil
+  )
+  end
+
+  # The runtime(s) the SDK is operating in.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime)]) }
+  def runtimes
+  end
+
+  # The runtime(s) the SDK is operating in.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def runtimes=(value)
+  end
+
+  # The runtime(s) the SDK is operating in.
+  sig { void }
+  def clear_runtimes
+  end
+
+  # The hosting environment(s) the SDK is operating in. Repeated to allow for layering (ex: Docker inside k8s).
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment)]) }
+  def hosting_environments
+  end
+
+  # The hosting environment(s) the SDK is operating in. Repeated to allow for layering (ex: Docker inside k8s).
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def hosting_environments=(value)
+  end
+
+  # The hosting environment(s) the SDK is operating in. Repeated to allow for layering (ex: Docker inside k8s).
+  sig { void }
+  def clear_hosting_environments
+  end
+
+  # The platform the SDK is operating on.
+  sig { returns(T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::Platform)) }
+  def platform
+  end
+
+  # The platform the SDK is operating on.
+  sig { params(value: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::Platform)).void }
+  def platform=(value)
+  end
+
+  # The platform the SDK is operating on.
+  sig { void }
+  def clear_platform
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # A command sent from the server to a worker.
 class Temporalio::Api::Worker::V1::WorkerCommand
   include ::Google::Protobuf::MessageExts
@@ -1560,6 +1673,633 @@ class Temporalio::Api::Worker::V1::CancelActivityResult
   end
 
   sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      type: T.nilable(T.any(Symbol, String, Integer)),
+      version: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    type: :RUNTIME_TYPE_UNSPECIFIED,
+    version: ""
+  )
+  end
+
+  # The type of the runtime.
+  sig { returns(T.any(Symbol, Integer)) }
+  def type
+  end
+
+  # The type of the runtime.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def type=(value)
+  end
+
+  # The type of the runtime.
+  sig { void }
+  def clear_type
+  end
+
+  # The version of the runtime, if obtainable.
+  sig { returns(String) }
+  def version
+  end
+
+  # The version of the runtime, if obtainable.
+  sig { params(value: String).void }
+  def version=(value)
+  end
+
+  # The version of the runtime, if obtainable.
+  sig { void }
+  def clear_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      type: T.nilable(T.any(Symbol, String, Integer)),
+      version: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    type: :HOSTING_ENVIRONMENT_TYPE_UNSPECIFIED,
+    version: ""
+  )
+  end
+
+  # The type of hosting environment.
+  sig { returns(T.any(Symbol, Integer)) }
+  def type
+  end
+
+  # The type of hosting environment.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def type=(value)
+  end
+
+  # The type of hosting environment.
+  sig { void }
+  def clear_type
+  end
+
+  # The version of the hosting environment, if obtainable.
+  sig { returns(String) }
+  def version
+  end
+
+  # The version of the hosting environment, if obtainable.
+  sig { params(value: String).void }
+  def version=(value)
+  end
+
+  # The version of the hosting environment, if obtainable.
+  sig { void }
+  def clear_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::Platform
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      linux: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform),
+      macos: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform),
+      windows: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform)
+    ).void
+  end
+  def initialize(
+    linux: nil,
+    macos: nil,
+    windows: nil
+  )
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform)) }
+  def linux
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform)).void }
+  def linux=(value)
+  end
+
+  sig { void }
+  def clear_linux
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform)) }
+  def macos
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform)).void }
+  def macos=(value)
+  end
+
+  sig { void }
+  def clear_macos
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform)) }
+  def windows
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform)).void }
+  def windows=(value)
+  end
+
+  sig { void }
+  def clear_windows
+  end
+
+  sig { returns(T.nilable(Symbol)) }
+  def variant
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::Platform) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::Platform).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::Platform) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::Platform, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      version: T.nilable(String),
+      architecture: T.nilable(T.any(Symbol, String, Integer)),
+      libc: T.nilable(T.any(Symbol, String, Integer))
+    ).void
+  end
+  def initialize(
+    version: "",
+    architecture: :ARCHITECTURE_UNSPECIFIED,
+    libc: :LIBC_UNSPECIFIED
+  )
+  end
+
+  # The Linux kernel or distribution version, if obtainable.
+  sig { returns(String) }
+  def version
+  end
+
+  # The Linux kernel or distribution version, if obtainable.
+  sig { params(value: String).void }
+  def version=(value)
+  end
+
+  # The Linux kernel or distribution version, if obtainable.
+  sig { void }
+  def clear_version
+  end
+
+  # The architecture of the worker process.
+  sig { returns(T.any(Symbol, Integer)) }
+  def architecture
+  end
+
+  # The architecture of the worker process.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def architecture=(value)
+  end
+
+  # The architecture of the worker process.
+  sig { void }
+  def clear_architecture
+  end
+
+  # The libc used by the worker process.
+  sig { returns(T.any(Symbol, Integer)) }
+  def libc
+  end
+
+  # The libc used by the worker process.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def libc=(value)
+  end
+
+  # The libc used by the worker process.
+  sig { void }
+  def clear_libc
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      version: T.nilable(String),
+      architecture: T.nilable(T.any(Symbol, String, Integer))
+    ).void
+  end
+  def initialize(
+    version: "",
+    architecture: :ARCHITECTURE_UNSPECIFIED
+  )
+  end
+
+  # The macOS version, if obtainable.
+  sig { returns(String) }
+  def version
+  end
+
+  # The macOS version, if obtainable.
+  sig { params(value: String).void }
+  def version=(value)
+  end
+
+  # The macOS version, if obtainable.
+  sig { void }
+  def clear_version
+  end
+
+  # The architecture of the worker process.
+  sig { returns(T.any(Symbol, Integer)) }
+  def architecture
+  end
+
+  # The architecture of the worker process.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def architecture=(value)
+  end
+
+  # The architecture of the worker process.
+  sig { void }
+  def clear_architecture
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::MacOSPlatform, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      version: T.nilable(String),
+      architecture: T.nilable(T.any(Symbol, String, Integer)),
+      crt: T.nilable(T.any(Symbol, String, Integer))
+    ).void
+  end
+  def initialize(
+    version: "",
+    architecture: :ARCHITECTURE_UNSPECIFIED,
+    crt: :CRT_UNSPECIFIED
+  )
+  end
+
+  # The Windows version, if obtainable.
+  sig { returns(String) }
+  def version
+  end
+
+  # The Windows version, if obtainable.
+  sig { params(value: String).void }
+  def version=(value)
+  end
+
+  # The Windows version, if obtainable.
+  sig { void }
+  def clear_version
+  end
+
+  # The architecture of the worker process.
+  sig { returns(T.any(Symbol, Integer)) }
+  def architecture
+  end
+
+  # The architecture of the worker process.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def architecture=(value)
+  end
+
+  # The architecture of the worker process.
+  sig { void }
+  def clear_architecture
+  end
+
+  # The C runtime used by the worker process, if obtainable.
+  sig { returns(T.any(Symbol, Integer)) }
+  def crt
+  end
+
+  # The C runtime used by the worker process, if obtainable.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def crt=(value)
+  end
+
+  # The C runtime used by the worker process, if obtainable.
+  sig { void }
+  def clear_crt
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Worker::V1::EnvironmentInfo::Architecture
+  self::ARCHITECTURE_UNSPECIFIED = T.let(0, Integer)
+  self::ARCHITECTURE_AMD64 = T.let(1, Integer)
+  self::ARCHITECTURE_ARM64 = T.let(2, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType
+  self::RUNTIME_TYPE_UNSPECIFIED = T.let(0, Integer)
+  self::RUNTIME_TYPE_JVM = T.let(1, Integer)
+  self::RUNTIME_TYPE_CPYTHON = T.let(2, Integer)
+  self::RUNTIME_TYPE_NODE = T.let(3, Integer)
+  self::RUNTIME_TYPE_BUN = T.let(4, Integer)
+  self::RUNTIME_TYPE_CRUBY = T.let(5, Integer)
+  self::RUNTIME_TYPE_GO = T.let(6, Integer)
+  self::RUNTIME_TYPE_DOTNET_FRAMEWORK = T.let(7, Integer)
+  self::RUNTIME_TYPE_DOTNET_CORE = T.let(8, Integer)
+  self::RUNTIME_TYPE_NATIVE = T.let(9, Integer)
+  self::RUNTIME_TYPE_ROADRUNNER = T.let(10, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Worker::V1::EnvironmentInfo::HostingEnvironment::HostingEnvironmentType
+  self::HOSTING_ENVIRONMENT_TYPE_UNSPECIFIED = T.let(0, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_DOCKER = T.let(1, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_K8S = T.let(2, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_AWS_LAMBDA = T.let(3, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_AWS_ECS = T.let(4, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_GOOGLE_CLOUD_RUN = T.let(6, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_GOOGLE_APP_ENGINE = T.let(7, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_AZURE_APP_SERVICE = T.let(8, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_AZURE_FUNCTIONS = T.let(9, Integer)
+  self::HOSTING_ENVIRONMENT_TYPE_AZURE_CONTAINER_APPS = T.let(10, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Worker::V1::EnvironmentInfo::LinuxPlatform::Libc
+  self::LIBC_UNSPECIFIED = T.let(0, Integer)
+  self::LIBC_GLIBC = T.let(1, Integer)
+  self::LIBC_MUSL = T.let(2, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Worker::V1::EnvironmentInfo::WindowsPlatform::Crt
+  self::CRT_UNSPECIFIED = T.let(0, Integer)
+  self::CRT_UCRT = T.let(1, Integer)
+  self::CRT_MSVCRT = T.let(2, Integer)
+  self::CRT_MINGW = T.let(3, Integer)
+  self::CRT_CYGWIN = T.let(4, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
   def self.descriptor
   end
 end

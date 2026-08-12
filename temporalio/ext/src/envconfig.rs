@@ -119,10 +119,10 @@ fn load_client_config_inner(
     config_file_strict: bool,
     env_vars: Option<HashMap<String, String>>,
 ) -> Result<RHash, Error> {
-    let options = LoadClientConfigOptions {
-        config_source,
-        config_file_strict,
-    };
+    let options = LoadClientConfigOptions::builder()
+        .maybe_config_source(config_source)
+        .config_file_strict(config_file_strict)
+        .build();
     let core_config = core_load_client_config(options, env_vars.as_ref())
         .map_err(|e| error!("EnvConfig error: {}", e))?;
 
@@ -138,13 +138,13 @@ fn load_client_connect_config_inner(
     config_file_strict: bool,
     env_vars: Option<HashMap<String, String>>,
 ) -> Result<RHash, Error> {
-    let options = LoadClientConfigProfileOptions {
-        config_source,
-        config_file_profile: profile,
-        config_file_strict,
-        disable_file,
-        disable_env,
-    };
+    let options = LoadClientConfigProfileOptions::builder()
+        .maybe_config_source(config_source)
+        .maybe_config_file_profile(profile)
+        .config_file_strict(config_file_strict)
+        .disable_file(disable_file)
+        .disable_env(disable_env)
+        .build();
 
     let profile = core_load_client_config_profile(options, env_vars.as_ref())
         .map_err(|e| error!("EnvConfig error: {}", e))?;
