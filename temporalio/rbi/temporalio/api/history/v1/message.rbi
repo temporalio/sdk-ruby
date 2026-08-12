@@ -8295,8 +8295,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionUnpausedEventAttributes
   end
 end
 
-# Attributes for an event indicating that time skipping state changed for a workflow execution,
-# either time was advanced or time skipping was disabled automatically due to the fast_forward completing.
+# Attributes for an event indicating that time skipping state changed for a workflow execution:
+# either time was advanced, or time skipping was stopped automatically due to the fast_forward completing.
 # The worker_may_ignore field in HistoryEvent should always be set true for this event.
 class Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes
   include ::Google::Protobuf::MessageExts
@@ -8331,21 +8331,21 @@ class Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEve
   def clear_target_time
   end
 
-  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
+  # When true, time skipping has been stopped automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { returns(T::Boolean) }
   def disabled_after_fast_forward
   end
 
-  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
+  # When true, time skipping has been stopped automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { params(value: T::Boolean).void }
   def disabled_after_fast_forward=(value)
   end
 
-  # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
+  # When true, time skipping has been stopped automatically due to a call to fast_forward completing.
 # (-- api-linter: core::0140::prepositions=disabled
 #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
   sig { void }

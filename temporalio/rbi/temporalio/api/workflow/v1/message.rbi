@@ -559,7 +559,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
       original_start_time: T.nilable(Google::Protobuf::Timestamp),
       reset_run_id: T.nilable(String),
       request_id_infos: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Workflow::V1::RequestIdInfo)]),
-      pause_info: T.nilable(Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo)
+      pause_info: T.nilable(Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo),
+      time_skipping_info: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)
     ).void
   end
   def initialize(
@@ -570,7 +571,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
     original_start_time: nil,
     reset_run_id: "",
     request_id_infos: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Workflow::V1::RequestIdInfo),
-    pause_info: nil
+    pause_info: nil,
+    time_skipping_info: nil
   )
   end
 
@@ -704,6 +706,24 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
   # Information about the workflow execution pause operation.
   sig { void }
   def clear_pause_info
+  end
+
+  # Information about time skipping of the workflow execution.
+# If the execution has never enabled time skipping, it will be nil.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)) }
+  def time_skipping_info
+  end
+
+  # Information about time skipping of the workflow execution.
+# If the execution has never enabled time skipping, it will be nil.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)).void }
+  def time_skipping_info=(value)
+  end
+
+  # Information about time skipping of the workflow execution.
+# If the execution has never enabled time skipping, it will be nil.
+  sig { void }
+  def clear_time_skipping_info
   end
 
   sig { params(field: String).returns(T.untyped) }

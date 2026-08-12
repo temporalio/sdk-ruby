@@ -78,6 +78,56 @@ module Temporalio
               | ("build_id" name, (::String | ::Symbol) value) -> void
           end
 
+          # Metrics for a set of external payload storage operations (all uploads and downloads)
+          # performed while processing a task, so core can emit unified logging and metrics.
+          class ExternalStorageMetrics < ::Google::Protobuf::AbstractMessage
+
+            # Number of payloads stored or retrieved externally.
+            attr_reader payload_count(): ::Integer
+            attr_writer payload_count(): ::Integer | ::Float
+            def clear_payload_count: () -> void
+
+            # Total size in bytes of the externally stored or retrieved payloads.
+            attr_reader total_size_bytes(): ::Integer
+            attr_writer total_size_bytes(): ::Integer | ::Float
+            def clear_total_size_bytes: () -> void
+
+            # Wall-clock time spent on the external storage operations.
+            attr_reader total_duration(): ::Google::Protobuf::Duration?
+            attr_writer total_duration(): (::Google::Protobuf::Duration | ::int)?
+            def has_total_duration?: () -> bool
+            def clear_total_duration: () -> void
+
+            # Names of the drivers that participated in the operations.
+            attr_accessor driver_names(): ::Google::Protobuf::RepeatedField
+            def clear_driver_names: () -> void
+
+            type init_map = {
+              payload_count: (::Integer | ::Float)?,
+              "payload_count" => (::Integer | ::Float)?,
+              total_size_bytes: (::Integer | ::Float)?,
+              "total_size_bytes" => (::Integer | ::Float)?,
+              total_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+              "total_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+              driver_names: ::Array[::String | ::Symbol]?,
+              "driver_names" => ::Array[::String | ::Symbol]?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("payload_count" name) -> ::Integer
+              | ("total_size_bytes" name) -> ::Integer
+              | ("total_duration" name) -> ::Google::Protobuf::Duration?
+              | ("driver_names" name) -> (::Google::Protobuf::RepeatedField)
+
+            def []=:
+                ("payload_count" name, (::Integer | ::Float) value) -> void
+              | ("total_size_bytes" name, (::Integer | ::Float) value) -> void
+              | ("total_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+              | ("driver_names" name, (::Google::Protobuf::RepeatedField) value) -> void
+          end
+
           # An indication of user's intent concerning what Build ID versioning approach should be used for
           # a specific command
           module VersioningIntent

@@ -1033,12 +1033,14 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Limits
   sig do
     params(
       blob_size_limit_error: T.nilable(Integer),
-      memo_size_limit_error: T.nilable(Integer)
+      memo_size_limit_error: T.nilable(Integer),
+      workflow_task_completion_size_limit_error: T.nilable(Integer)
     ).void
   end
   def initialize(
     blob_size_limit_error: 0,
-    memo_size_limit_error: 0
+    memo_size_limit_error: 0,
+    workflow_task_completion_size_limit_error: 0
   )
   end
 
@@ -1076,6 +1078,27 @@ class Temporalio::Api::Namespace::V1::NamespaceInfo::Limits
   # Maximum total memo size in bytes per workflow execution.
   sig { void }
   def clear_memo_size_limit_error
+  end
+
+  # Maximum total size in bytes of a single RespondWorkflowTaskCompleted request.
+# Requests exceeding this fail the workflow task with
+# WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE. 0 means no explicit limit.
+  sig { returns(Integer) }
+  def workflow_task_completion_size_limit_error
+  end
+
+  # Maximum total size in bytes of a single RespondWorkflowTaskCompleted request.
+# Requests exceeding this fail the workflow task with
+# WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE. 0 means no explicit limit.
+  sig { params(value: Integer).void }
+  def workflow_task_completion_size_limit_error=(value)
+  end
+
+  # Maximum total size in bytes of a single RespondWorkflowTaskCompleted request.
+# Requests exceeding this fail the workflow task with
+# WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE. 0 means no explicit limit.
+  sig { void }
+  def clear_workflow_task_completion_size_limit_error
   end
 
   sig { params(field: String).returns(T.untyped) }
