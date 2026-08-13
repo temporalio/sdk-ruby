@@ -1,0 +1,32 @@
+name: Gems Publish
+run-name: Gems Publish (stub)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      artifact-name:
+        required: true
+        type: string
+      host:
+        required: false
+        type: string
+        default: https://rubygems.org
+
+permissions:
+  contents: read
+
+jobs:
+  placeholder:
+    name: placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain
+        run: |
+          echo "Stub gems-publish.yml on main."
+          exit 1

@@ -1,0 +1,20 @@
+name: Release Publish
+run-name: Release Publish (stub)
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  placeholder:
+    name: placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain
+        run: |
+          cat <<'EOF'
+          This is a stub release-publish.yml.
+          EOF
+          exit 1

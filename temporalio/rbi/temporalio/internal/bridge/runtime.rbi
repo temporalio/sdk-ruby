@@ -19,10 +19,12 @@ class Temporalio::Internal::Bridge::Runtime::Options < ::Struct
   sig do
     params(
       telemetry: Temporalio::Internal::Bridge::Runtime::TelemetryOptions,
-      worker_heartbeat_interval: T.nilable(T.any(Integer, Float))
+      worker_heartbeat_interval: T.nilable(T.any(Integer, Float)),
+      disable_environment_info: T::Boolean,
+      runtime_version: T.nilable(String)
     ).void
   end
-  def initialize(telemetry, worker_heartbeat_interval); end
+  def initialize(telemetry, worker_heartbeat_interval, disable_environment_info, runtime_version); end
 
   sig { returns(Temporalio::Internal::Bridge::Runtime::TelemetryOptions) }
   def telemetry; end
@@ -35,6 +37,18 @@ class Temporalio::Internal::Bridge::Runtime::Options < ::Struct
 
   sig { params(_: T.nilable(T.any(Integer, Float))).void }
   def worker_heartbeat_interval=(_); end
+
+  sig { returns(T::Boolean) }
+  def disable_environment_info; end
+
+  sig { params(_: T::Boolean).void }
+  def disable_environment_info=(_); end
+
+  sig { returns(T.nilable(String)) }
+  def runtime_version; end
+
+  sig { params(_: T.nilable(String)).void }
+  def runtime_version=(_); end
 end
 
 class Temporalio::Internal::Bridge::Runtime::TelemetryOptions < ::Struct

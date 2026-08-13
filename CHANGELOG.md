@@ -21,6 +21,9 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added `FailureConverter` `process_common_attributes:` to customize the value sent to the payload converter when
+  encoding common failure attributes.
+
 - Added the `Temporalio::Worker` `max_eager_activity_reservations_per_workflow_task:` option to
   configure the number of activity slots reserved for eager execution per workflow task. Values
   must be positive; use `disable_eager_activity_execution: true` to disable eager execution.
@@ -45,8 +48,21 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- `Temporalio::Client::WorkflowHandle#result` now preserves fiber-local `Thread.current[]` context
+  while fetching workflow history, allowing gRPC interceptors to apply request-scoped RPC options.
 - `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
   running when a history long poll expires without returning an event.
+
+### Added
+
+- Worker heartbeats now report the SDK runtime and hosting/platform information the first time each
+  worker heartbeats successfully. Set `Temporalio::Runtime.new(disable_environment_info: true)` to
+  opt out of environment reporting entirely.
+
+#### Core updates
+
+- Bumped bundled sdk-core to 0.6.0.Bump sdk-core to 8cf682b7 (0.6.0). Changes in
+  temporalio/ext/src/client.rs, envconfig.rs, worker.rs to use .builder().
 
 ## [v1.6.0] - 2026-07-16
 

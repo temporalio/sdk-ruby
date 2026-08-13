@@ -6,4 +6,6 @@ class RuntimeTest < Test
   ) -> String?
 
   def assert_bad_call: (?String? message_includes) { (?) -> untyped } -> void
+
+  def capture_bridge_runtime_options: () { () -> void } -> Temporalio::Internal::Bridge::Runtime::Options?
 end
