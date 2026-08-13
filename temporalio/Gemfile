@@ -12,6 +12,7 @@ group :development do
   gem 'googleapis-common-protos-types'
   gem 'irb'
   gem 'minitest'
+  gem 'minitest-mock'
   gem 'openssl'
   # We are intentionally not pinning OTel versions here so that upon lockfile upgrades we test the latest. This also
   # means that the OTel contrib library also does not require specific versions, we are relying on the compatibility
