@@ -166,11 +166,17 @@ impl Client {
                 ))
                 .randomization_factor(rpc_retry.member(id!("randomization_factor"))?)
                 .multiplier(rpc_retry.member(id!("multiplier"))?)
-                .max_interval(Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?))
+                .max_interval(Duration::from_secs_f64(
+                    rpc_retry.member(id!("max_interval"))?,
+                ))
                 .max_elapsed_time({
                     let v = rpc_retry.member::<f64>(id!("max_elapsed_time"))?;
                     // 0 means none
-                    if v == 0.0 { None } else { Some(Duration::from_secs_f64(v)) }
+                    if v == 0.0 {
+                        None
+                    } else {
+                        Some(Duration::from_secs_f64(v))
+                    }
                 })
                 .max_retries(rpc_retry.member::<usize>(id!("max_retries"))?)
                 .build(),

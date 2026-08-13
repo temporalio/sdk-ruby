@@ -3562,6 +3562,7 @@ dependencies = [
  "rand 0.10.2",
  "rstest",
  "rustls-native-certs",
+ "serde_json",
  "tempfile",
  "temporalio-common",
  "thiserror 2.0.19",

@@ -500,9 +500,7 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 };
                 WorkerVersioningStrategy::WorkerDeploymentBased(
                     WorkerDeploymentOptions::new(deployment_version)
-                        .use_worker_versioning(
-                            dopts.member::<bool>(id!("use_worker_versioning"))?,
-                        )
+                        .use_worker_versioning(dopts.member::<bool>(id!("use_worker_versioning"))?)
                         .maybe_default_versioning_behavior(default_versioning_behavior)
                         .build(),
                 )
