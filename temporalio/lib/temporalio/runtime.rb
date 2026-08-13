@@ -46,20 +46,32 @@ module Temporalio
     end
 
     LoggingOptions = Data.define(
-      :log_filter
+      :log_filter,
+      :log_format
       # TODO(cretz): forward_to
     )
+
+    # Formats for Core logs written to the console.
+    module ConsoleLogFormat
+      COMPACT = :compact
+      PRETTY = :pretty
+      JSON = :json
+    end
 
     # Logging options for runtime telemetry.
     #
     # @!attribute log_filter
     #   @return [LoggingFilterOptions, String] Logging filter for Core, default is new {LoggingFilterOptions} with no
     #     parameters.
+    # @!attribute log_format
+    #   @return [ConsoleLogFormat, nil] Format for Core logs written to the console. If unset, Core preserves its
+    #     existing output selection, including `TEMPORAL_CORE_PRETTY_LOGS` support.
     class LoggingOptions
       # Create logging options
       #
       # @param log_filter [LoggingFilterOptions, String] Logging filter for Core.
-      def initialize(log_filter: LoggingFilterOptions.new)
+      # @param log_format [ConsoleLogFormat, nil] Format for Core logs written to the console.
+      def initialize(log_filter: LoggingFilterOptions.new, log_format: nil)
         super
       end
 
@@ -73,7 +85,8 @@ module Temporalio
                         log_filter._to_bridge
                       else
                         raise 'Log filter must be string or LoggingFilterOptions'
-                      end
+                      end,
+          log_format: log_format&.to_s
         )
       end
     end

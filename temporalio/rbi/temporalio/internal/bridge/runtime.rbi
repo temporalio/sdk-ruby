@@ -78,14 +78,20 @@ end
 class Temporalio::Internal::Bridge::Runtime::LoggingOptions < ::Struct
   extend T::Sig
 
-  sig { params(log_filter: T.nilable(String)).void }
-  def initialize(log_filter); end
+  sig { params(log_filter: T.nilable(String), log_format: T.nilable(String)).void }
+  def initialize(log_filter, log_format); end
 
   sig { returns(T.nilable(String)) }
   def log_filter; end
 
   sig { params(_: T.nilable(String)).void }
   def log_filter=(_); end
+
+  sig { returns(T.nilable(String)) }
+  def log_format; end
+
+  sig { params(_: T.nilable(String)).void }
+  def log_format=(_); end
 end
 
 class Temporalio::Internal::Bridge::Runtime::MetricsOptions < ::Struct
