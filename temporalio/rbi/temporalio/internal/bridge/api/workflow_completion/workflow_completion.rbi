@@ -11,13 +11,17 @@ class Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationC
     params(
       run_id: T.nilable(String),
       successful: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCompletion::Success),
-      failed: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCompletion::Failure)
+      failed: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCompletion::Failure),
+      payload_download_metrics: T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics),
+      payload_upload_metrics: T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics)
     ).void
   end
   def initialize(
     run_id: "",
     successful: nil,
-    failed: nil
+    failed: nil,
+    payload_download_metrics: nil,
+    payload_upload_metrics: nil
   )
   end
 
@@ -58,6 +62,42 @@ class Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationC
 
   sig { void }
   def clear_failed
+  end
+
+  # Metrics for external payload storage downloads (retrievals) performed while processing
+# this activation. Only set when external storage retrieved payloads.
+  sig { returns(T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics)) }
+  def payload_download_metrics
+  end
+
+  # Metrics for external payload storage downloads (retrievals) performed while processing
+# this activation. Only set when external storage retrieved payloads.
+  sig { params(value: T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics)).void }
+  def payload_download_metrics=(value)
+  end
+
+  # Metrics for external payload storage downloads (retrievals) performed while processing
+# this activation. Only set when external storage retrieved payloads.
+  sig { void }
+  def clear_payload_download_metrics
+  end
+
+  # Metrics for external payload storage uploads (stores) performed while processing this
+# activation. Only set when external storage stored payloads.
+  sig { returns(T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics)) }
+  def payload_upload_metrics
+  end
+
+  # Metrics for external payload storage uploads (stores) performed while processing this
+# activation. Only set when external storage stored payloads.
+  sig { params(value: T.nilable(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics)).void }
+  def payload_upload_metrics=(value)
+  end
+
+  # Metrics for external payload storage uploads (stores) performed while processing this
+# activation. Only set when external storage stored payloads.
+  sig { void }
+  def clear_payload_upload_metrics
   end
 
   sig { returns(T.nilable(Symbol)) }

@@ -1567,5 +1567,13 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     end
     def delete_nexus_operation_execution(request)
     end
+
+    sig do
+      params(
+        request: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest
+      ).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse)
+    end
+    def poll_workflow_execution_time_skipping(request)
+    end
   end
 end

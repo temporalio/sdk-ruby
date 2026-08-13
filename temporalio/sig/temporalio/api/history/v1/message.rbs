@@ -3794,8 +3794,8 @@ module Temporalio
             | ("request_id" name, (::String | ::Symbol) value) -> void
         end
 
-        # Attributes for an event indicating that time skipping state changed for a workflow execution,
-        # either time was advanced or time skipping was disabled automatically due to the fast_forward completing.
+        # Attributes for an event indicating that time skipping state changed for a workflow execution:
+        # either time was advanced, or time skipping was stopped automatically due to the fast_forward completing.
         # The worker_may_ignore field in HistoryEvent should always be set true for this event.
         class WorkflowExecutionTimeSkippingTransitionedEventAttributes < ::Google::Protobuf::AbstractMessage
 
@@ -3805,7 +3805,7 @@ module Temporalio
           def has_target_time?: () -> bool
           def clear_target_time: () -> void
 
-          # When true, time skipping has been disabled automatically due to a call to fast_forward completing.
+          # When true, time skipping has been stopped automatically due to a call to fast_forward completing.
           # (-- api-linter: core::0140::prepositions=disabled
           #     aip.dev/not-precedent: "after" is used to indicate temporal ordering. --)
           attr_accessor disabled_after_fast_forward(): bool

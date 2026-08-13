@@ -177,11 +177,20 @@ module Temporalio
             attr_writer memo_size_limit_error(): ::Integer | ::Float
             def clear_memo_size_limit_error: () -> void
 
+            # Maximum total size in bytes of a single RespondWorkflowTaskCompleted request.
+            # Requests exceeding this fail the workflow task with
+            # WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE. 0 means no explicit limit.
+            attr_reader workflow_task_completion_size_limit_error(): ::Integer
+            attr_writer workflow_task_completion_size_limit_error(): ::Integer | ::Float
+            def clear_workflow_task_completion_size_limit_error: () -> void
+
             type init_map = {
               blob_size_limit_error: (::Integer | ::Float)?,
               "blob_size_limit_error" => (::Integer | ::Float)?,
               memo_size_limit_error: (::Integer | ::Float)?,
               "memo_size_limit_error" => (::Integer | ::Float)?,
+              workflow_task_completion_size_limit_error: (::Integer | ::Float)?,
+              "workflow_task_completion_size_limit_error" => (::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -189,10 +198,12 @@ module Temporalio
             def []:
                 ("blob_size_limit_error" name) -> ::Integer
               | ("memo_size_limit_error" name) -> ::Integer
+              | ("workflow_task_completion_size_limit_error" name) -> ::Integer
 
             def []=:
                 ("blob_size_limit_error" name, (::Integer | ::Float) value) -> void
               | ("memo_size_limit_error" name, (::Integer | ::Float) value) -> void
+              | ("workflow_task_completion_size_limit_error" name, (::Integer | ::Float) value) -> void
           end
 
           attr_reader name(): ::String

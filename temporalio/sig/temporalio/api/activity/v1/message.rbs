@@ -22,6 +22,13 @@ module Temporalio
           def has_failure?: () -> bool
           def clear_failure: () -> void
 
+          # The retry state associated with an unsuccessful activity execution.
+          # This field is only meaningful when `failure` is set.
+          attr_reader retry_state(): ::Temporalio::Api::Enums::V1::RetryState::names | ::Integer
+          attr_writer retry_state(): ::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float
+          attr_reader retry_state_const(): ::Integer
+          def clear_retry_state: () -> void
+
           attr_reader value(): (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Failure::V1::Failure)?
           def has_value?: () -> bool
           def clear_value: () -> void
@@ -31,6 +38,8 @@ module Temporalio
             "result" => (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
             "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+            retry_state: (::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float)?,
+            "retry_state" => (::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -38,10 +47,12 @@ module Temporalio
           def []:
               ("result" name) -> ::Temporalio::Api::Common::V1::Payloads?
             | ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+            | ("retry_state" name) -> (::Temporalio::Api::Enums::V1::RetryState::names | ::Integer)
 
           def []=:
               ("result" name, ::Temporalio::Api::Common::V1::Payloads? value) -> void
             | ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+            | ("retry_state" name, (::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float) value) -> void
         end
 
         class ActivityOptions < ::Google::Protobuf::AbstractMessage

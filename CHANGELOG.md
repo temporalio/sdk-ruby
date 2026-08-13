@@ -53,6 +53,17 @@ to docs, or any other relevant information.
 - `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
   running when a history long poll expires without returning an event.
 
+### Added
+
+- Worker heartbeats now report the SDK runtime and hosting/platform information the first time each
+  worker heartbeats successfully. Set `Temporalio::Runtime.new(disable_environment_info: true)` to
+  opt out of environment reporting entirely.
+
+#### Core updates
+
+- Bumped bundled sdk-core to 0.6.0.Bump sdk-core to 8cf682b7 (0.6.0). Changes in
+  temporalio/ext/src/client.rs, envconfig.rs, worker.rs to use .builder().
+
 ## [v1.6.0] - 2026-07-16
 
 ### Added

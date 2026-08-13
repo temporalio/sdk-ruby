@@ -43,6 +43,7 @@ module Temporalio::Api::Enums::V1::WorkflowTaskFailedCause
   self::WORKFLOW_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE = T.let(37, Integer)
   self::WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE = T.let(38, Integer)
   self::WORKFLOW_TASK_FAILED_CAUSE_WORKFLOW_PAUSE_REQUESTED_BEFORE_TASK_STARTED = T.let(39, Integer)
+  self::WORKFLOW_TASK_FAILED_CAUSE_REQUEST_TOO_LARGE = T.let(40, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

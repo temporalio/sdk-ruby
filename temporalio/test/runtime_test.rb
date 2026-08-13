@@ -129,6 +129,56 @@ class RuntimeTest < Test
     # steep:ignore:end
   end
 
+  # Reports as a Cruby runtime with the current RUBY_VERSION unless the caller opts out; used by
+  # sdk-core to populate the runtime entry on the first worker heartbeat's EnvironmentInfo.
+  def test_runtime_environment_info_default
+    captured = capture_bridge_runtime_options { Temporalio::Runtime.new }
+    refute_nil captured
+    refute captured&.disable_environment_info
+    assert_equal RUBY_VERSION, captured&.runtime_version
+  end
+
+  def test_runtime_disable_environment_info
+    captured = capture_bridge_runtime_options do
+      Temporalio::Runtime.new(disable_environment_info: true)
+    end
+    refute_nil captured
+    assert captured&.disable_environment_info
+    # runtime_version is still populated — the flag suppresses reporting on the sdk-core side, not
+    # what we hand across the bridge.
+    assert_equal RUBY_VERSION, captured&.runtime_version
+  end
+
+  # Capture the Options struct that Runtime#initialize passes to Internal::Bridge::Runtime.new
+  # without actually spinning up a native runtime. Shims out the two bridge calls Runtime#initialize
+  # makes on the returned object: run_command_loop (from a background thread) and the metric-meter
+  # lookup (kept null to avoid touching the native metric bridge).
+  def capture_bridge_runtime_options
+    captured = nil
+    shim = Class.new do
+      def run_command_loop; end
+    end.new
+
+    bridge_class = Temporalio::Internal::Bridge::Runtime.singleton_class
+    meter_class = Temporalio::Internal::Metric::Meter.singleton_class
+    orig_new = bridge_class.instance_method(:new)
+    orig_create = meter_class.instance_method(:create_from_runtime)
+
+    bridge_class.define_method(:new) do |opts|
+      captured = opts
+      shim
+    end
+    meter_class.define_method(:create_from_runtime) { |_runtime| nil }
+
+    begin
+      yield
+    ensure
+      bridge_class.define_method(:new, orig_new)
+      meter_class.define_method(:create_from_runtime, orig_create)
+    end
+    captured
+  end
+
   def test_histogram_bucket_overrides
     # Prom metrics with custom histogram buckets
     prom_addr = "127.0.0.1:#{find_free_port}"

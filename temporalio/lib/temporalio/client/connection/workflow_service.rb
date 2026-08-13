@@ -1845,6 +1845,21 @@ module Temporalio
             rpc_options:
           )
         end
+
+        # Calls WorkflowService.PollWorkflowExecutionTimeSkipping API call.
+        #
+        # @param request [Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse] API response.
+        def poll_workflow_execution_time_skipping(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'poll_workflow_execution_time_skipping',
+            request_class: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest,
+            response_class: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse,
+            request:,
+            rpc_options:
+          )
+        end
       end
     end
   end

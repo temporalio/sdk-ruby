@@ -1524,7 +1524,6 @@ dependencies = [
  "hyper",
  "hyper-util",
  "rustls",
- "rustls-native-certs",
  "tokio",
  "tokio-rustls",
  "tower-service",
@@ -2196,7 +2195,7 @@ dependencies = [
  "bytes",
  "http",
  "opentelemetry",
- "reqwest 0.13.4",
+ "reqwest",
 ]
 
 [[package]]
@@ -2211,7 +2210,7 @@ dependencies = [
  "opentelemetry-proto",
  "opentelemetry_sdk",
  "prost",
- "reqwest 0.13.4",
+ "reqwest",
  "thiserror 2.0.18",
  "tokio",
  "tonic",
@@ -2956,43 +2955,6 @@ checksum = "ba39f3699c378cd8970968dcbff9c43159ea4cfbd88d43c00b22f2ef10a435d2"
 
 [[package]]
 name = "reqwest"
-version = "0.12.28"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eddd3ca559203180a307f12d114c268abf583f59b03cb906fd0b3ff8646c1147"
-dependencies = [
- "base64",
- "bytes",
- "futures-core",
- "http",
- "http-body",
- "http-body-util",
- "hyper",
- "hyper-rustls",
- "hyper-util",
- "js-sys",
- "log",
- "percent-encoding",
- "pin-project-lite",
- "rustls",
- "rustls-native-certs",
- "rustls-pki-types",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sync_wrapper",
- "tokio",
- "tokio-rustls",
- "tower",
- "tower-http",
- "tower-service",
- "url",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "reqwest"
 version = "0.13.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "219c5811de6525e5416c7d5d53bb656d3afdbc6c5af816e0802bcfa42dbdc1c3"
@@ -3564,7 +3526,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-client"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "assert_matches",
@@ -3588,6 +3550,8 @@ dependencies = [
  "prost-wkt-types",
  "rand 0.10.2",
  "rstest",
+ "rustls-native-certs",
+ "serde_json",
  "tempfile",
  "temporalio-common",
  "thiserror 2.0.18",
@@ -3602,7 +3566,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-common"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3624,9 +3588,10 @@ dependencies = [
  "prometheus",
  "prost",
  "prost-types",
- "reqwest 0.12.28",
+ "reqwest",
  "ringbuf",
  "rstest",
+ "rustls",
  "serde",
  "serde_json",
  "tempfile",
@@ -3645,7 +3610,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-common-wasm"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3674,7 +3639,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-macros"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "derive_more",
  "proc-macro2",
@@ -3685,7 +3650,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-protos"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "base64",
@@ -3706,7 +3671,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-sdk"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -3737,7 +3702,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-sdk-core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "antithesis_sdk",
  "anyhow",
@@ -3774,7 +3739,7 @@ dependencies = [
  "prost",
  "prost-wkt-types",
  "rand 0.10.2",
- "reqwest 0.13.4",
+ "reqwest",
  "rstest",
  "semver",
  "serde",
@@ -3803,7 +3768,7 @@ dependencies = [
 
 [[package]]
 name = "temporalio-workflow"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "bon",
