@@ -15,13 +15,9 @@ module Temporalio
     #
     # WARNING: Standalone Activities are experimental.
     class ActivityHandle
-      # Sentinel used by {#update_options} to distinguish an option that was not provided from one
-      # explicitly set to nil. Only provided options are included in the update mask.
       UNSET = Object.new
       private_constant :UNSET
 
-      # Read-only view of a standalone activity's options, returned by {ActivityHandle#update_options}.
-      #
       # WARNING: Standalone Activities are experimental.
       UpdatedOptions = Data.define(
         :task_queue,
