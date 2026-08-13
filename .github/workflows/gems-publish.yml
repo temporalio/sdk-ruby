@@ -1,19 +1,16 @@
 name: Gems Publish
-run-name: Gems Publish (stub)
+
+# Push gems to rubygems.org (or another host) using Trusted Publishing (OIDC).
 
 on:
   workflow_call:
     inputs:
-      environment:
-        required: true
-        type: string
-      version:
-        required: true
-        type: string
       artifact-name:
+        description: "Run artifact containing the .gem files to publish."
         required: true
         type: string
       host:
+        description: "Gem host to push to. Defaults to rubygems.org."
         required: false
         type: string
         default: https://rubygems.org
@@ -22,11 +19,46 @@ permissions:
   contents: read
 
 jobs:
-  placeholder:
-    name: placeholder
+  publish:
     runs-on: ubuntu-latest
+    # The 'rubygems' environment matches the Trusted Publisher config on rubygems.
+    environment: rubygems
+    permissions:
+      contents: read
+      id-token: write # Required for Trusted Publishing OIDC token issuance.
     steps:
-      - name: Explain
+      - name: Download gem artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: dist
+
+      - name: List gems to be published
+        run: ls -la dist
+
+      - uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: false
+          cargo-cache: false
+
+      # Requests a short-lived RubyGems API key via GitHub OIDC and
+      # configures env vars for subsequent `gem push` calls.
+      - name: RubyGems login (Trusted Publishing / OIDC)
+        uses: rubygems/configure-rubygems-credentials@dc5a8d8553e6ee01fc26761a49e99e733d17954a # v2.1.0
+
+      - name: Push gems
+        env:
+          HOST: ${{ inputs.host }}
         run: |
-          echo "Stub gems-publish.yml on main."
-          exit 1
+          set -euo pipefail
+          shopt -s nullglob
+          gems=(dist/*.gem)
+          if [[ ${#gems[@]} -eq 0 ]]; then
+            echo "No .gem files found in dist/" >&2
+            exit 1
+          fi
+          for gem in "${gems[@]}"; do
+            echo "Pushing $gem to $HOST"
+            gem push --host "$HOST" "$gem"
+          done
