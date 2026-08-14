@@ -100,6 +100,9 @@ module Worker
         assert_equal 20, pool.completed_task_count
         assert_equal 0, pool.queue_length
       end
+
+      pool.shutdown
+      assert_eventually { assert_equal 0, pool.length }
     end
   end
 end
