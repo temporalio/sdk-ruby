@@ -10,6 +10,7 @@ module Temporalio
       CANCELED: enum
       TERMINATED: enum
       TIMED_OUT: enum
+      PAUSED: enum
     end
   end
 end

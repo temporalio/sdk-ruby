@@ -271,6 +271,30 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  def test_describe_paused_activity_reports_paused_status
+    with_activity_worker([QuickActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # Start delayed so the activity sits SCHEDULED; pausing from there reaches a true PAUSED
+      # state rather than the PAUSE_REQUESTED of a running activity. `status` is the overall
+      # ActivityExecutionStatus (api#834 added PAUSED to it); `run_state` is the finer-grained
+      # PendingActivityState. Both should read PAUSED here.
+      handle = env.client.start_activity(
+        QuickActivity,
+        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, start_delay: 30.0
+      )
+      # Before the pause the activity is simply RUNNING (scheduled, not yet started).
+      assert_equal Temporalio::Client::ActivityExecutionStatus::RUNNING, handle.describe.status
+
+      handle.pause('hold')
+      assert_eventually do
+        desc = handle.describe
+        assert_equal Temporalio::Client::ActivityExecutionStatus::PAUSED, desc.status
+        assert_equal Temporalio::Client::PendingActivityState::PAUSED, desc.run_state
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
   def test_reset_keeps_paused
     with_activity_worker([QuickActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
