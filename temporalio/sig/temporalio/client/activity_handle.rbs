@@ -46,31 +46,10 @@ module Temporalio
         ?heartbeat_timeout: Float?,
         ?retry_policy: RetryPolicy?,
         ?priority: Priority?,
+        ?start_delay: Float?,
         ?restore_original: bool,
         ?rpc_options: RPCOptions?
-      ) -> UpdatedOptions
-
-      class UpdatedOptions
-        attr_reader task_queue: String?
-        attr_reader schedule_to_close_timeout: Float?
-        attr_reader schedule_to_start_timeout: Float?
-        attr_reader start_to_close_timeout: Float?
-        attr_reader heartbeat_timeout: Float?
-        attr_reader retry_policy: RetryPolicy?
-        attr_reader priority: Priority
-
-        def self._from_proto: (untyped options) -> UpdatedOptions
-
-        def initialize: (
-          task_queue: String?,
-          schedule_to_close_timeout: Float?,
-          schedule_to_start_timeout: Float?,
-          start_to_close_timeout: Float?,
-          heartbeat_timeout: Float?,
-          retry_policy: RetryPolicy?,
-          priority: Priority
-        ) -> void
-      end
+      ) -> ActivityExecutionOptions
 
       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
     end

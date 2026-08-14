@@ -9,6 +9,7 @@ module Temporalio
       def activity_run_id: -> String?
       def activity_type: -> String
       def schedule_time: -> Time?
+      def execution_time: -> Time?
       def close_time: -> Time?
       def status: -> ActivityExecutionStatus::enum
       def search_attributes: -> SearchAttributes?

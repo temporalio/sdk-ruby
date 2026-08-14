@@ -343,7 +343,7 @@ class ClientActivityOperatorCommandsTest < Test
       handle.reset(keep_paused: true)
       # keep_paused means the activity remains paused across the reset.
       # DIAGNOSTIC (2026-07-30): bumped from default 10s to 60s.
-      assert_eventually(timeout: 60) do
+      assert_eventually(timeout: 60.0) do
         assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
       end
       handle.terminate('cleanup')
@@ -360,7 +360,7 @@ class ClientActivityOperatorCommandsTest < Test
       handle.reset(restore_original_options: true)
       # restore_original_options reverts the changed option to the value the activity was created with.
       # DIAGNOSTIC (2026-07-30): bumped from 30s to 60s.
-      assert_eventually(timeout: 60) do
+      assert_eventually(timeout: 60.0) do
         assert_equal 45.0, handle.describe.start_to_close_timeout
       end
       handle.terminate('cleanup')
@@ -434,7 +434,7 @@ class ClientActivityOperatorCommandsTest < Test
 
       # Opt-in flag clears details.
       handle.reset(keep_paused: true, reset_heartbeat: true)
-      assert_eventually(timeout: 30) do
+      assert_eventually(timeout: 30.0) do
         refute handle.describe.has_heartbeat_details?
       end
       handle.terminate('cleanup')

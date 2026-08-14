@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/client/activity_execution'
+require 'temporalio/client/activity_execution_options'
 require 'temporalio/client/interceptor'
 require 'temporalio/error'
 require 'temporalio/internal/proto_utils'
@@ -18,31 +19,6 @@ module Temporalio
       UNSET = Object.new
       private_constant :UNSET
 
-      # WARNING: Standalone Activities are experimental.
-      UpdatedOptions = Data.define(
-        :task_queue,
-        :schedule_to_close_timeout,
-        :schedule_to_start_timeout,
-        :start_to_close_timeout,
-        :heartbeat_timeout,
-        :retry_policy,
-        :priority,
-        :start_delay
-      ) do
-        # @!visibility private
-        def self._from_proto(options)
-          new(
-            task_queue: Internal::ProtoUtils.string_or(options.task_queue&.name, nil),
-            schedule_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(options.schedule_to_close_timeout),
-            schedule_to_start_timeout: Internal::ProtoUtils.duration_to_seconds(options.schedule_to_start_timeout),
-            start_to_close_timeout: Internal::ProtoUtils.duration_to_seconds(options.start_to_close_timeout),
-            heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(options.heartbeat_timeout),
-            retry_policy: options.retry_policy ? RetryPolicy._from_proto(options.retry_policy) : nil,
-            priority: Priority._from_proto(options.priority),
-            start_delay: Internal::ProtoUtils.duration_to_seconds(options.start_delay)
-          )
-        end
-      end
       # @return [String] ID for the activity.
       attr_reader :id
 
@@ -222,7 +198,7 @@ module Temporalio
       #   was created with. Mutually exclusive with any other option.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
-      # @return [UpdatedOptions] The activity options after the update.
+      # @return [ActivityExecutionOptions] The activity options after the update.
       #
       # @raise [ArgumentError] If `restore_original` is combined with any other option, or if no
       #   option is provided and `restore_original` is false.
@@ -291,7 +267,7 @@ module Temporalio
             rpc_options:
           )
         )
-        UpdatedOptions._from_proto(result)
+        ActivityExecutionOptions._from_proto(result)
       end
 
       private

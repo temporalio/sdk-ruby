@@ -8,4 +8,6 @@ class ClientActivityOperatorCommandsTest < Test
   def start_running_slow_activity: (String task_queue, **untyped kwargs) -> Temporalio::Client::ActivityHandle
 
   def start_backed_off_heartbeat_activity: (String task_queue) -> Temporalio::Client::ActivityHandle
+
+  def start_heartbeat_ready_activity: (String task_queue) -> Temporalio::Client::ActivityHandle
 end
