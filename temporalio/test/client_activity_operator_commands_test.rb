@@ -147,14 +147,14 @@ class ClientActivityOperatorCommandsTest < Test
       updated = handle.update_options(start_to_close_timeout: 90.0)
 
       # Returned options: only start_to_close changed; schedule_to_close kept its original value.
-      assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
-      assert_in_delta 120.0, updated.schedule_to_close_timeout, 0.5
+      assert_equal 90.0, updated.start_to_close_timeout
+      assert_equal 120.0, updated.schedule_to_close_timeout
 
       # Confirm via describe that the partial update was applied server-side.
       assert_eventually do
         desc = handle.describe
-        assert_in_delta 90.0, desc.start_to_close_timeout, 0.5
-        assert_in_delta 120.0, desc.schedule_to_close_timeout, 0.5
+        assert_equal 90.0, desc.start_to_close_timeout
+        assert_equal 120.0, desc.schedule_to_close_timeout
       end
       handle.terminate('cleanup')
     end
@@ -184,27 +184,26 @@ class ClientActivityOperatorCommandsTest < Test
 
       # Every field is settable and lands: the returned options reflect each new value.
       assert_equal 'updated-tq', updated.task_queue
-      assert_in_delta 200.0, updated.schedule_to_close_timeout, 0.5
-      assert_in_delta 15.0, updated.schedule_to_start_timeout, 0.5
-      assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
-      assert_in_delta 25.0, updated.heartbeat_timeout, 0.5
+      assert_equal 200.0, updated.schedule_to_close_timeout
+      assert_equal 15.0, updated.schedule_to_start_timeout
+      assert_equal 90.0, updated.start_to_close_timeout
+      assert_equal 25.0, updated.heartbeat_timeout
       assert_equal 7, updated.retry_policy&.max_attempts
       assert_equal 3, updated.priority.priority_key
-      assert_in_delta 500.0, updated.start_delay, 0.5
+      assert_equal 500.0, updated.start_delay
 
       # And describe reflects them server-side.
       desc = handle.describe
       assert_equal 'updated-tq', desc.task_queue
-      assert_in_delta 200.0, desc.schedule_to_close_timeout, 0.5
-      assert_in_delta 15.0, desc.schedule_to_start_timeout, 0.5
-      assert_in_delta 90.0, desc.start_to_close_timeout, 0.5
-      assert_in_delta 25.0, desc.heartbeat_timeout, 0.5
+      assert_equal 200.0, desc.schedule_to_close_timeout
+      assert_equal 15.0, desc.schedule_to_start_timeout
+      assert_equal 90.0, desc.start_to_close_timeout
+      assert_equal 25.0, desc.heartbeat_timeout
       assert_equal 7, desc.retry_policy&.max_attempts
       assert_equal 3, desc.priority.priority_key
       # start_delay isn't surfaced by the SDK's describe wrapper yet; read via raw_info.
-      assert_in_delta 500.0,
-                      Temporalio::Internal::ProtoUtils.duration_to_seconds(desc.raw_info.start_delay),
-                      0.5
+      assert_equal 500.0,
+                   Temporalio::Internal::ProtoUtils.duration_to_seconds(desc.raw_info.start_delay)
 
       handle.terminate('cleanup')
     end
@@ -262,11 +261,43 @@ class ClientActivityOperatorCommandsTest < Test
 
       # Change an option away from the original.
       changed = handle.update_options(start_to_close_timeout: 90.0)
-      assert_in_delta 90.0, changed.start_to_close_timeout, 0.5
+      assert_equal 90.0, changed.start_to_close_timeout
 
       # restore_original alone reverts to the value the activity was created with.
       restored = handle.update_options(restore_original: true)
-      assert_in_delta 45.0, restored.start_to_close_timeout, 0.5
+      assert_equal 45.0, restored.start_to_close_timeout
+      handle.terminate('cleanup')
+    end
+  end
+
+  def test_update_options_on_paused_activity
+    with_activity_worker([QuickActivity]) do |task_queue|
+      activity_id = "act-#{SecureRandom.uuid}"
+      # Start delayed so the activity sits SCHEDULED and pauses to a true PAUSED state rather than
+      # the PAUSE_REQUESTED a running activity lands in.
+      handle = env.client.start_activity(
+        QuickActivity,
+        id: activity_id, task_queue: task_queue,
+        start_to_close_timeout: 45, schedule_to_close_timeout: 120, start_delay: 60.0
+      )
+      handle.pause('hold')
+      assert_eventually do
+        assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
+      end
+
+      # Updating options is legal while paused, and the new value lands. Whole-second timeouts
+      # round-trip exactly through the protobuf Duration conversion, so assert on equality.
+      updated = handle.update_options(start_to_close_timeout: 90.0)
+      assert_equal 90.0, updated.start_to_close_timeout
+
+      desc = handle.describe
+      assert_equal 90.0, desc.start_to_close_timeout
+      # The mask is still honored while paused — an option we didn't touch keeps its original value.
+      assert_equal 120.0, desc.schedule_to_close_timeout
+      # And the update leaves the activity paused; it is not an implicit unpause.
+      assert_equal Temporalio::Client::PendingActivityState::PAUSED, desc.run_state
+      assert_equal Temporalio::Client::ActivityExecutionStatus::PAUSED, desc.status
+
       handle.terminate('cleanup')
     end
   end
@@ -324,13 +355,13 @@ class ClientActivityOperatorCommandsTest < Test
       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
 
       updated = handle.update_options(start_to_close_timeout: 90.0)
-      assert_in_delta 90.0, updated.start_to_close_timeout, 0.5
+      assert_equal 90.0, updated.start_to_close_timeout
 
       handle.reset(restore_original_options: true)
       # restore_original_options reverts the changed option to the value the activity was created with.
       # DIAGNOSTIC (2026-07-30): bumped from 30s to 60s.
       assert_eventually(timeout: 60) do
-        assert_in_delta 45.0, handle.describe.start_to_close_timeout, 0.5
+        assert_equal 45.0, handle.describe.start_to_close_timeout
       end
       handle.terminate('cleanup')
     end
