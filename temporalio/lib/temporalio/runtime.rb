@@ -64,8 +64,8 @@ module Temporalio
     #   @return [LoggingFilterOptions, String] Logging filter for Core, default is new {LoggingFilterOptions} with no
     #     parameters.
     # @!attribute log_format
-    #   @return [ConsoleLogFormat, nil] Format for Core logs written to the console. If unset, Core preserves its
-    #     existing output selection, including `TEMPORAL_CORE_PRETTY_LOGS` support.
+    #   @return [ConsoleLogFormat, nil] Format for Core logs written to the console. If unset, this defaults to compact
+    #     output.
     class LoggingOptions
       # Create logging options
       #
