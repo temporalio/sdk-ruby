@@ -217,13 +217,15 @@ module Temporalio
       # @param heartbeat_timeout [Float, nil] New heartbeat timeout in seconds.
       # @param retry_policy [RetryPolicy, nil] New retry policy.
       # @param priority [Priority, nil] New priority.
+      # @param start_delay [Float, nil] New start delay in seconds.
       # @param restore_original [Boolean] If true, restore the options to the originals the activity
       #   was created with. Mutually exclusive with any other option.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [UpdatedOptions] The activity options after the update.
       #
-      # @raise [ArgumentError] If `restore_original` is combined with any other option.
+      # @raise [ArgumentError] If `restore_original` is combined with any other option, or if no
+      #   option is provided and `restore_original` is false.
       # @raise [Error::RPCError] RPC error from call.
       def update_options(
         task_queue: UNSET,
@@ -275,6 +277,8 @@ module Temporalio
 
         if restore_original && !paths.empty?
           raise ArgumentError, 'restore_original cannot be combined with any other option'
+        elsif !restore_original && paths.empty?
+          raise ArgumentError, 'At least one option must be set, or restore_original must be used'
         end
 
         result = @client._impl.update_activity_options(

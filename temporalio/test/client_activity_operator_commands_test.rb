@@ -234,6 +234,28 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  def test_update_options_requires_at_least_one_option
+    with_activity_worker([SlowActivity]) do |task_queue|
+      handle = start_running_slow_activity(task_queue)
+      # Wrap the RPC so we can prove it is never reached when the validation fails.
+      ws = env.client.workflow_service
+      reached = false
+      original = ws.method(:update_activity_execution_options)
+      ws.define_singleton_method(:update_activity_execution_options) do |req, **kwargs|
+        reached = true
+        original.call(req, **kwargs)
+      end
+      begin
+        err = assert_raises(ArgumentError) { handle.update_options }
+        assert_match(/at least one option/i, err.message)
+        refute reached, 'update_activity_execution_options RPC should not be reached when validation fails'
+      ensure
+        ws.singleton_class.send(:remove_method, :update_activity_execution_options)
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
   def test_update_options_restore_original
     with_activity_worker([SlowActivity]) do |task_queue|
       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
