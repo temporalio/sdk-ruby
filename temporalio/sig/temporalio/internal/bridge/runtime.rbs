@@ -28,9 +28,11 @@ module Temporalio
     
         class LoggingOptions
           attr_accessor log_filter: String?
+          attr_accessor log_format: String?
     
           def initialize: (
-            log_filter: String?
+            log_filter: String?,
+            log_format: String?
           ) -> void
         end
     

@@ -39,8 +39,17 @@ class Temporalio::Runtime::LoggingOptions < ::Data
   sig { returns(T.any(Temporalio::Runtime::LoggingFilterOptions, String)) }
   def log_filter; end
 
-  sig { params(log_filter: T.any(Temporalio::Runtime::LoggingFilterOptions, String)).void }
-  def initialize(log_filter: T.unsafe(nil)); end
+  sig { returns(T.nilable(Symbol)) }
+  def log_format; end
+
+  sig { params(log_filter: T.any(Temporalio::Runtime::LoggingFilterOptions, String), log_format: T.nilable(Symbol)).void }
+  def initialize(log_filter: T.unsafe(nil), log_format: T.unsafe(nil)); end
+end
+
+module Temporalio::Runtime::ConsoleLogFormat
+  COMPACT = T.let(T.unsafe(nil), Symbol)
+  JSON = T.let(T.unsafe(nil), Symbol)
+  PRETTY = T.let(T.unsafe(nil), Symbol)
 end
 
 class Temporalio::Runtime::LoggingFilterOptions < ::Data

@@ -149,6 +149,21 @@ class RuntimeTest < Test
     assert_equal RUBY_VERSION, captured&.runtime_version
   end
 
+  def test_runtime_console_log_format
+    captured = capture_bridge_runtime_options do
+      Temporalio::Runtime.new(
+        telemetry: Temporalio::Runtime::TelemetryOptions.new(
+          logging: Temporalio::Runtime::LoggingOptions.new(
+            log_format: Temporalio::Runtime::ConsoleLogFormat::JSON
+          )
+        )
+      )
+    end
+    logging = captured&.telemetry&.logging
+    refute_nil logging
+    assert_equal 'json', logging&.log_format
+  end
+
   # Capture the Options struct that Runtime#initialize passes to Internal::Bridge::Runtime.new
   # without actually spinning up a native runtime. Shims out the two bridge calls Runtime#initialize
   # makes on the returned object: run_command_loop (from a background thread) and the metric-meter
