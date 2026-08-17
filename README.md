@@ -1453,8 +1453,23 @@ the gem at `lib/temporalio/internal/bridge/3.2/temporalio_bridge.so` and
 
 ### Testing
 
-Note you can set `TEMPORAL_TEST_CLIENT_TARGET_HOST` and `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE`
-(optional, defaults to 'default') environment variables to use an existing server.
+Tests start a local Temporal dev server by default. Set `TEMPORAL_TEST_ENV_CONFIG_SERVER=1` to use
+the SDK's environment configuration for an existing server. The standard `TEMPORAL_*` variables
+can provide the client configuration directly:
+
+    TEMPORAL_TEST_ENV_CONFIG_SERVER=1 \
+      TEMPORAL_ADDRESS=my-namespace.tmprl.cloud:7233 \
+      TEMPORAL_NAMESPACE=my-namespace \
+      TEMPORAL_API_KEY=my-api-key \
+      bundle exec rake test
+
+Configuration files and profiles are also supported:
+
+    TEMPORAL_TEST_ENV_CONFIG_SERVER=1 TEMPORAL_PROFILE=cloud bundle exec rake test
+
+The envconfig-backed run preserves configured API keys, TLS or mTLS settings, and gRPC metadata. The legacy
+`TEMPORAL_TEST_CLIENT_TARGET_HOST` and `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE` (optional, defaults
+to `default`) environment variables remain available when envconfig mode is not selected.
 
 This project uses `minitest`. To test:
 
