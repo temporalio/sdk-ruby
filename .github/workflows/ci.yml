@@ -176,6 +176,7 @@ jobs:
     timeout-minutes: 45
     env:
       TEMPORAL_TEST_ENV_CONFIG_SERVER: "1"
+      TEMPORAL_CLIENT_CLOUD_API_VERSION: v0.19.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -233,20 +234,24 @@ jobs:
         run: bundle exec ruby ../.github/scripts/cloud_namespace.rb create
         env:
           TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-          TEMPORAL_CLIENT_CLOUD_API_VERSION: v0.19.1
 
       - name: Test Ruby against Temporal Cloud
         working-directory: ./temporalio
         timeout-minutes: 15
         env:
-          TEMPORAL_ADDRESS: ${{ steps.create-cloud-namespace.outputs.address }}
+          TEMPORAL_ADDRESS: ${{ steps.create-cloud-namespace.outputs.namespace }}.tmprl.cloud:7233
           TEMPORAL_NAMESPACE: ${{ steps.create-cloud-namespace.outputs.namespace }}
         run: bundle exec rake test TEST=test/worker_workflow_test.rb TESTOPTS="--name=/WorkerWorkflowTest#test_simple/"
 
       - name: Delete Cloud namespace
-        if: ${{ always() && steps.create-cloud-namespace.outputs.namespace_name != '' }}
+        id: delete-cloud-namespace
+        if: ${{ always() && steps.create-cloud-namespace.outputs.namespace != '' }}
+        continue-on-error: true
         working-directory: ./temporalio
-        run: bundle exec ruby ../.github/scripts/cloud_namespace.rb delete "${{ steps.create-cloud-namespace.outputs.namespace }}" "${{ steps.create-cloud-namespace.outputs.namespace_name }}"
+        run: bundle exec ruby ../.github/scripts/cloud_namespace.rb delete "${{ steps.create-cloud-namespace.outputs.namespace }}"
         env:
           TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-          TEMPORAL_CLIENT_CLOUD_API_VERSION: v0.19.1
+
+      - name: Report Cloud namespace cleanup failure
+        if: ${{ always() && steps.delete-cloud-namespace.outcome == 'failure' }}
+        run: echo "::warning title=Cloud namespace cleanup failed::Failed to delete Cloud namespace ${{ steps.create-cloud-namespace.outputs.namespace }}"
