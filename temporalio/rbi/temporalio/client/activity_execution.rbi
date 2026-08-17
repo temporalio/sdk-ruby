@@ -76,8 +76,14 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   sig { returns(T.nilable(Float)) }
   def heartbeat_timeout; end
 
+  sig { returns(T.nilable(Float)) }
+  def start_delay; end
+
   sig { returns(T::Boolean) }
   def has_heartbeat_details?; end
+
+  sig { returns(T::Boolean) }
+  def has_last_failure?; end
 
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: T.unsafe(nil)); end

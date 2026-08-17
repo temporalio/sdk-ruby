@@ -1026,8 +1026,10 @@ module Temporalio
               namespace: @client.namespace,
               activity_id: input.activity_id,
               run_id: input.activity_run_id || '',
-              include_heartbeat_details: true,
-              include_last_failure: true
+              include_input: input.include_input,
+              include_outcome: input.include_outcome,
+              include_heartbeat_details: input.include_heartbeat_details,
+              include_last_failure: input.include_last_failure
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )

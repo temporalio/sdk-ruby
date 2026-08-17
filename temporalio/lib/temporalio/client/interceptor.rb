@@ -291,6 +291,10 @@ module Temporalio
       DescribeActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
+        :include_input,
+        :include_outcome,
+        :include_heartbeat_details,
+        :include_last_failure,
         :rpc_options
       )
 

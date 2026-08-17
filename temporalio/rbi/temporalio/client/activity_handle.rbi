@@ -28,8 +28,22 @@ class Temporalio::Client::ActivityHandle
   end
   def result(result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  sig { params(rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Client::ActivityExecution::Description) }
-  def describe(rpc_options: T.unsafe(nil)); end
+  sig do
+    params(
+      include_input: T::Boolean,
+      include_outcome: T::Boolean,
+      include_heartbeat_details: T::Boolean,
+      include_last_failure: T::Boolean,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(Temporalio::Client::ActivityExecution::Description)
+  end
+  def describe(
+    include_input: T.unsafe(nil),
+    include_outcome: T.unsafe(nil),
+    include_heartbeat_details: T.unsafe(nil),
+    include_last_failure: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  ); end
 
   sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def cancel(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end

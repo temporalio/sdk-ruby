@@ -62,15 +62,35 @@ module Temporalio
 
       # Describe the activity.
       #
+      # The payload-bearing fields are opt-in because they can be arbitrarily large; request them
+      # only when needed. Each has a corresponding predicate on the returned description that
+      # reports whether the server supplied it.
+      #
+      # @param include_input [Boolean] If true and the activity received input, include the input.
+      # @param include_outcome [Boolean] If true and the activity is closed, include the outcome.
+      # @param include_heartbeat_details [Boolean] If true and the activity recorded heartbeat
+      #   details, include them.
+      # @param include_last_failure [Boolean] If true and the activity has a failed attempt, include
+      #   the last failure.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
       #
       # @return [ActivityExecution::Description] Activity description.
       # @raise [Error::RPCError] RPC error from call.
-      def describe(rpc_options: nil)
+      def describe(
+        include_input: false,
+        include_outcome: false,
+        include_heartbeat_details: false,
+        include_last_failure: false,
+        rpc_options: nil
+      )
         @client._impl.describe_activity(
           Interceptor::DescribeActivityInput.new(
             activity_id: id,
             activity_run_id: run_id,
+            include_input:,
+            include_outcome:,
+            include_heartbeat_details:,
+            include_last_failure:,
             rpc_options:
           )
         )

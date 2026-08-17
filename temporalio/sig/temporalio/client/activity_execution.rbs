@@ -26,7 +26,9 @@ module Temporalio
         def schedule_to_start_timeout: -> Float?
         def start_to_close_timeout: -> Float?
         def heartbeat_timeout: -> Float?
+        def start_delay: -> Float?
         def has_heartbeat_details?: -> bool
+        def has_last_failure?: -> bool
         def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
         def retry_policy: -> RetryPolicy
         def last_heartbeat_time: -> Time?

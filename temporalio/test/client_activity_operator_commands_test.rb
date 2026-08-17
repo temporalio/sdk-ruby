@@ -201,9 +201,7 @@ class ClientActivityOperatorCommandsTest < Test
       assert_equal 25.0, desc.heartbeat_timeout
       assert_equal 7, desc.retry_policy&.max_attempts
       assert_equal 3, desc.priority.priority_key
-      # start_delay isn't surfaced by the SDK's describe wrapper yet; read via raw_info.
-      assert_equal 500.0,
-                   Temporalio::Internal::ProtoUtils.duration_to_seconds(desc.raw_info.start_delay)
+      assert_equal 500.0, desc.start_delay
 
       handle.terminate('cleanup')
     end
@@ -378,9 +376,22 @@ class ClientActivityOperatorCommandsTest < Test
       id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, heartbeat_timeout: 30
     )
     assert_eventually do
-      assert handle.describe.has_heartbeat_details?
+      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
     end
     handle
+  end
+
+  # The payload-bearing describe fields are opt-in (api#792). Assert the default really is "off"
+  # rather than the SDK quietly requesting everything: same activity, same moment, two describes.
+  def test_describe_payload_fields_are_opt_in
+    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
+      handle = start_heartbeat_ready_activity(task_queue)
+      refute handle.describe.has_heartbeat_details?
+      assert_empty handle.describe.heartbeat_details
+      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
+      assert_equal ['hb-details'], handle.describe(include_heartbeat_details: true).heartbeat_details
+      handle.terminate('cleanup')
+    end
   end
 
   def test_pause_preserves_heartbeat
@@ -389,7 +400,7 @@ class ClientActivityOperatorCommandsTest < Test
       handle.pause('hold')
       assert_eventually_paused(handle)
       # Pause never touches heartbeat details — they persist across the transition.
-      assert handle.describe.has_heartbeat_details?
+      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       handle.terminate('cleanup')
     end
   end
@@ -404,7 +415,7 @@ class ClientActivityOperatorCommandsTest < Test
       # attempt 1 does), so the persisted details are stable and observable.
       handle.unpause
       assert_eventually do
-        assert handle.describe.has_heartbeat_details?
+        assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       end
       handle.terminate('cleanup')
     end
@@ -421,7 +432,7 @@ class ClientActivityOperatorCommandsTest < Test
       handle.reset(keep_paused: true)
       # Give the server time to persist any state change, then confirm details survive.
       sleep 2
-      assert handle.describe.has_heartbeat_details?
+      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       handle.terminate('cleanup')
     end
   end
@@ -435,7 +446,7 @@ class ClientActivityOperatorCommandsTest < Test
       # Opt-in flag clears details.
       handle.reset(keep_paused: true, reset_heartbeat: true)
       assert_eventually(timeout: 30.0) do
-        refute handle.describe.has_heartbeat_details?
+        refute handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       end
       handle.terminate('cleanup')
     end
@@ -449,7 +460,7 @@ class ClientActivityOperatorCommandsTest < Test
 
       # UpdateOptions changes activity options only; it never touches heartbeat details.
       handle.update_options(start_to_close_timeout: 90.0)
-      assert handle.describe.has_heartbeat_details?
+      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       handle.terminate('cleanup')
     end
   end

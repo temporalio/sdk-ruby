@@ -118,7 +118,17 @@ module Temporalio
           Internal::ProtoUtils.duration_to_seconds(@raw_info.heartbeat_timeout)
         end
 
-        # @return [Boolean] Whether the activity has recorded any heartbeat details.
+        # @return [Float, nil] Delay in seconds before the first activity task is made available for
+        #   dispatch. Not applied to retry attempts.
+        def start_delay
+          Internal::ProtoUtils.duration_to_seconds(@raw_info.start_delay)
+        end
+
+        # Whether heartbeat details are present on this description. False when the activity
+        # recorded none, and also when {ActivityHandle#describe} was called without
+        # `include_heartbeat_details:`.
+        #
+        # @return [Boolean] Whether heartbeat details are present.
         def has_heartbeat_details? # rubocop:disable Naming/PredicatePrefix
           !@raw_info.heartbeat_details&.payloads.nil? && !@raw_info.heartbeat_details.payloads.empty?
         end
@@ -149,6 +159,15 @@ module Temporalio
         # @return [Integer] Current attempt number. Attempts start at 1 and increment on each retry.
         def attempt
           @raw_info.attempt
+        end
+
+        # Whether a last failure is present on this description. False when the activity has no
+        # failed attempt, and also when {ActivityHandle#describe} was called without
+        # `include_last_failure:`.
+        #
+        # @return [Boolean] Whether a last failure is present.
+        def has_last_failure? # rubocop:disable Naming/PredicatePrefix
+          !@raw_info.last_failure.nil?
         end
 
         # @return [Error::Failure, nil] Failure of the last failed attempt if any.

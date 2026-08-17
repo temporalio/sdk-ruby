@@ -16,7 +16,13 @@ module Temporalio
 
       def result: (?result_hint: Object?, ?rpc_options: RPCOptions?) -> Object?
 
-      def describe: (?rpc_options: RPCOptions?) -> ActivityExecution::Description
+      def describe: (
+        ?include_input: bool,
+        ?include_outcome: bool,
+        ?include_heartbeat_details: bool,
+        ?include_last_failure: bool,
+        ?rpc_options: RPCOptions?
+      ) -> ActivityExecution::Description
 
       def cancel: (?String? reason, ?rpc_options: RPCOptions?) -> void
 

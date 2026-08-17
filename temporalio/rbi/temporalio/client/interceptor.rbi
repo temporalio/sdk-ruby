@@ -834,6 +834,18 @@ class Temporalio::Client::Interceptor::DescribeActivityInput < ::Data
   sig { returns(T.nilable(String)) }
   def activity_run_id; end
 
+  sig { returns(T::Boolean) }
+  def include_input; end
+
+  sig { returns(T::Boolean) }
+  def include_outcome; end
+
+  sig { returns(T::Boolean) }
+  def include_heartbeat_details; end
+
+  sig { returns(T::Boolean) }
+  def include_last_failure; end
+
   sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
   def rpc_options; end
 

@@ -481,11 +481,19 @@ module Temporalio
       class DescribeActivityInput
         attr_reader activity_id: String
         attr_reader activity_run_id: String?
+        attr_reader include_input: bool
+        attr_reader include_outcome: bool
+        attr_reader include_heartbeat_details: bool
+        attr_reader include_last_failure: bool
         attr_reader rpc_options: RPCOptions?
 
         def initialize: (
           activity_id: String,
           activity_run_id: String?,
+          include_input: bool,
+          include_outcome: bool,
+          include_heartbeat_details: bool,
+          include_last_failure: bool,
           rpc_options: RPCOptions?
         ) -> void
       end
