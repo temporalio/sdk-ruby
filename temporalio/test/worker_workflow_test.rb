@@ -3035,4 +3035,86 @@ class WorkerWorkflowTest < Test
     # This used to fail because of a workflow task failure caused by a leftover wait condition
     assert_nil handle.fetch_history_events.find(&:workflow_task_failed_event_attributes)
   end
+
+  class UnawaitedFutureError < StandardError; end
+  class UnawaitedFutureError2 < StandardError; end
+
+  class UnawaitedFailedFutureWorkflow < Temporalio::Workflow::Definition
+    def execute(scenario)
+      case scenario.to_sym
+      when :unawaited_single
+        Temporalio::Workflow::Future.new { raise UnawaitedFutureError, 'activity failed' }
+        Temporalio::Workflow.sleep(0.1)
+        'done'
+      when :unawaited_multiple
+        Temporalio::Workflow::Future.new { raise UnawaitedFutureError, 'first failure' }
+        Temporalio::Workflow::Future.new { raise UnawaitedFutureError2, 'second failure' }
+        Temporalio::Workflow.sleep(0.1)
+        'done'
+      when :awaited_with_wait
+        fut = Temporalio::Workflow::Future.new { raise UnawaitedFutureError, 'activity failed' }
+        begin
+          fut.wait
+        rescue UnawaitedFutureError
+          # handled
+        end
+        'done'
+      when :awaited_with_wait_no_raise
+        fut = Temporalio::Workflow::Future.new { raise UnawaitedFutureError, 'activity failed' }
+        fut.wait_no_raise
+        'done'
+      when :unawaited_success
+        Temporalio::Workflow::Future.new { 'ok' }
+        Temporalio::Workflow.sleep(0.1)
+        'done'
+      else
+        raise NotImplementedError
+      end
+    end
+  end
+
+  def test_unawaited_failed_future_warns
+    _, err = safe_capture_io do
+      execute_workflow(UnawaitedFailedFutureWorkflow, 'unawaited_single', logger: Logger.new($stdout))
+    end
+    lines = err.split("\n")
+    warning_lines = lines.select { |l| l.include?('TMPRL1103') }
+    assert_equal 1, warning_lines.size
+    assert_includes warning_lines.first, '1 unawaited failed future(s)'
+    assert_includes warning_lines.first, 'UnawaitedFutureError'
+    assert_includes warning_lines.first, 'activity failed'
+  end
+
+  def test_unawaited_multiple_failed_futures_warns
+    _, err = safe_capture_io do
+      execute_workflow(UnawaitedFailedFutureWorkflow, 'unawaited_multiple', logger: Logger.new($stdout))
+    end
+    lines = err.split("\n")
+    warning_lines = lines.select { |l| l.include?('TMPRL1103') }
+    assert_equal 1, warning_lines.size
+    assert_includes warning_lines.first, '2 unawaited failed future(s)'
+    assert_includes warning_lines.first, 'UnawaitedFutureError'
+    assert_includes warning_lines.first, 'UnawaitedFutureError2'
+  end
+
+  def test_awaited_failed_future_with_wait_no_warning
+    _, err = safe_capture_io do
+      execute_workflow(UnawaitedFailedFutureWorkflow, 'awaited_with_wait', logger: Logger.new($stdout))
+    end
+    refute_includes err, 'TMPRL1103'
+  end
+
+  def test_awaited_failed_future_with_wait_no_raise_no_warning
+    _, err = safe_capture_io do
+      execute_workflow(UnawaitedFailedFutureWorkflow, 'awaited_with_wait_no_raise', logger: Logger.new($stdout))
+    end
+    refute_includes err, 'TMPRL1103'
+  end
+
+  def test_unawaited_successful_future_no_warning
+    _, err = safe_capture_io do
+      execute_workflow(UnawaitedFailedFutureWorkflow, 'unawaited_success', logger: Logger.new($stdout))
+    end
+    refute_includes err, 'TMPRL1103'
+  end
 end
