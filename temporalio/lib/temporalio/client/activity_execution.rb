@@ -169,12 +169,14 @@ module Temporalio
         # Deserialized result the activity closed with. Nil when no result is present (still
         # running, closed with a failure, or `include_outcome:` was not requested).
         #
-        # @param hint [Object, nil] Hint, if any, to assist conversion.
+        # @param result_hint [Object, nil] Hint, if any, to assist conversion.
         # @return [Object, nil] Converted result.
-        def result(hint: nil)
+        def result(result_hint: nil)
           return nil unless has_result?
 
-          @data_converter.from_payloads(@raw_description.outcome.result, hints: Array(hint)).first
+          @data_converter.from_payloads(
+            @raw_description.outcome.result, hints: Array(result_hint)
+          ).first
         end
 
         # Failure the activity closed with. Nil when the activity did not close with a failure or

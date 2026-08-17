@@ -32,7 +32,7 @@ module Temporalio
         def has_input?: -> bool
         def input: (?hints: Array[Object]?) -> Array[Object?]
         def has_result?: -> bool
-        def result: (?hint: Object?) -> Object?
+        def result: (?result_hint: Object?) -> Object?
         def failure: -> Error::Failure?
         def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
         def retry_policy: -> RetryPolicy

@@ -94,8 +94,8 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   sig { returns(T::Boolean) }
   def has_result?; end
 
-  sig { params(hint: T.nilable(Object)).returns(T.nilable(Object)) }
-  def result(hint: T.unsafe(nil)); end
+  sig { params(result_hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  def result(result_hint: T.unsafe(nil)); end
 
   sig { returns(T.nilable(Temporalio::Error::Failure)) }
   def failure; end
