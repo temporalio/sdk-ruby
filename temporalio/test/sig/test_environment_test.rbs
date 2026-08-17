@@ -1,0 +1,7 @@
+class TestEnvironmentTest < Test
+  private
+
+  def with_test_env: [T] (Hash[String, String] values) { () -> T } -> T
+  def env_config_key?: (String key) -> bool
+  def missing_config_path: -> String
+end

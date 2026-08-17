@@ -9,6 +9,7 @@ require 'singleton'
 require 'socket'
 require 'temporalio/client'
 require 'temporalio/converters'
+require 'temporalio/env_config'
 require 'temporalio/internal/bridge'
 require 'temporalio/runtime'
 require 'temporalio/testing'
@@ -20,7 +21,6 @@ if ENV['TEMPORAL_SORBET_RUNTIME_CHECK']
   require 'temporalio/common_enums'
   require 'temporalio/contrib/open_telemetry'
   require 'temporalio/converters/payload_codec'
-  require 'temporalio/env_config'
   require 'temporalio/simple_plugin'
   require 'temporalio/worker/interceptor'
   require 'temporalio/worker/workflow_replayer'
@@ -154,12 +154,31 @@ class Test < Minitest::Test
   class TestEnvironment
     include Singleton
 
+    ENV_CONFIG_SERVER_ENV_VAR = 'TEMPORAL_TEST_ENV_CONFIG_SERVER'
+
     attr_reader :server
 
+    def self.env_config_server?
+      !ENV.fetch(ENV_CONFIG_SERVER_ENV_VAR, '').empty?
+    end
+
+    def self.client_connect_options
+      if env_config_server?
+        Temporalio::EnvConfig::ClientConfig.load_client_connect_options
+      else
+        target_host = ENV.fetch('TEMPORAL_TEST_CLIENT_TARGET_HOST', '')
+        return nil if target_host.empty?
+
+        [[target_host, ENV['TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE'] || 'default'], {}]
+      end
+    end
+
     def initialize
-      # Start workflow env for an existing server if env vars present
-      target_host = ENV.fetch('TEMPORAL_TEST_CLIENT_TARGET_HOST', '')
-      if target_host.empty?
+      if (connect_options = self.class.client_connect_options)
+        args, kwargs = connect_options
+        client = Temporalio::Client.connect(args[0], args[1], **kwargs, logger: Logger.new($stdout))
+        @server = Temporalio::Testing::WorkflowEnvironment.new(client)
+      else
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
           dev_server_download_version: 'v1.7.1-standalone-nexus-operations',
@@ -179,14 +198,6 @@ class Test < Minitest::Test
         Minitest.after_run do
           @server.shutdown
         end
-      else
-        client = Temporalio::Client.connect(
-          target_host,
-          ENV['TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE'] || 'default',
-          logger: Logger.new($stdout)
-        )
-        @server = Temporalio::Testing::WorkflowEnvironment.new(client)
-        nil
       end
     end
 

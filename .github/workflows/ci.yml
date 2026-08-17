@@ -168,3 +168,49 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: npx vercel deploy temporalio/doc --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
+
+  cloud-test:
+    # Secrets are unavailable to workflows from forks.
+    if: ${{ github.event.pull_request.head.repo.full_name == '' || github.event.pull_request.head.repo.full_name == 'temporalio/sdk-ruby' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: sdk-ruby-cloud-test
+      cancel-in-progress: false
+    env:
+      TEMPORAL_TEST_ENV_CONFIG_SERVER: "1"
+      TEMPORAL_ADDRESS: ca-central-1.aws.api.temporal.io:7233
+      TEMPORAL_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+      TEMPORAL_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+      TEMPORAL_GRPC_META_TEMPORAL_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          submodules: recursive
+
+      - name: Setup Ruby and Rust
+        uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+          cargo-cache: true
+          working-directory: ./temporalio
+
+      - name: Install bundle
+        working-directory: ./temporalio
+        run: bundle install
+
+      - name: Compile Ruby bridge
+        working-directory: ./temporalio
+        run: bundle exec rake compile
+
+      - name: Test Ruby against Temporal Cloud
+        if: ${{ env.TEMPORAL_NAMESPACE != '' && env.TEMPORAL_API_KEY != '' }}
+        working-directory: ./temporalio
+        timeout-minutes: 20
+        run: bundle exec rake test TEST=test/worker_workflow_test.rb TESTOPTS="--name=/WorkerWorkflowTest#test_simple/"
+
+      - name: Report unavailable Cloud configuration
+        if: ${{ env.TEMPORAL_NAMESPACE == '' || env.TEMPORAL_API_KEY == '' }}
+        run: echo "Temporal Cloud test skipped because its namespace or API key is unavailable"

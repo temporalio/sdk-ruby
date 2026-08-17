@@ -30,6 +30,8 @@ class Test < Minitest::Test
 
     # Need manual instance method: https://github.com/ruby/rbs/issues/1498
     def self.instance: -> TestEnvironment
+    def self.env_config_server?: -> bool
+    def self.client_connect_options: -> [[String, String], Hash[Symbol, untyped]]?
 
     attr_reader server: Temporalio::Testing::WorkflowEnvironment
 
