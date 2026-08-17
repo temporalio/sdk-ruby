@@ -4,6 +4,8 @@ on:
     branches:
       - main
       - "releases/*"
+  workflow_dispatch: {}
+  workflow_call: {}
 
 permissions:
   contents: read

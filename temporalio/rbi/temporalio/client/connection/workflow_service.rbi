@@ -374,4 +374,7 @@ class Temporalio::Client::Connection::WorkflowService < ::Temporalio::Client::Co
 
   sig { params(request: Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::DeleteNexusOperationExecutionResponse) }
   def delete_nexus_operation_execution(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse) }
+  def poll_workflow_execution_time_skipping(request, rpc_options: T.unsafe(nil)); end
 end

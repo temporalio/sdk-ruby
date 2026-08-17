@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/converters/failure_converter'
+require 'temporalio/converters/payload_codec'
 require 'temporalio/converters/payload_converter'
 
 module Temporalio

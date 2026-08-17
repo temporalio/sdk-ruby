@@ -172,6 +172,121 @@ class Temporalio::Internal::Bridge::Api::Common::WorkerDeploymentVersion
   end
 end
 
+# Metrics for a set of external payload storage operations (all uploads and downloads)
+# performed while processing a task, so core can emit unified logging and metrics.
+class Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      payload_count: T.nilable(Integer),
+      total_size_bytes: T.nilable(Integer),
+      total_duration: T.nilable(Google::Protobuf::Duration),
+      driver_names: T.nilable(T::Array[String])
+    ).void
+  end
+  def initialize(
+    payload_count: 0,
+    total_size_bytes: 0,
+    total_duration: nil,
+    driver_names: []
+  )
+  end
+
+  # Number of payloads stored or retrieved externally.
+  sig { returns(Integer) }
+  def payload_count
+  end
+
+  # Number of payloads stored or retrieved externally.
+  sig { params(value: Integer).void }
+  def payload_count=(value)
+  end
+
+  # Number of payloads stored or retrieved externally.
+  sig { void }
+  def clear_payload_count
+  end
+
+  # Total size in bytes of the externally stored or retrieved payloads.
+  sig { returns(Integer) }
+  def total_size_bytes
+  end
+
+  # Total size in bytes of the externally stored or retrieved payloads.
+  sig { params(value: Integer).void }
+  def total_size_bytes=(value)
+  end
+
+  # Total size in bytes of the externally stored or retrieved payloads.
+  sig { void }
+  def clear_total_size_bytes
+  end
+
+  # Wall-clock time spent on the external storage operations.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def total_duration
+  end
+
+  # Wall-clock time spent on the external storage operations.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def total_duration=(value)
+  end
+
+  # Wall-clock time spent on the external storage operations.
+  sig { void }
+  def clear_total_duration
+  end
+
+  # Names of the drivers that participated in the operations.
+  sig { returns(T::Array[String]) }
+  def driver_names
+  end
+
+  # Names of the drivers that participated in the operations.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def driver_names=(value)
+  end
+
+  # Names of the drivers that participated in the operations.
+  sig { void }
+  def clear_driver_names
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Internal::Bridge::Api::Common::ExternalStorageMetrics, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 module Temporalio::Internal::Bridge::Api::Common::VersioningIntent
   self::UNSPECIFIED = T.let(0, Integer)
   self::COMPATIBLE = T.let(1, Integer)

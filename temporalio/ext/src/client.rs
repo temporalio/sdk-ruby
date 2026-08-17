@@ -128,69 +128,88 @@ impl Client {
         .maybe_api_key(options.member::<Option<String>>(id!("api_key"))?)
         .identity(options.member::<String>(id!("identity"))?)
         .maybe_tls_options(if let Some(tls) = tls {
-            Some(TlsOptions {
-                client_tls_options: match (
-                    tls.member::<Option<RString>>(id!("client_cert"))?,
-                    tls.member::<Option<RString>>(id!("client_private_key"))?,
-                ) {
-                    (None, None) => None,
-                    (Some(client_cert), Some(client_private_key)) => Some(ClientTlsOptions {
+            let client_tls_options = match (
+                tls.member::<Option<RString>>(id!("client_cert"))?,
+                tls.member::<Option<RString>>(id!("client_private_key"))?,
+            ) {
+                (None, None) => None,
+                (Some(client_cert), Some(client_private_key)) => Some(
+                    ClientTlsOptions::builder()
                         // These are unsafe because of lifetime issues, but we copy right away
-                        client_cert: unsafe { client_cert.as_slice().to_vec() },
-                        client_private_key: unsafe { client_private_key.as_slice().to_vec() },
-                    }),
-                    _ => {
-                        return Err(error!(
-                            "Must have both client cert and private key or neither"
-                        ));
-                    }
-                },
-                server_root_ca_cert: tls
-                    .member::<Option<RString>>(id!("server_root_ca_cert"))?
-                    .map(|rstr| unsafe { rstr.as_slice().to_vec() }),
-                domain: tls.member(id!("domain"))?,
-                server_cert_verifier: None,
-            })
+                        .client_cert(unsafe { client_cert.as_slice().to_vec() })
+                        .client_private_key(unsafe { client_private_key.as_slice().to_vec() })
+                        .build(),
+                ),
+                _ => {
+                    return Err(error!(
+                        "Must have both client cert and private key or neither"
+                    ));
+                }
+            };
+            let server_root_ca_cert = tls
+                .member::<Option<RString>>(id!("server_root_ca_cert"))?
+                .map(|rstr| unsafe { rstr.as_slice().to_vec() });
+            Some(
+                TlsOptions::builder()
+                    .maybe_client_tls_options(client_tls_options)
+                    .maybe_server_root_ca_cert(server_root_ca_cert)
+                    .maybe_domain(tls.member::<Option<String>>(id!("domain"))?)
+                    .build(),
+            )
         } else {
             None
         })
-        .retry_options(RetryOptions {
-            initial_interval: Duration::from_secs_f64(rpc_retry.member(id!("initial_interval"))?),
-            randomization_factor: rpc_retry.member(id!("randomization_factor"))?,
-            multiplier: rpc_retry.member(id!("multiplier"))?,
-            max_interval: Duration::from_secs_f64(rpc_retry.member(id!("max_interval"))?),
-            max_elapsed_time: match rpc_retry.member::<f64>(id!("max_elapsed_time"))? {
-                // 0 means none
-                0.0 => None,
-                val => Some(Duration::from_secs_f64(val)),
-            },
-            max_retries: rpc_retry.member(id!("max_retries"))?,
-        })
+        .retry_options(
+            RetryOptions::builder()
+                .initial_interval(Duration::from_secs_f64(
+                    rpc_retry.member(id!("initial_interval"))?,
+                ))
+                .randomization_factor(rpc_retry.member(id!("randomization_factor"))?)
+                .multiplier(rpc_retry.member(id!("multiplier"))?)
+                .max_interval(Duration::from_secs_f64(
+                    rpc_retry.member(id!("max_interval"))?,
+                ))
+                .max_elapsed_time({
+                    let v = rpc_retry.member::<f64>(id!("max_elapsed_time"))?;
+                    // 0 means none
+                    if v == 0.0 {
+                        None
+                    } else {
+                        Some(Duration::from_secs_f64(v))
+                    }
+                })
+                .max_retries(rpc_retry.member::<usize>(id!("max_retries"))?)
+                .build(),
+        )
         .keep_alive(
             if let Some(keep_alive) = options.child(id!("keep_alive"))? {
-                Some(ClientKeepAliveOptions {
-                    interval: Duration::from_secs_f64(keep_alive.member(id!("interval"))?),
-                    timeout: Duration::from_secs_f64(keep_alive.member(id!("timeout"))?),
-                })
+                Some(
+                    ClientKeepAliveOptions::builder()
+                        .interval(Duration::from_secs_f64(keep_alive.member(id!("interval"))?))
+                        .timeout(Duration::from_secs_f64(keep_alive.member(id!("timeout"))?))
+                        .build(),
+                )
             } else {
                 None
             },
         )
         .maybe_http_connect_proxy(
             if let Some(proxy) = options.child(id!("http_connect_proxy"))? {
-                Some(HttpConnectProxyOptions {
-                    target_addr: proxy.member(id!("target_host"))?,
-                    basic_auth: match (
-                        proxy.member::<Option<String>>(id!("basic_auth_user"))?,
-                        proxy.member::<Option<String>>(id!("basic_auth_pass"))?,
-                    ) {
-                        (None, None) => None,
-                        (Some(user), Some(pass)) => Some((user, pass)),
-                        _ => {
-                            return Err(error!("Must have both basic auth and pass or neither"));
-                        }
-                    },
-                })
+                let basic_auth = match (
+                    proxy.member::<Option<String>>(id!("basic_auth_user"))?,
+                    proxy.member::<Option<String>>(id!("basic_auth_pass"))?,
+                ) {
+                    (None, None) => None,
+                    (Some(user), Some(pass)) => Some((user, pass)),
+                    _ => {
+                        return Err(error!("Must have both basic auth and pass or neither"));
+                    }
+                };
+                Some(
+                    HttpConnectProxyOptions::new(proxy.member::<String>(id!("target_host"))?)
+                        .maybe_basic_auth(basic_auth)
+                        .build(),
+                )
             } else {
                 None
             },
@@ -208,10 +227,12 @@ impl Client {
         })
         // The connection layer always supplies concrete thresholds (512 KiB / 2 KiB by default);
         // `0` disables that warning.
-        .payload_limits(PayloadLimitsOptions {
-            payloads_warn_size: options.member::<u64>(id!("payloads_warn_size"))?,
-            memo_warn_size: options.member::<u64>(id!("memo_warn_size"))?,
-        })
+        .payload_limits(
+            PayloadLimitsOptions::builder()
+                .payloads_warn_size(options.member::<u64>(id!("payloads_warn_size"))?)
+                .memo_warn_size(options.member::<u64>(id!("memo_warn_size"))?)
+                .build(),
+        )
         .maybe_metrics_meter(metrics_meter)
         .build();
 
