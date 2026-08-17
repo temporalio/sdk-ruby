@@ -141,6 +141,55 @@ module Temporalio
           @data_converter.from_payloads(@raw_info.heartbeat_details, hints:)
         end
 
+        # Whether the activity's input is present. False unless {ActivityHandle#describe} was
+        # called with `include_input:`.
+        #
+        # @return [Boolean] Whether input is present.
+        def has_input? # rubocop:disable Naming/PredicatePrefix
+          !@raw_description.input.nil?
+        end
+
+        # Deserialized activity input, one element per argument. Empty when no input is present.
+        #
+        # @param hints [Array<Object>, nil] Hints, if any, to assist conversion.
+        # @return [Array<Object>] Converted arguments.
+        def input(hints: nil)
+          @data_converter.from_payloads(@raw_description.input, hints:)
+        end
+
+        # Whether the activity closed with a successful result. False while the activity is still
+        # running, when it closed with a failure, and when {ActivityHandle#describe} was called
+        # without `include_outcome:`.
+        #
+        # @return [Boolean] Whether a result is present.
+        def has_result? # rubocop:disable Naming/PredicatePrefix
+          @raw_description.outcome&.value == :result
+        end
+
+        # Deserialized result the activity closed with. Nil when no result is present (still
+        # running, closed with a failure, or `include_outcome:` was not requested).
+        #
+        # @param hint [Object, nil] Hint, if any, to assist conversion.
+        # @return [Object, nil] Converted result.
+        def result(hint: nil)
+          return nil unless has_result?
+
+          @data_converter.from_payloads(@raw_description.outcome.result, hints: Array(hint)).first
+        end
+
+        # Failure the activity closed with. Nil when the activity did not close with a failure or
+        # when {ActivityHandle#describe} was called without `include_outcome:`.
+        #
+        # This is the terminal outcome; {#last_failure} is the failure of the most recent attempt,
+        # which may be set while the activity is still retrying.
+        #
+        # @return [Error::Failure, nil] Converted failure.
+        def failure
+          return nil unless @raw_description.outcome&.value == :failure
+
+          @data_converter.from_failure(@raw_description.outcome.failure)
+        end
+
         # @return [RetryPolicy] Retry policy in effect for this activity.
         def retry_policy
           RetryPolicy._from_proto(@raw_info.retry_policy)

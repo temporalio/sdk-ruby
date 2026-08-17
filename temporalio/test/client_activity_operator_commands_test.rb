@@ -38,6 +38,22 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  # Takes an argument and returns a value derived from it, so a completed execution has both an
+  # input and a successful outcome to read back off describe.
+  class EchoActivity < Temporalio::Activity::Definition
+    def execute(word)
+      "#{word}-echoed"
+    end
+  end
+
+  # Always fails. Paired with a single-attempt retry policy so the activity reaches a terminal
+  # failure outcome rather than retrying.
+  class AlwaysFailActivity < Temporalio::Activity::Definition
+    def execute
+      raise Temporalio::Error::ApplicationError, 'deliberate failure'
+    end
+  end
+
   # Records heartbeat details on attempt 1, then blocks waiting for cancellation. The heartbeat
   # runs on its own — not adjacent to any completion RPC — so the details reliably persist and are
   # observable via describe. Later attempts (after a reset or an unpause that spawns a new attempt)
@@ -391,6 +407,51 @@ class ClientActivityOperatorCommandsTest < Test
       assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       assert_equal ['hb-details'], handle.describe(include_heartbeat_details: true).heartbeat_details
       handle.terminate('cleanup')
+    end
+  end
+
+  # Input and outcome are opt-in like the other payload fields, and the outcome is a
+  # result-or-failure oneof. A successful activity populates the result arm only.
+  def test_describe_input_and_result_are_opt_in
+    with_activity_worker([EchoActivity]) do |task_queue|
+      handle = env.client.start_activity(
+        EchoActivity, 'ping',
+        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 60
+      )
+      assert_equal 'ping-echoed', handle.result
+
+      desc = handle.describe
+      refute desc.has_input?
+      assert_empty desc.input
+      refute desc.has_result?
+      assert_nil desc.result
+
+      desc = handle.describe(include_input: true, include_outcome: true)
+      assert desc.has_input?
+      assert_equal ['ping'], desc.input
+      assert desc.has_result?
+      assert_equal 'ping-echoed', desc.result
+      # A successful outcome has no failure arm.
+      assert_nil desc.failure
+    end
+  end
+
+  # The other arm of the oneof: a terminally failed activity has a failure and no result.
+  def test_describe_outcome_failure
+    with_activity_worker([AlwaysFailActivity]) do |task_queue|
+      handle = env.client.start_activity(
+        AlwaysFailActivity,
+        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 60,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+      assert_raises(Temporalio::Error::ActivityFailedError) { handle.result }
+
+      desc = handle.describe(include_outcome: true)
+      refute desc.has_result?
+      assert_nil desc.result
+      failure = desc.failure
+      assert_instance_of Temporalio::Error::ApplicationError, failure
+      assert_equal 'deliberate failure', failure&.message
     end
   end
 

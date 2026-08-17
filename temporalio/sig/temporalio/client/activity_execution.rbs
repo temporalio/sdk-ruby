@@ -29,6 +29,11 @@ module Temporalio
         def start_delay: -> Float?
         def has_heartbeat_details?: -> bool
         def has_last_failure?: -> bool
+        def has_input?: -> bool
+        def input: (?hints: Array[Object]?) -> Array[Object?]
+        def has_result?: -> bool
+        def result: (?hint: Object?) -> Object?
+        def failure: -> Error::Failure?
         def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
         def retry_policy: -> RetryPolicy
         def last_heartbeat_time: -> Time?

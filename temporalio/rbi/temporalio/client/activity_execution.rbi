@@ -85,6 +85,21 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   sig { returns(T::Boolean) }
   def has_last_failure?; end
 
+  sig { returns(T::Boolean) }
+  def has_input?; end
+
+  sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
+  def input(hints: T.unsafe(nil)); end
+
+  sig { returns(T::Boolean) }
+  def has_result?; end
+
+  sig { params(hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  def result(hint: T.unsafe(nil)); end
+
+  sig { returns(T.nilable(Temporalio::Error::Failure)) }
+  def failure; end
+
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: T.unsafe(nil)); end
 
