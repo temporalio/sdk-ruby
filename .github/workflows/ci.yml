@@ -189,6 +189,10 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Read protoc version
+        shell: bash
+        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
+
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
         with:
@@ -196,6 +200,12 @@ jobs:
           bundler-cache: true
           cargo-cache: true
           working-directory: ./temporalio
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
+        with:
+          version: ${{ env.PROTOC_VERSION }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install bundle
         working-directory: ./temporalio
