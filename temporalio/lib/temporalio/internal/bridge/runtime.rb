@@ -18,6 +18,7 @@ module Temporalio
 
         LoggingOptions = Struct.new(
           :log_filter,
+          :log_format,
           :forward_to # Optional
         )
 
