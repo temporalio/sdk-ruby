@@ -14,12 +14,22 @@ module Temporalio
 
     class LoggingOptions
       attr_reader log_filter: LoggingFilterOptions | String
+      attr_reader log_format: ConsoleLogFormat::enum?
 
       def initialize: (
-        ?log_filter: LoggingFilterOptions | String
+        ?log_filter: LoggingFilterOptions | String,
+        ?log_format: ConsoleLogFormat::enum?
       ) -> void
 
       def _to_bridge: -> Internal::Bridge::Runtime::LoggingOptions
+    end
+
+    module ConsoleLogFormat
+      COMPACT: :compact
+      PRETTY: :pretty
+      JSON: :json
+
+      type enum = :compact | :pretty | :json
     end
 
     type logging_filter_level = 'TRACE' | 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'

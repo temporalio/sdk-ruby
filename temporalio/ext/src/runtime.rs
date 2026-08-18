@@ -15,8 +15,8 @@ use temporalio_common::protos::temporal::api::worker::v1::environment_info::{
 };
 use temporalio_common::telemetry::metrics::core::MetricCallBufferer;
 use temporalio_common::telemetry::{
-    HistogramBucketOverrides, Logger, MetricTemporality, OtelCollectorOptions, OtlpProtocol,
-    PrometheusExporterOptions, TelemetryOptions, build_otlp_metric_exporter,
+    HistogramBucketOverrides, Logger, LoggerFormat, MetricTemporality, OtelCollectorOptions,
+    OtlpProtocol, PrometheusExporterOptions, TelemetryOptions, build_otlp_metric_exporter,
     start_prometheus_metric_exporter,
 };
 use temporalio_sdk_core::telemetry::MetricsCallBuffer;
@@ -94,6 +94,15 @@ impl Runtime {
                 } else {
                     Some(Logger::Console {
                         filter: logging.member(id!("log_filter"))?,
+                        format: logging
+                            .member::<Option<String>>(id!("log_format"))?
+                            .map(|format| match format.as_str() {
+                                "compact" => Ok(LoggerFormat::Compact),
+                                "pretty" => Ok(LoggerFormat::Pretty),
+                                "json" => Ok(LoggerFormat::Json),
+                                _ => Err(error!("Unrecognized console log format")),
+                            })
+                            .transpose()?,
                     })
                 }
             }

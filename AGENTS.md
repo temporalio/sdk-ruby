@@ -43,8 +43,10 @@ TEMPORAL_SORBET_RUNTIME_CHECK=1 bundle exec rake test TESTOPTS="--name=test_some
 ```
 
 - Run `bundle exec rake rbs:install_collection` if Steep lacks its RBS collection.
-- Tests start a local Temporal dev server by default. To use an existing server, set
-  `TEMPORAL_TEST_CLIENT_TARGET_HOST` and optionally `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE`.
+- Tests start a local Temporal dev server by default. To use an envconfig client, set
+  `TEMPORAL_TEST_ENV_CONFIG_SERVER=1` and configure the standard `TEMPORAL_*` variables or a
+  `TEMPORAL_CONFIG_FILE`/`TEMPORAL_PROFILE`. The legacy `TEMPORAL_TEST_CLIENT_TARGET_HOST` and
+  optional `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE` path remains supported.
 - Proto generation requires `protoc >= 34.0` and `protoc-gen-rbi`. From `temporalio/`, install the
   RBI plugin with `go install github.com/coinbase/protoc-gen-rbi@$(cat ../.protoc-gen-rbi-version)`,
   or set `PROTOC_GEN_RBI` to an executable path.
