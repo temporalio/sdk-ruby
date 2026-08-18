@@ -231,7 +231,7 @@ jobs:
       - name: Create Cloud namespace
         id: create-cloud-namespace
         working-directory: ./temporalio
-        run: bundle exec ruby ../.github/scripts/cloud_namespace.rb create
+        run: bundle exec ruby extra/cloud_namespace.rb create
         env:
           TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
 
@@ -248,7 +248,7 @@ jobs:
         if: ${{ always() && steps.create-cloud-namespace.outputs.namespace != '' }}
         continue-on-error: true
         working-directory: ./temporalio
-        run: bundle exec ruby ../.github/scripts/cloud_namespace.rb delete "${{ steps.create-cloud-namespace.outputs.namespace }}"
+        run: bundle exec ruby extra/cloud_namespace.rb delete "${{ steps.create-cloud-namespace.outputs.namespace }}"
         env:
           TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
 

@@ -14,29 +14,21 @@ module CloudNamespace
 
   class << self
     # Keep command dispatch separate so the lifecycle can run inside the repository's Ruby bundle.
-    def run(args, env: ENV)
-      service = cloud_service(env)
+    def run(args)
       case args
       in ['create']
-        File.open(required_env(env, 'GITHUB_OUTPUT'), 'a') do |output|
-          create(service:, env:, output:)
-        end
+        create
       in ['delete', namespace]
-        delete(service:, namespace:)
+        delete(namespace)
       else
         raise ArgumentError, 'Usage: cloud_namespace.rb create|delete <namespace>'
       end
     end
 
     # Emit the namespace before polling so cleanup can run if provisioning later fails.
-    def create(
-      service:,
-      env:,
-      output:,
-      monotonic: -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) },
-      sleeper: ->(duration) { Kernel.sleep(duration) }
-    )
-      namespace_name = "sdk-ruby-ci-#{required_env(env, 'GITHUB_RUN_ID')}-#{required_env(env, 'GITHUB_RUN_ATTEMPT')}"
+    def create
+      service = cloud_service
+      namespace_name = "sdk-ruby-ci-#{required_env('GITHUB_RUN_ID')}-#{required_env('GITHUB_RUN_ATTEMPT')}"
       result = service.create_namespace(
         Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest.new(
           spec: Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec.new(
@@ -44,7 +36,7 @@ module CloudNamespace
             replicas: [Temporalio::Api::Cloud::Namespace::V1::ReplicaSpec.new(region: CLOUD_REGION)],
             retention_days: 1,
             mtls_auth: Temporalio::Api::Cloud::Namespace::V1::MtlsAuthSpec.new(
-              accepted_client_ca: File.binread(required_env(env, 'TEMPORAL_CLOUD_CLIENT_CA_PATH')),
+              accepted_client_ca: File.binread(required_env('TEMPORAL_CLOUD_CLIENT_CA_PATH')),
               enabled: true
             )
           ),
@@ -54,18 +46,13 @@ module CloudNamespace
       namespace = result.namespace
       raise 'Create namespace response did not include a namespace' if namespace.nil? || namespace.empty?
 
-      output.puts("namespace=#{namespace}")
-      output.flush
-      wait_for_operation(service, result.async_operation, monotonic:, sleeper:)
+      File.open(required_env('GITHUB_OUTPUT'), 'a') { |output| output.puts("namespace=#{namespace}") }
+      wait_for_operation(service, result.async_operation)
     end
 
     # Read the current resource version because Cloud uses optimistic concurrency for deletion.
-    def delete(
-      service:,
-      namespace:,
-      monotonic: -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) },
-      sleeper: ->(duration) { Kernel.sleep(duration) }
-    )
+    def delete(namespace)
+      service = cloud_service
       existing = service.get_namespace(
         Temporalio::Api::Cloud::CloudService::V1::GetNamespaceRequest.new(namespace:)
       ).namespace
@@ -81,20 +68,15 @@ module CloudNamespace
           async_operation_id: SecureRandom.uuid
         )
       )
-      wait_for_operation(service, result.async_operation, monotonic:, sleeper:)
+      wait_for_operation(service, result.async_operation)
     end
 
     # Honor server polling guidance while bounding the overall asynchronous operation.
-    def wait_for_operation(
-      service,
-      operation,
-      monotonic: -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) },
-      sleeper: ->(duration) { Kernel.sleep(duration) }
-    )
+    def wait_for_operation(service, operation)
       operation_id = operation&.id
       raise 'Cloud operation response did not include an ID' if operation_id.nil? || operation_id.empty?
 
-      deadline = monotonic.call + OPERATION_TIMEOUT_SECONDS
+      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + OPERATION_TIMEOUT_SECONDS
       loop do
         operation = service.get_async_operation(
           Temporalio::Api::Cloud::CloudService::V1::GetAsyncOperationRequest.new(
@@ -109,29 +91,30 @@ module CloudNamespace
           raise "Cloud operation #{operation_id} #{state}: #{operation.failure_reason}"
         end
 
-        remaining = deadline - monotonic.call
+        remaining = deadline - Process.clock_gettime(Process::CLOCK_MONOTONIC)
         raise Timeout::Error, "Timed out waiting for Cloud operation #{operation_id}" if remaining <= 0
 
         duration = operation.check_duration
         delay = duration ? duration.seconds + (duration.nanos / 1_000_000_000.0) : 10
-        sleeper.call([delay, 1].max.clamp(0, remaining))
+        minimum_delay = [1, remaining].min
+        Kernel.sleep(delay.clamp(minimum_delay, remaining))
       end
     end
 
     private
 
-    def cloud_service(env)
+    def cloud_service
       Temporalio::Client::Connection.new(
         target_host: CLOUD_API_TARGET,
-        api_key: required_env(env, 'TEMPORAL_CLIENT_CLOUD_API_KEY'),
+        api_key: required_env('TEMPORAL_CLIENT_CLOUD_API_KEY'),
         rpc_metadata: {
-          'temporal-cloud-api-version' => required_env(env, 'TEMPORAL_CLIENT_CLOUD_API_VERSION')
+          'temporal-cloud-api-version' => required_env('TEMPORAL_CLIENT_CLOUD_API_VERSION')
         }
       ).cloud_service
     end
 
-    def required_env(env, name)
-      value = env.fetch(name, '')
+    def required_env(name)
+      value = ENV.fetch(name, '')
       return value unless value.empty?
 
       raise "Missing required environment variable #{name}"
