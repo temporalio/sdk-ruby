@@ -1,6 +1,14 @@
 # typed: true
 
 class Temporalio::Client::ActivityExecutionOptions
+  class << self
+    sig do
+      params(options: Temporalio::Api::Activity::V1::ActivityOptions)
+        .returns(Temporalio::Client::ActivityExecutionOptions)
+    end
+    def _from_proto(options); end
+  end
+
   sig do
     params(
       task_queue: T.nilable(String),

@@ -1,7 +1,7 @@
 module Temporalio
   class Client
     class ActivityHandle
-      UNSET: Object
+      UPDATABLE_OPTION_PATHS: Hash[Symbol, String]
 
       attr_reader id: String
       attr_reader run_id: String?
@@ -45,16 +45,9 @@ module Temporalio
       ) -> void
 
       def update_options: (
-        ?task_queue: (String | Symbol)?,
-        ?schedule_to_close_timeout: Float?,
-        ?schedule_to_start_timeout: Float?,
-        ?start_to_close_timeout: Float?,
-        ?heartbeat_timeout: Float?,
-        ?retry_policy: RetryPolicy?,
-        ?priority: Priority?,
-        ?start_delay: Float?,
         ?restore_original: bool,
-        ?rpc_options: RPCOptions?
+        ?rpc_options: RPCOptions?,
+        **untyped options
       ) -> ActivityExecutionOptions
 
       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?

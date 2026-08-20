@@ -861,6 +861,121 @@ class Temporalio::Client::Interceptor::DescribeActivityInput < ::Data
   end
 end
 
+class Temporalio::Client::Interceptor::PauseActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(String)) }
+  def reason; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::PauseActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::PauseActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+class Temporalio::Client::Interceptor::UnpauseActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T.nilable(String)) }
+  def reason; end
+
+  sig { returns(T.nilable(Float)) }
+  def jitter; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::UnpauseActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::UnpauseActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+class Temporalio::Client::Interceptor::ResetActivityInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(T::Boolean) }
+  def keep_paused; end
+
+  sig { returns(T.nilable(Float)) }
+  def jitter; end
+
+  sig { returns(T::Boolean) }
+  def restore_original_options; end
+
+  sig { returns(T::Boolean) }
+  def reset_heartbeat; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::ResetActivityInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::ResetActivityInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+class Temporalio::Client::Interceptor::UpdateActivityOptionsInput < ::Data
+  sig { returns(String) }
+  def activity_id; end
+
+  sig { returns(T.nilable(String)) }
+  def activity_run_id; end
+
+  sig { returns(Temporalio::Api::Activity::V1::ActivityOptions) }
+  def activity_options; end
+
+  sig { returns(Google::Protobuf::FieldMask) }
+  def update_mask; end
+
+  sig { returns(T::Boolean) }
+  def restore_original; end
+
+  sig { returns(T.nilable(Temporalio::Client::RPCOptions)) }
+  def rpc_options; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::UpdateActivityOptionsInput) }
+    def new(*args); end
+
+    sig { params(args: T.untyped).returns(Temporalio::Client::Interceptor::UpdateActivityOptionsInput) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+  end
+end
+
 class Temporalio::Client::Interceptor::CancelActivityInput < ::Data
   sig { returns(String) }
   def activity_id; end
@@ -1067,6 +1182,21 @@ class Temporalio::Client::Interceptor::Outbound
 
   sig { params(input: Temporalio::Client::Interceptor::TerminateActivityInput).void }
   def terminate_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::PauseActivityInput).void }
+  def pause_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::UnpauseActivityInput).void }
+  def unpause_activity(input); end
+
+  sig { params(input: Temporalio::Client::Interceptor::ResetActivityInput).void }
+  def reset_activity(input); end
+
+  sig do
+    params(input: Temporalio::Client::Interceptor::UpdateActivityOptionsInput)
+      .returns(Temporalio::Client::ActivityExecutionOptions)
+  end
+  def update_activity_options(input); end
 
   sig { params(input: Temporalio::Client::Interceptor::ListActivitiesInput).returns(T::Enumerator[Temporalio::Client::ActivityExecution]) }
   def list_activities(input); end

@@ -34,6 +34,9 @@ class Temporalio::Client::ActivityExecution
   def schedule_time; end
 
   sig { returns(T.nilable(Time)) }
+  def execution_time; end
+
+  sig { returns(T.nilable(Time)) }
   def close_time; end
 
   sig { returns(Integer) }

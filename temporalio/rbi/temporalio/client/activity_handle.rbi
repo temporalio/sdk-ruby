@@ -1,6 +1,8 @@
 # typed: true
 
 class Temporalio::Client::ActivityHandle
+  UPDATABLE_OPTION_PATHS = T.let(T.unsafe(nil), T::Hash[Symbol, String])
+
   sig do
     params(
       client: Temporalio::Client,
@@ -50,6 +52,48 @@ class Temporalio::Client::ActivityHandle
 
   sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def terminate(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
+  def pause(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
+      reason: T.nilable(String),
+      jitter: T.nilable(Float),
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).void
+  end
+  def unpause(reason: T.unsafe(nil), jitter: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
+      keep_paused: T::Boolean,
+      jitter: T.nilable(Float),
+      restore_original_options: T::Boolean,
+      reset_heartbeat: T::Boolean,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).void
+  end
+  def reset(
+    keep_paused: T.unsafe(nil),
+    jitter: T.unsafe(nil),
+    restore_original_options: T.unsafe(nil),
+    reset_heartbeat: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  ); end
+
+  sig do
+    params(
+      restore_original: T::Boolean,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions),
+      options: T.untyped
+    ).returns(Temporalio::Client::ActivityExecutionOptions)
+  end
+  def update_options(
+    restore_original: T.unsafe(nil),
+    rpc_options: T.unsafe(nil),
+    **options
+  ); end
 
   private
 

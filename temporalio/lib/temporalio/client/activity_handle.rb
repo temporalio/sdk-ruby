@@ -16,8 +16,16 @@ module Temporalio
     #
     # WARNING: Standalone Activities are experimental.
     class ActivityHandle
-      UNSET = Object.new
-      private_constant :UNSET
+      UPDATABLE_OPTION_PATHS = {
+        task_queue: 'task_queue.name',
+        schedule_to_close_timeout: 'schedule_to_close_timeout',
+        schedule_to_start_timeout: 'schedule_to_start_timeout',
+        start_to_close_timeout: 'start_to_close_timeout',
+        heartbeat_timeout: 'heartbeat_timeout',
+        retry_policy: 'retry_policy',
+        priority: 'priority',
+        start_delay: 'start_delay'
+      }.freeze
 
       # @return [String] ID for the activity.
       attr_reader :id
@@ -201,88 +209,65 @@ module Temporalio
         nil
       end
 
-      # Update the activity's options. Only the options explicitly provided are changed; any option
-      # left as its default is not included in the update.
+      # Update the activity's options. Only the options you actually pass are changed; anything you
+      # omit is left as-is. Passing an option explicitly as `nil` clears it.
       #
       # WARNING: Standalone Activities are experimental.
       #
-      # @param task_queue [String, nil] New task queue.
-      # @param schedule_to_close_timeout [Float, nil] New schedule-to-close timeout in seconds.
-      # @param schedule_to_start_timeout [Float, nil] New schedule-to-start timeout in seconds.
-      # @param start_to_close_timeout [Float, nil] New start-to-close timeout in seconds.
-      # @param heartbeat_timeout [Float, nil] New heartbeat timeout in seconds.
-      # @param retry_policy [RetryPolicy, nil] New retry policy.
-      # @param priority [Priority, nil] New priority.
-      # @param start_delay [Float, nil] New start delay in seconds.
       # @param restore_original [Boolean] If true, restore the options to the originals the activity
       #   was created with. Mutually exclusive with any other option.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+      # @param options [Hash{Symbol => Object, nil}] The options to change. Keys must be drawn from
+      #   {UPDATABLE_OPTION_PATHS}; anything else raises `ArgumentError`.
+      # @option options [String, Symbol, nil] :task_queue New task queue.
+      # @option options [Float, nil] :schedule_to_close_timeout New schedule-to-close timeout in seconds.
+      # @option options [Float, nil] :schedule_to_start_timeout New schedule-to-start timeout in seconds.
+      # @option options [Float, nil] :start_to_close_timeout New start-to-close timeout in seconds.
+      # @option options [Float, nil] :heartbeat_timeout New heartbeat timeout in seconds.
+      # @option options [RetryPolicy, nil] :retry_policy New retry policy.
+      # @option options [Priority, nil] :priority New priority.
+      # @option options [Float, nil] :start_delay New start delay in seconds.
       #
       # @return [ActivityExecutionOptions] The activity options after the update.
       #
-      # @raise [ArgumentError] If `restore_original` is combined with any other option, or if no
-      #   option is provided and `restore_original` is false.
+      # @raise [ArgumentError] If an unknown option is given, if `restore_original` is combined with
+      #   any other option, or if no option is provided and `restore_original` is false.
       # @raise [Error::RPCError] RPC error from call.
-      def update_options(
-        task_queue: UNSET,
-        schedule_to_close_timeout: UNSET,
-        schedule_to_start_timeout: UNSET,
-        start_to_close_timeout: UNSET,
-        heartbeat_timeout: UNSET,
-        retry_policy: UNSET,
-        priority: UNSET,
-        start_delay: UNSET,
-        restore_original: false,
-        rpc_options: nil
-      )
-        options = Api::Activity::V1::ActivityOptions.new
-        paths = []
-
-        unless UNSET.equal?(task_queue)
-          paths << 'task_queue.name'
-          options.task_queue = Api::TaskQueue::V1::TaskQueue.new(name: task_queue.to_s) if task_queue
-        end
-        unless UNSET.equal?(schedule_to_close_timeout)
-          paths << 'schedule_to_close_timeout'
-          options.schedule_to_close_timeout = Internal::ProtoUtils.seconds_to_duration(schedule_to_close_timeout)
-        end
-        unless UNSET.equal?(schedule_to_start_timeout)
-          paths << 'schedule_to_start_timeout'
-          options.schedule_to_start_timeout = Internal::ProtoUtils.seconds_to_duration(schedule_to_start_timeout)
-        end
-        unless UNSET.equal?(start_to_close_timeout)
-          paths << 'start_to_close_timeout'
-          options.start_to_close_timeout = Internal::ProtoUtils.seconds_to_duration(start_to_close_timeout)
-        end
-        unless UNSET.equal?(heartbeat_timeout)
-          paths << 'heartbeat_timeout'
-          options.heartbeat_timeout = Internal::ProtoUtils.seconds_to_duration(heartbeat_timeout)
-        end
-        unless UNSET.equal?(retry_policy)
-          paths << 'retry_policy'
-          options.retry_policy = retry_policy&._to_proto
-        end
-        unless UNSET.equal?(priority)
-          paths << 'priority'
-          options.priority = priority&._to_proto
-        end
-        unless UNSET.equal?(start_delay)
-          paths << 'start_delay'
-          options.start_delay = Internal::ProtoUtils.seconds_to_duration(start_delay)
+      def update_options(restore_original: false, rpc_options: nil, **options)
+        unknown = options.keys - UPDATABLE_OPTION_PATHS.keys
+        unless unknown.empty?
+          raise ArgumentError,
+                "Unknown option(s): #{unknown.join(', ')}. " \
+                "Expected any of: #{UPDATABLE_OPTION_PATHS.keys.join(', ')}"
         end
 
-        if restore_original && !paths.empty?
+        if restore_original && !options.empty?
           raise ArgumentError, 'restore_original cannot be combined with any other option'
-        elsif !restore_original && paths.empty?
+        elsif !restore_original && options.empty?
           raise ArgumentError, 'At least one option must be set, or restore_original must be used'
         end
+
+        proto = Api::Activity::V1::ActivityOptions.new
+        if options.key?(:task_queue) && (task_queue = options[:task_queue])
+          proto.task_queue = Api::TaskQueue::V1::TaskQueue.new(name: task_queue.to_s)
+        end
+        %i[schedule_to_close_timeout schedule_to_start_timeout start_to_close_timeout
+           heartbeat_timeout start_delay].each do |name|
+          next unless options.key?(name)
+
+          proto[name.to_s] = Internal::ProtoUtils.seconds_to_duration(options[name])
+        end
+        proto.retry_policy = options[:retry_policy]&._to_proto if options.key?(:retry_policy)
+        proto.priority = options[:priority]&._to_proto if options.key?(:priority)
 
         @client._impl.update_activity_options(
           Interceptor::UpdateActivityOptionsInput.new(
             activity_id: id,
             activity_run_id: run_id,
-            activity_options: options,
-            update_mask: Google::Protobuf::FieldMask.new(paths:),
+            activity_options: proto,
+            update_mask: Google::Protobuf::FieldMask.new(
+              paths: options.keys.map { |k| UPDATABLE_OPTION_PATHS.fetch(k) }
+            ),
             restore_original:,
             rpc_options:
           )
