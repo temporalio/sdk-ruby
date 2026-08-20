@@ -277,7 +277,7 @@ module Temporalio
           raise ArgumentError, 'At least one option must be set, or restore_original must be used'
         end
 
-        result = @client._impl.update_activity_options(
+        @client._impl.update_activity_options(
           Interceptor::UpdateActivityOptionsInput.new(
             activity_id: id,
             activity_run_id: run_id,
@@ -287,7 +287,6 @@ module Temporalio
             rpc_options:
           )
         )
-        ActivityExecutionOptions._from_proto(result)
       end
 
       private
