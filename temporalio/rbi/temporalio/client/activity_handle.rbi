@@ -86,7 +86,9 @@ class Temporalio::Client::ActivityHandle
     params(
       restore_original: T::Boolean,
       rpc_options: T.nilable(Temporalio::Client::RPCOptions),
-      options: T.untyped
+      options: T.nilable(
+        T.any(String, Symbol, Integer, Float, Temporalio::RetryPolicy, Temporalio::Priority)
+      )
     ).returns(Temporalio::Client::ActivityExecutionOptions)
   end
   def update_options(
