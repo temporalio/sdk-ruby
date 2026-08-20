@@ -45,25 +45,21 @@ class ClientActivityOperatorCommandsBuildTest < Test
       ws.singleton_class.send(:remove_method, :update_activity_execution_options)
     end
 
-    # pause carries the reason and an auto-generated dedup request_id; neither is returned by describe.
     pause_req = captured.fetch(:pause)
     assert_equal 'because', pause_req.reason
     refute_empty pause_req.request_id
 
-    # unpause carries the reason, jitter, and an auto-generated dedup request_id (api#844).
     unpause_req = captured.fetch(:unpause)
     assert_equal 'go', unpause_req.reason
     assert_equal 5, unpause_req.jitter.seconds
     assert_equal 0, unpause_req.jitter.nanos
     refute_empty unpause_req.request_id
 
-    # reset carries jitter and an auto-generated dedup request_id (api#844).
     reset_req = captured.fetch(:reset)
     assert_equal 2, reset_req.jitter.seconds
     assert_equal 0, reset_req.jitter.nanos
     refute_empty reset_req.request_id
 
-    # update_options carries an auto-generated dedup request_id (api#844).
     update_req = captured.fetch(:update)
     refute_empty update_req.request_id
   end

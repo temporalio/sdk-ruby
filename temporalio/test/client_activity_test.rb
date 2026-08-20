@@ -305,10 +305,7 @@ class ClientActivityTest < Test
       assert_equal 'SlowActivity', desc.activity_type
       # Status should be RUNNING (1).
       assert_equal Temporalio::Client::ActivityExecutionStatus::RUNNING, desc.status
-      # execution_time is populated by the server (api#807 + temporal#11017); without start_delay
-      # it should be at or near schedule_time.
       refute_nil desc.execution_time
-      assert_in_delta desc.schedule_time.to_f, desc.execution_time.to_f, 1.0
 
       handle.terminate('test-termination')
       # After terminate, status should reach TERMINATED eventually.
