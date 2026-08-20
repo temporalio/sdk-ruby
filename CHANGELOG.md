@@ -21,6 +21,11 @@ to docs, or any other relevant information.
 
 ### Added
 
+#### Standalone Activity operator commands
+
+- `Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
+  `#unpause`, `#reset`, and `#update_options`.
+
 ### Changed
 
 ### Deprecated
@@ -179,14 +184,6 @@ accepts a standalone-form `ActivityIDReference` (constructed via `ActivityIDRefe
 async completion.
 
 See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
-
-#### Standalone Activity operator commands
-
-`Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
-`#unpause`, `#reset`, and `#update_options`. `#pause` and `#unpause` hold and resume the activity.
-`#reset` rewinds the activity to its first attempt. `#update_options` partially updates the
-activity's options — `task_queue`, the timeouts, `retry_policy`, and `priority` — or restores
-the originals (`restore_original:`).  Currently experimental.
 
 ### Fixed
 
