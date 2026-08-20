@@ -475,6 +475,35 @@ class WorkerActivityTest < Test
     end
   end
 
+  class FiberShieldingActivity < ShieldingActivity
+    activity_executor :fiber # steep:ignore
+  end
+
+  def test_activity_shielding_fiber
+    skip_if_fibers_not_supported!
+
+    Async do
+      act = FiberShieldingActivity.new
+      execute_activity(
+        act,
+        cancel_on_signal: 'cancel-activity',
+        wait_for_cancellation: true,
+        heartbeat_timeout: 0.8
+      ) do |handle|
+        # Wait for it to be waiting
+        act.wait_until_waiting
+        # Send activity cancel
+        handle.signal('cancel-activity')
+        # Wait for completion
+        error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+        assert_kind_of Temporalio::Error::CanceledError, error.cause
+        # Confirm thrown in activity but the proper levels reached
+        assert act.canceled
+        assert_equal 2, act.levels_reached
+      end
+    end
+  end
+
   class NoRaiseCancellationActivity < Temporalio::Activity::Definition
     activity_cancel_raise false
     attr_reader :canceled

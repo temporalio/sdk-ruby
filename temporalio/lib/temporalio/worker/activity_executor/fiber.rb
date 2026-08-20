@@ -39,20 +39,17 @@ module Temporalio
           return unless defn.cancel_raise
 
           fiber = ::Fiber.current
-          # Cancel callbacks run on the canceler's fiber, which for activity cancellation is the
-          # worker's single task-dispatch fiber. Fiber#raise uses resume semantics, so under a
-          # scheduler that drives fibers with Fiber#transfer (e.g. async) the target never returns
-          # to its resumer and the dispatch fiber is suspended forever, wedging the whole worker.
-          # Schedulers expose fiber_interrupt (Ruby 3.3+) to perform the raise themselves, which
-          # returns to the caller immediately.
           scheduler = ::Fiber.scheduler
           scheduler = nil unless scheduler.respond_to?(:fiber_interrupt)
           context&.cancellation&.add_cancel_callback do
             error = Error::CanceledError.new('Activity canceled')
-            if scheduler
-              scheduler.fiber_interrupt(fiber, error)
-            else
+            # Directly raising from another fiber can strand a `Fiber#transfer`
+            # based scheduler's current fiber, so we defer to the scheduler to interrupt.
+            # If on the same fiber, we can just raise directly.
+            if scheduler.nil? || ::Fiber.current.equal?(fiber)
               fiber.raise(error)
+            else
+              scheduler.fiber_interrupt(fiber, error)
             end
           end
         end
