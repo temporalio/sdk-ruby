@@ -21,6 +21,30 @@ runs:
         bundler-cache: false
         cargo-cache: false
 
+    # Rubygems visibility can differ by runner, so each smoke-test runner waits itself.
+    - name: Wait for version in compact-index
+      shell: bash
+      env:
+        VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        deadline=$(( $(date +%s) + 1500 )) # 25 minutes
+        version_re="^${VERSION//./\\.}[ -]"
+        url="https://index.rubygems.org/info/temporalio"
+        while true; do
+          body=$(curl -fsSL "$url" 2>/dev/null || true)
+          if echo "$body" | grep -qE "$version_re"; then
+            echo "temporalio $VERSION visible in compact-index"
+            exit 0
+          fi
+          if [[ $(date +%s) -ge $deadline ]]; then
+            echo "Timed out waiting for temporalio $VERSION in compact-index" >&2
+            exit 1
+          fi
+          echo "Not yet in compact-index; sleeping 15s..."
+          sleep 15
+        done
+
     - name: Install gem and run workflow smoke test
       shell: bash
       env:
