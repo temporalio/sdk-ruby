@@ -21,6 +21,20 @@ to docs, or any other relevant information.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v1.7.0] - 2026-08-20
+
+### Added
+
 - Added `Temporalio::Runtime::LoggingOptions#log_format` to select compact, pretty, or
   newline-delimited JSON output for Core logs written to the console.
 - Added `FailureConverter` `process_common_attributes:` to customize the value sent to the payload converter when
