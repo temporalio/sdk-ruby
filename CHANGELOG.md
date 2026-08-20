@@ -28,6 +28,9 @@ to docs, or any other relevant information.
 ### :boom: Breaking Changes
 
 ### Fixed
+- Canceling a fiber-executor activity no longer wedges the worker if using a `Fiber#transfer` based scheduler
+  (such as `async`). The exception is now delivered through the scheduler's `fiber_interrupt` hook when it
+  provides one.
 
 ### Security
 
@@ -68,11 +71,6 @@ to docs, or any other relevant information.
   while fetching workflow history, allowing gRPC interceptors to apply request-scoped RPC options.
 - `Temporalio::Client::WorkflowHandle#result` no longer returns `nil` while a workflow is still
   running when a history long poll expires without returning an event.
-- Canceling a fiber-executor activity no longer wedges the worker. Cancellation was delivered with
-  `Fiber#raise` from the worker's task-dispatch fiber, which under a scheduler that resumes fibers
-  with `Fiber#transfer` (such as `async`) never returns, permanently stopping the worker from
-  dispatching any further activity tasks or workflow activations. The exception is now delivered
-  through the scheduler's `fiber_interrupt` hook when it provides one.
 
 ### Added
 
