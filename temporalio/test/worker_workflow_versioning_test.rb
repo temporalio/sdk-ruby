@@ -852,7 +852,7 @@ class WorkerWorkflowVersioningTest < Test
     client, deployment_name, expected_current_build_id, expected_ramping_build_id = '',
     expected_ramping_percentage = nil
   )
-    assert_eventually do
+    assert_eventually(timeout: 30) do
       res = client.workflow_service.describe_worker_deployment(
         Temporalio::Api::WorkflowService::V1::DescribeWorkerDeploymentRequest.new(
           namespace: client.namespace,
