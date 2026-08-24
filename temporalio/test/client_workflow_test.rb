@@ -8,6 +8,8 @@ require 'test'
 class ClientWorkflowTest < Test
   also_run_all_tests_in_fiber
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_start_simple
     # Create ephemeral test server
     env.with_kitchen_sink_worker do |task_queue|
@@ -26,6 +28,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_result_preserves_fiber_local_context_for_history_rpc
     context_key = :temporalio_test_result_context
     context = :my_context
@@ -55,6 +59,8 @@ class ClientWorkflowTest < Test
     Thread.current[context_key] = previous_context
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_workflow_exists
     env.with_kitchen_sink_worker do |task_queue|
       # Create a workflow that hangs
@@ -104,6 +110,7 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_lazy_connect
     client = Temporalio::Client.connect(
       env.client.connection.target_host,
@@ -120,6 +127,8 @@ class ClientWorkflowTest < Test
     assert client.connection.connected?
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes and a Go worker with Cloud TLS configuration.'
   def test_describe
     # Make sure all keys on server
     env.ensure_common_search_attribute_keys
@@ -174,6 +183,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_start_delay
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -194,6 +205,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_failure
     env.with_kitchen_sink_worker do |task_queue|
       # Simple error
@@ -226,6 +239,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_retry_policy
     env.with_kitchen_sink_worker do |task_queue|
       err = assert_raises(Temporalio::Error::WorkflowFailedError) do
@@ -245,6 +260,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes, consistent visibility, and Go worker Cloud TLS.'
   def test_list_and_count
     # Make sure all keys on server
     env.ensure_common_search_attribute_keys
@@ -325,6 +342,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_continue_as_new
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -354,6 +373,8 @@ class ClientWorkflowTest < Test
     assert_equal Temporalio::Error::RPCError::Code::NOT_FOUND, err.code
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_config_change
     env.with_kitchen_sink_worker do |task_queue|
       # Regular query works
@@ -378,6 +399,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_signal
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -391,6 +414,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_query
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -417,6 +442,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_update
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -466,6 +493,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_cancel
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -482,6 +511,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_terminate
     env.with_kitchen_sink_worker do |task_queue|
       handle = env.client.start_workflow(
@@ -500,6 +531,8 @@ class ClientWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_rpc_cancellation
     # Start a workflow, create cancellation, cancel after 500ms in background,
     # wait on complete

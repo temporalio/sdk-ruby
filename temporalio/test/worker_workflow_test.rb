@@ -493,6 +493,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
   def test_search_attributes_memo
     env.ensure_common_search_attribute_keys
 
@@ -1103,6 +1105,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
   def test_payload_codec
     env.ensure_common_search_attribute_keys
 
@@ -1962,6 +1966,7 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_custom_metrics
     # Create a client w/ a Prometheus-enabled runtime
     prom_addr = "127.0.0.1:#{find_free_port}"
@@ -2022,6 +2027,7 @@ class WorkerWorkflowTest < Test
     assert line.end_with?(' 4560')
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_workflow_buffered_metrics
     # Create runtime with metric buffer
     buffer = Temporalio::Runtime::MetricBuffer.new(10_000)
@@ -2337,6 +2343,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :requires_local_server,
+                     'Starts a second local server to verify worker client replacement.'
   def test_worker_client_replacement
     # Create a second ephemeral server and start workflow on both servers
     Temporalio::Testing::WorkflowEnvironment.start_local do |env2|

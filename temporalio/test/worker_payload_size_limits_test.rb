@@ -14,6 +14,9 @@ require 'test'
 # disable_payload_error_limit opt-out lets the oversized payload reach (and be rejected by) the
 # server. The warning channel is asserted via the default log filter.
 class WorkerPayloadSizeLimitsTest < Test
+  exclude_class_from_cloud :requires_local_server,
+                           'Starts a server with custom payload-size dynamic configuration.'
+
   PAYLOAD_ERROR_LIMIT = 10 * 1024
 
   class LargePayloadActivity < Temporalio::Activity::Definition

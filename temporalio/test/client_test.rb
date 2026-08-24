@@ -11,6 +11,8 @@ class ClientTest < Test
     assert !Temporalio::VERSION.nil?
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_lazy_connection
     assert env.client.connection.connected?
     client = Temporalio::Client.connect(env.client.connection.target_host, env.client.namespace, lazy_connect: true)
@@ -140,6 +142,8 @@ class ClientTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_interceptor
     # Create client with interceptor
     track = TrackCallsInterceptor.new
@@ -222,6 +226,7 @@ class ClientTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_fork
     # Cannot use client on other side of fork from where created
     pre_fork_client = env.client

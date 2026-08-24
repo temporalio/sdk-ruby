@@ -8,6 +8,8 @@ require 'tmpdir'
 require_relative 'test'
 
 class EnvConfigTest < Test
+  exclude_all_from_cloud :needs_cloud_adaptation
+
   # A base TOML config with a default and a custom profile
   TOML_CONFIG_BASE = <<~TOML
     [profile.default]

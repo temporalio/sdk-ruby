@@ -52,6 +52,7 @@ class PluginTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_client_plugin
     # Connect with a plugin that fails on connect
     err = assert_raises do
@@ -213,6 +214,7 @@ class PluginTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation
   def test_simple_plugin
     # Create a simple plugin that just confirms some things are properly set
     payload_converter = ToPayloadTrackingPayloadConverter.new(Temporalio::Converters::PayloadConverter.default)

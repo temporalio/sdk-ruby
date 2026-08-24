@@ -9,6 +9,8 @@ require 'test'
 class ClientScheduleTest < Test
   also_run_all_tests_in_fiber
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes and immediately consistent schedule visibility.'
   def test_basics # rubocop:disable Metrics/AbcSize
     expected_ids = []
     assert_no_schedules
@@ -265,6 +267,8 @@ class ClientScheduleTest < Test
     delete_schedules(handle.id) if handle
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_trigger_immediately
     assert_no_schedules
 
@@ -296,6 +300,8 @@ class ClientScheduleTest < Test
     delete_schedules(handle.id) if handle
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Relies on backfill action counts becoming immediately consistent.'
   def test_backfill
     assert_no_schedules
 
