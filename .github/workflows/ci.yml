@@ -173,7 +173,7 @@ jobs:
     # Secrets are unavailable to workflows from forks.
     if: ${{ (github.event.pull_request.head.repo.full_name == '' || github.event.pull_request.head.repo.full_name == 'temporalio/sdk-ruby') && github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     env:
       TEMPORAL_TEST_ENV_CONFIG_SERVER: "1"
       TEMPORAL_CLIENT_CLOUD_API_VERSION: v0.19.1
@@ -241,7 +241,9 @@ jobs:
         env:
           TEMPORAL_ADDRESS: ${{ steps.create-cloud-namespace.outputs.namespace }}.tmprl.cloud:7233
           TEMPORAL_NAMESPACE: ${{ steps.create-cloud-namespace.outputs.namespace }}
-        run: bundle exec rake test TEST=test/worker_workflow_test.rb TESTOPTS="--name=/WorkerWorkflowTest#test_simple/"
+        run: |
+          mkdir -p tmp
+          TESTOPTS="--verbose" bundle exec rake test:cloud 2>&1 | tee tmp/cloud-test.log
 
       - name: Delete Cloud namespace
         id: delete-cloud-namespace
@@ -255,3 +257,12 @@ jobs:
       - name: Report Cloud namespace cleanup failure
         if: ${{ always() && steps.delete-cloud-namespace.outcome == 'failure' }}
         run: echo "::warning title=Cloud namespace cleanup failed::Failed to delete Cloud namespace ${{ steps.create-cloud-namespace.outputs.namespace }}"
+
+      - name: Upload Cloud test output
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: cloud-test-${{ github.run_id }}-${{ github.run_attempt }}
+          path: temporalio/tmp/cloud-test.log
+          if-no-files-found: warn
+          retention-days: 14

@@ -1495,6 +1495,10 @@ To list source tests excluded from Cloud, grouped by reason and note:
 
     bundle exec rake test:cloud_inventory
 
+To run the Cloud-eligible suite against an envconfig-defined server:
+
+    bundle exec rake test:cloud
+
 ### Code Formatting and Type Checking
 
 This project uses `rubocop`:

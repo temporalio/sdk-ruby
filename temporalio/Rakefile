@@ -37,7 +37,15 @@ namespace :test do
     ].compact.join(' ')
     Rake::Task[:test].invoke
   end
+
+  desc 'Run tests eligible for Temporal Cloud using envconfig'
+  task :cloud do
+    ENV['TEMPORAL_TEST_ENV_CONFIG_SERVER'] = '1'
+    ENV['TESTOPTS'] = [ENV.fetch('TESTOPTS', nil), '--cloud'].compact.join(' ')
+    Rake::Task[:test].invoke
+  end
 end
+
 require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new
