@@ -1,5 +1,6 @@
 module TemporalioTestMode
   def self.cloud?: -> bool
+  def self.cloud_inventory?: -> bool
 end
 
 class Test < Minitest::Test

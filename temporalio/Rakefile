@@ -27,6 +27,17 @@ Rake::TestTask.new(:test) do |t|
   t.test_files = FileList['test/**/*_test.rb', 'extra/release/test/**/*_test.rb']
 end
 
+namespace :test do
+  desc 'List tests excluded from Temporal Cloud by reason'
+  task :cloud_inventory do
+    ENV['TESTOPTS'] = [
+      ENV.fetch('TESTOPTS', nil),
+      '--cloud-inventory',
+      '--name=/CloudTestInventoryTest#test_report/'
+    ].compact.join(' ')
+    Rake::Task[:test].invoke
+  end
+end
 require 'rubocop/rake_task'
 
 RuboCop::RakeTask.new

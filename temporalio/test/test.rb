@@ -37,11 +37,17 @@ end
 #   report.pretty_print
 # end
 
+# Rake passes these internal modes through TESTOPTS; consume them before Minitest parses ARGV.
 module TemporalioTestMode
   @cloud = !ARGV.delete('--cloud').nil?
+  @cloud_inventory = !ARGV.delete('--cloud-inventory').nil?
 
   def self.cloud?
     @cloud
+  end
+
+  def self.cloud_inventory?
+    @cloud_inventory
   end
 end
 
