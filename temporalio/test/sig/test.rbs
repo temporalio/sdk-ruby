@@ -1,6 +1,20 @@
+module TemporalioTestMode
+  def self.cloud?: -> bool
+end
+
 class Test < Minitest::Test
   include ExtraAssertions
   include WorkflowUtils
+
+  type cloud_test_exclusion_reason = :requires_cloud_provisioning | :needs_cloud_adaptation | :requires_local_server
+
+  CLOUD_TEST_EXCLUSION_REASONS: Hash[cloud_test_exclusion_reason, String]
+
+  class CloudTestExclusion
+    attr_reader reason: cloud_test_exclusion_reason
+    attr_reader note: String
+    def initialize: (cloud_test_exclusion_reason reason, String note) -> void
+  end
 
   ATTR_KEY_TEXT: Temporalio::SearchAttributes::Key
   ATTR_KEY_KEYWORD: Temporalio::SearchAttributes::Key
@@ -11,6 +25,15 @@ class Test < Minitest::Test
   ATTR_KEY_KEYWORD_LIST: Temporalio::SearchAttributes::Key
 
   def self.also_run_all_tests_in_fiber: -> void
+  def self.exclude_from_cloud: (cloud_test_exclusion_reason reason, String note) -> void
+  def self.exclude_class_from_cloud: (cloud_test_exclusion_reason reason, String note) -> void
+  def self.cloud_test_exclusion: (String | Symbol method_name) -> CloudTestExclusion?
+
+  private
+
+  def self.build_cloud_test_exclusion: (cloud_test_exclusion_reason reason, String note) -> CloudTestExclusion
+
+  public
 
   def skip_if_fibers_not_supported!: -> void
   def skip_if_not_x86!: -> void
