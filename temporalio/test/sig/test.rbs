@@ -61,6 +61,12 @@ class Test < Minitest::Test
 
     def client: -> Temporalio::Client
 
+    def reconnect_client: (
+      ?target_host: String,
+      ?namespace: String,
+      **untyped overrides
+    ) -> Temporalio::Client
+
     def with_kitchen_sink_worker: [T] (
       ?Temporalio::Client worker_client,
       ?task_queue: String,

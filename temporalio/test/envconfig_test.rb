@@ -8,8 +8,6 @@ require 'tmpdir'
 require_relative 'test'
 
 class EnvConfigTest < Test
-  exclude_all_from_cloud :needs_cloud_adaptation
-
   # A base TOML config with a default and a custom profile
   TOML_CONFIG_BASE = <<~TOML
     [profile.default]
@@ -64,6 +62,18 @@ class EnvConfigTest < Test
     "ANOTHER_HEADER_KEY" = "another-value"
     "mixed_Case-header" = "mixed-value"
   TOML
+
+  def setup
+    super
+    @original_temporal_env = ENV.to_h.select { |key, _| key.start_with?('TEMPORAL_') }
+    @original_temporal_env.each_key { |key| ENV.delete(key) }
+  end
+
+  def teardown
+    ENV.keys.select { |key| key.start_with?('TEMPORAL_') }.each { |key| ENV.delete(key) }
+    @original_temporal_env.each { |key, value| ENV[key] = value }
+    super
+  end
 
   # =============================================================================
   # PROFILE LOADING TESTS (7 tests)

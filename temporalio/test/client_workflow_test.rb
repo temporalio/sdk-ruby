@@ -110,13 +110,8 @@ class ClientWorkflowTest < Test
     end
   end
 
-  exclude_from_cloud :needs_cloud_adaptation
   def test_lazy_connect
-    client = Temporalio::Client.connect(
-      env.client.connection.target_host,
-      env.client.namespace,
-      lazy_connect: true
-    )
+    client = env.reconnect_client(lazy_connect: true)
     # Not connected until we do something
     refute client.connection.connected?
     client.start_workflow(

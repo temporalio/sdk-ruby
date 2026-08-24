@@ -280,6 +280,20 @@ class Test < Minitest::Test
       @server.client
     end
 
+    def reconnect_client(target_host: client.connection.target_host, namespace: client.namespace, **overrides)
+      # Reconnect through Client.connect so overrides and connection plugins apply. Host and namespace are positional,
+      # the connection is rebuilt, and Client.connect cannot accept payload limits.
+      connection_options = client.connection.options.to_h.except(:target_host, :payload_limits)
+      client_options = client.options.to_h.except(:connection, :namespace)
+      Temporalio::Client.connect(
+        target_host,
+        namespace,
+        **connection_options,
+        **client_options,
+        **overrides
+      )
+    end
+
     def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}", nexus: false)
       # Create Nexus endpoint for the task queue if requested
       endpoint = nil
