@@ -106,6 +106,9 @@ module Temporalio
         message_str = message.is_a?(String) ? message : message.inspect
         "#{message_str} #{scoped_values}"
       end
+
+      # @return [String] The log message.
+      alias to_s message
     end
   end
 end
