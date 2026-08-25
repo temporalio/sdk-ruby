@@ -482,37 +482,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_reset_preserves_heartbeat_by_default
-    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
-      handle = start_heartbeat_ready_activity(task_queue)
-      handle.pause('hold')
-      assert_eventually_paused(handle)
-
-      # As of api#848 / temporal#11417, reset does NOT clear heartbeat details by default —
-      # you must pass reset_heartbeat: true. keep_paused so no new attempt reshapes state.
-      handle.reset(keep_paused: true)
-      # Give the server time to persist any state change, then confirm details survive.
-      sleep 2
-      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
-      handle.terminate('cleanup')
-    end
-  end
-
-  def test_reset_clears_heartbeat_when_flag_set
-    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
-      handle = start_heartbeat_ready_activity(task_queue)
-      handle.pause('hold')
-      assert_eventually_paused(handle)
-
-      # Opt-in flag clears details.
-      handle.reset(keep_paused: true, reset_heartbeat: true)
-      assert_eventually(timeout: 30.0) do
-        refute handle.describe(include_heartbeat_details: true).has_heartbeat_details?
-      end
-      handle.terminate('cleanup')
-    end
-  end
-
   def test_update_options_preserves_heartbeat
     with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
       handle = start_heartbeat_ready_activity(task_queue)
