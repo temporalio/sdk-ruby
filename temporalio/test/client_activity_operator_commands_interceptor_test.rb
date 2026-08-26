@@ -61,6 +61,32 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
     Temporalio::Client.new(**env.client.options.with(interceptors: [interceptor]).to_h)
   end
 
+  # restore_original_options reuses the update_activity_options interceptor rather than having
+  # one of its own, distinguished purely by restore_original with no updates. An interceptor
+  # watching option updates would otherwise silently miss restores.
+  def test_restore_original_options_routes_through_update
+    events = []
+    client = client_with_interceptor(events)
+    handle = client.activity_handle('act-1')
+
+    ws = client.workflow_service
+    captured = {}
+    ws.define_singleton_method(:update_activity_execution_options) do |req, **_kwargs|
+      captured[:update] = req
+      Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse.new(
+        activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new
+      )
+    end
+
+    handle.update_options(restore_original: true)
+
+    assert_includes events, 'update_activity_options'
+    req = captured.fetch(:update)
+
+    assert req.restore_original
+    assert_empty req.update_mask.paths
+  end
+
   def test_interceptor_invokes_each_operator_command
     events = []
     client = client_with_interceptor(events)
