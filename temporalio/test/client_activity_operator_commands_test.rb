@@ -495,8 +495,10 @@ class ClientActivityOperatorCommandsTest < Test
 
       refute desc.has_result?
       assert_nil desc.result
-      assert_instance_of Temporalio::Error::ApplicationError, desc.failure
-      assert_equal 'deliberate failure', desc.failure.message
+      failure = desc.failure
+
+      assert_instance_of Temporalio::Error::ApplicationError, failure
+      assert_equal 'deliberate failure', failure&.message
     end
   end
 
