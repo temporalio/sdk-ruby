@@ -181,7 +181,7 @@ class Test < Minitest::Test
       else
         @server = Temporalio::Testing::WorkflowEnvironment.start_local(
           logger: Logger.new($stdout),
-          dev_server_download_version: 'v1.7.1-standalone-nexus-operations',
+          dev_server_download_version: 'v1.8.3-server-1.32.0-162.0',
           dev_server_extra_args: [
             # Allow continue as new to be immediate
             '--dynamic-config-value', 'history.workflowIdReuseMinimalInterval="0s"',
