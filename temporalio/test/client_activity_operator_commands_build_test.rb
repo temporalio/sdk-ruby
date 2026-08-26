@@ -6,6 +6,48 @@ require 'test'
 
 # Unit test for the operator-command request fields that the server does not surface back.
 class ClientActivityOperatorCommandsBuildTest < Test
+  # The four api#792 opt-ins are invisible in any observable server state, so only the
+  # outgoing request shows whether the SDK asked for them.
+  def test_describe_opt_ins_reach_the_request
+    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
+    handle = client.activity_handle('act-1')
+
+    ws = client.workflow_service
+    captured = {}
+    ws.define_singleton_method(:describe_activity_execution) do |req, **_kwargs|
+      captured[:describe] = req
+      Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse.new(
+        info: Temporalio::Api::Activity::V1::ActivityExecutionInfo.new(activity_id: 'act-1')
+      )
+    end
+
+    handle.describe
+    bare = captured.fetch(:describe)
+
+    refute bare.include_input
+    refute bare.include_outcome
+    refute bare.include_heartbeat_details
+    refute bare.include_last_failure
+
+    handle.describe(include_input: true, include_outcome: true,
+                    include_heartbeat_details: true, include_last_failure: true)
+    all = captured.fetch(:describe)
+
+    assert all.include_input
+    assert all.include_outcome
+    assert all.include_heartbeat_details
+    assert all.include_last_failure
+
+    # Each flag is independent: asking for one must not set the others.
+    handle.describe(include_input: true)
+    one = captured.fetch(:describe)
+
+    assert one.include_input
+    refute one.include_outcome
+    refute one.include_heartbeat_details
+    refute one.include_last_failure
+  end
+
   # Clearing is the third state: the path is named in the mask so the server acts on it, but
   # the proto field is left unset so the value goes away rather than being set.
   def test_nil_value_clears_the_option
