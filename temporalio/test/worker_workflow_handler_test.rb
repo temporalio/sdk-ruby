@@ -630,6 +630,8 @@ class WorkerWorkflowHandlerTest < Test
     end
   end
 
+  exclude_from_cloud :requires_local_server,
+                     'Requires local server metrics and update-related dynamic configuration.'
   def test_retry_start_update
     # This test confirms that the UpdateWorkflowExecution call occurs multiple times if it hasn't reached accepted. We
     # check this via metrics.

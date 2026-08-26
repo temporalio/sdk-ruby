@@ -263,6 +263,8 @@ class WorkerWorkflowChildTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
   def test_search_attributes
     env.ensure_common_search_attribute_keys
 
@@ -283,6 +285,8 @@ class WorkerWorkflowChildTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_child_workflow_without_result_from_go_sdk
     env.with_kitchen_sink_worker do |child_task_queue|
       execute_workflow(GoNoResultParentWorkflow, child_task_queue) do |handle|

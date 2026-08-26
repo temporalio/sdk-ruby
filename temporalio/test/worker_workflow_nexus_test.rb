@@ -10,6 +10,9 @@ require 'temporalio/workflow'
 require 'test'
 
 class WorkerWorkflowNexusTest < Test
+  exclude_class_from_cloud :needs_cloud_adaptation,
+                           'Requires Cloud Nexus endpoint setup and a Go worker with Cloud TLS configuration.'
+
   # Test basic sync operation success
   class NexusSyncOperationSuccessWorkflow < Temporalio::Workflow::Definition
     def execute(endpoint)

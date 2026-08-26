@@ -121,6 +121,8 @@ class WorkerTest < Test
     assert_equal 'Intentional error', err.message
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_can_run_with_resource_tuner
     worker = Temporalio::Worker.new(
       client: env.client,
@@ -143,6 +145,8 @@ class WorkerTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_can_run_with_composite_tuner
     resource_tuner_options = Temporalio::Worker::Tuner::ResourceBasedTunerOptions.new(
       target_memory_usage: 0.5,

@@ -37,9 +37,33 @@ end
 #   report.pretty_print
 # end
 
+# Rake passes these internal modes through TESTOPTS; consume them before Minitest parses ARGV.
+module TemporalioTestMode
+  @cloud = !ARGV.delete('--cloud').nil?
+  @cloud_inventory = !ARGV.delete('--cloud-inventory').nil?
+
+  def self.cloud?
+    @cloud
+  end
+
+  def self.cloud_inventory?
+    @cloud_inventory
+  end
+end
+
 class Test < Minitest::Test
   include ExtraAssertions
   include WorkflowUtils
+
+  CloudTestExclusion = Data.define(:reason, :note)
+
+  CLOUD_TEST_EXCLUSION_REASONS = {
+    requires_cloud_provisioning: 'Requires a Cloud capability that the test harness cannot provision or a feature ' \
+                                 'that is not yet available in Temporal Cloud',
+    needs_cloud_adaptation: 'Requires setup or assertions adapted for the Temporal Cloud environment',
+    requires_local_server: 'Inherently requires one or more local Temporal Server instances, such as a dev or ' \
+                           'time-skipping server or custom server configuration'
+  }.freeze
 
   ATTR_KEY_TEXT = Temporalio::SearchAttributes::Key.new('ruby-key-text',
                                                         Temporalio::SearchAttributes::IndexedValueType::TEXT)
@@ -58,6 +82,38 @@ class Test < Minitest::Test
     Temporalio::SearchAttributes::IndexedValueType::KEYWORD_LIST
   )
 
+  def self.exclude_from_cloud(reason, note)
+    raise 'A Cloud test exclusion is already waiting for the next test method' if @next_cloud_test_exclusion
+
+    @next_cloud_test_exclusion = build_cloud_test_exclusion(reason, note)
+  end
+
+  def self.exclude_class_from_cloud(reason, note)
+    @cloud_test_exclusion = build_cloud_test_exclusion(reason, note)
+  end
+
+  def self.cloud_test_exclusion(method_name)
+    method_name = method_name.to_s
+    ancestors.each do |ancestor|
+      break unless ancestor <= Test
+
+      exclusion = ancestor.instance_variable_get(:@cloud_test_exclusion)
+      return exclusion if exclusion
+
+      exclusions = ancestor.instance_variable_get(:@cloud_test_exclusions)
+      return exclusions[method_name] if exclusions&.key?(method_name) # steep:ignore
+    end
+    nil
+  end
+
+  def self.runnable_methods
+    methods = super
+    raise 'Cloud test exclusion is not followed by a test method' if @next_cloud_test_exclusion
+    return methods unless TemporalioTestMode.cloud?
+
+    methods.reject { |method_name| cloud_test_exclusion(method_name) }
+  end
+
   def self.also_run_all_tests_in_fiber
     @also_run_all_tests_in_fiber = true
     # We have to tell Minitest the diff executable to use because "async" has an
@@ -69,6 +125,13 @@ class Test < Minitest::Test
 
   def self.method_added(method_name)
     super
+    if (exclusion = @next_cloud_test_exclusion)
+      @next_cloud_test_exclusion = nil
+      raise 'Cloud test exclusions must decorate test methods' unless method_name.start_with?('test_')
+
+      (@cloud_test_exclusions ||= {})[method_name.to_s] = exclusion
+    end
+
     # If we are also running all tests in fiber, define `_in_fiber` equivalent,
     # unless we are < 3.3
     unless @also_run_all_tests_in_fiber &&
@@ -79,12 +142,24 @@ class Test < Minitest::Test
     end
 
     original_method = instance_method(method_name)
-    define_method("#{method_name}_in_fiber") do
+    fiber_method_name = "#{method_name}_in_fiber"
+    (@cloud_test_exclusions ||= {})[fiber_method_name] = exclusion if exclusion
+    define_method(fiber_method_name) do
       Kernel.Async do |_task|
         original_method.bind(self).call
       end
     end
   end
+
+  def self.build_cloud_test_exclusion(reason, note)
+    unless CLOUD_TEST_EXCLUSION_REASONS.key?(reason)
+      raise ArgumentError, "Unknown Cloud test exclusion reason: #{reason.inspect}"
+    end
+    raise ArgumentError, 'Cloud test exclusion note cannot be blank' unless note.is_a?(String) && !note.strip.empty?
+
+    CloudTestExclusion.new(reason, note.dup.freeze)
+  end
+  private_class_method :build_cloud_test_exclusion
 
   def skip_if_fibers_not_supported!
     return if Temporalio::Internal::Bridge.fibers_supported
@@ -203,6 +278,20 @@ class Test < Minitest::Test
 
     def client
       @server.client
+    end
+
+    def reconnect_client(target_host: client.connection.target_host, namespace: client.namespace, **overrides)
+      # Reconnect through Client.connect so overrides and connection plugins apply. Host and namespace are positional,
+      # the connection is rebuilt, and Client.connect cannot accept payload limits.
+      connection_options = client.connection.options.to_h.except(:target_host, :payload_limits)
+      client_options = client.options.to_h.except(:connection, :namespace)
+      Temporalio::Client.connect(
+        target_host,
+        namespace,
+        **connection_options,
+        **client_options,
+        **overrides
+      )
     end
 
     def with_kitchen_sink_worker(worker_client = client, task_queue: "tq-#{SecureRandom.uuid}", nexus: false)

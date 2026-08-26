@@ -70,6 +70,32 @@ class TestEnvironmentTest < Test
     end
   end
 
+  def test_reconnect_client_preserves_base_configuration
+    tls = Temporalio::Client::Connection::TLSOptions.new(domain: 'cloud.example')
+    base_client = Temporalio::Client.connect(
+      'cloud.example:7233',
+      'base-namespace',
+      api_key: 'api-key',
+      tls:,
+      rpc_metadata: { 'x-test-source' => 'base' },
+      logger: Logger.new(File::NULL),
+      lazy_connect: true
+    )
+    test_env = TestEnvironment.send(:allocate)
+    test_env.instance_variable_set(:@server, Temporalio::Testing::WorkflowEnvironment.new(base_client))
+
+    new_client = test_env.reconnect_client(namespace: 'override-namespace')
+
+    refute_same base_client.connection, new_client.connection
+    assert_equal 'override-namespace', new_client.namespace
+    assert_equal 'api-key', new_client.connection.options.api_key
+    assert_equal tls, new_client.connection.options.tls
+    assert_equal({ 'x-test-source' => 'base' }, new_client.connection.options.rpc_metadata)
+    assert_same base_client.connection.options.runtime, new_client.connection.options.runtime
+    assert_same base_client.options.data_converter, new_client.options.data_converter
+    assert_equal 'base-namespace', base_client.namespace
+  end
+
   private
 
   def with_test_env(values)
