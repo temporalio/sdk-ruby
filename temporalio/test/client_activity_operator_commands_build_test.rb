@@ -60,7 +60,7 @@ class ClientActivityOperatorCommandsBuildTest < Test
     begin
       handle.pause('because')
       handle.unpause(reason: 'go', jitter: 5.0)
-      handle.reset(jitter: 2.0)
+      handle.reset(jitter: 2.0, keep_paused: true, restore_original_options: true, reset_heartbeat: true)
       handle.update_options(restore_original: true)
     ensure
       ws.singleton_class.send(:remove_method, :pause_activity_execution)
@@ -83,6 +83,9 @@ class ClientActivityOperatorCommandsBuildTest < Test
     assert_equal 2, reset_req.jitter.seconds
     assert_equal 0, reset_req.jitter.nanos
     refute_empty reset_req.request_id
+    assert reset_req.keep_paused
+    assert reset_req.restore_original_options
+    assert reset_req.reset_heartbeat
 
     update_req = captured.fetch(:update)
     refute_empty update_req.request_id
