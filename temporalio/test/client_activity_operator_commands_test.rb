@@ -18,6 +18,19 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  # Heartbeats continuously. SlowActivity beats only once, so it cannot drive a heartbeat count
+  # past one however long the test waits.
+  class FastHeartbeatActivity < Temporalio::Activity::Definition
+    def execute
+      ctx = Temporalio::Activity::Context.current
+      until ctx.cancellation.canceled?
+        ctx.heartbeat
+        sleep 0.05
+      end
+      raise Temporalio::Error::CanceledError, 'canceled'
+    end
+  end
+
   # Returns immediately. Used together with a start delay so it can be paused while scheduled
   # (before it ever runs) and then resumed to a successful completion.
   class QuickActivity < Temporalio::Activity::Definition
@@ -412,6 +425,21 @@ class ClientActivityOperatorCommandsTest < Test
 
   # Input and outcome are opt-in like the other payload fields, and the outcome is a
   # result-or-failure oneof. A successful activity populates the result arm only.
+  # The count tracks heartbeats the server recorded.
+  def test_describe_reports_total_heartbeat_count
+    with_activity_worker([FastHeartbeatActivity]) do |task_queue|
+      handle = env.client.start_activity(
+        FastHeartbeatActivity,
+        id: "act-#{SecureRandom.uuid}", task_queue:,
+        start_to_close_timeout: 60, heartbeat_timeout: 3
+      )
+      assert_eventually(timeout: 20.0) do
+        assert_operator handle.describe.total_heartbeat_count, :>=, 2
+      end
+      handle.terminate('cleanup')
+    end
+  end
+
   def test_describe_input_and_result_are_opt_in
     with_activity_worker([EchoActivity]) do |task_queue|
       handle = env.client.start_activity(

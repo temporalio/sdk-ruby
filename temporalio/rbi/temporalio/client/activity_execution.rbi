@@ -118,6 +118,9 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   sig { returns(Integer) }
   def attempt; end
 
+  sig { returns(Integer) }
+  def total_heartbeat_count; end
+
   sig { returns(T.nilable(Temporalio::Error::Failure)) }
   def last_failure; end
 

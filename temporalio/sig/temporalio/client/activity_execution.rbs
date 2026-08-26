@@ -39,6 +39,8 @@ module Temporalio
         def last_heartbeat_time: -> Time?
         def last_started_time: -> Time?
         def attempt: -> Integer
+
+        def total_heartbeat_count: -> Integer
         def last_failure: -> Error::Failure?
         def expiration_time: -> Time?
         def last_worker_identity: -> String?

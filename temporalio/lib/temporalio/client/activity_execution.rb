@@ -212,6 +212,11 @@ module Temporalio
           @raw_info.attempt
         end
 
+        # @return [Integer] Total number of heartbeats recorded across all attempts.
+        def total_heartbeat_count
+          @raw_info.total_heartbeat_count
+        end
+
         # Whether a last failure is present on this description. False when the activity has no
         # failed attempt, and also when {ActivityHandle#describe} was called without
         # `include_last_failure:`.
