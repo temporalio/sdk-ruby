@@ -6,6 +6,9 @@ require 'temporalio/client'
 require 'test'
 
 class ClientCloudTest < Test
+  exclude_class_from_cloud :requires_cloud_provisioning,
+                           'Requires separately provisioned Cloud credentials and operations permissions.'
+
   class SimpleWorkflow < Temporalio::Workflow::Definition
     def execute(name)
       "Hello, #{name}!"

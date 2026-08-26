@@ -11,6 +11,8 @@ require 'workflow_utils'
 
 module Testing
   class WorkflowEnvironmentTest < Test
+    exclude_class_from_cloud :requires_local_server, 'Covers local and time-skipping test-server APIs.'
+
     include WorkflowUtils
 
     class SlowWorkflow < Temporalio::Workflow::Definition

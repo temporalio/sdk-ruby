@@ -67,6 +67,8 @@ class WorkerWorkflowActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_activity_without_result_from_go_sdk
     env.with_kitchen_sink_worker do |activity_task_queue|
       execute_workflow(GoNoResultActivityWorkflow, activity_task_queue) do |handle|
@@ -315,6 +317,8 @@ class WorkerWorkflowActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Activity pause and reset APIs that are not enabled in Cloud CI.'
   def test_cancellation_pause
     # Swallow
     queue = Queue.new
@@ -370,6 +374,8 @@ class WorkerWorkflowActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Activity pause and reset APIs that are not enabled in Cloud CI.'
   def test_cancellation_reset
     queue = Queue.new
     execute_workflow(

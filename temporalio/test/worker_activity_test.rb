@@ -18,6 +18,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_class
     assert_equal 'Hello, Class!', execute_activity(ClassActivity, 'Class')
   end
@@ -32,10 +34,14 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_instance
     assert_equal 'Howdy, Instance!', execute_activity(InstanceActivity.new('Howdy'), 'Instance')
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_block
     activity = Temporalio::Activity::Definition::Info.new(name: 'BlockActivity') { |name| "Greetings, #{name}!" }
     assert_equal 'Greetings, Block!', execute_activity(activity, 'Block')
@@ -50,6 +56,8 @@ class WorkerActivityTest < Test
   end
 
   # Unconditionally assert fiber executor works for all supported Ruby versions support fibers
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_simple_fiber_activity
     Async do
       assert_equal 'Hello, Fiber!', execute_activity(SimpleFiberActivity, 'Fiber')
@@ -73,6 +81,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_fiber
     # Tests are doubly executed in threaded and fiber, so we start a new Async block just in case
     Async do |_task|
@@ -103,6 +113,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_logging
     out, = safe_capture_io do
       # New logger each time since stdout is replaced
@@ -121,6 +133,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_custom_name
     execute_activity(CustomNameActivity) do |handle|
       assert_equal 'done', handle.result
@@ -212,6 +226,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_failure
     # Check basic error
     error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(FailureActivity, 'simple') }
@@ -246,11 +262,15 @@ class WorkerActivityTest < Test
   class UnimplementedExecuteActivity < Temporalio::Activity::Definition
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_unimplemented_execute
     error = assert_raises(Temporalio::Error::WorkflowFailedError) { execute_activity(UnimplementedExecuteActivity) }
     assert_equal 'Activity did not implement "execute"', error.cause.cause.message
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_not_found
     error = assert_raises(Temporalio::Error::WorkflowFailedError) do
       execute_activity(UnimplementedExecuteActivity, override_name: 'not-found')
@@ -266,6 +286,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_multi_param
     assert_equal "Args: #{{ 'foo' => 'bar' }}, 123, baz", # rubocop:disable Lint/LiteralInInterpolation
                  execute_activity(MultiParamActivity, { foo: 'bar' }, 123, 'baz')
@@ -280,6 +302,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_info
     # The hash is round-tripped through the data converter so non-primitive
     # values (Time, RetryPolicy) are serialized to strings. Use string keys
@@ -330,6 +354,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_cancellation_simple
     act = CancellationActivity.new
     execute_activity(
@@ -350,6 +376,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_cancellation_swallowed
     act = CancellationActivity.new(swallow: true)
     execute_activity(
@@ -382,6 +410,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_heartbeat_details
     assert_equal 'details: ["detail1", "detail2"]',
                  execute_activity(HeartbeatDetailsActivity, retry_max_attempts: 2, heartbeat_timeout: 0.8)
@@ -415,6 +445,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_background_heartbeat
     assert_equal 'details: ["some detail"]',
                  execute_activity(BackgroundHeartbeatActivity, retry_max_attempts: 2, heartbeat_timeout: 0.8)
@@ -454,6 +486,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_activity_shielding
     act = ShieldingActivity.new
     execute_activity(
@@ -479,6 +513,8 @@ class WorkerActivityTest < Test
     activity_executor :fiber # steep:ignore
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_activity_shielding_fiber
     skip_if_fibers_not_supported!
 
@@ -532,6 +568,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_no_raise_cancellation
     act = NoRaiseCancellationActivity.new
     execute_activity(
@@ -576,6 +614,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_fiber_cancellation
     skip_if_fibers_not_supported!
     # Tests are doubly executed in threaded and fiber, so we start a new Async block just in case
@@ -637,6 +677,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_worker_shutdown
     act = WorkerShutdownActivity.new
     # Start the activity, then cancel worker but let block complete
@@ -691,6 +733,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_async_completion_success
     act = AsyncCompletionActivity.new
     execute_activity(act) do |handle|
@@ -703,6 +747,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_async_completion_heartbeat_and_fail
     act = AsyncCompletionActivity.new
     execute_activity(act) do |handle|
@@ -725,6 +771,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_async_completion_cancel
     act = AsyncCompletionActivity.new
     execute_activity(act, wait_for_cancellation: true) do |handle|
@@ -746,6 +794,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Activity pause and reset APIs that are not enabled in Cloud CI.'
   def test_async_completion_cancel_details
     # Cancel
     act = AsyncCompletionActivity.new
@@ -810,6 +860,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_async_completion_timeout
     act = AsyncCompletionActivity.new
     execute_activity(act, start_to_close_timeout: 0.5, wait_for_cancellation: true) do
@@ -851,6 +903,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_custom_executor
     assert_equal 'local val: foo',
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
@@ -919,10 +973,14 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_concurrent_multi_worker_threaded_activities
     assert_multi_worker_activities(50.times.map { ConcurrentActivity.new })
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_concurrent_multi_worker_fiber_activities
     skip 'Must be fiber-based worker to do fiber-based activities' if Fiber.current_scheduler.nil?
     assert_multi_worker_activities(50.times.map { ConcurrentFiberActivity.new })
@@ -962,10 +1020,14 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_concurrent_single_worker_threaded_activities
     assert_single_worker_activities(ConcurrentActivity.new, 50)
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_concurrent_single_worker_fiber_activities
     skip 'Must be fiber-based worker to do fiber-based activities' if Fiber.current_scheduler.nil?
     assert_single_worker_activities(ConcurrentFiberActivity.new, 50)
@@ -1024,6 +1086,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_interceptor
     interceptor = TrackCallsInterceptor.new
     assert_equal 'Hello, Temporal!', execute_activity(InterceptorActivity, 'Temporal', interceptors: [interceptor])
@@ -1035,6 +1099,8 @@ class WorkerActivityTest < Test
     assert_equal ['heartbeat-val'], interceptor.calls[2][1].details
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_interceptor_from_client
     interceptor = TrackCallsInterceptor.new
     # Create new client with the interceptor set
@@ -1057,6 +1123,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_dynamic_activity
     assert_equal 'Activity does-not-exist called with ["arg1", 123]',
                  execute_activity(DynamicActivity, 'arg1', 123, override_name: 'does-not-exist')
@@ -1078,6 +1146,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_dynamic_activity_raw_args
     assert_equal 'Activity does-not-exist called with ' \
                  '["arg1", nil, 123] that have encodings ["json/plain", "binary/null", "json/plain"]',
@@ -1114,6 +1184,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_context_instance
     # Instance-per-attempt (twice)
     assert_equal %w[interceptor-init interceptor-execute execute],
@@ -1137,6 +1209,8 @@ class WorkerActivityTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_client_access
     assert_equal 'ClientAccessActivity', execute_activity(ClientAccessActivity)
   end
@@ -1156,6 +1230,8 @@ class WorkerActivityTest < Test
     def execute(foo, bar: 'baz'); end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
   def test_keyword_arguments
     err = assert_raises { Temporalio::Activity::Definition::Info.from_activity(KeywordArgumentActivity) }
     assert_includes err.message, 'Activity execute cannot have keyword arguments'

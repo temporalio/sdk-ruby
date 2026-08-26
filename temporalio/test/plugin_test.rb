@@ -55,9 +55,8 @@ class PluginTest < Test
   def test_client_plugin
     # Connect with a plugin that fails on connect
     err = assert_raises do
-      Temporalio::Client.connect(
-        'bad',
-        env.client.namespace,
+      env.reconnect_client(
+        target_host: 'bad',
         plugins: [ClientPluginForTest.new(target_host: env.client.connection.target_host, fail_connect: true)]
       )
     end
@@ -65,7 +64,7 @@ class PluginTest < Test
 
     # Connect with a plugin that sets address, run a workflow, confirm plugin properly configured interceptor
     plugin = ClientPluginForTest.new(target_host: env.client.connection.target_host)
-    client = Temporalio::Client.connect('bad-address', env.client.namespace, plugins: [plugin])
+    client = env.reconnect_client(target_host: 'bad-address', plugins: [plugin])
     refute plugin.start_workflow_called
     client.start_workflow(SimpleWorkflow, 'some-name',
                           id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}")
@@ -228,7 +227,7 @@ class PluginTest < Test
     )
 
     # Create a client and worker with the plugin, run workflow, confirm success
-    client = Temporalio::Client.connect(env.client.connection.target_host, env.client.namespace, plugins: [plugin])
+    client = env.reconnect_client(plugins: [plugin])
     worker = Temporalio::Worker.new(client:, task_queue: "tq-#{SecureRandom.uuid}")
     handle = worker.run do
       client.start_workflow(SimpleWorkflow, 'some-name',

@@ -742,6 +742,8 @@ class ClientActivityTest < Test
     assert_match(/start_delay must be non-negative/i, err.message)
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_start_activity_with_start_delay_dispatches_after_delay
     delay = 2.0
     with_activity_worker([SimpleActivity]) do |task_queue|
@@ -763,6 +765,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_start_activity_with_zero_start_delay_dispatches_immediately
     # start_delay: 0 means no delay (proto-3 default for an unset Duration); activity
     # behaves exactly like one started without a start_delay kwarg.
@@ -783,6 +787,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_start_activity_with_nil_start_delay_dispatches_immediately
     # Explicit nil should be indistinguishable from omitting the kwarg.
     with_activity_worker([SimpleActivity]) do |task_queue|
@@ -802,6 +808,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_cancel_during_start_delay_transitions_to_canceled_immediately
     with_activity_worker([SimpleActivity]) do |task_queue|
       handle = env.client.start_activity(
@@ -818,6 +826,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_terminate_during_start_delay_transitions_to_terminated_immediately
     with_activity_worker([SimpleActivity]) do |task_queue|
       handle = env.client.start_activity(
@@ -834,6 +844,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_start_delay_extends_schedule_to_start_timeout
     # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s), and would fire if it
     # were not properly delayed by start_delay.
@@ -850,6 +862,8 @@ class ClientActivityTest < Test
     end
   end
 
+  exclude_from_cloud :requires_cloud_provisioning,
+                     'Requires Standalone Activity start delay to be enabled in the Cloud namespace.'
   def test_start_delay_extends_schedule_to_close_timeout
     # schedule_to_start_timeout (0.5s) is shorter than start_delay (1.0s), and would fire if it
     # were not properly delayed by start_delay.

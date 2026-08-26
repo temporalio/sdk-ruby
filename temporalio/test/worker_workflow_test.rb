@@ -493,6 +493,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
   def test_search_attributes_memo
     env.ensure_common_search_attribute_keys
 
@@ -1103,6 +1105,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
   def test_payload_codec
     env.ensure_common_search_attribute_keys
 
@@ -1993,21 +1997,22 @@ class WorkerWorkflowTest < Test
     line = lines.find { |l| l.start_with?('temporal_activity_task_received{') }
     assert_includes line, 'activity_type="CustomMetricsActivity"'
     assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
+    namespace_label = %(namespace="#{client.namespace}")
+    assert_includes line, namespace_label
     assert line.end_with?(' 1')
 
     # Confirm we have the regular workflow metrics
     line = lines.find { |l| l.start_with?('temporal_workflow_completed{') }
     assert_includes line, 'workflow_type="CustomMetricsWorkflow"'
     assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
+    assert_includes line, namespace_label
     assert line.end_with?(' 1')
 
     # Confirm custom activity metric has the tags we expect
     line = lines.find { |l| l.start_with?('my_activity_counter{') }
     assert_includes line, 'activity_type="CustomMetricsActivity"'
     assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
+    assert_includes line, namespace_label
     assert_includes line, 'someattr="someval1"'
     assert_includes line, 'anotherattr="anotherval1"'
     assert line.end_with?(' 123')
@@ -2016,7 +2021,7 @@ class WorkerWorkflowTest < Test
     line = lines.find { |l| l.start_with?('my_workflow_histogram_sum{') }
     assert_includes line, 'workflow_type="CustomMetricsWorkflow"'
     assert_includes line, 'task_queue="'
-    assert_includes line, 'namespace="default"'
+    assert_includes line, namespace_label
     assert_includes line, 'someattr="someval2"'
     assert_includes line, 'anotherattr="anotherval2"'
     assert line.end_with?(' 4560')
@@ -2122,7 +2127,7 @@ class WorkerWorkflowTest < Test
       value: 4560,
       attributes: {
         'service_name' => 'temporal-core-sdk',
-        'namespace' => 'default',
+        'namespace' => client.namespace,
         'task_queue' => task_queue,
         'workflow_type' => 'CustomMetricsWorkflow',
         'someattr' => 'someval2',
@@ -2137,7 +2142,7 @@ class WorkerWorkflowTest < Test
       value: 123,
       attributes: {
         'service_name' => 'temporal-core-sdk',
-        'namespace' => 'default',
+        'namespace' => client.namespace,
         'task_queue' => task_queue,
         'activity_type' => 'CustomMetricsActivity',
         'someattr' => 'someval1',
@@ -2337,6 +2342,8 @@ class WorkerWorkflowTest < Test
     end
   end
 
+  exclude_from_cloud :requires_local_server,
+                     'Starts a second local server to verify worker client replacement.'
   def test_worker_client_replacement
     # Create a second ephemeral server and start workflow on both servers
     Temporalio::Testing::WorkflowEnvironment.start_local do |env2|
