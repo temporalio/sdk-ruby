@@ -1,0 +1,24 @@
+Temporal CLI 0.0.0-DEV (Server 1.32.0, UI 2.53.1)
+
+Temporal Server:      localhost:7833
+Temporal Persistence: in-memory
+Temporal Metrics:     http://localhost:54793/metrics
+SigApplicator: applied 1885 runtime type signatures (216 skipped)
+/Users/gregorytravis/temporalio/operator-commands/operator-commands-ruby/temporalio/test/support/sig_applicator.rb:211:in `raise_instrumentation_errors!': SigApplicator: 1 methods could not be instrumented: (RuntimeError)
+  Temporalio::Client::Interceptor::PauseActivityInput#activity_idq: method not found
+	from /Users/gregorytravis/temporalio/operator-commands/operator-commands-ruby/temporalio/test/support/sig_applicator.rb:130:in `apply_all!'
+	from /Users/gregorytravis/temporalio/operator-commands/operator-commands-ruby/temporalio/test/test.rb:30:in `<top (required)>'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/3.3.0/bundled_gems.rb:69:in `require'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/3.3.0/bundled_gems.rb:69:in `block (2 levels) in replace_require'
+	from /Users/gregorytravis/temporalio/operator-commands/operator-commands-ruby/temporalio/test/client_activity_operator_commands_build_test.rb:5:in `<top (required)>'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/3.3.0/bundled_gems.rb:69:in `require'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/3.3.0/bundled_gems.rb:69:in `block (2 levels) in replace_require'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/gems/3.3.0/gems/rake-13.3.1/lib/rake/rake_test_loader.rb:21:in `block in <main>'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/gems/3.3.0/gems/rake-13.3.1/lib/rake/rake_test_loader.rb:6:in `select'
+	from /Users/gregorytravis/.rbenv/versions/3.3.6/lib/ruby/gems/3.3.0/gems/rake-13.3.1/lib/rake/rake_test_loader.rb:6:in `<main>'
+rake aborted!
+Command failed with status (1)
+/Users/gregorytravis/.rbenv/versions/3.3.6/bin/bundle:25:in `load'
+/Users/gregorytravis/.rbenv/versions/3.3.6/bin/bundle:25:in `<main>'
+Tasks: TOP => test
+(See full trace by running task with --trace)

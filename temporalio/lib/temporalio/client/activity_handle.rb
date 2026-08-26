@@ -255,7 +255,12 @@ module Temporalio
            heartbeat_timeout start_delay].each do |name|
           next unless options.key?(name)
 
-          proto[name.to_s] = Internal::ProtoUtils.seconds_to_duration(options[name])
+          value = options[name]
+          # A nil value clears the option: the mask still names the path, but the proto
+          # field is left unset so the server removes the value instead of setting one.
+          next if value.nil?
+
+          proto[name.to_s] = Internal::ProtoUtils.seconds_to_duration(value)
         end
         proto.retry_policy = options[:retry_policy]&._to_proto if options.key?(:retry_policy)
         proto.priority = options[:priority]&._to_proto if options.key?(:priority)

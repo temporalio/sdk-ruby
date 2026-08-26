@@ -6,6 +6,30 @@ require 'test'
 
 # Unit test for the operator-command request fields that the server does not surface back.
 class ClientActivityOperatorCommandsBuildTest < Test
+  # Clearing is the third state: the path is named in the mask so the server acts on it, but
+  # the proto field is left unset so the value goes away rather than being set.
+  def test_nil_value_clears_the_option
+    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
+    handle = client.activity_handle('act-1')
+
+    ws = client.workflow_service
+    captured = {}
+    ws.define_singleton_method(:update_activity_execution_options) do |req, **_kwargs|
+      captured[:update] = req
+      Temporalio::Api::WorkflowService::V1::UpdateActivityExecutionOptionsResponse.new(
+        activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new
+      )
+    end
+
+    handle.update_options(heartbeat_timeout: nil, start_to_close_timeout: 90.0)
+
+    req = captured.fetch(:update)
+
+    assert_equal %w[heartbeat_timeout start_to_close_timeout], req.update_mask.paths.sort
+    refute req.activity_options.has_heartbeat_timeout?
+    assert_equal 90, req.activity_options.start_to_close_timeout.seconds
+  end
+
   def test_unobservable_request_fields
     # Lazy connect so no real connection is opened; the RPCs below are stubbed.
     client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)

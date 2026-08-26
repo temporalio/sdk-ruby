@@ -1,0 +1,256 @@
+diff --git a/temporalio/lib/temporalio/client/activity_execution.rb b/temporalio/lib/temporalio/client/activity_execution.rb
+index e9765d8..e75a01a 100644
+--- a/temporalio/lib/temporalio/client/activity_execution.rb
++++ b/temporalio/lib/temporalio/client/activity_execution.rb
+@@ -186,7 +186,7 @@ module Temporalio
+         # which may be set while the activity is still retrying.
+         #
+         # @return [Error::Failure, nil] Converted failure.
+-        def failure
++        def outcome_failure
+           return nil unless @raw_description.outcome&.value == :failure
+ 
+           @data_converter.from_failure(@raw_description.outcome.failure)
+diff --git a/temporalio/lib/temporalio/client/activity_handle.rb b/temporalio/lib/temporalio/client/activity_handle.rb
+index 128d26c..956efe0 100644
+--- a/temporalio/lib/temporalio/client/activity_handle.rb
++++ b/temporalio/lib/temporalio/client/activity_handle.rb
+@@ -214,14 +214,10 @@ module Temporalio
+       # @param retry_policy [RetryPolicy, nil] New retry policy.
+       # @param priority [Priority, nil] New priority.
+       # @param start_delay [Float, nil] New start delay in seconds.
+-      # @param restore_original [Boolean] If true, restore the options to the originals the activity
+-      #   was created with. Mutually exclusive with any other option.
+       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+       #
+       # @return [ActivityExecutionOptions] The activity options after the update.
+       #
+-      # @raise [ArgumentError] If `restore_original` is combined with any other option, or if no
+-      #   option is provided and `restore_original` is false.
+       # @raise [Error::RPCError] RPC error from call.
+       def update_options(
+         task_queue: UNSET,
+@@ -232,7 +228,6 @@ module Temporalio
+         retry_policy: UNSET,
+         priority: UNSET,
+         start_delay: UNSET,
+-        restore_original: false,
+         rpc_options: nil
+       )
+         options = Api::Activity::V1::ActivityOptions.new
+@@ -271,23 +266,39 @@ module Temporalio
+           options.start_delay = Internal::ProtoUtils.seconds_to_duration(start_delay)
+         end
+ 
+-        if restore_original && !paths.empty?
+-          raise ArgumentError, 'restore_original cannot be combined with any other option'
+-        elsif !restore_original && paths.empty?
+-          raise ArgumentError, 'At least one option must be set, or restore_original must be used'
+-        end
+-
+-        result = @client._impl.update_activity_options(
++        @client._impl.update_activity_options(
+           Interceptor::UpdateActivityOptionsInput.new(
+             activity_id: id,
+             activity_run_id: run_id,
+             activity_options: options,
+             update_mask: Google::Protobuf::FieldMask.new(paths:),
+-            restore_original:,
++            restore_original: false,
++            rpc_options:
++          )
++        )
++      end
++
++      # Restore the activity's options to the originals it was created with (the options recorded
++      # in the first schedule event).
++      #
++      # WARNING: Standalone Activities are experimental.
++      #
++      # @param rpc_options [RPCOptions, nil] Advanced RPC options.
++      #
++      # @return [ActivityExecutionOptions] The activity options after the restore.
++      #
++      # @raise [Error::RPCError] RPC error from call.
++      def restore_original_options(rpc_options: nil)
++        @client._impl.update_activity_options(
++          Interceptor::UpdateActivityOptionsInput.new(
++            activity_id: id,
++            activity_run_id: run_id,
++            activity_options: Api::Activity::V1::ActivityOptions.new,
++            update_mask: Google::Protobuf::FieldMask.new(paths: []),
++            restore_original: true,
+             rpc_options:
+           )
+         )
+-        ActivityExecutionOptions._from_proto(result)
+       end
+ 
+       private
+diff --git a/temporalio/lib/temporalio/internal/client/implementation.rb b/temporalio/lib/temporalio/internal/client/implementation.rb
+index 093f080..880c306 100644
+--- a/temporalio/lib/temporalio/internal/client/implementation.rb
++++ b/temporalio/lib/temporalio/internal/client/implementation.rb
+@@ -1033,6 +1033,13 @@ module Temporalio
+             ),
+             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+           )
++          # The server is expected to omit payload fields that were not requested, but older or
++          # buggy servers may return them anyway. Clear them so the description's `has_*?`
++          # predicates agree with what was asked for.
++          resp.input = nil unless input.include_input
++          resp.outcome = nil unless input.include_outcome
++          resp.info.heartbeat_details = nil unless input.include_heartbeat_details
++          resp.info.last_failure = nil unless input.include_last_failure
+           Temporalio::Client::ActivityExecution::Description.new(resp, @client.data_converter)
+         end
+ 
+@@ -1129,7 +1136,7 @@ module Temporalio
+             ),
+             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+           )
+-          resp.activity_options
++          Temporalio::Client::ActivityExecutionOptions._from_proto(resp.activity_options)
+         end
+ 
+         def list_activities(input)
+diff --git a/temporalio/rbi/temporalio/client/activity_execution.rbi b/temporalio/rbi/temporalio/client/activity_execution.rbi
+index 8c1052e..70ee231 100644
+--- a/temporalio/rbi/temporalio/client/activity_execution.rbi
++++ b/temporalio/rbi/temporalio/client/activity_execution.rbi
+@@ -98,7 +98,7 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
+   def result(result_hint: T.unsafe(nil)); end
+ 
+   sig { returns(T.nilable(Temporalio::Error::Failure)) }
+-  def failure; end
++  def outcome_failure; end
+ 
+   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
+   def heartbeat_details(hints: T.unsafe(nil)); end
+diff --git a/temporalio/sig/temporalio/client/activity_execution.rbs b/temporalio/sig/temporalio/client/activity_execution.rbs
+index 2b657e0..526567f 100644
+--- a/temporalio/sig/temporalio/client/activity_execution.rbs
++++ b/temporalio/sig/temporalio/client/activity_execution.rbs
+@@ -33,7 +33,7 @@ module Temporalio
+         def input: (?hints: Array[Object]?) -> Array[Object?]
+         def has_result?: -> bool
+         def result: (?result_hint: Object?) -> Object?
+-        def failure: -> Error::Failure?
++        def outcome_failure: -> Error::Failure?
+         def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
+         def retry_policy: -> RetryPolicy
+         def last_heartbeat_time: -> Time?
+diff --git a/temporalio/sig/temporalio/client/activity_handle.rbs b/temporalio/sig/temporalio/client/activity_handle.rbs
+index 2f8679b..6509707 100644
+--- a/temporalio/sig/temporalio/client/activity_handle.rbs
++++ b/temporalio/sig/temporalio/client/activity_handle.rbs
+@@ -53,10 +53,11 @@ module Temporalio
+         ?retry_policy: RetryPolicy?,
+         ?priority: Priority?,
+         ?start_delay: Float?,
+-        ?restore_original: bool,
+         ?rpc_options: RPCOptions?
+       ) -> ActivityExecutionOptions
+ 
++      def restore_original_options: (?rpc_options: RPCOptions?) -> ActivityExecutionOptions
++
+       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
+     end
+   end
+diff --git a/temporalio/test/client_activity_operator_commands_build_test.rb b/temporalio/test/client_activity_operator_commands_build_test.rb
+index 26bde15..67e01ae 100644
+--- a/temporalio/test/client_activity_operator_commands_build_test.rb
++++ b/temporalio/test/client_activity_operator_commands_build_test.rb
+@@ -37,7 +37,7 @@ class ClientActivityOperatorCommandsBuildTest < Test
+       handle.pause('because')
+       handle.unpause(reason: 'go', jitter: 5.0)
+       handle.reset(jitter: 2.0)
+-      handle.update_options(restore_original: true)
++      handle.restore_original_options
+     ensure
+       ws.singleton_class.send(:remove_method, :pause_activity_execution)
+       ws.singleton_class.send(:remove_method, :unpause_activity_execution)
+diff --git a/temporalio/test/client_activity_operator_commands_test.rb b/temporalio/test/client_activity_operator_commands_test.rb
+index a12461c..e9a7b1b 100644
+--- a/temporalio/test/client_activity_operator_commands_test.rb
++++ b/temporalio/test/client_activity_operator_commands_test.rb
+@@ -223,52 +223,6 @@ class ClientActivityOperatorCommandsTest < Test
+     end
+   end
+ 
+-  def test_update_options_restore_original_exclusive
+-    with_activity_worker([SlowActivity]) do |task_queue|
+-      handle = start_running_slow_activity(task_queue)
+-      # Wrap the RPC so we can prove it is never reached when the validation fails.
+-      ws = env.client.workflow_service
+-      reached = false
+-      original = ws.method(:update_activity_execution_options)
+-      ws.define_singleton_method(:update_activity_execution_options) do |req, **kwargs|
+-        reached = true
+-        original.call(req, **kwargs)
+-      end
+-      begin
+-        err = assert_raises(ArgumentError) do
+-          handle.update_options(restore_original: true, start_to_close_timeout: 5.0)
+-        end
+-        assert_match(/restore_original cannot be combined/i, err.message)
+-        refute reached, 'update_activity_execution_options RPC should not be reached when validation fails'
+-      ensure
+-        ws.singleton_class.send(:remove_method, :update_activity_execution_options)
+-      end
+-      handle.terminate('cleanup')
+-    end
+-  end
+-
+-  def test_update_options_requires_at_least_one_option
+-    with_activity_worker([SlowActivity]) do |task_queue|
+-      handle = start_running_slow_activity(task_queue)
+-      # Wrap the RPC so we can prove it is never reached when the validation fails.
+-      ws = env.client.workflow_service
+-      reached = false
+-      original = ws.method(:update_activity_execution_options)
+-      ws.define_singleton_method(:update_activity_execution_options) do |req, **kwargs|
+-        reached = true
+-        original.call(req, **kwargs)
+-      end
+-      begin
+-        err = assert_raises(ArgumentError) { handle.update_options }
+-        assert_match(/at least one option/i, err.message)
+-        refute reached, 'update_activity_execution_options RPC should not be reached when validation fails'
+-      ensure
+-        ws.singleton_class.send(:remove_method, :update_activity_execution_options)
+-      end
+-      handle.terminate('cleanup')
+-    end
+-  end
+-
+   def test_update_options_restore_original
+     with_activity_worker([SlowActivity]) do |task_queue|
+       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
+@@ -278,7 +232,7 @@ class ClientActivityOperatorCommandsTest < Test
+       assert_equal 90.0, changed.start_to_close_timeout
+ 
+       # restore_original alone reverts to the value the activity was created with.
+-      restored = handle.update_options(restore_original: true)
++      restored = handle.restore_original_options
+       assert_equal 45.0, restored.start_to_close_timeout
+       handle.terminate('cleanup')
+     end
+@@ -432,7 +386,7 @@ class ClientActivityOperatorCommandsTest < Test
+       assert desc.has_result?
+       assert_equal 'ping-echoed', desc.result
+       # A successful outcome has no failure arm.
+-      assert_nil desc.failure
++      assert_nil desc.outcome_failure
+     end
+   end
+ 
+@@ -449,7 +403,7 @@ class ClientActivityOperatorCommandsTest < Test
+       desc = handle.describe(include_outcome: true)
+       refute desc.has_result?
+       assert_nil desc.result
+-      failure = desc.failure
++      failure = desc.outcome_failure
+       assert_instance_of Temporalio::Error::ApplicationError, failure
+       assert_equal 'deliberate failure', failure&.message
+     end
