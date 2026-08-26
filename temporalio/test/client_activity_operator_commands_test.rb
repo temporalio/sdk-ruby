@@ -59,6 +59,19 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  # Heartbeats, fails the first attempt, then succeeds. One execution of this carries input, a
+  # result, heartbeat details and a last failure all at once, which is what lets a single
+  # describe exercise every payload field.
+  class HeartbeatFailIncrementActivity < Temporalio::Activity::Definition
+    def execute(value)
+      ctx = Temporalio::Activity::Context.current
+      ctx.heartbeat('heartbeat details')
+      raise Temporalio::Error::ApplicationError, 'deliberate first-attempt failure' if ctx.info.attempt == 1
+
+      value + 1
+    end
+  end
+
   # Always fails. Paired with a single-attempt retry policy so the activity reaches a terminal
   # failure outcome rather than retrying.
   class AlwaysFailActivity < Temporalio::Activity::Definition
@@ -410,19 +423,6 @@ class ClientActivityOperatorCommandsTest < Test
     handle
   end
 
-  # The payload-bearing describe fields are opt-in (api#792). Assert the default really is "off"
-  # rather than the SDK quietly requesting everything: same activity, same moment, two describes.
-  def test_describe_payload_fields_are_opt_in
-    with_activity_worker([HeartbeatOnceActivity]) do |task_queue|
-      handle = start_heartbeat_ready_activity(task_queue)
-      refute handle.describe.has_heartbeat_details?
-      assert_empty handle.describe.heartbeat_details
-      assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
-      assert_equal ['hb-details'], handle.describe(include_heartbeat_details: true).heartbeat_details
-      handle.terminate('cleanup')
-    end
-  end
-
   # Input and outcome are opt-in like the other payload fields, and the outcome is a
   # result-or-failure oneof. A successful activity populates the result arm only.
   # The count tracks heartbeats the server recorded.
@@ -440,46 +440,63 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_describe_input_and_result_are_opt_in
-    with_activity_worker([EchoActivity]) do |task_queue|
+  # Every payload field on one description. The activity heartbeats, fails once, then succeeds,
+  # so a single execution carries input, a result, heartbeat details and a last failure at once.
+  def test_describe_payloads
+    with_activity_worker([HeartbeatFailIncrementActivity, AlwaysFailActivity]) do |task_queue|
       handle = env.client.start_activity(
-        EchoActivity, 'ping',
-        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 60
+        HeartbeatFailIncrementActivity, 1,
+        id: "act-#{SecureRandom.uuid}", task_queue:,
+        start_to_close_timeout: 60, heartbeat_timeout: 5,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 2, initial_interval: 0.1)
       )
-      assert_equal 'ping-echoed', handle.result
 
-      desc = handle.describe
-      refute desc.has_input?
-      assert_empty desc.input
-      refute desc.has_result?
-      assert_nil desc.result
+      assert_equal 2, handle.result
 
-      desc = handle.describe(include_input: true, include_outcome: true)
-      assert desc.has_input?
-      assert_equal ['ping'], desc.input
-      assert desc.has_result?
-      assert_equal 'ping-echoed', desc.result
-      # A successful outcome has no failure arm.
-      assert_nil desc.failure
-    end
-  end
+      # Nothing requested: every payload field is absent.
+      bare = handle.describe
 
-  # The other arm of the oneof: a terminally failed activity has a failure and no result.
-  def test_describe_outcome_failure
-    with_activity_worker([AlwaysFailActivity]) do |task_queue|
-      handle = env.client.start_activity(
+      refute bare.has_input?
+      refute bare.has_result?
+      refute bare.has_heartbeat_details?
+      refute bare.has_last_failure?
+      assert_empty bare.input
+      assert_nil bare.result
+      assert_nil bare.failure
+      assert_nil bare.last_failure
+
+      # All four requested. The activity succeeded on its second attempt, so it has a result
+      # and a last failure at the same time, and no terminal failure.
+      full = handle.describe(
+        include_input: true, include_outcome: true,
+        include_heartbeat_details: true, include_last_failure: true
+      )
+
+      assert full.has_input?
+      assert_equal [1], full.input
+      assert full.has_result?
+      assert_equal 2, full.result
+      assert_nil full.failure
+      assert full.has_heartbeat_details?
+      assert_equal ['heartbeat details'], full.heartbeat_details
+      assert full.has_last_failure?
+      refute_nil full.last_failure
+
+      # The other arm of the oneof, on an activity that never succeeds.
+      failed = env.client.start_activity(
         AlwaysFailActivity,
-        id: "act-#{SecureRandom.uuid}", task_queue: task_queue, start_to_close_timeout: 60,
+        id: "act-#{SecureRandom.uuid}", task_queue:,
+        start_to_close_timeout: 60,
         retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
       )
-      assert_raises(Temporalio::Error::ActivityFailedError) { handle.result }
+      assert_raises(Temporalio::Error) { failed.result }
 
-      desc = handle.describe(include_outcome: true)
+      desc = failed.describe(include_outcome: true, include_last_failure: true)
+
       refute desc.has_result?
       assert_nil desc.result
-      failure = desc.failure
-      assert_instance_of Temporalio::Error::ApplicationError, failure
-      assert_equal 'deliberate failure', failure&.message
+      assert_instance_of Temporalio::Error::ApplicationError, desc.failure
+      assert_equal 'deliberate failure', desc.failure.message
     end
   end
 
