@@ -440,8 +440,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Every payload field on one description. The activity heartbeats, fails once, then succeeds,
-  # so a single execution carries input, a result, heartbeat details and a last failure at once.
   def test_describe_payloads
     with_activity_worker([HeartbeatFailIncrementActivity, AlwaysFailActivity]) do |task_queue|
       handle = env.client.start_activity(
@@ -482,7 +480,6 @@ class ClientActivityOperatorCommandsTest < Test
       assert full.has_last_failure?
       refute_nil full.last_failure
 
-      # The other arm of the oneof, on an activity that never succeeds.
       failed = env.client.start_activity(
         AlwaysFailActivity,
         id: "act-#{SecureRandom.uuid}", task_queue:,
