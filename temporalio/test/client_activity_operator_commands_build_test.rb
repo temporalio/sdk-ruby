@@ -4,10 +4,7 @@ require 'temporalio/api'
 require 'temporalio/client'
 require 'test'
 
-# Unit test for the operator-command request fields that the server does not surface back.
 class ClientActivityOperatorCommandsBuildTest < Test
-  # A server that ignores the opt-ins must not be able to make the description's has_*
-  # accessors disagree with what the caller asked for. Only a stub can produce that response.
   def test_unrequested_payloads_are_stripped
     client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
     handle = client.activity_handle('act-1')
@@ -54,8 +51,6 @@ class ClientActivityOperatorCommandsBuildTest < Test
     refute one.has_last_failure?
   end
 
-  # Clearing is the third state: the path is named in the mask so the server acts on it, but
-  # the proto field is left unset so the value goes away rather than being set.
   def test_nil_value_clears_the_option
     client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
     handle = client.activity_handle('act-1')

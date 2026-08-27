@@ -256,8 +256,6 @@ module Temporalio
           next unless options.key?(name)
 
           value = options[name]
-          # A nil value clears the option: the mask still names the path, but the proto
-          # field is left unset so the server removes the value instead of setting one.
           next if value.nil?
 
           proto[name.to_s] = Internal::ProtoUtils.seconds_to_duration(value)
