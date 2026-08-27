@@ -101,8 +101,6 @@ class ClientActivityHintsTest < Test
                  'Worker-side result encode should use definition result_hint'
   end
 
-  # describe(include_input:, include_outcome:) returns undecoded payloads; the hints are
-  # supplied at read time, not at describe time. Nothing else covers that argument.
   def test_describe_input_and_result_hints
     client = build_tracking_client
     task_queue = "saa-hints-tq-#{SecureRandom.uuid}"
