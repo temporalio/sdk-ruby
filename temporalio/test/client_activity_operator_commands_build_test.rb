@@ -51,7 +51,57 @@ class ClientActivityOperatorCommandsBuildTest < Test
     refute one.has_last_failure?
   end
 
-  def test_nil_value_clears_the_option
+  def test_value_set_of_zero_sends_an_explicit_zero
+    req = capture_update do |handle|
+      handle.update_options(Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_set(0))
+    end
+
+    assert_equal %w[heartbeat_timeout], req.update_mask.paths.sort
+    # Present and zero, which is distinct from absent: the caller asked for zero.
+    assert req.activity_options.has_heartbeat_timeout?
+    assert_equal 0, req.activity_options.heartbeat_timeout.seconds
+    assert_equal 0, req.activity_options.heartbeat_timeout.nanos
+  end
+
+  def test_value_unset_names_the_path_but_leaves_the_field_absent
+    req = capture_update do |handle|
+      handle.update_options(Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_unset)
+    end
+
+    assert_equal %w[heartbeat_timeout], req.update_mask.paths.sort
+    # Absent, which is how the server is told to clear the option.
+    refute req.activity_options.has_heartbeat_timeout?
+  end
+
+  def test_mask_names_only_the_changed_options
+    req = capture_update do |handle|
+      handle.update_options(
+        Temporalio::Client::ActivityOptions::TASK_QUEUE.value_set('new-tq'),
+        Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0)
+      )
+    end
+
+    assert_equal %w[start_to_close_timeout task_queue.name], req.update_mask.paths.sort
+    refute req.restore_original
+    assert_equal 'new-tq', req.activity_options.task_queue.name
+    assert_equal 90, req.activity_options.start_to_close_timeout.seconds
+  end
+
+  def test_a_repeated_key_resolves_to_its_last_update
+    req = capture_update do |handle|
+      handle.update_options(
+        Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_set(5.0),
+        Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_unset
+      )
+    end
+
+    # The later unset wins, and the path is named once.
+    assert_equal %w[heartbeat_timeout], req.update_mask.paths.sort
+    refute req.activity_options.has_heartbeat_timeout?
+  end
+
+  # Runs the block against a handle whose update RPC is stubbed, returning the captured request.
+  def capture_update
     client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
     handle = client.activity_handle('act-1')
 
@@ -64,13 +114,8 @@ class ClientActivityOperatorCommandsBuildTest < Test
       )
     end
 
-    handle.update_options(heartbeat_timeout: nil, start_to_close_timeout: 90.0)
-
-    req = captured.fetch(:update)
-
-    assert_equal %w[heartbeat_timeout start_to_close_timeout], req.update_mask.paths.sort
-    refute req.activity_options.has_heartbeat_timeout?
-    assert_equal 90, req.activity_options.start_to_close_timeout.seconds
+    yield handle
+    captured.fetch(:update)
   end
 
   def test_unobservable_request_fields

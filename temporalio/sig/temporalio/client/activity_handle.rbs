@@ -45,9 +45,9 @@ module Temporalio
       ) -> void
 
       def update_options: (
+        *ActivityOptions::Update updates,
         ?restore_original: bool,
-        ?rpc_options: RPCOptions?,
-        **untyped options
+        ?rpc_options: RPCOptions?
       ) -> ActivityExecutionOptions
 
       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?

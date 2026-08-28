@@ -186,7 +186,7 @@ class ClientActivityOperatorCommandsTest < Test
         schedule_to_close_timeout: 120
       )
 
-      updated = handle.update_options(start_to_close_timeout: 90.0)
+      updated = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
 
       # Returned options: only start_to_close changed; schedule_to_close kept its original value.
       assert_equal 90.0, updated.start_to_close_timeout
@@ -214,14 +214,16 @@ class ClientActivityOperatorCommandsTest < Test
       )
 
       updated = handle.update_options(
-        task_queue: 'updated-tq',
-        schedule_to_close_timeout: 200.0,
-        schedule_to_start_timeout: 15.0,
-        start_to_close_timeout: 90.0,
-        heartbeat_timeout: 25.0,
-        retry_policy: Temporalio::RetryPolicy.new(initial_interval: 1.0, backoff_coefficient: 2.0, max_attempts: 7),
-        priority: Temporalio::Priority.new(priority_key: 3),
-        start_delay: 500.0
+        Temporalio::Client::ActivityOptions::TASK_QUEUE.value_set('updated-tq'),
+        Temporalio::Client::ActivityOptions::SCHEDULE_TO_CLOSE_TIMEOUT.value_set(200.0),
+        Temporalio::Client::ActivityOptions::SCHEDULE_TO_START_TIMEOUT.value_set(15.0),
+        Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0),
+        Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_set(25.0),
+        Temporalio::Client::ActivityOptions::RETRY_POLICY.value_set(
+          Temporalio::RetryPolicy.new(initial_interval: 1.0, backoff_coefficient: 2.0, max_attempts: 7)
+        ),
+        Temporalio::Client::ActivityOptions::PRIORITY.value_set(Temporalio::Priority.new(priority_key: 3)),
+        Temporalio::Client::ActivityOptions::START_DELAY.value_set(500.0)
       )
 
       # Every field is settable and lands: the returned options reflect each new value.
@@ -262,7 +264,8 @@ class ClientActivityOperatorCommandsTest < Test
       end
       begin
         err = assert_raises(ArgumentError) do
-          handle.update_options(restore_original: true, start_to_close_timeout: 5.0)
+          handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(5.0),
+                                restore_original: true)
         end
         assert_match(/restore_original cannot be combined/i, err.message)
         refute reached, 'update_activity_execution_options RPC should not be reached when validation fails'
@@ -300,7 +303,7 @@ class ClientActivityOperatorCommandsTest < Test
       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
 
       # Change an option away from the original.
-      changed = handle.update_options(start_to_close_timeout: 90.0)
+      changed = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       assert_equal 90.0, changed.start_to_close_timeout
 
       # restore_original alone reverts to the value the activity was created with.
@@ -327,7 +330,7 @@ class ClientActivityOperatorCommandsTest < Test
 
       # Updating options is legal while paused, and the new value lands. Whole-second timeouts
       # round-trip exactly through the protobuf Duration conversion, so assert on equality.
-      updated = handle.update_options(start_to_close_timeout: 90.0)
+      updated = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       assert_equal 90.0, updated.start_to_close_timeout
 
       desc = handle.describe
@@ -394,7 +397,7 @@ class ClientActivityOperatorCommandsTest < Test
     with_activity_worker([SlowActivity]) do |task_queue|
       handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
 
-      updated = handle.update_options(start_to_close_timeout: 90.0)
+      updated = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       assert_equal 90.0, updated.start_to_close_timeout
 
       handle.reset(restore_original_options: true)
@@ -533,7 +536,7 @@ class ClientActivityOperatorCommandsTest < Test
       assert_eventually_paused(handle)
 
       # UpdateOptions changes activity options only; it never touches heartbeat details.
-      handle.update_options(start_to_close_timeout: 90.0)
+      handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       assert handle.describe(include_heartbeat_details: true).has_heartbeat_details?
       handle.terminate('cleanup')
     end

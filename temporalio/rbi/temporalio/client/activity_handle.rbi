@@ -84,17 +84,15 @@ class Temporalio::Client::ActivityHandle
 
   sig do
     params(
+      updates: Temporalio::Client::ActivityOptions::Update,
       restore_original: T::Boolean,
-      rpc_options: T.nilable(Temporalio::Client::RPCOptions),
-      options: T.nilable(
-        T.any(String, Symbol, Integer, Float, Temporalio::RetryPolicy, Temporalio::Priority)
-      )
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
     ).returns(Temporalio::Client::ActivityExecutionOptions)
   end
   def update_options(
+    *updates,
     restore_original: T.unsafe(nil),
-    rpc_options: T.unsafe(nil),
-    **options
+    rpc_options: T.unsafe(nil)
   ); end
 
   private

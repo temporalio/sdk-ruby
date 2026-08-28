@@ -3,6 +3,7 @@
 require 'temporalio/api'
 require 'temporalio/client/activity_execution'
 require 'temporalio/client/activity_execution_options'
+require 'temporalio/client/activity_options'
 require 'temporalio/client/interceptor'
 require 'temporalio/error'
 require 'temporalio/internal/proto_utils'
@@ -16,17 +17,6 @@ module Temporalio
     #
     # WARNING: Standalone Activities are experimental.
     class ActivityHandle
-      UPDATABLE_OPTION_PATHS = {
-        task_queue: 'task_queue.name',
-        schedule_to_close_timeout: 'schedule_to_close_timeout',
-        schedule_to_start_timeout: 'schedule_to_start_timeout',
-        start_to_close_timeout: 'start_to_close_timeout',
-        heartbeat_timeout: 'heartbeat_timeout',
-        retry_policy: 'retry_policy',
-        priority: 'priority',
-        start_delay: 'start_delay'
-      }.freeze
-
       # @return [String] ID for the activity.
       attr_reader :id
 
@@ -209,68 +199,54 @@ module Temporalio
         nil
       end
 
-      # Update the activity's options. Only the options you actually pass are changed; anything you
-      # omit is left as-is. Passing an option explicitly as `nil` clears it.
+      # Update the activity's options. Only the options named by `updates` are changed; anything
+      # not named is left as-is.
+      #
+      # Updates are created from the keys on {ActivityOptions}, via {ActivityOptions::Key#value_set}
+      # to set an option or {ActivityOptions::Key#value_unset} to clear it.
       #
       # WARNING: Standalone Activities are experimental.
       #
+      # @param updates [Array<ActivityOptions::Update>] The option updates to apply. At least one is
+      #   required unless `restore_original` is true.
       # @param restore_original [Boolean] If true, restore the options to the originals the activity
-      #   was created with. Mutually exclusive with any other option.
+      #   was created with. Mutually exclusive with any update.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
-      # @param options [Hash{Symbol => Object, nil}] The options to change. Keys must be drawn from
-      #   {UPDATABLE_OPTION_PATHS}; anything else raises `ArgumentError`.
-      # @option options [String, Symbol, nil] :task_queue New task queue.
-      # @option options [Float, nil] :schedule_to_close_timeout New schedule-to-close timeout in seconds.
-      # @option options [Float, nil] :schedule_to_start_timeout New schedule-to-start timeout in seconds.
-      # @option options [Float, nil] :start_to_close_timeout New start-to-close timeout in seconds.
-      # @option options [Float, nil] :heartbeat_timeout New heartbeat timeout in seconds.
-      # @option options [RetryPolicy, nil] :retry_policy New retry policy.
-      # @option options [Priority, nil] :priority New priority.
-      # @option options [Float, nil] :start_delay New start delay in seconds.
       #
       # @return [ActivityExecutionOptions] The activity options after the update.
       #
-      # @raise [ArgumentError] If an unknown option is given, if `restore_original` is combined with
-      #   any other option, or if no option is provided and `restore_original` is false.
+      # @raise [ArgumentError] If a non-update is given, if `restore_original` is combined with any
+      #   update, or if no update is provided and `restore_original` is false.
       # @raise [Error::RPCError] RPC error from call.
-      def update_options(restore_original: false, rpc_options: nil, **options)
-        unknown = options.keys - UPDATABLE_OPTION_PATHS.keys
-        unless unknown.empty?
+      def update_options(*updates, restore_original: false, rpc_options: nil)
+        unless updates.all?(ActivityOptions::Update)
           raise ArgumentError,
-                "Unknown option(s): #{unknown.join(', ')}. " \
-                "Expected any of: #{UPDATABLE_OPTION_PATHS.keys.join(', ')}"
+                'Updates must be created via ActivityOptions::Key#value_set or #value_unset'
         end
 
-        if restore_original && !options.empty?
-          raise ArgumentError, 'restore_original cannot be combined with any other option'
-        elsif !restore_original && options.empty?
-          raise ArgumentError, 'At least one option must be set, or restore_original must be used'
+        if restore_original && !updates.empty?
+          raise ArgumentError, 'restore_original cannot be combined with any option update'
+        elsif !restore_original && updates.empty?
+          raise ArgumentError,
+                'At least one option update must be given, or restore_original must be used'
         end
+
+        # For repeated keys, later values override previous ones.
+        by_path = updates.to_h { |update| [update.key.name, update] }
 
         proto = Api::Activity::V1::ActivityOptions.new
-        if options.key?(:task_queue) && (task_queue = options[:task_queue])
-          proto.task_queue = Api::TaskQueue::V1::TaskQueue.new(name: task_queue.to_s)
+        by_path.each_value do |update|
+          # An unset update names its path but leaves the field absent, which is how the server is
+          # told to clear the option rather than set it to a value.
+          update.key._apply(proto, update.value) unless update.value.nil?
         end
-        %i[schedule_to_close_timeout schedule_to_start_timeout start_to_close_timeout
-           heartbeat_timeout start_delay].each do |name|
-          next unless options.key?(name)
-
-          value = options[name]
-          next if value.nil?
-
-          proto[name.to_s] = Internal::ProtoUtils.seconds_to_duration(value)
-        end
-        proto.retry_policy = options[:retry_policy]&._to_proto if options.key?(:retry_policy)
-        proto.priority = options[:priority]&._to_proto if options.key?(:priority)
 
         @client._impl.update_activity_options(
           Interceptor::UpdateActivityOptionsInput.new(
             activity_id: id,
             activity_run_id: run_id,
             activity_options: proto,
-            update_mask: Google::Protobuf::FieldMask.new(
-              paths: options.keys.map { |k| UPDATABLE_OPTION_PATHS.fetch(k) }
-            ),
+            update_mask: Google::Protobuf::FieldMask.new(paths: by_path.keys),
             restore_original:,
             rpc_options:
           )

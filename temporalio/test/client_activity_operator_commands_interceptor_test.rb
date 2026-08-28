@@ -85,7 +85,7 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
         assert_includes paused_states, handle.describe.run_state
       end
       handle.unpause
-      handle.update_options(start_to_close_timeout: 90.0)
+      handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       handle.reset
 
       handle.terminate('cleanup')
