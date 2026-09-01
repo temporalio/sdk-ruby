@@ -1,0 +1,30 @@
+module Temporalio
+  class Client
+    module ActivityOptions
+      class Key
+        attr_reader name: String
+
+        def initialize: (String name) { (untyped proto, untyped value) -> void } -> void
+        def value_set: (untyped value) -> Update
+        def value_unset: () -> Update
+        def _apply: (untyped proto, untyped value) -> void
+      end
+
+      class Update
+        attr_reader key: Key
+        attr_reader value: untyped?
+
+        def initialize: (Key key, untyped? value) -> void
+      end
+
+      TASK_QUEUE: Key
+      SCHEDULE_TO_CLOSE_TIMEOUT: Key
+      SCHEDULE_TO_START_TIMEOUT: Key
+      START_TO_CLOSE_TIMEOUT: Key
+      HEARTBEAT_TIMEOUT: Key
+      START_DELAY: Key
+      RETRY_POLICY: Key
+      PRIORITY: Key
+    end
+  end
+end
