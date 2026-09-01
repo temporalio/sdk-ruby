@@ -396,16 +396,20 @@ class ClientActivityOperatorCommandsTest < Test
   end
 
   def test_reset_restores_original_options
-    with_activity_worker([SlowActivity]) do |task_queue|
-      handle = start_running_slow_activity(task_queue, start_to_close_timeout: 45)
+    with_activity_worker([QuickActivity]) do |task_queue|
+      # Start delayed so the restore is applied immediately.
+      handle = env.client.start_activity(
+        QuickActivity,
+        id: "act-#{SecureRandom.uuid}", task_queue: task_queue,
+        start_to_close_timeout: 45, start_delay: 300.0
+      )
 
       updated = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
       assert_equal 90.0, updated.start_to_close_timeout
 
       handle.reset(restore_original_options: true)
       # restore_original_options reverts the changed option to the value the activity was created with.
-      # DIAGNOSTIC (2026-07-30): bumped from 30s to 60s.
-      assert_eventually(timeout: 60.0) do
+      assert_eventually do
         assert_equal 45.0, handle.describe.start_to_close_timeout
       end
       handle.terminate('cleanup')
