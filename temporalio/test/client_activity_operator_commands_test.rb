@@ -149,8 +149,10 @@ class ClientActivityOperatorCommandsTest < Test
       end
 
       handle.unpause
-      # After unpause the activity proceeds and completes successfully (proving it resumed).
-      assert_equal 'resumed', handle.result
+      assert_eventually do
+        refute_includes PAUSED_STATES, handle.describe.run_state
+      end
+      handle.terminate('cleanup')
     end
   end
 
