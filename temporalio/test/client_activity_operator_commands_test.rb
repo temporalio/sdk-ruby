@@ -350,10 +350,6 @@ class ClientActivityOperatorCommandsTest < Test
   def test_describe_paused_activity_reports_paused_status
     with_activity_worker([QuickActivity]) do |task_queue|
       activity_id = "act-#{SecureRandom.uuid}"
-      # Start delayed so the activity sits SCHEDULED; pausing from there reaches a true PAUSED
-      # state rather than the PAUSE_REQUESTED of a running activity. `status` is the overall
-      # ActivityExecutionStatus (api#834 added PAUSED to it); `run_state` is the finer-grained
-      # PendingActivityState. Both should read PAUSED here.
       handle = env.client.start_activity(
         QuickActivity,
         id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, start_delay: 30.0
