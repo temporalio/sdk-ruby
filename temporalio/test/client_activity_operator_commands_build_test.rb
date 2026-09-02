@@ -5,52 +5,6 @@ require 'temporalio/client'
 require 'test'
 
 class ClientActivityOperatorCommandsBuildTest < Test
-  def test_unrequested_payloads_are_stripped
-    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
-    handle = client.activity_handle('act-1')
-
-    payloads = Temporalio::Api::Common::V1::Payloads.new(
-      payloads: [Temporalio::Api::Common::V1::Payload.new(
-        metadata: { 'encoding' => 'json/plain' }, data: '"x"'
-      )]
-    )
-    ws = client.workflow_service
-    ws.define_singleton_method(:describe_activity_execution) do |_req, **_kwargs|
-      Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse.new(
-        info: Temporalio::Api::Activity::V1::ActivityExecutionInfo.new(
-          activity_id: 'act-1',
-          heartbeat_details: payloads,
-          last_failure: Temporalio::Api::Failure::V1::Failure.new(message: 'boom')
-        ),
-        input: payloads,
-        outcome: Temporalio::Api::Activity::V1::ActivityExecutionOutcome.new(result: payloads)
-      )
-    end
-
-    bare = handle.describe
-
-    refute bare.has_input?
-    refute bare.has_result?
-    refute bare.has_heartbeat_details?
-    refute bare.has_last_failure?
-
-    full = handle.describe(include_input: true, include_outcome: true,
-                           include_heartbeat_details: true, include_last_failure: true)
-
-    assert full.has_input?
-    assert full.has_result?
-    assert full.has_heartbeat_details?
-    assert full.has_last_failure?
-
-    # Stripping is per field: asking for one must not let the others through.
-    one = handle.describe(include_input: true)
-
-    assert one.has_input?
-    refute one.has_result?
-    refute one.has_heartbeat_details?
-    refute one.has_last_failure?
-  end
-
   def test_value_set_of_zero_sends_an_explicit_zero
     req = capture_update do |handle|
       handle.update_options(Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_set(0))

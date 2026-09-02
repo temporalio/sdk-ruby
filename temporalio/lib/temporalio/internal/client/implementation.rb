@@ -1033,12 +1033,6 @@ module Temporalio
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
-          # Clear payload-bearing fields the caller did not ask for, in case an older
-          # or buggy server sent them anyway.
-          resp.input = nil unless input.include_input
-          resp.outcome = nil unless input.include_outcome
-          resp.info.heartbeat_details = nil unless input.include_heartbeat_details
-          resp.info.last_failure = nil unless input.include_last_failure
           Temporalio::Client::ActivityExecution::Description.new(resp, @client.data_converter)
         end
 
