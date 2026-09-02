@@ -57,7 +57,8 @@ module Temporalio
     #   @return [RetryPolicy, nil] Retry policy for the workflow.
     # @!attribute root
     #   @return [RootInfo, nil] Root information for the workflow. This is nil in pre-1.27.0 server versions or if there
-    #     is no root (i.e. the root is itself).
+    #     is no root (i.e. the root is itself). Its namespace is not retained and may differ from this workflow's
+    #     namespace for cross-namespace child workflows. Track it separately if needed.
     # @!attribute run_id
     #   @return [String] Run ID for the workflow.
     # @!attribute run_timeout
@@ -93,7 +94,8 @@ module Temporalio
         :workflow_id
       )
 
-      # Information about a root of a workflow.
+      # Information about a root of a workflow. Its namespace is not retained and may differ from the current
+      # workflow's namespace for cross-namespace child workflows. Track it separately if needed.
       #
       # @!attribute run_id
       #   @return [String] Run ID for the root.
