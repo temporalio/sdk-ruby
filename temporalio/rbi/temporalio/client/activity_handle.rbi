@@ -67,23 +67,6 @@ class Temporalio::Client::ActivityHandle
 
   sig do
     params(
-      keep_paused: T::Boolean,
-      jitter: T.nilable(Float),
-      restore_original_options: T::Boolean,
-      reset_heartbeat: T::Boolean,
-      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
-    ).void
-  end
-  def reset(
-    keep_paused: T.unsafe(nil),
-    jitter: T.unsafe(nil),
-    restore_original_options: T.unsafe(nil),
-    reset_heartbeat: T.unsafe(nil),
-    rpc_options: T.unsafe(nil)
-  ); end
-
-  sig do
-    params(
       updates: Temporalio::Client::ActivityOptions::Update,
       restore_original: T::Boolean,
       rpc_options: T.nilable(Temporalio::Client::RPCOptions)

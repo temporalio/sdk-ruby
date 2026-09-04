@@ -339,19 +339,6 @@ module Temporalio
         :rpc_options
       )
 
-      # Input for {Outbound.reset_activity}.
-      #
-      # WARNING: Standalone Activities are experimental.
-      ResetActivityInput = Data.define(
-        :activity_id,
-        :activity_run_id,
-        :keep_paused,
-        :jitter,
-        :restore_original_options,
-        :reset_heartbeat,
-        :rpc_options
-      )
-
       # Input for {Outbound.update_activity_options}.
       #
       # WARNING: Standalone Activities are experimental.
@@ -653,15 +640,6 @@ module Temporalio
         # @param input [UnpauseActivityInput] Input.
         def unpause_activity(input)
           next_interceptor.unpause_activity(input)
-        end
-
-        # Called for every {ActivityHandle.reset} call.
-        #
-        # WARNING: Standalone Activities are experimental.
-        #
-        # @param input [ResetActivityInput] Input.
-        def reset_activity(input)
-          next_interceptor.reset_activity(input)
         end
 
         # Called for every {ActivityHandle.update_options} call.

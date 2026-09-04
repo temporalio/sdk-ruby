@@ -6,7 +6,7 @@ require 'temporalio/testing'
 require 'temporalio/worker'
 require 'test'
 
-# Verifies each operator command (pause/unpause/reset/update_options) flows through the outbound
+# Verifies each operator command (pause/unpause/update_options) flows through the outbound
 # client interceptor chain.
 class ClientActivityOperatorCommandsInterceptorTest < Test
   class SlowActivity < Temporalio::Activity::Definition
@@ -50,12 +50,6 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
         super
       end
 
-      def reset_activity(input)
-        @events << 'reset_activity'
-        @inputs[:reset_activity] = input
-        super
-      end
-
       def update_activity_options(input)
         @events << 'update_activity_options'
         @inputs[:update_activity_options] = input
@@ -94,14 +88,12 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
       end
       handle.unpause
       handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
-      handle.reset
 
       handle.terminate('cleanup')
     end
 
     assert_includes events, 'pause_activity'
     assert_includes events, 'unpause_activity'
-    assert_includes events, 'reset_activity'
     assert_includes events, 'update_activity_options'
   end
 
@@ -125,15 +117,11 @@ class ClientActivityOperatorCommandsInterceptorTest < Test
 
       handle.pause('pause-reason')
       handle.unpause(reason: 'unpause-reason', jitter: 5.0)
-      handle.reset(keep_paused: true, reset_heartbeat: true)
       handle.terminate('cleanup')
     end
 
     assert_equal 'pause-reason', recorder.inputs[:pause_activity].reason
     assert_equal 'unpause-reason', recorder.inputs[:unpause_activity].reason
     assert_equal 5.0, recorder.inputs[:unpause_activity].jitter
-    assert recorder.inputs[:reset_activity].keep_paused
-    assert recorder.inputs[:reset_activity].reset_heartbeat
-    refute recorder.inputs[:reset_activity].restore_original_options
   end
 end

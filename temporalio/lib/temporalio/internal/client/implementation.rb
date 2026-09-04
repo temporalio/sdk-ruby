@@ -1097,24 +1097,6 @@ module Temporalio
           nil
         end
 
-        def reset_activity(input)
-          @client.workflow_service.reset_activity_execution(
-            Api::WorkflowService::V1::ResetActivityExecutionRequest.new(
-              namespace: @client.namespace,
-              activity_id: input.activity_id,
-              run_id: input.activity_run_id || '',
-              identity: @client.connection.identity,
-              request_id: SecureRandom.uuid,
-              keep_paused: input.keep_paused,
-              jitter: ProtoUtils.seconds_to_duration(input.jitter),
-              restore_original_options: input.restore_original_options,
-              reset_heartbeat: input.reset_heartbeat
-            ),
-            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
-          )
-          nil
-        end
-
         def update_activity_options(input)
           resp = @client.workflow_service.update_activity_execution_options(
             Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest.new(

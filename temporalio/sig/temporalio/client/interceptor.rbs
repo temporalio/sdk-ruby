@@ -556,26 +556,6 @@ module Temporalio
         ) -> void
       end
 
-      class ResetActivityInput
-        attr_reader activity_id: String
-        attr_reader activity_run_id: String?
-        attr_reader keep_paused: bool
-        attr_reader jitter: Float?
-        attr_reader restore_original_options: bool
-        attr_reader reset_heartbeat: bool
-        attr_reader rpc_options: RPCOptions?
-
-        def initialize: (
-          activity_id: String,
-          activity_run_id: String?,
-          keep_paused: bool,
-          jitter: Float?,
-          restore_original_options: bool,
-          reset_heartbeat: bool,
-          rpc_options: RPCOptions?
-        ) -> void
-      end
-
       class UpdateActivityOptionsInput
         attr_reader activity_id: String
         attr_reader activity_run_id: String?
@@ -690,8 +670,6 @@ module Temporalio
         def pause_activity: (PauseActivityInput input) -> void
 
         def unpause_activity: (UnpauseActivityInput input) -> void
-
-        def reset_activity: (ResetActivityInput input) -> void
 
         def update_activity_options: (UpdateActivityOptionsInput input) -> untyped
 

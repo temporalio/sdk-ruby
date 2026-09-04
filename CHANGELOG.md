@@ -24,7 +24,7 @@ to docs, or any other relevant information.
 #### Standalone Activity operator commands
 
 - `Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
-  `#unpause`, `#reset`, and `#update_options`.
+  `#unpause` and `#update_options`.
 - Added opt-in payload fields to `Client::ActivityHandle#describe`: `include_input:`,
   `include_outcome:`, `include_heartbeat_details:` and `include_last_failure:`, all default
   `false`.

@@ -36,14 +36,6 @@ module Temporalio
         ?rpc_options: RPCOptions?
       ) -> void
 
-      def reset: (
-        ?keep_paused: bool,
-        ?jitter: Float?,
-        ?restore_original_options: bool,
-        ?reset_heartbeat: bool,
-        ?rpc_options: RPCOptions?
-      ) -> void
-
       def update_options: (
         *ActivityOptions::Update updates,
         ?restore_original: bool,

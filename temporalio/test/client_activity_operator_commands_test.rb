@@ -7,7 +7,7 @@ require 'temporalio/worker'
 require 'test'
 
 # Tests for the standalone-activity operator commands on ActivityHandle:
-# pause / unpause / reset / update_options. Each asserts an observable server state change.
+# pause / unpause / update_options. Each asserts an observable server state change.
 class ClientActivityOperatorCommandsTest < Test
   # Long-running activity that heartbeats and runs until cancellation.
   class SlowActivity < Temporalio::Activity::Definition
@@ -40,7 +40,7 @@ class ClientActivityOperatorCommandsTest < Test
   end
 
   # Fails the first two attempts so retries are forced, then succeeds on the third. Used to exercise
-  # reset against an activity that has recorded more than one attempt.
+  # an activity that has recorded more than one attempt.
   class FailThenSucceedActivity < Temporalio::Activity::Definition
     def execute
       if Temporalio::Activity::Context.current.info.attempt < 3
@@ -82,7 +82,7 @@ class ClientActivityOperatorCommandsTest < Test
 
   # Records heartbeat details on attempt 1, then blocks waiting for cancellation. The heartbeat
   # runs on its own — not adjacent to any completion RPC — so the details reliably persist and are
-  # observable via describe. Later attempts (after a reset or an unpause that spawns a new attempt)
+  # observable via describe. Later attempts (after an unpause that spawns a new attempt)
   # do not heartbeat, so any operator-driven clearing of the details stays observable.
   class HeartbeatOnceActivity < Temporalio::Activity::Definition
     def execute
@@ -151,30 +151,6 @@ class ClientActivityOperatorCommandsTest < Test
       handle.unpause
       assert_eventually do
         refute_includes PAUSED_STATES, handle.describe.run_state
-      end
-      handle.terminate('cleanup')
-    end
-  end
-
-  def test_reset
-    with_activity_worker([FailThenSucceedActivity]) do |task_queue|
-      activity_id = "act-#{SecureRandom.uuid}"
-      handle = env.client.start_activity(
-        FailThenSucceedActivity,
-        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60,
-        retry_policy: Temporalio::RetryPolicy.new(
-          initial_interval: 0.2, backoff_coefficient: 1.0, max_interval: 0.2, max_attempts: 50
-        )
-      )
-      # Wait until the activity has recorded more than one attempt (i.e. it has retried).
-      assert_eventually do
-        assert_operator handle.describe.attempt, :>, 1
-      end
-
-      handle.reset
-      # After reset the attempt counter goes back to the start.
-      assert_eventually do
-        assert_equal 1, handle.describe.attempt
       end
       handle.terminate('cleanup')
     end
@@ -367,55 +343,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  def test_reset_keeps_paused
-    with_activity_worker([QuickActivity]) do |task_queue|
-      activity_id = "act-#{SecureRandom.uuid}"
-      # Start delayed so the activity sits SCHEDULED and pauses to a true PAUSED state (not the
-      # PAUSE_REQUESTED of a running activity), which is what keep_paused must preserve across reset.
-      handle = env.client.start_activity(
-        QuickActivity,
-        id: activity_id, task_queue: task_queue, start_to_close_timeout: 60, start_delay: 30.0
-      )
-      handle.pause('hold')
-      assert_eventually do
-        assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
-      end
-
-      handle.reset(keep_paused: true)
-      # keep_paused means the activity remains paused across the reset.
-      # DIAGNOSTIC (2026-07-30): bumped from default 10s to 60s.
-      assert_eventually(timeout: 60.0) do
-        assert_equal Temporalio::Client::PendingActivityState::PAUSED, handle.describe.run_state
-      end
-      handle.terminate('cleanup')
-    end
-  end
-
-  def test_reset_restores_original_options
-    with_activity_worker([QuickActivity]) do |task_queue|
-      # Start delayed so the restore is applied immediately.
-      handle = env.client.start_activity(
-        QuickActivity,
-        id: "act-#{SecureRandom.uuid}", task_queue: task_queue,
-        start_to_close_timeout: 45, start_delay: 300.0
-      )
-
-      updated = handle.update_options(Temporalio::Client::ActivityOptions::START_TO_CLOSE_TIMEOUT.value_set(90.0))
-      assert_equal 90.0, updated.start_to_close_timeout
-
-      handle.reset(restore_original_options: true)
-      # restore_original_options reverts the changed option to the value the activity was created with.
-      assert_eventually do
-        assert_equal 45.0, handle.describe.start_to_close_timeout
-      end
-      handle.terminate('cleanup')
-    end
-  end
-
-  # Start a HeartbeatOnceActivity and wait until its first attempt has recorded heartbeat details.
-  # The activity keeps running (sleeping until cancellation) once heartbeat has fired, so pause
-  # transitions the activity through PAUSE_REQUESTED to PAUSED — assert_eventually_paused tolerates
-  # both.
   def start_heartbeat_ready_activity(task_queue)
     activity_id = "act-#{SecureRandom.uuid}"
     handle = env.client.start_activity(

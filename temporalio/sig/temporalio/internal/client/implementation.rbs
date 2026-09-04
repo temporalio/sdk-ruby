@@ -26,7 +26,6 @@ module Temporalio
 
         def unpause_activity: (Temporalio::Client::Interceptor::UnpauseActivityInput input) -> void
 
-        def reset_activity: (Temporalio::Client::Interceptor::ResetActivityInput input) -> void
 
         def update_activity_options: (Temporalio::Client::Interceptor::UpdateActivityOptionsInput input) -> untyped
 
