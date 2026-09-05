@@ -39,18 +39,6 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
-  # Fails the first two attempts so retries are forced, then succeeds on the third. Used to exercise
-  # an activity that has recorded more than one attempt.
-  class FailThenSucceedActivity < Temporalio::Activity::Definition
-    def execute
-      if Temporalio::Activity::Context.current.info.attempt < 3
-        raise Temporalio::Error::ApplicationError, 'retryable failure'
-      end
-
-      'done'
-    end
-  end
-
   # Takes an argument and returns a value derived from it, so a completed execution has both an
   # input and a successful outcome to read back off describe.
   class EchoActivity < Temporalio::Activity::Definition
@@ -343,6 +331,10 @@ class ClientActivityOperatorCommandsTest < Test
     end
   end
 
+  # Start a HeartbeatOnceActivity and wait until its first attempt has recorded heartbeat details.
+  # The activity keeps running (sleeping until cancellation) once heartbeat has fired, so pause
+  # transitions the activity through PAUSE_REQUESTED to PAUSED — assert_eventually_paused tolerates
+  # both.
   def start_heartbeat_ready_activity(task_queue)
     activity_id = "act-#{SecureRandom.uuid}"
     handle = env.client.start_activity(
