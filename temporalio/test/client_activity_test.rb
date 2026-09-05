@@ -305,6 +305,7 @@ class ClientActivityTest < Test
       assert_equal 'SlowActivity', desc.activity_type
       # Status should be RUNNING (1).
       assert_equal Temporalio::Client::ActivityExecutionStatus::RUNNING, desc.status
+      refute_nil desc.execution_time
 
       handle.terminate('test-termination')
       # After terminate, status should reach TERMINATED eventually.

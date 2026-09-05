@@ -46,6 +46,12 @@ module Temporalio
         Internal::ProtoUtils.timestamp_to_time(@raw_info.schedule_time)
       end
 
+      # @return [Time, nil] When the first activity task was made available for dispatch. Equals
+      #   schedule_time + start_delay; equal to schedule_time when no start delay is set.
+      def execution_time
+        Internal::ProtoUtils.timestamp_to_time(@raw_info.execution_time)
+      end
+
       # @return [Time, nil] When the activity reached a terminal state.
       def close_time
         Internal::ProtoUtils.timestamp_to_time(@raw_info.close_time)
@@ -112,7 +118,17 @@ module Temporalio
           Internal::ProtoUtils.duration_to_seconds(@raw_info.heartbeat_timeout)
         end
 
-        # @return [Boolean] Whether the activity has recorded any heartbeat details.
+        # @return [Float, nil] Delay in seconds before the first activity task is made available for
+        #   dispatch. Not applied to retry attempts.
+        def start_delay
+          Internal::ProtoUtils.duration_to_seconds(@raw_info.start_delay)
+        end
+
+        # Whether heartbeat details are present on this description. False when the activity
+        # recorded none, and also when {ActivityHandle#describe} was called without
+        # `include_heartbeat_details:`.
+        #
+        # @return [Boolean] Whether heartbeat details are present.
         def has_heartbeat_details? # rubocop:disable Naming/PredicatePrefix
           !@raw_info.heartbeat_details&.payloads.nil? && !@raw_info.heartbeat_details.payloads.empty?
         end
@@ -123,6 +139,57 @@ module Temporalio
         # @return [Array<Object>] Converted details.
         def heartbeat_details(hints: nil)
           @data_converter.from_payloads(@raw_info.heartbeat_details, hints:)
+        end
+
+        # Whether the activity's input is present. False unless {ActivityHandle#describe} was
+        # called with `include_input:`.
+        #
+        # @return [Boolean] Whether input is present.
+        def has_input? # rubocop:disable Naming/PredicatePrefix
+          !@raw_description.input.nil?
+        end
+
+        # Deserialized activity input, one element per argument. Empty when no input is present.
+        #
+        # @param hints [Array<Object>, nil] Hints, if any, to assist conversion.
+        # @return [Array<Object>] Converted arguments.
+        def input(hints: nil)
+          @data_converter.from_payloads(@raw_description.input, hints:)
+        end
+
+        # Whether the activity closed with a successful result. False while the activity is still
+        # running, when it closed with a failure, and when {ActivityHandle#describe} was called
+        # without `include_outcome:`.
+        #
+        # @return [Boolean] Whether a result is present.
+        def has_result? # rubocop:disable Naming/PredicatePrefix
+          @raw_description.outcome&.value == :result
+        end
+
+        # Deserialized result the activity closed with. Nil when no result is present (still
+        # running, closed with a failure, or `include_outcome:` was not requested).
+        #
+        # @param result_hint [Object, nil] Hint, if any, to assist conversion.
+        # @return [Object, nil] Converted result.
+        def result(result_hint: nil)
+          return nil unless has_result?
+
+          @data_converter.from_payloads(
+            @raw_description.outcome.result, hints: Array(result_hint)
+          ).first
+        end
+
+        # Failure the activity closed with. Nil when the activity did not close with a failure or
+        # when {ActivityHandle#describe} was called without `include_outcome:`.
+        #
+        # This is the terminal outcome; {#last_failure} is the failure of the most recent attempt,
+        # which may be set while the activity is still retrying.
+        #
+        # @return [Error::Failure, nil] Converted failure.
+        def failure
+          return nil unless @raw_description.outcome&.value == :failure
+
+          @data_converter.from_failure(@raw_description.outcome.failure)
         end
 
         # @return [RetryPolicy] Retry policy in effect for this activity.
@@ -143,6 +210,20 @@ module Temporalio
         # @return [Integer] Current attempt number. Attempts start at 1 and increment on each retry.
         def attempt
           @raw_info.attempt
+        end
+
+        # @return [Integer] Total number of heartbeats recorded across all attempts.
+        def total_heartbeat_count
+          @raw_info.total_heartbeat_count
+        end
+
+        # Whether a last failure is present on this description. False when the activity has no
+        # failed attempt, and also when {ActivityHandle#describe} was called without
+        # `include_last_failure:`.
+        #
+        # @return [Boolean] Whether a last failure is present.
+        def has_last_failure? # rubocop:disable Naming/PredicatePrefix
+          !@raw_info.last_failure.nil?
         end
 
         # @return [Error::Failure, nil] Failure of the last failed attempt if any.

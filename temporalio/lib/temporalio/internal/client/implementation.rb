@@ -29,7 +29,7 @@ require 'temporalio/workflow/definition'
 module Temporalio
   module Internal
     module Client
-      class Implementation < Temporalio::Client::Interceptor::Outbound
+      class Implementation < Temporalio::Client::Interceptor::Outbound # rubocop:disable Metrics/ClassLength
         # Proto routing convention for standalone activity completion: `*_by_id` requests carry
         # `resource_id = "activity:<activity_id>"`. See the resource_id field comment on
         # `RecordActivityTaskHeartbeatByIdRequest` (and the analogous Completed/Failed/Canceled
@@ -1025,7 +1025,11 @@ module Temporalio
             Api::WorkflowService::V1::DescribeActivityExecutionRequest.new(
               namespace: @client.namespace,
               activity_id: input.activity_id,
-              run_id: input.activity_run_id || ''
+              run_id: input.activity_run_id || '',
+              include_input: input.include_input,
+              include_outcome: input.include_outcome,
+              include_heartbeat_details: input.include_heartbeat_details,
+              include_last_failure: input.include_last_failure
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
@@ -1060,6 +1064,54 @@ module Temporalio
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
           )
           nil
+        end
+
+        def pause_activity(input)
+          @client.workflow_service.pause_activity_execution(
+            Api::WorkflowService::V1::PauseActivityExecutionRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason || ''
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def unpause_activity(input)
+          @client.workflow_service.unpause_activity_execution(
+            Api::WorkflowService::V1::UnpauseActivityExecutionRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              reason: input.reason || '',
+              jitter: ProtoUtils.seconds_to_duration(input.jitter)
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          nil
+        end
+
+        def update_activity_options(input)
+          resp = @client.workflow_service.update_activity_execution_options(
+            Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest.new(
+              namespace: @client.namespace,
+              activity_id: input.activity_id,
+              run_id: input.activity_run_id || '',
+              identity: @client.connection.identity,
+              request_id: SecureRandom.uuid,
+              activity_options: input.activity_options,
+              update_mask: input.update_mask,
+              restore_original: input.restore_original
+            ),
+            rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+          )
+          Temporalio::Client::ActivityExecutionOptions._from_proto(resp.activity_options)
         end
 
         def list_activities(input)

@@ -21,11 +21,22 @@ to docs, or any other relevant information.
 
 ### Added
 
+#### Standalone Activity operator commands
+
+- `Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
+  `#unpause` and `#update_options`.
+- Added opt-in payload fields to `Client::ActivityHandle#describe`: `include_input:`,
+  `include_outcome:`, `include_heartbeat_details:` and `include_last_failure:`, all default
+  `false`.
+- Add missing description fields: `execution_time`, `start_delay`, `total_heartbeat_count`.
+
+### :boom: Breaking Changes
+
+- `Description` payload fields are now opt-in: `input`, `outcome`, `heartbeat_details`, `last_failure`.
+
 ### Changed
 
 ### Deprecated
-
-### :boom: Breaking Changes
 
 ### Fixed
 - Canceling a fiber-executor activity no longer wedges the worker if using a `Fiber#transfer` based scheduler

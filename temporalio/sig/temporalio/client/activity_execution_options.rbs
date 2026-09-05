@@ -1,0 +1,27 @@
+module Temporalio
+  class Client
+    class ActivityExecutionOptions
+      attr_reader task_queue: String?
+      attr_reader schedule_to_close_timeout: Float?
+      attr_reader schedule_to_start_timeout: Float?
+      attr_reader start_to_close_timeout: Float?
+      attr_reader heartbeat_timeout: Float?
+      attr_reader retry_policy: RetryPolicy?
+      attr_reader priority: Priority
+      attr_reader start_delay: Float?
+
+      def self._from_proto: (untyped options) -> ActivityExecutionOptions
+
+      def initialize: (
+        task_queue: String?,
+        schedule_to_close_timeout: Float?,
+        schedule_to_start_timeout: Float?,
+        start_to_close_timeout: Float?,
+        heartbeat_timeout: Float?,
+        retry_policy: RetryPolicy?,
+        priority: Priority,
+        start_delay: Float?
+      ) -> void
+    end
+  end
+end

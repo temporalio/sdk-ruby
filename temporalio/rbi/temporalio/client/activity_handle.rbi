@@ -1,6 +1,8 @@
 # typed: true
 
 class Temporalio::Client::ActivityHandle
+  UPDATABLE_OPTION_PATHS = T.let(T.unsafe(nil), T::Hash[Symbol, String])
+
   sig do
     params(
       client: Temporalio::Client,
@@ -28,14 +30,53 @@ class Temporalio::Client::ActivityHandle
   end
   def result(result_hint: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
-  sig { params(rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Client::ActivityExecution::Description) }
-  def describe(rpc_options: T.unsafe(nil)); end
+  sig do
+    params(
+      include_input: T::Boolean,
+      include_outcome: T::Boolean,
+      include_heartbeat_details: T::Boolean,
+      include_last_failure: T::Boolean,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(Temporalio::Client::ActivityExecution::Description)
+  end
+  def describe(
+    include_input: T.unsafe(nil),
+    include_outcome: T.unsafe(nil),
+    include_heartbeat_details: T.unsafe(nil),
+    include_last_failure: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  ); end
 
   sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def cancel(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
 
   sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
   def terminate(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig { params(reason: T.nilable(String), rpc_options: T.nilable(Temporalio::Client::RPCOptions)).void }
+  def pause(reason = T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
+      reason: T.nilable(String),
+      jitter: T.nilable(Float),
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).void
+  end
+  def unpause(reason: T.unsafe(nil), jitter: T.unsafe(nil), rpc_options: T.unsafe(nil)); end
+
+  sig do
+    params(
+      updates: Temporalio::Client::ActivityOptions::Update,
+      restore_original: T::Boolean,
+      rpc_options: T.nilable(Temporalio::Client::RPCOptions)
+    ).returns(Temporalio::Client::ActivityExecutionOptions)
+  end
+  def update_options(
+    *updates,
+    restore_original: T.unsafe(nil),
+    rpc_options: T.unsafe(nil)
+  ); end
 
   private
 
