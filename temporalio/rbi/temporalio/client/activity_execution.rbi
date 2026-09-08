@@ -34,6 +34,9 @@ class Temporalio::Client::ActivityExecution
   def schedule_time; end
 
   sig { returns(T.nilable(Time)) }
+  def execution_time; end
+
+  sig { returns(T.nilable(Time)) }
   def close_time; end
 
   sig { returns(Integer) }
@@ -76,8 +79,29 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   sig { returns(T.nilable(Float)) }
   def heartbeat_timeout; end
 
+  sig { returns(T.nilable(Float)) }
+  def start_delay; end
+
   sig { returns(T::Boolean) }
   def has_heartbeat_details?; end
+
+  sig { returns(T::Boolean) }
+  def has_last_failure?; end
+
+  sig { returns(T::Boolean) }
+  def has_input?; end
+
+  sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
+  def input(hints: T.unsafe(nil)); end
+
+  sig { returns(T::Boolean) }
+  def has_result?; end
+
+  sig { params(result_hint: T.nilable(Object)).returns(T.nilable(Object)) }
+  def result(result_hint: T.unsafe(nil)); end
+
+  sig { returns(T.nilable(Temporalio::Error::Failure)) }
+  def failure; end
 
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: T.unsafe(nil)); end
@@ -93,6 +117,9 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
 
   sig { returns(Integer) }
   def attempt; end
+
+  sig { returns(Integer) }
+  def total_heartbeat_count; end
 
   sig { returns(T.nilable(Temporalio::Error::Failure)) }
   def last_failure; end

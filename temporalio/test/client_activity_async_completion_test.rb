@@ -94,8 +94,8 @@ class ClientActivityAsyncCompletionTest < Test
         activity_run_id: handle.run_id
       )
       env.client.async_activity_handle(ref).heartbeat('hb-1', 'hb-2')
-      assert_equal %w[hb-1 hb-2],
-                   env.client.data_converter.from_payloads(handle.describe.raw_info.heartbeat_details)
+      desc = handle.describe(include_heartbeat_details: true)
+      assert_equal %w[hb-1 hb-2], env.client.data_converter.from_payloads(desc.raw_info.heartbeat_details)
       env.client.async_activity_handle(ref).complete('done-after-heartbeat')
       assert_equal 'done-after-heartbeat', handle.result
     end
@@ -144,8 +144,8 @@ class ClientActivityAsyncCompletionTest < Test
         activity_run_id: handle.run_id
       )
       env.client.async_activity_handle(ref).heartbeat('hb-1', 'hb-2')
-      assert_equal %w[hb-1 hb-2],
-                   env.client.data_converter.from_payloads(handle.describe.raw_info.heartbeat_details)
+      desc = handle.describe(include_heartbeat_details: true)
+      assert_equal %w[hb-1 hb-2], env.client.data_converter.from_payloads(desc.raw_info.heartbeat_details)
       env.client.async_activity_handle(ref).fail(
         Temporalio::Error::ApplicationError.new('hb-then-fail', non_retryable: true)
       )

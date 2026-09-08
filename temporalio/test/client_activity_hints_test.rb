@@ -101,6 +101,37 @@ class ClientActivityHintsTest < Test
                  'Worker-side result encode should use definition result_hint'
   end
 
+  def test_describe_input_and_result_hints
+    client = build_tracking_client
+    task_queue = "saa-hints-tq-#{SecureRandom.uuid}"
+    Temporalio::Worker.new(client:, task_queue:, activities: [HintActivity]).run do
+      handle = client.start_activity(
+        HintActivity, 'described',
+        id: "act-#{SecureRandom.uuid}", task_queue:, start_to_close_timeout: 10
+      )
+      handle.result
+
+      desc = handle.describe(include_input: true, include_outcome: true)
+      @hint_converter.inbound_hints = nil
+
+      assert_equal ['described'], desc.input(hints: [:describe_arg])
+      assert_equal 'result-of:described', desc.result(result_hint: :describe_result)
+
+      inbound = @hint_converter.inbound_hints || []
+      arg_decode = inbound.find { |e| e[:value] == 'described' }
+
+      refute_nil arg_decode
+      assert_equal :describe_arg, arg_decode[:hint],
+                   'describe input hints should reach the payload converter'
+
+      result_decode = inbound.find { |e| e[:value] == 'result-of:described' }
+
+      refute_nil result_decode
+      assert_equal :describe_result, result_decode[:hint],
+                   'describe result_hint should reach the payload converter'
+    end
+  end
+
   def test_activity_hints_call_site_override
     client = build_tracking_client
     task_queue = "saa-hints-tq-#{SecureRandom.uuid}"

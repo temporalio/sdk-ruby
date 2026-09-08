@@ -9,6 +9,7 @@ module Temporalio
       def activity_run_id: -> String?
       def activity_type: -> String
       def schedule_time: -> Time?
+      def execution_time: -> Time?
       def close_time: -> Time?
       def status: -> ActivityExecutionStatus::enum
       def search_attributes: -> SearchAttributes?
@@ -25,12 +26,21 @@ module Temporalio
         def schedule_to_start_timeout: -> Float?
         def start_to_close_timeout: -> Float?
         def heartbeat_timeout: -> Float?
+        def start_delay: -> Float?
         def has_heartbeat_details?: -> bool
+        def has_last_failure?: -> bool
+        def has_input?: -> bool
+        def input: (?hints: Array[Object]?) -> Array[Object?]
+        def has_result?: -> bool
+        def result: (?result_hint: Object?) -> Object?
+        def failure: -> Error::Failure?
         def heartbeat_details: (?hints: Array[Object]?) -> Array[Object?]
         def retry_policy: -> RetryPolicy
         def last_heartbeat_time: -> Time?
         def last_started_time: -> Time?
         def attempt: -> Integer
+
+        def total_heartbeat_count: -> Integer
         def last_failure: -> Error::Failure?
         def expiration_time: -> Time?
         def last_worker_identity: -> String?

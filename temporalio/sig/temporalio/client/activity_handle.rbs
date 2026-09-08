@@ -1,6 +1,8 @@
 module Temporalio
   class Client
     class ActivityHandle
+      UPDATABLE_OPTION_PATHS: Hash[Symbol, String]
+
       attr_reader id: String
       attr_reader run_id: String?
       attr_reader result_hint: Object?
@@ -14,11 +16,31 @@ module Temporalio
 
       def result: (?result_hint: Object?, ?rpc_options: RPCOptions?) -> Object?
 
-      def describe: (?rpc_options: RPCOptions?) -> ActivityExecution::Description
+      def describe: (
+        ?include_input: bool,
+        ?include_outcome: bool,
+        ?include_heartbeat_details: bool,
+        ?include_last_failure: bool,
+        ?rpc_options: RPCOptions?
+      ) -> ActivityExecution::Description
 
       def cancel: (?String? reason, ?rpc_options: RPCOptions?) -> void
 
       def terminate: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      def pause: (?String? reason, ?rpc_options: RPCOptions?) -> void
+
+      def unpause: (
+        ?reason: String?,
+        ?jitter: Float?,
+        ?rpc_options: RPCOptions?
+      ) -> void
+
+      def update_options: (
+        *ActivityOptions::Update updates,
+        ?restore_original: bool,
+        ?rpc_options: RPCOptions?
+      ) -> ActivityExecutionOptions
 
       private def _process_outcome: (Api::Activity::V1::ActivityExecutionOutcome? outcome, Object? hint) -> Object?
     end

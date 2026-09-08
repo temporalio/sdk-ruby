@@ -8,4 +8,5 @@ module Temporalio::Client::ActivityExecutionStatus
   CANCELED = T.let(T.unsafe(nil), Integer)
   TERMINATED = T.let(T.unsafe(nil), Integer)
   TIMED_OUT = T.let(T.unsafe(nil), Integer)
+  PAUSED = T.let(T.unsafe(nil), Integer)
 end
