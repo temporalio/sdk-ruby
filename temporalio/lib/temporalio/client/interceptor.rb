@@ -291,6 +291,10 @@ module Temporalio
       DescribeActivityInput = Data.define(
         :activity_id,
         :activity_run_id,
+        :include_input,
+        :include_outcome,
+        :include_heartbeat_details,
+        :include_last_failure,
         :rpc_options
       )
 
@@ -311,6 +315,39 @@ module Temporalio
         :activity_id,
         :activity_run_id,
         :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.pause_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
+      PauseActivityInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :reason,
+        :rpc_options
+      )
+
+      # Input for {Outbound.unpause_activity}.
+      #
+      # WARNING: Standalone Activities are experimental.
+      UnpauseActivityInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :reason,
+        :jitter,
+        :rpc_options
+      )
+
+      # Input for {Outbound.update_activity_options}.
+      #
+      # WARNING: Standalone Activities are experimental.
+      UpdateActivityOptionsInput = Data.define(
+        :activity_id,
+        :activity_run_id,
+        :activity_options,
+        :update_mask,
+        :restore_original,
         :rpc_options
       )
 
@@ -585,6 +622,34 @@ module Temporalio
         # @param input [TerminateActivityInput] Input.
         def terminate_activity(input)
           next_interceptor.terminate_activity(input)
+        end
+
+        # Called for every {ActivityHandle.pause} call.
+        #
+        # WARNING: Standalone Activities are experimental.
+        #
+        # @param input [PauseActivityInput] Input.
+        def pause_activity(input)
+          next_interceptor.pause_activity(input)
+        end
+
+        # Called for every {ActivityHandle.unpause} call.
+        #
+        # WARNING: Standalone Activities are experimental.
+        #
+        # @param input [UnpauseActivityInput] Input.
+        def unpause_activity(input)
+          next_interceptor.unpause_activity(input)
+        end
+
+        # Called for every {ActivityHandle.update_options} call.
+        #
+        # WARNING: Standalone Activities are experimental.
+        #
+        # @param input [UpdateActivityOptionsInput] Input.
+        # @return [Api::Activity::V1::ActivityOptions] Activity options after the update.
+        def update_activity_options(input)
+          next_interceptor.update_activity_options(input)
         end
 
         # Called for every {Client.list_activities} call.

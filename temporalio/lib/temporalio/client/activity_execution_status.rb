@@ -15,6 +15,7 @@ module Temporalio
       CANCELED = Api::Enums::V1::ActivityExecutionStatus::ACTIVITY_EXECUTION_STATUS_CANCELED
       TERMINATED = Api::Enums::V1::ActivityExecutionStatus::ACTIVITY_EXECUTION_STATUS_TERMINATED
       TIMED_OUT = Api::Enums::V1::ActivityExecutionStatus::ACTIVITY_EXECUTION_STATUS_TIMED_OUT
+      PAUSED = Api::Enums::V1::ActivityExecutionStatus::ACTIVITY_EXECUTION_STATUS_PAUSED
     end
   end
 end
