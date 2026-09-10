@@ -179,7 +179,7 @@ module Temporalio
       # WARNING: Standalone Activities are experimental.
       #
       # @param updates [Array<ActivityOptions::Update>] The option updates to apply. At least one is
-      #   required unless `restore_original` is true.
+      #   required unless `restore_original` is true. Each option may be named at most once.
       # @param restore_original [Boolean] If true, restore the options to the originals the activity
       #   was created with. Mutually exclusive with any update.
       # @param rpc_options [RPCOptions, nil] Advanced RPC options.
@@ -187,7 +187,8 @@ module Temporalio
       # @return [ActivityExecutionOptions] The activity options after the update.
       #
       # @raise [ArgumentError] If a non-update is given, if `restore_original` is combined with any
-      #   update, or if no update is provided and `restore_original` is false.
+      #   update, if no update is provided and `restore_original` is false, or if the same option is
+      #   named more than once.
       # @raise [Error::RPCError] RPC error from call.
       def update_options(*updates, restore_original: false, rpc_options: nil)
         unless updates.all?(ActivityOptions::Update)
@@ -202,8 +203,12 @@ module Temporalio
                 'At least one option update must be given, or restore_original must be used'
         end
 
-        # For repeated keys, later values override previous ones.
-        by_path = updates.to_h { |update| [update.key.name, update] }
+        by_path = updates.each_with_object({}) do |update, acc|
+          name = update.key.name
+          raise ArgumentError, "More than one update given for option #{name}" if acc.key?(name)
+
+          acc[name] = update
+        end
 
         proto = Api::Activity::V1::ActivityOptions.new
         by_path.each_value do |update|
