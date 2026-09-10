@@ -275,7 +275,7 @@ module Temporalio
         :id_conflict_policy,
         :retry_policy,
         :search_attributes,
-        :static_summary,
+        :summary,
         :static_details,
         :headers,
         :priority,

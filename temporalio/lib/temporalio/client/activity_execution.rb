@@ -280,7 +280,7 @@ module Temporalio
         end
 
         # @return [String, nil] Static user-metadata summary on the activity.
-        def static_summary
+        def summary
           user_metadata.first
         end
 

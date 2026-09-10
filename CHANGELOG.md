@@ -27,6 +27,10 @@ to docs, or any other relevant information.
 
 ### :boom: Breaking Changes
 
+- Renamed the standalone activity `static_summary:` option on `Client#start_activity` and
+  `Client#execute_activity` to `summary:`, and `Client::ActivityExecution::Description#static_summary`
+  to `#summary`.
+
 ### Fixed
 
 ### Security
