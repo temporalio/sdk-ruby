@@ -216,7 +216,8 @@ module PrepareRelease
        '--base', 'main',
        '--head', branch_name(version),
        '--title', "Prepare release #{version}",
-       '--body', "Prepare release #{version}."],
+       '--body', "Prepare release #{version}.",
+       '--label', 'skip-changelog'], # Make CI allow the changes
       cwd: cwd
     )
   end
