@@ -445,7 +445,7 @@ module Temporalio
         attr_reader id_conflict_policy: ActivityIDConflictPolicy::enum
         attr_reader retry_policy: RetryPolicy?
         attr_reader search_attributes: SearchAttributes?
-        attr_reader static_summary: String?
+        attr_reader summary: String?
         attr_reader static_details: String?
         attr_reader headers: Hash[String, Object?]
         attr_reader priority: Priority
@@ -467,7 +467,7 @@ module Temporalio
           id_conflict_policy: ActivityIDConflictPolicy::enum,
           retry_policy: RetryPolicy?,
           search_attributes: SearchAttributes?,
-          static_summary: String?,
+          summary: String?,
           static_details: String?,
           headers: Hash[String, Object?],
           priority: Priority,

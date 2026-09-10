@@ -28,6 +28,9 @@ to docs, or any other relevant information.
 ### :boom: Breaking Changes
 
 - Duplicate keys in `update_options` are now an error.
+- Renamed the standalone activity `static_summary:` option on `Client#start_activity` and
+  `Client#execute_activity` to `summary:`, and `Client::ActivityExecution::Description#static_summary`
+  to `#summary`.
 
 ### Fixed
 

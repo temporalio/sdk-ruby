@@ -984,7 +984,7 @@ module Temporalio
             retry_policy: input.retry_policy&._to_proto,
             search_attributes: input.search_attributes&._to_proto,
             user_metadata: ProtoUtils.to_user_metadata(
-              input.static_summary, input.static_details, @client.data_converter
+              input.summary, input.static_details, @client.data_converter
             ),
             header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
             priority: input.priority._to_proto,

@@ -792,7 +792,7 @@ class Temporalio::Client::Interceptor::StartActivityInput < ::Data
   def search_attributes; end
 
   sig { returns(T.nilable(String)) }
-  def static_summary; end
+  def summary; end
 
   sig { returns(T.nilable(String)) }
   def static_details; end

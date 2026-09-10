@@ -50,7 +50,7 @@ module Temporalio
         def last_deployment_version: -> WorkerDeploymentVersion?
         def priority: -> Priority
         def canceled_reason: -> String?
-        def static_summary: -> String?
+        def summary: -> String?
         def static_details: -> String?
 
         private def user_metadata: -> [String?, String?]
