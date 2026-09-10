@@ -41,17 +41,36 @@ class ClientActivityOperatorCommandsBuildTest < Test
     assert_equal 90, req.activity_options.start_to_close_timeout.seconds
   end
 
-  def test_a_repeated_key_resolves_to_its_last_update
-    req = capture_update do |handle|
+  def test_a_repeated_key_is_rejected
+    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
+    handle = client.activity_handle('act-1')
+
+    err = assert_raises(ArgumentError) do
       handle.update_options(
         Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_set(5.0),
         Temporalio::Client::ActivityOptions::HEARTBEAT_TIMEOUT.value_unset
       )
     end
+    assert_includes err.message, 'More than one update given for option heartbeat_timeout'
+  end
 
-    # The later unset wins, and the path is named once.
-    assert_equal %w[heartbeat_timeout], req.update_mask.paths.sort
-    refute req.activity_options.has_heartbeat_timeout?
+  # The handle rejects a repeat, so only a hand-built interceptor input can carry one.
+  def test_a_repeated_key_from_an_interceptor_is_rejected
+    client = Temporalio::Client.connect('localhost:7233', 'test-namespace', lazy_connect: true)
+
+    err = assert_raises(ArgumentError) do
+      client._impl.update_activity_options(
+        Temporalio::Client::Interceptor::UpdateActivityOptionsInput.new(
+          activity_id: 'act-1',
+          activity_run_id: nil,
+          activity_options: Temporalio::Api::Activity::V1::ActivityOptions.new,
+          update_mask: Google::Protobuf::FieldMask.new(paths: %w[heartbeat_timeout heartbeat_timeout]),
+          restore_original: false,
+          rpc_options: nil
+        )
+      )
+    end
+    assert_includes err.message, 'More than one update given for option heartbeat_timeout'
   end
 
   # Runs the block against a handle whose update RPC is stubbed, returning the captured request.

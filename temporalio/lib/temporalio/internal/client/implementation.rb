@@ -1098,6 +1098,11 @@ module Temporalio
         end
 
         def update_activity_options(input)
+          # The handle rejects a repeated option, but an interceptor could still add one.
+          paths = input.update_mask&.paths || []
+          dupe = paths.tally.find { |_, count| count > 1 }&.first
+          raise ArgumentError, "More than one update given for option #{dupe}" if dupe
+
           resp = @client.workflow_service.update_activity_execution_options(
             Api::WorkflowService::V1::UpdateActivityExecutionOptionsRequest.new(
               namespace: @client.namespace,
