@@ -252,7 +252,8 @@ class TestPrepareRelease < Minitest::Test
           '--base', 'main',
           '--head', 'chore/release-1.6.1',
           '--title', 'Prepare release 1.6.1',
-          '--body', 'Prepare release 1.6.1.'
+          '--body', 'Prepare release 1.6.1.',
+          '--label', 'skip-changelog'
         ],
         calls[0][0]
       )
