@@ -149,7 +149,7 @@ class Temporalio::Client::ActivityExecution::Description < ::Temporalio::Client:
   def canceled_reason; end
 
   sig { returns(T.nilable(String)) }
-  def static_summary; end
+  def summary; end
 
   sig { returns(T.nilable(String)) }
   def static_details; end

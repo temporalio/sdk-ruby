@@ -519,7 +519,7 @@ module Temporalio
     #   is currently running. Defaults to `FAIL` (reject the start attempt).
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
-    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity. This is currently experimental.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
@@ -545,7 +545,7 @@ module Temporalio
       id_conflict_policy: ActivityIDConflictPolicy::FAIL,
       retry_policy: nil,
       search_attributes: nil,
-      static_summary: nil,
+      summary: nil,
       static_details: nil,
       priority: Priority.default,
       start_delay: nil,
@@ -568,7 +568,7 @@ module Temporalio
                              id_conflict_policy:,
                              retry_policy:,
                              search_attributes:,
-                             static_summary:,
+                             summary:,
                              static_details:,
                              headers: {},
                              priority:,
@@ -601,7 +601,7 @@ module Temporalio
     #   is currently running. Defaults to `FAIL` (reject the start attempt).
     # @param retry_policy [RetryPolicy, nil] Retry policy for the activity.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
-    # @param static_summary [String, nil] Fixed single-line summary for this activity execution.
+    # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
     # @param priority [Priority] Priority for the activity. This is currently experimental.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
@@ -628,7 +628,7 @@ module Temporalio
       id_conflict_policy: ActivityIDConflictPolicy::FAIL,
       retry_policy: nil,
       search_attributes: nil,
-      static_summary: nil,
+      summary: nil,
       static_details: nil,
       priority: Priority.default,
       start_delay: nil,
@@ -649,7 +649,7 @@ module Temporalio
         id_conflict_policy:,
         retry_policy:,
         search_attributes:,
-        static_summary:,
+        summary:,
         static_details:,
         priority:,
         start_delay:,
