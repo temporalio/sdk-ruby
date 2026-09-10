@@ -21,6 +21,20 @@ to docs, or any other relevant information.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v99.99.99] - 2026-09-10
+
+### Added
+
 #### Standalone Activity operator commands
 
 - `Client::ActivityHandle` now supports operator commands for standalone activities: `#pause`,
@@ -34,16 +48,10 @@ to docs, or any other relevant information.
 
 - `Description` payload fields are now opt-in: `input`, `outcome`, `heartbeat_details`, `last_failure`.
 
-### Changed
-
-### Deprecated
-
 ### Fixed
 - Canceling a fiber-executor activity no longer wedges the worker if using a `Fiber#transfer` based scheduler
   (such as `async`). The exception is now delivered through the scheduler's `fiber_interrupt` hook when it
   provides one.
-
-### Security
 
 ## [v1.7.0] - 2026-08-20
 
