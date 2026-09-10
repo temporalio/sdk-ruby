@@ -1,5 +1,6 @@
 use std::ffi::c_void;
 use std::mem::ManuallyDrop;
+use std::sync::Mutex;
 
 use magnus::symbol::IntoSymbol;
 use magnus::value::{BoxValue, OpaqueId, ReprValue};
@@ -138,24 +139,65 @@ impl AsyncCallback {
     }
 }
 
+trait DeferredRubyDrop: Send {}
+
+struct DeferredBoxValue<T: ReprValue + 'static> {
+    _value: BoxValue<T>,
+}
+
+unsafe impl<T: ReprValue + 'static> Send for DeferredBoxValue<T> {}
+
+impl<T: ReprValue + 'static> DeferredRubyDrop for DeferredBoxValue<T> {}
+
+static DEFERRED_RUBY_DROPS: Mutex<Vec<Box<dyn DeferredRubyDrop>>> = Mutex::new(Vec::new());
+
+fn drop_deferred_ruby_values() {
+    let values = {
+        let mut values = DEFERRED_RUBY_DROPS
+            .lock()
+            .unwrap_or_else(|err| err.into_inner());
+        std::mem::take(&mut *values)
+    };
+    drop(values);
+}
+
 /// Utility that basically combines Magnus BoxValue with Magnus Opaque. It's a
-/// Send/Sync safe Ruby value that prevents GC until dropped and is only
-/// accessible from a Ruby thread.
+/// Send/Sync safe Ruby value that prevents GC and is only accessible from a
+/// Ruby thread.
 #[derive(Debug)]
-pub(crate) struct SendSyncBoxValue<T: ReprValue>(BoxValue<T>);
+pub(crate) struct SendSyncBoxValue<T: ReprValue + 'static>(ManuallyDrop<BoxValue<T>>);
 
 // We trust our usage of this across threads. We would use Opaque but we can't
 // box that properly/safely to ensure it does not get GC'd.
-unsafe impl<T: ReprValue> Send for SendSyncBoxValue<T> {}
-unsafe impl<T: ReprValue> Sync for SendSyncBoxValue<T> {}
+unsafe impl<T: ReprValue + 'static> Send for SendSyncBoxValue<T> {}
+unsafe impl<T: ReprValue + 'static> Sync for SendSyncBoxValue<T> {}
 
-impl<T: ReprValue> SendSyncBoxValue<T> {
+impl<T: ReprValue + 'static> SendSyncBoxValue<T> {
     pub fn new(val: T) -> Self {
-        Self(BoxValue::new(val))
+        drop_deferred_ruby_values();
+        Self(ManuallyDrop::new(BoxValue::new(val)))
     }
 
     pub fn value(&self, _: &Ruby) -> T {
-        *self.0
+        **self.0
+    }
+}
+
+impl<T: ReprValue + 'static> Drop for SendSyncBoxValue<T> {
+    fn drop(&mut self) {
+        if Ruby::get().is_ok() {
+            unsafe {
+                ManuallyDrop::drop(&mut self.0);
+            }
+        } else {
+            // Ruby's GC registration APIs are unsafe from Tokio threads, so
+            // retain the BoxValue until a Ruby thread can unregister it.
+            let value = unsafe { ManuallyDrop::take(&mut self.0) };
+            DEFERRED_RUBY_DROPS
+                .lock()
+                .unwrap_or_else(|err| err.into_inner())
+                .push(Box::new(DeferredBoxValue { _value: value }));
+        }
     }
 }
 
