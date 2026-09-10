@@ -27,6 +27,8 @@ to docs, or any other relevant information.
 
 ### :boom: Breaking Changes
 
+- Duplicate keys in `update_options` are now an error.
+
 ### Fixed
 
 ### Security
