@@ -23,6 +23,9 @@ to docs, or any other relevant information.
 
 ### Changed
 
+- Standalone Activities are now generally available (GA). (Standalone Activities as Nexus operations
+  and Standalone Activities operator commands remain experimental.)
+
 ### Deprecated
 
 ### :boom: Breaking Changes

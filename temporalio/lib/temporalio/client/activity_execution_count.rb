@@ -3,8 +3,6 @@
 module Temporalio
   class Client
     # Result of a {Client#count_activities} call.
-    #
-    # WARNING: Standalone Activities are experimental.
     class ActivityExecutionCount
       # @return [Integer] Approximate number of activities matching the query. If the query had a group-by clause,
       #   this is the sum of all the counts in {groups}.
@@ -20,8 +18,6 @@ module Temporalio
       end
 
       # Aggregation group if the activity count query had a group-by clause.
-      #
-      # WARNING: Standalone Activities are experimental.
       class AggregationGroup
         # @return [Integer] Approximate number of activities matching the query for this group.
         attr_reader :count
