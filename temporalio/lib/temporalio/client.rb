@@ -485,8 +485,6 @@ module Temporalio
     # Get a handle for an existing standalone activity. Useful when the activity was started elsewhere
     # (a different process, or by another client) and you have only its ID.
     #
-    # WARNING: Standalone Activities are experimental.
-    #
     # @param activity_id [String] ID for the activity.
     # @param activity_run_id [String, nil] Run ID for the activity execution. If nil, operations target the
     #   latest run of the given activity ID.
@@ -499,8 +497,6 @@ module Temporalio
     end
 
     # Start a standalone activity execution and return its handle.
-    #
-    # WARNING: Standalone Activities are experimental.
     #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
@@ -582,8 +578,6 @@ module Temporalio
     # Start a standalone activity execution and wait for its result. Shortcut for
     # {start_activity} + {ActivityHandle#result}.
     #
-    # WARNING: Standalone Activities are experimental.
-    #
     # @param activity [Class<Activity::Definition>, Activity::Definition, Activity::Definition::Info, Symbol, String]
     #   Activity definition, definition class or activity name.
     # @param args [Array<Object>] Arguments to the activity.
@@ -661,8 +655,6 @@ module Temporalio
 
     # List standalone activities matching a visibility query.
     #
-    # WARNING: Standalone Activities are experimental.
-    #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.
     #
@@ -673,8 +665,6 @@ module Temporalio
     end
 
     # Count standalone activities matching a visibility query.
-    #
-    # WARNING: Standalone Activities are experimental.
     #
     # @param query [String] Visibility list filter.
     # @param rpc_options [RPCOptions, nil] Advanced RPC options.

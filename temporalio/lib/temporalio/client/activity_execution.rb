@@ -13,8 +13,6 @@ module Temporalio
   class Client
     # Info for a standalone activity execution. Returned by list_activities; extended by {Description}
     # for describe results.
-    #
-    # WARNING: Standalone Activities are experimental.
     class ActivityExecution
       # @return [Api::Activity::V1::ActivityExecutionListInfo, Api::Activity::V1::ActivityExecutionInfo]
       #   Underlying protobuf info.
@@ -78,8 +76,6 @@ module Temporalio
       end
 
       # Rich description of a standalone activity execution; returned by {ActivityHandle#describe}.
-      #
-      # WARNING: Standalone Activities are experimental.
       class Description < ActivityExecution
         # @return [Api::WorkflowService::V1::DescribeActivityExecutionResponse] Underlying protobuf response.
         attr_reader :raw_description
