@@ -23,11 +23,21 @@ to docs, or any other relevant information.
 
 ### Changed
 
+### Deprecated
+
+### :boom: Breaking Changes
+
+### Fixed
+
+### Security
+
+## [v1.9.0] - 2026-09-14
+
+### Changed
+
 - Standalone Activities are now generally available (GA). (Standalone Activities as Nexus operations
   and Standalone Activities operator commands remain experimental. Operator commands are `pause`,
   `unpause`, `updateOptions`, `restoreOriginal`.)
-
-### Deprecated
 
 ### :boom: Breaking Changes
 
@@ -35,10 +45,6 @@ to docs, or any other relevant information.
 - Renamed the standalone activity `static_summary:` option on `Client#start_activity` and
   `Client#execute_activity` to `summary:`, and `Client::ActivityExecution::Description#static_summary`
   to `#summary`.
-
-### Fixed
-
-### Security
 
 ## [v1.8.0] - 2026-09-10
 
