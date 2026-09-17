@@ -26,17 +26,35 @@ class WorkerThreadPoolTest < Test
     end
   end
 
+  # Polls the block until it returns truthy or `timeout` elapses, and returns the last result so
+  # callers can assert on it. The block is evaluated once per iteration, so a block with side
+  # effects runs a predictable number of times.
   def wait_until(timeout: 10)
     deadline = Time.now + timeout
-    sleep(0.02) until yield || Time.now > deadline
-    yield
+    loop do
+      result = yield
+      return result if result || Time.now > deadline
+
+      sleep(0.02)
+    end
+  end
+
+  # Blocks until the pool runs something on a thread, so the thread is known to exist and to have
+  # entered its context. Fails rather than hanging if that never happens.
+  def run_and_wait(pool, timeout: 10)
+    done = Queue.new
+    pool.execute { done.push(:ran) }
+    assert_equal :ran, done.pop(timeout:), 'pool never ran the block'
   end
 
   def test_default_context_is_no_op
     pool = Temporalio::Worker::ThreadPool.new
     ran = Queue.new
-    pool.execute { ran.push(Thread.current[:test_thread_context_var]) }
-    assert_nil ran.pop
+    # Wrapped, because the value under test is itself nil and a timed-out pop also returns nil.
+    pool.execute { ran.push({ value: Thread.current[:test_thread_context_var] }) }
+    seen = ran.pop(timeout: 10)
+    refute_nil seen, 'pool never ran the block'
+    assert_nil seen[:value]
   ensure
     pool&.shutdown
   end
@@ -50,7 +68,7 @@ class WorkerThreadPoolTest < Test
     seen = Queue.new
     pool.execute { seen.push(Thread.current[:test_thread_context_var]) }
 
-    assert_equal 'set-by-context', seen.pop
+    assert_equal 'set-by-context', seen.pop(timeout: 10)
     refute_empty context.entered
     assert_empty context.exited, 'context must not have exited while the thread is still alive'
   ensure
@@ -80,14 +98,12 @@ class WorkerThreadPoolTest < Test
     pool&.shutdown
   end
 
-  # The doc's claim: `throw :stop` unwinds through the context, so graceful shutdown releases the
-  # resource via `ensure`.
+  # The doc's claim, for graceful shutdown. `shutdown` queues `:stop` for each worker; the worker
+  # thread itself then runs `throw :stop`, which unwinds out through the context's `ensure`.
   def test_context_released_on_graceful_shutdown
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
-    done = Queue.new
-    pool.execute { done.push(nil) }
-    done.pop
+    run_and_wait(pool)
     assert_empty context.exited
 
     pool.shutdown
@@ -106,23 +122,26 @@ class WorkerThreadPoolTest < Test
     started = Queue.new
     2.times do
       pool.execute do
-        started.push(nil)
+        started.push(:started)
         release.pop
       end
     end
-    2.times { started.pop }
+    2.times { assert_equal :started, started.pop(timeout: 10), 'thread never started' }
     2.times { release.push(nil) }
     assert wait_until { pool.active_count.zero? }, 'threads did not go idle'
-    assert_equal 2, pool.largest_length
+    assert_equal 2, pool.length
     assert_empty context.exited
 
-    # Let both threads age past the idle timeout, then drive a prune with one more task.
+    # Let both threads age past the idle timeout, then drive a prune with one more task. Pruning
+    # only happens inside `execute`, so the poll has to keep feeding it work.
     sleep(0.2)
     pruned = wait_until do
       pool.execute { nil }
       !context.exited.empty?
     end
     assert pruned, 'context did not exit when its idle thread was pruned'
+    # The pruned thread is removed from the pool, not just told to stop.
+    assert wait_until { pool.length < 2 }, 'pruned thread was not removed from the pool'
   ensure
     pool&.shutdown
   end
@@ -135,10 +154,10 @@ class WorkerThreadPoolTest < Test
     started = Queue.new
     blocked = Queue.new
     pool.execute do
-      started.push(nil)
+      started.push(:started)
       blocked.pop # never pushed to; the thread is killed while parked here
     end
-    started.pop
+    assert_equal :started, started.pop(timeout: 10), 'thread never started'
     assert_empty context.exited
 
     pool.kill
@@ -146,13 +165,14 @@ class WorkerThreadPoolTest < Test
     assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
   end
 
+  class RaisingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def call
+      raise 'context failed'
+    end
+  end
+
   def test_context_that_raises_kills_only_its_own_thread
-    context = Class.new(Temporalio::Worker::ThreadPool::ThreadContext) do
-      def call
-        raise 'context failed'
-      end
-    end.new
-    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: RaisingContext.new)
 
     # The block never runs, because the context never yielded.
     ran = Queue.new
