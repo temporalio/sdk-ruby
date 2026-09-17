@@ -158,7 +158,7 @@ module Temporalio
     #   optimization on some servers that sends activities back to the same worker as the calling workflow if they can
     #   run there. If `false` (the default), eager execution may still be disabled at the worker level or may not be
     #   requested due to lack of available slots.
-    # @param priority [Priority] Priority of the activity. This is currently experimental.
+    # @param priority [Priority] Priority of the activity.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   activity definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
@@ -424,7 +424,7 @@ module Temporalio
     # @param cron_schedule [String, nil] Cron schedule. Users should use schedules instead of this.
     # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
-    # @param priority [Priority] Priority of the workflow. This is currently experimental.
+    # @param priority [Priority] Priority of the workflow.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
