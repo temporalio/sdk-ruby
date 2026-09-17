@@ -4,7 +4,7 @@ module Temporalio
       class ThreadPool < ActivityExecutor
         def self.default: -> ThreadPool
 
-        def initialize: (?ThreadPool thread_poll) -> void
+        def initialize: (?::Temporalio::Worker::ThreadPool thread_pool) -> void
       end
     end
   end

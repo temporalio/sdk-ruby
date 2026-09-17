@@ -10,6 +10,39 @@ module Temporalio
       # see MIT license at
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/LICENSE.txt
 
+      # Wraps the body of each pool thread, for acquiring a resource when a thread starts and
+      # releasing it when the thread exits. Since the block is invoked for the entire lifetime of
+      # the thread, a resource acquired around it can be released from an `ensure`.
+      #
+      # Not to be confused with an interceptor, which wraps a single activity execution.
+      #
+      # @note The same instance is used by every thread in the pool, so implementations must be
+      #   thread safe. Per-thread state belongs in the block, not in the ThreadContext object.
+      class ThreadContext
+        # @return [ThreadContext] Default/shared context that just invokes the block.
+        def self.default
+          @default ||= NoOp.new
+        end
+
+        # Invoke the given block for the lifetime of a pool thread. Implementations must invoke
+        # the block; a thread whose context does not yield never runs any work.
+        #
+        # @yield Block to invoke for the lifetime of the thread.
+        def call(&)
+          raise NotImplementedError
+        end
+
+        # Context that adds no behavior, used when a pool is created without one.
+        #
+        # @!visibility private
+        class NoOp < ThreadContext
+          # @see ThreadContext.call
+          def call(&)
+            yield
+          end
+        end
+      end
+
       # @return [ThreadPool] Default/shared thread pool instance with unlimited max threads.
       def self.default
         @default ||= new
@@ -25,9 +58,12 @@ module Temporalio
       # @param max_threads [Integer, nil] Maximum number of thread workers to create, or nil for unlimited max.
       # @param idle_timeout [Float] Number of seconds before a thread worker with no work should be stopped. Note,
       #   the check of whether a thread worker is idle is only done on each new {execute} call.
-      def initialize(max_threads: nil, idle_timeout: 20)
+      # @param thread_context [ThreadContext] Invoked around the body of each thread this pool starts, for
+      #   acquiring and releasing per-thread resources. Defaults to one that adds no behavior.
+      def initialize(max_threads: nil, idle_timeout: 20, thread_context: ThreadContext.default)
         @max_threads = max_threads
         @idle_timeout = idle_timeout
+        @thread_context = thread_context
 
         @mutex = Mutex.new
         @pool = []
@@ -123,6 +159,11 @@ module Temporalio
         @mutex.synchronize { @completed_task_count += 1 }
       end
 
+      # @!visibility private
+      def _thread_context
+        @thread_context
+      end
+
       private
 
       def locked_assign_worker(&block) # rubocop:disable Naming/PredicateMethod
@@ -189,24 +230,28 @@ module Temporalio
         def initialize(pool, id)
           @queue = Queue.new
           @thread = Thread.new(@queue, pool) do |my_queue, my_pool|
-            catch(:stop) do
-              loop do
-                case block = my_queue.pop
-                when :stop
-                  pool._remove_busy_worker(self)
-                  throw :stop
-                else
-                  begin
-                    block.call
-                    my_pool._worker_task_completed
-                    my_pool._ready_worker(self, ThreadPool._monotonic_time)
-                  rescue StandardError => e
-                    # Ignore
-                    warn("Unexpected execute block error: #{e.full_message}")
-                  rescue Exception => e # rubocop:disable Lint/RescueException
-                    warn("Unexpected execute block exception: #{e.full_message}")
-                    my_pool._worker_died(self)
+            # Wraps the whole loop, so a context can hold a resource for the thread's lifetime and
+            # release it from an `ensure` however the loop ends.
+            my_pool._thread_context.call do
+              catch(:stop) do
+                loop do
+                  case block = my_queue.pop
+                  when :stop
+                    pool._remove_busy_worker(self)
                     throw :stop
+                  else
+                    begin
+                      block.call
+                      my_pool._worker_task_completed
+                      my_pool._ready_worker(self, ThreadPool._monotonic_time)
+                    rescue StandardError => e
+                      # Ignore
+                      warn("Unexpected execute block error: #{e.full_message}")
+                    rescue Exception => e # rubocop:disable Lint/RescueException
+                      warn("Unexpected execute block exception: #{e.full_message}")
+                      my_pool._worker_died(self)
+                      throw :stop
+                    end
                   end
                 end
               end

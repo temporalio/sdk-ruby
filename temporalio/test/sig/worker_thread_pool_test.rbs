@@ -1,0 +1,10 @@
+class WorkerThreadPoolTest < Test
+  class RecordingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    attr_reader entered: Queue
+    attr_reader exited: Queue
+    def initialize: (?var_value: String) -> void
+    def call: { -> void } -> void
+  end
+
+  def wait_until: (?timeout: Float) { () -> boolish } -> boolish
+end

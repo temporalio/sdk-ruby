@@ -910,6 +910,57 @@ class WorkerActivityTest < Test
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
   end
 
+  # Sets a thread-local for the lifetime of each pool thread and clears it on the way out, so a
+  # real activity can observe that it ran inside the context and the test can observe the teardown.
+  class ThreadContextRecorder < Temporalio::Worker::ThreadPool::ThreadContext
+    # Pool threads outlive the activity, so the exit is recorded on a queue the test can wait on.
+    attr_reader :exited
+
+    def initialize
+      super
+      @exited = Queue.new
+    end
+
+    def call
+      Thread.current[:thread_context_val] = 'acquired'
+      yield
+    ensure
+      Thread.current[:thread_context_val] = nil
+      @exited.push(Thread.current.name)
+    end
+  end
+
+  class ThreadContextActivity < Temporalio::Activity::Definition
+    activity_executor :context_executor
+
+    def execute
+      "context val: #{Thread.current[:thread_context_val]}"
+    end
+  end
+
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
+  def test_thread_pool_thread_context_wraps_activity
+    context = ThreadContextRecorder.new
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+    executor = Temporalio::Worker::ActivityExecutor::ThreadPool.new(pool)
+
+    # The activity reads the value the context set before the thread began taking work.
+    assert_equal 'context val: acquired',
+                 execute_activity(ThreadContextActivity, activity_executors: { context_executor: executor })
+
+    # The context is still holding the thread open, since the pool thread outlives the activity.
+    assert_empty context.exited
+
+    # Shutting the pool down unwinds the thread through the context's `ensure`.
+    pool.shutdown
+    deadline = Time.now + 10
+    sleep(0.02) while context.exited.empty? && Time.now < deadline
+    refute_empty context.exited, 'thread context did not release when the pool shut down'
+  ensure
+    pool&.kill
+  end
+
   class ConcurrentActivity < Temporalio::Activity::Definition
     def initialize
       @started = Queue.new
