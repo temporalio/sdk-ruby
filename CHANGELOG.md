@@ -22,18 +22,9 @@ to docs, or any other relevant information.
 ### Added
 
 - `Temporalio::Worker::ThreadPool::ThreadContext` can be passed to `ThreadPool.new` as
-  `thread_context:` to wrap the body of each pool thread. The context's `call` receives a block
-  covering the thread's entire lifetime, so a resource acquired around it (a database connection,
-  say) can be reused by every activity that thread runs and released from an `ensure`. The default
-  context adds no behavior.
+  `thread_context:` to wrap the execution of the body of each pool thread.
 
 ### Changed
-
-### Fixed
-
-- The RBS signature for `Worker::ActivityExecutor::ThreadPool#initialize` declared its parameter as
-  an `ActivityExecutor::ThreadPool` rather than the `Worker::ThreadPool` the method actually takes,
-  so passing a custom thread pool failed type checking.
 
 ### Deprecated
 

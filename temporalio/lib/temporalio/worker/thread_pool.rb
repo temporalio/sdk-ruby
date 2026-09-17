@@ -14,8 +14,6 @@ module Temporalio
       # releasing it when the thread exits. Since the block is invoked for the entire lifetime of
       # the thread, a resource acquired around it can be released from an `ensure`.
       #
-      # Not to be confused with an interceptor, which wraps a single activity execution.
-      #
       # @note The same instance is used by every thread in the pool, so implementations must be
       #   thread safe. Per-thread state belongs in the block, not in the ThreadContext object.
       class ThreadContext
@@ -25,15 +23,13 @@ module Temporalio
         end
 
         # Invoke the given block for the lifetime of a pool thread. Implementations must invoke
-        # the block; a thread whose context does not yield never runs any work.
+        # the block.
         #
         # @yield Block to invoke for the lifetime of the thread.
         def call(&)
           raise NotImplementedError
         end
 
-        # Context that adds no behavior, used when a pool is created without one.
-        #
         # @!visibility private
         class NoOp < ThreadContext
           # @see ThreadContext.call
@@ -230,8 +226,7 @@ module Temporalio
         def initialize(pool, id)
           @queue = Queue.new
           @thread = Thread.new(@queue, pool) do |my_queue, my_pool|
-            # Wraps the whole loop, so a context can hold a resource for the thread's lifetime and
-            # release it from an `ensure` however the loop ends.
+            # Run the entire loop inside the ThreadContext.
             my_pool._thread_context.call do
               catch(:stop) do
                 loop do
