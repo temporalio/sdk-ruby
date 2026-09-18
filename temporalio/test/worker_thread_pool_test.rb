@@ -149,21 +149,49 @@ class WorkerThreadPoolTest < Test
     assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
   end
 
-  class RaisingContext < Temporalio::Worker::ThreadPool::ThreadContext
+  # Raises for the first thread only, so the second thread's context succeeds.
+  class RaisesOnceContext < Temporalio::Worker::ThreadPool::ThreadContext
+    attr_reader :raised
+
+    def initialize
+      super
+      @mutex = Mutex.new
+      @raised = Queue.new
+      @first = true
+    end
+
     def call
-      raise 'context failed'
+      should_raise = @mutex.synchronize { @first ? (@first = false) || true : false }
+      if should_raise
+        @raised.push(:raised)
+        raise 'context failed'
+      end
+
+      yield
     end
   end
 
-  def test_context_that_raises_kills_only_its_own_thread
-    pool = Temporalio::Worker::ThreadPool.new(thread_context: RaisingContext.new)
+  def test_raising_context_kills_only_its_own_thread
+    context = RaisesOnceContext.new
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    # The block never runs, because the context never yielded.
-    ran = Queue.new
-    _, err = capture_subprocess_io { pool.execute { ran.push(nil) } }
+    # Submit both up front. The first worker's context raises, so that worker never completes a
+    # task and so never enters the ready list -- which makes the second `execute` create a fresh
+    # worker rather than reuse the dead one.
+    first = Queue.new
+    second = Queue.new
+    # Captured only to keep the dying thread's report_on_exception warning out of the test output.
+    capture_subprocess_io do
+      pool.execute { first.push(:ran) }
+      pool.execute { second.push(:ran) }
 
-    assert(wait_until { ran.empty? })
-    assert_includes err.to_s, 'context failed' if err && !err.empty?
+      assert_equal :raised, context.raised.pop(timeout: 10), 'context never raised'
+      assert_equal :ran, second.pop(timeout: 10), 'second thread never ran its work'
+    end
+
+    # Its worker is dead, so nothing can ever pop this block; no waiting needed to establish that.
+    assert_empty first, 'block ran even though its context raised'
+    assert_equal 2, pool.largest_length
   ensure
     pool&.kill
   end

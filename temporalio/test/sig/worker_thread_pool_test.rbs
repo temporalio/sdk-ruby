@@ -6,7 +6,9 @@ class WorkerThreadPoolTest < Test
     def call: { -> void } -> void
   end
 
-  class RaisingContext < Temporalio::Worker::ThreadPool::ThreadContext
+  class RaisesOnceContext < Temporalio::Worker::ThreadPool::ThreadContext
+    attr_reader raised: Queue
+    def initialize: -> void
     def call: { -> void } -> void
   end
 
