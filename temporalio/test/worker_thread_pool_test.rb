@@ -72,9 +72,9 @@ class WorkerThreadPoolTest < Test
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    # Occupy two threads at once so the pool has to start a second one.
     release = Queue.new
     seen = Queue.new
+    # Ensure two threads are running.
     2.times do
       pool.execute do
         seen.push(Thread.current[:test_thread_context_var])
@@ -91,8 +91,6 @@ class WorkerThreadPoolTest < Test
     pool&.shutdown
   end
 
-  # The doc's claim, for graceful shutdown. `shutdown` queues `:stop` for each worker; the worker
-  # thread itself then runs `throw :stop`, which unwinds out through the context's `ensure`.
   def test_context_released_on_graceful_shutdown
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
@@ -104,12 +102,9 @@ class WorkerThreadPoolTest < Test
     assert wait_until { !context.exited.empty? }, 'context did not exit on graceful shutdown'
   end
 
-  # Same claim, for the idle-timeout prune path, which also stops a thread with `throw :stop`.
   def test_context_released_on_idle_timeout_prune
     context = RecordingContext.new
-    # Prune checks run on `execute`, and only stop threads that have been idle longer than the
-    # timeout. Two threads are needed: `execute` hands the new task to one idle thread before
-    # pruning, so a second must remain in the ready list for there to be anything to prune.
+    # We need two threads to make sure there is one that can be pruned.
     pool = Temporalio::Worker::ThreadPool.new(idle_timeout: 0.05, thread_context: context)
     release = Queue.new
     started = Queue.new
@@ -125,22 +120,18 @@ class WorkerThreadPoolTest < Test
     assert_equal 2, pool.length
     assert_empty context.exited
 
-    # Let both threads age past the idle timeout, then drive a prune with one more task. Pruning
-    # only happens inside `execute`, so the poll has to keep feeding it work.
+    # Pruning only happens inside `execute`.
     sleep(0.2)
     pruned = wait_until do
       pool.execute { nil }
       !context.exited.empty?
     end
     assert pruned, 'context did not exit when its idle thread was pruned'
-    # The pruned thread is removed from the pool, not just told to stop.
     assert wait_until { pool.length < 2 }, 'pruned thread was not removed from the pool'
   ensure
     pool&.shutdown
   end
 
-  # The doc predicted `ThreadPool#kill` would NOT release the resource. It does: `Thread#kill`
-  # unwinds the stack and runs `ensure` blocks.
   def test_context_released_on_kill
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
@@ -148,7 +139,7 @@ class WorkerThreadPoolTest < Test
     blocked = Queue.new
     pool.execute do
       started.push(:started)
-      blocked.pop # never pushed to; the thread is killed while parked here
+      blocked.pop # blocks
     end
     assert_equal :started, started.pop(timeout: 10), 'thread never started'
     assert_empty context.exited
