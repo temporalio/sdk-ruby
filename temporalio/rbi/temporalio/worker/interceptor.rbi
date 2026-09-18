@@ -171,6 +171,9 @@ class Temporalio::Worker::Interceptor::Workflow::CancelExternalWorkflowInput < :
 
   sig { returns(T.nilable(String)) }
   def run_id; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::ExecuteActivityInput < ::Data
@@ -226,6 +229,9 @@ class Temporalio::Worker::Interceptor::Workflow::ExecuteActivityInput < ::Data
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::ExecuteLocalActivityInput < ::Data
@@ -272,6 +278,9 @@ class Temporalio::Worker::Interceptor::Workflow::ExecuteLocalActivityInput < ::D
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::InitializeContinueAsNewErrorInput < ::Data
@@ -301,6 +310,9 @@ class Temporalio::Worker::Interceptor::Workflow::SignalChildWorkflowInput < ::Da
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::SignalExternalWorkflowInput < ::Data
@@ -326,6 +338,9 @@ class Temporalio::Worker::Interceptor::Workflow::SignalExternalWorkflowInput < :
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::SleepInput < ::Data
@@ -339,6 +354,9 @@ class Temporalio::Worker::Interceptor::Workflow::SleepInput < ::Data
 
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput < ::Data
@@ -406,6 +424,9 @@ class Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput < ::Dat
 
   sig { returns(T::Hash[String, T.nilable(Object)]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::StartNexusOperationInput < ::Data
@@ -449,6 +470,9 @@ class Temporalio::Worker::Interceptor::Workflow::StartNexusOperationInput < ::Da
 
   sig { returns(T::Hash[String, String]) }
   def headers; end
+
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  def event_groups; end
 end
 
 class Temporalio::Worker::Interceptor::Workflow::Outbound

@@ -276,6 +276,7 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def coresdk_workflow_activation_signal_workflow: (untyped value) -> void
       def coresdk_workflow_activation_workflow_activation: (untyped value) -> void
       def coresdk_workflow_activation_workflow_activation_job: (untyped value) -> void
+      def coresdk_workflow_commands_cancel_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_complete_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_continue_as_new_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_fail_workflow_execution: (untyped value) -> void

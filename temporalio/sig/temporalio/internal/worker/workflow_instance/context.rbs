@@ -28,7 +28,7 @@ module Temporalio
 
           def current_update_info: -> Workflow::UpdateInfo?
 
-          def deprecate_patch: (Symbol | String patch_id) -> void
+          def deprecate_patch: (Symbol | String patch_id, ?event_groups: Array[Workflow::EventGroup]?) -> void
 
           def durable_scheduler_disabled: [T] { -> T } -> T
 
@@ -48,7 +48,8 @@ module Temporalio
             disable_eager_execution: bool,
             priority: Priority,
             arg_hints: Array[Object]?,
-            result_hint: Object?
+            result_hint: Object?,
+            event_groups: Array[Workflow::EventGroup]?
           ) -> Object?
 
           def execute_local_activity: (
@@ -64,7 +65,8 @@ module Temporalio
             cancellation_type: Workflow::ActivityCancellationType::enum,
             activity_id: String?,
             arg_hints: Array[Object]?,
-            result_hint: Object?
+            result_hint: Object?,
+            event_groups: Array[Workflow::EventGroup]?
           ) -> Object?
 
           def external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
@@ -87,7 +89,7 @@ module Temporalio
 
           def now: -> Time
 
-          def patched: (Symbol | String patch_id) -> bool
+          def patched: (Symbol | String patch_id, ?event_groups: Array[Workflow::EventGroup]?) -> bool
 
           def payload_converter: -> Converters::PayloadConverter
 
@@ -103,7 +105,7 @@ module Temporalio
 
           def signal_handlers: -> HandlerHash[Workflow::Definition::Signal]
 
-          def sleep: (duration? duration, summary: String?, cancellation: Cancellation) -> void
+          def sleep: (duration? duration, summary: String?, cancellation: Cancellation, ?event_groups: Array[Workflow::EventGroup]?) -> void
 
           def start_child_workflow: (
             singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
@@ -125,7 +127,8 @@ module Temporalio
             search_attributes: SearchAttributes?,
             priority: Priority,
             arg_hints: Array[Object]?,
-            result_hint: Object?
+            result_hint: Object?,
+            event_groups: Array[Workflow::EventGroup]?
           ) -> ChildWorkflowHandle
 
           def storage: -> Hash[Object, Object]
@@ -134,18 +137,19 @@ module Temporalio
             duration? duration,
             singleton(Exception) exception_class,
             *Object? exception_args,
-            summary: String?
+            summary: String?,
+            ?event_groups: Array[Workflow::EventGroup]?
           ) { -> T } -> T
 
           def update_handlers: -> HandlerHash[Workflow::Definition::Update]
 
-          def upsert_memo: (Hash[Symbol | String, Object?] hash) -> void
+          def upsert_memo: (Hash[Symbol | String, Object?] hash, ?event_groups: Array[Workflow::EventGroup]?) -> void
 
-          def upsert_search_attributes: (*SearchAttributes::Update updates) -> void
+          def upsert_search_attributes: (*SearchAttributes::Update updates, ?event_groups: Array[Workflow::EventGroup]?) -> void
 
           def wait_condition: [T] (cancellation: Cancellation?) { -> T } -> T
 
-          def _cancel_external_workflow: (id: String, run_id: String?) -> void
+          def _cancel_external_workflow: (id: String, run_id: String?, ?event_groups: Array[Workflow::EventGroup]?) -> void
 
           def _outbound=: (Temporalio::Worker::Interceptor::Workflow::Outbound outbound) -> void
 
@@ -154,7 +158,8 @@ module Temporalio
             signal: Workflow::Definition::Signal | Symbol | String,
             args: Array[Object?],
             cancellation: Cancellation,
-            arg_hints: Array[Object]?
+            arg_hints: Array[Object]?,
+            ?event_groups: Array[Workflow::EventGroup]?
           ) -> void
 
           def _signal_external_workflow: (
@@ -163,7 +168,8 @@ module Temporalio
             signal: Workflow::Definition::Signal | Symbol | String,
             args: Array[Object?],
             cancellation: Cancellation,
-            arg_hints: Array[Object]?
+            arg_hints: Array[Object]?,
+            ?event_groups: Array[Workflow::EventGroup]?
           ) -> void
         end
       end

@@ -1,0 +1,38 @@
+module Temporalio
+  module Workflow
+    class EventGroup
+      class Active
+        attr_accessor implicit: EventGroup?
+        attr_accessor explicit: Hash[String, EventGroup]
+
+        def initialize: (?implicit: EventGroup?, ?explicit: Hash[String, EventGroup]) -> void
+      end
+
+      EMPTY_ACTIVE: Active
+      STORAGE_KEY: Symbol
+
+      def self._active: -> Active
+      def self._with_active: [T] (Active active) { -> T } -> T
+      def self._markers_for_command: (Array[EventGroup]? directs) -> Array[Api::Sdk::V1::EventGroupMarker]
+
+      def initialize: -> void
+      def _applied_over: (Active _active) -> Active
+      def _to_proto: -> Api::Sdk::V1::EventGroupMarker?
+
+      class Label < EventGroup
+        attr_reader id: String
+        attr_reader label: String?
+
+        def initialize: (String id, String? label) -> void
+      end
+
+      class Implicit < EventGroup
+        def initialize: (Api::Sdk::V1::EventGroupMarker marker) -> void
+      end
+
+      class StubImplicit < EventGroup
+        def initialize: -> void
+      end
+    end
+  end
+end

@@ -125,10 +125,12 @@ module Temporalio
         class CancelExternalWorkflowInput
           attr_reader id: String
           attr_reader run_id: String?
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             id: String,
-            run_id: String?
+            run_id: String?,
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -150,6 +152,7 @@ module Temporalio
           attr_reader arg_hints: Array[Object]?
           attr_reader result_hint: Object?
           attr_reader headers: Hash[String, Object?]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             activity: String,
@@ -168,7 +171,8 @@ module Temporalio
             priority: Temporalio::Priority,
             arg_hints: Array[Object]?,
             result_hint: Object?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -187,6 +191,7 @@ module Temporalio
           attr_reader arg_hints: Array[Object]?
           attr_reader result_hint: Object?
           attr_reader headers: Hash[String, Object?]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             activity: String,
@@ -202,7 +207,8 @@ module Temporalio
             activity_id: String?,
             arg_hints: Array[Object]?,
             result_hint: Object?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -221,6 +227,7 @@ module Temporalio
           attr_reader cancellation: Cancellation
           attr_reader arg_hints: Array[Object]?
           attr_reader headers: Hash[String, Object?]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             id: String,
@@ -228,7 +235,8 @@ module Temporalio
             args: Array[Object?],
             cancellation: Cancellation,
             arg_hints: Array[Object]?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -240,6 +248,7 @@ module Temporalio
           attr_reader cancellation: Cancellation
           attr_reader arg_hints: Array[Object]?
           attr_reader headers: Hash[String, Object?]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             id: String,
@@ -248,7 +257,8 @@ module Temporalio
             args: Array[Object?],
             cancellation: Cancellation,
             arg_hints: Array[Object]?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -256,11 +266,13 @@ module Temporalio
           attr_reader duration: duration?
           attr_reader summary: String?
           attr_reader cancellation: Cancellation
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             duration: duration?,
             summary: String?,
-            cancellation: Cancellation
+            cancellation: Cancellation,
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -286,6 +298,7 @@ module Temporalio
           attr_reader arg_hints: Array[Object]?
           attr_reader result_hint: Object?
           attr_reader headers: Hash[String, Object?]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             workflow: String,
@@ -308,7 +321,8 @@ module Temporalio
             priority: Temporalio::Priority,
             arg_hints: Array[Object]?,
             result_hint: Object?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 
@@ -326,6 +340,7 @@ module Temporalio
           attr_reader arg_hint: Object?
           attr_reader result_hint: Object?
           attr_reader headers: Hash[String, String]
+          attr_reader event_groups: Array[Temporalio::Workflow::EventGroup]?
 
           def initialize: (
             endpoint: String,
@@ -340,7 +355,8 @@ module Temporalio
             cancellation: Cancellation,
             arg_hint: Object?,
             result_hint: Object?,
-            headers: Hash[String, String]
+            headers: Hash[String, String],
+            event_groups: Array[Temporalio::Workflow::EventGroup]?
           ) -> void
         end
 

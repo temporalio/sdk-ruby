@@ -8,6 +8,7 @@ require 'temporalio/workflow/activity_cancellation_type'
 require 'temporalio/workflow/child_workflow_cancellation_type'
 require 'temporalio/workflow/child_workflow_handle'
 require 'temporalio/workflow/definition'
+require 'temporalio/workflow/event_group'
 require 'temporalio/workflow/external_workflow_handle'
 require 'temporalio/workflow/future'
 require 'temporalio/workflow/handler_unfinished_policy'
@@ -52,6 +53,82 @@ module Temporalio
     # @return [NexusClient] Client for executing Nexus operations.
     def self.create_nexus_client(endpoint:, service:)
       _current.create_nexus_client(endpoint:, service:)
+    end
+
+    # Create an Event Group that can be attached to commands scheduled by this workflow.
+    #
+    # Attach the returned group via command `event_groups:` options, or via {with_event_groups}.
+    #
+    # @param id [String] Non-empty group identity. Commands with the same `id` belong to the same group. The
+    #   user-provided ID is stored as plain text in the workflow history and should therefore not contain sensitive
+    #   information.
+    # @param label [String, nil] Optional non-empty display text for the UI / CLI. If provided, it is persisted to
+    #   history as a codec-encoded Payload.
+    # @return [EventGroup] Created Event Group.
+    #
+    # WARNING: Event Groups is an experimental API and may change without notice.
+    def self.create_event_group(id, label: nil)
+      _current
+      raise ArgumentError, 'Event group id cannot be empty' if !id.is_a?(String) || id.empty?
+      raise ArgumentError, 'Event group label cannot be empty' if !label.nil? && (!label.is_a?(String) || label.empty?)
+
+      EventGroup::Label.new(id, label)
+    end
+
+    # Run the given block with one or more Event Groups attached to every command produced inside it.
+    #
+    # Nested scopes compose: a command produced inside an inner scope carries the Event Groups of all enclosing scopes.
+    # Fibers started within a scope inherit it, since they capture Fiber storage at creation.
+    #
+    # @param groups [Array<EventGroup>] Event Groups created via {create_event_group}.
+    # @yield Block to run with the given Event Groups in scope.
+    # @return [Object] Result of the block.
+    #
+    # WARNING: Event Groups is an experimental API and may change without notice.
+    def self.with_event_groups(*groups, &)
+      raise ArgumentError, 'Block required' unless block_given?
+
+      _current
+      active = EventGroup._active
+      explicit = active.explicit.dup
+      groups.each do |group|
+        unless group.is_a?(EventGroup::Label)
+          raise TypeError, 'Event groups must be created with Temporalio::Workflow.create_event_group'
+        end
+
+        explicit[group.id] = group
+      end
+      EventGroup._with_active(EventGroup::Active.new(implicit: active.implicit, explicit:), &)
+    end
+
+    # @!visibility private
+    def self._with_implicit_event_group(group, &)
+      EventGroup._with_active(group._applied_over(EventGroup._active), &)
+    end
+
+    # @!visibility private
+    def self._inbound_event_group(event_id)
+      if event_id.nil? || event_id <= 0
+        _current_or_nil&.logger&.warn(
+          "Cannot create implicit Event Group for signal with invalid originating event ID: #{event_id}"
+        )
+        EventGroup::StubImplicit.new
+      else
+        EventGroup::Implicit.new(
+          Api::Sdk::V1::EventGroupMarker.new(
+            inbound_event: Api::Sdk::V1::EventGroupMarker::InboundEvent.new(inbound_event_id: event_id)
+          )
+        )
+      end
+    end
+
+    # @!visibility private
+    def self._inbound_update_event_group(update_id)
+      EventGroup::Implicit.new(
+        Api::Sdk::V1::EventGroupMarker.new(
+          inbound_update: Api::Sdk::V1::EventGroupMarker::InboundUpdate.new(inbound_update_id: update_id)
+        )
+      )
     end
 
     # @return [Array<SuggestContinueAsNewReason::enum>] Reasons the server suggests continue-as-new. Empty if no
@@ -121,8 +198,9 @@ module Temporalio
     # removed as well.
     #
     # @param patch_id [Symbol, String] Patch ID.
-    def self.deprecate_patch(patch_id)
-      _current.deprecate_patch(patch_id)
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the patch marker command.
+    def self.deprecate_patch(patch_id, event_groups: nil)
+      _current.deprecate_patch(patch_id, event_groups:)
     end
 
     # Execute an activity and return its result. Either `start_to_close_timeout` or `schedule_to_close_timeout` _must_
@@ -163,6 +241,8 @@ module Temporalio
     #   activity definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
     #   definition has result hint, it is used by default.
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the activity command, in addition to any
+    #   groups from enclosing {with_event_groups} scopes.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -184,13 +264,14 @@ module Temporalio
       disable_eager_execution: false,
       priority: Priority.default,
       arg_hints: nil,
-      result_hint: nil
+      result_hint: nil,
+      event_groups: nil
     )
       _current.execute_activity(
         activity, *args,
         task_queue:, summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:,
-        priority:, arg_hints:, result_hint:
+        priority:, arg_hints:, result_hint:, event_groups:
       )
     end
 
@@ -215,13 +296,15 @@ module Temporalio
       search_attributes: nil,
       priority: Priority.default,
       arg_hints: nil,
-      result_hint: nil
+      result_hint: nil,
+      event_groups: nil
     )
       start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:,
+        event_groups:
       ).result
     end
 
@@ -258,6 +341,8 @@ module Temporalio
     #   activity definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
     #   definition has result hint, it is used by default.
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the activity command, in addition to any
+    #   groups from enclosing {with_event_groups} scopes.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -276,13 +361,14 @@ module Temporalio
       cancellation_type: ActivityCancellationType::TRY_CANCEL,
       activity_id: nil,
       arg_hints: nil,
-      result_hint: nil
+      result_hint: nil,
+      event_groups: nil
     )
       _current.execute_local_activity(
         activity, *args,
         summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         retry_policy:, local_retry_threshold:, cancellation:, cancellation_type:,
-        activity_id:, arg_hints:, result_hint:
+        activity_id:, arg_hints:, result_hint:, event_groups:
       )
     end
 
@@ -348,9 +434,10 @@ module Temporalio
     # deployments. That callback is only used when the patch marker would otherwise be created for the first time.
     #
     # @param patch_id [Symbol, String] Patch ID.
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the patch marker command.
     # @return [Boolean] True if this should take the newer patch, false if it should take the old path.
-    def self.patched(patch_id)
-      _current.patched(patch_id)
+    def self.patched(patch_id, event_groups: nil)
+      _current.patched(patch_id, event_groups:)
     end
 
     # @return [Converters::PayloadConverter] Payload converter for the workflow.
@@ -395,9 +482,11 @@ module Temporalio
     # @param summary [String, nil] A simple string identifying this timer that may be visible in UI/CLI. While it can be
     #   normal text, it is best to treat as a timer ID.
     # @param cancellation [Cancellation] Cancellation for this timer.
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the timer command, in addition to any
+    #   groups from enclosing {with_event_groups} scopes.
     # @raise [Error::CanceledError] Sleep canceled.
-    def self.sleep(duration, summary: nil, cancellation: Workflow.cancellation)
-      _current.sleep(duration, summary:, cancellation:)
+    def self.sleep(duration, summary: nil, cancellation: Workflow.cancellation, event_groups: nil)
+      _current.sleep(duration, summary:, cancellation:, event_groups:)
     end
 
     # Start a child workflow and return the handle.
@@ -453,13 +542,15 @@ module Temporalio
       search_attributes: nil,
       priority: Priority.default,
       arg_hints: nil,
-      result_hint: nil
+      result_hint: nil,
+      event_groups: nil
     )
       _current.start_child_workflow(
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:,
+        event_groups:
       )
     end
 
@@ -480,6 +571,8 @@ module Temporalio
     #   {::Timeout.timeout}.
     # @param summary [String] Timer summary for the timer created by this timeout. This is backed by {sleep} so see that
     #   method for details.
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the timeout timer, in addition to any
+    #   groups from enclosing {with_event_groups} scopes. Prefer this over {wait_condition} for wait-with-timeout.
     #
     # @yield Block to run with a timeout.
     # @return [Object] The result of the block.
@@ -489,9 +582,10 @@ module Temporalio
       exception_class = Timeout::Error,
       message = 'execution expired',
       summary: 'Timeout timer',
+      event_groups: nil,
       &
     )
-      _current.timeout(duration, exception_class, message, summary:, &)
+      _current.timeout(duration, exception_class, message, summary:, event_groups:, &)
     end
 
     # @return [Hash<String, Definition::Update>] Update handlers for this workflow. This hash is mostly immutable except
@@ -505,16 +599,18 @@ module Temporalio
     #
     # @param hash [Hash{String, Symbol => Object, nil}] Updates to apply. Value can be `nil` to effectively remove the
     #   memo value.
-    def self.upsert_memo(hash)
-      _current.upsert_memo(hash)
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the modify-properties command.
+    def self.upsert_memo(hash, event_groups: nil)
+      _current.upsert_memo(hash, event_groups:)
     end
 
     # Issue updates to the workflow search attributes.
     #
     # @param updates [Array<SearchAttributes::Update>] Updates to apply. Note these are {SearchAttributes::Update}
     #   objects which are created via {SearchAttributes::Key.value_set} and {SearchAttributes::Key.value_unset} methods.
-    def self.upsert_search_attributes(*updates)
-      _current.upsert_search_attributes(*updates)
+    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the upsert-search-attributes command.
+    def self.upsert_search_attributes(*updates, event_groups: nil)
+      _current.upsert_search_attributes(*updates, event_groups:)
     end
 
     # Wait for the given block to return a "truthy" value (i.e. any value other than `false` or `nil`). The block must
@@ -650,7 +746,7 @@ module Temporalio
       attr_accessor :args, :workflow, :task_queue, :run_timeout, :task_timeout,
                     :backoff_start_interval,
                     :retry_policy, :memo, :search_attributes, :arg_hints, :headers,
-                    :initial_versioning_behavior
+                    :initial_versioning_behavior, :event_groups, :_event_group_markers
 
       # Create a continue as new error.
       #
@@ -679,6 +775,7 @@ module Temporalio
       #   first task of the new run. Set to {ContinueAsNewVersioningBehavior::AUTO_UPGRADE} to upgrade a pinned workflow
       #   to the latest version on continue-as-new or {ContinueAsNewVersioningBehavior::USE_RAMPING_VERSION} to start on
       #   the task queue's Ramping Version. This is currently experimental.
+      # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the continue-as-new command.
       def initialize(
         *args,
         workflow: nil,
@@ -691,7 +788,8 @@ module Temporalio
         search_attributes: nil,
         arg_hints: nil,
         headers: {},
-        initial_versioning_behavior: nil
+        initial_versioning_behavior: nil,
+        event_groups: nil
       )
         super('Continue as new')
         @args = args
@@ -706,6 +804,7 @@ module Temporalio
         @arg_hints = arg_hints
         @headers = headers
         @initial_versioning_behavior = initial_versioning_behavior
+        @event_groups = event_groups
         Workflow._current.initialize_continue_as_new_error(self)
       end
     end

@@ -21,6 +21,11 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Experimental Event Groups: `Workflow.create_event_group`, `Workflow.with_event_groups`, and
+  `event_groups:` on workflow command APIs. Signal and update handlers get implicit inbound groups.
+- Added `Workflow::Info#original_execution_run_id`, the run ID recorded on the workflow execution
+  started event. Unlike `#run_id`, this value is preserved across workflow resets.
+
 ### Changed
 
 ### Deprecated

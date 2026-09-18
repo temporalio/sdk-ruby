@@ -31,6 +31,7 @@ module Temporalio
           def cancel_external_workflow(input)
             # Add command
             seq = (@external_cancel_counter += 1)
+            markers = Workflow::EventGroup._markers_for_command(input.event_groups)
             cmd = Bridge::Api::WorkflowCommands::RequestCancelExternalWorkflowExecution.new(
               seq:,
               workflow_execution: Bridge::Api::Common::NamespacedWorkflowExecution.new(
@@ -40,7 +41,10 @@ module Temporalio
               )
             )
             @instance.add_command(
-              Bridge::Api::WorkflowCommands::WorkflowCommand.new(request_cancel_external_workflow_execution: cmd)
+              Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                request_cancel_external_workflow_execution: cmd,
+                event_group_markers: markers
+              )
             )
             @instance.pending_external_cancels[seq] = Fiber.current
 
@@ -64,7 +68,8 @@ module Temporalio
             end
 
             execute_activity_with_local_backoffs(local: false, cancellation: input.cancellation,
-                                                 result_hint: input.result_hint) do
+                                                 result_hint: input.result_hint,
+                                                 event_groups: input.event_groups) do |_do_backoff, markers|
               seq = (@activity_counter += 1)
               @instance.add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
@@ -86,7 +91,8 @@ module Temporalio
                     do_not_eagerly_execute: input.disable_eager_execution,
                     priority: input.priority._to_proto
                   ),
-                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
+                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter),
+                  event_group_markers: markers
                 )
               )
               seq
@@ -101,7 +107,8 @@ module Temporalio
             @instance.assert_valid_local_activity.call(input.activity)
 
             execute_activity_with_local_backoffs(local: true, cancellation: input.cancellation,
-                                                 result_hint: input.result_hint) do |do_backoff|
+                                                 result_hint: input.result_hint,
+                                                 event_groups: input.event_groups) do |do_backoff, markers|
               seq = (@activity_counter += 1)
               @instance.add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
@@ -122,37 +129,42 @@ module Temporalio
                     attempt: do_backoff&.attempt || 0,
                     original_schedule_time: do_backoff&.original_schedule_time
                   ),
-                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
+                  user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter),
+                  event_group_markers: markers
                 )
               )
               seq
             end
           end
 
-          def execute_activity_with_local_backoffs(local:, cancellation:, result_hint:, &block)
+          def execute_activity_with_local_backoffs(local:, cancellation:, result_hint:, event_groups:, &block)
             # We do not even want to schedule if the cancellation is already cancelled. We choose to use canceled
             # failure instead of wrapping in activity failure which is similar to what other SDKs do, with the accepted
             # tradeoff that it makes rescue more difficult (hence the presence of Error.canceled? helper).
             raise Error::CanceledError, 'Activity canceled before scheduled' if cancellation.canceled?
 
+            # Capture at request time. Cancel callbacks run on the canceler's fiber, and backoff sleep happens later.
+            markers = Workflow::EventGroup._markers_for_command(event_groups)
+
             # This has to be done in a loop for local activity backoff
             last_local_backoff = nil
             loop do
-              result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &block)
+              result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, markers:,
+                                             &block)
               return result unless result.is_a?(Bridge::Api::ActivityResult::DoBackoff)
 
               # @type var result: untyped
               last_local_backoff = result
               # Have to sleep the amount of the backoff, which can be canceled with the same cancellation
               # TODO(cretz): What should this cancellation raise?
-              Workflow.sleep(ProtoUtils.duration_to_seconds(result.backoff_duration), cancellation:)
+              Workflow.sleep(ProtoUtils.duration_to_seconds(result.backoff_duration), cancellation:, event_groups:)
             end
           end
 
           # If this doesn't raise, it returns success | DoBackoff
-          def execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, &block)
+          def execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:, markers:, &block)
             # Add to pending activities (removed by the resolver)
-            seq = block.call(last_local_backoff)
+            seq = block.call(last_local_backoff, markers)
             @instance.pending_activities[seq] = Fiber.current
 
             # Add cancellation hook
@@ -162,13 +174,17 @@ module Temporalio
                 if local
                   @instance.add_command(
                     Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                      request_cancel_local_activity: Bridge::Api::WorkflowCommands::RequestCancelLocalActivity.new(seq:)
+                      request_cancel_local_activity: Bridge::Api::WorkflowCommands::RequestCancelLocalActivity.new(
+                        seq:
+                      ),
+                      event_group_markers: markers
                     )
                   )
                 else
                   @instance.add_command(
                     Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                      request_cancel_activity: Bridge::Api::WorkflowCommands::RequestCancelActivity.new(seq:)
+                      request_cancel_activity: Bridge::Api::WorkflowCommands::RequestCancelActivity.new(seq:),
+                      event_group_markers: markers
                     )
                   )
                 end
@@ -211,7 +227,8 @@ module Temporalio
               args: input.args,
               cancellation: input.cancellation,
               arg_hints: input.arg_hints,
-              headers: input.headers
+              headers: input.headers,
+              event_groups: input.event_groups
             )
           end
 
@@ -224,15 +241,18 @@ module Temporalio
               args: input.args,
               cancellation: input.cancellation,
               arg_hints: input.arg_hints,
-              headers: input.headers
+              headers: input.headers,
+              event_groups: input.event_groups
             )
           end
 
-          def _signal_external_workflow(id:, run_id:, child:, signal:, args:, cancellation:, arg_hints:, headers:)
+          def _signal_external_workflow(id:, run_id:, child:, signal:, args:, cancellation:, arg_hints:, headers:,
+                                        event_groups:)
             raise Error::CanceledError, 'Signal canceled before scheduled' if cancellation.canceled?
 
             # Add command
             seq = (@external_signal_counter += 1)
+            markers = Workflow::EventGroup._markers_for_command(event_groups)
             cmd = Bridge::Api::WorkflowCommands::SignalExternalWorkflowExecution.new(
               seq:,
               signal_name: signal,
@@ -249,7 +269,10 @@ module Temporalio
               )
             end
             @instance.add_command(
-              Bridge::Api::WorkflowCommands::WorkflowCommand.new(signal_external_workflow_execution: cmd)
+              Bridge::Api::WorkflowCommands::WorkflowCommand.new(
+                signal_external_workflow_execution: cmd,
+                event_group_markers: markers
+              )
             )
             @instance.pending_external_signals[seq] = Fiber.current
 
@@ -258,7 +281,8 @@ module Temporalio
               # Add the command but do not raise, we will let resolution do that
               @instance.add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                  cancel_signal_workflow: Bridge::Api::WorkflowCommands::CancelSignalWorkflow.new(seq:)
+                  cancel_signal_workflow: Bridge::Api::WorkflowCommands::CancelSignalWorkflow.new(seq:),
+                  event_group_markers: markers
                 )
               )
             end
@@ -301,13 +325,15 @@ module Temporalio
 
             # Add command
             seq = (@timer_counter += 1)
+            markers = Workflow::EventGroup._markers_for_command(input.event_groups)
             @instance.add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 start_timer: Bridge::Api::WorkflowCommands::StartTimer.new(
                   seq:,
                   start_to_fire_timeout: ProtoUtils.seconds_to_duration(duration)
                 ),
-                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
+                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter),
+                event_group_markers: markers
               )
             )
             @instance.pending_timers[seq] = Fiber.current
@@ -320,7 +346,8 @@ module Temporalio
                 # Add the command for cancel then raise
                 @instance.add_command(
                   Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                    cancel_timer: Bridge::Api::WorkflowCommands::CancelTimer.new(seq:)
+                    cancel_timer: Bridge::Api::WorkflowCommands::CancelTimer.new(seq:),
+                    event_group_markers: markers
                   )
                 )
                 if fiber.alive?
@@ -346,6 +373,7 @@ module Temporalio
 
             # Add the command
             seq = (@child_counter += 1)
+            markers = Workflow::EventGroup._markers_for_command(input.event_groups)
             @instance.add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 start_child_workflow_execution: Bridge::Api::WorkflowCommands::StartChildWorkflowExecution.new(
@@ -371,7 +399,8 @@ module Temporalio
                 ),
                 user_metadata: ProtoUtils.to_user_metadata(
                   input.static_summary, input.static_details, @instance.payload_converter
-                )
+                ),
+                event_group_markers: markers
               )
             )
 
@@ -385,7 +414,8 @@ module Temporalio
                   Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                     cancel_child_workflow_execution: Bridge::Api::WorkflowCommands::CancelChildWorkflowExecution.new(
                       child_workflow_seq: seq
-                    )
+                    ),
+                    event_group_markers: markers
                   )
                 )
               end
@@ -437,6 +467,7 @@ module Temporalio
 
             # Add the command
             seq = (@nexus_operation_counter += 1)
+            markers = Workflow::EventGroup._markers_for_command(input.event_groups)
             @instance.add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 schedule_nexus_operation: Bridge::Api::WorkflowCommands::ScheduleNexusOperation.new(
@@ -451,7 +482,8 @@ module Temporalio
                   nexus_header: input.headers,
                   cancellation_type: input.cancellation_type
                 ),
-                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter)
+                user_metadata: ProtoUtils.to_user_metadata(input.summary, nil, @instance.payload_converter),
+                event_group_markers: markers
               )
             )
 
@@ -467,7 +499,8 @@ module Temporalio
                   Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                     request_cancel_nexus_operation: Bridge::Api::WorkflowCommands::RequestCancelNexusOperation.new(
                       seq:
-                    )
+                    ),
+                    event_group_markers: markers
                   )
                 )
               end

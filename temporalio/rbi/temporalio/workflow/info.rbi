@@ -33,6 +33,9 @@ class Temporalio::Workflow::Info < ::Struct
   sig { returns(String) }
   def namespace; end
 
+  sig { returns(String) }
+  def original_execution_run_id; end
+
   sig { returns(T.nilable(Temporalio::Workflow::Info::ParentInfo)) }
   def parent; end
 

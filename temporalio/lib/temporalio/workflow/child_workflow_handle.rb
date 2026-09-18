@@ -43,7 +43,9 @@ module Temporalio
       # @param cancellation [Cancellation] Cancellation for canceling the signalling.
       # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
       #   signal definition has arg hints, those are used by default.
-      def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil)
+      # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the signal command, in addition to any
+      #   groups from enclosing {Workflow.with_event_groups} scopes.
+      def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil, event_groups: nil)
         raise NotImplementedError
       end
     end
