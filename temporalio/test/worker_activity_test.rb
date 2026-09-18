@@ -910,8 +910,7 @@ class WorkerActivityTest < Test
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
   end
 
-  # Sets a thread-local for the lifetime of each pool thread and clears it on the way out, so a
-  # real activity can observe that it ran inside the context and the test can observe the teardown.
+  # Sets a thread-local for the lifetime of each pool thread.
   class ThreadContextRecorder < Temporalio::Worker::ThreadPool::ThreadContext
     # Pool threads outlive the activity, so the exit is recorded on a queue the test can wait on.
     attr_reader :exited
@@ -945,14 +944,12 @@ class WorkerActivityTest < Test
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
     executor = Temporalio::Worker::ActivityExecutor::ThreadPool.new(pool)
 
-    # The activity reads the value the context set before the thread began taking work.
     assert_equal 'context val: acquired',
                  execute_activity(ThreadContextActivity, activity_executors: { context_executor: executor })
 
-    # The context is still holding the thread open, since the pool thread outlives the activity.
+    # The context is still active
     assert_empty context.exited
 
-    # Shutting the pool down unwinds the thread through the context's `ensure`.
     pool.shutdown
     deadline = Time.now + 10
     sleep(0.02) while context.exited.empty? && Time.now < deadline

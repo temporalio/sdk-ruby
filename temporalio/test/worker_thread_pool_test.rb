@@ -4,8 +4,6 @@ require 'temporalio/worker/thread_pool'
 require 'test'
 
 class WorkerThreadPoolTest < Test
-  # Records what happened on each thread it wraps. `entered`/`exited` are pushed to from pool
-  # threads, so they are queues rather than plain arrays.
   class RecordingContext < Temporalio::Worker::ThreadPool::ThreadContext
     attr_reader :entered, :exited
 
@@ -26,9 +24,7 @@ class WorkerThreadPoolTest < Test
     end
   end
 
-  # Polls the block until it returns truthy or `timeout` elapses, and returns the last result so
-  # callers can assert on it. The block is evaluated once per iteration, so a block with side
-  # effects runs a predictable number of times.
+  # Polls the block until it returns truthy or `timeout` elapses.
   def wait_until(timeout: 10)
     deadline = Time.now + timeout
     loop do
@@ -50,7 +46,6 @@ class WorkerThreadPoolTest < Test
   def test_default_context_is_no_op
     pool = Temporalio::Worker::ThreadPool.new
     ran = Queue.new
-    # Wrapped, because the value under test is itself nil and a timed-out pop also returns nil.
     pool.execute { ran.push({ value: Thread.current[:test_thread_context_var] }) }
     seen = ran.pop(timeout: 10)
     refute_nil seen, 'pool never ran the block'
@@ -63,8 +58,6 @@ class WorkerThreadPoolTest < Test
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    # The block the pool runs is the stand-in for an activity: it observes the variable the
-    # context set in its preamble.
     seen = Queue.new
     pool.execute { seen.push(Thread.current[:test_thread_context_var]) }
 
