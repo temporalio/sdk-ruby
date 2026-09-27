@@ -13,6 +13,8 @@ module Worker
     class SchedulerThread
       def initialize: (Temporalio::Internal::Worker::WorkflowInstance::Scheduler scheduler) -> void
 
+      def waiting_in_active_model_cache?: -> bool
+
       def call: [T] () { -> T } -> T
 
       def async_call: [T] () { -> T } -> Queue

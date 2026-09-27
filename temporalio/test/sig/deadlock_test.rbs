@@ -29,5 +29,9 @@ class DeadlockTest < Test
 
   def hold_protobuf_object_cache_mutex: -> ^() -> void
 
+  def hold_mutex: (Mutex mutex) -> ^() -> void
+
+  def wait_for_active_model_cache_mutex_waiter: -> void
+
   def wait_for_protobuf_object_cache_mutex_waiter: -> void
 end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'active_model'
 require 'temporalio/internal/worker/workflow_instance/scheduler'
 require 'test'
 
@@ -8,6 +9,12 @@ require_relative '../google/protobuf/scheduler_mutex_wait'
 
 module Worker
   class WorkflowInstanceSchedulerTest < Test
+    class ActiveModelObject
+      include ActiveModel::Attributes
+
+      attribute :value, :string # steep:ignore
+    end
+
     class FakeWorkflowInstance
       attr_reader :context
 
@@ -82,6 +89,43 @@ module Worker
       scheduler_thread&.stop
     end
 
+    def test_active_model_cache_mutex_wait_blocks_scheduler_drain
+      scheduler = new_scheduler
+      scheduler_thread = SchedulerThread.new(scheduler)
+      model = ActiveModelObject.new
+      map = ActiveModelObject.send(:attribute_method_patterns_cache)
+      map.clear
+      original_mutex = map.instance_variable_get(:@write_lock)
+      mutex, release_mutex = held_mutex
+      map.instance_variable_set(:@write_lock, mutex)
+      after_mutex = Queue.new
+
+      scheduler_thread.call do
+        scheduler.fiber do
+          after_mutex << model.respond_to?(:unknown_attribute_for_scheduler)
+        end
+      end
+
+      drain_result = scheduler_thread.async_call do
+        scheduler.run_until_all_yielded
+      end
+      assert_eventually(timeout: 2.0, interval: 0.01) do
+        assert scheduler_thread.waiting_in_active_model_cache?
+      end
+      assert_empty after_mutex
+      assert_empty drain_result
+
+      release_mutex.call
+      scheduler_thread.wait_result(drain_result)
+      assert_equal false, after_mutex.pop(true)
+      assert_thread_blocking_fiber_count(scheduler, 0)
+    ensure
+      release_mutex&.call
+      unblock_thread_blocking_fibers(scheduler) if scheduler
+      scheduler_thread&.stop
+      map&.instance_variable_set(:@write_lock, original_mutex)
+    end
+
     def test_thread_blocking_fiber_settles_before_wait_condition_resolution
       scheduler = new_scheduler
       scheduler_thread = SchedulerThread.new(scheduler)
@@ -138,6 +182,12 @@ module Worker
         ensure
           Fiber.set_scheduler(previous_scheduler)
         end
+      end
+
+      def waiting_in_active_model_cache?
+        @thread.status == 'sleep' && (@thread.backtrace_locations&.any? do |location|
+          location.path.end_with?('/active_model/attribute_methods.rb')
+        end || false)
       end
 
       def call(&)
