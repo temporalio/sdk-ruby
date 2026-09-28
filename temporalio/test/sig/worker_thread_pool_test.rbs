@@ -12,6 +12,12 @@ class WorkerThreadPoolTest < Test
     def call: { -> void } -> void
   end
 
+  class AlwaysRaisesContext < Temporalio::Worker::ThreadPool::ThreadContext
+    attr_reader raised: Queue
+    def initialize: -> void
+    def call: { -> void } -> void
+  end
+
   def wait_until: (?timeout: Float) { () -> boolish } -> boolish
   def run_and_wait: (Temporalio::Worker::ThreadPool pool, ?timeout: Float) -> void
 end

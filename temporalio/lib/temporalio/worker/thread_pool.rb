@@ -251,6 +251,19 @@ module Temporalio
                 end
               end
             end
+          # Block-level rescue on the Thread.new block above, so it runs on that thread.
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            # Only reachable when the context itself raised; everything the loop can raise is
+            # handled inside it. Drop the worker so the pool does not keep an entry with a dead
+            # thread behind it, holding an undeliverable block. Removal is idempotent, so this is
+            # safe even if the loop already deregistered before the context raised on the way out.
+            #
+            # Deliberately not `_worker_died`: that adds a replacement, and a context that fails
+            # once usually fails every time, so the replacement dies the same way and spawns
+            # another without bound. The pool still recovers, because the next `execute` finds no
+            # ready worker and starts a fresh one -- driven by demand rather than by the failure.
+            warn("Unexpected thread context exception: #{e.full_message}")
+            my_pool._remove_busy_worker(self)
           end
           @thread.name = "temporal-thread-#{id}"
         end
