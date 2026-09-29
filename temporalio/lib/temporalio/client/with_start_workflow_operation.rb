@@ -43,7 +43,7 @@ module Temporalio
       # Note, for {Client.start_update_with_start_workflow} and {Client.execute_update_with_start_workflow},
       # `id_conflict_policy` is required.
       #
-      # @param priority [Priority] Priority of the workflow that may be started. This is currently experimental.
+      # @param priority [Priority] Priority of the workflow that may be started.
       def initialize(
         workflow,
         *args,
