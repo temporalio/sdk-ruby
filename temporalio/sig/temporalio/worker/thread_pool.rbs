@@ -3,6 +3,8 @@ module Temporalio
     class ThreadPool
       class ThreadContext
         def self.default: -> ThreadContext
+        attr_reader restart_worker: bool
+        def initialize: (?restart_worker: bool) -> void
         def call: { -> void } -> void
 
         class NoOp < ThreadContext
@@ -36,6 +38,7 @@ module Temporalio
       def _worker_died: (Worker worker) -> void
       def _worker_task_completed: -> void
       def _thread_context: -> ThreadContext
+      def _remove_ready_worker: (Worker worker) -> void
       private def locked_assign_worker: { (?) -> untyped } -> void
       private def locked_enqueue: { (?) -> untyped } -> void
       private def locked_add_busy_worker: -> Worker?

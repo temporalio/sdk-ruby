@@ -262,6 +262,73 @@ class WorkerThreadPoolTest < Test
     assert_equal 1, pool.largest_length, 'kill spawned a replacement thread'
   end
 
+  # Raises the first `fail_times` invocations, then yields. Each invocation is a fresh thread when
+  # restart_worker is on, so the count doubles as a count of threads started.
+  class RestartingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def initialize(fail_times:)
+      super(restart_worker: true)
+      @fail_times = fail_times
+      @mutex = Mutex.new
+      @count = 0
+    end
+
+    def count
+      @mutex.synchronize { @count }
+    end
+
+    def call
+      n = @mutex.synchronize { @count += 1 }
+      raise "context failed (attempt #{n})" if n <= @fail_times
+
+      yield
+    end
+  end
+
+  def test_restart_worker_restarts_the_thread_until_the_context_succeeds
+    context = RestartingContext.new(fail_times: 10)
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+
+    capture_subprocess_io do
+      pool.execute { nil }
+      # Each restart re-invokes the context with no further work submitted, so reaching 11 means
+      # the 10 failures each produced a replacement thread.
+      assert wait_until { context.count >= 11 }, "context ran #{context.count} times, wanted 11"
+    end
+
+    # The 11th invocation yielded, so that thread stays alive and restarting stops.
+    sleep(0.3)
+    assert_equal 11, context.count, 'context kept restarting after it stopped raising'
+    assert_equal 1, pool.length, 'the surviving thread is not in the pool'
+  ensure
+    pool&.kill
+  end
+
+  # A worker dropped from the pool must also leave the ready list, or the pool hands later work to
+  # a dead thread and it silently never runs. `ready_workers` reaches in because the pool exposes
+  # no accessor for it.
+  def ready_workers(pool)
+    pool.instance_variable_get(:@ready).map(&:first)
+  end
+
+  def assert_no_stale_ready(pool, message)
+    live = pool.instance_variable_get(:@pool)
+    orphans = ready_workers(pool).reject { |w| live.include?(w) }
+    assert_empty orphans, message
+  end
+
+  def test_shutdown_leaves_no_stale_ready_workers
+    pool = Temporalio::Worker::ThreadPool.new
+    run_and_wait(pool)
+    assert_equal 1, ready_workers(pool).size, 'worker did not go idle'
+
+    pool.shutdown
+
+    # ThreadPool exposes `length` but no `empty?`.
+    assert wait_until { pool.length.zero? }, # rubocop:disable Style/ZeroLengthPredicate
+           'worker was not removed from the pool'
+    assert_no_stale_ready(pool, 'shutdown left a stopped worker in the ready list')
+  end
+
   def test_base_context_is_abstract
     assert_raises(NotImplementedError) { Temporalio::Worker::ThreadPool::ThreadContext.new.call { nil } }
   end

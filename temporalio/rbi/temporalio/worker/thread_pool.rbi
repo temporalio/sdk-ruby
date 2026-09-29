@@ -49,6 +49,12 @@ class Temporalio::Worker::ThreadPool::ThreadContext
   sig { returns(Temporalio::Worker::ThreadPool::ThreadContext) }
   def self.default; end
 
+  sig { returns(T::Boolean) }
+  attr_reader :restart_worker
+
+  sig { params(restart_worker: T::Boolean).void }
+  def initialize(restart_worker: T.unsafe(nil)); end
+
   sig { params(block: T.proc.void).void }
   def call(&block); end
 end

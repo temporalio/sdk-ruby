@@ -22,8 +22,20 @@ module Temporalio
           @default ||= NoOp.new
         end
 
+        # @return [Boolean] Whether a thread whose context raised is replaced with a new one.
+        attr_reader :restart_worker
+
+        # @param restart_worker [Boolean] What to do when {call} raises. When false, the thread is
+        #   dropped from the pool and a new one is started only when more work arrives. When true,
+        #   a replacement thread is started immediately, which invokes {call} again -- so a context
+        #   that always raises will restart without bound.
+        def initialize(restart_worker: false)
+          @restart_worker = restart_worker
+        end
+
         # Invoke the given block for the lifetime of a pool thread. Implementations must invoke
-        # the block.
+        # the block exactly once; invoking it again re-enters a loop the pool has stopped tracking,
+        # which blocks that thread forever and skips the rest of this method.
         #
         # @yield Block to invoke for the lifetime of the thread.
         def call(&)
@@ -119,8 +131,10 @@ module Temporalio
       # global default).
       def shutdown
         @mutex.synchronize do
-          # Stop all workers
+          # Stop all workers. None can still be ready once stopped, and a stale ready entry would
+          # have later work handed to a dead thread.
           @pool.each(&:stop)
+          @ready.clear
         end
       end
 
@@ -158,6 +172,11 @@ module Temporalio
       # @!visibility private
       def _thread_context
         @thread_context
+      end
+
+      # @!visibility private
+      def _remove_ready_worker(worker)
+        @mutex.synchronize { @ready.reject! { |ready_worker, _| ready_worker.equal?(worker) } }
       end
 
       private
@@ -258,12 +277,15 @@ module Temporalio
             # thread behind it, holding an undeliverable block. Removal is idempotent, so this is
             # safe even if the loop already deregistered before the context raised on the way out.
             #
-            # Deliberately not `_worker_died`: that adds a replacement, and a context that fails
-            # once usually fails every time, so the replacement dies the same way and spawns
-            # another without bound. The pool still recovers, because the next `execute` finds no
-            # ready worker and starts a fresh one -- driven by demand rather than by the failure.
             warn("Unexpected thread context exception: #{e.full_message}")
-            my_pool._remove_busy_worker(self)
+            # A restarted worker is put in the ready list before its context runs, so drop it from
+            # there first or the pool hands later work to this dead thread.
+            my_pool._remove_ready_worker(self)
+            if my_pool._thread_context.restart_worker
+              my_pool._worker_died(self)
+            else
+              my_pool._remove_busy_worker(self)
+            end
           end
           @thread.name = "temporal-thread-#{id}"
         end

@@ -32,6 +32,10 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- `Worker::ThreadPool#shutdown` no longer leaves stopped threads in the pool's internal ready list.
+  A block submitted after `shutdown` was previously handed to one of those dead threads and
+  silently never ran; it is now executed on a new thread.
+
 ### Security
 
 ## [v1.9.0] - 2026-09-14
