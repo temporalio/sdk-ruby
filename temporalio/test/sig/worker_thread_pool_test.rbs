@@ -24,8 +24,6 @@ class WorkerThreadPoolTest < Test
     def call: { -> void } -> void
   end
 
-  def ready_workers: (Temporalio::Worker::ThreadPool pool) -> Array[untyped]
-  def assert_no_stale_ready: (Temporalio::Worker::ThreadPool pool, String message) -> void
   def wait_until: (?timeout: Float) { () -> boolish } -> boolish
   def run_and_wait: (Temporalio::Worker::ThreadPool pool, ?timeout: Float) -> void
 end

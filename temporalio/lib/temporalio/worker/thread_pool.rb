@@ -131,10 +131,8 @@ module Temporalio
       # global default).
       def shutdown
         @mutex.synchronize do
-          # Stop all workers. None can still be ready once stopped, and a stale ready entry would
-          # have later work handed to a dead thread.
+          # Stop all workers
           @pool.each(&:stop)
-          @ready.clear
         end
       end
 

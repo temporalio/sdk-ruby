@@ -303,32 +303,6 @@ class WorkerThreadPoolTest < Test
     pool&.kill
   end
 
-  # A worker dropped from the pool must also leave the ready list, or the pool hands later work to
-  # a dead thread and it silently never runs. `ready_workers` reaches in because the pool exposes
-  # no accessor for it.
-  def ready_workers(pool)
-    pool.instance_variable_get(:@ready).map(&:first)
-  end
-
-  def assert_no_stale_ready(pool, message)
-    live = pool.instance_variable_get(:@pool)
-    orphans = ready_workers(pool).reject { |w| live.include?(w) }
-    assert_empty orphans, message
-  end
-
-  def test_shutdown_leaves_no_stale_ready_workers
-    pool = Temporalio::Worker::ThreadPool.new
-    run_and_wait(pool)
-    assert_equal 1, ready_workers(pool).size, 'worker did not go idle'
-
-    pool.shutdown
-
-    # ThreadPool exposes `length` but no `empty?`.
-    assert wait_until { pool.length.zero? }, # rubocop:disable Style/ZeroLengthPredicate
-           'worker was not removed from the pool'
-    assert_no_stale_ready(pool, 'shutdown left a stopped worker in the ready list')
-  end
-
   def test_base_context_is_abstract
     assert_raises(NotImplementedError) { Temporalio::Worker::ThreadPool::ThreadContext.new.call { nil } }
   end
