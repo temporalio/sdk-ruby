@@ -179,7 +179,6 @@ class WorkerThreadPoolTest < Test
     # worker rather than reuse the dead one.
     first = Queue.new
     second = Queue.new
-    # Captured only to keep the dying thread's report_on_exception warning out of the test output.
     capture_subprocess_io do
       pool.execute { first.push(:ran) }
       pool.execute { second.push(:ran) }
@@ -188,7 +187,6 @@ class WorkerThreadPoolTest < Test
       assert_equal :ran, second.pop(timeout: 10), 'second thread never ran its work'
     end
 
-    # Its worker is dead, so nothing can ever pop this block; no waiting needed to establish that.
     assert_empty first, 'block ran even though its context raised'
     assert_equal 2, pool.largest_length
   ensure
@@ -205,15 +203,12 @@ class WorkerThreadPoolTest < Test
       assert wait_until { context.count >= 1 }, 'context never raised'
     end
 
-    # ThreadPool exposes `length` but no `empty?`.
     assert wait_until { pool.length.zero? }, # rubocop:disable Style/ZeroLengthPredicate
            'dead worker was left in the pool'
   ensure
     pool&.kill
   end
 
-  # The cleanup must not ask for a replacement: a context that fails once generally fails every
-  # time, so replacing on failure spawns threads without bound.
   def test_raising_context_does_not_spawn_replacement_threads
     context = CountingContext.new(fail_times: Float::INFINITY)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
@@ -221,18 +216,15 @@ class WorkerThreadPoolTest < Test
     capture_subprocess_io do
       pool.execute { nil }
       assert wait_until { context.count >= 1 }, 'context never raised'
-      sleep(0.5)
     end
 
-    # One submission, one thread, so the context ran exactly once. Replacing the worker on failure
-    # produced tens of thousands of invocations here.
-    assert_equal 1, context.count, 'context ran on replacement threads'
+  sleep(0.5)
+  assert_equal 1, context.count, 'context ran on new replacement threads'
   ensure
     pool&.kill
   end
 
-  # `ThreadPool#kill` already drops every worker, so the cleanup must not resurrect any.
-  def test_kill_does_not_resurrect_workers
+  def test_kill_does_not_spawn_replacement_threads
     context = RecordingContext.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
     run_and_wait(pool)
@@ -246,8 +238,6 @@ class WorkerThreadPoolTest < Test
     assert_equal 1, pool.largest_length, 'kill spawned a replacement thread'
   end
 
-  # Raises the first `fail_times` invocations, then yields. Each invocation is a fresh thread when
-  # restart_worker is on, so the count doubles as a count of threads started.
   def test_restart_worker_restarts_the_thread_until_the_context_succeeds
     context = CountingContext.new(fail_times: 10, restart_worker: true)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
@@ -259,10 +249,9 @@ class WorkerThreadPoolTest < Test
       assert wait_until { context.count >= 11 }, "context ran #{context.count} times, wanted 11"
     end
 
-    # The 11th invocation yielded, so that thread stays alive and restarting stops.
     sleep(0.3)
     assert_equal 11, context.count, 'context kept restarting after it stopped raising'
-    assert_equal 1, pool.length, 'the surviving thread is not in the pool'
+    assert_equal 1, pool.length, 'only the last restart should leave a thread in the pool'
 
     live = pool.instance_variable_get(:@pool)
     ready = pool.instance_variable_get(:@ready).map(&:first)
