@@ -8,6 +8,7 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'test'
+require 'thread_context_recorder'
 
 class WorkerActivityTest < Test
   also_run_all_tests_in_fiber
@@ -910,30 +911,11 @@ class WorkerActivityTest < Test
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
   end
 
-  # Sets a thread-local for the lifetime of each pool thread.
-  class ThreadContextRecorder < Temporalio::Worker::ThreadPool::ThreadContext
-    # Pool threads outlive the activity, so the exit is recorded on a queue the test can wait on.
-    attr_reader :exited
-
-    def initialize
-      super
-      @exited = Queue.new
-    end
-
-    def call
-      Thread.current[:thread_context_val] = 'acquired'
-      yield
-    ensure
-      Thread.current[:thread_context_val] = nil
-      @exited.push(Thread.current.name)
-    end
-  end
-
   class ThreadContextActivity < Temporalio::Activity::Definition
     activity_executor :context_executor
 
     def execute
-      "context val: #{Thread.current[:thread_context_val]}"
+      "context val: #{Thread.current[ThreadContextRecorder::VALUE_KEY]}"
     end
   end
 

@@ -2,28 +2,9 @@
 
 require 'temporalio/worker/thread_pool'
 require 'test'
+require 'thread_context_recorder'
 
 class WorkerThreadPoolTest < Test
-  class RecordingContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader :entered, :exited
-
-    def initialize(var_value: 'set-by-context')
-      super()
-      @var_value = var_value
-      @entered = Queue.new
-      @exited = Queue.new
-    end
-
-    def call
-      Thread.current[:test_thread_context_var] = @var_value
-      @entered.push(Thread.current.name)
-      yield
-    ensure
-      Thread.current[:test_thread_context_var] = nil
-      @exited.push(Thread.current.name)
-    end
-  end
-
   # Raises the first `fail_times` invocations, then yields. `count` is the number of
   # invocations/threads.
   class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
@@ -76,13 +57,13 @@ class WorkerThreadPoolTest < Test
   end
 
   def test_context_wraps_work_on_the_thread
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     seen = Queue.new
-    pool.execute { seen.push(Thread.current[:test_thread_context_var]) }
+    pool.execute { seen.push(Thread.current[ThreadContextRecorder::VALUE_KEY]) }
 
-    assert_equal 'set-by-context', seen.pop(timeout: 10)
+    assert_equal 'acquired', seen.pop(timeout: 10)
     refute_empty context.entered
     assert_empty context.exited, 'context must not have exited while the thread is still alive'
   ensure
@@ -90,7 +71,7 @@ class WorkerThreadPoolTest < Test
   end
 
   def test_context_wraps_every_thread_in_the_pool
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     release = Queue.new
@@ -98,11 +79,11 @@ class WorkerThreadPoolTest < Test
     # Ensure two threads are running.
     2.times do
       pool.execute do
-        seen.push(Thread.current[:test_thread_context_var])
+        seen.push(Thread.current[ThreadContextRecorder::VALUE_KEY])
         release.pop
       end
     end
-    assert_equal %w[set-by-context set-by-context], [seen.pop, seen.pop]
+    assert_equal %w[acquired acquired], [seen.pop, seen.pop]
     2.times { release.push(nil) }
 
     assert_equal 2, pool.largest_length
@@ -113,7 +94,7 @@ class WorkerThreadPoolTest < Test
   end
 
   def test_context_released_on_graceful_shutdown
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
     run_and_wait(pool)
     assert_empty context.exited
@@ -124,7 +105,7 @@ class WorkerThreadPoolTest < Test
   end
 
   def test_context_released_on_idle_timeout_prune
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     # We need two threads to make sure there is one that can be pruned.
     pool = Temporalio::Worker::ThreadPool.new(idle_timeout: 0.05, thread_context: context)
     release = Queue.new
@@ -154,7 +135,7 @@ class WorkerThreadPoolTest < Test
   end
 
   def test_context_released_on_kill
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
     started = Queue.new
     blocked = Queue.new
@@ -218,14 +199,14 @@ class WorkerThreadPoolTest < Test
       assert wait_until { context.count >= 1 }, 'context never raised'
     end
 
-  sleep(0.5)
-  assert_equal 1, context.count, 'context ran on new replacement threads'
+    sleep(0.5)
+    assert_equal 1, context.count, 'context ran on new replacement threads'
   ensure
     pool&.kill
   end
 
   def test_kill_does_not_spawn_replacement_threads
-    context = RecordingContext.new
+    context = ThreadContextRecorder.new
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
     run_and_wait(pool)
     assert_equal 1, pool.length

@@ -1,11 +1,4 @@
 class WorkerThreadPoolTest < Test
-  class RecordingContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader entered: Queue
-    attr_reader exited: Queue
-    def initialize: (?var_value: String) -> void
-    def call: { -> void } -> void
-  end
-
   class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
     def initialize: (fail_times: Numeric, ?restart_worker: bool) -> void
     def count: -> Integer
