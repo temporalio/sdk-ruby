@@ -148,30 +148,30 @@ class WorkerThreadPoolTest < Test
     assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
   end
 
-  # Raises for the first thread only, so the second thread's context succeeds.
-  class RaisesOnceContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader :raised
-
-    def initialize
-      super
+  # Raises the first `fail_times` invocations, then yields. `count` is the number of
+  # invocations/threads.
+  class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def initialize(fail_times:, restart_worker: false)
+      super(restart_worker:)
+      @fail_times = fail_times
       @mutex = Mutex.new
-      @raised = Queue.new
-      @first = true
+      @count = 0
+    end
+
+    def count
+      @mutex.synchronize { @count }
     end
 
     def call
-      should_raise = @mutex.synchronize { @first ? (@first = false) || true : false }
-      if should_raise
-        @raised.push(:raised)
-        raise 'context failed'
-      end
+      n = @mutex.synchronize { @count += 1 }
+      raise "context failed (attempt #{n})" if n <= @fail_times
 
       yield
     end
   end
 
   def test_raising_context_kills_only_its_own_thread
-    context = RaisesOnceContext.new
+    context = CountingContext.new(fail_times: 1)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     # Submit both up front. The first worker's context raises, so that worker never completes a
@@ -184,7 +184,7 @@ class WorkerThreadPoolTest < Test
       pool.execute { first.push(:ran) }
       pool.execute { second.push(:ran) }
 
-      assert_equal :raised, context.raised.pop(timeout: 10), 'context never raised'
+      assert wait_until { context.count >= 1 }, 'context never raised'
       assert_equal :ran, second.pop(timeout: 10), 'second thread never ran its work'
     end
 
@@ -195,28 +195,14 @@ class WorkerThreadPoolTest < Test
     pool&.kill
   end
 
-  class AlwaysRaisesContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader :raised
-
-    def initialize
-      super
-      @raised = Queue.new
-    end
-
-    def call
-      @raised.push(:raised)
-      raise 'context failed'
-    end
-  end
-
   # A worker whose context raises must not be left in the pool with a dead thread behind it.
   def test_raising_context_removes_its_worker_from_the_pool
-    context = AlwaysRaisesContext.new
+    context = CountingContext.new(fail_times: Float::INFINITY)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     capture_subprocess_io do
       pool.execute { nil }
-      assert_equal :raised, context.raised.pop(timeout: 10), 'context never raised'
+      assert wait_until { context.count >= 1 }, 'context never raised'
     end
 
     # ThreadPool exposes `length` but no `empty?`.
@@ -229,19 +215,18 @@ class WorkerThreadPoolTest < Test
   # The cleanup must not ask for a replacement: a context that fails once generally fails every
   # time, so replacing on failure spawns threads without bound.
   def test_raising_context_does_not_spawn_replacement_threads
-    context = AlwaysRaisesContext.new
+    context = CountingContext.new(fail_times: Float::INFINITY)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     capture_subprocess_io do
       pool.execute { nil }
-      # Left on the queue rather than popped, so its size counts context invocations.
-      assert wait_until { !context.raised.empty? }, 'context never raised'
+      assert wait_until { context.count >= 1 }, 'context never raised'
       sleep(0.5)
     end
 
     # One submission, one thread, so the context ran exactly once. Replacing the worker on failure
     # produced tens of thousands of invocations here.
-    assert_equal 1, context.raised.size, 'context ran on replacement threads'
+    assert_equal 1, context.count, 'context ran on replacement threads'
   ensure
     pool&.kill
   end
@@ -263,28 +248,8 @@ class WorkerThreadPoolTest < Test
 
   # Raises the first `fail_times` invocations, then yields. Each invocation is a fresh thread when
   # restart_worker is on, so the count doubles as a count of threads started.
-  class RestartingContext < Temporalio::Worker::ThreadPool::ThreadContext
-    def initialize(fail_times:)
-      super(restart_worker: true)
-      @fail_times = fail_times
-      @mutex = Mutex.new
-      @count = 0
-    end
-
-    def count
-      @mutex.synchronize { @count }
-    end
-
-    def call
-      n = @mutex.synchronize { @count += 1 }
-      raise "context failed (attempt #{n})" if n <= @fail_times
-
-      yield
-    end
-  end
-
   def test_restart_worker_restarts_the_thread_until_the_context_succeeds
-    context = RestartingContext.new(fail_times: 10)
+    context = CountingContext.new(fail_times: 10, restart_worker: true)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
     capture_subprocess_io do
@@ -298,6 +263,14 @@ class WorkerThreadPoolTest < Test
     sleep(0.3)
     assert_equal 11, context.count, 'context kept restarting after it stopped raising'
     assert_equal 1, pool.length, 'the surviving thread is not in the pool'
+
+    live = pool.instance_variable_get(:@pool)
+    ready = pool.instance_variable_get(:@ready).map(&:first)
+    assert_empty ready.reject { |w| live.include?(w) }, 'restarts left dead workers in the ready list'
+
+    ran = Queue.new
+    10.times { pool.execute { ran.push(:ran) } }
+    assert wait_until { ran.size == 10 }, "only #{ran.size} of 10 tasks ran after the restarts"
   ensure
     pool&.kill
   end

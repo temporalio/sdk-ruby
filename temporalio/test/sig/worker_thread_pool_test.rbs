@@ -6,20 +6,8 @@ class WorkerThreadPoolTest < Test
     def call: { -> void } -> void
   end
 
-  class RaisesOnceContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader raised: Queue
-    def initialize: -> void
-    def call: { -> void } -> void
-  end
-
-  class AlwaysRaisesContext < Temporalio::Worker::ThreadPool::ThreadContext
-    attr_reader raised: Queue
-    def initialize: -> void
-    def call: { -> void } -> void
-  end
-
-  class RestartingContext < Temporalio::Worker::ThreadPool::ThreadContext
-    def initialize: (fail_times: Integer) -> void
+  class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def initialize: (fail_times: Numeric, ?restart_worker: bool) -> void
     def count: -> Integer
     def call: { -> void } -> void
   end
