@@ -189,7 +189,7 @@ class WorkerThreadPoolTest < Test
     # worker rather than reuse the dead one.
     first = Queue.new
     second = Queue.new
-    capture_subprocess_io do
+    safe_capture_io do
       pool.execute { first.push(:ran) }
       pool.execute { second.push(:ran) }
 
@@ -208,7 +208,7 @@ class WorkerThreadPoolTest < Test
     context = CountingContext.new(fail_times: Float::INFINITY)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    capture_subprocess_io do
+    safe_capture_io do
       pool.execute { nil }
       assert wait_until { context.count >= 1 }, 'context never raised'
     end
@@ -223,7 +223,7 @@ class WorkerThreadPoolTest < Test
     context = CountingContext.new(fail_times: Float::INFINITY)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    capture_subprocess_io do
+    safe_capture_io do
       pool.execute { nil }
       assert wait_until { context.count >= 1 }, 'context never raised'
     end
@@ -252,7 +252,7 @@ class WorkerThreadPoolTest < Test
     context = CountingContext.new(fail_times: 10, restart_worker: true)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
 
-    capture_subprocess_io do
+    safe_capture_io do
       pool.execute { nil }
       # Each restart re-invokes the context with no further work submitted, so reaching 11 means
       # the 10 failures each produced a replacement thread.
