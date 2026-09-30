@@ -186,7 +186,7 @@ class WorkerThreadContextTest < Test
     end
 
     assert_empty first, 'block ran even though its context raised'
-    assert_equal 2, pool.largest_length
+    assert_equal 2, context.count, 'a second thread was not created'
   ensure
     pool&.kill
   end
