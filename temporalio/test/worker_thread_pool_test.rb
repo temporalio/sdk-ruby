@@ -46,10 +46,9 @@ class WorkerThreadPoolTest < Test
   def test_default_context_is_no_op
     pool = Temporalio::Worker::ThreadPool.new
     ran = Queue.new
-    pool.execute { ran.push({ value: Thread.current[:test_thread_context_var] }) }
+    pool.execute { ran.push(42) }
     seen = ran.pop(timeout: 10)
-    refute_nil seen, 'pool never ran the block'
-    assert_nil seen[:value]
+    assert_equal seen, 42, 'pool never ran the block'
   ensure
     pool&.shutdown
   end

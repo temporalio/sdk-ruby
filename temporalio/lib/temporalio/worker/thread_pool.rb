@@ -2,7 +2,7 @@
 
 module Temporalio
   class Worker
-    # Implementation of a thread pool. This implementation is a stripped down form of Concurrent Ruby's
+# Implementation of a thread pool. This implementation is a stripped down form of Concurrent Ruby's
     # `CachedThreadPool`.
     class ThreadPool
       # Much of this logic taken from
@@ -14,10 +14,19 @@ module Temporalio
       # releasing it when the thread exits. Since the block is invoked for the entire lifetime of
       # the thread, a resource acquired around it can be released from an `ensure`.
       #
+      # The `call` wrapper should not raise. `call` has the responsibility for calling the
+      # passed block exactly once, and rescuing all exceptions and errors. If the `call` wrapper
+      # cannot invoke the block, the block is not re-queued.
+      #
+      # If the `call` wrapper does raise, the exception is swallowed, and the worker dies.
+      # The `restart_worker` constructor parameter determines whether a new worker is
+      # immediately created to replace the one that died. It defaults to false to avoid
+      # a rapid fail-and-restart loop.
+      #
       # @note The same instance is used by every thread in the pool, so implementations must be
       #   thread safe. Per-thread state belongs in the block, not in the ThreadContext object.
       class ThreadContext
-        # @return [ThreadContext] Default/shared context that just invokes the block.
+        # @return [ThreadContext] Default context that just invokes the block.
         def self.default
           @default ||= NoOp.new
         end
@@ -268,16 +277,10 @@ module Temporalio
                 end
               end
             end
-          # Block-level rescue on the Thread.new block above, so it runs on that thread.
           rescue Exception => e # rubocop:disable Lint/RescueException
-            # Only reachable when the context itself raised; everything the loop can raise is
-            # handled inside it. Drop the worker so the pool does not keep an entry with a dead
-            # thread behind it, holding an undeliverable block. Removal is idempotent, so this is
-            # safe even if the loop already deregistered before the context raised on the way out.
-            #
+            # Handles raises inside the ThreadContext. Drops the worker, and creates a replacement
+            # iff restart_worker is true.
             warn("Unexpected thread context exception: #{e.full_message}")
-            # A restarted worker is put in the ready list before its context runs, so drop it from
-            # there first or the pool hands later work to this dead thread.
             my_pool._remove_ready_worker(self)
             if my_pool._thread_context.restart_worker
               my_pool._worker_died(self)
