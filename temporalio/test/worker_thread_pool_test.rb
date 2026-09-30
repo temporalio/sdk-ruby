@@ -151,6 +151,35 @@ class WorkerThreadPoolTest < Test
     assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
   end
 
+  def test_stop_runs_code_after_the_yield
+    context = ThreadContextRecorder.new
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+    run_and_wait(pool)
+    assert_empty context.returned
+
+    pool.shutdown
+
+    assert wait_until { !context.exited.empty? }, 'context did not exit on graceful shutdown'
+    refute_empty context.returned, 'stop did not return through the context; code after the yield never ran'
+  end
+
+  def test_kill_does_not_run_code_after_the_yield
+    context = ThreadContextRecorder.new
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+    started = Queue.new
+    blocked = Queue.new
+    pool.execute do
+      started.push(:started)
+      blocked.pop # blocks
+    end
+    assert_equal :started, started.pop(timeout: 10), 'thread never started'
+
+    pool.kill
+
+    assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
+    assert_empty context.returned, 'kill let the context return normally'
+  end
+
   def test_raising_context_kills_only_its_own_thread
     context = CountingContext.new(fail_times: 1)
     pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
