@@ -251,43 +251,7 @@ module Temporalio
       class Worker
         def initialize(pool, id)
           @queue = Queue.new
-          @thread = Thread.new(@queue, pool) do |my_queue, my_pool|
-            # Run the entire loop inside the ThreadContext.
-            my_pool._thread_context.call do
-              catch(:stop) do
-                loop do
-                  case block = my_queue.pop
-                  when :stop
-                    pool._remove_busy_worker(self)
-                    throw :stop
-                  else
-                    begin
-                      block.call
-                      my_pool._worker_task_completed
-                      my_pool._ready_worker(self, ThreadPool._monotonic_time)
-                    rescue StandardError => e
-                      # Ignore
-                      warn("Unexpected execute block error: #{e.full_message}")
-                    rescue Exception => e # rubocop:disable Lint/RescueException
-                      warn("Unexpected execute block exception: #{e.full_message}")
-                      my_pool._worker_died(self)
-                      throw :stop
-                    end
-                  end
-                end
-              end
-            end
-          rescue Exception => e # rubocop:disable Lint/RescueException
-            # Handles raises inside the ThreadContext. Drops the worker, and creates a replacement
-            # iff restart_worker is true.
-            warn("Unexpected thread context exception: #{e.full_message}")
-            my_pool._remove_ready_worker(self)
-            if my_pool._thread_context.restart_worker
-              my_pool._worker_died(self)
-            else
-              my_pool._remove_busy_worker(self)
-            end
-          end
+          @thread = Thread.new(@queue, pool) { |my_queue, my_pool| worker_loop(my_queue, my_pool) }
           @thread.name = "temporal-thread-#{id}"
         end
 
@@ -304,6 +268,48 @@ module Temporalio
         # @!visibility private
         def kill
           @thread.kill
+        end
+
+        private
+
+        def worker_loop(my_queue, my_pool)
+          my_pool._thread_context.call do
+            catch(:stop) do
+              loop do
+                case block = my_queue.pop
+                when :stop
+                  my_pool._remove_busy_worker(self)
+                  throw :stop
+                else
+                  begin
+                    block.call
+                    my_pool._worker_task_completed
+                    my_pool._ready_worker(self, ThreadPool._monotonic_time)
+                  rescue StandardError => e
+                    # Ignore
+                    warn("Unexpected execute block error: #{e.full_message}")
+                  rescue Exception => e # rubocop:disable Lint/RescueException
+                    warn("Unexpected execute block exception: #{e.full_message}")
+                    my_pool._worker_died(self)
+                    throw :stop
+                  end
+                end
+              end
+            end
+          end
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          handle_thread_context_exception(my_pool, e)
+        end
+
+        # Removes the worker, and creates a replacement iff restart_worker is true.
+        def handle_thread_context_exception(my_pool, err)
+          warn("Unexpected thread context exception: #{err.full_message}")
+          my_pool._remove_ready_worker(self)
+          if my_pool._thread_context.restart_worker
+            my_pool._worker_died(self)
+          else
+            my_pool._remove_busy_worker(self)
+          end
         end
       end
 

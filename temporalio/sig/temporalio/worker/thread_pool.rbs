@@ -52,6 +52,9 @@ module Temporalio
         def <<: (Proc block) -> void
         def stop: -> void
         def kill: -> void
+
+        private def worker_loop: (Thread::Queue my_queue, ThreadPool my_pool) -> void
+        private def handle_thread_context_exception: (ThreadPool my_pool, Exception err) -> void
       end
     end
   end
