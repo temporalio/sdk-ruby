@@ -4,7 +4,7 @@ require 'temporalio/worker/thread_pool'
 require 'test'
 require 'thread_context_recorder'
 
-class WorkerThreadPoolTest < Test
+class WorkerThreadContextTest < Test
   # Raises the first `fail_times` invocations, then yields. `count` is the number of
   # invocations/threads.
   class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
@@ -24,17 +24,6 @@ class WorkerThreadPoolTest < Test
       raise "context failed (attempt #{n})" if n <= @fail_times
 
       yield
-    end
-  end
-
-  # Polls the block until it returns truthy or `timeout` elapses.
-  def wait_until(timeout: 10)
-    deadline = Time.now + timeout
-    loop do
-      result = yield
-      return result if result || Time.now > deadline
-
-      sleep(0.02)
     end
   end
 
@@ -101,7 +90,7 @@ class WorkerThreadPoolTest < Test
 
     pool.shutdown
 
-    assert wait_until { !context.exited.empty? }, 'context did not exit on graceful shutdown'
+    assert_eventually { refute_empty context.exited, 'context did not exit on graceful shutdown' }
   end
 
   def test_context_released_on_idle_timeout_prune
@@ -118,18 +107,17 @@ class WorkerThreadPoolTest < Test
     end
     2.times { assert_equal :started, started.pop(timeout: 10), 'thread never started' }
     2.times { release.push(nil) }
-    assert wait_until { pool.active_count.zero? }, 'threads did not go idle'
+    assert_eventually { assert_equal 0, pool.active_count, 'threads did not go idle' }
     assert_equal 2, pool.length
     assert_empty context.exited
 
     # Pruning only happens inside `execute`.
     sleep(0.2)
-    pruned = wait_until do
+    assert_eventually do
       pool.execute { nil }
-      !context.exited.empty?
+      refute_empty context.exited, 'context did not exit when its idle thread was pruned'
     end
-    assert pruned, 'context did not exit when its idle thread was pruned'
-    assert wait_until { pool.length < 2 }, 'pruned thread was not removed from the pool'
+    assert_eventually { assert_operator pool.length, :<, 2, 'pruned thread was not removed from the pool' }
   ensure
     pool&.shutdown
   end
@@ -148,7 +136,7 @@ class WorkerThreadPoolTest < Test
 
     pool.kill
 
-    assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
+    assert_eventually { refute_empty context.exited, 'context did not exit on kill' }
   end
 
   def test_stop_runs_code_after_the_yield
@@ -159,7 +147,7 @@ class WorkerThreadPoolTest < Test
 
     pool.shutdown
 
-    assert wait_until { !context.exited.empty? }, 'context did not exit on graceful shutdown'
+    assert_eventually { refute_empty context.exited, 'context did not exit on graceful shutdown' }
     refute_empty context.returned, 'stop did not return through the context; code after the yield never ran'
   end
 
@@ -176,7 +164,7 @@ class WorkerThreadPoolTest < Test
 
     pool.kill
 
-    assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
+    assert_eventually { refute_empty context.exited, 'context did not exit on kill' }
     assert_empty context.returned, 'kill let the context return normally'
   end
 
@@ -193,7 +181,7 @@ class WorkerThreadPoolTest < Test
       pool.execute { first.push(:ran) }
       pool.execute { second.push(:ran) }
 
-      assert wait_until { context.count >= 1 }, 'context never raised'
+      assert_eventually { assert_operator context.count, :>=, 1, 'context never raised' }
       assert_equal :ran, second.pop(timeout: 10), 'second thread never ran its work'
     end
 
@@ -210,11 +198,10 @@ class WorkerThreadPoolTest < Test
 
     safe_capture_io do
       pool.execute { nil }
-      assert wait_until { context.count >= 1 }, 'context never raised'
+      assert_eventually { assert_operator context.count, :>=, 1, 'context never raised' }
     end
 
-    assert wait_until { pool.length.zero? }, # rubocop:disable Style/ZeroLengthPredicate
-           'dead worker was left in the pool'
+    assert_eventually { assert_equal 0, pool.length, 'dead worker was left in the pool' }
   ensure
     pool&.kill
   end
@@ -225,7 +212,7 @@ class WorkerThreadPoolTest < Test
 
     safe_capture_io do
       pool.execute { nil }
-      assert wait_until { context.count >= 1 }, 'context never raised'
+      assert_eventually { assert_operator context.count, :>=, 1, 'context never raised' }
     end
 
     sleep(0.5)
@@ -242,7 +229,7 @@ class WorkerThreadPoolTest < Test
 
     pool.kill
 
-    assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
+    assert_eventually { refute_empty context.exited, 'context did not exit on kill' }
     sleep(0.3)
     assert_equal 0, pool.length, 'kill left workers in the pool'
     assert_equal 1, pool.largest_length, 'kill spawned a replacement thread'
@@ -256,7 +243,7 @@ class WorkerThreadPoolTest < Test
       pool.execute { nil }
       # Each restart re-invokes the context with no further work submitted, so reaching 11 means
       # the 10 failures each produced a replacement thread.
-      assert wait_until { context.count >= 11 }, "context ran #{context.count} times, wanted 11"
+      assert_eventually { assert_operator context.count, :>=, 11, 'context did not restart until it succeeded' }
     end
 
     sleep(0.3)
@@ -269,12 +256,25 @@ class WorkerThreadPoolTest < Test
 
     ran = Queue.new
     10.times { pool.execute { ran.push(:ran) } }
-    assert wait_until { ran.size == 10 }, "only #{ran.size} of 10 tasks ran after the restarts"
+    assert_eventually { assert_equal 10, ran.size, 'not all tasks ran after the restarts' }
   ensure
     pool&.kill
   end
 
   def test_base_context_is_abstract
-    assert_raises(NotImplementedError) { Temporalio::Worker::ThreadPool::ThreadContext.new.call { nil } }
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: Temporalio::Worker::ThreadPool::ThreadContext.new)
+
+    ran = Queue.new
+    # The thread warns before dropping itself from the pool, so an empty pool means the message has
+    # already been written.
+    _, err = safe_capture_io do
+      pool.execute { ran.push(:ran) }
+      assert_eventually { assert_equal 0, pool.length, 'abstract context left its worker in the pool' }
+    end
+
+    assert_includes err, 'NotImplementedError'
+    assert_empty ran, 'block ran even though the context is abstract'
+  ensure
+    pool&.kill
   end
 end

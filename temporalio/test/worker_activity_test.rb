@@ -933,9 +933,7 @@ class WorkerActivityTest < Test
     assert_empty context.exited
 
     pool.shutdown
-    deadline = Time.now + 10
-    sleep(0.02) while context.exited.empty? && Time.now < deadline
-    refute_empty context.exited, 'thread context did not release when the pool shut down'
+    assert_eventually { refute_empty context.exited, 'thread context did not release when the pool shut down' }
   ensure
     pool&.kill
   end
