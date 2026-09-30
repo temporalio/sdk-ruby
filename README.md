@@ -1098,7 +1098,6 @@ class DatabaseConnectionContext < Temporalio::Worker::ThreadPool::ThreadContext
     connection = MyDatabase.connect
     Thread.current[:my_connection] = connection
     yield
-    # not reached
   ensure
     Thread.current[:my_connection] = nil
     connection&.close
@@ -1118,16 +1117,19 @@ worker = Temporalio::Worker.new(
 
 Note:
 
-* You must explicitly constructd and use a pool and exeuctor with your custom thread context. The default pool
+* You must explicitly construct and use a pool and executor with your custom thread context. The default pool
   has no context.
 * `call` must invoke the block exactly once. Invoking it again re-enters a loop the pool has stopped tracking, which
   blocks that thread forever; not invoking it means the thread never runs any work.
-* Clean up in an `ensure`, not after the `yield`. The block is left via a non-local exit when the thread stops, so code
-  written after the `yield` does not run.
+* Clean up in an `ensure`. On a normal stop the block returns and code after the `yield` does run, but
+  `Temporalio::Worker::ThreadPool#kill` terminates the thread without letting the block return, so only an `ensure`
+  runs on every path.
 * This is not an interceptor. A context wraps a thread's whole lifetime, not a single activity execution. To run code
   around each activity, use an interceptor instead.
 * The `call` wrapper should not raise. If it does, work already queued on the worker is dropped silently (and thus
-  will time out and be retried).
+  will time out and be retried). The thread is dropped from the pool, and a new one is started when more work
+  arrives. Pass `restart_worker: true` to the `ThreadContext` constructor to start a replacement immediately instead;
+  a context that always raises will then restart without bound.
 
 #### Activity Testing
 
