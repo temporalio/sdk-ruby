@@ -24,6 +24,28 @@ class WorkerThreadPoolTest < Test
     end
   end
 
+  # Raises the first `fail_times` invocations, then yields. `count` is the number of
+  # invocations/threads.
+  class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def initialize(fail_times:, restart_worker: false)
+      super(restart_worker:)
+      @fail_times = fail_times
+      @mutex = Mutex.new
+      @count = 0
+    end
+
+    def count
+      @mutex.synchronize { @count }
+    end
+
+    def call
+      n = @mutex.synchronize { @count += 1 }
+      raise "context failed (attempt #{n})" if n <= @fail_times
+
+      yield
+    end
+  end
+
   # Polls the block until it returns truthy or `timeout` elapses.
   def wait_until(timeout: 10)
     deadline = Time.now + timeout
@@ -146,28 +168,6 @@ class WorkerThreadPoolTest < Test
     pool.kill
 
     assert wait_until { !context.exited.empty? }, 'context did not exit on kill'
-  end
-
-  # Raises the first `fail_times` invocations, then yields. `count` is the number of
-  # invocations/threads.
-  class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
-    def initialize(fail_times:, restart_worker: false)
-      super(restart_worker:)
-      @fail_times = fail_times
-      @mutex = Mutex.new
-      @count = 0
-    end
-
-    def count
-      @mutex.synchronize { @count }
-    end
-
-    def call
-      n = @mutex.synchronize { @count += 1 }
-      raise "context failed (attempt #{n})" if n <= @fail_times
-
-      yield
-    end
   end
 
   def test_raising_context_kills_only_its_own_thread
