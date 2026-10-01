@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+require 'base64_codec'
 require 'securerandom'
 require 'temporalio/client'
+require 'temporalio/converters/data_converter'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'test'
@@ -70,13 +72,40 @@ class ClientActivityTest < Test
     end
   end
 
+  class HeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader :observations
+
+    def initialize
+      @observations = Queue.new
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(self, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.attempt]
+        super
+      end
+    end
+  end
+
   # Run a worker with the supplied activities for the body of the block and yield the task_queue.
-  def with_activity_worker(activities, &)
+  def with_activity_worker(activities, client: env.client, interceptors: [], &)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
-      client: env.client,
+      client:,
       task_queue: task_queue,
-      activities: activities
+      activities: activities,
+      interceptors:
     )
     worker.run { yield task_queue }
   end
@@ -91,6 +120,92 @@ class ClientActivityTest < Test
         start_to_close_timeout: 10
       )
       assert_equal 'saa: hi', result
+    end
+  end
+
+  def test_activity_headers_start_and_execute
+    interceptor = HeadersInboundInterceptor.new
+    with_activity_worker([SimpleActivity], interceptors: [interceptor]) do |task_queue|
+      start_headers = { 'request-id' => 'req-start', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      handle = env.client.start_activity(
+        SimpleActivity,
+        'start headers',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: start_headers
+      )
+      assert_equal 'saa: start headers', handle.result
+      assert_equal start_headers, interceptor.observations.pop.first
+
+      execute_headers = { 'request-id' => 'req-execute', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      result = env.client.execute_activity(
+        SimpleActivity,
+        'execute headers',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: execute_headers
+      )
+      assert_equal 'saa: execute headers', result
+      assert_equal execute_headers, interceptor.observations.pop.first
+    end
+  end
+
+  def test_activity_headers_omitted_and_empty
+    interceptor = HeadersInboundInterceptor.new
+    with_activity_worker([SimpleActivity], interceptors: [interceptor]) do |task_queue|
+      result = env.client.execute_activity(
+        SimpleActivity,
+        'omitted headers',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'saa: omitted headers', result
+      assert_equal({}, interceptor.observations.pop.first)
+
+      handle = env.client.start_activity(
+        SimpleActivity,
+        'empty headers',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: {}
+      )
+      assert_equal 'saa: empty headers', handle.result
+      assert_equal({}, interceptor.observations.pop.first)
+    end
+  end
+
+  def test_activity_headers_with_codec
+    data_converter = Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    client = Temporalio::Client.new(**env.client.options.with(data_converter:).to_h)
+    interceptor = HeadersInboundInterceptor.new
+    with_activity_worker([SimpleActivity], client:, interceptors: [interceptor]) do |task_queue|
+      start_headers = { 'request-id' => 'req-codec-start', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      handle = client.start_activity(
+        SimpleActivity,
+        'codec start',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: start_headers
+      )
+      assert_equal 'saa: codec start', handle.result
+      assert_equal start_headers, interceptor.observations.pop.first
+
+      execute_headers = { 'request-id' => 'req-codec-execute', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      result = client.execute_activity(
+        SimpleActivity,
+        'codec execute',
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: execute_headers
+      )
+      assert_equal 'saa: codec execute', result
+      assert_equal execute_headers, interceptor.observations.pop.first
     end
   end
 

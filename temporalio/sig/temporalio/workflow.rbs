@@ -41,6 +41,7 @@ module Temporalio
       ?disable_eager_execution: bool,
       ?priority: Priority,
       ?arg_hints: Array[Object]?,
+      ?headers: Hash[String, Object?],
       ?result_hint: Object?
     ) -> Object?
 
@@ -80,6 +81,7 @@ module Temporalio
       ?cancellation_type: ActivityCancellationType::enum,
       ?activity_id: String?,
       ?arg_hints: Array[Object]?,
+      ?headers: Hash[String, Object?],
       ?result_hint: Object?
     ) -> Object?
 

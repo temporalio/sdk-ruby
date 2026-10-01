@@ -48,7 +48,8 @@ module Temporalio
             disable_eager_execution: bool,
             priority: Priority,
             arg_hints: Array[Object]?,
-            result_hint: Object?
+            result_hint: Object?,
+            headers: Hash[String, Object?]
           ) -> Object?
 
           def execute_local_activity: (
@@ -64,7 +65,8 @@ module Temporalio
             cancellation_type: Workflow::ActivityCancellationType::enum,
             activity_id: String?,
             arg_hints: Array[Object]?,
-            result_hint: Object?
+            result_hint: Object?,
+            headers: Hash[String, Object?]
           ) -> Object?
 
           def external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle

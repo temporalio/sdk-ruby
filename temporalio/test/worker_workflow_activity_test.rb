@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'base64_codec'
 require 'securerandom'
 require 'temporalio/client'
 require 'temporalio/converters/data_converter'
@@ -42,6 +43,124 @@ class WorkerWorkflowActivityTest < Test
     end
   end
 
+  class HeadersActivity < Temporalio::Activity::Definition
+    def execute
+      'headers activity result'
+    end
+  end
+
+  class HeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader :observations
+
+    def initialize
+      @observations = Queue.new
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(self, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.attempt]
+        super
+      end
+    end
+  end
+
+  class HeadersOutboundInterceptor
+    include Temporalio::Worker::Interceptor::Workflow
+
+    def intercept_workflow(next_interceptor)
+      Inbound.new(next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Workflow::Inbound
+      def init(outbound)
+        super(Outbound.new(outbound))
+      end
+    end
+
+    class Outbound < Temporalio::Worker::Interceptor::Workflow::Outbound
+      def execute_activity(input)
+        headers = input.headers.merge('interceptor-added' => 'added', 'request-id' => 'interceptor')
+        super(input.with(headers:))
+      end
+
+      def execute_local_activity(input)
+        headers = input.headers.merge('interceptor-added' => 'added', 'request-id' => 'interceptor')
+        super(input.with(headers:))
+      end
+    end
+  end
+
+  class RetryingHeadersActivity < Temporalio::Activity::Definition
+    def execute
+      raise 'Intentional retry' if Temporalio::Activity::Context.current.info.attempt == 1
+
+      'retry success'
+    end
+  end
+
+  class RetryHeadersWorkflow < Temporalio::Workflow::Definition
+    def execute(local)
+      headers = { 'request-id' => 'req-retry', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      retry_policy = Temporalio::RetryPolicy.new(initial_interval: 0.2, backoff_coefficient: 1)
+      if local
+        Temporalio::Workflow.execute_local_activity(
+          RetryingHeadersActivity,
+          schedule_to_close_timeout: 30,
+          local_retry_threshold: 0.1,
+          retry_policy:,
+          headers:
+        )
+      else
+        Temporalio::Workflow.execute_activity(
+          RetryingHeadersActivity,
+          schedule_to_close_timeout: 30,
+          retry_policy:,
+          headers:
+        )
+      end
+    end
+  end
+
+  class HeadersWorkflow < Temporalio::Workflow::Definition
+    def execute(scenario)
+      case scenario.to_sym
+      when :remote
+        Temporalio::Workflow.execute_activity(
+          HeadersActivity,
+          start_to_close_timeout: 10,
+          headers: { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+        )
+      when :local
+        Temporalio::Workflow.execute_local_activity(
+          HeadersActivity,
+          start_to_close_timeout: 10,
+          headers: { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+        )
+      when :remote_omitted
+        Temporalio::Workflow.execute_activity(HeadersActivity, start_to_close_timeout: 10)
+      when :local_omitted
+        Temporalio::Workflow.execute_local_activity(HeadersActivity, start_to_close_timeout: 10)
+      when :remote_empty
+        Temporalio::Workflow.execute_activity(HeadersActivity, start_to_close_timeout: 10, headers: {})
+      when :local_empty
+        Temporalio::Workflow.execute_local_activity(HeadersActivity, start_to_close_timeout: 10, headers: {})
+      else
+        raise NotImplementedError
+      end
+    end
+  end
+
   def test_simple
     assert_equal 'from activity: remote',
                  execute_workflow(SimpleWorkflow, :remote, activities: [SimpleActivity])
@@ -55,6 +174,83 @@ class WorkerWorkflowActivityTest < Test
                  execute_workflow(SimpleWorkflow, :local_symbol_name, activities: [SimpleActivity])
     assert_equal 'from activity: local',
                  execute_workflow(SimpleWorkflow, :local_string_name, activities: [SimpleActivity])
+  end
+
+  def test_activity_headers_remote_and_local
+    expected = { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    %i[remote local].each do |scenario|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        HeadersWorkflow, scenario, activities: [HeadersActivity], interceptors: [interceptor]
+      )
+      assert_equal 'headers activity result', result
+      assert_equal expected, interceptor.observations.pop.first
+    end
+  end
+
+  def test_activity_headers_omitted_and_empty
+    %i[remote_omitted local_omitted remote_empty local_empty].each do |scenario|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        HeadersWorkflow, scenario, activities: [HeadersActivity], interceptors: [interceptor]
+      )
+      assert_equal 'headers activity result', result
+      assert_equal({}, interceptor.observations.pop.first)
+    end
+  end
+
+  def test_activity_headers_outbound_interception
+    expected = {
+      'request-id' => 'interceptor',
+      'tenant' => { 'id' => 42 },
+      'optional' => nil,
+      'interceptor-added' => 'added'
+    }
+    %i[remote local].each do |scenario|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        HeadersWorkflow,
+        scenario,
+        activities: [HeadersActivity],
+        interceptors: [interceptor, HeadersOutboundInterceptor.new]
+      )
+      assert_equal 'headers activity result', result
+      assert_equal expected, interceptor.observations.pop.first
+    end
+  end
+
+  def test_activity_headers_with_codec
+    data_converter = Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
+    client = Temporalio::Client.new(**env.client.options.with(data_converter:).to_h)
+    expected = { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    %i[remote local].each do |scenario|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        HeadersWorkflow,
+        scenario,
+        activities: [HeadersActivity],
+        client:,
+        workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default,
+        interceptors: [interceptor]
+      )
+      assert_equal 'headers activity result', result
+      assert_equal expected, interceptor.observations.pop.first
+    end
+  end
+
+  def test_activity_headers_retry_delivery
+    expected = { 'request-id' => 'req-retry', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    [false, true].each do |local|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        RetryHeadersWorkflow, local, activities: [RetryingHeadersActivity], interceptors: [interceptor]
+      )
+      assert_equal 'retry success', result
+
+      attempts = 2.times.map { interceptor.observations.pop }
+      assert_equal [1, 2], attempts.map(&:last)
+      assert_equal [expected, expected], attempts.map(&:first)
+    end
   end
 
   class GoNoResultActivityWorkflow < Temporalio::Workflow::Definition

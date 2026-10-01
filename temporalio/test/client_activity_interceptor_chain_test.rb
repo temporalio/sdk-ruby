@@ -21,6 +21,55 @@ class ClientActivityInterceptorChainTest < Test
     end
   end
 
+  class HeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader :observations
+
+    def initialize
+      @observations = Queue.new
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(self, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.attempt]
+        super
+      end
+    end
+  end
+
+  class HeadersOutboundInterceptor
+    include Temporalio::Client::Interceptor
+
+    def intercept_client(next_interceptor)
+      Outbound.new(next_interceptor)
+    end
+
+    class Outbound < Temporalio::Client::Interceptor::Outbound
+      def initialize(next_interceptor)
+        super
+        @calls = 0
+      end
+
+      def start_activity(input)
+        @calls += 1
+        input.headers['interceptor-added'] = 'added'
+        input.headers['request-id'] = 'interceptor'
+        input.headers['first-only'] = 'second call' if @calls == 2
+        super(input.with(headers: input.headers.dup))
+      end
+    end
+  end
+
   # Records the order of calls through the interceptor chain.
   class RecordingInterceptor
     include Temporalio::Client::Interceptor
@@ -92,6 +141,56 @@ class ClientActivityInterceptorChainTest < Test
       activities: activities
     )
     worker.run { yield task_queue }
+  end
+
+  def test_activity_headers_are_intercepted_and_replaced
+    client = client_with_interceptors([HeadersOutboundInterceptor.new])
+    interceptor = HeadersInboundInterceptor.new
+    task_queue = "saa-tq-#{SecureRandom.uuid}"
+    worker = Temporalio::Worker.new(
+      client: client,
+      task_queue: task_queue,
+      activities: [SimpleActivity],
+      interceptors: [interceptor]
+    )
+    worker.run do
+      caller_headers = { 'request-id' => 'caller', 'retained' => 'value' }
+      handle = client.start_activity(
+        SimpleActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: caller_headers
+      )
+      assert_equal 'ok', handle.result
+      expected_headers = { 'request-id' => 'interceptor', 'retained' => 'value', 'interceptor-added' => 'added' }
+      assert_equal expected_headers, interceptor.observations.pop.first
+      assert_equal expected_headers, caller_headers
+
+      result = client.execute_activity(
+        SimpleActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'ok', result
+      assert_equal(
+        { 'interceptor-added' => 'added', 'request-id' => 'interceptor', 'first-only' => 'second call' },
+        interceptor.observations.pop.first
+      )
+
+      result = client.execute_activity(
+        SimpleActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10
+      )
+      assert_equal 'ok', result
+      assert_equal(
+        { 'interceptor-added' => 'added', 'request-id' => 'interceptor' },
+        interceptor.observations.pop.first
+      )
+    end
   end
 
   def test_start_activity_interceptor_is_called

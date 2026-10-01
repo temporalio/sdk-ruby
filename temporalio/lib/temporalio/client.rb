@@ -517,6 +517,8 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
+    # @param headers [Hash<String, Object>] Mutable Temporal payload headers. Values must be payload-convertible and may
+    #   be nil. Interceptors may mutate this hash, so avoid sharing it across concurrent invocations.
     # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
@@ -543,6 +545,7 @@ module Temporalio
       search_attributes: nil,
       summary: nil,
       static_details: nil,
+      headers: {},
       priority: Priority.default,
       start_delay: nil,
       arg_hints: nil,
@@ -566,7 +569,7 @@ module Temporalio
                              search_attributes:,
                              summary:,
                              static_details:,
-                             headers: {},
+                             headers:,
                              priority:,
                              start_delay:,
                              arg_hints: arg_hints || defn_arg_hints,
@@ -597,6 +600,8 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
+    # @param headers [Hash<String, Object>] Mutable Temporal payload headers. Values must be payload-convertible and may
+    #   be nil. Interceptors may mutate this hash, so avoid sharing it across concurrent invocations.
     # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
@@ -624,6 +629,7 @@ module Temporalio
       search_attributes: nil,
       summary: nil,
       static_details: nil,
+      headers: {},
       priority: Priority.default,
       start_delay: nil,
       arg_hints: nil,
@@ -645,6 +651,7 @@ module Temporalio
         search_attributes:,
         summary:,
         static_details:,
+        headers:,
         priority:,
         start_delay:,
         arg_hints:,

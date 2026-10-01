@@ -21,6 +21,8 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added optional `headers:` to remote and local workflow activities and standalone activity invocations.
+
 ### Changed
 
 - Priority is no longer marked as experimental.
