@@ -211,7 +211,7 @@ module Temporalio
         # @!attribute search_attributes
         #   @return [SearchAttributes, nil] Search attributes for the workflow.
         # @!attribute priority
-        #   @return [Priority] Priority of the workflow. This is currently experimental.
+        #   @return [Priority] Priority of the workflow.
         # @!attribute arg_hints
         #   @return [Array<Object>, nil] Converter hints for workflow arguments. This is only user-set (e.g. on create)
         #     and is not persisted and therefore will not be set when describing a workflow.
@@ -242,7 +242,7 @@ module Temporalio
             # @param retry_policy [RetryPolicy, nil] Retry policy for the workflow.
             # @param memo [Hash<String, Object>, nil] Memo for the workflow.
             # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
-            # @param priority [Priority] Priority of the workflow. This is currently experimental.
+            # @param priority [Priority] Priority of the workflow.
             # @param headers [Hash<String, Object>, nil] Headers for the workflow.
             def new(
               workflow,

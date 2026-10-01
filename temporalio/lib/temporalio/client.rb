@@ -308,7 +308,7 @@ module Temporalio
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
-    # @param priority [Priority] Priority of the workflow. This is currently experimental.
+    # @param priority [Priority] Priority of the workflow.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
@@ -400,7 +400,7 @@ module Temporalio
     # @param request_eager_start [Boolean] Potentially reduce the latency to start this workflow by encouraging the
     #   server to start it on a local worker running with this same client. This is currently experimental.
     # @param versioning_override [VersioningOverride, nil] Override the version of the workflow.
-    # @param priority [Priority] Priority for the workflow. This is currently experimental.
+    # @param priority [Priority] Priority for the workflow.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
@@ -517,7 +517,7 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
     #   This is currently experimental.
@@ -597,7 +597,7 @@ module Temporalio
     # @param search_attributes [SearchAttributes, nil] Search attributes for the activity.
     # @param summary [String, nil] Fixed single-line summary for this activity execution.
     # @param static_details [String, nil] Fixed details for this activity execution. May be in markdown format.
-    # @param priority [Priority] Priority for the activity. This is currently experimental.
+    # @param priority [Priority] Priority for the activity.
     # @param start_delay [Float, nil] Time (in seconds) to wait before dispatching the first activity task. This delay
     #   is not applied to retry attempts. `nil` or `0` means no delay. Negative values raise `ArgumentError`.
     #   This is currently experimental.

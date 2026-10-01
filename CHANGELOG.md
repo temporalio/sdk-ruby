@@ -26,6 +26,8 @@ to docs, or any other relevant information.
 
 ### Changed
 
+- Priority is no longer marked as experimental.
+
 ### Deprecated
 
 ### :boom: Breaking Changes
