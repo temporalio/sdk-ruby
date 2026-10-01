@@ -2,7 +2,7 @@
 
 module Temporalio
   class Worker
-# Implementation of a thread pool. This implementation is a stripped down form of Concurrent Ruby's
+    # Implementation of a thread pool. This implementation is a stripped down form of Concurrent Ruby's
     # `CachedThreadPool`.
     class ThreadPool
       # Much of this logic taken from
