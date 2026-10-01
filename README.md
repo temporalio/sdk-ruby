@@ -549,30 +549,6 @@ Some things to note about the above code:
 * Activity failures are raised from the call as `Temporalio::Error::ActivityError`.
 * `execute_local_activity` exists with mostly the same options for local activities.
 
-Per-activity Temporal payload headers can be passed to either remote or local activity calls:
-
-```ruby
-Temporalio::Workflow.execute_activity(
-  MyActivity,
-  'input',
-  start_to_close_timeout: 30,
-  headers: { 'request-id' => 'req-123', 'tenant' => { 'id' => 42 }, 'optional' => nil }
-)
-
-Temporalio::Workflow.execute_local_activity(
-  MyActivity,
-  'input',
-  start_to_close_timeout: 10,
-  headers: { 'request-id' => 'req-123' }
-)
-```
-
-Header keys are strings and values use the workflow payload converter; `nil` values are supported. Propagation is
-explicit: workflow headers are not copied to activities automatically. Receiving activity code can inspect them through
-the inbound `Temporalio::Worker::Interceptor::Activity` input; there is no `Activity::Context` accessor. Pass a mutable
-hash and avoid sharing it across concurrent invocations because outbound interceptors may mutate it. These are persisted
-payload headers, not gRPC metadata, and this option does not encrypt their values.
-
 #### Invoking Child Workflows
 
 * Child workflows are started with `Temporalio::Workflow.start_child_workflow`, which accepts the workflow class or
@@ -1131,7 +1107,6 @@ handle = client.start_activity(
   'some-arg',
   id: 'my-activity-id',
   task_queue: 'my-task-queue',
-  headers: { 'request-id' => 'req-123' },
   start_to_close_timeout: 60
 )
 result = handle.result   # blocks until the activity completes
@@ -1145,16 +1120,9 @@ result = client.execute_activity(
   'some-arg',
   id: 'my-activity-id',
   task_queue: 'my-task-queue',
-  start_to_close_timeout: 60,
-  headers: { 'request-id' => 'req-123' }
+  start_to_close_timeout: 60
 )
 ```
-
-Headers are explicit per invocation; workflow headers are not copied automatically. The receiving activity can inspect
-them through an inbound `Temporalio::Worker::Interceptor::Activity` input, not through `Activity::Context`. Header keys
-are strings, payload-convertible values may be `nil`, and the mutable hash should not be shared across concurrent calls
-because outbound interceptors may mutate it. Headers are persisted payload metadata, not transport headers, and this
-option does not encrypt them.
 
 Get a handle to an existing standalone activity to describe, cancel, terminate, or fetch its result:
 

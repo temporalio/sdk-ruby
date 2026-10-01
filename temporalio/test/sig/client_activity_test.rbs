@@ -1,7 +1,29 @@
 class ClientActivityTest < Test
+  class HeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader observations: Queue[[Hash[String, Object?], Hash[String, Object?], Integer]]
+    attr_reader init_observations: Queue[Hash[String, Object?]]
+
+    def initialize: -> void
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize: (
+        HeadersInboundInterceptor root,
+        Temporalio::Worker::Interceptor::Activity::Inbound next_interceptor
+      ) -> void
+    end
+  end
+
   def with_activity_worker: (
     Array[singleton(Temporalio::Activity::Definition)] activities,
     ?client: Temporalio::Client,
     ?interceptors: Array[Temporalio::Worker::Interceptor::Activity]
   ) { (String) -> untyped } -> untyped
+
+  def assert_header_observation: (
+    HeadersInboundInterceptor interceptor,
+    Hash[String, Object?] headers,
+    ?attempt: Integer
+  ) -> void
 end

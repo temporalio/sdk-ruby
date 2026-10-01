@@ -177,6 +177,7 @@ module Temporalio
           # `namespace` is always set. `workflow_namespace` is the deprecated accessor, nil for standalone activities.
           namespace = Internal::ProtoUtils.string_or(start.workflow_namespace, @worker.options.client.namespace)
           workflow_namespace = workflow_id.nil? ? nil : namespace
+          headers = ProtoUtils.headers_from_proto_map(start.header_fields, @worker.options.client.data_converter) || {}
           info = Activity::Info.new(
             activity_id: start.activity_id,
             activity_run_id: activity_run_id,
@@ -185,6 +186,7 @@ module Temporalio
             current_attempt_scheduled_time: Internal::ProtoUtils.timestamp_to_time(
               start.current_attempt_scheduled_time
             ) || raise, # Never nil
+            headers:,
             heartbeat_timeout: Internal::ProtoUtils.duration_to_seconds(start.heartbeat_timeout),
             local?: start.is_local,
             namespace: namespace,
@@ -225,7 +227,7 @@ module Temporalio
                     )
                   end,
             result_hint: defn.result_hint,
-            headers: ProtoUtils.headers_from_proto_map(start.header_fields, @worker.options.client.data_converter) || {}
+            headers:
           )
 
           # Run

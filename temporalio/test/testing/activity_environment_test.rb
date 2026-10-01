@@ -37,6 +37,32 @@ module Testing
       assert_equal 'Intentional error', err.message
     end
 
+    class HeadersActivity < Temporalio::Activity::Definition
+      def execute(mutate)
+        headers = Temporalio::Activity::Context.current.info.headers
+        received = headers.dup
+        headers['run-only'] = 'changed' if mutate
+        received
+      end
+    end
+
+    def test_activity_headers_default_and_isolation
+      env = Temporalio::Testing::ActivityEnvironment.new
+      assert_equal({}, env.run(HeadersActivity, true))
+      assert_equal({}, env.run(HeadersActivity, false))
+      assert_equal({}, Temporalio::Testing::ActivityEnvironment.default_info.headers)
+      assert_equal({}, Temporalio::Testing::ActivityEnvironment.new.run(HeadersActivity, false))
+    end
+
+    def test_activity_headers_custom_info_and_isolation
+      headers = { 'request-id' => 'req-test', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+      info = Temporalio::Testing::ActivityEnvironment.default_info.with(headers: headers.dup)
+      env = Temporalio::Testing::ActivityEnvironment.new(info:)
+      assert_equal headers, env.run(HeadersActivity, true)
+      assert_equal headers, env.run(HeadersActivity, false)
+      assert_equal headers, info.headers
+    end
+
     class WaitCancelActivity < Temporalio::Activity::Definition
       def execute
         Temporalio::Activity::Context.current.cancellation.wait

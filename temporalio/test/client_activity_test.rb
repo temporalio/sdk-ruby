@@ -18,6 +18,12 @@ class ClientActivityTest < Test
     end
   end
 
+  class HeadersActivity < Temporalio::Activity::Definition
+    def execute
+      Temporalio::Activity::Context.current.info.headers
+    end
+  end
+
   class VoidActivity < Temporalio::Activity::Definition
     def execute
       # Returns nil implicitly.
@@ -72,13 +78,23 @@ class ClientActivityTest < Test
     end
   end
 
+  class RetryHeadersActivity < Temporalio::Activity::Definition
+    def execute
+      info = Temporalio::Activity::Context.current.info
+      raise Temporalio::Error::ApplicationError, 'retryable failure on attempt 1' if info.attempt == 1
+
+      info.headers
+    end
+  end
+
   class HeadersInboundInterceptor
     include Temporalio::Worker::Interceptor::Activity
 
-    attr_reader :observations
+    attr_reader :observations, :init_observations
 
     def initialize
       @observations = Queue.new
+      @init_observations = Queue.new
     end
 
     def intercept_activity(next_interceptor)
@@ -91,8 +107,14 @@ class ClientActivityTest < Test
         @root = root
       end
 
+      def init(outbound)
+        @root.init_observations << Temporalio::Activity::Context.current.info.headers.dup
+        super
+      end
+
       def execute(input)
-        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.attempt]
+        info = Temporalio::Activity::Context.current.info
+        @root.observations << [input.headers.dup, info.headers.dup, info.attempt]
         super
       end
     end
@@ -110,6 +132,14 @@ class ClientActivityTest < Test
     worker.run { yield task_queue }
   end
 
+  def assert_header_observation(interceptor, headers, attempt: 1)
+    input_headers, info_headers, observed_attempt = interceptor.observations.pop
+    assert_equal headers, input_headers
+    assert_equal headers, info_headers
+    assert_equal attempt, observed_attempt
+    assert_equal headers, interceptor.init_observations.pop
+  end
+
   def test_execute_activity_simple_with_result
     with_activity_worker([SimpleActivity]) do |task_queue|
       result = env.client.execute_activity(
@@ -125,56 +155,52 @@ class ClientActivityTest < Test
 
   def test_activity_headers_start_and_execute
     interceptor = HeadersInboundInterceptor.new
-    with_activity_worker([SimpleActivity], interceptors: [interceptor]) do |task_queue|
+    with_activity_worker([HeadersActivity], interceptors: [interceptor]) do |task_queue|
       start_headers = { 'request-id' => 'req-start', 'tenant' => { 'id' => 42 }, 'optional' => nil }
       handle = env.client.start_activity(
-        SimpleActivity,
-        'start headers',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: start_headers
       )
-      assert_equal 'saa: start headers', handle.result
-      assert_equal start_headers, interceptor.observations.pop.first
+      assert_equal start_headers, handle.result
+      assert_header_observation(interceptor, start_headers)
 
       execute_headers = { 'request-id' => 'req-execute', 'tenant' => { 'id' => 42 }, 'optional' => nil }
       result = env.client.execute_activity(
-        SimpleActivity,
-        'execute headers',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: execute_headers
       )
-      assert_equal 'saa: execute headers', result
-      assert_equal execute_headers, interceptor.observations.pop.first
+      assert_equal execute_headers, result
+      assert_header_observation(interceptor, execute_headers)
     end
   end
 
   def test_activity_headers_omitted_and_empty
     interceptor = HeadersInboundInterceptor.new
-    with_activity_worker([SimpleActivity], interceptors: [interceptor]) do |task_queue|
+    with_activity_worker([HeadersActivity], interceptors: [interceptor]) do |task_queue|
       result = env.client.execute_activity(
-        SimpleActivity,
-        'omitted headers',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10
       )
-      assert_equal 'saa: omitted headers', result
-      assert_equal({}, interceptor.observations.pop.first)
+      assert_equal({}, result)
+      assert_header_observation(interceptor, {})
 
       handle = env.client.start_activity(
-        SimpleActivity,
-        'empty headers',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: {}
       )
-      assert_equal 'saa: empty headers', handle.result
-      assert_equal({}, interceptor.observations.pop.first)
+      assert_equal({}, handle.result)
+      assert_header_observation(interceptor, {})
     end
   end
 
@@ -182,30 +208,48 @@ class ClientActivityTest < Test
     data_converter = Temporalio::Converters::DataConverter.new(payload_codec: Base64Codec.new)
     client = Temporalio::Client.new(**env.client.options.with(data_converter:).to_h)
     interceptor = HeadersInboundInterceptor.new
-    with_activity_worker([SimpleActivity], client:, interceptors: [interceptor]) do |task_queue|
+    with_activity_worker([HeadersActivity], client:, interceptors: [interceptor]) do |task_queue|
       start_headers = { 'request-id' => 'req-codec-start', 'tenant' => { 'id' => 42 }, 'optional' => nil }
       handle = client.start_activity(
-        SimpleActivity,
-        'codec start',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: start_headers
       )
-      assert_equal 'saa: codec start', handle.result
-      assert_equal start_headers, interceptor.observations.pop.first
+      assert_equal start_headers, handle.result
+      assert_header_observation(interceptor, start_headers)
 
       execute_headers = { 'request-id' => 'req-codec-execute', 'tenant' => { 'id' => 42 }, 'optional' => nil }
       result = client.execute_activity(
-        SimpleActivity,
-        'codec execute',
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: execute_headers
       )
-      assert_equal 'saa: codec execute', result
-      assert_equal execute_headers, interceptor.observations.pop.first
+      assert_equal execute_headers, result
+      assert_header_observation(interceptor, execute_headers)
+    end
+  end
+
+  def test_activity_headers_preserved_across_retry
+    interceptor = HeadersInboundInterceptor.new
+    headers = { 'request-id' => 'req-retry', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    with_activity_worker([RetryHeadersActivity], interceptors: [interceptor]) do |task_queue|
+      result = env.client.execute_activity(
+        RetryHeadersActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 30,
+        retry_policy: Temporalio::RetryPolicy.new(
+          initial_interval: 0.1, backoff_coefficient: 1.0, max_interval: 0.1, max_attempts: 3
+        ),
+        headers: headers
+      )
+      assert_equal headers, result
+      assert_header_observation(interceptor, headers, attempt: 1)
+      assert_header_observation(interceptor, headers, attempt: 2)
     end
   end
 

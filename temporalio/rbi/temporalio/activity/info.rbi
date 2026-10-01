@@ -8,6 +8,7 @@ class Temporalio::Activity::Info < ::Data
       activity_type: String,
       attempt: Integer,
       current_attempt_scheduled_time: Time,
+      headers: T::Hash[String, T.nilable(Object)],
       heartbeat_timeout: T.nilable(Float),
       local: T::Boolean,
       priority: T.nilable(Temporalio::Priority),
@@ -25,7 +26,7 @@ class Temporalio::Activity::Info < ::Data
       workflow_type: T.nilable(String)
     ).void
   end
-  def initialize(activity_id:, activity_run_id:, activity_type:, attempt:, current_attempt_scheduled_time:, heartbeat_timeout:, local:, priority:, raw_heartbeat_details:, retry_policy:, schedule_to_close_timeout:, scheduled_time:, start_to_close_timeout:, started_time:, task_queue:, task_token:, workflow_id:, workflow_namespace:, workflow_run_id:, workflow_type:); end
+  def initialize(activity_id:, activity_run_id:, activity_type:, attempt:, current_attempt_scheduled_time:, headers:, heartbeat_timeout:, local:, priority:, raw_heartbeat_details:, retry_policy:, schedule_to_close_timeout:, scheduled_time:, start_to_close_timeout:, started_time:, task_queue:, task_token:, workflow_id:, workflow_namespace:, workflow_run_id:, workflow_type:); end
 
   sig { returns(String) }
   def activity_id; end
@@ -41,6 +42,9 @@ class Temporalio::Activity::Info < ::Data
 
   sig { returns(Time) }
   def current_attempt_scheduled_time; end
+
+  sig { returns(T::Hash[String, T.nilable(Object)]) }
+  def headers; end
 
   sig { params(hints: T.nilable(T::Array[Object])).returns(T::Array[T.nilable(Object)]) }
   def heartbeat_details(hints: nil); end

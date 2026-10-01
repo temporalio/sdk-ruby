@@ -21,7 +21,8 @@ to docs, or any other relevant information.
 
 ### Added
 
-- Added optional `headers:` to remote and local workflow activities and standalone activity invocations.
+- Added optional `headers:` to remote and local workflow activities and standalone activity invocations, and decoded
+  received headers through `Temporalio::Activity::Context.current.info.headers`.
 
 ### Changed
 

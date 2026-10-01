@@ -6,6 +6,7 @@ require 'temporalio/client'
 require 'temporalio/converters/data_converter'
 require 'temporalio/testing'
 require 'temporalio/worker'
+require 'temporalio/worker/workflow_replayer'
 require 'temporalio/workflow'
 require 'test'
 
@@ -45,11 +46,72 @@ class WorkerWorkflowActivityTest < Test
 
   class HeadersActivity < Temporalio::Activity::Definition
     def execute
-      'headers activity result'
+      Temporalio::Activity::Context.current.info.headers
     end
   end
 
   class HeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader :observations, :init_observations
+
+    def initialize
+      @observations = Queue.new
+      @init_observations = Queue.new
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(self, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def init(outbound)
+        @root.init_observations << Temporalio::Activity::Context.current.info.headers.dup
+        super
+      end
+
+      def execute(input)
+        info = Temporalio::Activity::Context.current.info
+        @root.observations << [input.headers, info.headers, info.attempt]
+        super
+      end
+    end
+  end
+
+  class HeadersInboundMutationInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    def initialize(replace:)
+      @replace = replace
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(@replace, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(replace, next_interceptor)
+        super(next_interceptor)
+        @replace = replace
+      end
+
+      def execute(input)
+        if @replace
+          super(input.with(headers: { 'replacement' => 'replacement' }))
+        else
+          input.headers['in-place'] = 'mutated'
+          super
+        end
+      end
+    end
+  end
+
+  class HeadersInputObserverInterceptor
     include Temporalio::Worker::Interceptor::Activity
 
     attr_reader :observations
@@ -69,7 +131,7 @@ class WorkerWorkflowActivityTest < Test
       end
 
       def execute(input)
-        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.attempt]
+        @root.observations << [input.headers, Temporalio::Activity::Context.current.info.headers]
         super
       end
     end
@@ -103,9 +165,10 @@ class WorkerWorkflowActivityTest < Test
 
   class RetryingHeadersActivity < Temporalio::Activity::Definition
     def execute
-      raise 'Intentional retry' if Temporalio::Activity::Context.current.info.attempt == 1
+      info = Temporalio::Activity::Context.current.info
+      raise 'Intentional retry' if info.attempt == 1
 
-      'retry success'
+      info.headers
     end
   end
 
@@ -183,8 +246,11 @@ class WorkerWorkflowActivityTest < Test
       result = execute_workflow(
         HeadersWorkflow, scenario, activities: [HeadersActivity], interceptors: [interceptor]
       )
-      assert_equal 'headers activity result', result
-      assert_equal expected, interceptor.observations.pop.first
+      assert_equal expected, result
+      observation = interceptor.observations.pop
+      assert_equal expected, observation[0]
+      assert_equal expected, observation[1]
+      assert_equal expected, interceptor.init_observations.pop
     end
   end
 
@@ -194,8 +260,11 @@ class WorkerWorkflowActivityTest < Test
       result = execute_workflow(
         HeadersWorkflow, scenario, activities: [HeadersActivity], interceptors: [interceptor]
       )
-      assert_equal 'headers activity result', result
-      assert_equal({}, interceptor.observations.pop.first)
+      assert_equal({}, result)
+      observation = interceptor.observations.pop
+      assert_equal({}, observation[0])
+      assert_equal({}, observation[1])
+      assert_equal({}, interceptor.init_observations.pop)
     end
   end
 
@@ -214,8 +283,27 @@ class WorkerWorkflowActivityTest < Test
         activities: [HeadersActivity],
         interceptors: [interceptor, HeadersOutboundInterceptor.new]
       )
-      assert_equal 'headers activity result', result
-      assert_equal expected, interceptor.observations.pop.first
+      assert_equal expected, result
+      observation = interceptor.observations.pop
+      assert_equal expected, observation[0]
+      assert_equal expected, observation[1]
+      assert_equal expected, interceptor.init_observations.pop
+    end
+
+    omitted_expected = { 'request-id' => 'interceptor', 'interceptor-added' => 'added' }
+    %i[remote_omitted local_omitted].each do |scenario|
+      interceptor = HeadersInboundInterceptor.new
+      result = execute_workflow(
+        HeadersWorkflow,
+        scenario,
+        activities: [HeadersActivity],
+        interceptors: [interceptor, HeadersOutboundInterceptor.new]
+      )
+      assert_equal omitted_expected, result
+      observation = interceptor.observations.pop
+      assert_equal omitted_expected, observation[0]
+      assert_equal omitted_expected, observation[1]
+      assert_equal omitted_expected, interceptor.init_observations.pop
     end
   end
 
@@ -233,8 +321,11 @@ class WorkerWorkflowActivityTest < Test
         workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default,
         interceptors: [interceptor]
       )
-      assert_equal 'headers activity result', result
-      assert_equal expected, interceptor.observations.pop.first
+      assert_equal expected, result
+      observation = interceptor.observations.pop
+      assert_equal expected, observation[0]
+      assert_equal expected, observation[1]
+      assert_equal expected, interceptor.init_observations.pop
     end
   end
 
@@ -242,14 +333,63 @@ class WorkerWorkflowActivityTest < Test
     expected = { 'request-id' => 'req-retry', 'tenant' => { 'id' => 42 }, 'optional' => nil }
     [false, true].each do |local|
       interceptor = HeadersInboundInterceptor.new
-      result = execute_workflow(
+      history_events = execute_workflow(
         RetryHeadersWorkflow, local, activities: [RetryingHeadersActivity], interceptors: [interceptor]
-      )
-      assert_equal 'retry success', result
+      ) do |handle|
+        assert_equal expected, handle.result
+        handle.fetch_history_events.to_a
+      end
 
       attempts = 2.times.map { interceptor.observations.pop }
       assert_equal [1, 2], attempts.map(&:last)
       assert_equal [expected, expected], attempts.map(&:first)
+      assert_equal([expected, expected], attempts.map { |observation| observation[1] })
+      assert_equal([expected, expected], 2.times.map { interceptor.init_observations.pop })
+      next unless local
+
+      assert_equal(1, history_events.count do |event|
+        event.timer_started_event_attributes&.start_to_fire_timeout&.to_f == 0.2 # rubocop:disable Lint/FloatComparison
+      end)
+    end
+  end
+
+  def test_activity_headers_inbound_mutation_and_replacement
+    received = { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    %i[remote local].each do |scenario|
+      [false, true].each do |replace|
+        observer = HeadersInputObserverInterceptor.new
+        result = execute_workflow(
+          HeadersWorkflow,
+          scenario,
+          activities: [HeadersActivity],
+          interceptors: [HeadersInboundMutationInterceptor.new(replace:), observer]
+        )
+        downstream_headers, info_headers = observer.observations.pop
+        if replace
+          assert_equal received, result
+          assert_equal received, info_headers
+          assert_equal({ 'replacement' => 'replacement' }, downstream_headers)
+        else
+          expected = received.merge('in-place' => 'mutated')
+          assert_equal expected, result
+          assert_equal expected, info_headers
+          assert_equal expected, downstream_headers
+        end
+      end
+    end
+  end
+
+  def test_activity_headers_replay
+    expected = { 'request-id' => 'req-workflow', 'tenant' => { 'id' => 42 }, 'optional' => nil }
+    %i[remote local remote_omitted local_omitted].each do |scenario|
+      history = execute_workflow(
+        HeadersWorkflow, scenario, activities: [HeadersActivity]
+      ) do |handle|
+        assert_equal(scenario.to_s.end_with?('omitted') ? {} : expected, handle.result)
+        handle.fetch_history
+      end
+      replay_result = Temporalio::Worker::WorkflowReplayer.new(workflows: [HeadersWorkflow]).replay_workflow(history)
+      assert_nil replay_result.replay_failure
     end
   end
 

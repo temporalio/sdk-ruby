@@ -13,6 +13,12 @@ class ClientActivityInterceptorChainTest < Test
     end
   end
 
+  class HeadersActivity < Temporalio::Activity::Definition
+    def execute
+      Temporalio::Activity::Context.current.info.headers
+    end
+  end
+
   class SleepUntilCancelActivity < Temporalio::Activity::Definition
     def execute
       Temporalio::Activity::Context.current.heartbeat
@@ -66,6 +72,63 @@ class ClientActivityInterceptorChainTest < Test
         input.headers['request-id'] = 'interceptor'
         input.headers['first-only'] = 'second call' if @calls == 2
         super(input.with(headers: input.headers.dup))
+      end
+    end
+  end
+
+  class TransformingHeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    def initialize(action, replacement_headers = {})
+      @action = action
+      @replacement_headers = replacement_headers
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(@action, @replacement_headers, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(action, replacement_headers, next_interceptor)
+        super(next_interceptor)
+        @action = action
+        @replacement_headers = replacement_headers
+      end
+
+      def execute(input)
+        if @action == :mutate
+          input.headers['interceptor-mutation'] = 'visible'
+          super
+        else
+          super(input.with(headers: @replacement_headers))
+        end
+      end
+    end
+  end
+
+  class ObservingHeadersInboundInterceptor
+    include Temporalio::Worker::Interceptor::Activity
+
+    attr_reader :observations
+
+    def initialize
+      @observations = Queue.new
+    end
+
+    def intercept_activity(next_interceptor)
+      Inbound.new(self, next_interceptor)
+    end
+
+    class Inbound < Temporalio::Worker::Interceptor::Activity::Inbound
+      def initialize(root, next_interceptor)
+        super(next_interceptor)
+        @root = root
+      end
+
+      def execute(input)
+        info_headers = Temporalio::Activity::Context.current.info.headers
+        @root.observations << [input.headers.dup, info_headers.dup]
+        super
       end
     end
   end
@@ -133,12 +196,13 @@ class ClientActivityInterceptorChainTest < Test
     Temporalio::Client.new(**env.client.options.with(interceptors: interceptors).to_h)
   end
 
-  def with_activity_worker(client, activities, &)
+  def with_activity_worker(client, activities, interceptors: [], &)
     task_queue = "saa-tq-#{SecureRandom.uuid}"
     worker = Temporalio::Worker.new(
       client: client,
       task_queue: task_queue,
-      activities: activities
+      activities: activities,
+      interceptors: interceptors
     )
     worker.run { yield task_queue }
   end
@@ -150,46 +214,85 @@ class ClientActivityInterceptorChainTest < Test
     worker = Temporalio::Worker.new(
       client: client,
       task_queue: task_queue,
-      activities: [SimpleActivity],
+      activities: [HeadersActivity],
       interceptors: [interceptor]
     )
     worker.run do
       caller_headers = { 'request-id' => 'caller', 'retained' => 'value' }
       handle = client.start_activity(
-        SimpleActivity,
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10,
         headers: caller_headers
       )
-      assert_equal 'ok', handle.result
       expected_headers = { 'request-id' => 'interceptor', 'retained' => 'value', 'interceptor-added' => 'added' }
+      assert_equal expected_headers, handle.result
       assert_equal expected_headers, interceptor.observations.pop.first
       assert_equal expected_headers, caller_headers
 
       result = client.execute_activity(
-        SimpleActivity,
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10
       )
-      assert_equal 'ok', result
-      assert_equal(
-        { 'interceptor-added' => 'added', 'request-id' => 'interceptor', 'first-only' => 'second call' },
-        interceptor.observations.pop.first
-      )
+      expected_injected_headers = {
+        'interceptor-added' => 'added', 'request-id' => 'interceptor', 'first-only' => 'second call'
+      }
+      assert_equal expected_injected_headers, result
+      assert_equal expected_injected_headers, interceptor.observations.pop.first
 
       result = client.execute_activity(
-        SimpleActivity,
+        HeadersActivity,
         id: "act-#{SecureRandom.uuid}",
         task_queue: task_queue,
         start_to_close_timeout: 10
       )
-      assert_equal 'ok', result
-      assert_equal(
-        { 'interceptor-added' => 'added', 'request-id' => 'interceptor' },
-        interceptor.observations.pop.first
+      expected_injected_headers = { 'interceptor-added' => 'added', 'request-id' => 'interceptor' }
+      assert_equal expected_injected_headers, result
+      assert_equal expected_injected_headers, interceptor.observations.pop.first
+    end
+  end
+
+  def test_activity_headers_inbound_mutation_and_replacement
+    received_headers = { 'request-id' => 'received' }
+    mutated_headers = { 'request-id' => 'received', 'interceptor-mutation' => 'visible' }
+    mutation_observer = ObservingHeadersInboundInterceptor.new
+    with_activity_worker(
+      env.client,
+      [HeadersActivity],
+      interceptors: [TransformingHeadersInboundInterceptor.new(:mutate), mutation_observer]
+    ) do |task_queue|
+      result = env.client.execute_activity(
+        HeadersActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: received_headers
       )
+      assert_equal mutated_headers, result
+      assert_equal [mutated_headers, mutated_headers], mutation_observer.observations.pop
+    end
+
+    replacement_headers = { 'request-id' => 'replacement', 'downstream' => 'only' }
+    replacement_observer = ObservingHeadersInboundInterceptor.new
+    with_activity_worker(
+      env.client,
+      [HeadersActivity],
+      interceptors: [
+        TransformingHeadersInboundInterceptor.new(:replace, replacement_headers), replacement_observer
+      ]
+    ) do |task_queue|
+      result = env.client.execute_activity(
+        HeadersActivity,
+        id: "act-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        start_to_close_timeout: 10,
+        headers: received_headers
+      )
+      assert_equal received_headers, result
+      assert_equal [replacement_headers, received_headers], replacement_observer.observations.pop
     end
   end
 
