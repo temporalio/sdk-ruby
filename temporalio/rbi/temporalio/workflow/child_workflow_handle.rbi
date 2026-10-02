@@ -20,8 +20,9 @@ class Temporalio::Workflow::ChildWorkflowHandle
       signal: T.any(Temporalio::Workflow::Definition::Signal, Symbol, String),
       args: T.nilable(Object),
       cancellation: Temporalio::Cancellation,
-      arg_hints: T.nilable(T::Array[Object])
+      arg_hints: T.nilable(T::Array[Object]),
+      event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
     ).void
   end
-  def signal(signal, *args, cancellation: T.unsafe(nil), arg_hints: T.unsafe(nil)); end
+  def signal(signal, *args, cancellation: T.unsafe(nil), arg_hints: T.unsafe(nil), event_groups: T.unsafe(nil)); end
 end

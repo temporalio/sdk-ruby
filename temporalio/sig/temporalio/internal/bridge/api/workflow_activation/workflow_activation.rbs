@@ -487,6 +487,13 @@ module Temporalio
             def has_priority?: () -> bool
             def clear_priority: () -> void
 
+            # The run id recorded on the `WORKFLOW_EXECUTION_STARTED` event. Unlike the execution's current
+            # run id, this value is preserved across workflow resets. Mirrors the `original_execution_run_id`
+            # field from `WorkflowExecutionStartedEventAttributes`.
+            attr_reader original_execution_run_id(): ::String
+            attr_writer original_execution_run_id(): ::String | ::Symbol
+            def clear_original_execution_run_id: () -> void
+
             type init_map = {
               workflow_type: (::String | ::Symbol)?,
               "workflow_type" => (::String | ::Symbol)?,
@@ -538,6 +545,8 @@ module Temporalio
               "root_workflow" => (::Temporalio::Api::Common::V1::WorkflowExecution | ::Temporalio::Api::Common::V1::WorkflowExecution::init_map)?,
               priority: (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
               "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
+              original_execution_run_id: (::String | ::Symbol)?,
+              "original_execution_run_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -568,6 +577,7 @@ module Temporalio
               | ("start_time" name) -> ::Google::Protobuf::Timestamp?
               | ("root_workflow" name) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
               | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
+              | ("original_execution_run_id" name) -> ::String
 
             def []=:
                 ("workflow_type" name, (::String | ::Symbol) value) -> void
@@ -595,6 +605,7 @@ module Temporalio
               | ("start_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("root_workflow" name, ::Temporalio::Api::Common::V1::WorkflowExecution? value) -> void
               | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
+              | ("original_execution_run_id" name, (::String | ::Symbol) value) -> void
           end
 
           # Notify a workflow that a timer has fired
@@ -932,6 +943,11 @@ module Temporalio
             attr_accessor headers(): ::Google::Protobuf::Map[::String, ::Temporalio::Api::Common::V1::Payload]
             def clear_headers: () -> void
 
+            # Event ID of the `WORKFLOW_EXECUTION_SIGNALED` history event that produced this job.
+            attr_reader originating_event_id(): ::Integer
+            attr_writer originating_event_id(): ::Integer | ::Float
+            def clear_originating_event_id: () -> void
+
             type init_map = {
               signal_name: (::String | ::Symbol)?,
               "signal_name" => (::String | ::Symbol)?,
@@ -941,6 +957,8 @@ module Temporalio
               "identity" => (::String | ::Symbol)?,
               headers: ::Hash[::String | ::Symbol, ::Temporalio::Api::Common::V1::Payload]?,
               "headers" => ::Hash[::String | ::Symbol, ::Temporalio::Api::Common::V1::Payload]?,
+              originating_event_id: (::Integer | ::Float)?,
+              "originating_event_id" => (::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -950,12 +968,14 @@ module Temporalio
               | ("input" name) -> ::Google::Protobuf::RepeatedField
               | ("identity" name) -> ::String
               | ("headers" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Common::V1::Payload])
+              | ("originating_event_id" name) -> ::Integer
 
             def []=:
                 ("signal_name" name, (::String | ::Symbol) value) -> void
               | ("input" name, ::Google::Protobuf::RepeatedField value) -> void
               | ("identity" name, (::String | ::Symbol) value) -> void
               | ("headers" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Common::V1::Payload]) value) -> void
+              | ("originating_event_id" name, (::Integer | ::Float) value) -> void
           end
 
           # Inform lang what the result of a call to `patched` or similar API should be -- this is always
@@ -994,11 +1014,20 @@ module Temporalio
             def has_failure?: () -> bool
             def clear_failure: () -> void
 
+            # The server-reported cause when the signal failed. Unspecified when the signal succeeded or
+            # was cancelled before being sent.
+            attr_reader cause(): ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Integer
+            attr_writer cause(): ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float
+            attr_reader cause_const(): ::Integer
+            def clear_cause: () -> void
+
             type init_map = {
               seq: (::Integer | ::Float)?,
               "seq" => (::Integer | ::Float)?,
               failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
               "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+              cause: (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float)?,
+              "cause" => (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1006,10 +1035,12 @@ module Temporalio
             def []:
                 ("seq" name) -> ::Integer
               | ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+              | ("cause" name) -> (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Integer)
 
             def []=:
                 ("seq" name, (::Integer | ::Float) value) -> void
               | ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+              | ("cause" name, (::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::SignalExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float) value) -> void
           end
 
           class ResolveRequestCancelExternalWorkflow < ::Google::Protobuf::AbstractMessage
@@ -1020,17 +1051,24 @@ module Temporalio
             attr_writer seq(): ::Integer | ::Float
             def clear_seq: () -> void
 
-            # If populated, this signal either failed to be sent or was cancelled depending on failure
-            # type / info.
+            # If populated, the cancellation request failed.
             attr_accessor failure(): ::Temporalio::Api::Failure::V1::Failure?
             def has_failure?: () -> bool
             def clear_failure: () -> void
+
+            # The server-reported cause when the cancellation request failed.
+            attr_reader cause(): ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Integer
+            attr_writer cause(): ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float
+            attr_reader cause_const(): ::Integer
+            def clear_cause: () -> void
 
             type init_map = {
               seq: (::Integer | ::Float)?,
               "seq" => (::Integer | ::Float)?,
               failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
               "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+              cause: (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float)?,
+              "cause" => (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1038,10 +1076,12 @@ module Temporalio
             def []:
                 ("seq" name) -> ::Integer
               | ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+              | ("cause" name) -> (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Integer)
 
             def []=:
                 ("seq" name, (::Integer | ::Float) value) -> void
               | ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+              | ("cause" name, (::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::names | ::Temporalio::Api::Enums::V1::CancelExternalWorkflowExecutionFailedCause::strings | ::Integer | ::Float) value) -> void
           end
 
           # Lang is requested to invoke an update handler on the workflow. Lang should invoke the update

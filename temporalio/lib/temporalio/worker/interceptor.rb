@@ -200,7 +200,8 @@ module Temporalio
         # Input for {Outbound.cancel_external_workflow}.
         CancelExternalWorkflowInput = Data.define(
           :id,
-          :run_id
+          :run_id,
+          :event_groups
         )
 
         # Input for {Outbound.execute_activity}.
@@ -221,7 +222,8 @@ module Temporalio
           :priority,
           :arg_hints,
           :result_hint,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Input for {Outbound.execute_local_activity}.
@@ -239,7 +241,8 @@ module Temporalio
           :activity_id,
           :arg_hints,
           :result_hint,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Input for {Outbound.initialize_continue_as_new_error}.
@@ -254,7 +257,8 @@ module Temporalio
           :args,
           :cancellation,
           :arg_hints,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Input for {Outbound.signal_external_workflow}.
@@ -265,14 +269,16 @@ module Temporalio
           :args,
           :cancellation,
           :arg_hints,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Input for {Outbound.sleep}.
         SleepInput = Data.define(
           :duration,
           :summary,
-          :cancellation
+          :cancellation,
+          :event_groups
         )
 
         # Input for {Outbound.start_child_workflow}.
@@ -297,7 +303,8 @@ module Temporalio
           :priority,
           :arg_hints,
           :result_hint,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Input for {Outbound.start_nexus_operation}.
@@ -316,7 +323,8 @@ module Temporalio
           :cancellation,
           :arg_hint,
           :result_hint,
-          :headers
+          :headers,
+          :event_groups
         )
 
         # Outbound interceptor for intercepting outbound workflow calls. This should be extended by users needing to

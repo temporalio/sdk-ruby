@@ -1828,6 +1828,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def coresdk_workflow_commands_cancel_workflow_execution(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.details) if value.has_details?
+        @on_exit&.call(value)
+      end
+      
       def coresdk_workflow_commands_complete_workflow_execution(value)
         @on_enter&.call(value)
         api_common_v1_payload(value.result) if value.has_result?
@@ -1920,11 +1926,13 @@ module Temporalio
       def coresdk_workflow_commands_workflow_command(value)
         @on_enter&.call(value)
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.event_group_markers.each { |v| api_sdk_v1_event_group_marker(v) }
         coresdk_workflow_commands_schedule_activity(value.schedule_activity) if value.has_schedule_activity?
         coresdk_workflow_commands_query_result(value.respond_to_query) if value.has_respond_to_query?
         coresdk_workflow_commands_complete_workflow_execution(value.complete_workflow_execution) if value.has_complete_workflow_execution?
         coresdk_workflow_commands_fail_workflow_execution(value.fail_workflow_execution) if value.has_fail_workflow_execution?
         coresdk_workflow_commands_continue_as_new_workflow_execution(value.continue_as_new_workflow_execution) if value.has_continue_as_new_workflow_execution?
+        coresdk_workflow_commands_cancel_workflow_execution(value.cancel_workflow_execution) if value.has_cancel_workflow_execution?
         coresdk_workflow_commands_start_child_workflow_execution(value.start_child_workflow_execution) if value.has_start_child_workflow_execution?
         coresdk_workflow_commands_signal_external_workflow_execution(value.signal_external_workflow_execution) if value.has_signal_external_workflow_execution?
         coresdk_workflow_commands_schedule_local_activity(value.schedule_local_activity) if value.has_schedule_local_activity?

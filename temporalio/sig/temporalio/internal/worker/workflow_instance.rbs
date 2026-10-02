@@ -61,7 +61,7 @@ module Temporalio
 
         def illegal_call_tracing_disabled: [T] { -> T } -> T
 
-        def patch: (patch_id: Symbol | String, deprecated: bool) -> bool
+        def patch: (patch_id: Symbol | String, deprecated: bool, ?event_groups: Array[Workflow::EventGroup]?) -> bool
 
         def patch_activated?: (String patch_id) -> bool
 
