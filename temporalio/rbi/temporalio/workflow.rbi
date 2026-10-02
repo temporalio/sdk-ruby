@@ -60,6 +60,7 @@ module Temporalio::Workflow
         disable_eager_execution: T::Boolean,
         priority: Temporalio::Priority,
         arg_hints: T.nilable(T::Array[Object]),
+        headers: T::Hash[String, T.nilable(Object)],
         result_hint: T.nilable(Object)
       ).returns(T.nilable(Object))
     end
@@ -79,6 +80,7 @@ module Temporalio::Workflow
       disable_eager_execution: T.unsafe(nil),
       priority: T.unsafe(nil),
       arg_hints: T.unsafe(nil),
+      headers: T.unsafe(nil),
       result_hint: T.unsafe(nil)
     ); end
 
@@ -143,6 +145,7 @@ module Temporalio::Workflow
         cancellation_type: Integer,
         activity_id: T.nilable(String),
         arg_hints: T.nilable(T::Array[Object]),
+        headers: T::Hash[String, T.nilable(Object)],
         result_hint: T.nilable(Object)
       ).returns(T.nilable(Object))
     end
@@ -159,6 +162,7 @@ module Temporalio::Workflow
       cancellation_type: T.unsafe(nil),
       activity_id: T.unsafe(nil),
       arg_hints: T.unsafe(nil),
+      headers: T.unsafe(nil),
       result_hint: T.unsafe(nil)
     ); end
 

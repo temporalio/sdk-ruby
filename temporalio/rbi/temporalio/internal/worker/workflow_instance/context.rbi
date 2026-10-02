@@ -65,7 +65,8 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
       disable_eager_execution: T::Boolean,
       priority: Temporalio::Priority,
       arg_hints: T.nilable(T::Array[Object]),
-      result_hint: T.nilable(Object)
+      result_hint: T.nilable(Object),
+      headers: T::Hash[String, T.nilable(Object)]
     ).returns(T.nilable(Object))
   end
   def execute_activity(
@@ -84,7 +85,8 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
     disable_eager_execution:,
     priority:,
     arg_hints:,
-    result_hint:
+    result_hint:,
+    headers:
   ); end
 
   sig do
@@ -101,7 +103,8 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
       cancellation_type: Integer,
       activity_id: T.nilable(String),
       arg_hints: T.nilable(T::Array[Object]),
-      result_hint: T.nilable(Object)
+      result_hint: T.nilable(Object),
+      headers: T::Hash[String, T.nilable(Object)]
     ).returns(T.nilable(Object))
   end
   def execute_local_activity(
@@ -117,7 +120,8 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
     cancellation_type:,
     activity_id:,
     arg_hints:,
-    result_hint:
+    result_hint:,
+    headers:
   ); end
 
   sig do

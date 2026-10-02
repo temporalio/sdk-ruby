@@ -163,6 +163,8 @@ module Temporalio
     #   activity definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
     #   definition has result hint, it is used by default.
+    # @param headers [Hash<String, Object>] Mutable Temporal payload headers. Values must be payload-convertible and may
+    #   be nil. Interceptors may mutate this hash, so avoid sharing it across concurrent invocations.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -184,13 +186,14 @@ module Temporalio
       disable_eager_execution: false,
       priority: Priority.default,
       arg_hints: nil,
+      headers: {},
       result_hint: nil
     )
       _current.execute_activity(
         activity, *args,
         task_queue:, summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         heartbeat_timeout:, retry_policy:, cancellation:, cancellation_type:, activity_id:, disable_eager_execution:,
-        priority:, arg_hints:, result_hint:
+        priority:, arg_hints:, result_hint:, headers:
       )
     end
 
@@ -258,6 +261,8 @@ module Temporalio
     #   activity definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the activity
     #   definition has result hint, it is used by default.
+    # @param headers [Hash<String, Object>] Mutable Temporal payload headers. Values must be payload-convertible and may
+    #   be nil. Interceptors may mutate this hash, so avoid sharing it across concurrent invocations.
     #
     # @return [Object] Result of the activity.
     # @raise [Error::ActivityError] Activity failed (and retry was disabled or exhausted).
@@ -276,13 +281,14 @@ module Temporalio
       cancellation_type: ActivityCancellationType::TRY_CANCEL,
       activity_id: nil,
       arg_hints: nil,
+      headers: {},
       result_hint: nil
     )
       _current.execute_local_activity(
         activity, *args,
         summary:, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
         retry_policy:, local_retry_threshold:, cancellation:, cancellation_type:,
-        activity_id:, arg_hints:, result_hint:
+        activity_id:, arg_hints:, result_hint:, headers:
       )
     end
 

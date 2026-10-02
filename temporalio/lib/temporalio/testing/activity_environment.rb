@@ -22,6 +22,7 @@ module Temporalio
           activity_type: 'unknown',
           attempt: 1,
           current_attempt_scheduled_time: Time.at(0),
+          headers: {}.freeze,
           heartbeat_timeout: nil,
           local?: false,
           namespace: 'default',
@@ -97,7 +98,7 @@ module Temporalio
         executor.execute_activity(defn) do
           Activity::Context._current_executor = executor
           executor.set_activity_context(defn, Context.new(
-                                                info: @info.dup,
+                                                info: @info.with(headers: @info.headers.dup),
                                                 instance:
                                                   defn.instance.is_a?(Proc) ? defn.instance.call : defn.instance,
                                                 on_heartbeat: @on_heartbeat,

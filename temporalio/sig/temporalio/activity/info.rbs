@@ -6,6 +6,7 @@ module Temporalio
       attr_reader activity_type: String
       attr_reader attempt: Integer
       attr_reader current_attempt_scheduled_time: Time
+      attr_reader headers: Hash[String, Object?]
       attr_reader heartbeat_timeout: Float?
       attr_reader local?: bool
       attr_reader namespace: String
@@ -29,6 +30,7 @@ module Temporalio
         activity_type: String,
         attempt: Integer,
         current_attempt_scheduled_time: Time,
+        headers: Hash[String, Object?],
         heartbeat_timeout: Float?,
         local?: bool,
         namespace: String,

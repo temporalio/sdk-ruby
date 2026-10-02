@@ -102,7 +102,8 @@ module Temporalio
             disable_eager_execution:,
             priority:,
             arg_hints:,
-            result_hint:
+            result_hint:,
+            headers:
           )
             activity, defn_arg_hints, defn_result_hint =
               case activity
@@ -135,7 +136,7 @@ module Temporalio
                 priority:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
-                headers: {}
+                headers:
               )
             )
           end
@@ -153,7 +154,8 @@ module Temporalio
             cancellation_type:,
             activity_id:,
             arg_hints:,
-            result_hint:
+            result_hint:,
+            headers:
           )
             activity, defn_arg_hints, defn_result_hint =
               case activity
@@ -182,7 +184,7 @@ module Temporalio
                 activity_id:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
-                headers: {}
+                headers:
               )
             )
           end

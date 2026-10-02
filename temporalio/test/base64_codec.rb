@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'base64'
 require 'temporalio/api'
 require 'temporalio/converters/payload_codec'
 
