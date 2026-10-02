@@ -1,0 +1,17 @@
+module Temporalio
+  module Converters
+    class StorageDriverActivityInfo
+      attr_reader namespace: String
+      attr_reader id: String?
+      attr_reader run_id: String?
+      attr_reader type: String?
+
+      def initialize: (
+        namespace: String,
+        ?id: String?,
+        ?run_id: String?,
+        ?type: String?
+      ) -> void
+    end
+  end
+end

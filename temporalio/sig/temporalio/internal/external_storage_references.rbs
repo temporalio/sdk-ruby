@@ -1,0 +1,18 @@
+module Temporalio
+  module Internal
+    module ExternalStorageReferences
+      ENCODING: String
+      MESSAGE_TYPE: String
+
+      def self.reference?: (Api::Common::V1::Payload payload) -> bool
+      def self.parse_reference: (
+        Api::Common::V1::Payload payload
+      ) -> Api::Sdk::V1::ExternalStorageReference?
+      def self.create_reference_payload: (
+        driver_name: String,
+        claim_data: Hash[String, String],
+        original_size_bytes: Integer
+      ) -> Api::Common::V1::Payload
+    end
+  end
+end

@@ -281,6 +281,13 @@ class Temporalio::Error::ScheduleAlreadyRunningError < ::Temporalio::Error
   def initialize; end
 end
 
+class Temporalio::Error::ExternalStorageNotConfiguredError < ::Temporalio::Error
+  extend T::Sig
+
+  sig { params(message: String).void }
+  def initialize(message = T.unsafe(nil)); end
+end
+
 class Temporalio::Error::RPCError < ::Temporalio::Error
   sig { params(message: String, code: Integer, raw_grpc_status: T.nilable(Object)).void }
   def initialize(message, code:, raw_grpc_status:); end

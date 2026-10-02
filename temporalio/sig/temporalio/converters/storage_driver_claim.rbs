@@ -1,0 +1,11 @@
+module Temporalio
+  module Converters
+    class StorageDriverClaim
+      attr_reader claim_data: Hash[String, String]
+      def initialize: (Hash[String, String] claim_data) -> void
+      def ==: (untyped other) -> bool
+      def eql?: (untyped other) -> bool
+      def hash: -> Integer
+    end
+  end
+end
