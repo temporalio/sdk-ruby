@@ -732,7 +732,8 @@ module Temporalio
       # @!attribute overlap
       #   @return [OverlapPolicy] Controls what happens when an action is started while another is still running.
       # @!attribute catchup_window
-      #   @return [Float] After a Temporal server is unavailable, amount of time in the past to execute missed actions.
+      #   @return [Float, nil] After a Temporal server is unavailable, amount of time in the past to execute missed
+      #     actions. If nil, the server-configured default applies.
       # @!attribute pause_on_failure
       #   @return [Boolean] Whether to pause the schedule if an action fails or times out. Note: For workflows, this
       #     only applies after all retries have been exhausted.
@@ -743,7 +744,7 @@ module Temporalio
             overlap: Internal::ProtoUtils.enum_to_int(Api::Enums::V1::ScheduleOverlapPolicy,
                                                       raw_policies.overlap_policy,
                                                       zero_means_nil: true),
-            catchup_window: Internal::ProtoUtils.duration_to_seconds(raw_policies.catchup_window) || raise, # Never nil
+            catchup_window: Internal::ProtoUtils.duration_to_seconds(raw_policies.catchup_window),
             pause_on_failure: raw_policies.pause_on_failure
           )
         end
@@ -751,13 +752,13 @@ module Temporalio
         # Create a schedule policy.
         #
         # @param overlap [OverlapPolicy] Controls what happens when an action is started while another is still running.
-        # @param catchup_window [Float] After a Temporal server is unavailable, amount of time in the past to execute
-        #   missed actions.
+        # @param catchup_window [Float, nil] After a Temporal server is unavailable, amount of time in the past to
+        #   execute missed actions. If nil, the server-configured default applies. An explicit zero is sent.
         # @param pause_on_failure [Boolean] Whether to pause the schedule if an action fails or times out. Note: For
         #   workflows, this only applies after all retries have been exhausted.
         def initialize(
           overlap: OverlapPolicy::SKIP,
-          catchup_window: 365 * 24 * 60 * 60.0,
+          catchup_window: nil,
           pause_on_failure: false
         )
           super
