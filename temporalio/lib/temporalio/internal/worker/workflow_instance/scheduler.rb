@@ -3,6 +3,7 @@
 require 'temporalio'
 require 'temporalio/cancellation'
 require 'temporalio/error'
+require 'temporalio/internal/active_model_attribute_methods'
 require 'temporalio/internal/google_protobuf'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/workflow'
@@ -124,6 +125,14 @@ module Temporalio
 
           def block(blocker, timeout = nil)
             # TODO(cretz): Make the blocker visible in the stack trace?
+
+            # Ruby does not wake this scheduler when another thread releases the cache lock. Wait natively so the
+            # activation continues after release without treating the cache wait as a durable workflow yield.
+            if timeout.nil? && blocker.is_a?(::Mutex) &&
+               ::Temporalio::Internal::ActiveModelAttributeMethods.in_concurrent_map_call_stack?(caller_locations)
+              with_workflow_scheduler_disabled { blocker.synchronize { nil } }
+              return true
+            end
 
             # Protobuf's object cache uses a process-local Mutex. We allowlist that Mutex use, but it is not a durable
             # workflow yield: if it blocks the only runnable workflow fiber, the workflow task must remain blocked so

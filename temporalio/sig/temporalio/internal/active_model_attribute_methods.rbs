@@ -1,0 +1,9 @@
+module Temporalio
+  module Internal
+    module ActiveModelAttributeMethods
+      def self.in_concurrent_map_call_stack?: (Array[Thread::Backtrace::Location] | nil locations) -> bool
+
+      def self.in_cache_computation_call_stack?: (Array[Thread::Backtrace::Location] | nil locations) -> bool
+    end
+  end
+end

@@ -33,6 +33,8 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- ActiveModel attribute method cache misses no longer fail workflows when Concurrent::Map uses a mutex.
+
 ### Security
 
 ## [v1.9.0] - 2026-09-14

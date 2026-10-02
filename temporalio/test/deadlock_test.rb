@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'active_model'
 require 'google/protobuf'
 require 'securerandom'
 require 'temporalio/testing'
 require 'temporalio/worker'
+require 'temporalio/worker/workflow_replayer'
 require 'temporalio/workflow'
 require 'test'
 
@@ -104,6 +106,26 @@ class DeadlockTest < Test
         end
       end
       Temporalio::Workflow::Future.all_of(*futures).wait
+    end
+  end
+
+  class ActiveModelObject
+    include ActiveModel::Attributes
+
+    attribute :value, :string # steep:ignore
+  end
+
+  class ActiveModelCacheWorkflow < Temporalio::Workflow::Definition
+    def execute
+      before_cache = Temporalio::Workflow::Future.new do
+        Temporalio::Workflow.execute_activity(BasicActivity, 1, start_to_close_timeout: 10)
+      end
+      responds_to_missing = ActiveModelObject.new.respond_to?(:unknown_attribute_for_contention)
+      after_cache = Temporalio::Workflow::Future.new do
+        Temporalio::Workflow.execute_activity(BasicActivity, 2, start_to_close_timeout: 10)
+      end
+      Temporalio::Workflow::Future.all_of(before_cache, after_cache).wait
+      [before_cache.wait, after_cache.wait, responds_to_missing]
     end
   end
 
@@ -271,6 +293,80 @@ class DeadlockTest < Test
 
   def hold_protobuf_object_cache_mutex
     mutex = Google::Protobuf::Internal::OBJECT_CACHE.instance_variable_get(:@mutex)
+    hold_mutex(mutex)
+  end
+
+  def test_active_model_cache_mutex_resumes_without_partial_commands
+    cache = ActiveModelObject.send(:attribute_method_patterns_cache)
+    cache.clear
+    release_mutex = hold_mutex(cache.instance_variable_get(:@write_lock))
+    task_queue = "tq-#{SecureRandom.uuid}"
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [ActiveModelCacheWorkflow],
+      activities: [BasicActivity],
+      workflow_executor: DeadlockTimeoutOverrideExecutor.new(10.0)
+    )
+    history = worker.run do
+      handle = env.client.start_workflow(ActiveModelCacheWorkflow, id: "wf-#{SecureRandom.uuid}", task_queue:)
+      wait_for_active_model_cache_mutex_waiter
+      events = handle.fetch_history_events.to_a
+      refute events.any?(&:workflow_task_completed_event_attributes)
+      refute events.any?(&:activity_task_scheduled_event_attributes)
+      release_mutex.call
+      assert_equal [1, 2, false], handle.result
+      handle.fetch_history
+    ensure
+      release_mutex.call
+    end
+    events = history.events
+    completed_index = events.index(&:workflow_task_completed_event_attributes) || raise
+    scheduled = events.drop(completed_index + 1).take_while(&:activity_task_scheduled_event_attributes)
+    assert_equal 2, scheduled.size
+    refute events.any?(&:workflow_task_failed_event_attributes)
+    cache.clear
+    assert_nil Temporalio::Worker::WorkflowReplayer.new(workflows: [ActiveModelCacheWorkflow])
+                                                   .replay_workflow(history).replay_failure
+  ensure
+    release_mutex&.call
+  end
+
+  def test_active_model_cache_mutex_deadlock_retries_without_partial_commands
+    cache = ActiveModelObject.send(:attribute_method_patterns_cache)
+    cache.clear
+    release_mutex = hold_mutex(cache.instance_variable_get(:@write_lock))
+    task_queue = "tq-#{SecureRandom.uuid}"
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      workflows: [ActiveModelCacheWorkflow],
+      activities: [BasicActivity],
+      workflow_executor: DeadlockTimeoutOverrideExecutor.new(0.1)
+    )
+    handle = worker.run do
+      handle = env.client.start_workflow(ActiveModelCacheWorkflow, id: "wf-#{SecureRandom.uuid}", task_queue:)
+      assert_eventually_task_fail(handle:, message_contains: 'Potential deadlock detected')
+      refute handle.fetch_history_events.any?(&:activity_task_scheduled_event_attributes)
+      handle
+    end
+    release_mutex.call
+    worker = Temporalio::Worker.new(
+      client: env.client, task_queue:, workflows: [ActiveModelCacheWorkflow], activities: [BasicActivity]
+    )
+    history = worker.run do
+      assert_equal [1, 2, false], handle.result
+      handle.fetch_history
+    end
+    cache.clear
+    assert_nil Temporalio::Worker::WorkflowReplayer.new(workflows: [ActiveModelCacheWorkflow])
+                                                   .replay_workflow(history).replay_failure
+  ensure
+    release_mutex&.call
+    handle&.terminate unless history
+  end
+
+  def hold_mutex(mutex)
     acquired = Queue.new
     release = Queue.new
     released = false
@@ -288,6 +384,15 @@ class DeadlockTest < Test
         release << true
       end
       holder.join
+    end
+  end
+
+  def wait_for_active_model_cache_mutex_waiter
+    assert_eventually(timeout: 10.0, interval: 0.01) do
+      assert Thread.list.any? { |thread|
+        thread != Thread.current && thread.status == 'sleep' &&
+          thread.backtrace_locations&.any? { |location| location.path.end_with?('/active_model/attribute_methods.rb') }
+      }, 'Expected a workflow thread to block on the ActiveModel cache mutex'
     end
   end
 

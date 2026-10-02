@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/internal/active_model_attribute_methods'
 require 'temporalio/internal/google_protobuf'
 
 module Temporalio
@@ -45,8 +46,11 @@ module Temporalio
       #   but let others through for certain situations.
       def self.known_safe_mutex_validator
         @known_safe_mutex_validator ||= IllegalWorkflowCallValidator.new do
-          # Only Google Protobuf use of Mutex is known to be safe, fail unless any caller location path has protobuf
-          raise 'disallowed' unless ::Temporalio::Internal::GoogleProtobuf.in_call_stack?(caller_locations)
+          locations = caller_locations
+          next if ::Temporalio::Internal::GoogleProtobuf.in_call_stack?(locations)
+          next if ::Temporalio::Internal::ActiveModelAttributeMethods.in_concurrent_map_call_stack?(locations)
+
+          raise 'disallowed'
         end
       end
 
