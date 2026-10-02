@@ -116,6 +116,23 @@ module Temporalio
       end
     end
 
+    # Error that occurs when a payload stored in external storage is encountered but no external storage is
+    # configured to retrieve it. This usually means the client or worker reading the payload is configured
+    # differently from the one that wrote it.
+    #
+    # @note WARNING: This API is experimental and may change in the future.
+    #
+    # @!visibility private
+    class ExternalStorageNotConfiguredError < Error
+      # @!visibility private
+      def initialize(
+        message = '[TMPRL1105] Encountered a reference to a payload in external storage, but no external storage ' \
+                  'is configured to retrieve it. Configure external storage with a driver able to retrieve it.'
+      )
+        super
+      end
+    end
+
     # Error raised by a client for a general RPC failure.
     class RPCError < Error
       # @return [Code] Status code for the error.

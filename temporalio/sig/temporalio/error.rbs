@@ -49,6 +49,10 @@ module Temporalio
       def initialize: (Activity::CancellationDetails details) -> void
     end
 
+    class ExternalStorageNotConfiguredError < Error
+      def initialize: (?String message) -> void
+    end
+
     class RPCError < Error
       attr_reader code: Code::enum
 
