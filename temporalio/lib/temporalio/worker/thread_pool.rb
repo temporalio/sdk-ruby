@@ -10,6 +10,56 @@ module Temporalio
       # see MIT license at
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/044020f44b36930b863b930f3ee8fa1e9f750469/LICENSE.txt
 
+      # Wraps the body of each pool thread, for acquiring a resource when a thread starts and
+      # releasing it when the thread exits. Since the block is invoked for the entire lifetime of
+      # the thread, a resource acquired around it can be released from an `ensure`.
+      #
+      # The `call` wrapper should not raise. `call` has the responsibility for calling the
+      # passed block exactly once, and rescuing all exceptions and errors. If the `call` wrapper
+      # cannot invoke the block, the block is not re-queued.
+      #
+      # If the `call` wrapper does raise, the exception is swallowed, and the worker dies.
+      # The `restart_worker` constructor parameter determines whether a new worker is
+      # immediately created to replace the one that died. It defaults to false to avoid
+      # a rapid fail-and-restart loop.
+      #
+      # @note The same instance is used by every thread in the pool, so implementations must be
+      #   thread safe. Per-thread state belongs in the block, not in the ThreadContext object.
+      class ThreadContext
+        # @return [ThreadContext] Default context that just invokes the block.
+        def self.default
+          @default ||= NoOp.new
+        end
+
+        # @return [Boolean] Whether a thread whose context raised is replaced with a new one.
+        attr_reader :restart_worker
+
+        # @param restart_worker [Boolean] What to do when {call} raises. When false, the thread is
+        #   dropped from the pool and a new one is started only when more work arrives. When true,
+        #   a replacement thread is started immediately, which invokes {call} again -- so a context
+        #   that always raises will restart without bound.
+        def initialize(restart_worker: false)
+          @restart_worker = restart_worker
+        end
+
+        # Invoke the given block for the lifetime of a pool thread. Implementations must invoke
+        # the block exactly once; invoking it again re-enters a loop the pool has stopped tracking,
+        # which blocks that thread forever and skips the rest of this method.
+        #
+        # @yield Block to invoke for the lifetime of the thread.
+        def call(&)
+          raise NotImplementedError
+        end
+
+        # @!visibility private
+        class NoOp < ThreadContext
+          # @see ThreadContext.call
+          def call(&)
+            yield
+          end
+        end
+      end
+
       # @return [ThreadPool] Default/shared thread pool instance with unlimited max threads.
       def self.default
         @default ||= new
@@ -25,9 +75,12 @@ module Temporalio
       # @param max_threads [Integer, nil] Maximum number of thread workers to create, or nil for unlimited max.
       # @param idle_timeout [Float] Number of seconds before a thread worker with no work should be stopped. Note,
       #   the check of whether a thread worker is idle is only done on each new {execute} call.
-      def initialize(max_threads: nil, idle_timeout: 20)
+      # @param thread_context [ThreadContext] Invoked around the body of each thread this pool starts, for
+      #   acquiring and releasing per-thread resources. Defaults to one that adds no behavior.
+      def initialize(max_threads: nil, idle_timeout: 20, thread_context: ThreadContext.default)
         @max_threads = max_threads
         @idle_timeout = idle_timeout
+        @thread_context = thread_context
 
         @mutex = Mutex.new
         @pool = []
@@ -123,6 +176,16 @@ module Temporalio
         @mutex.synchronize { @completed_task_count += 1 }
       end
 
+      # @!visibility private
+      def _thread_context
+        @thread_context
+      end
+
+      # @!visibility private
+      def _remove_ready_worker(worker)
+        @mutex.synchronize { @ready.reject! { |ready_worker, _| ready_worker.equal?(worker) } }
+      end
+
       private
 
       def locked_assign_worker(&block) # rubocop:disable Naming/PredicateMethod
@@ -188,12 +251,34 @@ module Temporalio
       class Worker
         def initialize(pool, id)
           @queue = Queue.new
-          @thread = Thread.new(@queue, pool) do |my_queue, my_pool|
+          @thread = Thread.new(@queue, pool) { |my_queue, my_pool| worker_loop(my_queue, my_pool) }
+          @thread.name = "temporal-thread-#{id}"
+        end
+
+        # @!visibility private
+        def <<(block)
+          @queue << block
+        end
+
+        # @!visibility private
+        def stop
+          @queue << :stop
+        end
+
+        # @!visibility private
+        def kill
+          @thread.kill
+        end
+
+        private
+
+        def worker_loop(my_queue, my_pool)
+          my_pool._thread_context.call do
             catch(:stop) do
               loop do
                 case block = my_queue.pop
                 when :stop
-                  pool._remove_busy_worker(self)
+                  my_pool._remove_busy_worker(self)
                   throw :stop
                 else
                   begin
@@ -212,22 +297,19 @@ module Temporalio
               end
             end
           end
-          @thread.name = "temporal-thread-#{id}"
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          handle_thread_context_exception(my_pool, e)
         end
 
-        # @!visibility private
-        def <<(block)
-          @queue << block
-        end
-
-        # @!visibility private
-        def stop
-          @queue << :stop
-        end
-
-        # @!visibility private
-        def kill
-          @thread.kill
+        # Removes the worker, and creates a replacement iff restart_worker is true.
+        def handle_thread_context_exception(my_pool, err)
+          warn("Unexpected thread context exception: #{err.full_message}")
+          my_pool._remove_ready_worker(self)
+          if my_pool._thread_context.restart_worker
+            my_pool._worker_died(self)
+          else
+            my_pool._remove_busy_worker(self)
+          end
         end
       end
 

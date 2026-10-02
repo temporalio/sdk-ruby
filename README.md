@@ -61,6 +61,7 @@ Also see:
     - [Activity Heartbeating and Cancellation](#activity-heartbeating-and-cancellation)
     - [Activity Worker Shutdown](#activity-worker-shutdown)
     - [Activity Concurrency and Executors](#activity-concurrency-and-executors)
+    - [Per-Thread Setup for the Thread Pool Executor](#per-thread-setup-for-the-thread-pool-executor)
     - [Activity Testing](#activity-testing)
   - [Telemetry](#telemetry)
     - [Metrics](#metrics)
@@ -1083,6 +1084,52 @@ newer.
 Technically the executor can be customized. The `activity_executors` worker option accepts a hash with the key as the
 symbol and the value as a `Temporalio::Worker::ActivityExecutor` implementation. Users should usually not need to
 customize this. If general code is needed to run around activities, users should use interceptors instead.
+
+#### Per-Thread Setup for the Thread Pool Executor
+
+To acquire a resource once per thread and reuse it across every activity that thread runs -- a database connection, say
+-- pass a `Temporalio::Worker::ThreadPool::ThreadContext` when constructing a thread pool. The context's `call` method
+receives a block that executes the worker's assigned tasks, and should be called exactly once. `call` should not
+raise. Acquired resources should be released in an `ensure`, not directly after `yield`:
+
+```ruby
+class DatabaseConnectionContext < Temporalio::Worker::ThreadPool::ThreadContext
+  def call
+    connection = MyDatabase.connect
+    Thread.current[:my_connection] = connection
+    yield
+  ensure
+    Thread.current[:my_connection] = nil
+    connection&.close
+  end
+end
+
+pool = Temporalio::Worker::ThreadPool.new(thread_context: DatabaseConnectionContext.new)
+executor = Temporalio::Worker::ActivityExecutor::ThreadPool.new(pool)
+
+worker = Temporalio::Worker.new(
+  client:,
+  task_queue: 'my-task-queue',
+  activities: [MyActivity],
+  activity_executors: Temporalio::Worker::ActivityExecutor.defaults.merge(default: executor)
+)
+```
+
+Note:
+
+* You must explicitly construct and use a pool and executor with your custom thread context. The default pool
+  has no context.
+* `call` must invoke the block exactly once. Invoking it again re-enters a loop the pool has stopped tracking, which
+  blocks that thread forever; not invoking it means the thread never runs any work.
+* Clean up in an `ensure`. On a normal stop the block returns and code after the `yield` does run, but
+  `Temporalio::Worker::ThreadPool#kill` terminates the thread without letting the block return, so only an `ensure`
+  runs on every path.
+* This is not an interceptor. A context wraps a thread's whole lifetime, not a single activity execution. To run code
+  around each activity, use an interceptor instead.
+* The `call` wrapper should not raise. If it does, work already queued on the worker is dropped silently (and thus
+  will time out and be retried). The thread is dropped from the pool, and a new one is started when more work
+  arrives. Pass `restart_worker: true` to the `ThreadContext` constructor to start a replacement immediately instead;
+  a context that always raises will then restart without bound.
 
 #### Activity Testing
 
