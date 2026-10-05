@@ -44,9 +44,6 @@ module Temporalio
     #   @return [Time] When the current attempt was scheduled.
     # @!attribute headers
     #   @return [Hash<String, Object>] Received headers as decoded Ruby values, including nil values. Empty when absent.
-    #     Available during inbound interceptor initialization. In-place changes to the initial interceptor input's hash
-    #     are visible here; replacing that input's headers does not replace this map. Treat this mutable hash as
-    #     metadata; changes do not update server headers or another attempt's metadata.
     # @!attribute heartbeat_timeout
     #   @return [Float, nil] Heartbeat timeout set by the caller.
     # @!attribute local?
