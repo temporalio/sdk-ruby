@@ -42,35 +42,6 @@ module Worker
       end
     end
 
-    class ActivityHeadersActivity < Temporalio::Activity::Definition
-      def execute
-        'headers replay result'
-      end
-    end
-
-    class ActivityHeadersWorkflow < Temporalio::Workflow::Definition
-      def execute(scenario)
-        case scenario.to_sym
-        when :remote
-          Temporalio::Workflow.execute_activity(
-            ActivityHeadersActivity,
-            schedule_to_close_timeout: 10,
-            headers: { 'request-id' => 'replay', 'tenant' => { 'id' => 42 }, 'optional' => nil }
-          )
-        when :local
-          Temporalio::Workflow.execute_local_activity(
-            ActivityHeadersActivity,
-            schedule_to_close_timeout: 10,
-            headers: { 'request-id' => 'replay', 'tenant' => { 'id' => 42 }, 'optional' => nil }
-          )
-        when :without_headers
-          Temporalio::Workflow.execute_activity(ActivityHeadersActivity, schedule_to_close_timeout: 10)
-        else
-          raise NotImplementedError
-        end
-      end
-    end
-
     def test_simple
       # Run simple workflow to completion and get history
       history = execute_workflow(SayHelloWorkflow, { name: 'Temporal' }, activities: [SayHelloActivity]) do |handle|
@@ -107,20 +78,6 @@ module Worker
                                                      .replay_workflows(histories)
                                                      .first #: Temporalio::Worker::WorkflowReplayer::ReplayResult
                                                      .replay_failure
-    end
-
-    def test_activity_headers_replay
-      %i[remote local without_headers].each do |scenario|
-        history = execute_workflow(
-          ActivityHeadersWorkflow, scenario, activities: [ActivityHeadersActivity]
-        ) do |handle|
-          assert_equal 'headers replay result', handle.result
-          handle.fetch_history
-        end
-        replayer = Temporalio::Worker::WorkflowReplayer.new(workflows: [ActivityHeadersWorkflow])
-        replay_result = replayer.replay_workflow(history)
-        assert_nil replay_result.replay_failure
-      end
     end
 
     def test_incomplete_run

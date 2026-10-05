@@ -1116,11 +1116,8 @@ Or use the execute helper to start and wait:
 
 ```ruby
 result = client.execute_activity(
-  MyActivity,
-  'some-arg',
-  id: 'my-activity-id',
-  task_queue: 'my-task-queue',
-  start_to_close_timeout: 60
+  MyActivity, 'some-arg',
+  id: 'my-activity-id', task_queue: 'my-task-queue', start_to_close_timeout: 60
 )
 ```
 
