@@ -733,7 +733,7 @@ module Temporalio
       #   @return [OverlapPolicy] Controls what happens when an action is started while another is still running.
       # @!attribute catchup_window
       #   @return [Float, nil] After a Temporal server is unavailable, amount of time in the past to execute missed
-      #     actions. If nil, the server-configured default applies.
+      #     actions. If nil, the server-configured default applies (currently one year).
       # @!attribute pause_on_failure
       #   @return [Boolean] Whether to pause the schedule if an action fails or times out. Note: For workflows, this
       #     only applies after all retries have been exhausted.
