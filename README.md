@@ -1183,8 +1183,8 @@ OpenTelemetry metrics can be configured instead by passing `Temporalio::Runtime:
 #### OpenTelemetry Tracing
 
 OpenTelemetry tracing for clients, activities, and workflows can be enabled using the
-`Temporalio::Contrib::OpenTelemetry::TracingInterceptor`. Specifically, when creating a client, set the interceptor like
-so:
+`Temporalio::Contrib::OpenTelemetry::TracingPlugin`. Configure OpenTelemetry's tracer provider and exporters, then add
+the plugin when creating a client:
 
 ```ruby
 require 'opentelemetry/api'
@@ -1192,17 +1192,42 @@ require 'opentelemetry/sdk'
 require 'temporalio/client'
 require 'temporalio/contrib/open_telemetry'
 
-# ... assumes my_otel_tracer_provider is a tracer provider created by the user
-my_tracer = my_otel_tracer_provider.tracer('my-otel-tracer')
-
 my_client = Temporalio::Client.connect(
   'localhost:7233', 'my-namespace',
-  interceptors: [Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(my_tracer)]
+  plugins: [Temporalio::Contrib::OpenTelemetry::TracingPlugin.new]
 )
 ```
 
 Now many high-level client calls and activities/workflows on workers using this client will have spans created on that
-OpenTelemetry tracer.
+OpenTelemetry tracer. The plugin uses the global OpenTelemetry tracer provider by default. Pass `tracer: my_tracer` to
+use a specific tracer. Workers using this client automatically inherit tracing, so the plugin only needs to be added
+to the client.
+
+The plugin can also be added directly to a worker using a client without tracing:
+
+```ruby
+my_untraced_client = Temporalio::Client.connect('localhost:7233', 'my-namespace')
+my_worker = Temporalio::Worker.new(
+  client: my_untraced_client,
+  task_queue: 'my-task-queue',
+  workflows: [MyWorkflow],
+  activities: [MyActivity],
+  plugins: [Temporalio::Contrib::OpenTelemetry::TracingPlugin.new(always_create_workflow_spans: true)]
+)
+```
+
+When configuring tracing on both a client and its worker, reuse the same plugin instance. The plugin raises
+`ArgumentError` if another tracing interceptor is already configured on the client or worker, preventing duplicate
+spans and conflicting options.
+
+Worker plugins trace activities and workflows. `always_create_workflow_spans: true` enables workflow spans even when
+the workflow was started by a client without tracing, a schedule, or the CLI. As with the interceptor, these spans may
+be orphaned after replay because their parent context is absent from history. The plugin also accepts `header_key:`
+and `propagator:` to customize context propagation, and can be passed to `Temporalio::Worker::WorkflowReplayer` via
+`plugins:`. Plugins are experimental.
+
+Direct interceptor usage remains supported. To configure interceptors explicitly, pass
+`interceptors: [Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(my_tracer)]` to the client or worker.
 
 ##### OpenTelemetry Tracing in Workflows
 

@@ -1,4 +1,6 @@
 module OpenTelemetry
+  def self.tracer_provider: -> untyped
+
   module Context
     def self.current: -> untyped
     def self.attach: (untyped context) -> untyped

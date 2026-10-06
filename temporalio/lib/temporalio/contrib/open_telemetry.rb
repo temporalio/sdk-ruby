@@ -4,11 +4,64 @@ require 'English'
 require 'opentelemetry' # This import will intentionally fail if the user does not have OTel gem available
 require 'temporalio/client/interceptor'
 require 'temporalio/converters/payload_converter'
+require 'temporalio/simple_plugin'
+require 'temporalio/version'
 require 'temporalio/worker/interceptor'
 
 module Temporalio
   module Contrib
     module OpenTelemetry
+      # Plugin for OpenTelemetry tracing on clients, activities, workflows, and workflow replayers.
+      #
+      # When configured on a client, this plugin also applies to workers using that client.
+      # Reuse the same plugin instance on a worker to avoid conflicting tracing configurations.
+      #
+      # WARNING: Plugins are experimental.
+      class TracingPlugin < SimplePlugin
+        # Create a tracing plugin. Configure OpenTelemetry's tracer provider and exporters before creating this plugin.
+        #
+        # @param tracer [OpenTelemetry::Trace::Tracer] Tracer to use. Defaults to a tracer from the global provider.
+        # @param header_key [String] See {TracingInterceptor#initialize}.
+        # @param propagator [Object] See {TracingInterceptor#initialize}.
+        # @param always_create_workflow_spans [Boolean] See {TracingInterceptor#initialize}.
+        def initialize(
+          tracer: ::OpenTelemetry.tracer_provider.tracer('temporalio', Temporalio::VERSION),
+          header_key: '_tracer-data',
+          propagator: ::OpenTelemetry::Context::Propagation::CompositeTextMapPropagator.compose_propagators(
+            [
+              ::OpenTelemetry::Trace::Propagation::TraceContext::TextMapPropagator.new,
+              ::OpenTelemetry::Baggage::Propagation::TextMapPropagator.new
+            ]
+          ),
+          always_create_workflow_spans: false
+        )
+          @tracing_interceptor = TracingInterceptor.new(tracer, header_key:, propagator:, always_create_workflow_spans:)
+          super(
+            name: 'OpenTelemetryTracingPlugin',
+            client_interceptors: [@tracing_interceptor],
+            worker_interceptors: [@tracing_interceptor]
+          )
+        end
+
+        # Implements {Worker::Plugin#configure_worker}.
+        #
+        # @raise [ArgumentError] If another tracing interceptor is already configured on the client or worker.
+        def configure_worker(options)
+          interceptors = options.client.options.interceptors + options.interceptors
+          conflicting_interceptor = interceptors.any? do |interceptor|
+            interceptor.is_a?(TracingInterceptor) && !interceptor.equal?(@tracing_interceptor)
+          end
+          if conflicting_interceptor
+            raise ArgumentError, 'Another OpenTelemetry tracing interceptor is already configured on the client or ' \
+                                 'worker. Reuse the same TracingPlugin instance or configure tracing only once.'
+          end
+          # Workers inherit client interceptors, so adding this interceptor again would duplicate spans.
+          return options if interceptors.include?(@tracing_interceptor)
+
+          super
+        end
+      end
+
       # Tracing interceptor to add OpenTelemetry traces to clients, activities, and workflows.
       class TracingInterceptor
         include Client::Interceptor

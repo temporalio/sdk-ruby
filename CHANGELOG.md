@@ -21,6 +21,10 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added `Temporalio::Contrib::OpenTelemetry::TracingPlugin` to enable OpenTelemetry tracing through client, worker,
+  and workflow replayer plugins. Reusing the same plugin instance on a client and worker avoids duplicate spans;
+  overlapping tracing configurations raise `ArgumentError`. Direct `TracingInterceptor` usage remains supported.
+
 ### Changed
 
 - Priority is no longer marked as experimental.

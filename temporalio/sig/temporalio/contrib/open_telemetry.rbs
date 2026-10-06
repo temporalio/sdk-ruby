@@ -1,6 +1,19 @@
 module Temporalio
   module Contrib
     module OpenTelemetry
+      class TracingPlugin < SimplePlugin
+        @tracing_interceptor: TracingInterceptor
+
+        def initialize: (
+          ?tracer: untyped,
+          ?header_key: String,
+          ?propagator: untyped,
+          ?always_create_workflow_spans: bool
+        ) -> void
+
+        def configure_worker: (Worker::Options options) -> Worker::Options
+      end
+
       class TracingInterceptor
         include Client::Interceptor
         include Worker::Interceptor::Activity

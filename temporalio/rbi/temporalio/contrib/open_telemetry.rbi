@@ -4,6 +4,28 @@ module Temporalio::Contrib; end
 
 module Temporalio::Contrib::OpenTelemetry; end
 
+class Temporalio::Contrib::OpenTelemetry::TracingPlugin < Temporalio::SimplePlugin
+  extend T::Sig
+
+  sig do
+    params(
+      tracer: ::OpenTelemetry::Trace::Tracer,
+      header_key: String,
+      propagator: Object,
+      always_create_workflow_spans: T::Boolean
+    ).void
+  end
+  def initialize(
+    tracer: T.unsafe(nil),
+    header_key: T.unsafe(nil),
+    propagator: T.unsafe(nil),
+    always_create_workflow_spans: T.unsafe(nil)
+  ); end
+
+  sig { params(options: Temporalio::Worker::Options).returns(Temporalio::Worker::Options) }
+  def configure_worker(options); end
+end
+
 class Temporalio::Contrib::OpenTelemetry::TracingInterceptor
   include Temporalio::Client::Interceptor
   include Temporalio::Worker::Interceptor::Activity

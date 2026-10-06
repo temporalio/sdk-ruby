@@ -1,11 +1,17 @@
 # frozen_string_literal: true
 
+require 'minitest/mock'
 require 'opentelemetry/sdk'
 require 'temporalio/contrib/open_telemetry'
 require 'test'
 
 module Contrib
   class OpenTelemetryTest < Test
+    class PassthroughWorkerInterceptor
+      include Temporalio::Worker::Interceptor::Activity
+      include Temporalio::Worker::Interceptor::Workflow
+    end
+
     class TestActivity < Temporalio::Activity::Definition
       def initialize(tracer)
         @tracer = tracer
@@ -153,6 +159,131 @@ module Contrib
       tracer_provider.add_span_processor(OpenTelemetry::SDK::Trace::Export::SimpleSpanProcessor.new(exporter))
       tracer = tracer_provider.tracer('test-tracer')
       [tracer, exporter]
+    end
+
+    def test_tracing_plugin_default_tracer
+      provider = OpenTelemetry::SDK::Trace::TracerProvider.new
+      OpenTelemetry.stub(:tracer_provider, provider) do # steep:ignore NoMethod
+        plugin = Temporalio::Contrib::OpenTelemetry::TracingPlugin.new
+        options = plugin.configure_client(env.client.options)
+        interceptor = options.interceptors.last
+        assert_kind_of Temporalio::Contrib::OpenTelemetry::TracingInterceptor, interceptor
+        raise unless interceptor.is_a?(Temporalio::Contrib::OpenTelemetry::TracingInterceptor)
+
+        assert_same provider.tracer('temporalio', Temporalio::VERSION), interceptor.tracer
+      end
+    ensure
+      provider&.shutdown
+    end
+
+    def test_tracing_plugin_rejects_overlapping_worker_tracing
+      tracer, = init_tracer_and_exporter
+      client = env.reconnect_client(plugins: [Temporalio::Contrib::OpenTelemetry::TracingPlugin.new(tracer:)])
+      plugin = Temporalio::Contrib::OpenTelemetry::TracingPlugin.new(tracer:, always_create_workflow_spans: true)
+      error = assert_raises(ArgumentError) do
+        Temporalio::Worker.new(
+          client:, task_queue: "tq-#{SecureRandom.uuid}", workflows: [TestWorkflow], plugins: [plugin]
+        )
+      end
+      assert_match 'Another OpenTelemetry tracing interceptor is already configured', error.message
+
+      error = assert_raises(ArgumentError) do
+        Temporalio::Worker.new(
+          client: env.client, task_queue: "tq-#{SecureRandom.uuid}", workflows: [TestWorkflow], plugins: [plugin],
+          interceptors: [Temporalio::Contrib::OpenTelemetry::TracingInterceptor.new(tracer)]
+        )
+      end
+      assert_match 'Another OpenTelemetry tracing interceptor is already configured', error.message
+    end
+
+    def test_tracing_plugin_client_worker_and_replayer
+      %i[client worker both].each do |placement|
+        tracer, exporter = init_tracer_and_exporter
+        plugin = Temporalio::Contrib::OpenTelemetry::TracingPlugin.new(
+          tracer:,
+          header_key: 'custom-trace-header',
+          propagator: OpenTelemetry::Trace::Propagation::TraceContext::TextMapPropagator.new,
+          always_create_workflow_spans: placement == :worker
+        )
+        client_interceptor = Object.new.extend(Temporalio::Client::Interceptor)
+        worker_interceptor = PassthroughWorkerInterceptor.new
+        client = env.reconnect_client(
+          interceptors: [client_interceptor], plugins: placement == :worker ? [] : [plugin]
+        )
+        worker = Temporalio::Worker.new(
+          client:,
+          task_queue: "tq-#{SecureRandom.uuid}",
+          workflows: [TestWorkflow],
+          activities: [TestActivity.new(tracer)],
+          interceptors: [worker_interceptor],
+          plugins: placement == :client ? [] : [plugin]
+        )
+        assert_includes client.options.interceptors, client_interceptor
+        assert_includes worker.options.interceptors, worker_interceptor
+        # @type var history: Temporalio::WorkflowHistory?
+        history = nil
+        root_trace_id = nil
+        activity_trace_id = nil
+        tracer.in_span('root') do |root_span|
+          root_trace_id = root_span.context.hex_trace_id
+          outer_context = OpenTelemetry::Context.current
+          worker.run do
+            token = OpenTelemetry::Context.attach(outer_context)
+            handle = client.start_workflow(
+              TestWorkflow, :activity_success_return_trace_id, id: SecureRandom.uuid, task_queue: worker.task_queue
+            )
+            activity_trace_id = handle.result
+            history = handle.fetch_history
+          ensure
+            OpenTelemetry::Context.detach(token)
+          end
+        end
+
+        spans = exporter.finished_spans
+        expected_names = %w[root RunWorkflow:TestWorkflow StartActivity:TestActivity RunActivity:TestActivity
+                            CompleteWorkflow:TestWorkflow]
+        expected_names << 'StartWorkflow:TestWorkflow' unless placement == :worker
+        assert_equal expected_names.sort, spans.map(&:name).sort, placement.to_s
+        activity_span = spans.find { |span| span.name == 'RunActivity:TestActivity' } || raise
+        assert_equal activity_span.hex_trace_id, activity_trace_id
+        unless placement == :worker
+          assert_equal root_trace_id, activity_trace_id
+          start_span = spans.find { |span| span.name == 'StartWorkflow:TestWorkflow' } || raise
+          workflow_span = spans.find { |span| span.name == 'RunWorkflow:TestWorkflow' } || raise
+          assert_equal start_span.span_id, workflow_span.parent_span_id
+          fields = (history || raise).events.first.workflow_execution_started_event_attributes.header.fields
+          assert_includes fields.keys, 'custom-trace-header'
+          refute_includes fields.keys, '_tracer-data'
+        end
+        start_activity_span = spans.find { |span| span.name == 'StartActivity:TestActivity' } || raise
+        assert_equal start_activity_span.span_id, activity_span.parent_span_id
+
+        replayer = Temporalio::Worker::WorkflowReplayer.new(
+          workflows: [TestWorkflow], plugins: [plugin], interceptors: [worker_interceptor]
+        )
+        assert_includes replayer.options.interceptors, worker_interceptor
+        tracing_interceptors = replayer.options.interceptors.grep(Temporalio::Contrib::OpenTelemetry::TracingInterceptor)
+        assert_equal 1, tracing_interceptors.size
+        assert_equal plugin.options.worker_interceptors, tracing_interceptors
+        replayer.replay_workflow(history || raise)
+        assert_equal spans, exporter.finished_spans
+      end
+    end
+
+    def test_tracing_plugin_worker_without_client_context
+      tracer, exporter = init_tracer_and_exporter
+      worker = Temporalio::Worker.new(
+        client: env.client,
+        task_queue: "tq-#{SecureRandom.uuid}",
+        workflows: [TestWorkflow],
+        plugins: [Temporalio::Contrib::OpenTelemetry::TracingPlugin.new(tracer:)]
+      )
+      worker.run do
+        assert_equal 'workflow-done', env.client.execute_workflow(
+          TestWorkflow, :complete, id: SecureRandom.uuid, task_queue: worker.task_queue
+        )
+      end
+      assert_empty exporter.finished_spans
     end
 
     def trace(
