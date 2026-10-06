@@ -3,6 +3,7 @@ PATH
   specs:
     temporalio (1.9.0)
       google-protobuf (>= 3.25.0)
+      json (< 3)
       logger
 
 GEM
