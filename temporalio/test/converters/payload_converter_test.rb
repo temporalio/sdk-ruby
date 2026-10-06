@@ -106,12 +106,12 @@ module Converters
       included do
         def to_json(*args)
           hash = as_json
-          hash[::JSON.create_id] = self.class.name
+          hash['json_class'] = self.class.name
           hash.to_json(*args)
         end
 
         def self.json_create(object)
-          object.delete(::JSON.create_id)
+          object.delete('json_class')
           ret = new
           ret.attributes = object
           ret
