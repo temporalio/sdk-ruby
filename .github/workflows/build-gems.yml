@@ -39,7 +39,7 @@ jobs:
         run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby and Rust
-        uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
           ruby-version: "4.0"
           bundler-cache: false # Needed so 'bundler install' doesn't run
@@ -98,7 +98,7 @@ jobs:
         run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
 
       - name: Setup Ruby and Rust
-        uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
           ruby-version: "4.0"
           bundler-cache: true
@@ -174,7 +174,7 @@ jobs:
       # This only works on official runners
       - name: Setup Ruby
         if: ${{ matrix.container == '' }}
-        uses: oxidize-rb/actions/setup-ruby-and-rust@e5f9a49a7812a078584072f6e3f657ad247c8771 # v1
+        uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
           ruby-version: "${{ matrix.rubyVersion }}"
           bundler-cache: true
