@@ -480,10 +480,10 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 let version = dopts
                     .child(id!("version"))?
                     .ok_or(error!("Worker::DeploymentOptions must set version"))?;
-                let deployment_version = WorkerDeploymentVersion {
-                    deployment_name: version.member::<String>(id!("deployment_name"))?,
-                    build_id: version.member::<String>(id!("build_id"))?,
-                };
+                let deployment_version = WorkerDeploymentVersion::builder()
+                    .deployment_name(version.member::<String>(id!("deployment_name"))?)
+                    .build_id(version.member::<String>(id!("build_id"))?)
+                    .build();
                 let default_versioning_behavior = {
                     let val = dopts.member::<i32>(id!("default_versioning_behavior"))?;
                     if val == 0 {

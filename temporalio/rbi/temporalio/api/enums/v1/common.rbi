@@ -184,6 +184,7 @@ module Temporalio::Api::Enums::V1::ExecutionType
   self::EXECUTION_TYPE_UNSPECIFIED = T.let(0, Integer)
   self::EXECUTION_TYPE_WORKFLOW = T.let(1, Integer)
   self::EXECUTION_TYPE_ACTIVITY = T.let(2, Integer)
+  self::EXECUTION_TYPE_NEXUS_OPERATION = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

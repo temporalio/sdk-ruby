@@ -253,6 +253,12 @@ sig { params(value: Object).void }
   def api_command_v1_upsert_workflow_search_attributes_command_attributes(value); end
   
   sig { params(value: Object).void }
+  def api_common_v1_callback(value); end
+  
+  sig { params(value: Object).void }
+  def api_common_v1_callback_nexus_handler(value); end
+  
+  sig { params(value: Object).void }
   def api_common_v1_header(value); end
   
   sig { params(value: Object).void }
@@ -391,6 +397,12 @@ sig { params(value: Object).void }
   def api_history_v1_workflow_execution_failed_event_attributes(value); end
   
   sig { params(value: Object).void }
+  def api_history_v1_workflow_execution_options_updated_event_attributes(value); end
+  
+  sig { params(value: Object).void }
+  def api_history_v1_workflow_execution_options_updated_event_attributes_workflow_update_options_update(value); end
+  
+  sig { params(value: Object).void }
   def api_history_v1_workflow_execution_signaled_event_attributes(value); end
   
   sig { params(value: Object).void }
@@ -449,6 +461,9 @@ sig { params(value: Object).void }
   
   sig { params(value: Object).void }
   def api_nexus_v1_start_operation_response_sync(value); end
+  
+  sig { params(value: Object).void }
+  def api_nexusoperation_v1_callback_info(value); end
   
   sig { params(value: Object).void }
   def api_operatorservice_v1_create_nexus_endpoint_request(value); end
@@ -821,6 +836,9 @@ sig { params(value: Object).void }
   
   sig { params(value: Object).void }
   def coresdk_workflow_activation_workflow_activation_job(value); end
+  
+  sig { params(value: Object).void }
+  def coresdk_workflow_commands_cancel_workflow_execution(value); end
   
   sig { params(value: Object).void }
   def coresdk_workflow_commands_complete_workflow_execution(value); end

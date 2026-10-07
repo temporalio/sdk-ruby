@@ -58,6 +58,25 @@ module Temporalio::Api::Enums::V1::WorkflowTaskFailedCause
   end
 end
 
+module Temporalio::Api::Enums::V1::ActivityTaskFailedCause
+  self::ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE = T.let(1, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE = T.let(2, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE = T.let(3, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
 module Temporalio::Api::Enums::V1::StartChildWorkflowExecutionFailedCause
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS = T.let(1, Integer)
@@ -126,6 +145,7 @@ module Temporalio::Api::Enums::V1::ResourceExhaustedCause
   self::RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN = T.let(8, Integer)
   self::RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT = T.let(9, Integer)
   self::RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS = T.let(10, Integer)
+  self::RESOURCE_EXHAUSTED_CAUSE_BANDWIDTH_LIMIT = T.let(11, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

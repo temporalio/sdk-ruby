@@ -5491,7 +5491,8 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest
       last_heartbeat_details: T.nilable(Temporalio::Api::Common::V1::Payloads),
       worker_version: T.nilable(Temporalio::Api::Common::V1::WorkerVersionStamp),
       deployment: T.nilable(Temporalio::Api::Deployment::V1::Deployment),
-      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions)
+      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
@@ -5503,7 +5504,8 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest
     last_heartbeat_details: nil,
     worker_version: nil,
     deployment: nil,
-    deployment_options: nil
+    deployment_options: nil,
+    cause: :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -5654,6 +5656,21 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedRequest
   def clear_deployment_options
   end
 
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { void }
+  def clear_cause
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -5765,7 +5782,8 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest
       failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
       identity: T.nilable(String),
       last_heartbeat_details: T.nilable(Temporalio::Api::Common::V1::Payloads),
-      resource_id: T.nilable(String)
+      resource_id: T.nilable(String),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
@@ -5776,7 +5794,8 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest
     failure: nil,
     identity: "",
     last_heartbeat_details: nil,
-    resource_id: ""
+    resource_id: "",
+    cause: :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -5901,6 +5920,24 @@ class Temporalio::Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest
   # Resource ID for routing. Contains "workflow:workflow_id" or "activity:activity_id" for standalone activities.
   sig { void }
   def clear_resource_id
+  end
+
+  # Why did the activity task fail? Optional; when unset the failure is treated as a normal
+# activity failure. See the type's doc for more.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # Why did the activity task fail? Optional; when unset the failure is treated as a normal
+# activity failure. See the type's doc for more.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # Why did the activity task fail? Optional; when unset the failure is treated as a normal
+# activity failure. See the type's doc for more.
+  sig { void }
+  def clear_cause
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -26300,9 +26337,12 @@ class Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest
       input: T.nilable(Temporalio::Api::Common::V1::Payload),
       id_reuse_policy: T.nilable(T.any(Symbol, String, Integer)),
       id_conflict_policy: T.nilable(T.any(Symbol, String, Integer)),
+      on_conflict_options: T.nilable(Temporalio::Api::NexusOperation::V1::OnConflictOptions),
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       nexus_header: T.nilable(T::Hash[String, String]),
-      user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata)
+      user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
+      completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
+      links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)])
     ).void
   end
   def initialize(
@@ -26319,9 +26359,12 @@ class Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest
     input: nil,
     id_reuse_policy: :NEXUS_OPERATION_ID_REUSE_POLICY_UNSPECIFIED,
     id_conflict_policy: :NEXUS_OPERATION_ID_CONFLICT_POLICY_UNSPECIFIED,
+    on_conflict_options: nil,
     search_attributes: nil,
     nexus_header: ::Google::Protobuf::Map.new(:string, :string),
-    user_metadata: nil
+    user_metadata: nil,
+    completion_callbacks: [],
+    links: []
   )
   end
 
@@ -26574,6 +26617,27 @@ class Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest
   def clear_id_conflict_policy
   end
 
+  # Defines actions to be done to the existing running standalone Nexus when the conflict policy
+# NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING is used. If not set or set to a empty object
+# (all options with default value), it will not modify the running operation.
+  sig { returns(T.nilable(Temporalio::Api::NexusOperation::V1::OnConflictOptions)) }
+  def on_conflict_options
+  end
+
+  # Defines actions to be done to the existing running standalone Nexus when the conflict policy
+# NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING is used. If not set or set to a empty object
+# (all options with default value), it will not modify the running operation.
+  sig { params(value: T.nilable(Temporalio::Api::NexusOperation::V1::OnConflictOptions)).void }
+  def on_conflict_options=(value)
+  end
+
+  # Defines actions to be done to the existing running standalone Nexus when the conflict policy
+# NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING is used. If not set or set to a empty object
+# (all options with default value), it will not modify the running operation.
+  sig { void }
+  def clear_on_conflict_options
+  end
+
   # Search attributes for indexing.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::SearchAttributes)) }
   def search_attributes
@@ -26632,6 +26696,39 @@ class Temporalio::Api::WorkflowService::V1::StartNexusOperationExecutionRequest
   # Metadata for use by user interfaces to display the fixed as-of-start summary and details of the operation.
   sig { void }
   def clear_user_metadata
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]) }
+  def completion_callbacks
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def completion_callbacks=(value)
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+  sig { void }
+  def clear_completion_callbacks
+  end
+
+  # Links to be associated with the Nexus operation. Callbacks may also have associated links;
+# links already included with a callback should not be duplicated here.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]) }
+  def links
+  end
+
+  # Links to be associated with the Nexus operation. Callbacks may also have associated links;
+# links already included with a callback should not be duplicated here.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def links=(value)
+  end
+
+  # Links to be associated with the Nexus operation. Callbacks may also have associated links;
+# links already included with a callback should not be duplicated here.
+  sig { void }
+  def clear_links
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -26913,7 +27010,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRespo
       input: T.nilable(Temporalio::Api::Common::V1::Payload),
       result: T.nilable(Temporalio::Api::Common::V1::Payload),
       failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
-      long_poll_token: T.nilable(String)
+      long_poll_token: T.nilable(String),
+      completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::NexusOperation::V1::CallbackInfo)])
     ).void
   end
   def initialize(
@@ -26922,7 +27020,8 @@ class Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRespo
     input: nil,
     result: nil,
     failure: nil,
-    long_poll_token: ""
+    long_poll_token: "",
+    completion_callbacks: []
   )
   end
 
@@ -27017,6 +27116,24 @@ class Temporalio::Api::WorkflowService::V1::DescribeNexusOperationExecutionRespo
   # Token for follow-on long-poll requests. Absent only if the operation is complete.
   sig { void }
   def clear_long_poll_token
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+# They will remain in the CALLBACK_STATE_STANDBY state until the Nexus operation is finished.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::NexusOperation::V1::CallbackInfo)]) }
+  def completion_callbacks
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+# They will remain in the CALLBACK_STATE_STANDBY state until the Nexus operation is finished.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def completion_callbacks=(value)
+  end
+
+  # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+# They will remain in the CALLBACK_STATE_STANDBY state until the Nexus operation is finished.
+  sig { void }
+  def clear_completion_callbacks
   end
 
   sig { returns(T.nilable(Symbol)) }

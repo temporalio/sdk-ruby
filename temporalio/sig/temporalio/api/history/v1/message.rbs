@@ -1549,6 +1549,12 @@ module Temporalio
           def has_worker_version?: () -> bool
           def clear_worker_version: () -> void
 
+          # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+          attr_reader cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer
+          attr_writer cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float
+          attr_reader cause_const(): ::Integer
+          def clear_cause: () -> void
+
           type init_map = {
             failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
             "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
@@ -1562,6 +1568,8 @@ module Temporalio
             "retry_state" => (::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float)?,
             worker_version: (::Temporalio::Api::Common::V1::WorkerVersionStamp | ::Temporalio::Api::Common::V1::WorkerVersionStamp::init_map)?,
             "worker_version" => (::Temporalio::Api::Common::V1::WorkerVersionStamp | ::Temporalio::Api::Common::V1::WorkerVersionStamp::init_map)?,
+            cause: (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
+            "cause" => (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1573,6 +1581,7 @@ module Temporalio
             | ("identity" name) -> ::String
             | ("retry_state" name) -> (::Temporalio::Api::Enums::V1::RetryState::names | ::Integer)
             | ("worker_version" name) -> ::Temporalio::Api::Common::V1::WorkerVersionStamp?
+            | ("cause" name) -> (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer)
 
           def []=:
               ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
@@ -1581,6 +1590,7 @@ module Temporalio
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("retry_state" name, (::Temporalio::Api::Enums::V1::RetryState::names | ::Temporalio::Api::Enums::V1::RetryState::strings | ::Integer | ::Float) value) -> void
             | ("worker_version" name, ::Temporalio::Api::Common::V1::WorkerVersionStamp? value) -> void
+            | ("cause" name, (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float) value) -> void
         end
 
         class ActivityTaskTimedOutEventAttributes < ::Google::Protobuf::AbstractMessage

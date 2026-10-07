@@ -2528,6 +2528,12 @@ module Temporalio
           def has_deployment_options?: () -> bool
           def clear_deployment_options: () -> void
 
+          # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+          attr_reader cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer
+          attr_writer cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float
+          attr_reader cause_const(): ::Integer
+          def clear_cause: () -> void
+
           type init_map = {
             task_token: ::String?,
             "task_token" => ::String?,
@@ -2547,6 +2553,8 @@ module Temporalio
             "deployment" => (::Temporalio::Api::Deployment::V1::Deployment | ::Temporalio::Api::Deployment::V1::Deployment::init_map)?,
             deployment_options: (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             "deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
+            cause: (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
+            "cause" => (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2561,6 +2569,7 @@ module Temporalio
             | ("worker_version" name) -> ::Temporalio::Api::Common::V1::WorkerVersionStamp?
             | ("deployment" name) -> ::Temporalio::Api::Deployment::V1::Deployment?
             | ("deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
+            | ("cause" name) -> (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer)
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -2572,6 +2581,7 @@ module Temporalio
             | ("worker_version" name, ::Temporalio::Api::Common::V1::WorkerVersionStamp? value) -> void
             | ("deployment" name, ::Temporalio::Api::Deployment::V1::Deployment? value) -> void
             | ("deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
+            | ("cause" name, (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float) value) -> void
         end
 
         class RespondActivityTaskFailedResponse < ::Google::Protobuf::AbstractMessage
@@ -2638,6 +2648,13 @@ module Temporalio
           attr_writer resource_id(): ::String | ::Symbol
           def clear_resource_id: () -> void
 
+          # Why did the activity task fail? Optional; when unset the failure is treated as a normal
+          # activity failure. See the type's doc for more.
+          attr_reader cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer
+          attr_writer cause(): ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float
+          attr_reader cause_const(): ::Integer
+          def clear_cause: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -2655,6 +2672,8 @@ module Temporalio
             "last_heartbeat_details" => (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             resource_id: (::String | ::Symbol)?,
             "resource_id" => (::String | ::Symbol)?,
+            cause: (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
+            "cause" => (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2668,6 +2687,7 @@ module Temporalio
             | ("identity" name) -> ::String
             | ("last_heartbeat_details" name) -> ::Temporalio::Api::Common::V1::Payloads?
             | ("resource_id" name) -> ::String
+            | ("cause" name) -> (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Integer)
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -2678,6 +2698,7 @@ module Temporalio
             | ("identity" name, (::String | ::Symbol) value) -> void
             | ("last_heartbeat_details" name, ::Temporalio::Api::Common::V1::Payloads? value) -> void
             | ("resource_id" name, (::String | ::Symbol) value) -> void
+            | ("cause" name, (::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::names | ::Temporalio::Api::Enums::V1::ActivityTaskFailedCause::strings | ::Integer | ::Float) value) -> void
         end
 
         class RespondActivityTaskFailedByIdResponse < ::Google::Protobuf::AbstractMessage
@@ -11897,6 +11918,13 @@ module Temporalio
           attr_reader id_conflict_policy_const(): ::Integer
           def clear_id_conflict_policy: () -> void
 
+          # Defines actions to be done to the existing running standalone Nexus when the conflict policy
+          # NEXUS_OPERATION_ID_CONFLICT_POLICY_USE_EXISTING is used. If not set or set to a empty object
+          # (all options with default value), it will not modify the running operation.
+          attr_accessor on_conflict_options(): ::Temporalio::Api::NexusOperation::V1::OnConflictOptions?
+          def has_on_conflict_options?: () -> bool
+          def clear_on_conflict_options: () -> void
+
           # Search attributes for indexing.
           attr_accessor search_attributes(): ::Temporalio::Api::Common::V1::SearchAttributes?
           def has_search_attributes?: () -> bool
@@ -11915,6 +11943,15 @@ module Temporalio
           attr_accessor user_metadata(): ::Temporalio::Api::Sdk::V1::UserMetadata?
           def has_user_metadata?: () -> bool
           def clear_user_metadata: () -> void
+
+          # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+          attr_accessor completion_callbacks(): ::Google::Protobuf::RepeatedField
+          def clear_completion_callbacks: () -> void
+
+          # Links to be associated with the Nexus operation. Callbacks may also have associated links;
+          # links already included with a callback should not be duplicated here.
+          attr_accessor links(): ::Google::Protobuf::RepeatedField
+          def clear_links: () -> void
 
           type init_map = {
             namespace: (::String | ::Symbol)?,
@@ -11943,12 +11980,18 @@ module Temporalio
             "id_reuse_policy" => (::Temporalio::Api::Enums::V1::NexusOperationIdReusePolicy::names | ::Temporalio::Api::Enums::V1::NexusOperationIdReusePolicy::strings | ::Integer | ::Float)?,
             id_conflict_policy: (::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::names | ::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::strings | ::Integer | ::Float)?,
             "id_conflict_policy" => (::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::names | ::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::strings | ::Integer | ::Float)?,
+            on_conflict_options: (::Temporalio::Api::NexusOperation::V1::OnConflictOptions | ::Temporalio::Api::NexusOperation::V1::OnConflictOptions::init_map)?,
+            "on_conflict_options" => (::Temporalio::Api::NexusOperation::V1::OnConflictOptions | ::Temporalio::Api::NexusOperation::V1::OnConflictOptions::init_map)?,
             search_attributes: (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
             "search_attributes" => (::Temporalio::Api::Common::V1::SearchAttributes | ::Temporalio::Api::Common::V1::SearchAttributes::init_map)?,
             nexus_header: ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
             "nexus_header" => ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
             user_metadata: (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
             "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
+            completion_callbacks: ::Array[::Temporalio::Api::Common::V1::Callback]?,
+            "completion_callbacks" => ::Array[::Temporalio::Api::Common::V1::Callback]?,
+            links: ::Array[::Temporalio::Api::Common::V1::Link]?,
+            "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -11967,9 +12010,12 @@ module Temporalio
             | ("input" name) -> ::Temporalio::Api::Common::V1::Payload?
             | ("id_reuse_policy" name) -> (::Temporalio::Api::Enums::V1::NexusOperationIdReusePolicy::names | ::Integer)
             | ("id_conflict_policy" name) -> (::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::names | ::Integer)
+            | ("on_conflict_options" name) -> ::Temporalio::Api::NexusOperation::V1::OnConflictOptions?
             | ("search_attributes" name) -> ::Temporalio::Api::Common::V1::SearchAttributes?
             | ("nexus_header" name) -> (::Google::Protobuf::Map[::String, ::String])
             | ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
+            | ("completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
+            | ("links" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -11985,9 +12031,12 @@ module Temporalio
             | ("input" name, ::Temporalio::Api::Common::V1::Payload? value) -> void
             | ("id_reuse_policy" name, (::Temporalio::Api::Enums::V1::NexusOperationIdReusePolicy::names | ::Temporalio::Api::Enums::V1::NexusOperationIdReusePolicy::strings | ::Integer | ::Float) value) -> void
             | ("id_conflict_policy" name, (::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::names | ::Temporalio::Api::Enums::V1::NexusOperationIdConflictPolicy::strings | ::Integer | ::Float) value) -> void
+            | ("on_conflict_options" name, ::Temporalio::Api::NexusOperation::V1::OnConflictOptions? value) -> void
             | ("search_attributes" name, ::Temporalio::Api::Common::V1::SearchAttributes? value) -> void
             | ("nexus_header" name, (::Google::Protobuf::Map[::String, ::String]) value) -> void
             | ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
+            | ("completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         class StartNexusOperationExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -12117,6 +12166,11 @@ module Temporalio
           attr_accessor long_poll_token(): ::String
           def clear_long_poll_token: () -> void
 
+          # Completion callbacks to be invoked once the Nexus operation reaches a terminal state.
+          # They will remain in the CALLBACK_STATE_STANDBY state until the Nexus operation is finished.
+          attr_accessor completion_callbacks(): ::Google::Protobuf::RepeatedField
+          def clear_completion_callbacks: () -> void
+
           # Only set if the operation is completed and include_outcome was true in the request.
           attr_reader outcome(): (::Temporalio::Api::Common::V1::Payload | ::Temporalio::Api::Failure::V1::Failure)?
           def has_outcome?: () -> bool
@@ -12135,6 +12189,8 @@ module Temporalio
             "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
             long_poll_token: ::String?,
             "long_poll_token" => ::String?,
+            completion_callbacks: ::Array[::Temporalio::Api::NexusOperation::V1::CallbackInfo]?,
+            "completion_callbacks" => ::Array[::Temporalio::Api::NexusOperation::V1::CallbackInfo]?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -12146,6 +12202,7 @@ module Temporalio
             | ("result" name) -> ::Temporalio::Api::Common::V1::Payload?
             | ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
             | ("long_poll_token" name) -> ::String
+            | ("completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
 
           def []=:
               ("run_id" name, (::String | ::Symbol) value) -> void
@@ -12154,6 +12211,7 @@ module Temporalio
             | ("result" name, ::Temporalio::Api::Common::V1::Payload? value) -> void
             | ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
             | ("long_poll_token" name, ::String value) -> void
+            | ("completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
         end
 
         class PollNexusOperationExecutionRequest < ::Google::Protobuf::AbstractMessage

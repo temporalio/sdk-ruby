@@ -9,6 +9,7 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::WorkflowCommand
   sig do
     params(
       user_metadata: T.nilable(Temporalio::Api::Sdk::V1::UserMetadata),
+      event_group_markers: T.nilable(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]),
       start_timer: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer),
       schedule_activity: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleActivity),
       respond_to_query: T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCommands::QueryResult),
@@ -35,6 +36,7 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::WorkflowCommand
   end
   def initialize(
     user_metadata: nil,
+    event_group_markers: [],
     start_timer: nil,
     schedule_activity: nil,
     respond_to_query: nil,
@@ -79,6 +81,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::WorkflowCommand
 # per-command basis where applicable.
   sig { void }
   def clear_user_metadata
+  end
+
+  # Event group markers attached to the command. These are forwarded onto
+# the corresponding server-side Command, and consequently surfaced on the
+# resulting HistoryEvent. See `temporal/api/sdk/v1/event_group_marker.proto`.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Sdk::V1::EventGroupMarker)]) }
+  def event_group_markers
+  end
+
+  # Event group markers attached to the command. These are forwarded onto
+# the corresponding server-side Command, and consequently surfaced on the
+# resulting HistoryEvent. See `temporal/api/sdk/v1/event_group_marker.proto`.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def event_group_markers=(value)
+  end
+
+  # Event group markers attached to the command. These are forwarded onto
+# the corresponding server-side Command, and consequently surfaced on the
+# resulting HistoryEvent. See `temporal/api/sdk/v1/event_group_marker.proto`.
+  sig { void }
+  def clear_event_group_markers
   end
 
   sig { returns(T.nilable(Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer)) }
@@ -856,7 +879,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleLocalActivity
       start_to_close_timeout: T.nilable(Google::Protobuf::Duration),
       retry_policy: T.nilable(Temporalio::Api::Common::V1::RetryPolicy),
       local_retry_threshold: T.nilable(Google::Protobuf::Duration),
-      cancellation_type: T.nilable(T.any(Symbol, String, Integer))
+      cancellation_type: T.nilable(T.any(Symbol, String, Integer)),
+      include_arguments_in_marker: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -872,7 +896,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleLocalActivity
     start_to_close_timeout: nil,
     retry_policy: nil,
     local_retry_threshold: nil,
-    cancellation_type: :TRY_CANCEL
+    cancellation_type: :TRY_CANCEL,
+    include_arguments_in_marker: false
   )
   end
 
@@ -1111,6 +1136,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleLocalActivity
 # will default to `TRY_CANCEL` automatically.
   sig { void }
   def clear_cancellation_type
+  end
+
+  # If set, the local activity arguments will be included in the resulting marker under the
+# `input` key. This is disabled by default to avoid increasing history size unless the lang
+# SDK explicitly chooses to expose it.
+  sig { returns(T::Boolean) }
+  def include_arguments_in_marker
+  end
+
+  # If set, the local activity arguments will be included in the resulting marker under the
+# `input` key. This is disabled by default to avoid increasing history size unless the lang
+# SDK explicitly chooses to expose it.
+  sig { params(value: T::Boolean).void }
+  def include_arguments_in_marker=(value)
+  end
+
+  # If set, the local activity arguments will be included in the resulting marker under the
+# `input` key. This is disabled by default to avoid increasing history size unless the lang
+# SDK explicitly chooses to expose it.
+  sig { void }
+  def clear_include_arguments_in_marker
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1817,8 +1863,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::CancelWorkflowExecuti
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
 
-  sig {void}
-  def initialize; end
+  sig do
+    params(
+      details: T.nilable(Temporalio::Api::Common::V1::Payloads)
+    ).void
+  end
+  def initialize(
+    details: nil
+  )
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Payloads)) }
+  def details
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Payloads)).void }
+  def details=(value)
+  end
+
+  sig { void }
+  def clear_details
+  end
 
   sig { params(field: String).returns(T.untyped) }
   def [](field)
@@ -1967,7 +2032,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::StartChildWorkflowExe
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       cancellation_type: T.nilable(T.any(Symbol, String, Integer)),
       versioning_intent: T.nilable(T.any(Symbol, String, Integer)),
-      priority: T.nilable(Temporalio::Api::Common::V1::Priority)
+      priority: T.nilable(Temporalio::Api::Common::V1::Priority),
+      versioning_override: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)
     ).void
   end
   def initialize(
@@ -1989,7 +2055,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::StartChildWorkflowExe
     search_attributes: nil,
     cancellation_type: :ABANDON,
     versioning_intent: :UNSPECIFIED,
-    priority: nil
+    priority: nil,
+    versioning_override: nil
   )
   end
 
@@ -2258,6 +2325,24 @@ class Temporalio::Internal::Bridge::Api::WorkflowCommands::StartChildWorkflowExe
   # The Priority to use for this activity
   sig { void }
   def clear_priority
+  end
+
+  # Allows routing the child independently of the parent's worker deployment version.
+# Requires Temporal Server 1.32+.
+  sig { returns(T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)) }
+  def versioning_override
+  end
+
+  # Allows routing the child independently of the parent's worker deployment version.
+# Requires Temporal Server 1.32+.
+  sig { params(value: T.nilable(Temporalio::Api::Workflow::V1::VersioningOverride)).void }
+  def versioning_override=(value)
+  end
+
+  # Allows routing the child independently of the parent's worker deployment version.
+# Requires Temporal Server 1.32+.
+  sig { void }
+  def clear_versioning_override
   end
 
   sig { params(field: String).returns(T.untyped) }

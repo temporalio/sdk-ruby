@@ -704,7 +704,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
       search_attributes: T.nilable(Temporalio::Api::Common::V1::SearchAttributes),
       start_time: T.nilable(Google::Protobuf::Timestamp),
       root_workflow: T.nilable(Temporalio::Api::Common::V1::WorkflowExecution),
-      priority: T.nilable(Temporalio::Api::Common::V1::Priority)
+      priority: T.nilable(Temporalio::Api::Common::V1::Priority),
+      original_execution_run_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -732,7 +733,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
     search_attributes: nil,
     start_time: nil,
     root_workflow: nil,
-    priority: nil
+    priority: nil,
+    original_execution_run_id: ""
   )
   end
 
@@ -1148,6 +1150,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
   # Priority of this workflow execution
   sig { void }
   def clear_priority
+  end
+
+  # The run id recorded on the `WORKFLOW_EXECUTION_STARTED` event. Unlike the execution's current
+# run id, this value is preserved across workflow resets. Mirrors the `original_execution_run_id`
+# field from `WorkflowExecutionStartedEventAttributes`.
+  sig { returns(String) }
+  def original_execution_run_id
+  end
+
+  # The run id recorded on the `WORKFLOW_EXECUTION_STARTED` event. Unlike the execution's current
+# run id, this value is preserved across workflow resets. Mirrors the `original_execution_run_id`
+# field from `WorkflowExecutionStartedEventAttributes`.
+  sig { params(value: String).void }
+  def original_execution_run_id=(value)
+  end
+
+  # The run id recorded on the `WORKFLOW_EXECUTION_STARTED` event. Unlike the execution's current
+# run id, this value is preserved across workflow resets. Mirrors the `original_execution_run_id`
+# field from `WorkflowExecutionStartedEventAttributes`.
+  sig { void }
+  def clear_original_execution_run_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1995,14 +2018,16 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::SignalWorkflow
       signal_name: T.nilable(String),
       input: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Payload)]),
       identity: T.nilable(String),
-      headers: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Common::V1::Payload)])
+      headers: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Common::V1::Payload)]),
+      originating_event_id: T.nilable(Integer)
     ).void
   end
   def initialize(
     signal_name: "",
     input: [],
     identity: "",
-    headers: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Common::V1::Payload)
+    headers: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Common::V1::Payload),
+    originating_event_id: 0
   )
   end
 
@@ -2058,6 +2083,21 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::SignalWorkflow
   # Headers attached to the signal
   sig { void }
   def clear_headers
+  end
+
+  # Event ID of the `WORKFLOW_EXECUTION_SIGNALED` history event that produced this job.
+  sig { returns(Integer) }
+  def originating_event_id
+  end
+
+  # Event ID of the `WORKFLOW_EXECUTION_SIGNALED` history event that produced this job.
+  sig { params(value: Integer).void }
+  def originating_event_id=(value)
+  end
+
+  # Event ID of the `WORKFLOW_EXECUTION_SIGNALED` history event that produced this job.
+  sig { void }
+  def clear_originating_event_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2161,12 +2201,14 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::ResolveSignalExtern
   sig do
     params(
       seq: T.nilable(Integer),
-      failure: T.nilable(Temporalio::Api::Failure::V1::Failure)
+      failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
     seq: 0,
-    failure: nil
+    failure: nil,
+    cause: :SIGNAL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -2204,6 +2246,24 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::ResolveSignalExtern
 # type / info.
   sig { void }
   def clear_failure
+  end
+
+  # The server-reported cause when the signal failed. Unspecified when the signal succeeded or
+# was cancelled before being sent.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # The server-reported cause when the signal failed. Unspecified when the signal succeeded or
+# was cancelled before being sent.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # The server-reported cause when the signal failed. Unspecified when the signal succeeded or
+# was cancelled before being sent.
+  sig { void }
+  def clear_cause
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2246,12 +2306,14 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::ResolveRequestCance
   sig do
     params(
       seq: T.nilable(Integer),
-      failure: T.nilable(Temporalio::Api::Failure::V1::Failure)
+      failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
     seq: 0,
-    failure: nil
+    failure: nil,
+    cause: :CANCEL_EXTERNAL_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -2273,22 +2335,34 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::ResolveRequestCance
   def clear_seq
   end
 
-  # If populated, this signal either failed to be sent or was cancelled depending on failure
-# type / info.
+  # If populated, the cancellation request failed.
   sig { returns(T.nilable(Temporalio::Api::Failure::V1::Failure)) }
   def failure
   end
 
-  # If populated, this signal either failed to be sent or was cancelled depending on failure
-# type / info.
+  # If populated, the cancellation request failed.
   sig { params(value: T.nilable(Temporalio::Api::Failure::V1::Failure)).void }
   def failure=(value)
   end
 
-  # If populated, this signal either failed to be sent or was cancelled depending on failure
-# type / info.
+  # If populated, the cancellation request failed.
   sig { void }
   def clear_failure
+  end
+
+  # The server-reported cause when the cancellation request failed.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # The server-reported cause when the cancellation request failed.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # The server-reported cause when the cancellation request failed.
+  sig { void }
+  def clear_cause
   end
 
   sig { params(field: String).returns(T.untyped) }

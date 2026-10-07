@@ -86,6 +86,8 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_command_v1_signal_external_workflow_execution_command_attributes: (untyped value) -> void
       def api_command_v1_start_child_workflow_execution_command_attributes: (untyped value) -> void
       def api_command_v1_upsert_workflow_search_attributes_command_attributes: (untyped value) -> void
+      def api_common_v1_callback: (untyped value) -> void
+      def api_common_v1_callback_nexus_handler: (untyped value) -> void
       def api_common_v1_header: (untyped value) -> void
       def api_common_v1_memo: (untyped value) -> void
       def api_common_v1_payloads: (untyped value) -> void
@@ -132,6 +134,8 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_history_v1_workflow_execution_completed_event_attributes: (untyped value) -> void
       def api_history_v1_workflow_execution_continued_as_new_event_attributes: (untyped value) -> void
       def api_history_v1_workflow_execution_failed_event_attributes: (untyped value) -> void
+      def api_history_v1_workflow_execution_options_updated_event_attributes: (untyped value) -> void
+      def api_history_v1_workflow_execution_options_updated_event_attributes_workflow_update_options_update: (untyped value) -> void
       def api_history_v1_workflow_execution_signaled_event_attributes: (untyped value) -> void
       def api_history_v1_workflow_execution_started_event_attributes: (untyped value) -> void
       def api_history_v1_workflow_execution_terminated_event_attributes: (untyped value) -> void
@@ -152,6 +156,7 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_nexus_v1_start_operation_request: (untyped value) -> void
       def api_nexus_v1_start_operation_response: (untyped value) -> void
       def api_nexus_v1_start_operation_response_sync: (untyped value) -> void
+      def api_nexusoperation_v1_callback_info: (untyped value) -> void
       def api_operatorservice_v1_create_nexus_endpoint_request: (untyped value) -> void
       def api_operatorservice_v1_create_nexus_endpoint_response: (untyped value) -> void
       def api_operatorservice_v1_get_nexus_endpoint_response: (untyped value) -> void
@@ -276,6 +281,7 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def coresdk_workflow_activation_signal_workflow: (untyped value) -> void
       def coresdk_workflow_activation_workflow_activation: (untyped value) -> void
       def coresdk_workflow_activation_workflow_activation_job: (untyped value) -> void
+      def coresdk_workflow_commands_cancel_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_complete_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_continue_as_new_workflow_execution: (untyped value) -> void
       def coresdk_workflow_commands_fail_workflow_execution: (untyped value) -> void
