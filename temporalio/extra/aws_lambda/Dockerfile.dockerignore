@@ -1,0 +1,7 @@
+.git
+**/target
+**/tmp
+**/.bundle
+**/doc
+**/sdk-core
+**/.gem_rbs_collection

@@ -108,6 +108,9 @@ class Temporalio::Worker
     &block
   ); end
 
+  sig { void }
+  def _close; end
+
   class << self
     extend T::Sig
 

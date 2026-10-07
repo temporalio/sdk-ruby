@@ -21,6 +21,9 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added `Temporalio::Contrib::Aws::LambdaWorker` for running a Temporal worker during a single AWS Lambda invocation,
+  including optional ADOT tracing and OTLP metrics through `LambdaWorker::OpenTelemetry::Plugin`.
+
 ### Changed
 
 - Priority is no longer marked as experimental.
@@ -35,6 +38,7 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- Preserve automatic TLS selection when environment configuration is combined with an API-key override.
 - Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security
@@ -154,6 +158,9 @@ Client connections now use gzip transport compression by default. Pass
 `Client.connect` or `Client::Connection.new` to opt out.
 
 ### Fixed
+
+- Environment-derived client options no longer emit an implicit `tls: false`, preserving `Client.connect`'s automatic
+  TLS default when an API-key override is added while still honoring explicitly disabled TLS.
 
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
 

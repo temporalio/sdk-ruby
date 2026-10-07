@@ -1,0 +1,37 @@
+module Contrib
+  module Aws
+    class LambdaWorkerOpenTelemetryTest < Test
+      class FakeActivity < Temporalio::Activity::Definition
+        def execute: -> void
+      end
+
+      private
+
+      def build_plugin: (**untyped options) -> [Temporalio::Contrib::Aws::LambdaWorker::OpenTelemetry::Plugin, Temporalio::Runtime]
+      def with_environment: [T] (Hash[String, String?] values) { -> T } -> T
+
+      class FakeTracerProvider
+        attr_reader tracer_names: Array[String]
+        attr_reader flushes: Integer
+
+        def initialize: (?events: Array[Symbol]?) -> void
+        def tracer: (String name) -> untyped
+        def force_flush: -> void
+      end
+
+      class FakeInvocationContext
+        attr_reader aws_request_id: String
+        attr_reader invoked_function_arn: String
+
+        def initialize: -> void
+        def get_remaining_time_in_millis: -> Integer
+      end
+
+      class FakeInvocationWorker
+        def initialize: (Array[Symbol] events) -> void
+        def run: (cancellation: untyped) -> void
+      end
+
+    end
+  end
+end

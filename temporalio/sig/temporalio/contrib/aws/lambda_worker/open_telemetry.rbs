@@ -1,0 +1,45 @@
+module Temporalio
+  module Contrib
+    module Aws
+      class LambdaWorker
+        module OpenTelemetry
+          class Plugin < SimplePlugin
+            class Options
+              attr_reader tracer: untyped
+              attr_reader tracer_provider: untyped
+              attr_reader endpoint: String
+              attr_reader service_name: String?
+              attr_reader metric_periodicity: Float?
+
+              def initialize: (
+                tracer: untyped,
+                tracer_provider: untyped,
+                endpoint: String,
+                service_name: String?,
+                metric_periodicity: Float?
+              ) -> void
+            end
+
+            attr_reader otel_options: Options
+            attr_reader runtime: Runtime
+
+            def initialize: (
+              ?tracer: untyped,
+              ?tracer_provider: untyped,
+              ?endpoint: String?,
+              ?service_name: String?,
+              ?metric_periodicity: Numeric?
+            ) -> void
+
+            def connect_client: (
+              Client::Connection::Options options,
+              ^(Client::Connection::Options) -> Client::Connection next_call
+            ) -> Client::Connection
+
+            def lambda_shutdown_hook: -> ^() -> void
+          end
+        end
+      end
+    end
+  end
+end

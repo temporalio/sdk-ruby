@@ -29,6 +29,20 @@ class ClientTest < Test
     assert client.connection.connected?
   end
 
+  def test_internal_close_releases_core_client
+    connection = Temporalio::Client::Connection.new(**env.client.connection.options.to_h)
+    client = Temporalio::Client.new(**env.client.options.to_h, connection:)
+    core_client = client.connection._core_client
+
+    client.connection._close
+
+    refute client.connection.connected?
+    error = assert_raises(Temporalio::Internal::Bridge::Error) { core_client.update_api_key(nil) }
+    assert_includes error.message, 'Client is closed'
+    core_client.close
+    client.connection._close
+  end
+
   def test_dns_load_balancing_default_nil
     client = Temporalio::Client.connect('localhost:7233', 'default', lazy_connect: true)
     assert_nil client.connection.options.dns_load_balancing

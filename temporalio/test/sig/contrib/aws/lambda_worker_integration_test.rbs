@@ -1,0 +1,42 @@
+module Contrib
+  module Aws
+    class LambdaWorkerIntegrationTest < Test
+      class Context
+        attr_reader aws_request_id: String
+        attr_reader invoked_function_arn: String
+        def initialize: (?remaining_millis: Integer) -> void
+        def get_remaining_time_in_millis: -> Integer
+      end
+
+      class GreetingActivity < Temporalio::Activity::Definition
+        def execute: (String name) -> String
+      end
+
+      class WaitingWorkflow < Temporalio::Workflow::Definition
+        @finish: bool?
+        @ready: bool?
+        def execute: (String name) -> Object?
+        def finish: -> void
+        def self.ready: -> untyped
+      end
+
+      class RetryingActivity < Temporalio::Activity::Definition
+        def initialize: (Thread::Queue[Integer] attempts) -> void
+        def execute: (String name) -> String
+      end
+
+      class RetryingWorkflow < Temporalio::Workflow::Definition
+        def execute: (String name) -> Object?
+      end
+
+      def real_handler: (
+        workflows: Array[singleton(Temporalio::Workflow::Definition)],
+        activities: Array[Temporalio::Activity::Definition | singleton(Temporalio::Activity::Definition)]
+      ) -> [^(Object, Object) -> void, Temporalio::WorkerDeploymentVersion, String,
+            Thread::Queue[^() -> void], Array[Temporalio::Client], Array[Temporalio::Worker]]
+      def run_invocation: (^(Object, Object) -> void handler, Thread::Queue[^() -> void] timers) { () -> untyped } -> void
+      def terminate_workflow: (Temporalio::Client::WorkflowHandle? handle) -> void
+      def wait_until_deployment_registered: (Temporalio::WorkerDeploymentVersion version) -> void
+    end
+  end
+end

@@ -36,6 +36,8 @@ Also see:
       - [ActiveModel](#activemodel)
       - [Converter Hints](#converter-hints)
   - [Workers](#workers)
+    - [AWS Lambda Workers](#aws-lambda-workers)
+      - [ADOT tracing and metrics](#adot-tracing-and-metrics)
   - [Workflows](#workflows)
     - [Workflow Definition](#workflow-definition)
     - [Running Workflows](#running-workflows)
@@ -394,6 +396,78 @@ Notes about the above code:
   shutdown, see the "Activities" section.
 * Workers can have many more options not shown here (e.g. tuners and interceptors).
 * The `Temporalio::Worker.run_all` class method is available for running multiple workers concurrently.
+
+#### AWS Lambda Workers
+
+`Temporalio::Contrib::Aws::LambdaWorker` defines a Lambda handler that creates a fresh Temporal client and worker for
+each invocation. Set `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, and `TEMPORAL_TASK_QUEUE` in the Lambda environment (or
+provide a `temporal.toml` configuration file). The handler resolves configuration during cold start, checking
+`TEMPORAL_CONFIG_FILE`, then `$LAMBDA_TASK_ROOT/temporal.toml`, then `./temporal.toml`, before falling back to
+environment-only configuration.
+
+```ruby
+# lambda_function.rb
+require 'temporalio/contrib/aws/lambda_worker'
+require_relative 'my_activity'
+require_relative 'my_workflow'
+
+VERSION = Temporalio::WorkerDeploymentVersion.new(
+  deployment_name: 'orders',
+  build_id: ENV.fetch('TEMPORAL_WORKER_BUILD_ID')
+)
+
+OPTIONS = Temporalio::Contrib::Aws::LambdaWorker::Options.new(
+  workflows: [MyWorkflow],
+  activities: [MyActivity]
+)
+
+TEMPORAL_LAMBDA_WORKER = Temporalio::Contrib::Aws::LambdaWorker.define(VERSION, options: OPTIONS)
+
+def lambda_handler(event:, context:)
+  TEMPORAL_LAMBDA_WORKER.call(event, context)
+end
+```
+
+The Lambda worker applies Lambda-oriented polling, concurrency, caching, and graceful-shutdown defaults. It reserves
+seven seconds for shutdown by default, uses the Lambda request ID and function ARN as its Temporal identity, and always
+enables Worker Versioning with `PINNED` as the default behavior. Set `default_versioning_behavior:` to
+`Temporalio::VersioningBehavior::AUTO_UPGRADE` to change that default, or use `UNSPECIFIED` to require an explicit
+behavior on every workflow. Use immutable `Options#with` to derive a configuration with client, worker, hook, or plugin
+overrides. Eager activities are always disabled.
+
+Increase `shutdown_buffer:` together with `worker_options: { graceful_shutdown_period: ... }` for longer activity
+drains or telemetry hooks. Activities must cooperate with cancellation for the worker to finish before Lambda's hard
+deadline. Shutdown hooks run in order even after setup or execution fails, and a hook failure does not mask the worker
+error or prevent later hooks from running.
+
+See the [deployable Ruby Lambda sample](temporalio/extra/aws_lambda/README.md) for native gem packaging, a workflow
+starter, and ADOT collector configuration.
+
+WARNING: Plugins are experimental.
+
+##### ADOT tracing and metrics
+
+The optional `LambdaWorker::OpenTelemetry::Plugin` adds the existing Temporal tracing interceptor, exports Core metrics
+to ADOT over OTLP, and flushes the configured tracer provider after each invocation. Configure the application's
+OpenTelemetry SDK and exporter before creating the plugin; the Temporal gem does not install or configure them.
+
+```ruby
+require 'opentelemetry/sdk'
+require 'temporalio/contrib/aws/lambda_worker'
+
+# Configure the application's tracer provider and ADOT exporter before this point.
+adot_plugin = Temporalio::Contrib::Aws::LambdaWorker::OpenTelemetry::Plugin.new
+
+TEMPORAL_LAMBDA_WORKER = Temporalio::Contrib::Aws::LambdaWorker.define(
+  VERSION,
+  options: OPTIONS.with(plugins: [adot_plugin])
+)
+```
+
+The plugin uses `OTEL_EXPORTER_OTLP_ENDPOINT`, or `http://localhost:4317` when it is unset. Its metric service name
+comes from `OTEL_SERVICE_NAME`, then `AWS_LAMBDA_FUNCTION_NAME`, then `temporal-lambda-worker`. Ruby's OTLP trace exporter
+uses HTTP (typically port 4318), while this plugin's Core metrics use gRPC (typically port 4317); configure their
+endpoints separately. `metric_periodicity:` defaults to ten seconds and should be shorter than the invocation budget.
 
 ### Workflows
 

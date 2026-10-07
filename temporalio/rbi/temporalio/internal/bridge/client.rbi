@@ -54,6 +54,9 @@ class Temporalio::Internal::Bridge::Client
 
   sig { params(api_key: T.nilable(String)).void }
   def update_api_key(api_key); end
+
+  sig { void }
+  def close; end
 end
 
 class Temporalio::Internal::Bridge::Client::Options < ::Struct
