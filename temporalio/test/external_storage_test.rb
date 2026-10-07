@@ -152,13 +152,21 @@ class ExternalStorageTest < Test
   end
 
   def test_non_integer_threshold_rejected
-    [nil, '256', 256.0].each do |value|
-      err = assert_raises(ArgumentError) do
-        Temporalio::Converters::ExternalStorage.new(
-          drivers: [InMemoryStorageDriver.new], payload_size_threshold: value # steep:ignore
-        )
+    block = proc do
+      [nil, '256', 256.0].each do |value|
+        err = assert_raises(ArgumentError) do
+          Temporalio::Converters::ExternalStorage.new(
+            drivers: [InMemoryStorageDriver.new], payload_size_threshold: value # steep:ignore
+          )
+        end
+        assert_includes err.message, 'non-negative Integer'
       end
-      assert_includes err.message, 'non-negative Integer'
+    end
+    # Passing the wrong type is the point of this test, so the runtime signature check must not record it.
+    if defined?(SigApplicator)
+      SigApplicator.suppress_errors { block.call }
+    else
+      block.call
     end
   end
 
