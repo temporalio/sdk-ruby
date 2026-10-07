@@ -40,6 +40,19 @@ class ExternalStorageTest < Test
     assert_nil References.parse_reference(payload)
   end
 
+  def test_reference_with_unknown_field_parses
+    # A newer SDK may add fields to the reference before this one knows about them.
+    payload = Temporalio::Api::Common::V1::Payload.new(
+      metadata: { 'encoding' => References::ENCODING, 'messageType' => References::MESSAGE_TYPE },
+      data: '{"driverName":"mem","claimData":{"k":"v"},"fieldFromANewerSdk":42}'
+    )
+
+    reference = References.parse_reference(payload)
+
+    assert_equal 'mem', reference.driver_name
+    assert_equal({ 'k' => 'v' }, reference.claim_data.to_h)
+  end
+
   def test_reference_from_another_sdk_parses
     # Verbatim from the Go SDK's TestClaimDeserialization_OtherSdk_ProtoJSON fixture: compact and differently ordered
     # JSON, which is what another SDK actually puts on the wire.
