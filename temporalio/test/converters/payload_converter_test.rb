@@ -58,14 +58,6 @@ module Converters
         assert_payload some_arr, 'json/plain', 'whatever'
       end
 
-      # Time without addition is a time string (not ISO-8601)
-      time = Time.now
-      assert_payload time, 'json/plain', "\"#{time}\"", expected_decoded_input: time.to_s
-      # Time with addition comes back as the same object (but not very useful
-      # outside of Ruby)
-      require 'json/add/time'
-      assert_payload time, 'json/plain', time.to_json
-
       # Proto payloads with multi-byte UTF-8 characters (em-dash U+2014) are serialized correctly
       proto_with_multibyte = Temporalio::Api::Common::V1::WorkflowExecution.new(workflow_id: 'test — emdash')
       payload = assert_payload(

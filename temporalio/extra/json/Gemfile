@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+
+gemspec path: '../..'
+gem 'json', '~> 3.0'
+
+# RuboCop currently requires JSON 2, so compatibility tests need their own bundle.
+gem 'async'
+gem 'minitest'

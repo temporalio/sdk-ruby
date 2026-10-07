@@ -1,0 +1,11 @@
+module Worker
+  class WorkflowReplayerTest < Test
+    class JSONAddition
+      attr_reader value: Float
+
+      def initialize: (Float value) -> void
+      def self.json_create: (Hash[String, untyped] object) -> JSONAddition
+      def to_json: (*untyped args) -> String
+    end
+  end
+end

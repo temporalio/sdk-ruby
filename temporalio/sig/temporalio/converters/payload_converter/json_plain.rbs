@@ -8,6 +8,10 @@ module Temporalio
           ?parse_options: Hash[Symbol, untyped],
           ?generate_options: Hash[Symbol, untyped]
         ) -> void
+
+        private
+
+        def json3_parse_options: () -> Hash[Symbol, untyped]
       end
     end
   end

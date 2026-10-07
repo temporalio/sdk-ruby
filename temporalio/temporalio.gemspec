@@ -26,6 +26,6 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 3.3.0'
 
   spec.add_dependency 'google-protobuf', '>= 3.25.0'
-  spec.add_dependency 'json', '< 3'
+  spec.add_dependency 'json'
   spec.add_dependency 'logger'
 end

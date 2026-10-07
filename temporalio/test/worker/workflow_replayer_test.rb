@@ -8,6 +8,41 @@ require 'test'
 
 module Worker
   class WorkflowReplayerTest < Test
+    class JSONAddition
+      attr_reader :value
+
+      def self.json_create(object)
+        new(object.fetch('value'))
+      end
+
+      def initialize(value)
+        @value = value
+      end
+
+      def to_json(*args)
+        { 'json_class' => self.class.name, 'value' => value }.to_json(*args) # steep:ignore
+      end
+    end
+
+    class JSONAdditionWorkflow < Temporalio::Workflow::Definition
+      def execute(input)
+        raise 'JSON addition was not restored' unless input['items'].first.is_a?(JSONAddition)
+
+        Temporalio::Workflow.sleep(input['items'].first.value)
+        JSONAddition.new(input['items'].first.value + 1)
+      end
+    end
+
+    def test_json_additions_replay
+      # A history recorded with JSON 2.21.2
+      history = Temporalio::WorkflowHistory.from_history_json(
+        File.read(File.join(__dir__ || raise, 'fixtures', 'json_additions_history.json'))
+      )
+      assert_nil Temporalio::Worker::WorkflowReplayer.new(workflows: [JSONAdditionWorkflow])
+                                                     .replay_workflow(history)
+                                                     .replay_failure
+    end
+
     class SayHelloActivity < Temporalio::Activity::Definition
       def execute(name)
         "Hello, #{name}!"

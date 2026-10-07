@@ -35,7 +35,9 @@ to docs, or any other relevant information.
 
 ### Fixed
 
-- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
+- Support JSON 3 payload decoding, including nested `json_create` additions and encoded failure attributes, while
+  retaining native JSON 2 support. JSON 3 applications using `JSON.create_id`
+  or built-in `json/add/*` serializers must migrate those serializers.
 
 ### Security
 

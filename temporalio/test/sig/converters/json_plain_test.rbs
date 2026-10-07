@@ -1,0 +1,25 @@
+module Converters
+  class JSONPlainTest < Test
+    class Addition
+      attr_reader value: untyped
+
+      def initialize: (untyped value) -> void
+      def self.json_create: (Hash[String, untyped] object) -> Addition
+      def to_json: (*untyped args) -> String
+    end
+
+    class NonCreatableAddition < Addition
+      def self.json_creatable?: () -> bool
+    end
+
+    class ObjectHash < Hash[untyped, untyped]
+    end
+
+    class ObjectArray < Array[untyped]
+    end
+
+    private
+
+    def payload: (String json) -> Temporalio::Api::Common::V1::Payload
+  end
+end

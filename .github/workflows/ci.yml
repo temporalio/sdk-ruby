@@ -161,6 +161,20 @@ jobs:
 
         run: bundle exec rake test TESTOPTS="--verbose"
 
+        # If we ever need addtitional gem-version tests we should adopt
+        # https://github.com/thoughtbot/appraisal
+      - name: Test JSON 3 compatibility and replay
+        if: ${{ matrix.os == 'ubuntu-latest' && !matrix.fips }}
+        working-directory: ./temporalio
+        env:
+          BUNDLE_FROZEN: "true"
+          BUNDLE_GEMFILE: extra/json/Gemfile
+        run: |
+          json_bundle_path="$(BUNDLE_GEMFILE=Gemfile bundle exec ruby -rbundler -e 'puts Bundler.bundle_path')"
+          export BUNDLE_PATH="$json_bundle_path"
+          bundle install
+          bundle exec ruby -Ilib -Itest extra/json/test.rb
+
       - name: Deploy docs
         # Only deploy on main merge, not in PRs
         if: ${{ github.ref == 'refs/heads/main' && matrix.docsTarget }}

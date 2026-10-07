@@ -14,7 +14,8 @@ module Temporalio
 
         # Create JSONPlain converter.
         #
-        # @param parse_options [Hash] Options for {::JSON.parse}.
+        # @param parse_options [Hash] Options for {::JSON.parse}. If using json >3, this converter supports
+        #   +create_additions+ through parser callbacks so existing +json_class+ payloads can still be restored.
         # @param generate_options [Hash] Options for {::JSON.generate}.
         def initialize(parse_options: { create_additions: true }, generate_options: {})
           super()
@@ -46,14 +47,38 @@ module Temporalio
 
         # (see Encoding.from_payload)
         def from_payload(payload, hint: nil) # rubocop:disable Lint/UnusedMethodArgument
+          parse_options = JSON::VERSION.to_i >= 3 ? json3_parse_options : @parse_options
           # See comment in to_payload about why we have to do something different in workflow
           if Temporalio::Workflow.in_workflow?
             Temporalio::Workflow::Unsafe.durable_scheduler_disabled do
-              JSON.parse(payload.data, @parse_options)
+              JSON.parse(payload.data, **parse_options)
             end
           else
-            JSON.parse(payload.data, @parse_options)
+            JSON.parse(payload.data, **parse_options)
           end
+        end
+
+        private
+
+        def json3_parse_options
+          options = @parse_options.dup
+          return options unless options.delete(:create_additions)
+
+          on_load = options[:on_load]
+          options[:on_load] = lambda do |object|
+            if object.is_a?(Hash) && (class_path = object['json_class'])
+              klass = begin
+                Object.const_get(class_path)
+              rescue NameError => e
+                raise ArgumentError, "can't get const #{class_path}: #{e}"
+              end
+              if klass.respond_to?(:json_creatable?) ? klass.json_creatable? : klass.respond_to?(:json_create)
+                object = klass.json_create(object)
+              end
+            end
+            on_load.nil? ? object : on_load.call(object)
+          end
+          options
         end
       end
     end
