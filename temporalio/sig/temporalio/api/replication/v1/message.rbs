@@ -15,18 +15,29 @@ module Temporalio
           attr_writer cluster_name(): ::String | ::Symbol
           def clear_cluster_name: () -> void
 
+          # Ramp duration when this cluster is added as passive by UpdateNamespace; unset or non-positive disables gradual connect.
+          # This field is not persisted and is omitted from namespace responses.
+          attr_reader replication_ramp_duration(): ::Google::Protobuf::Duration?
+          attr_writer replication_ramp_duration(): (::Google::Protobuf::Duration | ::int)?
+          def has_replication_ramp_duration?: () -> bool
+          def clear_replication_ramp_duration: () -> void
+
           type init_map = {
             cluster_name: (::String | ::Symbol)?,
             "cluster_name" => (::String | ::Symbol)?,
+            replication_ramp_duration: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            "replication_ramp_duration" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
           }
 
           def initialize: (?init_map initial_value) -> void
 
           def []:
               ("cluster_name" name) -> ::String
+            | ("replication_ramp_duration" name) -> ::Google::Protobuf::Duration?
 
           def []=:
               ("cluster_name" name, (::String | ::Symbol) value) -> void
+            | ("replication_ramp_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
         end
 
         class NamespaceReplicationConfig < ::Google::Protobuf::AbstractMessage

@@ -13,5 +13,12 @@ module Temporalio
         def initialize: -> void
         def _to_proto: -> Api::Workflow::V1::VersioningOverride
     end
+
+    class OneTime < VersioningOverride
+        attr_reader target_version: WorkerDeploymentVersion
+
+        def initialize: (WorkerDeploymentVersion target_version) -> void
+        def _to_proto: -> Api::Workflow::V1::VersioningOverride
+    end
   end
 end

@@ -5,6 +5,16 @@ class Temporalio::Error < ::StandardError
   def self.canceled?(error); end
 end
 
+class Temporalio::Error::InvalidVersioningOverrideError < ::Temporalio::Error::Failure
+  sig { void }
+  def initialize; end
+end
+
+class Temporalio::Error::NamespaceNotFoundError < ::Temporalio::Error::Failure
+  sig { void }
+  def initialize; end
+end
+
 class Temporalio::Error::WorkflowAlreadyStartedError < ::Temporalio::Error::Failure
   sig { params(workflow_id: String, workflow_type: String, run_id: T.nilable(String)).void }
   def initialize(workflow_id:, workflow_type:, run_id:); end

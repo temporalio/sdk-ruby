@@ -200,6 +200,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
       memo: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)]),
       search_attributes: T.nilable(Temporalio::SearchAttributes),
       priority: Temporalio::Priority,
+      versioning_override: T.nilable(Temporalio::VersioningOverride),
       arg_hints: T.nilable(T::Array[Object]),
       result_hint: T.nilable(Object)
     ).returns(Temporalio::Internal::Worker::WorkflowInstance::ChildWorkflowHandle)
@@ -223,6 +224,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Context
     memo:,
     search_attributes:,
     priority:,
+    versioning_override:,
     arg_hints:,
     result_hint:
   ); end

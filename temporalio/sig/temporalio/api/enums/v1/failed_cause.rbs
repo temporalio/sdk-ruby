@@ -142,6 +142,40 @@ module Temporalio
           type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40
         end
 
+        # Activity tasks can fail for various reasons. Note that some of these reasons can only originate
+        # from the server, and some of them can only originate from the SDK/worker.
+        module ActivityTaskFailedCause
+
+          ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED: 0
+
+          # A payload-bearing field on a request the worker sent for this activity task exceeded the
+          # per-field size limit configured on the server for the namespace.
+          # Check the activity task failure message for more information.
+          ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE: 1
+
+          # The worker failed to offload a payload to, or retrieve one from, external storage while
+          # processing this activity task.
+          # Check the activity task failure message for more information.
+          ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE: 2
+
+          # The default cause for an activity task failure reported by a worker; a more specific cause
+          # takes precedence whenever the condition is recognized.
+          # Check the activity task failure message for more information.
+          ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE: 3
+
+          def self.lookup: (::Integer number) -> ::Symbol
+
+
+          def self.resolve: (::Symbol name) -> ::Integer
+
+
+          type names = :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED | :ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE | :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE | :ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE
+
+          type strings = "ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED" | "ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE" | "ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE" | "ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE"
+
+          type numbers = 0 | 1 | 2 | 3
+        end
+
         module StartChildWorkflowExecutionFailedCause
 
           START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED: 0
@@ -244,27 +278,30 @@ module Temporalio
           # Limits related to Worker Deployments are reached.
           RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS: 10
 
+          # Namespace exceeds bandwidth limit.
+          RESOURCE_EXHAUSTED_CAUSE_BANDWIDTH_LIMIT: 11
+
           def self.lookup: (::Integer number) -> ::Symbol
 
 
           def self.resolve: (::Symbol name) -> ::Integer
 
 
-          type names = :RESOURCE_EXHAUSTED_CAUSE_UNSPECIFIED | :RESOURCE_EXHAUSTED_CAUSE_RPS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_CONCURRENT_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_SYSTEM_OVERLOADED | :RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_BUSY_WORKFLOW | :RESOURCE_EXHAUSTED_CAUSE_APS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_STORAGE_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN | :RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS
+          type names = :RESOURCE_EXHAUSTED_CAUSE_UNSPECIFIED | :RESOURCE_EXHAUSTED_CAUSE_RPS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_CONCURRENT_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_SYSTEM_OVERLOADED | :RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_BUSY_WORKFLOW | :RESOURCE_EXHAUSTED_CAUSE_APS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_STORAGE_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN | :RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT | :RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS | :RESOURCE_EXHAUSTED_CAUSE_BANDWIDTH_LIMIT
 
-          type strings = "RESOURCE_EXHAUSTED_CAUSE_UNSPECIFIED" | "RESOURCE_EXHAUSTED_CAUSE_RPS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_CONCURRENT_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_SYSTEM_OVERLOADED" | "RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_BUSY_WORKFLOW" | "RESOURCE_EXHAUSTED_CAUSE_APS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_STORAGE_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN" | "RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS"
+          type strings = "RESOURCE_EXHAUSTED_CAUSE_UNSPECIFIED" | "RESOURCE_EXHAUSTED_CAUSE_RPS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_CONCURRENT_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_SYSTEM_OVERLOADED" | "RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_BUSY_WORKFLOW" | "RESOURCE_EXHAUSTED_CAUSE_APS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_PERSISTENCE_STORAGE_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_CIRCUIT_BREAKER_OPEN" | "RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT" | "RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS" | "RESOURCE_EXHAUSTED_CAUSE_BANDWIDTH_LIMIT"
 
-          type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+          type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
         end
 
         module ResourceExhaustedScope
 
           RESOURCE_EXHAUSTED_SCOPE_UNSPECIFIED: 0
 
-          # Exhausted resource is a system-level resource.
+          # Exhausted resource is a namespace-level resource.
           RESOURCE_EXHAUSTED_SCOPE_NAMESPACE: 1
 
-          # Exhausted resource is a namespace-level resource.
+          # Exhausted resource is a system-level resource.
           RESOURCE_EXHAUSTED_SCOPE_SYSTEM: 2
 
           def self.lookup: (::Integer number) -> ::Symbol

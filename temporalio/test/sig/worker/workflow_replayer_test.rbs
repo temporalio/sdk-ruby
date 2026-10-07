@@ -1,0 +1,5 @@
+module Worker
+  class WorkflowReplayerTest < Test
+    def replay_child_start_failure: (Symbol cause, String expected_cause) -> void
+  end
+end

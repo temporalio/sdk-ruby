@@ -295,6 +295,7 @@ module Temporalio
           :memo,
           :search_attributes,
           :priority,
+          :versioning_override,
           :arg_hints,
           :result_hint,
           :headers

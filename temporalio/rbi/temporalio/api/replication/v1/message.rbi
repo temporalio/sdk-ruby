@@ -8,11 +8,13 @@ class Temporalio::Api::Replication::V1::ClusterReplicationConfig
 
   sig do
     params(
-      cluster_name: T.nilable(String)
+      cluster_name: T.nilable(String),
+      replication_ramp_duration: T.nilable(Google::Protobuf::Duration)
     ).void
   end
   def initialize(
-    cluster_name: ""
+    cluster_name: "",
+    replication_ramp_duration: nil
   )
   end
 
@@ -26,6 +28,24 @@ class Temporalio::Api::Replication::V1::ClusterReplicationConfig
 
   sig { void }
   def clear_cluster_name
+  end
+
+  # Ramp duration when this cluster is added as passive by UpdateNamespace; unset or non-positive disables gradual connect.
+# This field is not persisted and is omitted from namespace responses.
+  sig { returns(T.nilable(Google::Protobuf::Duration)) }
+  def replication_ramp_duration
+  end
+
+  # Ramp duration when this cluster is added as passive by UpdateNamespace; unset or non-positive disables gradual connect.
+# This field is not persisted and is omitted from namespace responses.
+  sig { params(value: T.nilable(Google::Protobuf::Duration)).void }
+  def replication_ramp_duration=(value)
+  end
+
+  # Ramp duration when this cluster is added as passive by UpdateNamespace; unset or non-positive disables gradual connect.
+# This field is not persisted and is omitted from namespace responses.
+  sig { void }
+  def clear_replication_ramp_duration
   end
 
   sig { params(field: String).returns(T.untyped) }

@@ -9,6 +9,22 @@ module Temporalio
     class Failure < Error
     end
 
+    # Cause of {ChildWorkflowError} when the server rejects the child's versioning override.
+    class InvalidVersioningOverrideError < Failure
+      # @!visibility private
+      def initialize
+        super('Invalid versioning override')
+      end
+    end
+
+    # Cause of {ChildWorkflowError} when the child's namespace does not exist.
+    class NamespaceNotFoundError < Failure
+      # @!visibility private
+      def initialize
+        super('Namespace not found')
+      end
+    end
+
     # Error raised by a client or workflow when a workflow execution has already started.
     class WorkflowAlreadyStartedError < Failure
       # @return [String] ID of the already-started workflow.

@@ -486,8 +486,7 @@ class Temporalio::Api::Common::V1::WorkflowExecution
   end
 end
 
-# Identifies a specific execution within a namespace. This is used for standalone activities
-# executions in batch jobs currently.
+# Identifies a specific execution within a namespace.
 class Temporalio::Api::Common::V1::Execution
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -1314,12 +1313,14 @@ class Temporalio::Api::Common::V1::Callback
     params(
       nexus: T.nilable(Temporalio::Api::Common::V1::Callback::Nexus),
       internal: T.nilable(Temporalio::Api::Common::V1::Callback::Internal),
+      nexus_handler: T.nilable(Temporalio::Api::Common::V1::Callback::NexusHandler),
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)])
     ).void
   end
   def initialize(
     nexus: nil,
     internal: nil,
+    nexus_handler: nil,
     links: []
   )
   end
@@ -1346,6 +1347,18 @@ class Temporalio::Api::Common::V1::Callback
 
   sig { void }
   def clear_internal
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Callback::NexusHandler)) }
+  def nexus_handler
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Callback::NexusHandler)).void }
+  def nexus_handler=(value)
+  end
+
+  sig { void }
+  def clear_nexus_handler
   end
 
   # Links associated with the callback. It can be used to link to underlying resources of the
@@ -1417,7 +1430,8 @@ class Temporalio::Api::Common::V1::Link
       batch_job: T.nilable(Temporalio::Api::Common::V1::Link::BatchJob),
       activity: T.nilable(Temporalio::Api::Common::V1::Link::Activity),
       nexus_operation: T.nilable(Temporalio::Api::Common::V1::Link::NexusOperation),
-      workflow: T.nilable(Temporalio::Api::Common::V1::Link::Workflow)
+      workflow: T.nilable(Temporalio::Api::Common::V1::Link::Workflow),
+      callback: T.nilable(Temporalio::Api::Common::V1::Link::Callback)
     ).void
   end
   def initialize(
@@ -1425,7 +1439,8 @@ class Temporalio::Api::Common::V1::Link
     batch_job: nil,
     activity: nil,
     nexus_operation: nil,
-    workflow: nil
+    workflow: nil,
+    callback: nil
   )
   end
 
@@ -1487,6 +1502,18 @@ class Temporalio::Api::Common::V1::Link
 
   sig { void }
   def clear_workflow
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Link::Callback)) }
+  def callback
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Link::Callback)).void }
+  def callback=(value)
+  end
+
+  sig { void }
+  def clear_callback
   end
 
   sig { returns(T.nilable(Symbol)) }
@@ -2702,6 +2729,8 @@ class Temporalio::Api::Common::V1::Payload::ExternalPayloadDetails
   end
 end
 
+# Nexus callbacks are used to delivery Nexus operation completions, as defined in the Nexus RPC spec:
+# https://github.com/nexus-rpc/api/blob/main/SPEC.md#callback-urls
 class Temporalio::Api::Common::V1::Callback::Nexus
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2839,6 +2868,152 @@ class Temporalio::Api::Common::V1::Callback::Internal
   end
 
   sig { params(msg: Temporalio::Api::Common::V1::Callback::Internal, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# NexusHandler callbacks are requests to invoke a specific shape of Nexus operation on a Temporal worker.
+# The specified Nexus operation must have the following:
+# - Input:  temporal.api.notificationservice.v1.OnCompleteRequest
+# - Output: temporal.api.notificationservice.v1.OnCompleteResponse
+#
+# The targeted Nexus service must be registered within the same namespace as the source operation
+# the callback is attached to. (While Nexus allows for cross-namespace operations, NexusHandler callbacks
+# are strictly caller-side.)
+#
+# NexusHandler callbacks are only supported for certain types of operations, e.g. standalone Nexus operations.
+# Attempting to attach a Worker callback for an unsupported operation will result in an INVALID_ARGUMENT
+# error from the server.
+class Temporalio::Api::Common::V1::Callback::NexusHandler
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      task_queue_name: T.nilable(String),
+      service: T.nilable(String),
+      operation: T.nilable(String),
+      source_context: T.nilable(Temporalio::Api::Common::V1::Payload)
+    ).void
+  end
+  def initialize(
+    task_queue_name: "",
+    service: "",
+    operation: "",
+    source_context: nil
+  )
+  end
+
+  # Nexus task queue the Temporal worker is listening on.
+#
+# NOTE: This is not a temporal.api.taskqueue.v1.TaskQueue to avoid a circular dependency.
+  sig { returns(String) }
+  def task_queue_name
+  end
+
+  # Nexus task queue the Temporal worker is listening on.
+#
+# NOTE: This is not a temporal.api.taskqueue.v1.TaskQueue to avoid a circular dependency.
+  sig { params(value: String).void }
+  def task_queue_name=(value)
+  end
+
+  # Nexus task queue the Temporal worker is listening on.
+#
+# NOTE: This is not a temporal.api.taskqueue.v1.TaskQueue to avoid a circular dependency.
+  sig { void }
+  def clear_task_queue_name
+  end
+
+  # Target Nexus service, e.g. "HTTPAdapter".
+  sig { returns(String) }
+  def service
+  end
+
+  # Target Nexus service, e.g. "HTTPAdapter".
+  sig { params(value: String).void }
+  def service=(value)
+  end
+
+  # Target Nexus service, e.g. "HTTPAdapter".
+  sig { void }
+  def clear_service
+  end
+
+  # Target operation, e.g. "DeliverAsWebhook".
+  sig { returns(String) }
+  def operation
+  end
+
+  # Target operation, e.g. "DeliverAsWebhook".
+  sig { params(value: String).void }
+  def operation=(value)
+  end
+
+  # Target operation, e.g. "DeliverAsWebhook".
+  sig { void }
+  def clear_operation
+  end
+
+  # Arbitrary user-supplied data from the source operation's callsite. (As applicable, not all operations
+# support attaching context data.)
+#
+# There are restrictions on the maxium payload size a single callback can carry, as well as the
+# total sum of all source context payloads attached to an execution. See dynamic configuration:
+# "callback.nexusHandler.sourceContext.maxSize", "callback.nexusHandler.sourceContext.aggregateMaxSize".
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Payload)) }
+  def source_context
+  end
+
+  # Arbitrary user-supplied data from the source operation's callsite. (As applicable, not all operations
+# support attaching context data.)
+#
+# There are restrictions on the maxium payload size a single callback can carry, as well as the
+# total sum of all source context payloads attached to an execution. See dynamic configuration:
+# "callback.nexusHandler.sourceContext.maxSize", "callback.nexusHandler.sourceContext.aggregateMaxSize".
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Payload)).void }
+  def source_context=(value)
+  end
+
+  # Arbitrary user-supplied data from the source operation's callsite. (As applicable, not all operations
+# support attaching context data.)
+#
+# There are restrictions on the maxium payload size a single callback can carry, as well as the
+# total sum of all source context payloads attached to an execution. See dynamic configuration:
+# "callback.nexusHandler.sourceContext.maxSize", "callback.nexusHandler.sourceContext.aggregateMaxSize".
+  sig { void }
+  def clear_source_context
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::Callback::NexusHandler) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Callback::NexusHandler).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::Callback::NexusHandler) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Callback::NexusHandler, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -3300,6 +3475,121 @@ class Temporalio::Api::Common::V1::Link::Workflow
   end
 
   sig { params(msg: Temporalio::Api::Common::V1::Link::Workflow, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# A link to a worker callback attached to an execution. An execution (e.g. standalone Nexus operation) can have
+# multiple callbacks attached, and will be differentiated by the request_id used when the callback is invoked.
+class Temporalio::Api::Common::V1::Link::Callback
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      execution: T.nilable(Temporalio::Api::Common::V1::Execution),
+      component_path: T.nilable(T::Array[String]),
+      request_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    execution: nil,
+    component_path: [],
+    request_id: ""
+  )
+  end
+
+  sig { returns(String) }
+  def namespace
+  end
+
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::Execution)) }
+  def execution
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::Execution)).void }
+  def execution=(value)
+  end
+
+  sig { void }
+  def clear_execution
+  end
+
+  # In most cases, the Execution is sufficient to identify the callback's source. But the callback could have
+# been attached some child component of that execution. e.g. a workflow update. The component path describes
+# the unique component as applicable, typically ending with a unique ID. e.g. ["Update", $workflowUpdateId ]
+  sig { returns(T::Array[String]) }
+  def component_path
+  end
+
+  # In most cases, the Execution is sufficient to identify the callback's source. But the callback could have
+# been attached some child component of that execution. e.g. a workflow update. The component path describes
+# the unique component as applicable, typically ending with a unique ID. e.g. ["Update", $workflowUpdateId ]
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def component_path=(value)
+  end
+
+  # In most cases, the Execution is sufficient to identify the callback's source. But the callback could have
+# been attached some child component of that execution. e.g. a workflow update. The component path describes
+# the unique component as applicable, typically ending with a unique ID. e.g. ["Update", $workflowUpdateId ]
+  sig { void }
+  def clear_component_path
+  end
+
+  # Server-generate request ID sent when the callback was dispatched.
+  sig { returns(String) }
+  def request_id
+  end
+
+  # Server-generate request ID sent when the callback was dispatched.
+  sig { params(value: String).void }
+  def request_id=(value)
+  end
+
+  # Server-generate request ID sent when the callback was dispatched.
+  sig { void }
+  def clear_request_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::Link::Callback) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Link::Callback).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::Link::Callback) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::Link::Callback, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

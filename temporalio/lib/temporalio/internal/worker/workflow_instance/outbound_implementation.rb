@@ -367,7 +367,8 @@ module Temporalio
                   memo: ProtoUtils.memo_to_proto_hash(input.memo, @instance.payload_converter),
                   search_attributes: input.search_attributes&._to_proto,
                   cancellation_type: input.cancellation_type,
-                  priority: input.priority._to_proto
+                  priority: input.priority._to_proto,
+                  versioning_override: input.versioning_override&._to_proto
                 ),
                 user_metadata: ProtoUtils.to_user_metadata(
                   input.static_summary, input.static_details, @instance.payload_converter
@@ -415,14 +416,31 @@ module Temporalio
             when :failed
               # Remove cancel callback and handle failure
               input.cancellation.remove_cancel_callback(cancel_callback_key)
-              if resolution.failed.cause == :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS
+              case resolution.failed.cause
+              when :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS
                 raise Error::WorkflowAlreadyStartedError.new(
                   workflow_id: resolution.failed.workflow_id,
                   workflow_type: resolution.failed.workflow_type,
                   run_id: nil
                 )
+              when :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID_VERSIONING_OVERRIDE
+                cause = Error::InvalidVersioningOverrideError.new
+              when :START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND
+                cause = Error::NamespaceNotFoundError.new
+              else
+                raise "Unknown child start fail cause: #{resolution.failed.cause}"
               end
-              raise "Unknown child start fail cause: #{resolution.failed.cause}"
+              # Core does not supply event IDs or a run ID when the child never started.
+              raise Error::ChildWorkflowError.new(
+                'Child workflow failed to start',
+                namespace: @instance.info.namespace,
+                workflow_id: resolution.failed.workflow_id,
+                run_id: '',
+                workflow_type: resolution.failed.workflow_type,
+                initiated_event_id: 0,
+                started_event_id: 0,
+                retry_state: nil
+              ), cause: cause
             when :cancelled
               # Remove cancel callback and handle cancel
               input.cancellation.remove_cancel_callback(cancel_callback_key)

@@ -57,6 +57,12 @@ module Temporalio
           attr_writer blocked_reason(): ::String | ::Symbol
           def clear_blocked_reason: () -> void
 
+          # Server-generated request ID used as an idempotency token when invoking callbacks.
+          # It has no relation to caller-side request_id sent in operations like StartNexusOperationExecutionRequest.
+          attr_reader request_id(): ::String
+          attr_writer request_id(): ::String | ::Symbol
+          def clear_request_id: () -> void
+
           type init_map = {
             callback: (::Temporalio::Api::Common::V1::Callback | ::Temporalio::Api::Common::V1::Callback::init_map)?,
             "callback" => (::Temporalio::Api::Common::V1::Callback | ::Temporalio::Api::Common::V1::Callback::init_map)?,
@@ -74,6 +80,8 @@ module Temporalio
             "next_attempt_schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             blocked_reason: (::String | ::Symbol)?,
             "blocked_reason" => (::String | ::Symbol)?,
+            request_id: (::String | ::Symbol)?,
+            "request_id" => (::String | ::Symbol)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -87,6 +95,7 @@ module Temporalio
             | ("last_attempt_failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
             | ("next_attempt_schedule_time" name) -> ::Google::Protobuf::Timestamp?
             | ("blocked_reason" name) -> ::String
+            | ("request_id" name) -> ::String
 
           def []=:
               ("callback" name, ::Temporalio::Api::Common::V1::Callback? value) -> void
@@ -97,6 +106,7 @@ module Temporalio
             | ("last_attempt_failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
             | ("next_attempt_schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
             | ("blocked_reason" name, (::String | ::Symbol) value) -> void
+            | ("request_id" name, (::String | ::Symbol) value) -> void
         end
       end
     end

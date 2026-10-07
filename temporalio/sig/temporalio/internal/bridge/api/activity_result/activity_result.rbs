@@ -137,18 +137,29 @@ module Temporalio
             def has_failure?: () -> bool
             def clear_failure: () -> void
 
+            # Only meaningful on ActivityExecutionResult (lang -> core); ignored on ActivityResolution,
+            # which reuses this message.
+            attr_reader cause(): ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Integer
+            attr_writer cause(): ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::strings | ::Integer | ::Float
+            attr_reader cause_const(): ::Integer
+            def clear_cause: () -> void
+
             type init_map = {
               failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
               "failure" => (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
+              cause: (::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
+              "cause" => (::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::strings | ::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
 
             def []:
                 ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
+              | ("cause" name) -> (::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Integer)
 
             def []=:
                 ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
+              | ("cause" name, (::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::names | ::Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause::strings | ::Integer | ::Float) value) -> void
           end
 
           # Used to report cancellation from both Core and Lang.
@@ -231,6 +242,41 @@ module Temporalio
                 ("attempt" name, (::Integer | ::Float) value) -> void
               | ("backoff_duration" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
               | ("original_schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+          end
+
+          # A well-known condition that caused an activity task to fail. Lang reports one alongside the
+          # failure so core can categorize activity failures instead of treating them all alike; it becomes
+          # the `failure_reason` metric label, so the set of values is deliberately small and bounded.
+          module ActivityTaskFailedCause
+
+            ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED: 0
+
+            # A payload-bearing field on a request the worker sent for this activity task exceeded the
+            # per-field size limit configured on the server for the namespace.
+            # Check the activity task failure message for more information.
+            ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE: 1
+
+            # The worker failed to offload a payload to, or retrieve one from, external storage while
+            # processing this activity task.
+            # Check the activity task failure message for more information.
+            ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE: 2
+
+            # The default cause for an activity task failure reported by a worker; a more specific cause
+            # takes precedence whenever the condition is recognized.
+            # Check the activity task failure message for more information.
+            ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE: 3
+
+            def self.lookup: (::Integer number) -> ::Symbol
+
+
+            def self.resolve: (::Symbol name) -> ::Integer
+
+
+            type names = :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED | :ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE | :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE | :ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE
+
+            type strings = "ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED" | "ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE" | "ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE" | "ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE"
+
+            type numbers = 0 | 1 | 2 | 3
           end
         end
       end

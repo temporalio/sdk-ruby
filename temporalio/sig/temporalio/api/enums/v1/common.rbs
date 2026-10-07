@@ -105,7 +105,7 @@ module Temporalio
           # Callback has succeeded.
           CALLBACK_STATE_SUCCEEDED: 5
 
-          # Callback is blocked (eg: by circuit breaker).
+          # Callback is blocked, e.g. by circuit breaker.
           CALLBACK_STATE_BLOCKED: 6
 
           def self.lookup: (::Integer number) -> ::Symbol
@@ -268,17 +268,20 @@ module Temporalio
           # An activity execution archetype. This is reserved for standalone activities.
           EXECUTION_TYPE_ACTIVITY: 2
 
+          # A Nexus operation execution archetype. This is reserved for standalone Nexus operations.
+          EXECUTION_TYPE_NEXUS_OPERATION: 3
+
           def self.lookup: (::Integer number) -> ::Symbol
 
 
           def self.resolve: (::Symbol name) -> ::Integer
 
 
-          type names = :EXECUTION_TYPE_UNSPECIFIED | :EXECUTION_TYPE_WORKFLOW | :EXECUTION_TYPE_ACTIVITY
+          type names = :EXECUTION_TYPE_UNSPECIFIED | :EXECUTION_TYPE_WORKFLOW | :EXECUTION_TYPE_ACTIVITY | :EXECUTION_TYPE_NEXUS_OPERATION
 
-          type strings = "EXECUTION_TYPE_UNSPECIFIED" | "EXECUTION_TYPE_WORKFLOW" | "EXECUTION_TYPE_ACTIVITY"
+          type strings = "EXECUTION_TYPE_UNSPECIFIED" | "EXECUTION_TYPE_WORKFLOW" | "EXECUTION_TYPE_ACTIVITY" | "EXECUTION_TYPE_NEXUS_OPERATION"
 
-          type numbers = 0 | 1 | 2
+          type numbers = 0 | 1 | 2 | 3
         end
       end
     end

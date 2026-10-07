@@ -14,7 +14,8 @@ class Temporalio::Internal::Bridge::Api::ExternalData::LocalActivityMarkerData
       activity_type: T.nilable(String),
       complete_time: T.nilable(Google::Protobuf::Timestamp),
       backoff: T.nilable(Google::Protobuf::Duration),
-      original_schedule_time: T.nilable(Google::Protobuf::Timestamp)
+      original_schedule_time: T.nilable(Google::Protobuf::Timestamp),
+      activation_index: T.nilable(Integer)
     ).void
   end
   def initialize(
@@ -24,7 +25,8 @@ class Temporalio::Internal::Bridge::Api::ExternalData::LocalActivityMarkerData
     activity_type: "",
     complete_time: nil,
     backoff: nil,
-    original_schedule_time: nil
+    original_schedule_time: nil,
+    activation_index: 0
   )
   end
 
@@ -140,6 +142,31 @@ class Temporalio::Internal::Bridge::Api::ExternalData::LocalActivityMarkerData
 # schedule-to-close timeouts when timer-based backoffs are used
   sig { void }
   def clear_original_schedule_time
+  end
+
+  # Position, within the workflow task, of the activation this resolution was delivered in.
+# Replay must deliver resolutions in the same activations because workflow code can branch on
+# which handles are ready. Absent in markers written by Core versions that predate this field.
+  sig { returns(Integer) }
+  def activation_index
+  end
+
+  # Position, within the workflow task, of the activation this resolution was delivered in.
+# Replay must deliver resolutions in the same activations because workflow code can branch on
+# which handles are ready. Absent in markers written by Core versions that predate this field.
+  sig { params(value: Integer).void }
+  def activation_index=(value)
+  end
+
+  # Position, within the workflow task, of the activation this resolution was delivered in.
+# Replay must deliver resolutions in the same activations because workflow code can branch on
+# which handles are ready. Absent in markers written by Core versions that predate this field.
+  sig { void }
+  def clear_activation_index
+  end
+
+  sig { returns(T::Boolean) }
+  def has_activation_index?
   end
 
   sig { params(field: String).returns(T.untyped) }
