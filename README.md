@@ -557,13 +557,6 @@ Some things to note about the above code:
   wait on the `result`, and the ability to `signal` the child.
 * The `start_child_workflow` call does not complete until the start has been accepted by the server.
 * A helper `execute_child_workflow` method is available that is just `start_child_workflow` + handle `result`.
-* Both methods accept experimental `versioning_override:` to route a child independently of its parent. Use
-  `Temporalio::VersioningOverride::Pinned.new(version)` to pin it,
-  `Temporalio::VersioningOverride::AutoUpgrade.new` to auto-upgrade it, or
-  `Temporalio::VersioningOverride::OneTime.new(version)` to route to a target until a workflow task completes there,
-  then resume normal versioning behavior. These child overrides require Temporal Server 1.32.0 or later.
-  Without an override, normal inheritance applies. A rejected override raises `Temporalio::Error::ChildWorkflowError`
-  with a `Temporalio::Error::InvalidVersioningOverrideError` cause.
 
 #### Timers and Conditions
 
