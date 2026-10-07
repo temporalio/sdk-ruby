@@ -19,9 +19,10 @@ module Temporalio
       # @param claim_data [Hash<String, String>] Data identifying the stored payload.
       def initialize(claim_data:)
         # Copied and frozen because a claim is compared and hashed by this data, so a later mutation would silently
-        # change its identity.
+        # change its identity. The values are copied individually because freezing the Hash leaves them mutable in
+        # place and still aliased to the caller's objects. Ruby already copies and freezes String keys on insert.
         # steep:ignore:start
-        super(claim_data: claim_data.dup.freeze)
+        super(claim_data: claim_data.transform_values { |value| value.dup.freeze }.freeze)
         # steep:ignore:end
       end
     end

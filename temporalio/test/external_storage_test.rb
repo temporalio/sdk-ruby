@@ -199,6 +199,19 @@ class ExternalStorageTest < Test
     assert first.eql?(second)
   end
 
+  def test_mutating_the_given_claim_data_does_not_affect_the_claim
+    value = +'my-bucket'
+    claim = Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'bucket' => value })
+    hash_before = claim.hash
+
+    value << '-tampered'
+
+    assert_equal 'my-bucket', claim.claim_data.fetch('bucket')
+    assert_equal hash_before, claim.hash
+    assert_predicate claim.claim_data, :frozen?
+    assert_raises(FrozenError) { claim.claim_data.fetch('bucket') << 'x' }
+  end
+
   def test_claims_with_different_content_are_not_equal
     claim = Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => 'k' })
 
