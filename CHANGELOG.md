@@ -35,6 +35,7 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- ActiveModel attribute method cache misses no longer fail workflows when Concurrent::Map uses a mutex.
 - Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security

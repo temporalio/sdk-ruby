@@ -311,7 +311,15 @@ module Temporalio
           'Date' => %i[initialize today],
           'DateTime' => %i[initialize now],
           'Dir' => :all,
-          'Fiber' => [:set_scheduler],
+          'Fiber' => [
+            :set_scheduler,
+            IllegalWorkflowCallValidator.new(method_name: :yield) do
+              # A callback yielding under the process-wide cache mutex could leave it locked across workflow tasks.
+              if Internal::ActiveModelAttributeMethods.in_cache_computation_call_stack?(caller_locations)
+                raise 'Cannot yield while computing the ActiveModel attribute method cache'
+              end
+            end
+          ],
           'File' => :all,
           'FileTest' => :all,
           'FileUtils' => :all,

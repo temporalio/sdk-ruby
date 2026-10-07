@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
+require 'active_model'
 require 'base64_codec'
+require 'concurrent/map'
 require 'gc_utils'
 require 'net/http'
 require 'temporalio/client'
 require 'temporalio/error'
 require 'temporalio/testing'
 require 'temporalio/worker'
+require 'temporalio/worker/workflow_replayer'
 require 'temporalio/workflow'
 require 'test'
 require 'timeout'
+
+# A map-like directory must not allow application mutex use inside the cache computation.
+require_relative 'support/concurrent/collection/map/user_pattern'
 
 class WorkerWorkflowTest < Test
   class SimpleWorkflow < Temporalio::Workflow::Definition
@@ -23,6 +29,7 @@ class WorkerWorkflowTest < Test
   end
 
   IGNORED_LOGGER = Logger.new($stdout) # rubocop:disable Layout/ClassStructure
+  CONCURRENT_MAP = Concurrent::Map.new
 
   class IllegalCallsWorkflow < Temporalio::Workflow::Definition
     def execute(scenario)
@@ -73,6 +80,8 @@ class WorkerWorkflowTest < Test
         Mutex.new
       when :condvar
         ConditionVariable.new
+      when :concurrent_map
+        CONCURRENT_MAP.compute_if_absent(:outside_active_model) { true }
       when :monitor
         Monitor.new.synchronize { 'test' }
       else
@@ -115,7 +124,112 @@ class WorkerWorkflowTest < Test
     exec.call(:sized_queue, 'Thread::SizedQueue initialize')
     exec.call(:mutex, 'Thread::Mutex initialize')
     exec.call(:condvar, 'Thread::ConditionVariable initialize')
+    exec.call(:concurrent_map, 'Thread::Mutex synchronize')
     exec.call(:monitor, 'Monitor synchronize')
+  end
+
+  class ActiveModelObject
+    include ActiveModel::Model
+    include ActiveModel::Attributes
+
+    attribute :value, :string # steep:ignore
+  end
+
+  class ActiveModelWorkflow < Temporalio::Workflow::Definition
+    def execute
+      model = ActiveModelObject.new(value: 'initial')
+      model.assign_attributes(value: 'updated')
+      responds_to_missing = model.respond_to?(:unknown_attribute_for_respond_to)
+      missing_attribute_raises = begin
+        model.another_missing_attribute
+        false
+      rescue NoMethodError
+        true
+      end
+      [model.value, responds_to_missing, missing_attribute_raises]
+    end
+  end
+
+  class ActiveModelWithMutexPattern < ActiveModelObject
+    MUTEX = Mutex.new
+
+    class MutexPattern
+      def match(_method_name)
+        MUTEX.synchronize { nil }
+      end
+    end
+
+    self.attribute_method_patterns += [MutexPattern.new] # steep:ignore
+  end
+
+  class ActiveModelMutexPatternWorkflow < Temporalio::Workflow::Definition
+    def execute
+      ActiveModelWithMutexPattern.new.respond_to?(:missing_attribute_with_mutex_pattern)
+      'done'
+    end
+  end
+
+  class ActiveModelWithMapPattern < ActiveModelObject
+    self.attribute_method_patterns += [ActiveModelConcurrentMapPattern.new] # steep:ignore
+  end
+
+  class ActiveModelMapPatternWorkflow < Temporalio::Workflow::Definition
+    def execute
+      ActiveModelWithMapPattern.new.respond_to?(:missing_attribute_with_map_pattern)
+      'done'
+    end
+  end
+
+  class ActiveModelWithYieldingPattern < ActiveModelObject
+    class YieldingPattern
+      def match(_method_name)
+        Temporalio::Workflow.wait_condition { false }
+      end
+    end
+
+    self.attribute_method_patterns += [YieldingPattern.new] # steep:ignore
+  end
+
+  class ActiveModelYieldingPatternWorkflow < Temporalio::Workflow::Definition
+    def execute
+      ActiveModelWithYieldingPattern.new.respond_to?(:unknown_attribute_with_yielding_pattern)
+      'done'
+    end
+  end
+
+  def test_active_model_attribute_methods_in_workflow
+    cache = ActiveModelObject.send(:attribute_method_patterns_cache)
+    cache.clear
+    history = execute_workflow(ActiveModelWorkflow) do |handle|
+      assert_equal ['updated', false, true], handle.result
+      handle.fetch_history
+    end
+    cache.clear
+    2.times do
+      assert_nil Temporalio::Worker::WorkflowReplayer.new(workflows: [ActiveModelWorkflow])
+                                                     .replay_workflow(history)
+                                                     .replay_failure
+    end
+  end
+
+  def test_active_model_pattern_mutex_remains_illegal
+    execute_workflow(ActiveModelMutexPatternWorkflow) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot access Thread::Mutex synchronize')
+    end
+  end
+
+  def test_active_model_pattern_map_mutex_remains_illegal
+    execute_workflow(ActiveModelMapPatternWorkflow) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot access Thread::Mutex synchronize')
+    end
+  end
+
+  def test_active_model_cache_callback_cannot_yield_or_leave_mutex_locked
+    execute_workflow(ActiveModelYieldingPatternWorkflow) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'Cannot yield while computing the ActiveModel')
+      cache = ActiveModelWithYieldingPattern.send(:attribute_method_patterns_cache)
+      refute cache.instance_variable_get(:@write_lock).locked?
+    end
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition

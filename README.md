@@ -333,6 +333,10 @@ Now if `include ActiveModelJSONSupport` is present on any ActiveModel class, on 
 which will use `as_json` which calls the super `as_json` but also includes the fully qualified class name as the JSON
 `json_class` key. On deserialization, Ruby JSON then uses this key to know what class to call `json_create` on.
 
+Within workflows, the SDK permits the mutex used by `ActiveModel::Attributes`' attribute method cache. If it is
+contended, the workflow task waits for it to unblock.
+Custom attribute method patterns cannot yield while computing this cache.
+
 ##### Converter Hints
 
 In most places where objects are converted to payloads or vice versa, a "hint" can be provided to tell the converter
