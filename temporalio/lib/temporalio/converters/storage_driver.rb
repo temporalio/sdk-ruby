@@ -8,8 +8,8 @@ module Temporalio
     # reference, so the payload data itself never reaches the Temporal server.
     #
     # Implementations are called concurrently and must be thread safe. Methods block, and may perform I/O directly.
-    # To work a batch concurrently, fan out with threads: Ruby releases its global lock during blocking I/O, so threads
-    # give real parallelism, and they work whether or not the worker is running under a fiber scheduler.
+    # To work a batch concurrently, fan out with threads: threads overlap blocking I/O, since Ruby releases its global
+    # lock around it, and they work whether or not the worker is running under a fiber scheduler.
     # {::Fiber.schedule} must not be used, since it raises when the worker is configured with a payload codec thread
     # pool instead of a fiber scheduler. {Temporalio::Worker::ThreadPool} can be used to bound that fan out.
     #
@@ -26,7 +26,7 @@ module Temporalio
         raise NotImplementedError
       end
 
-      # Identifier for this driver implementation, for example +aws.s3driver+. Unlike {name}, this is identical across
+      # Identifier for this driver implementation, for example +aws.s3driver+. Unlike {#name}, this is identical across
       # every instance of the same implementation and across SDK languages.
       #
       # @return [String] Driver implementation identifier.

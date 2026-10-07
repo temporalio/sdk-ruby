@@ -1,0 +1,5 @@
+module Temporalio
+  module Converters
+    type storageDriverTargetInfo = StorageDriverWorkflowInfo | StorageDriverActivityInfo
+  end
+end

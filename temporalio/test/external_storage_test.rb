@@ -98,6 +98,13 @@ class ExternalStorageTest < Test
     assert_nil storage.driver('added')
   end
 
+  def test_drivers_is_frozen
+    storage = Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new])
+
+    assert_predicate storage.drivers, :frozen?
+    assert_raises(FrozenError) { storage.drivers << InMemoryStorageDriver.new(name: 'added') }
+  end
+
   def test_no_drivers_rejected
     err = assert_raises(ArgumentError) { Temporalio::Converters::ExternalStorage.new(drivers: []) }
     assert_includes err.message, 'At least one driver'
@@ -141,7 +148,18 @@ class ExternalStorageTest < Test
     err = assert_raises(ArgumentError) do
       Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new], payload_size_threshold: -1)
     end
-    assert_includes err.message, 'cannot be negative'
+    assert_includes err.message, 'non-negative Integer'
+  end
+
+  def test_non_integer_threshold_rejected
+    [nil, '256', 256.0].each do |value|
+      err = assert_raises(ArgumentError) do
+        Temporalio::Converters::ExternalStorage.new(
+          drivers: [InMemoryStorageDriver.new], payload_size_threshold: value # steep:ignore
+        )
+      end
+      assert_includes err.message, 'non-negative Integer'
+    end
   end
 
   def test_zero_threshold_allowed

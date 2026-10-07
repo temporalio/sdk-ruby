@@ -36,11 +36,14 @@ module Temporalio
       # @param driver_selector [Proc, nil] Selector choosing which driver stores each payload. Required when more than
       #   one driver is given; with a single driver it may be nil, in which case that driver stores every eligible
       #   payload.
-      # @param payload_size_threshold [Integer] Minimum encoded payload size, in bytes, to offload.
+      # @param payload_size_threshold [Integer] Minimum encoded payload size, in bytes, to offload. Must be a
+      #   non-negative Integer.
       def initialize(drivers:, driver_selector: nil, payload_size_threshold: DEFAULT_PAYLOAD_SIZE_THRESHOLD)
         raise ArgumentError, 'At least one driver is required' if drivers.empty?
 
-        raise ArgumentError, 'payload_size_threshold cannot be negative' if payload_size_threshold.negative?
+        unless payload_size_threshold.is_a?(Integer) && payload_size_threshold >= 0
+          raise ArgumentError, 'payload_size_threshold must be a non-negative Integer'
+        end
 
         if drivers.size > 1 && driver_selector.nil?
           raise ArgumentError, 'driver_selector is required when more than one driver is given'

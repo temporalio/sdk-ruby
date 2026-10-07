@@ -1,7 +1,5 @@
 module Temporalio
   module Converters
-    type storageDriverTargetInfo = StorageDriverWorkflowInfo | StorageDriverActivityInfo
-
     class StorageDriver
       def name: -> String
       def type: -> String
