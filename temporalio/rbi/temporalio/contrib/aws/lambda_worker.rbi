@@ -56,6 +56,9 @@ class Temporalio::Contrib::Aws::LambdaWorker::Options < ::Data
   sig { returns(T::Hash[Symbol, Object]) }
   def worker_options; end
 
+  sig { returns(Integer) }
+  def default_versioning_behavior; end
+
   sig { returns(Numeric) }
   def shutdown_buffer; end
 
@@ -79,6 +82,7 @@ class Temporalio::Contrib::Aws::LambdaWorker::Options < ::Data
       client_options: T.nilable(T::Hash[Symbol, Object]),
       client_connect_options: T.nilable(T::Hash[Symbol, Object]),
       worker_options: T::Hash[Symbol, Object],
+      default_versioning_behavior: Integer,
       shutdown_buffer: Numeric,
       shutdown_hooks: T::Array[T.proc.void],
       plugins: T::Array[T.any(Temporalio::Client::Plugin, Temporalio::Worker::Plugin)]
@@ -91,6 +95,7 @@ class Temporalio::Contrib::Aws::LambdaWorker::Options < ::Data
     client_options: T.unsafe(nil),
     client_connect_options: T.unsafe(nil),
     worker_options: T.unsafe(nil),
+    default_versioning_behavior: T.unsafe(nil),
     shutdown_buffer: T.unsafe(nil),
     shutdown_hooks: T.unsafe(nil),
     plugins: T.unsafe(nil)

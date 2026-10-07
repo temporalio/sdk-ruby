@@ -413,7 +413,7 @@ require_relative 'my_workflow'
 
 VERSION = Temporalio::WorkerDeploymentVersion.new(
   deployment_name: 'orders',
-  build_id: ENV.fetch('AWS_LAMBDA_FUNCTION_VERSION')
+  build_id: ENV.fetch('TEMPORAL_WORKER_BUILD_ID')
 )
 
 OPTIONS = Temporalio::Contrib::Aws::LambdaWorker::Options.new(
@@ -430,8 +430,18 @@ end
 
 The Lambda worker applies Lambda-oriented polling, concurrency, caching, and graceful-shutdown defaults. It reserves
 seven seconds for shutdown by default, uses the Lambda request ID and function ARN as its Temporal identity, and always
-enables Worker Versioning with `PINNED` as the default behavior. Use immutable `Options#with` to derive a configuration
-with client, worker, hook, or plugin overrides.
+enables Worker Versioning with `PINNED` as the default behavior. Set `default_versioning_behavior:` to
+`Temporalio::VersioningBehavior::AUTO_UPGRADE` to change that default, or use `UNSPECIFIED` to require an explicit
+behavior on every workflow. Use immutable `Options#with` to derive a configuration with client, worker, hook, or plugin
+overrides. Eager activities are always disabled.
+
+Increase `shutdown_buffer:` together with `worker_options: { graceful_shutdown_period: ... }` for longer activity
+drains or telemetry hooks. Activities must cooperate with cancellation for the worker to finish before Lambda's hard
+deadline. Shutdown hooks run in order even after setup or execution fails, and a hook failure does not mask the worker
+error or prevent later hooks from running.
+
+See the [deployable Ruby Lambda sample](temporalio/extra/aws_lambda/README.md) for native gem packaging, a workflow
+starter, and ADOT collector configuration.
 
 WARNING: Plugins are experimental.
 
@@ -455,7 +465,9 @@ TEMPORAL_LAMBDA_WORKER = Temporalio::Contrib::Aws::LambdaWorker.define(
 ```
 
 The plugin uses `OTEL_EXPORTER_OTLP_ENDPOINT`, or `http://localhost:4317` when it is unset. Its metric service name
-comes from `OTEL_SERVICE_NAME`, then `AWS_LAMBDA_FUNCTION_NAME`.
+comes from `OTEL_SERVICE_NAME`, then `AWS_LAMBDA_FUNCTION_NAME`, then `temporal-lambda-worker`. Ruby's OTLP trace exporter
+uses HTTP (typically port 4318), while this plugin's Core metrics use gRPC (typically port 4317); configure their
+endpoints separately. `metric_periodicity:` defaults to ten seconds and should be shorter than the invocation budget.
 
 ### Workflows
 

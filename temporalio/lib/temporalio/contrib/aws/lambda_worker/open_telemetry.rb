@@ -54,7 +54,7 @@ module Temporalio
             # @param endpoint [String, nil] OTLP endpoint. Defaults to `OTEL_EXPORTER_OTLP_ENDPOINT`, then ADOT's
             #   local `http://localhost:4317` endpoint.
             # @param service_name [String, nil] Metric service name. Defaults to `OTEL_SERVICE_NAME`, then
-            #   `AWS_LAMBDA_FUNCTION_NAME`.
+            #   `AWS_LAMBDA_FUNCTION_NAME`, then `temporal-lambda-worker`.
             # @param metric_periodicity [Numeric, nil] Core OTLP metric export interval in seconds.
             def initialize(
               tracer: nil,
@@ -71,9 +71,13 @@ module Temporalio
               endpoint = 'http://localhost:4317' if endpoint.nil? || endpoint.empty?
               service_name = ENV.fetch('OTEL_SERVICE_NAME', nil) if service_name.nil? || service_name.empty?
               service_name = ENV.fetch('AWS_LAMBDA_FUNCTION_NAME', nil) if service_name.nil? || service_name.empty?
+              service_name = 'temporal-lambda-worker' if service_name.nil? || service_name.empty?
               endpoint = endpoint.dup.freeze
               service_name = service_name&.dup&.freeze
               metric_periodicity = Float(metric_periodicity) if metric_periodicity
+              if metric_periodicity && (!metric_periodicity.finite? || metric_periodicity <= 0)
+                raise ArgumentError, 'metric_periodicity must be finite and positive'
+              end
 
               @otel_options = Options.new(
                 tracer:,

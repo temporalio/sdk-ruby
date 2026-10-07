@@ -17,6 +17,7 @@ module Temporalio
           attr_reader workflows: Array[singleton(Workflow::Definition) | Workflow::Definition::Info]
           attr_reader client_options: Hash[Symbol, untyped]
           attr_reader worker_options: Hash[Symbol, untyped]
+          attr_reader default_versioning_behavior: VersioningBehavior::enum
           attr_reader shutdown_buffer: Numeric
           attr_reader shutdown_hooks: Array[^() -> void]
           attr_reader plugins: Array[Client::Plugin | Worker::Plugin]
@@ -28,6 +29,7 @@ module Temporalio
             ?client_options: Hash[Symbol, untyped]?,
             ?client_connect_options: Hash[Symbol, untyped]?,
             ?worker_options: Hash[Symbol, untyped],
+            ?default_versioning_behavior: VersioningBehavior::enum,
             ?shutdown_buffer: Numeric,
             ?shutdown_hooks: Array[^() -> void],
             ?plugins: Array[Client::Plugin | Worker::Plugin]

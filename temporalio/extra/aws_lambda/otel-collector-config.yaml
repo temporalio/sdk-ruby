@@ -1,0 +1,27 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: localhost:4317
+      http:
+        endpoint: localhost:4318
+
+exporters:
+  awsxray:
+    region: ${env:AWS_REGION}
+  awsemf:
+    region: ${env:AWS_REGION}
+    namespace: TemporalWorkerMetrics
+    log_group_name: /aws/lambda/${env:AWS_LAMBDA_FUNCTION_NAME}
+    dimension_rollup_option: NoDimensionRollup
+    resource_to_telemetry_conversion:
+      enabled: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [awsxray]
+    metrics:
+      receivers: [otlp]
+      exporters: [awsemf]

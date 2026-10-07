@@ -12,6 +12,10 @@ module Contrib
 
       FakeTracer = Object.new.freeze
 
+      class FakeActivity < Temporalio::Activity::Definition
+        def execute; end
+      end
+
       class FakeTracerProvider
         attr_reader :tracer_names, :flushes
 
@@ -120,7 +124,7 @@ module Contrib
         plugin, = build_plugin(tracer_provider: provider)
         options = LambdaWorker::Options.new(
           task_queue: 'queue',
-          activities: [Object.new],
+          activities: [FakeActivity],
           plugins: [plugin]
         )
         version = Temporalio::WorkerDeploymentVersion.new(deployment_name: 'lambda-worker-test', build_id: 'build-1')
@@ -144,6 +148,21 @@ module Contrib
 
         assert_equal %i[worker_run worker_cleanup flush cleanup], events
         assert_equal 1, provider.flushes
+      end
+
+      def test_plugin_has_a_service_name_without_lambda_environment
+        plugin = with_environment('OTEL_SERVICE_NAME' => nil, 'AWS_LAMBDA_FUNCTION_NAME' => nil) do
+          build_plugin(tracer_provider: FakeTracerProvider.new).first
+        end
+        assert_equal 'temporal-lambda-worker', plugin.otel_options.service_name
+      end
+
+      def test_plugin_rejects_invalid_metric_intervals
+        [0, -1, Float::NAN, Float::INFINITY].each do |metric_periodicity|
+          assert_raises(ArgumentError) do
+            build_plugin(tracer_provider: FakeTracerProvider.new, metric_periodicity:)
+          end
+        end
       end
 
       private

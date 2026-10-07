@@ -48,6 +48,7 @@ module Temporalio
           :workflows,
           :client_options,
           :worker_options,
+          :default_versioning_behavior,
           :shutdown_buffer,
           :shutdown_hooks,
           :plugins
@@ -67,6 +68,8 @@ module Temporalio
           # @param worker_options [Hash] Remaining options passed to the worker constructor. Values required by Lambda,
           #   including registrations, identity, and deployment options, are supplied by {LambdaWorker}.
           # @param shutdown_buffer [Numeric] Seconds reserved for graceful shutdown and hooks.
+          # @param default_versioning_behavior [VersioningBehavior] Default behavior for workflows without an explicit
+          #   versioning behavior. Defaults to pinned.
           # @param shutdown_hooks [Array<Proc>] No-argument hooks called after a worker has stopped.
           # @param plugins [Array<Client::Plugin, Worker::Plugin>] SDK plugins applied to each invocation.
           #   WARNING: Plugins are experimental.
@@ -77,6 +80,7 @@ module Temporalio
             client_options: nil,
             client_connect_options: nil,
             worker_options: {},
+            default_versioning_behavior: VersioningBehavior::PINNED,
             shutdown_buffer: DEFAULT_SHUTDOWN_BUFFER,
             shutdown_hooks: [],
             plugins: []
@@ -93,6 +97,10 @@ module Temporalio
             raise TypeError, 'shutdown_hooks must be an Array' unless shutdown_hooks.is_a?(Array)
             raise TypeError, 'plugins must be an Array' unless plugins.is_a?(Array)
             raise TypeError, 'shutdown_buffer must be Numeric' unless shutdown_buffer.is_a?(Numeric)
+            unless [VersioningBehavior::UNSPECIFIED, VersioningBehavior::PINNED,
+                    VersioningBehavior::AUTO_UPGRADE].include?(default_versioning_behavior)
+              raise ArgumentError, 'default_versioning_behavior must be a Temporalio::VersioningBehavior'
+            end
 
             shutdown_buffer_seconds = Float(shutdown_buffer)
             unless shutdown_buffer_seconds&.finite? && shutdown_buffer_seconds >= 0
@@ -120,6 +128,7 @@ module Temporalio
               workflows: LambdaWorker._immutable_copy(workflows),
               client_options: LambdaWorker._immutable_copy(client_options),
               worker_options: LambdaWorker._immutable_copy(lambda_worker_options),
+              default_versioning_behavior:,
               shutdown_buffer:,
               shutdown_hooks: LambdaWorker._immutable_copy(shutdown_hooks),
               plugins: LambdaWorker._immutable_copy(plugins)
@@ -265,7 +274,7 @@ module Temporalio
             deployment_options = Worker::DeploymentOptions.new(
               version:,
               use_worker_versioning: true,
-              default_versioning_behavior: VersioningBehavior::PINNED
+              default_versioning_behavior: selected_options.default_versioning_behavior
             ).freeze
 
             definition = Definition.new(
@@ -444,7 +453,7 @@ module Temporalio
             end
 
             work_time = (remaining_seconds / 1000.0) - shutdown_seconds
-            if work_time < 1
+            if work_time <= 1
               raise 'Lambda timeout leaves too little time for work ' \
                     "(work_time=#{work_time}, shutdown_buffer=#{shutdown_buffer})"
             end
@@ -492,6 +501,7 @@ module Temporalio
               timer.cancel
             elsif timer.respond_to?(:kill)
               timer.kill
+              timer.join unless timer == Thread.current
             end
           rescue StandardError
             nil

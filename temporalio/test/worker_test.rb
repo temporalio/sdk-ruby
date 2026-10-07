@@ -65,6 +65,52 @@ class WorkerTest < Test
     assert_equal 'Workers finished', err.message unless Fiber.current_scheduler
   end
 
+  def test_internal_close_before_run_is_idempotent
+    task_queue = "tq-#{SecureRandom.uuid}"
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      activities: [SimpleActivity]
+    )
+    bridge_worker = worker._bridge_worker
+
+    worker._close
+
+    assert bridge_worker.finalized?
+    worker._close
+
+    normally_run_worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      activities: [SimpleActivity]
+    )
+    normally_run_bridge_worker = normally_run_worker._bridge_worker
+    normally_run_worker.run { nil }
+    assert normally_run_bridge_worker.finalized?
+    normally_run_worker._close
+  end
+
+  def test_initialization_failure_releases_core_worker
+    task_queue = "tq-#{SecureRandom.uuid}"
+
+    assert_raises(ArgumentError) do
+      Temporalio::Worker.new(
+        client: env.client,
+        task_queue:,
+        activities: [SimpleActivity, SimpleActivity]
+      )
+    end
+
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue:,
+      activities: [SimpleActivity]
+    )
+    worker._close
+
+    assert worker._bridge_worker.finalized?
+  end
+
   def test_run_immediately_complete_block
     worker = Temporalio::Worker.new(
       client: env.client,

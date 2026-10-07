@@ -68,6 +68,9 @@ class Temporalio::Client::Connection
 
   sig { params(rpc_metadata: T::Hash[String, String]).void }
   def rpc_metadata=(rpc_metadata); end
+
+  sig { void }
+  def _close; end
 end
 
 class Temporalio::Client::Connection::Options < ::Data

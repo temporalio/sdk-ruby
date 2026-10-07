@@ -100,6 +100,10 @@ module Contrib
         def execute; end
       end
 
+      class PluginWorkflow < Temporalio::Workflow::Definition
+        def execute; end
+      end
+
       class DeploymentOptionsCarrier
         attr_reader :deployment_options, :identity, :disable_eager_activity_execution
 
@@ -208,13 +212,13 @@ module Contrib
       end
 
       def test_options_apply_lambda_defaults_and_freeze_collections
-        activities = [Object.new]
+        activities = [PluginActivity]
         nested_worker_option = ['mutable']
         worker_options = { max_cached_workflows: 99, nested: nested_worker_option }
         options = LambdaWorker::Options.new(
           task_queue: 'queue',
           activities:,
-          workflows: [Object.new],
+          workflows: [PluginWorkflow],
           client_options: { rpc_metadata: { 'x-test' => 'value' } },
           worker_options:,
           shutdown_hooks: [-> {}],
@@ -238,21 +242,21 @@ module Contrib
         assert_equal 5, options.worker_options[:graceful_shutdown_period]
         assert_equal 7, options.shutdown_buffer
         assert_raises(ArgumentError) do
-          LambdaWorker::Options.new(task_queue: 'queue', activities: [Object.new], shutdown_buffer: Float::NAN)
+          LambdaWorker::Options.new(task_queue: 'queue', activities: [PluginActivity], shutdown_buffer: Float::NAN)
         end
         assert_raises(ArgumentError) do
-          LambdaWorker::Options.new(task_queue: 'queue', activities: [Object.new], shutdown_buffer: Float::INFINITY)
+          LambdaWorker::Options.new(task_queue: 'queue', activities: [PluginActivity], shutdown_buffer: Float::INFINITY)
         end
 
-        activities << Object.new
+        activities << PluginActivity
         nested_worker_option << 'changed'
         assert_equal 1, options.activities.length
         assert_equal ['mutable'], options.worker_options[:nested]
-        assert_raises(FrozenError) { options.activities << Object.new }
+        assert_raises(FrozenError) { options.activities << PluginActivity }
       end
 
       def test_options_with_rebuilds_immutable_collections
-        options = LambdaWorker::Options.new(task_queue: 'one', activities: [Object.new])
+        options = LambdaWorker::Options.new(task_queue: 'one', activities: [PluginActivity])
         updated = options.with(
           task_queue: 'two',
           client_connect_options: { rpc_metadata: { 'x-test' => 'value' } }
@@ -268,7 +272,7 @@ module Contrib
       def test_options_derive_poller_behavior_from_overridden_poll_counts
         options = LambdaWorker::Options.new(
           task_queue: 'queue',
-          activities: [Object.new],
+          activities: [PluginActivity],
           worker_options: {
             max_concurrent_workflow_task_polls: 3,
             max_concurrent_activity_task_polls: 4
@@ -452,6 +456,53 @@ module Contrib
         assert_equal Temporalio::VersioningBehavior::PINNED, deployment_options.default_versioning_behavior
       end
 
+      def test_handler_preserves_configured_default_versioning_behavior
+        handler, captures = define_handler(
+          Version,
+          base_options(default_versioning_behavior: Temporalio::VersioningBehavior::AUTO_UPGRADE)
+        )
+
+        handler.call({}, FakeContext.new)
+
+        deployment = captures[:worker_options].first[:deployment_options]
+        assert_equal Version, deployment.version
+        assert deployment.use_worker_versioning
+        assert_equal Temporalio::VersioningBehavior::AUTO_UPGRADE, deployment.default_versioning_behavior
+      end
+
+      def test_handler_joins_shutdown_timer
+        timer = LambdaWorker.send(:_default_dependencies).fetch(:start_shutdown_timer).call(60) do
+          flunk 'Shutdown timer fired after cancellation'
+        end
+
+        LambdaWorker.send(:_cancel_shutdown_timer, timer)
+
+        refute timer.alive?
+      ensure
+        timer&.kill&.join
+      end
+
+      def test_handler_runs_hooks_on_connection_failure
+        events = []
+        timer = FakeTimer.new
+        handler = LambdaWorker.send(
+          :_define,
+          Version,
+          options: base_options(shutdown_hooks: [-> { events << :hook }]),
+          dependencies: LambdaWorker.send(:_default_dependencies).merge(
+            load_client_options: ->(_path) { [['temporal.example:7233', 'namespace'], {}] },
+            connect_client: ->(*_args, **_kwargs) { raise 'connect failed' },
+            start_shutdown_timer: ->(_delay, &_block) { timer }
+          )
+        )
+
+        error = assert_raises(RuntimeError) { handler.call({}, FakeContext.new) }
+
+        assert_equal 'connect failed', error.message
+        assert_equal [:hook], events
+        assert timer.cancelled
+      end
+
       def test_handler_starts_shutdown_timer_before_client_setup
         events = []
         handler, = define_handler(
@@ -565,14 +616,16 @@ module Contrib
         assert captures[:timers].first.cancelled
       end
 
-      def test_handler_rejects_deadlines_with_less_than_one_second_of_work
+      def test_handler_rejects_deadlines_with_at_most_one_second_of_work
         handler, captures = define_handler(Version, base_options)
 
-        error = assert_raises(RuntimeError) do
-          handler.call({}, FakeContext.new(remaining_millis: 7_999))
+        [7_999, 8_000].each do |remaining_millis|
+          error = assert_raises(RuntimeError) do
+            handler.call({}, FakeContext.new(remaining_millis:))
+          end
+          assert_includes error.message, 'too little time'
         end
 
-        assert_includes error.message, 'too little time'
         assert_empty captures[:client_options]
       end
 
@@ -658,7 +711,7 @@ module Contrib
 
       def base_options(**kwargs)
         LambdaWorker::Options.new(task_queue: 'queue',
-                                  activities: [Object.new], **kwargs)
+                                  activities: [PluginActivity], **kwargs)
       end
 
       def define_handler(

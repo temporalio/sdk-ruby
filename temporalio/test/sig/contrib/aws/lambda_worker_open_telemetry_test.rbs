@@ -1,6 +1,10 @@
 module Contrib
   module Aws
     class LambdaWorkerOpenTelemetryTest < Test
+      class FakeActivity < Temporalio::Activity::Definition
+        def execute: -> void
+      end
+
       private
 
       def build_plugin: (**untyped options) -> [Temporalio::Contrib::Aws::LambdaWorker::OpenTelemetry::Plugin, Temporalio::Runtime]

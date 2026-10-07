@@ -155,6 +155,7 @@ module Temporalio
         def replace_client: (Client client) -> void
 
         def initiate_shutdown: -> void
+        def finalized?: -> bool
 
         class WorkerDeploymentVersion
           attr_accessor deployment_name: String

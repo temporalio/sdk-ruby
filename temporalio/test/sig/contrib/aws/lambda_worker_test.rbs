@@ -76,6 +76,10 @@ module Contrib
         def execute: -> void
       end
 
+      class PluginWorkflow < Temporalio::Workflow::Definition
+        def execute: -> void
+      end
+
       class DeploymentOptionsCarrier
         attr_reader deployment_options: Temporalio::Worker::DeploymentOptions
         attr_reader identity: String?
