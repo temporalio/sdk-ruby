@@ -4,6 +4,7 @@ require 'random/formatter'
 require 'temporalio/error'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/priority'
+require 'temporalio/versioning_override'
 require 'temporalio/workflow/activity_cancellation_type'
 require 'temporalio/workflow/child_workflow_cancellation_type'
 require 'temporalio/workflow/child_workflow_handle'
@@ -214,6 +215,7 @@ module Temporalio
       memo: nil,
       search_attributes: nil,
       priority: Priority.default,
+      versioning_override: nil,
       arg_hints: nil,
       result_hint: nil
     )
@@ -221,7 +223,8 @@ module Temporalio
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, versioning_override:,
+        arg_hints:, result_hint:
       ).result
     end
 
@@ -425,6 +428,9 @@ module Temporalio
     # @param memo [Hash{String, Symbol => Object}, nil] Memo for the workflow.
     # @param search_attributes [SearchAttributes, nil] Search attributes for the workflow.
     # @param priority [Priority] Priority of the workflow.
+    # @param versioning_override [VersioningOverride, nil] Override the child's versioning independently of its parent.
+    #   If unset, normal versioning inheritance applies. Requires Temporal Server 1.32.0 or later.
+    #   WARNING: This option is experimental.
     # @param arg_hints [Array<Object>, nil] Overrides converter hints for arguments if any. If unset/nil and the
     #   workflow definition has arg hints, those are used by default.
     # @param result_hint [Object, nil] Overrides converter hint for result if any. If unset/nil and the workflow
@@ -432,6 +438,8 @@ module Temporalio
     #
     # @return [ChildWorkflowHandle] Workflow handle to the started workflow.
     # @raise [Error::WorkflowAlreadyStartedError] Workflow already exists for the ID.
+    # @raise [Error::ChildWorkflowError] Child could not start. The cause is {Error::InvalidVersioningOverrideError}
+    #   for an invalid versioning override or {Error::NamespaceNotFoundError} for a missing namespace.
     # @raise [Error::CanceledError] Starting of the child was canceled.
     def self.start_child_workflow(
       workflow,
@@ -452,6 +460,7 @@ module Temporalio
       memo: nil,
       search_attributes: nil,
       priority: Priority.default,
+      versioning_override: nil,
       arg_hints: nil,
       result_hint: nil
     )
@@ -459,7 +468,8 @@ module Temporalio
         workflow, *args,
         id:, task_queue:, static_summary:, static_details:, cancellation:, cancellation_type:,
         parent_close_policy:, execution_timeout:, run_timeout:, task_timeout:, id_reuse_policy:,
-        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, arg_hints:, result_hint:
+        retry_policy:, cron_schedule:, memo:, search_attributes:, priority:, versioning_override:,
+        arg_hints:, result_hint:
       )
     end
 

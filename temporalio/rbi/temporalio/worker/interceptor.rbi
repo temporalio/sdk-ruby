@@ -398,6 +398,9 @@ class Temporalio::Worker::Interceptor::Workflow::StartChildWorkflowInput < ::Dat
   sig { returns(Temporalio::Priority) }
   def priority; end
 
+  sig { returns(T.nilable(Temporalio::VersioningOverride)) }
+  def versioning_override; end
+
   sig { returns(T.nilable(T::Array[Object])) }
   def arg_hints; end
 

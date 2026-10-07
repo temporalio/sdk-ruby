@@ -298,6 +298,7 @@ module Temporalio
             memo:,
             search_attributes:,
             priority:,
+            versioning_override:,
             arg_hints:,
             result_hint:
           )
@@ -323,6 +324,7 @@ module Temporalio
                 memo:,
                 search_attributes:,
                 priority:,
+                versioning_override:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
                 headers: {}
