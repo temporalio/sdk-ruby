@@ -24,6 +24,10 @@ module Temporalio
 
         # @param payload [Api::Common::V1::Payload] Payload to parse.
         # @return [Api::Sdk::V1::ExternalStorageReference, nil] Parsed reference, or nil if not a reference.
+        #
+        # TODO: Surface parse failures as a Temporal error instead of Google::Protobuf::ParseError. The runner is the
+        # right layer for it, since only the caller knows which payload failed; a malformed reference cannot name its
+        # own driver.
         def parse_reference(payload)
           return nil unless reference?(payload)
 
