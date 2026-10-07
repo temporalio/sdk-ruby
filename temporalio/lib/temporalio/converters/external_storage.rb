@@ -48,11 +48,13 @@ module Temporalio
 
         @drivers_by_name = {}
         drivers.each do |driver|
-          # The name is the routing key written into history, so a driver without one can never be resolved on read.
-          raise ArgumentError, 'Driver name cannot be empty' if driver.name.nil? || driver.name.empty?
-          raise ArgumentError, "Multiple drivers given with name '#{driver.name}'" if @drivers_by_name.key?(driver.name)
+          name = driver.name
+          # The name is the routing key written into history and is written to a string proto field, so anything but
+          # a non-empty String cannot be resolved on read. A Symbol in particular passes a bare empty? check.
+          raise ArgumentError, 'Driver name must be a non-empty String' unless name.is_a?(String) && !name.empty?
+          raise ArgumentError, "Multiple drivers given with name '#{name}'" if @drivers_by_name.key?(name)
 
-          @drivers_by_name[driver.name] = driver
+          @drivers_by_name[name] = driver
         end
         @drivers_by_name.freeze
 
