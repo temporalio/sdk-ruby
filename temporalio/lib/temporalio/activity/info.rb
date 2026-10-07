@@ -11,6 +11,7 @@ module Temporalio
       :activity_type,
       :attempt,
       :current_attempt_scheduled_time,
+      :headers,
       :heartbeat_timeout,
       :local?,
       :namespace,
@@ -41,6 +42,8 @@ module Temporalio
     #   @return [Integer] Attempt the activity is on. Attempts start at 1 and increment on each retry.
     # @!attribute current_attempt_scheduled_time
     #   @return [Time] When the current attempt was scheduled.
+    # @!attribute headers
+    #   @return [Hash<String, Object>] Received headers as decoded Ruby values, including nil values. Empty when absent.
     # @!attribute heartbeat_timeout
     #   @return [Float, nil] Heartbeat timeout set by the caller.
     # @!attribute local?
