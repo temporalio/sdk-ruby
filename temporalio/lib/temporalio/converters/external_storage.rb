@@ -58,7 +58,7 @@ module Temporalio
 
         @drivers = drivers.dup.freeze
         # Normalized so callers never have to distinguish the single-driver case.
-        @driver_selector = driver_selector || ->(_context, _payload) { drivers.first }
+        @driver_selector = driver_selector || ->(_context, _payload) { @drivers.first }
         @payload_size_threshold = payload_size_threshold
       end
 

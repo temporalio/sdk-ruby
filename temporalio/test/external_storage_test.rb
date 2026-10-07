@@ -72,6 +72,19 @@ class ExternalStorageTest < Test
     assert_nil storage.driver('missing')
   end
 
+  def test_mutating_the_given_driver_array_does_not_affect_storage
+    driver = InMemoryStorageDriver.new
+    drivers = [driver]
+    storage = Temporalio::Converters::ExternalStorage.new(drivers:)
+
+    drivers << InMemoryStorageDriver.new(name: 'added')
+    drivers.clear
+
+    assert_same driver, storage.drivers.first
+    assert_same driver, storage.driver_selector.call(select_context, payload('x'))
+    assert_nil storage.driver('added')
+  end
+
   def test_no_drivers_rejected
     err = assert_raises(ArgumentError) { Temporalio::Converters::ExternalStorage.new(drivers: []) }
     assert_includes err.message, 'At least one driver'
