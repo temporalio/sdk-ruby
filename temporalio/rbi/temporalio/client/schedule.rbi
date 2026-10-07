@@ -377,7 +377,7 @@ class Temporalio::Client::Schedule::Policy < ::Data
   sig do
     params(
       overlap: Integer,
-      catchup_window: T.any(Integer, Float),
+      catchup_window: T.nilable(T.any(Integer, Float)),
       pause_on_failure: T::Boolean
     ).void
   end
@@ -386,7 +386,7 @@ class Temporalio::Client::Schedule::Policy < ::Data
   sig { returns(Integer) }
   def overlap; end
 
-  sig { returns(T.any(Integer, Float)) }
+  sig { returns(T.nilable(T.any(Integer, Float))) }
   def catchup_window; end
 
   sig { returns(T::Boolean) }

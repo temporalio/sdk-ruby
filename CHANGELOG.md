@@ -24,14 +24,19 @@ to docs, or any other relevant information.
 ### Changed
 
 - Priority is no longer marked as experimental.
+- The `dev_server_` and `test_server_` options of `Testing::WorkflowEnvironment.start_local` and
+  `start_time_skipping` are no longer described as unstable.
 
 ### Deprecated
 
 ### :boom: Breaking Changes
 
+- `Schedule::Policy#catchup_window` now defaults to `nil`. If unspecified the server configured default is used.
+
 ### Fixed
 
 - ActiveModel attribute method cache misses no longer fail workflows when Concurrent::Map uses a mutex.
+- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security
 

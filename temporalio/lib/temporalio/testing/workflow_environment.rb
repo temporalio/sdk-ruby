@@ -23,8 +23,8 @@ module Temporalio
 
       # Start a local dev server. This is a full Temporal dev server from the CLI that by default downloaded to tmp if
       # not already present. The dev server is run as a child process. All options that start with +dev_server_+ are for
-      # this specific implementation and therefore are not stable and may be changed as the underlying implementation
-      # changes.
+      # this specific implementation. If that implementation changes, these options and their values may no longer be
+      # valid.
       #
       # If a block is given it is passed the environment and the environment is shut down after. If a block is not
       # given, the environment is returned and {shutdown} needs to be called manually.
@@ -124,8 +124,8 @@ module Temporalio
 
       # Start a time-skipping test server. This server can skip time but may not have all of the Temporal features of
       # the {start_local} form. By default, the server is downloaded to tmp if not already present. The test server is
-      # run as a child process. All options that start with +test_server_+ are for this specific implementation and
-      # therefore are not stable and may be changed as the underlying implementation changes.
+      # run as a child process. All options that start with +test_server_+ are for this specific implementation. If that
+      # implementation changes, these options and their values may no longer be valid.
       #
       # If a block is given it is passed the environment and the environment is shut down after. If a block is not
       # given, the environment is returned and {shutdown} needs to be called manually.
