@@ -14,6 +14,9 @@ module Temporalio
     # @note WARNING: This API is experimental and may change in the future. Members may be added, so accept keyword
     #   arguments defensively if constructing this yourself.
     #
+    # @!attribute [r] cancellation
+    #   @return [Cancellation] Cancelled when the SDK abandons this retrieve operation.
+    #
     # @!visibility private
     class StorageDriverRetrieveContext; end # rubocop:disable Lint/EmptyClass
   end
