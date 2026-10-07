@@ -21,6 +21,11 @@ to docs, or any other relevant information.
 
 ### Added
 
+- Added experimental `versioning_override:` to `Workflow.start_child_workflow` and
+  `Workflow.execute_child_workflow` for routing children independently of their parent, including
+  `VersioningOverride::OneTime` for one-time routing. Requires Temporal Server 1.32.0 or later.
+  Rejected overrides raise `Error::ChildWorkflowError` with an `Error::InvalidVersioningOverrideError` cause.
+
 ### Changed
 
 - Priority is no longer marked as experimental.

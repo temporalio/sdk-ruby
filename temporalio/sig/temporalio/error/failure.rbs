@@ -3,6 +3,14 @@ module Temporalio
     class Failure < Error
     end
 
+    class InvalidVersioningOverrideError < Failure
+      def initialize: -> void
+    end
+
+    class NamespaceNotFoundError < Failure
+      def initialize: -> void
+    end
+
     class WorkflowAlreadyStartedError < Failure
       attr_reader workflow_id: String
       attr_reader workflow_type: String

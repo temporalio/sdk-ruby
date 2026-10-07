@@ -102,6 +102,7 @@ module Temporalio::Workflow
         memo: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)]),
         search_attributes: T.nilable(Temporalio::SearchAttributes),
         priority: Temporalio::Priority,
+        versioning_override: T.nilable(Temporalio::VersioningOverride),
         arg_hints: T.nilable(T::Array[Object]),
         result_hint: T.nilable(Object)
       ).returns(T.nilable(Object))
@@ -125,6 +126,7 @@ module Temporalio::Workflow
       memo: T.unsafe(nil),
       search_attributes: T.unsafe(nil),
       priority: T.unsafe(nil),
+      versioning_override: nil,
       arg_hints: T.unsafe(nil),
       result_hint: T.unsafe(nil)
     ); end
@@ -227,6 +229,7 @@ module Temporalio::Workflow
         memo: T.nilable(T::Hash[T.any(String, Symbol), T.nilable(Object)]),
         search_attributes: T.nilable(Temporalio::SearchAttributes),
         priority: Temporalio::Priority,
+        versioning_override: T.nilable(Temporalio::VersioningOverride),
         arg_hints: T.nilable(T::Array[Object]),
         result_hint: T.nilable(Object)
       ).returns(Temporalio::Workflow::ChildWorkflowHandle)
@@ -250,6 +253,7 @@ module Temporalio::Workflow
       memo: T.unsafe(nil),
       search_attributes: T.unsafe(nil),
       priority: T.unsafe(nil),
+      versioning_override: nil,
       arg_hints: T.unsafe(nil),
       result_hint: T.unsafe(nil)
     ); end

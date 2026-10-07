@@ -3,6 +3,7 @@
 require 'temporalio/client'
 require 'temporalio/common_enums'
 require 'temporalio/testing'
+require 'temporalio/versioning_override'
 require 'temporalio/worker'
 require 'temporalio/worker/deployment_options'
 require 'temporalio/worker_deployment_version'
@@ -643,6 +644,139 @@ class WorkerWorkflowVersioningTest < Test
       execution_started_event = history.events.find { |evt| evt.event_type == :EVENT_TYPE_WORKFLOW_EXECUTION_STARTED }
       # Check if the versioning override is present in the workflow execution started event
       assert(execution_started_event.workflow_execution_started_event_attributes.versioning_override)
+    end
+  end
+
+  class ChildVersioningOverrideWorkflow < Temporalio::Workflow::Definition
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+
+    def execute(override_type, deployment_name, build_id, use_execute)
+      version = Temporalio::WorkerDeploymentVersion.new(deployment_name: deployment_name, build_id: build_id)
+      override = case override_type
+                 when 'pinned'
+                   Temporalio::VersioningOverride::Pinned.new(version)
+                 when 'auto_upgrade'
+                   Temporalio::VersioningOverride::AutoUpgrade.new
+                 when 'one_time'
+                   Temporalio::VersioningOverride::OneTime.new(version)
+                 end
+      child_type = override_type == 'auto_upgrade' ? PinnedVersionedChildWorkflow : AutoUpgradeVersionedChildWorkflow
+      options = { id: "#{Temporalio::Workflow.info.workflow_id}-child", versioning_override: override }
+      result = if use_execute
+                 Temporalio::Workflow.execute_child_workflow(child_type, **options)
+               else
+                 Temporalio::Workflow.start_child_workflow(child_type, **options).result
+               end
+      [Temporalio::Workflow.current_deployment_version&.build_id, result]
+    end
+  end
+
+  class AutoUpgradeVersionedChildWorkflow < Temporalio::Workflow::Definition
+    workflow_versioning_behavior Temporalio::VersioningBehavior::AUTO_UPGRADE
+
+    def execute
+      Temporalio::Workflow.wait_condition { @finish }
+      Temporalio::Workflow.current_deployment_version&.build_id
+    end
+
+    workflow_signal
+    def do_finish
+      @finish = true
+    end
+  end
+
+  class PinnedVersionedChildWorkflow < AutoUpgradeVersionedChildWorkflow
+    workflow_versioning_behavior Temporalio::VersioningBehavior::PINNED
+  end
+
+  def test_child_workflow_without_versioning_override
+    run_child_workflow_versioning_override_test(nil, use_execute: true)
+  end
+
+  def test_child_workflow_pinned_versioning_override
+    run_child_workflow_versioning_override_test('pinned', use_execute: false)
+  end
+
+  def test_child_workflow_auto_upgrade_versioning_override
+    run_child_workflow_versioning_override_test('auto_upgrade', use_execute: true)
+  end
+
+  def test_child_workflow_one_time_versioning_override
+    run_child_workflow_versioning_override_test('one_time', use_execute: false)
+  end
+
+  def run_child_workflow_versioning_override_test(override_type, use_execute:)
+    deployment_name = "child-versioning-#{SecureRandom.uuid}"
+    versions = %w[1.0 2.0].map do |build_id|
+      Temporalio::WorkerDeploymentVersion.new(deployment_name: deployment_name, build_id: build_id)
+    end
+    task_queue = "tq-#{SecureRandom.uuid}"
+    workers = versions.map do |version|
+      Temporalio::Worker.new(
+        client: env.client,
+        task_queue: task_queue,
+        workflows: [
+          ChildVersioningOverrideWorkflow, AutoUpgradeVersionedChildWorkflow, PinnedVersionedChildWorkflow
+        ],
+        deployment_options: Temporalio::Worker::DeploymentOptions.new(version: version, use_worker_versioning: true)
+      )
+    end
+    Temporalio::Worker.run_all(*workers) do
+      versions.each { |version| wait_until_worker_deployment_visible(env.client, version) }
+      current = override_type.nil? || override_type == 'auto_upgrade' ? versions[1] : versions[0]
+      description = wait_until_worker_deployment_visible(env.client, current)
+      set_current_deployment_version(env.client, description.conflict_token, current)
+      wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, current.build_id)
+
+      parent = env.client.start_workflow(
+        ChildVersioningOverrideWorkflow, override_type, deployment_name, versions[1].build_id, use_execute,
+        id: "child-versioning-parent-#{SecureRandom.uuid}",
+        task_queue: task_queue,
+        versioning_override: Temporalio::VersioningOverride::Pinned.new(versions[0])
+      )
+      child = env.client.workflow_handle("#{parent.id}-child")
+      first_build_id = override_type.nil? ? versions[0].build_id : versions[1].build_id
+      wait_for_workflow_running_on_version(parent, versions[0].build_id)
+      wait_for_workflow_running_on_version(child, first_build_id)
+
+      initiated = parent.fetch_history.events.find do |event|
+        event.event_type == :EVENT_TYPE_START_CHILD_WORKFLOW_EXECUTION_INITIATED
+      end
+      assert initiated
+      override = initiated.start_child_workflow_execution_initiated_event_attributes.versioning_override
+      case override_type
+      when nil
+        assert_nil override
+      when 'auto_upgrade'
+        assert override.auto_upgrade
+      when 'one_time'
+        assert_equal versions[1]._to_proto, override.one_time.target_deployment_version
+      else
+        assert_equal versions[1]._to_proto, override.pinned.version
+        assert_equal :PINNED_OVERRIDE_BEHAVIOR_PINNED, override.pinned.behavior
+      end
+
+      if override_type == 'one_time'
+        assert_eventually do
+          assert_nil child.describe.raw_description.workflow_execution_info.versioning_info.versioning_override
+        end
+      end
+      first_task = child.fetch_history.events.find do |event|
+        event.event_type == :EVENT_TYPE_WORKFLOW_TASK_COMPLETED
+      end
+      assert first_task
+      assert_equal first_build_id, first_task.workflow_task_completed_event_attributes.deployment_version.build_id
+
+      if override_type == 'auto_upgrade'
+        current = versions[0]
+        description = wait_until_worker_deployment_visible(env.client, current)
+        set_current_deployment_version(env.client, description.conflict_token, current)
+        wait_for_worker_deployment_routing_config_propagation(env.client, deployment_name, current.build_id)
+      end
+      child.signal(:do_finish)
+      follows_current = override_type == 'one_time' || override_type == 'auto_upgrade'
+      final_build_id = follows_current ? current.build_id : first_build_id
+      assert_equal [versions[0].build_id, final_build_id], parent.result
     end
   end
 
