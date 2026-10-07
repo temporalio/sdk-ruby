@@ -21,6 +21,9 @@ to docs, or any other relevant information.
 
 ### Added
 
+- `Temporalio::Worker::ThreadPool::ThreadContext` can be passed to `ThreadPool.new` as
+  `thread_context:` to wrap the execution of the body of each pool thread.
+
 ### Changed
 
 - Priority is no longer marked as experimental.

@@ -1,0 +1,9 @@
+class WorkerThreadContextTest < Test
+  class CountingContext < Temporalio::Worker::ThreadPool::ThreadContext
+    def initialize: (fail_times: Numeric, ?restart_worker: bool) -> void
+    def count: -> Integer
+    def call: { -> void } -> void
+  end
+
+  def run_and_wait: (Temporalio::Worker::ThreadPool pool, ?timeout: Float) -> void
+end

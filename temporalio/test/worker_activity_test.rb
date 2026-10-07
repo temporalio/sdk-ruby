@@ -8,6 +8,7 @@ require 'temporalio/client'
 require 'temporalio/testing'
 require 'temporalio/worker'
 require 'test'
+require 'thread_context_recorder'
 
 class WorkerActivityTest < Test
   also_run_all_tests_in_fiber
@@ -908,6 +909,33 @@ class WorkerActivityTest < Test
   def test_custom_executor
     assert_equal 'local val: foo',
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
+  end
+
+  class ThreadContextActivity < Temporalio::Activity::Definition
+    activity_executor :context_executor
+
+    def execute
+      "context val: #{Thread.current[ThreadContextRecorder::VALUE_KEY]}"
+    end
+  end
+
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
+  def test_thread_pool_thread_context_wraps_activity
+    context = ThreadContextRecorder.new
+    pool = Temporalio::Worker::ThreadPool.new(thread_context: context)
+    executor = Temporalio::Worker::ActivityExecutor::ThreadPool.new(pool)
+
+    assert_equal 'context val: acquired',
+                 execute_activity(ThreadContextActivity, activity_executors: { context_executor: executor })
+
+    # The context is still active
+    assert_empty context.exited
+
+    pool.shutdown
+    assert_eventually { refute_empty context.exited, 'thread context did not release when the pool shut down' }
+  ensure
+    pool&.kill
   end
 
   class ConcurrentActivity < Temporalio::Activity::Definition

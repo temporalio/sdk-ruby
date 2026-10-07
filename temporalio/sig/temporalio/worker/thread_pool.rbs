@@ -1,13 +1,25 @@
 module Temporalio
   class Worker
     class ThreadPool
+      class ThreadContext
+        def self.default: -> ThreadContext
+        attr_reader restart_worker: bool
+        def initialize: (?restart_worker: bool) -> void
+        def call: { -> void } -> void
+
+        class NoOp < ThreadContext
+          def call: { -> void } -> void
+        end
+      end
+
       def self.default: -> ThreadPool
 
       def self._monotonic_time: -> Float
 
       def initialize: (
         ?max_threads: Integer?,
-        ?idle_timeout: Float
+        ?idle_timeout: Float,
+        ?thread_context: ThreadContext
       ) -> void
 
       def execute: { -> void } -> void
@@ -25,6 +37,8 @@ module Temporalio
       def _ready_worker: (Worker worker, Float last_message) -> void
       def _worker_died: (Worker worker) -> void
       def _worker_task_completed: -> void
+      def _thread_context: -> ThreadContext
+      def _remove_ready_worker: (Worker worker) -> void
       private def locked_assign_worker: { (?) -> untyped } -> void
       private def locked_enqueue: { (?) -> untyped } -> void
       private def locked_add_busy_worker: -> Worker?
@@ -38,6 +52,9 @@ module Temporalio
         def <<: (Proc block) -> void
         def stop: -> void
         def kill: -> void
+
+        private def worker_loop: (Thread::Queue my_queue, ThreadPool my_pool) -> void
+        private def handle_thread_context_exception: (ThreadPool my_pool, Exception err) -> void
       end
     end
   end
