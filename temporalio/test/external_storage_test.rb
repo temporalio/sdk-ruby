@@ -152,8 +152,8 @@ class ExternalStorageTest < Test
   end
 
   def test_claims_with_equal_content_are_equal
-    first = Temporalio::Converters::StorageDriverClaim.new({ 'a' => '1', 'b' => '2' })
-    second = Temporalio::Converters::StorageDriverClaim.new({ 'b' => '2', 'a' => '1' })
+    first = Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'a' => '1', 'b' => '2' })
+    second = Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'b' => '2', 'a' => '1' })
 
     assert_equal first, second
     assert_equal first.hash, second.hash
@@ -161,11 +161,11 @@ class ExternalStorageTest < Test
   end
 
   def test_claims_with_different_content_are_not_equal
-    claim = Temporalio::Converters::StorageDriverClaim.new({ 'key' => 'k' })
+    claim = Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => 'k' })
 
-    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new({ 'key' => 'other' })
-    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new({ 'another' => 'k' })
-    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new({ 'key' => 'k', 'x' => 'y' })
+    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => 'other' })
+    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'another' => 'k' })
+    refute_equal claim, Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => 'k', 'x' => 'y' })
     refute_equal claim, 'not a claim'
   end
 

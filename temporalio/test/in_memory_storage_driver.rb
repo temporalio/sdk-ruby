@@ -23,7 +23,7 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
     payloads.map do |payload|
       key = SecureRandom.uuid
       @stored[key] = payload.to_proto
-      Temporalio::Converters::StorageDriverClaim.new({ 'key' => key })
+      Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => key })
     end
   end
 

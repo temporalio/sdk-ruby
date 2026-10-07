@@ -1,23 +1,6 @@
 # typed: true
 
-class Temporalio::Converters::StorageDriverStoreContext
-  extend T::Sig
-
-  sig do
-    returns(
-      T.nilable(
-        T.any(
-          Temporalio::Converters::StorageDriverWorkflowInfo,
-          Temporalio::Converters::StorageDriverActivityInfo
-        )
-      )
-    )
-  end
-  attr_reader :target
-
-  sig { returns(Temporalio::Cancellation) }
-  attr_reader :cancellation
-
+class Temporalio::Converters::StorageDriverStoreContext < ::Data
   sig do
     params(
       target: T.nilable(
@@ -30,4 +13,30 @@ class Temporalio::Converters::StorageDriverStoreContext
     ).void
   end
   def initialize(target:, cancellation:); end
+
+  sig do
+    returns(
+      T.nilable(
+        T.any(
+          Temporalio::Converters::StorageDriverWorkflowInfo,
+          Temporalio::Converters::StorageDriverActivityInfo
+        )
+      )
+    )
+  end
+  def target; end
+
+  sig { returns(Temporalio::Cancellation) }
+  def cancellation; end
+
+  class << self
+    sig { params(args: T.untyped).returns(Temporalio::Converters::StorageDriverStoreContext) }
+    def [](*args); end
+
+    sig { returns(T::Array[Symbol]) }
+    def members; end
+
+    sig { params(args: T.untyped).returns(Temporalio::Converters::StorageDriverStoreContext) }
+    def new(*args); end
+  end
 end

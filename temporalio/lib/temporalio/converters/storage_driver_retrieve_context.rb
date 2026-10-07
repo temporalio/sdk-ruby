@@ -4,6 +4,8 @@ require 'temporalio/cancellation'
 
 module Temporalio
   module Converters
+    StorageDriverRetrieveContext = Data.define(:cancellation)
+
     # Context given to {StorageDriver#retrieve}.
     #
     # This deliberately carries no target. A payload must be retrievable from its {StorageDriverClaim} alone, since the
@@ -13,16 +15,6 @@ module Temporalio
     #   arguments defensively if constructing this yourself.
     #
     # @!visibility private
-    class StorageDriverRetrieveContext
-      # @return [Cancellation] Cancelled when the SDK abandons this retrieve operation.
-      attr_reader :cancellation
-
-      # Create a retrieve context.
-      #
-      # @param cancellation [Cancellation] Cancellation for the operation.
-      def initialize(cancellation:)
-        @cancellation = cancellation
-      end
-    end
+    class StorageDriverRetrieveContext; end # rubocop:disable Lint/EmptyClass
   end
 end
