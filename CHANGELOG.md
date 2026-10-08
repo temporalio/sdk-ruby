@@ -1,43 +1,4 @@
-<!--
-High-level release notes.
-Loosely based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
-
-When your PR includes a user-facing change, add an entry below under the
-appropriate heading (create the heading if it does not yet exist). Within
-each heading content can be free-form. Feel free to include examples, links
-to docs, or any other relevant information.
-
-### Added            — new features
-### Changed          — changes in existing functionality
-### Deprecated       — soon-to-be-removed features
-### :boom: Breaking Changes — removed or backwards-incompatible features
-### Fixed            — notable bug fixes
-### Security         — notable security fixes
--->
-
 # Changelog
-
-## [Unreleased]
-
-### Added
-
-### Changed
-
-- Priority is no longer marked as experimental.
-- The `dev_server_` and `test_server_` options of `Testing::WorkflowEnvironment.start_local` and
-  `start_time_skipping` are no longer described as unstable.
-
-### Deprecated
-
-### :boom: Breaking Changes
-
-- `Schedule::Policy#catchup_window` now defaults to `nil`. If unspecified the server configured default is used.
-
-### Fixed
-
-- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
-
-### Security
 
 ## [v1.9.0] - 2026-09-14
 

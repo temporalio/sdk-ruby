@@ -138,6 +138,7 @@ module Temporalio
       
       def api_callback_v1_callback_info(value)
         @on_enter&.call(value)
+        api_common_v1_callback(value.callback) if value.has_callback?
         api_failure_v1_failure(value.last_attempt_failure) if value.has_last_attempt_failure?
         @on_exit&.call(value)
       end
@@ -532,6 +533,18 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_common_v1_callback(value)
+        @on_enter&.call(value)
+        api_common_v1_callback_nexus_handler(value.nexus_handler) if value.has_nexus_handler?
+        @on_exit&.call(value)
+      end
+      
+      def api_common_v1_callback_nexus_handler(value)
+        @on_enter&.call(value)
+        api_common_v1_payload(value.source_context) if value.has_source_context?
+        @on_exit&.call(value)
+      end
+      
       def api_common_v1_header(value)
         @on_enter&.call(value)
         value.fields.values.each { |v| api_common_v1_payload(v) }
@@ -764,6 +777,7 @@ module Temporalio
         api_history_v1_nexus_operation_failed_event_attributes(value.nexus_operation_failed_event_attributes) if value.has_nexus_operation_failed_event_attributes?
         api_history_v1_nexus_operation_canceled_event_attributes(value.nexus_operation_canceled_event_attributes) if value.has_nexus_operation_canceled_event_attributes?
         api_history_v1_nexus_operation_timed_out_event_attributes(value.nexus_operation_timed_out_event_attributes) if value.has_nexus_operation_timed_out_event_attributes?
+        api_history_v1_workflow_execution_options_updated_event_attributes(value.workflow_execution_options_updated_event_attributes) if value.has_workflow_execution_options_updated_event_attributes?
         api_history_v1_nexus_operation_cancel_request_failed_event_attributes(value.nexus_operation_cancel_request_failed_event_attributes) if value.has_nexus_operation_cancel_request_failed_event_attributes?
         @on_exit&.call(value)
       end
@@ -863,6 +877,19 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_history_v1_workflow_execution_options_updated_event_attributes(value)
+        @on_enter&.call(value)
+        value.attached_completion_callbacks.each { |v| api_common_v1_callback(v) }
+        value.workflow_update_options.each { |v| api_history_v1_workflow_execution_options_updated_event_attributes_workflow_update_options_update(v) }
+        @on_exit&.call(value)
+      end
+      
+      def api_history_v1_workflow_execution_options_updated_event_attributes_workflow_update_options_update(value)
+        @on_enter&.call(value)
+        value.attached_completion_callbacks.each { |v| api_common_v1_callback(v) }
+        @on_exit&.call(value)
+      end
+      
       def api_history_v1_workflow_execution_signaled_event_attributes(value)
         @on_enter&.call(value)
         api_common_v1_payloads(value.input) if value.has_input?
@@ -878,6 +905,7 @@ module Temporalio
         api_common_v1_memo(value.memo) if value.has_memo?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         api_common_v1_header(value.header) if value.has_header?
+        value.completion_callbacks.each { |v| api_common_v1_callback(v) }
         @on_exit&.call(value)
       end
       
@@ -994,6 +1022,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_nexusoperation_v1_callback_info(value)
+        @on_enter&.call(value)
+        api_callback_v1_callback_info(value.info) if value.has_info?
+        @on_exit&.call(value)
+      end
+      
       def api_operatorservice_v1_create_nexus_endpoint_request(value)
         @on_enter&.call(value)
         api_nexus_v1_endpoint_spec(value.spec) if value.has_spec?
@@ -1105,11 +1139,13 @@ module Temporalio
       def api_update_v1_request(value)
         @on_enter&.call(value)
         api_update_v1_input(value.input) if value.has_input?
+        value.completion_callbacks.each { |v| api_common_v1_callback(v) }
         @on_exit&.call(value)
       end
       
       def api_workflow_v1_callback_info(value)
         @on_enter&.call(value)
+        api_common_v1_callback(value.callback) if value.has_callback?
         api_failure_v1_failure(value.last_attempt_failure) if value.has_last_attempt_failure?
         @on_exit&.call(value)
       end
@@ -1253,6 +1289,7 @@ module Temporalio
         api_common_v1_payload(value.input) if value.has_input?
         api_common_v1_payload(value.result) if value.has_result?
         api_failure_v1_failure(value.failure) if value.has_failure?
+        value.completion_callbacks.each { |v| api_nexusoperation_v1_callback_info(v) }
         @on_exit&.call(value)
       end
       
@@ -1578,6 +1615,7 @@ module Temporalio
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         api_common_v1_header(value.header) if value.has_header?
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.completion_callbacks.each { |v| api_common_v1_callback(v) }
         @on_exit&.call(value)
       end
       
@@ -1594,6 +1632,7 @@ module Temporalio
         api_common_v1_payload(value.input) if value.has_input?
         api_common_v1_search_attributes(value.search_attributes) if value.has_search_attributes?
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.completion_callbacks.each { |v| api_common_v1_callback(v) }
         @on_exit&.call(value)
       end
       
@@ -1605,6 +1644,7 @@ module Temporalio
         api_common_v1_header(value.header) if value.has_header?
         api_failure_v1_failure(value.continued_failure) if value.has_continued_failure?
         api_common_v1_payloads(value.last_completion_result) if value.has_last_completion_result?
+        value.completion_callbacks.each { |v| api_common_v1_callback(v) }
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
         @on_exit&.call(value)
       end
@@ -1828,6 +1868,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def coresdk_workflow_commands_cancel_workflow_execution(value)
+        @on_enter&.call(value)
+        api_common_v1_payloads(value.details) if value.has_details?
+        @on_exit&.call(value)
+      end
+      
       def coresdk_workflow_commands_complete_workflow_execution(value)
         @on_enter&.call(value)
         api_common_v1_payload(value.result) if value.has_result?
@@ -1920,11 +1966,13 @@ module Temporalio
       def coresdk_workflow_commands_workflow_command(value)
         @on_enter&.call(value)
         api_sdk_v1_user_metadata(value.user_metadata) if value.has_user_metadata?
+        value.event_group_markers.each { |v| api_sdk_v1_event_group_marker(v) }
         coresdk_workflow_commands_schedule_activity(value.schedule_activity) if value.has_schedule_activity?
         coresdk_workflow_commands_query_result(value.respond_to_query) if value.has_respond_to_query?
         coresdk_workflow_commands_complete_workflow_execution(value.complete_workflow_execution) if value.has_complete_workflow_execution?
         coresdk_workflow_commands_fail_workflow_execution(value.fail_workflow_execution) if value.has_fail_workflow_execution?
         coresdk_workflow_commands_continue_as_new_workflow_execution(value.continue_as_new_workflow_execution) if value.has_continue_as_new_workflow_execution?
+        coresdk_workflow_commands_cancel_workflow_execution(value.cancel_workflow_execution) if value.has_cancel_workflow_execution?
         coresdk_workflow_commands_start_child_workflow_execution(value.start_child_workflow_execution) if value.has_start_child_workflow_execution?
         coresdk_workflow_commands_signal_external_workflow_execution(value.signal_external_workflow_execution) if value.has_signal_external_workflow_execution?
         coresdk_workflow_commands_schedule_local_activity(value.schedule_local_activity) if value.has_schedule_local_activity?

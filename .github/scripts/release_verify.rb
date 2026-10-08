@@ -8,11 +8,6 @@
 #       assert it looks like a semver-ish string with no leading 'v',
 #       and emit `version=...` (and optional `sha=...`) to GITHUB_OUTPUT.
 #
-#   changelog-notes --version VERSION --output PATH [--changelog PATH]
-#       Extract the `## [VERSION]` section from CHANGELOG.md, prepend a
-#       "Notable Changes" header, and write to PATH. Fails if the section
-#       is missing or empty.
-#
 #   verify-dist --version VERSION --dist DIR
 #       Assert DIR contains exactly the expected set of .gem files for
 #       VERSION: one source gem plus one gem per platform in the release
@@ -24,7 +19,6 @@ require 'pathname'
 
 REPO_ROOT = Pathname.new(__dir__).parent.parent.expand_path
 VERSION_FILE = REPO_ROOT.join('temporalio', 'lib', 'temporalio', 'version.rb')
-DEFAULT_CHANGELOG = REPO_ROOT.join('CHANGELOG.md')
 
 # Platform suffixes that appear on a gem filename: temporalio-VERSION-PLATFORM.gem.
 # Kept in sync with the matrix in .github/workflows/build-gems.yml.
@@ -74,49 +68,6 @@ def cmd_validate_version(args)
   end
 end
 
-def cmd_changelog_notes(args)
-  opts = { version: nil, output: nil, changelog: DEFAULT_CHANGELOG.to_s }
-  OptionParser.new do |o|
-    o.on('--version VERSION') { |v| opts[:version] = v }
-    o.on('--output PATH')     { |v| opts[:output] = v }
-    o.on('--changelog PATH')  { |v| opts[:changelog] = v }
-  end.parse!(args)
-
-  raise '--version is required' unless opts[:version]
-  raise '--output is required'  unless opts[:output]
-
-  lines = File.readlines(opts[:changelog], chomp: true)
-  heading = /\A##\s+\[(?<version>[^\]]+)\](?:\s+-\s+.*)?\s*\z/
-  wanted = [opts[:version], "v#{opts[:version]}"]
-
-  start_index = nil
-  lines.each_with_index do |line, index|
-    match = heading.match(line)
-    next unless match && wanted.include?(match[:version])
-
-    start_index = index + 1
-    break
-  end
-
-  raise "Could not find changelog section for version #{opts[:version].inspect}" unless start_index
-
-  end_index = lines.length
-  (start_index...lines.length).each do |index|
-    if lines[index].start_with?('## ')
-      end_index = index
-      break
-    end
-  end
-
-  section = lines[start_index...end_index]
-  section.shift while section.first && section.first.strip.empty?
-  section.pop   while section.last && section.last.strip.empty?
-
-  raise "Changelog section for #{opts[:version].inspect} is empty" if section.empty?
-
-  File.write(opts[:output], (['## Notable Changes', ''] + section).join("\n") + "\n")
-end
-
 def cmd_verify_dist(args)
   opts = { version: nil, dist: 'dist' }
   OptionParser.new do |o|
@@ -146,7 +97,6 @@ end
 
 DISPATCH = {
   'validate-version' => method(:cmd_validate_version),
-  'changelog-notes'  => method(:cmd_changelog_notes),
   'verify-dist'      => method(:cmd_verify_dist)
 }.freeze
 

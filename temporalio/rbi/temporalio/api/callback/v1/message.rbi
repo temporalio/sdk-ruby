@@ -16,7 +16,8 @@ class Temporalio::Api::Callback::V1::CallbackInfo
       last_attempt_complete_time: T.nilable(Google::Protobuf::Timestamp),
       last_attempt_failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
       next_attempt_schedule_time: T.nilable(Google::Protobuf::Timestamp),
-      blocked_reason: T.nilable(String)
+      blocked_reason: T.nilable(String),
+      request_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -27,7 +28,8 @@ class Temporalio::Api::Callback::V1::CallbackInfo
     last_attempt_complete_time: nil,
     last_attempt_failure: nil,
     next_attempt_schedule_time: nil,
-    blocked_reason: ""
+    blocked_reason: "",
+    request_id: ""
   )
   end
 
@@ -152,6 +154,24 @@ class Temporalio::Api::Callback::V1::CallbackInfo
   # If the state is BLOCKED, blocked reason provides additional information.
   sig { void }
   def clear_blocked_reason
+  end
+
+  # Server-generated request ID used as an idempotency token when invoking callbacks.
+# It has no relation to caller-side request_id sent in operations like StartNexusOperationExecutionRequest.
+  sig { returns(String) }
+  def request_id
+  end
+
+  # Server-generated request ID used as an idempotency token when invoking callbacks.
+# It has no relation to caller-side request_id sent in operations like StartNexusOperationExecutionRequest.
+  sig { params(value: String).void }
+  def request_id=(value)
+  end
+
+  # Server-generated request ID used as an idempotency token when invoking callbacks.
+# It has no relation to caller-side request_id sent in operations like StartNexusOperationExecutionRequest.
+  sig { void }
+  def clear_request_id
   end
 
   sig { params(field: String).returns(T.untyped) }

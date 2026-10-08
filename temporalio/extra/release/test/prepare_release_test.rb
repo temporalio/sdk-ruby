@@ -69,99 +69,6 @@ class TestPrepareRelease < Minitest::Test
     end
   end
 
-  def test_finalize_changelog_release_rolls_unreleased_into_dated_section
-    text = <<~MD
-      # Changelog
-
-      ## [Unreleased]
-
-      ### Added
-
-      - New feature X.
-
-      ### Fixed
-
-      - Fixed bug Y.
-
-      ## [v1.5.0] - 2026-06-11
-
-      ### Added
-
-      - Prior release note.
-    MD
-    updated = PrepareRelease.finalize_changelog_release(
-      text, version: '1.6.0', release_date: Date.new(2026, 8, 1)
-    )
-
-    # New [Unreleased] block is present, with all headers seeded empty.
-    assert_match(/^## \[Unreleased\]$/, updated)
-    PrepareRelease::CHANGELOG_HEADERS.each { |h| assert_includes updated, "### #{h}" }
-
-    # Dated release section with v prefix contains only the non-empty
-    # sections we had populated.
-    assert_match(/^## \[v1\.6\.0\] - 2026-08-01$/, updated)
-    assert_includes updated, '- New feature X.'
-    assert_includes updated, '- Fixed bug Y.'
-
-    # Prior release section untouched.
-    assert_includes updated, '## [v1.5.0] - 2026-06-11'
-    assert_includes updated, '- Prior release note.'
-
-    # Only non-empty headers made it into the dated section.
-    dated_start = updated.index('## [v1.6.0]')
-    dated_end   = updated.index('## [v1.5.0]')
-    dated_section = updated[dated_start...dated_end]
-    refute_includes dated_section, '### Deprecated'
-    refute_includes dated_section, '### Security'
-  end
-
-  def test_finalize_changelog_release_refuses_empty_unreleased
-    text = <<~MD
-      # Changelog
-
-      ## [Unreleased]
-
-      ### Added
-
-      ## [v1.5.0] - 2026-06-11
-    MD
-    assert_raises(RuntimeError) do
-      PrepareRelease.finalize_changelog_release(
-        text, version: '1.6.0', release_date: Date.new(2026, 8, 1)
-      )
-    end
-  end
-
-  def test_finalize_changelog_release_refuses_missing_unreleased
-    text = "# Changelog\n\n## [v1.5.0] - 2026-06-11\n\n### Added\n- prior\n"
-    assert_raises(RuntimeError) do
-      PrepareRelease.finalize_changelog_release(
-        text, version: '1.6.0', release_date: Date.new(2026, 8, 1)
-      )
-    end
-  end
-
-  def test_finalize_changelog_release_refuses_duplicate_version_section
-    text = <<~MD
-      # Changelog
-
-      ## [Unreleased]
-
-      ### Added
-
-      - something
-
-      ## [v1.6.0] - 2026-06-01
-
-      - already released
-    MD
-    assert_raises(RuntimeError) do
-      PrepareRelease.finalize_changelog_release(
-        text, version: '1.6.0', release_date: Date.new(2026, 8, 1)
-      )
-    end
-  end
-
   def test_branch_name
     assert_equal 'chore/release-1.6.1', PrepareRelease.branch_name('1.6.1')
   end
@@ -189,7 +96,8 @@ class TestPrepareRelease < Minitest::Test
       assert_equal(
         [
           [%w[git fetch origin main], REPO, true],
-          [['git', 'switch', '--create', 'chore/release-1.6.1', 'origin/main'], REPO, true]
+          [['git', 'switch', '--create', 'chore/release-1.6.1', 'origin/main'], REPO, true],
+          [%w[git submodule update --init --recursive], REPO, true]
         ],
         calls
       )
@@ -206,7 +114,8 @@ class TestPrepareRelease < Minitest::Test
       assert_equal(
         [
           [%w[git fetch origin gmt/ruby-auto-release], REPO, true],
-          [['git', 'switch', '--create', 'chore/release-1.6.1', 'origin/gmt/ruby-auto-release'], REPO, true]
+          [['git', 'switch', '--create', 'chore/release-1.6.1', 'origin/gmt/ruby-auto-release'], REPO, true],
+          [%w[git submodule update --init --recursive], REPO, true]
         ],
         calls
       )
@@ -239,6 +148,14 @@ class TestPrepareRelease < Minitest::Test
         [[['git', 'push', '--set-upstream', 'origin', 'chore/release-1.6.1'], REPO, true]],
         calls
       )
+    end
+  end
+
+  def test_commit_release_changes_includes_consumed_fragments
+    with_recorded_run do |calls|
+      fragment = 'changelog/fixed/dancing-teapot.md'
+      PrepareRelease.commit_release_changes('1.6.1', cwd: REPO, consumed_paths: [fragment])
+      assert_equal fragment, calls[0][0].last
     end
   end
 
@@ -288,6 +205,14 @@ class TestPrepareRelease < Minitest::Test
       err = assert_raises(RuntimeError) { PrepareRelease.ensure_only_release_changes(cwd: REPO) }
       assert_match(/unexpected files/, err.message)
       assert_match(/unrelated\.txt/, err.message)
+    end
+  end
+
+  def test_ensure_only_release_changes_allows_consumed_fragments
+    fragment = 'changelog/fixed/dancing-teapot.md'
+    PrepareRelease.stub(:changed_files, Set.new(PrepareRelease::RELEASE_FILES + [fragment])) do
+      PrepareRelease.ensure_only_release_changes(cwd: REPO, consumed_paths: [fragment])
+      assert_raises(RuntimeError) { PrepareRelease.ensure_only_release_changes(cwd: REPO) }
     end
   end
 end

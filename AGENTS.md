@@ -13,7 +13,7 @@ submitting pull requests; use `README.md` and `CONTRIBUTING.md` for full contrib
 - `temporalio/ext/sdk-core/` has its own `AGENTS.md`; follow it understanding Core.
 - Ignore generated/build output such as `temporalio/doc/`, `temporalio/pkg/`,
   `temporalio/target/`, `temporalio/tmp/`, `target/`, and `.bundle/`.
-- Public API changes usually need tests, YARD/README updates, RBS, RBI, and a `CHANGELOG.md` entry
+- Public API changes usually need tests, YARD/README updates, RBS, RBI, and a changelog fragment
   when user-facing.
 - Keep RBS in `temporalio/sig/` and RBI in `temporalio/rbi/` in sync with Ruby implementation
   changes.
@@ -76,7 +76,15 @@ compile, and the full Minitest suite. It does not enable Sorbet runtime validati
 - Format and lint your code before submitting.
 - Ensure targeted tests cover the changed behavior.
 - Update RBS/RBI signatures with Ruby implementation changes.
-- Update docs and `CHANGELOG.md` for public user-facing API changes.
+- Update docs and add a fragment under `changelog/<category>/` for user-facing changes.
+  Categories are `added`, `stabilized`, `changed`, `deprecated`, `breaking-changes`, `fixed`, and
+  `security`; use `stabilized` when a feature is no longer experimental. Use fun, whimsical,
+  unique lowercase kebab-case filenames, such as `tap-dancing-teapot.md`. Keep entries concise,
+  ideally one or two sentences. Write each entry on one line without a leading `-`; the tooling
+  adds a bullet for each nonempty line. Multiple entries per fragment are allowed.
+  `CHANGELOG.md` contains completed releases only. See `changelog/README.md`.
+- Update Core with `bundle exec rake core:update` from `temporalio/`, then review and commit the
+  pin, imported `Core: ` fragments, and bridge lockfile together. See `CONTRIBUTING.md`.
 - Regenerate protobuf output with `bundle exec rake proto:generate`
 
 ## Review Checklist

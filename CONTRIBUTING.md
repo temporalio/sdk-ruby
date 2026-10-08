@@ -68,6 +68,48 @@ Good pull requests are focused and easy to review:
 Run the relevant local checks when practical. CI must pass before a pull request can
 be merged.
 
+## Development workflow
+
+### Changelog fragments
+
+For user-facing changes, add a concise fragment under `changelog/<category>/`
+instead of editing `CHANGELOG.md`. Use fun, whimsical lowercase kebab-case names,
+such as `tap-dancing-teapot.md`. Each nonempty line becomes a bullet; omit the
+leading `-`. See [the fragment convention](changelog/README.md).
+
+### Updating SDK Core
+
+From `temporalio/`, run `bundle exec rake core:update` to update to Core's latest
+main commit, import its changelog entries with a `Core: ` prefix, and refresh
+`Cargo.lock`. Set `REVISION=<ref>` to select another locally available commit.
+Review and commit the Core pin, imported fragments, and lockfile together. If Core
+package versions change, update the path dependency requirements in `ext/Cargo.toml`
+and rerun `cargo fetch`. Check bridge compatibility with `bundle exec rake compile`
+and regenerate changed protobuf definitions with `bundle exec rake proto:generate`.
+If dependency resolution fails, the pin and fragments remain for inspection.
+
+### Preparing and publishing a release
+
+From `temporalio/`, run:
+
+```bash
+ruby extra/release/scripts/prepare_release.rb 1.10.0
+```
+
+The adapter updates `Temporalio::VERSION` and `Gemfile.lock`, then invokes Core's
+shared `prepare` command to write the dated changelog and consume fragments. It
+commits those changes, including fragment deletions, and opens a release PR.
+Version and lockfile changes remain for review if preparation fails. For a local
+rehearsal in a disposable checkout, pass `--skip-git`; `--skip-lock` also skips
+Bundler. See [release testing](temporalio/extra/release/README.md).
+
+The publishing workflow uses Core's `release-notes` command to read the completed
+changelog and append Core commit links. It does not import entries at publish time.
+For manual generation, run
+`bundle exec rake changelog:release_notes VERSION=1.10.0`, with optional
+`FROM=<previous-tag>` and `OUTPUT=<file>`. The shared tool selects the greatest
+numeric release tag below the requested version, including `v`-prefixed tags.
+
 ## Things to Avoid
 
 Avoid changes that make review harder without improving the contribution:

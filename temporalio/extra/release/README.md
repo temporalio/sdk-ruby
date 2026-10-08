@@ -12,7 +12,7 @@ When testing the release process, you'll create a release branch and a release d
 Specify your branch explicitly:
 
 ```
-ruby release/scripts/prepare_release.rb 1.6.1.test.only.rc3 --base-ref origin/gmt/my-release-process-changes
+ruby extra/release/scripts/prepare_release.rb 1.6.1.test.only.rc3 --base-ref origin/gmt/my-release-process-changes
 ```
 
 Note that this test release branch will include your changes to the release code; this is fine, since you won't merge it.

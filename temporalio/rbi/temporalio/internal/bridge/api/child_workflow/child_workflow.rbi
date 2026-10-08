@@ -298,6 +298,8 @@ end
 module Temporalio::Internal::Bridge::Api::ChildWorkflow::StartChildWorkflowExecutionFailedCause
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
   self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_WORKFLOW_ALREADY_EXISTS = T.let(1, Integer)
+  self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_NAMESPACE_NOT_FOUND = T.let(2, Integer)
+  self::START_CHILD_WORKFLOW_EXECUTION_FAILED_CAUSE_INVALID_VERSIONING_OVERRIDE = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

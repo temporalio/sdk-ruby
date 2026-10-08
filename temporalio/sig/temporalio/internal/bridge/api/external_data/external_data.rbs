@@ -53,6 +53,18 @@ module Temporalio
             def has_original_schedule_time?: () -> bool
             def clear_original_schedule_time: () -> void
 
+            # Position, within the workflow task, of the activation this resolution was delivered in.
+            # Replay must deliver resolutions in the same activations because workflow code can branch on
+            # which handles are ready. Absent in markers written by Core versions that predate this field.
+            attr_reader activation_index(): ::Integer
+            attr_writer activation_index(): ::Integer | ::Float
+            def has_activation_index?: () -> bool
+            def clear_activation_index: () -> void
+
+            attr_reader _activation_index(): ::Integer?
+            def has__activation_index?: () -> bool
+            def clear__activation_index: () -> void
+
             type init_map = {
               seq: (::Integer | ::Float)?,
               "seq" => (::Integer | ::Float)?,
@@ -68,6 +80,8 @@ module Temporalio
               "backoff" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
               original_schedule_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
               "original_schedule_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              activation_index: (::Integer | ::Float)?,
+              "activation_index" => (::Integer | ::Float)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -80,6 +94,7 @@ module Temporalio
               | ("complete_time" name) -> ::Google::Protobuf::Timestamp?
               | ("backoff" name) -> ::Google::Protobuf::Duration?
               | ("original_schedule_time" name) -> ::Google::Protobuf::Timestamp?
+              | ("activation_index" name) -> ::Integer
 
             def []=:
                 ("seq" name, (::Integer | ::Float) value) -> void
@@ -89,6 +104,7 @@ module Temporalio
               | ("complete_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
               | ("backoff" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
               | ("original_schedule_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("activation_index" name, (::Integer | ::Float) value) -> void
           end
 
           class PatchedMarkerData < ::Google::Protobuf::AbstractMessage
