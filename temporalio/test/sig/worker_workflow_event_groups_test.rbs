@@ -1,0 +1,34 @@
+class WorkerWorkflowEventGroupsTest < Test
+  ACT_TIMEOUT: Integer
+
+  def self.activity: (
+    String activity_id,
+    ?event_groups: Array[Temporalio::Workflow::EventGroup]?
+  ) -> untyped
+
+  def events_of_type: (Array[untyped] events, untyped event_type) -> Array[untyped]
+  def single_event: (Array[untyped] events, untyped event_type) -> untyped
+  def activity_event: (Array[untyped] events, String activity_id) -> untyped
+  def markers_named: (Array[untyped] events, String marker_name) -> Array[untyped]
+  def signaled_event_ids: (Array[untyped] events) -> Array[Integer]
+  def render_marker: (untyped marker) -> String
+  def render_marker_id: (untyped marker) -> String
+  def marker_ids: (untyped event) -> Array[String]
+  def assert_markers: (untyped event, *String expected) -> void
+  def assert_marker_ids: (untyped event, *String expected) -> void
+  def label_marker: (String group_id, String label) -> String
+  def label_marker_id: (String group_id) -> String
+  def event_marker: (Integer event_id) -> String
+  def update_marker: (String update_id) -> String
+  def label_payload_of: (untyped event, String marker_id) -> [untyped, untyped]
+  def label_payload_set?: (untyped event, String marker_id) -> bool
+  def raw_label_payload: (untyped event, String marker_id) -> untyped
+  def fetch_events: (Temporalio::Client::WorkflowHandle handle) -> Array[untyped]
+  def run_and_events: [T] (
+    singleton(Temporalio::Workflow::Definition) workflow,
+    *untyped args,
+    ?activities: Array[untyped],
+    ?more_workflows: Array[singleton(Temporalio::Workflow::Definition)],
+    **untyped kwargs
+  ) { (Temporalio::Client::WorkflowHandle, Array[untyped]) -> T } -> T
+end

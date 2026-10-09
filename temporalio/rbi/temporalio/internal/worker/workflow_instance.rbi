@@ -142,8 +142,8 @@ class Temporalio::Internal::Worker::WorkflowInstance
   sig { type_parameters(:T).params(block: T.proc.returns(T.type_parameter(:T))).returns(T.type_parameter(:T)) }
   def illegal_call_tracing_disabled(&block); end
 
-  sig { params(patch_id: T.any(Symbol, String), deprecated: T::Boolean).returns(T::Boolean) }
-  def patch(patch_id:, deprecated:); end
+  sig { params(patch_id: T.any(Symbol, String), deprecated: T::Boolean, event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).returns(T::Boolean) }
+  def patch(patch_id:, deprecated:, event_groups: T.unsafe(nil)); end
 
   sig { params(patch_id: String).returns(T::Boolean) }
   def patch_activated?(patch_id); end

@@ -71,8 +71,8 @@ module Temporalio
             Fiber[:__temporal_update_info]
           end
 
-          def deprecate_patch(patch_id)
-            @instance.patch(patch_id:, deprecated: true)
+          def deprecate_patch(patch_id, event_groups: nil)
+            @instance.patch(patch_id:, deprecated: true, event_groups:)
           end
 
           def durable_scheduler_disabled(&)
@@ -102,7 +102,8 @@ module Temporalio
             disable_eager_execution:,
             priority:,
             arg_hints:,
-            result_hint:
+            result_hint:,
+            event_groups:
           )
             activity, defn_arg_hints, defn_result_hint =
               case activity
@@ -135,7 +136,8 @@ module Temporalio
                 priority:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end
@@ -153,7 +155,8 @@ module Temporalio
             cancellation_type:,
             activity_id:,
             arg_hints:,
-            result_hint:
+            result_hint:,
+            event_groups:
           )
             activity, defn_arg_hints, defn_result_hint =
               case activity
@@ -182,7 +185,8 @@ module Temporalio
                 activity_id:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end
@@ -204,6 +208,7 @@ module Temporalio
           end
 
           def initialize_continue_as_new_error(error)
+            error._event_group_markers = Workflow::EventGroup._markers_for_command(error.event_groups)
             @outbound.initialize_continue_as_new_error(
               Temporalio::Worker::Interceptor::Workflow::InitializeContinueAsNewErrorInput.new(error:)
             )
@@ -235,8 +240,8 @@ module Temporalio
             @instance.now
           end
 
-          def patched(patch_id)
-            @instance.patch(patch_id:, deprecated: false)
+          def patched(patch_id, event_groups: nil)
+            @instance.patch(patch_id:, deprecated: false, event_groups:)
           end
 
           def payload_converter
@@ -269,12 +274,13 @@ module Temporalio
             @instance.signal_handlers
           end
 
-          def sleep(duration, summary:, cancellation:)
+          def sleep(duration, summary:, cancellation:, event_groups: nil)
             @outbound.sleep(
               Temporalio::Worker::Interceptor::Workflow::SleepInput.new(
                 duration:,
                 summary:,
-                cancellation:
+                cancellation:,
+                event_groups:
               )
             )
           end
@@ -299,7 +305,8 @@ module Temporalio
             search_attributes:,
             priority:,
             arg_hints:,
-            result_hint:
+            result_hint:,
+            event_groups:
           )
             workflow, defn_arg_hints, defn_result_hint =
               Workflow::Definition._workflow_type_and_hints_from_workflow_parameter(workflow)
@@ -325,7 +332,8 @@ module Temporalio
                 priority:,
                 arg_hints: arg_hints || defn_arg_hints,
                 result_hint: result_hint || defn_result_hint,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end
@@ -334,7 +342,7 @@ module Temporalio
             @storage ||= {}
           end
 
-          def timeout(duration, exception_class, *exception_args, summary:, &)
+          def timeout(duration, exception_class, *exception_args, summary:, event_groups: nil, &)
             raise 'Block required for timeout' unless block_given?
 
             # Run timer in background and block in foreground. This gives better stack traces than a future any-of race.
@@ -342,7 +350,7 @@ module Temporalio
             sleep_cancel, sleep_cancel_proc = Cancellation.new
             fiber = Fiber.current
             Workflow::Future.new do
-              Workflow.sleep(duration, summary:, cancellation: sleep_cancel)
+              Workflow.sleep(duration, summary:, cancellation: sleep_cancel, event_groups:)
               fiber.raise(exception_class, *exception_args) if fiber.alive? # steep:ignore
             rescue Exception => e # rubocop:disable Lint/RescueException
               # Re-raise in fiber
@@ -360,7 +368,7 @@ module Temporalio
             @instance.update_handlers
           end
 
-          def upsert_memo(hash)
+          def upsert_memo(hash, event_groups: nil)
             # Convert to memo, apply updates, then add the command (so command adding is post validation)
             upserted_memo = ProtoUtils.memo_to_proto(hash, payload_converter)
             memo._update do |new_hash|
@@ -377,12 +385,13 @@ module Temporalio
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
                 modify_workflow_properties: Bridge::Api::WorkflowCommands::ModifyWorkflowProperties.new(
                   upserted_memo:
-                )
+                ),
+                event_group_markers: Workflow::EventGroup._markers_for_command(event_groups)
               )
             )
           end
 
-          def upsert_search_attributes(*updates)
+          def upsert_search_attributes(*updates, event_groups: nil)
             # Apply updates then add the command (so command adding is post validation)
             search_attributes._disable_mutations = false
             search_attributes.update!(*updates)
@@ -392,7 +401,8 @@ module Temporalio
                   search_attributes: Api::Common::V1::SearchAttributes.new(
                     indexed_fields: updates.to_h(&:_to_proto_pair)
                   )
-                )
+                ),
+                event_group_markers: Workflow::EventGroup._markers_for_command(event_groups)
               )
             )
           ensure
@@ -403,9 +413,9 @@ module Temporalio
             @instance.scheduler.wait_condition(cancellation:, &)
           end
 
-          def _cancel_external_workflow(id:, run_id:)
+          def _cancel_external_workflow(id:, run_id:, event_groups: nil)
             @outbound.cancel_external_workflow(
-              Temporalio::Worker::Interceptor::Workflow::CancelExternalWorkflowInput.new(id:, run_id:)
+              Temporalio::Worker::Interceptor::Workflow::CancelExternalWorkflowInput.new(id:, run_id:, event_groups:)
             )
           end
 
@@ -413,7 +423,7 @@ module Temporalio
             @outbound = outbound
           end
 
-          def _signal_child_workflow(id:, signal:, args:, cancellation:, arg_hints:)
+          def _signal_child_workflow(id:, signal:, args:, cancellation:, arg_hints:, event_groups: nil)
             signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
             @outbound.signal_child_workflow(
               Temporalio::Worker::Interceptor::Workflow::SignalChildWorkflowInput.new(
@@ -422,12 +432,13 @@ module Temporalio
                 args:,
                 cancellation:,
                 arg_hints: arg_hints || defn_arg_hints,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end
 
-          def _signal_external_workflow(id:, run_id:, signal:, args:, cancellation:, arg_hints:)
+          def _signal_external_workflow(id:, run_id:, signal:, args:, cancellation:, arg_hints:, event_groups: nil)
             signal, defn_arg_hints = Workflow::Definition::Signal._name_and_hints_from_parameter(signal)
             @outbound.signal_external_workflow(
               Temporalio::Worker::Interceptor::Workflow::SignalExternalWorkflowInput.new(
@@ -437,7 +448,8 @@ module Temporalio
                 args:,
                 cancellation:,
                 arg_hints: arg_hints || defn_arg_hints,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end

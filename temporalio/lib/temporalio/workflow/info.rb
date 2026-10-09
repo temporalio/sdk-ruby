@@ -13,6 +13,7 @@ module Temporalio
       :last_result,
       :has_last_result?,
       :namespace,
+      :original_execution_run_id,
       :parent,
       :priority,
       :retry_policy,
@@ -49,6 +50,9 @@ module Temporalio
 
     # @!attribute namespace
     #   @return [String] Namespace for the workflow.
+    # @!attribute original_execution_run_id
+    #   @return [String] Run ID recorded on the workflow execution started event. Unlike {#run_id},
+    #     this value is preserved across workflow resets.
     # @!attribute parent
     #   @return [ParentInfo, nil] Parent information for the workflow if this is a child.
     # @!attribute priority

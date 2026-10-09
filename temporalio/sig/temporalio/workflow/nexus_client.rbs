@@ -14,7 +14,8 @@ module Temporalio
         ?summary: String?,
         ?cancellation: Cancellation,
         ?arg_hint: Object?,
-        ?result_hint: Object?
+        ?result_hint: Object?,
+        ?event_groups: Array[EventGroup]?
       ) -> NexusOperationHandle
 
       def execute_operation: (
@@ -27,7 +28,8 @@ module Temporalio
         ?summary: String?,
         ?cancellation: Cancellation,
         ?arg_hint: Object?,
-        ?result_hint: Object?
+        ?result_hint: Object?,
+        ?event_groups: Array[EventGroup]?
       ) -> Object?
     end
   end

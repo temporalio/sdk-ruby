@@ -46,8 +46,8 @@ module Temporalio
             @resolution = resolution
           end
 
-          def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil)
-            @instance.context._signal_child_workflow(id:, signal:, args:, cancellation:, arg_hints:)
+          def signal(signal, *args, cancellation: Workflow.cancellation, arg_hints: nil, event_groups: nil)
+            @instance.context._signal_child_workflow(id:, signal:, args:, cancellation:, arg_hints:, event_groups:)
           end
         end
       end

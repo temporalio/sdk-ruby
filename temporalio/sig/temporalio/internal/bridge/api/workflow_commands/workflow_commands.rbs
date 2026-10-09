@@ -19,6 +19,12 @@ module Temporalio
             def has_user_metadata?: () -> bool
             def clear_user_metadata: () -> void
 
+            # Event group markers attached to the command. These are forwarded onto
+            # the corresponding server-side Command, and consequently surfaced on the
+            # resulting HistoryEvent. See `temporal/api/sdk/v1/event_group_marker.proto`.
+            attr_accessor event_group_markers(): ::Google::Protobuf::RepeatedField
+            def clear_event_group_markers: () -> void
+
             attr_accessor start_timer(): ::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer?
             def has_start_timer?: () -> bool
             def clear_start_timer: () -> void
@@ -114,6 +120,8 @@ module Temporalio
             type init_map = {
               user_metadata: (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
               "user_metadata" => (::Temporalio::Api::Sdk::V1::UserMetadata | ::Temporalio::Api::Sdk::V1::UserMetadata::init_map)?,
+              event_group_markers: ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
+              "event_group_markers" => ::Array[::Temporalio::Api::Sdk::V1::EventGroupMarker]?,
               start_timer: (::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer::init_map)?,
               "start_timer" => (::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer::init_map)?,
               schedule_activity: (::Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleActivity | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleActivity::init_map)?,
@@ -164,6 +172,7 @@ module Temporalio
 
             def []:
                 ("user_metadata" name) -> ::Temporalio::Api::Sdk::V1::UserMetadata?
+              | ("event_group_markers" name) -> ::Google::Protobuf::RepeatedField
               | ("start_timer" name) -> ::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer?
               | ("schedule_activity" name) -> ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleActivity?
               | ("respond_to_query" name) -> ::Temporalio::Internal::Bridge::Api::WorkflowCommands::QueryResult?
@@ -189,6 +198,7 @@ module Temporalio
 
             def []=:
                 ("user_metadata" name, ::Temporalio::Api::Sdk::V1::UserMetadata? value) -> void
+              | ("event_group_markers" name, ::Google::Protobuf::RepeatedField value) -> void
               | ("start_timer" name, ::Temporalio::Internal::Bridge::Api::WorkflowCommands::StartTimer? value) -> void
               | ("schedule_activity" name, ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ScheduleActivity? value) -> void
               | ("respond_to_query" name, ::Temporalio::Internal::Bridge::Api::WorkflowCommands::QueryResult? value) -> void
@@ -505,6 +515,12 @@ module Temporalio
             attr_reader cancellation_type_const(): ::Integer
             def clear_cancellation_type: () -> void
 
+            # If set, the local activity arguments will be included in the resulting marker under the
+            # `input` key. This is disabled by default to avoid increasing history size unless the lang
+            # SDK explicitly chooses to expose it.
+            attr_accessor include_arguments_in_marker(): bool
+            def clear_include_arguments_in_marker: () -> void
+
             type init_map = {
               seq: (::Integer | ::Float)?,
               "seq" => (::Integer | ::Float)?,
@@ -532,6 +548,8 @@ module Temporalio
               "local_retry_threshold" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
               cancellation_type: (::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::names | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::strings | ::Integer | ::Float)?,
               "cancellation_type" => (::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::names | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::strings | ::Integer | ::Float)?,
+              include_arguments_in_marker: bool?,
+              "include_arguments_in_marker" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -550,6 +568,7 @@ module Temporalio
               | ("retry_policy" name) -> ::Temporalio::Api::Common::V1::RetryPolicy?
               | ("local_retry_threshold" name) -> ::Google::Protobuf::Duration?
               | ("cancellation_type" name) -> (::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::names | ::Integer)
+              | ("include_arguments_in_marker" name) -> bool
 
             def []=:
                 ("seq" name, (::Integer | ::Float) value) -> void
@@ -565,6 +584,7 @@ module Temporalio
               | ("retry_policy" name, ::Temporalio::Api::Common::V1::RetryPolicy? value) -> void
               | ("local_retry_threshold" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
               | ("cancellation_type" name, (::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::names | ::Temporalio::Internal::Bridge::Api::WorkflowCommands::ActivityCancellationType::strings | ::Integer | ::Float) value) -> void
+              | ("include_arguments_in_marker" name, bool value) -> void
           end
 
           class RequestCancelActivity < ::Google::Protobuf::AbstractMessage
@@ -845,10 +865,22 @@ module Temporalio
           # containing a cancellation job.
           class CancelWorkflowExecution < ::Google::Protobuf::AbstractMessage
 
+            attr_accessor details(): ::Temporalio::Api::Common::V1::Payloads?
+            def has_details?: () -> bool
+            def clear_details: () -> void
+
             type init_map = {
+              details: (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
+              "details" => (::Temporalio::Api::Common::V1::Payloads | ::Temporalio::Api::Common::V1::Payloads::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("details" name) -> ::Temporalio::Api::Common::V1::Payloads?
+
+            def []=:
+                ("details" name, ::Temporalio::Api::Common::V1::Payloads? value) -> void
           end
 
           # A request to set/check if a certain patch is present or not

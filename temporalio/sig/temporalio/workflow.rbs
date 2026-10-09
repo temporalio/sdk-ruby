@@ -8,6 +8,16 @@ module Temporalio
 
     def self.create_nexus_client: (endpoint: Symbol | String, service: Symbol | String) -> NexusClient
 
+    def self.create_event_group: (String id, ?label: String?) -> EventGroup
+
+    def self.with_event_groups: [T] (*EventGroup groups) { -> T } -> T
+
+    def self._with_implicit_event_group: [T] (EventGroup group) { -> T } -> T
+
+    def self._inbound_event_group: (Integer? event_id) -> EventGroup
+
+    def self._inbound_update_event_group: (String update_id) -> EventGroup
+
     def self.suggest_continue_as_new_reasons: -> Array[SuggestContinueAsNewReason::enum]
 
     def self.target_worker_deployment_version_changed?: -> bool
@@ -23,7 +33,7 @@ module Temporalio
 
     def self.current_update_info: -> UpdateInfo?
 
-    def self.deprecate_patch: (Symbol | String patch_id) -> void
+    def self.deprecate_patch: (Symbol | String patch_id, ?event_groups: Array[EventGroup]?) -> void
 
     def self.execute_activity: (
       singleton(Activity::Definition) | Symbol | String activity,
@@ -41,7 +51,8 @@ module Temporalio
       ?disable_eager_execution: bool,
       ?priority: Priority,
       ?arg_hints: Array[Object]?,
-      ?result_hint: Object?
+      ?result_hint: Object?,
+      ?event_groups: Array[EventGroup]?
     ) -> Object?
 
     def self.execute_child_workflow: (
@@ -64,7 +75,8 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?priority: Priority,
       ?arg_hints: Array[Object]?,
-      ?result_hint: Object?
+      ?result_hint: Object?,
+      ?event_groups: Array[EventGroup]?
     ) -> Object?
 
     def self.execute_local_activity: (
@@ -80,7 +92,8 @@ module Temporalio
       ?cancellation_type: ActivityCancellationType::enum,
       ?activity_id: String?,
       ?arg_hints: Array[Object]?,
-      ?result_hint: Object?
+      ?result_hint: Object?,
+      ?event_groups: Array[EventGroup]?
     ) -> Object?
 
     def self.external_workflow_handle: (String workflow_id, ?run_id: String?) -> ExternalWorkflowHandle
@@ -99,7 +112,7 @@ module Temporalio
 
     def self.now: -> Time
 
-    def self.patched: (Symbol | String patch_id) -> bool
+    def self.patched: (Symbol | String patch_id, ?event_groups: Array[EventGroup]?) -> bool
 
     def self.payload_converter: -> Converters::PayloadConverter
 
@@ -111,7 +124,7 @@ module Temporalio
 
     def self.signal_handlers: -> Hash[String?, Workflow::Definition::Signal]
 
-    def self.sleep: (duration? duration, ?summary: String?, ?cancellation: Cancellation) -> void
+    def self.sleep: (duration? duration, ?summary: String?, ?cancellation: Cancellation, ?event_groups: Array[EventGroup]?) -> void
 
     def self.start_child_workflow: (
       singleton(Workflow::Definition) | Workflow::Definition::Info | Symbol | String workflow,
@@ -133,7 +146,8 @@ module Temporalio
       ?search_attributes: SearchAttributes?,
       ?priority: Priority,
       ?arg_hints: Array[Object]?,
-      ?result_hint: Object?
+      ?result_hint: Object?,
+      ?event_groups: Array[EventGroup]?
     ) -> ChildWorkflowHandle
 
     def self.storage: -> Hash[Object, Object]
@@ -142,14 +156,15 @@ module Temporalio
       duration? duration,
       ?singleton(Exception) exception_class,
       ?String message,
-      ?summary: String?
+      ?summary: String?,
+      ?event_groups: Array[EventGroup]?
     ) { -> T } -> T
 
     def self.update_handlers: -> Hash[String?, Workflow::Definition::Update]
 
-    def self.upsert_memo: (Hash[Symbol | String, Object?] hash) -> void
+    def self.upsert_memo: (Hash[Symbol | String, Object?] hash, ?event_groups: Array[EventGroup]?) -> void
 
-    def self.upsert_search_attributes: (*SearchAttributes::Update updates) -> void
+    def self.upsert_search_attributes: (*SearchAttributes::Update updates, ?event_groups: Array[EventGroup]?) -> void
 
     def self.wait_condition: [T] (?cancellation: Cancellation?) { -> T } -> T
 
@@ -183,6 +198,8 @@ module Temporalio
       attr_accessor arg_hints: Array[Object]?
       attr_accessor headers: Hash[String, Object?]
       attr_accessor initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?
+      attr_accessor event_groups: Array[EventGroup]?
+      attr_accessor _event_group_markers: Array[Api::Sdk::V1::EventGroupMarker]?
 
       def initialize: (
         *Object? args,
@@ -196,7 +213,8 @@ module Temporalio
         ?search_attributes: SearchAttributes?,
         ?arg_hints: Array[Object]?,
         ?headers: Hash[String, Object?],
-        ?initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?
+        ?initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?,
+        ?event_groups: Array[EventGroup]?
       ) -> void
     end
 

@@ -8,15 +8,17 @@ module Temporalio
           def execute_activity_with_local_backoffs: (
             local: bool,
             cancellation: Cancellation,
-            result_hint: Object?
-          ) { (untyped?) -> Integer } -> Object?
+            result_hint: Object?,
+            event_groups: Array[Workflow::EventGroup]?
+          ) { (untyped?, untyped) -> Integer } -> Object?
 
           def execute_activity_once: (
             local: bool,
             cancellation: Cancellation,
             last_local_backoff: untyped?,
-            result_hint: Object?
-          ) { (untyped?) -> Integer } -> Object?
+            result_hint: Object?,
+            markers: untyped
+          ) { (untyped?, untyped) -> Integer } -> Object?
 
           def _signal_external_workflow: (
             id: String,
@@ -26,7 +28,8 @@ module Temporalio
             args: Array[Object?],
             cancellation: Cancellation,
             arg_hints: Array[Object]?,
-            headers: Hash[String, Object?]
+            headers: Hash[String, Object?],
+            event_groups: Array[Workflow::EventGroup]?
           ) -> void
         end
       end

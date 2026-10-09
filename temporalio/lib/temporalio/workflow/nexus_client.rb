@@ -37,6 +37,8 @@ module Temporalio
       # @param cancellation [Cancellation] Cancellation for the operation.
       # @param arg_hint [Object, nil] Converter hint for the argument.
       # @param result_hint [Object, nil] Converter hint for the result.
+      # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the schedule command, in addition to any
+      #   groups from enclosing {Workflow.with_event_groups} scopes.
       # @return [NexusOperationHandle] Handle to the started operation.
       def start_operation(
         operation,
@@ -48,7 +50,8 @@ module Temporalio
         summary: nil,
         cancellation: Workflow.cancellation,
         arg_hint: nil,
-        result_hint: nil
+        result_hint: nil,
+        event_groups: nil
       )
         raise NotImplementedError
       end
@@ -69,6 +72,8 @@ module Temporalio
       # @param cancellation [Cancellation] Cancellation for the operation.
       # @param arg_hint [Object, nil] Converter hint for the argument.
       # @param result_hint [Object, nil] Converter hint for the result.
+      # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the schedule command, in addition to any
+      #   groups from enclosing {Workflow.with_event_groups} scopes.
       # @return [Object] Result of the operation.
       # @raise [Error::NexusOperationError] Operation failed.
       def execute_operation(
@@ -81,11 +86,12 @@ module Temporalio
         summary: nil,
         cancellation: Workflow.cancellation,
         arg_hint: nil,
-        result_hint: nil
+        result_hint: nil,
+        event_groups: nil
       )
         start_operation(
           operation, arg, schedule_to_close_timeout:, schedule_to_start_timeout:, start_to_close_timeout:,
-                          cancellation_type:, summary:, cancellation:, arg_hint:, result_hint:
+                          cancellation_type:, summary:, cancellation:, arg_hint:, result_hint:, event_groups:
         ).result
       end
     end

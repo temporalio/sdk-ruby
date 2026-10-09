@@ -823,6 +823,9 @@ sig { params(value: Object).void }
   def coresdk_workflow_activation_workflow_activation_job(value); end
   
   sig { params(value: Object).void }
+  def coresdk_workflow_commands_cancel_workflow_execution(value); end
+  
+  sig { params(value: Object).void }
   def coresdk_workflow_commands_complete_workflow_execution(value); end
   
   sig { params(value: Object).void }

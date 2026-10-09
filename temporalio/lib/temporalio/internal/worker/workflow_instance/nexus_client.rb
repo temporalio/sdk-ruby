@@ -19,7 +19,7 @@ module Temporalio
 
           def start_operation(operation, arg, schedule_to_close_timeout: nil, schedule_to_start_timeout: nil,
                               start_to_close_timeout: nil, cancellation_type: nil, summary: nil,
-                              cancellation: Workflow.cancellation, arg_hint: nil, result_hint: nil)
+                              cancellation: Workflow.cancellation, arg_hint: nil, result_hint: nil, event_groups: nil)
             @outbound.start_nexus_operation(
               Temporalio::Worker::Interceptor::Workflow::StartNexusOperationInput.new(
                 endpoint: @endpoint,
@@ -34,7 +34,8 @@ module Temporalio
                 cancellation:,
                 arg_hint:,
                 result_hint:,
-                headers: {}
+                headers: {},
+                event_groups:
               )
             )
           end
