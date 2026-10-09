@@ -282,11 +282,13 @@ class Temporalio::Internal::Bridge::Api::ActivityResult::Failure
 
   sig do
     params(
-      failure: T.nilable(Temporalio::Api::Failure::V1::Failure)
+      failure: T.nilable(Temporalio::Api::Failure::V1::Failure),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
-    failure: nil
+    failure: nil,
+    cause: :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -300,6 +302,24 @@ class Temporalio::Internal::Bridge::Api::ActivityResult::Failure
 
   sig { void }
   def clear_failure
+  end
+
+  # Only meaningful on ActivityExecutionResult (lang -> core); ignored on ActivityResolution,
+# which reuses this message.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # Only meaningful on ActivityExecutionResult (lang -> core); ignored on ActivityResolution,
+# which reuses this message.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # Only meaningful on ActivityExecutionResult (lang -> core); ignored on ActivityResolution,
+# which reuses this message.
+  sig { void }
+  def clear_cause
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -542,6 +562,25 @@ class Temporalio::Internal::Bridge::Api::ActivityResult::DoBackoff
   end
 
   sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause
+  self::ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE = T.let(1, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE = T.let(2, Integer)
+  self::ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE = T.let(3, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
   def self.descriptor
   end
 end

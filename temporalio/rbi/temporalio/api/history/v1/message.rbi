@@ -3300,7 +3300,8 @@ class Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes
       started_event_id: T.nilable(Integer),
       identity: T.nilable(String),
       retry_state: T.nilable(T.any(Symbol, String, Integer)),
-      worker_version: T.nilable(Temporalio::Api::Common::V1::WorkerVersionStamp)
+      worker_version: T.nilable(Temporalio::Api::Common::V1::WorkerVersionStamp),
+      cause: T.nilable(T.any(Symbol, String, Integer))
     ).void
   end
   def initialize(
@@ -3309,7 +3310,8 @@ class Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes
     started_event_id: 0,
     identity: "",
     retry_state: :RETRY_STATE_UNSPECIFIED,
-    worker_version: nil
+    worker_version: nil,
+    cause: :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED
   )
   end
 
@@ -3401,6 +3403,21 @@ class Temporalio::Api::History::V1::ActivityTaskFailedEventAttributes
 # Deprecated. This field should be cleaned up when versioning-2 API is removed. [cleanup-experimental-wv]
   sig { void }
   def clear_worker_version
+  end
+
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { returns(T.any(Symbol, Integer)) }
+  def cause
+  end
+
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def cause=(value)
+  end
+
+  # Why did the task fail? When unset, the failure is treated as an unspecified activity failure.
+  sig { void }
+  def clear_cause
   end
 
   sig { params(field: String).returns(T.untyped) }

@@ -41,6 +41,9 @@ jobs:
       artifact_name: release-dist-${{ steps.validate.outputs.version }}
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
@@ -56,12 +59,13 @@ jobs:
             --sha "$(git rev-parse HEAD)" \
             --github-output "$GITHUB_OUTPUT"
 
-      - name: Extract changelog release notes
+      - name: Generate changelog and Core commit release notes
         env:
           VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
-          ruby .github/scripts/release_verify.rb changelog-notes \
+          ruby temporalio/extra/release/scripts/changelog.rb release-notes \
+            --submodule temporalio/ext/sdk-core \
             --version "$VERSION" \
             --output release-notes.md
 

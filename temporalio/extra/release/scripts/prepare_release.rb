@@ -4,9 +4,8 @@
 
 # Prepare checked-in files for a Ruby SDK release.
 #
-# Bumps Temporalio::VERSION, rolls the CHANGELOG's [Unreleased] section
-# into a dated [vVERSION] section (adding a fresh [Unreleased]),
-# refreshes Gemfile.lock, and — unless --skip-git is passed — creates a
+# Bumps Temporalio::VERSION, refreshes Gemfile.lock, assembles changelog fragments
+# through Core's shared tool, and — unless --skip-git is passed — creates a
 # chore/release-VERSION branch off origin/main, commits the release files,
 # pushes, and opens the release PR via `gh`.
 
@@ -14,22 +13,12 @@ require 'date'
 require 'optparse'
 require 'pathname'
 
+require_relative 'changelog'
+
 module PrepareRelease
   REPO_ROOT = Pathname.new(__dir__).parent.parent.parent.parent.expand_path
 
-  CHANGELOG_HEADERS = [
-    'Added',
-    'Changed',
-    'Deprecated',
-    ':boom: Breaking Changes',
-    'Fixed',
-    'Security'
-  ].freeze
-
   VERSION_RE = /\A[0-9]+(?:\.[0-9]+)+[A-Za-z0-9_.+-]*\z/
-  CHANGELOG_HEADING_RE = /\A##\s+\[(?<version>[^\]]+)\](?:\s+-\s+.*)?\s*\z/
-  CHANGELOG_SUBHEADING_RE = /\A###\s+(?<header>.+?)\s*\z/
-
   RELEASE_FILES = [
     'CHANGELOG.md',
     'temporalio/Gemfile.lock',
@@ -62,102 +51,6 @@ module PrepareRelease
     updated
   end
 
-  # Roll [Unreleased] into a dated [vVERSION] section, add a fresh
-  # empty [Unreleased] above it. Fails if [Unreleased] is empty or
-  # missing, or if a section for the target version already exists.
-  def finalize_changelog_release(text, version:, release_date:)
-    validate_version(version)
-    heading = "[v#{version}]"
-
-    lines = text.split("\n", -1)
-    trailing_newline = lines.pop == '' # split with -1 keeps a trailing '' for text ending in \n
-
-    raise "Changelog already has a section for #{heading}" if find_version_section(lines, "v#{version}")
-
-    unreleased = find_version_section(lines, 'Unreleased')
-    raise "Could not find changelog section for 'Unreleased'" unless unreleased
-
-    heading_index, section_start, section_end = unreleased
-    body = strip_empty_changelog_headers(strip_outer_blank_lines(lines[section_start...section_end]))
-    raise "Changelog section for 'Unreleased' is empty" if body.empty?
-
-    result = lines[0...heading_index] +
-             seeded_unreleased_lines +
-             ["## #{heading} - #{release_date.iso8601}", ''] +
-             body +
-             [''] +
-             lines[section_end..]
-    output = collapse_blank_lines(result).join("\n").rstrip
-    output + (trailing_newline ? "\n" : '')
-  end
-
-  def seeded_unreleased_lines
-    lines = ['## [Unreleased]', '']
-    CHANGELOG_HEADERS.each { |h| lines.push("### #{h}", '') }
-    lines
-  end
-
-  def find_version_section(lines, version)
-    lines.each_with_index do |line, index|
-      match = CHANGELOG_HEADING_RE.match(line)
-      next unless match && match[:version] == version
-
-      section_end = lines.length
-      ((index + 1)...lines.length).each do |end_index|
-        if lines[end_index].start_with?('## ')
-          section_end = end_index
-          break
-        end
-      end
-      return [index, index + 1, section_end]
-    end
-    nil
-  end
-
-  def strip_outer_blank_lines(lines)
-    result = lines.dup
-    result.shift while result.first && result.first.strip.empty?
-    result.pop   while result.last  && result.last.strip.empty?
-    result
-  end
-
-  def strip_empty_changelog_headers(lines)
-    filtered = []
-    index = 0
-    while index < lines.length
-      match = CHANGELOG_SUBHEADING_RE.match(lines[index])
-      unless match && CHANGELOG_HEADERS.include?(match[:header])
-        filtered << lines[index]
-        index += 1
-        next
-      end
-
-      next_index = index + 1
-      next_index += 1 while next_index < lines.length && !lines[next_index].start_with?('### ')
-
-      body = lines[(index + 1)...next_index]
-      if body.any? { |l| !l.strip.empty? }
-        filtered << lines[index]
-        filtered.concat(body)
-      end
-      index = next_index
-    end
-    strip_outer_blank_lines(filtered)
-  end
-
-  def collapse_blank_lines(lines)
-    collapsed = []
-    previous_blank = false
-    lines.each do |line|
-      blank = line.strip.empty?
-      next if blank && previous_blank
-
-      collapsed << line
-      previous_blank = blank
-    end
-    collapsed
-  end
-
   # --- git / gh side effects -------------------------------------------------
 
   def run(cmd, cwd: REPO_ROOT, check: true)
@@ -183,8 +76,8 @@ module PrepareRelease
     raise "Release preparation requires a clean worktree; found changes in #{changes.to_a.sort.join(', ')}"
   end
 
-  def ensure_only_release_changes(cwd: REPO_ROOT)
-    unexpected = changed_files(cwd: cwd) - RELEASE_FILES
+  def ensure_only_release_changes(cwd: REPO_ROOT, consumed_paths: [])
+    unexpected = changed_files(cwd: cwd) - RELEASE_FILES - consumed_paths
     return if unexpected.empty?
 
     raise "Release preparation changed unexpected files: #{unexpected.to_a.sort.join(', ')}"
@@ -200,10 +93,11 @@ module PrepareRelease
 
     run(['git', 'fetch', 'origin', branch], cwd: cwd)
     run(['git', 'switch', '--create', branch_name(version), base_ref], cwd: cwd)
+    run(%w[git submodule update --init --recursive], cwd: cwd)
   end
 
-  def commit_release_changes(version, cwd: REPO_ROOT)
-    run(['git', 'commit', '-m', "Prepare release #{version}", '--', *RELEASE_FILES], cwd: cwd)
+  def commit_release_changes(version, cwd: REPO_ROOT, consumed_paths: [])
+    run(['git', 'commit', '-m', "Prepare release #{version}", '--', *RELEASE_FILES, *consumed_paths], cwd: cwd)
   end
 
   def push_release_branch(version, cwd: REPO_ROOT)
@@ -223,6 +117,14 @@ module PrepareRelease
   end
 
   # --- main ------------------------------------------------------------------
+
+  def prepare_release_files(version, release_date, cwd: REPO_ROOT, skip_lock: false)
+    version_path = cwd.join('temporalio/lib/temporalio/version.rb')
+    version_path.write(replace_version_constant(version_path.read, version))
+    run(%w[bundle lock], cwd: cwd.join('temporalio')) unless skip_lock
+    Changelog.run('prepare', '--version', version, '--date', release_date.iso8601, repo_root: cwd)
+    capture(%w[git ls-files --deleted -z -- changelog], cwd: cwd).split("\0")
+  end
 
   def main(argv)
     options = {
@@ -258,19 +160,11 @@ module PrepareRelease
     ensure_clean_worktree unless options[:skip_git]
     create_release_branch(version, base_ref: options[:base_ref]) unless options[:skip_git]
 
-    changelog_path = REPO_ROOT.join('CHANGELOG.md')
-    version_path   = REPO_ROOT.join('temporalio', 'lib', 'temporalio', 'version.rb')
-
-    changelog_path.write(
-      finalize_changelog_release(changelog_path.read, version: version, release_date: release_date)
-    )
-    version_path.write(replace_version_constant(version_path.read, version))
-
-    run(%w[bundle lock], cwd: REPO_ROOT.join('temporalio')) unless options[:skip_lock]
+    consumed = prepare_release_files(version, release_date, skip_lock: options[:skip_lock])
 
     unless options[:skip_git]
-      ensure_only_release_changes
-      commit_release_changes(version)
+      ensure_only_release_changes(consumed_paths: consumed)
+      commit_release_changes(version, consumed_paths: consumed)
       push_release_branch(version)
       create_release_pr(version)
     end

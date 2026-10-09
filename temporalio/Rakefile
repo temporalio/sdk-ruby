@@ -116,4 +116,32 @@ task :rust_lint do
   sh 'cargo', 'fmt', '--check'
 end
 
+namespace :changelog do
+  desc 'Validate pending changelog fragments'
+  task :check do
+    require_relative 'extra/release/scripts/changelog'
+    Changelog.run('check')
+  end
+
+  desc 'Generate release notes (VERSION required; optional FROM and OUTPUT)'
+  task :release_notes do
+    require_relative 'extra/release/scripts/changelog'
+    args = ['release-notes', '--submodule', Changelog::CORE_PATH, '--version', ENV.fetch('VERSION')]
+    args.push('--from', ENV.fetch('FROM')) if ENV.key?('FROM')
+    args.push('--output', ENV.fetch('OUTPUT')) if ENV.key?('OUTPUT')
+    Changelog.run(*args)
+  end
+end
+
+namespace :core do
+  desc 'Update Core and import its changelog fragments (optional REVISION)'
+  task :update do
+    require_relative 'extra/release/scripts/changelog'
+    args = ['update-core', '--submodule', Changelog::CORE_PATH]
+    args.push('--revision', ENV.fetch('REVISION')) if ENV.key?('REVISION')
+    Changelog.run(*args)
+    sh 'cargo', 'fetch'
+  end
+end
+
 task default: ['rubocop', 'yard', 'rbs:install_collection', 'steep', 'rust_lint', 'compile', 'test']

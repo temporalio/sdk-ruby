@@ -33,6 +33,11 @@ fn data_source_to_hash(ruby: &Ruby, ds: &DataSource) -> Result<RHash, Error> {
         DataSource::Data(d) => {
             hash.aset(ruby.sym_new("data"), ruby.str_from_slice(d))?;
         }
+        _ => {
+            return Err(error!(
+                "Unsupported Core environment configuration data source"
+            ));
+        }
     }
     Ok(hash)
 }
