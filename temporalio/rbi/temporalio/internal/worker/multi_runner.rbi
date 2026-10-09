@@ -6,6 +6,9 @@ class Temporalio::Internal::Worker::MultiRunner
   sig { params(workers: T::Array[Object], shutdown_signals: T::Array[T.any(String, Integer)]).void }
   def initialize(workers:, shutdown_signals:); end
 
+  sig { void }
+  def remove_shutdown_signal_handlers; end
+
   sig { params(block: T.nilable(T.proc.returns(Object))).void }
   def apply_thread_or_fiber_block(&block); end
 
@@ -32,6 +35,38 @@ class Temporalio::Internal::Worker::MultiRunner
 
   sig { returns(Temporalio::Internal::Worker::MultiRunner::Event) }
   def next_event; end
+end
+
+class Temporalio::Internal::Worker::MultiRunner::ShutdownSignalHandlers
+  extend T::Sig
+
+  sig { params(signal: Integer, queue: Queue).void }
+  def self.add(signal, queue); end
+
+  sig { params(signal: Integer, queue: Queue).void }
+  def self.remove(signal, queue); end
+
+  sig { params(signals: T::Array[T.any(String, Integer)], queue: Queue).void }
+  def initialize(signals, queue); end
+
+  sig { void }
+  def close; end
+end
+
+class Temporalio::Internal::Worker::MultiRunner::ShutdownSignalHandlers::Handler
+  extend T::Sig
+
+  sig { returns(T::Array[Queue]) }
+  attr_reader :queues
+
+  sig { params(queues: T::Array[Queue]).returns(T::Array[Queue]) }
+  attr_writer :queues
+
+  sig { params(signal: Integer, queue: Queue).void }
+  def initialize(signal, queue); end
+
+  sig { void }
+  def close; end
 end
 
 class Temporalio::Internal::Worker::MultiRunner::Event

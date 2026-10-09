@@ -35,6 +35,8 @@ to docs, or any other relevant information.
 
 ### Fixed
 
+- Restore worker shutdown signal handlers after a run, and allow concurrent runs to share signals. The worker example
+  now opts into graceful shutdown on both SIGINT and SIGTERM.
 - Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security

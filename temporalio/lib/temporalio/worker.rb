@@ -127,7 +127,8 @@ module Temporalio
     #
     # @param workers [Array<Worker>] Workers to run.
     # @param cancellation [Cancellation] Cancellation that can be canceled to shut down all workers.
-    # @param shutdown_signals [Array] Signals to trap and cause worker shutdown.
+    # @param shutdown_signals [Array] Signals to trap and cause graceful worker shutdown, e.g. `['SIGINT', 'SIGTERM']`.
+    #   Defaults to no signal handlers. Previous handlers are restored when the workers finish.
     # @param raise_in_block_on_shutdown [Exception, nil] Exception to {::Thread.raise} or {::Fiber.raise} if a block is
     #   present and still running on shutdown. If nil, `raise` is not used.
     # @param wait_block_complete [Boolean] If block given and shutdown caused by something else (e.g. cancellation
@@ -299,6 +300,8 @@ module Temporalio
       elsif block_result.is_a?(Internal::Worker::MultiRunner::Event::BlockSuccess)
         block_result.result
       end
+    ensure
+      runner&.remove_shutdown_signal_handlers
     end
 
     # @return [Hash<String, [:all, Array<Symbol, IllegalWorkflowCallValidator>, IllegalWorkflowCallValidator]>] Default,
@@ -675,12 +678,13 @@ module Temporalio
     # Run this worker until cancellation or optional block completes. When the cancellation or block is complete, the
     # worker is shut down. This will return the block result if everything successful or raise an error if not.
     #
-    # Upon shutdown (either via cancellation, block completion, or worker fatal error), the worker immediately stops
+    # Upon shutdown (via cancellation, a configured signal, block completion, or worker fatal error), the worker stops
     # accepting new work. Then, after an optional grace period, all activities are canceled. This call then waits for
     # every activity and workflow task to complete before returning.
     #
     # @param cancellation [Cancellation] Cancellation that can be canceled to shut down this worker.
-    # @param shutdown_signals [Array] Signals to trap and cause worker shutdown.
+    # @param shutdown_signals [Array] Signals to trap and cause graceful worker shutdown, e.g. `['SIGINT', 'SIGTERM']`.
+    #   Defaults to no signal handlers. Previous handlers are restored when the worker finishes.
     # @param raise_in_block_on_shutdown [Exception, nil] Exception to {::Thread.raise} or {::Fiber.raise} if a block is
     #   present and still running on shutdown. If nil, `raise` is not used.
     # @param wait_block_complete [Boolean] If block given and shutdown caused by something else (e.g. cancellation
