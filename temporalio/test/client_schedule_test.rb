@@ -352,4 +352,19 @@ class ClientScheduleTest < Test
   ensure
     delete_schedules(handle.id) if handle
   end
+
+  def test_policy_catchup_window_proto
+    default_policy = Temporalio::Client::Schedule::Policy.new
+    assert_nil default_policy.catchup_window
+    refute default_policy._to_proto.has_catchup_window?
+
+    explicit_zero_policies = [0, 0.0].map do |catchup_window|
+      Temporalio::Client::Schedule::Policy.new(catchup_window:)
+    end
+    explicit_zero_policies.each do |policy|
+      explicit_zero_proto = policy._to_proto
+      assert explicit_zero_proto.has_catchup_window?
+      assert_equal 0.0, Temporalio::Internal::ProtoUtils.duration_to_seconds(explicit_zero_proto.catchup_window)
+    end
+  end
 end

@@ -31,7 +31,11 @@ to docs, or any other relevant information.
 
 ### :boom: Breaking Changes
 
+- `Schedule::Policy#catchup_window` now defaults to `nil`. If unspecified the server configured default is used.
+
 ### Fixed
+
+- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security
 

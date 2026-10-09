@@ -313,7 +313,7 @@ module ActiveModelJSONSupport
 
   included do
     def as_json(*)
-      super.merge(::JSON.create_id => self.class.name)
+      super.merge('json_class' => self.class.name)
     end
 
     def to_json(*args)
@@ -322,7 +322,7 @@ module ActiveModelJSONSupport
 
     def self.json_create(object)
       object = object.dup
-      object.delete(::JSON.create_id)
+      object.delete('json_class')
       new(**object.symbolize_keys)
     end
   end
@@ -331,7 +331,7 @@ end
 
 Now if `include ActiveModelJSONSupport` is present on any ActiveModel class, on serialization `to_json` will be used
 which will use `as_json` which calls the super `as_json` but also includes the fully qualified class name as the JSON
-`create_id` key. On deserialization, Ruby JSON then uses this key to know what class to call `json_create` on.
+`json_class` key. On deserialization, Ruby JSON then uses this key to know what class to call `json_create` on.
 
 ##### Converter Hints
 
