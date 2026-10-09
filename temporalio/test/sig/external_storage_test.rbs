@@ -1,0 +1,6 @@
+class ExternalStorageTest < Test
+  def cancellation: -> Temporalio::Cancellation
+  def select_context: -> Temporalio::Converters::StorageDriverSelectContext
+  def store_context: -> Temporalio::Converters::StorageDriverStoreContext
+  def payload: (String data) -> Temporalio::Api::Common::V1::Payload
+end

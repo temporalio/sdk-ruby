@@ -1,0 +1,23 @@
+module Temporalio
+  module Converters
+    class ExternalStorage
+      DEFAULT_PAYLOAD_SIZE_THRESHOLD: Integer
+
+      type driverSelector = ^(StorageDriverSelectContext, Api::Common::V1::Payload) -> StorageDriver?
+
+      attr_reader drivers: Array[StorageDriver]
+      attr_reader driver_selector: driverSelector
+      attr_reader payload_size_threshold: Integer
+
+      @drivers_by_name: Hash[String, StorageDriver]
+
+      def initialize: (
+        drivers: Array[StorageDriver],
+        ?driver_selector: driverSelector?,
+        ?payload_size_threshold: Integer
+      ) -> void
+
+      def driver: (String name) -> StorageDriver?
+    end
+  end
+end

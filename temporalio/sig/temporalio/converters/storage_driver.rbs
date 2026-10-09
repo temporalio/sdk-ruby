@@ -1,0 +1,16 @@
+module Temporalio
+  module Converters
+    class StorageDriver
+      def name: -> String
+      def type: -> String
+      def store: (
+        StorageDriverStoreContext context,
+        Enumerable[Api::Common::V1::Payload] payloads
+      ) -> Array[StorageDriverClaim]
+      def retrieve: (
+        StorageDriverRetrieveContext context,
+        Enumerable[StorageDriverClaim] claims
+      ) -> Array[Api::Common::V1::Payload]
+    end
+  end
+end

@@ -1,0 +1,9 @@
+module Temporalio
+  module Converters
+    class StorageDriverRetrieveContext
+      attr_reader cancellation: Cancellation
+
+      def initialize: (cancellation: Cancellation) -> void
+    end
+  end
+end
