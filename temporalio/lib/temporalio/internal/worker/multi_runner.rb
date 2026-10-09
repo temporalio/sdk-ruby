@@ -16,13 +16,17 @@ module Temporalio
           @shutdown_initiated_mutex = Mutex.new
           @shutdown_initiated = false
 
-          # Trap signals to push to queue
-          shutdown_signals.each do |signal|
-            Signal.trap(signal) { @queue.push(Event::ShutdownSignalReceived.new) }
-          end
+          @shutdown_signal_handlers = ShutdownSignalHandlers.new(shutdown_signals, @queue)
 
           # Start pollers
           Bridge::Worker.async_poll_all(workers.map(&:_bridge_worker), @queue)
+        rescue Exception # rubocop:disable Lint/RescueException -- Restore traps even if startup is interrupted.
+          remove_shutdown_signal_handlers
+          raise
+        end
+
+        def remove_shutdown_signal_handlers
+          @shutdown_signal_handlers&.close
         end
 
         def apply_thread_or_fiber_block(&)
@@ -112,6 +116,76 @@ module Temporalio
               else
                 Event::PollSuccess.new(worker:, worker_type: second, bytes: third)
               end
+            end
+          end
+        end
+
+        class ShutdownSignalHandlers
+          @mutex = Mutex.new
+          @handlers = {}
+
+          def self.add(signal, queue)
+            @mutex.synchronize do
+              if (handler = @handlers[signal])
+                handler.queues += [queue]
+              else
+                @handlers[signal] = Handler.new(signal, queue)
+              end
+            end
+          end
+
+          def self.remove(signal, queue)
+            @mutex.synchronize do
+              handler = @handlers.fetch(signal)
+              handler.queues -= [queue]
+              if handler.queues.empty?
+                handler.close
+                @handlers.delete(signal)
+              end
+            end
+          end
+
+          def initialize(signals, queue)
+            @queue = queue
+            @signals = []
+            signals.each do |signal|
+              number = if signal.is_a?(String)
+                         Signal.list.fetch(signal.delete_prefix('SIG')) do
+                           raise ArgumentError, "Unsupported signal: #{signal}"
+                         end
+                       else
+                         signal
+                       end
+              next if @signals.include?(number)
+
+              ShutdownSignalHandlers.add(number, queue)
+              @signals.push(number)
+            end
+          rescue Exception # rubocop:disable Lint/RescueException -- Roll back partial registrations even on Interrupt.
+            close
+            raise
+          end
+
+          def close
+            @signals.each { |signal| ShutdownSignalHandlers.remove(signal, @queue) }
+            @signals.clear
+          end
+
+          class Handler
+            attr_accessor :queues
+
+            def initialize(signal, queue)
+              @signal = signal
+              @queues = [queue]
+              # Signal callbacks cannot acquire a mutex, so registrations replace the queue snapshot instead.
+              @callback = proc { @queues.each { |queue| queue.push(Event::ShutdownSignalReceived.new) } }
+              @previous_handler = Signal.trap(signal, @callback)
+            end
+
+            def close
+              current_handler = Signal.trap(@signal, @previous_handler)
+              # An application may replace its handler while workers are running.
+              Signal.trap(@signal, current_handler) unless @callback.equal?(current_handler)
             end
           end
         end

@@ -1,0 +1,5 @@
+class WorkerShutdownSignalsTest < Test
+  private
+
+  def run_signal_subprocess: (String code, ?signal: String?, ?server: bool) -> String
+end

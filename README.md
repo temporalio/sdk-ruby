@@ -165,11 +165,11 @@ worker = Temporalio::Worker.new(
   activities: [SayHelloActivity]
 )
 
-# Run the worker until SIGINT. This can be done in many ways, see "Workers" section for details.
-worker.run(shutdown_signals: ['SIGINT'])
+# Run the worker until SIGINT or SIGTERM. See the "Workers" section for details.
+worker.run(shutdown_signals: ['SIGINT', 'SIGTERM'])
 ```
 
-Running that will run the worker until Ctrl+C is pressed.
+Running that will run the worker until Ctrl+C is pressed or SIGTERM is received.
 
 ### Executing a Workflow
 
@@ -385,8 +385,11 @@ Notes about the above code:
 * This just shows providing an activity class, but there are other forms, see the "Activities" section for details.
 * The worker `run` method accepts an optional `Temporalio::Cancellation` object that can be used to cancel instead or in
   addition to providing a block that waits for completion.
-* The worker `run` method accepts a `shutdown_signals` array which will trap the signal and start shutdown when
-  received.
+* The worker `run` method accepts a `shutdown_signals` array. On POSIX, use `['SIGINT', 'SIGTERM']` so both Ctrl-C and
+  process termination initiate graceful shutdown, using the worker's configured activity grace period. Signal handling
+  is opt-in: the default `[]` installs no handlers, and explicit lists handle only those signals. Previous handlers are
+  restored when the run finishes, unless the application replaced them during the run. Workers running concurrently can
+  share the same shutdown signals.
 * Workers work with threads or fibers (but fiber compatibility only supported for Ruby 3.3+ at this time). Fiber-based
   activities (see "Activities" section) only work if the worker is created within a fiber.
 * The `run` method does not return until the worker is shut down. This means even if shutdown is triggered (e.g. via

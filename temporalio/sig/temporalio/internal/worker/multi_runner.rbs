@@ -11,6 +11,8 @@ module Temporalio
 
         def initialize: (workers: Array[_Worker], shutdown_signals: Array[String | Integer]) -> void
 
+        def remove_shutdown_signal_handlers: -> void
+
         def apply_thread_or_fiber_block: ?{ (?) -> untyped } -> void
 
         def apply_workflow_activation_decoded: (
@@ -31,6 +33,23 @@ module Temporalio
         def wait_complete_and_finalize_shutdown: -> void
 
         def next_event: -> Event
+
+        class ShutdownSignalHandlers
+          self.@mutex: Mutex
+          self.@handlers: Hash[Integer, Handler]
+
+          def self.add: (Integer signal, Queue queue) -> void
+          def self.remove: (Integer signal, Queue queue) -> void
+          def initialize: (Array[String | Integer] signals, Queue queue) -> void
+          def close: -> void
+
+          class Handler
+            attr_accessor queues: Array[Queue]
+
+            def initialize: (Integer signal, Queue queue) -> void
+            def close: -> void
+          end
+        end
 
         class Event
           class PollSuccess < Event
