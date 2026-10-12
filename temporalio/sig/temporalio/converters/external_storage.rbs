@@ -8,13 +8,15 @@ module Temporalio
       attr_reader drivers: Array[StorageDriver]
       attr_reader driver_selector: driverSelector
       attr_reader payload_size_threshold: Integer
+      attr_reader concurrency: ExternalStorageConcurrency
 
       @drivers_by_name: Hash[String, StorageDriver]
 
       def initialize: (
         drivers: Array[StorageDriver],
         ?driver_selector: driverSelector?,
-        ?payload_size_threshold: Integer
+        ?payload_size_threshold: Integer,
+        ?concurrency: ExternalStorageConcurrency
       ) -> void
 
       def driver: (String name) -> StorageDriver?

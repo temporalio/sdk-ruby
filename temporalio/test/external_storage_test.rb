@@ -2,6 +2,7 @@
 
 require 'base64'
 require 'in_memory_storage_driver'
+require 'recording_storage_driver_limiter'
 require 'securerandom'
 require 'temporalio/cancellation'
 require 'temporalio/converters/external_storage'
@@ -170,6 +171,42 @@ class ExternalStorageTest < Test
     end
   end
 
+  def test_default_concurrency_matches_the_other_sdks
+    storage = Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new])
+
+    assert_equal 64, storage.concurrency.max_driver_operations
+    assert_equal 8, storage.concurrency.max_operations_per_message
+  end
+
+  def test_concurrency_budgets_must_be_positive
+    block = proc do
+      [0, -1, nil, '8', 8.0].each do |value|
+        assert_raises(ArgumentError) do
+          Temporalio::Converters::ExternalStorageConcurrency.new(max_driver_operations: value) # steep:ignore
+        end
+        assert_raises(ArgumentError) do
+          Temporalio::Converters::ExternalStorageConcurrency.new(max_operations_per_message: value) # steep:ignore
+        end
+      end
+    end
+    # Passing the wrong type is the point of this test, so the runtime signature check must not record it.
+    if defined?(SigApplicator)
+      SigApplicator.suppress_errors { block.call }
+    else
+      block.call
+    end
+  end
+
+  def test_limiter_holds_a_permit_around_the_block_and_records_the_item
+    recording = RecordingStorageDriverLimiter.new
+    item = payload('x')
+
+    result = recording.permit(item) { :done }
+
+    assert_equal :done, result
+    assert_equal [item], recording.items
+  end
+
   def test_zero_threshold_allowed
     # Zero offloads every payload rather than disabling offload.
     storage = Temporalio::Converters::ExternalStorage.new(
@@ -192,7 +229,8 @@ class ExternalStorageTest < Test
     payloads = [payload('one'), payload('two')]
 
     claims = driver.store(store_context, payloads)
-    restored = driver.retrieve(Temporalio::Converters::StorageDriverRetrieveContext.new(cancellation:), claims)
+    retrieve_context = Temporalio::Converters::StorageDriverRetrieveContext.new(cancellation:, limiter:)
+    restored = driver.retrieve(retrieve_context, claims)
 
     assert_equal 2, claims.size
     assert_equal payloads, restored
@@ -253,12 +291,16 @@ class ExternalStorageTest < Test
     Temporalio::Cancellation.new
   end
 
+  def limiter
+    RecordingStorageDriverLimiter.new
+  end
+
   def select_context
     Temporalio::Converters::StorageDriverSelectContext.new(target: nil, cancellation:)
   end
 
   def store_context
-    Temporalio::Converters::StorageDriverStoreContext.new(target: nil, cancellation:)
+    Temporalio::Converters::StorageDriverStoreContext.new(target: nil, cancellation:, limiter:)
   end
 
   def payload(data)

@@ -3,10 +3,12 @@ module Temporalio
     class StorageDriverStoreContext
       attr_reader target: storageDriverTargetInfo?
       attr_reader cancellation: Cancellation
+      attr_reader limiter: StorageDriverLimiter
 
       def initialize: (
         target: storageDriverTargetInfo?,
-        cancellation: Cancellation
+        cancellation: Cancellation,
+        limiter: StorageDriverLimiter
       ) -> void
     end
   end
