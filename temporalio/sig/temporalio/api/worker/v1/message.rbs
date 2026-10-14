@@ -660,17 +660,23 @@ module Temporalio
 
               RUNTIME_TYPE_ROADRUNNER: 10
 
+              # Report when the application is compiled ahead-of-time as a GraalVM native image.
+              RUNTIME_TYPE_GRAAL_AOT: 11
+
+              # Report when any registered Workflow or Activity implementation is a Kotlin class.
+              RUNTIME_TYPE_KOTLIN: 12
+
               def self.lookup: (::Integer number) -> ::Symbol
 
 
               def self.resolve: (::Symbol name) -> ::Integer
 
 
-              type names = :RUNTIME_TYPE_UNSPECIFIED | :RUNTIME_TYPE_JVM | :RUNTIME_TYPE_CPYTHON | :RUNTIME_TYPE_NODE | :RUNTIME_TYPE_BUN | :RUNTIME_TYPE_CRUBY | :RUNTIME_TYPE_GO | :RUNTIME_TYPE_DOTNET_FRAMEWORK | :RUNTIME_TYPE_DOTNET_CORE | :RUNTIME_TYPE_NATIVE | :RUNTIME_TYPE_ROADRUNNER
+              type names = :RUNTIME_TYPE_UNSPECIFIED | :RUNTIME_TYPE_JVM | :RUNTIME_TYPE_CPYTHON | :RUNTIME_TYPE_NODE | :RUNTIME_TYPE_BUN | :RUNTIME_TYPE_CRUBY | :RUNTIME_TYPE_GO | :RUNTIME_TYPE_DOTNET_FRAMEWORK | :RUNTIME_TYPE_DOTNET_CORE | :RUNTIME_TYPE_NATIVE | :RUNTIME_TYPE_ROADRUNNER | :RUNTIME_TYPE_GRAAL_AOT | :RUNTIME_TYPE_KOTLIN
 
-              type strings = "RUNTIME_TYPE_UNSPECIFIED" | "RUNTIME_TYPE_JVM" | "RUNTIME_TYPE_CPYTHON" | "RUNTIME_TYPE_NODE" | "RUNTIME_TYPE_BUN" | "RUNTIME_TYPE_CRUBY" | "RUNTIME_TYPE_GO" | "RUNTIME_TYPE_DOTNET_FRAMEWORK" | "RUNTIME_TYPE_DOTNET_CORE" | "RUNTIME_TYPE_NATIVE" | "RUNTIME_TYPE_ROADRUNNER"
+              type strings = "RUNTIME_TYPE_UNSPECIFIED" | "RUNTIME_TYPE_JVM" | "RUNTIME_TYPE_CPYTHON" | "RUNTIME_TYPE_NODE" | "RUNTIME_TYPE_BUN" | "RUNTIME_TYPE_CRUBY" | "RUNTIME_TYPE_GO" | "RUNTIME_TYPE_DOTNET_FRAMEWORK" | "RUNTIME_TYPE_DOTNET_CORE" | "RUNTIME_TYPE_NATIVE" | "RUNTIME_TYPE_ROADRUNNER" | "RUNTIME_TYPE_GRAAL_AOT" | "RUNTIME_TYPE_KOTLIN"
 
-              type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+              type numbers = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
             end
 
             # The type of the runtime.

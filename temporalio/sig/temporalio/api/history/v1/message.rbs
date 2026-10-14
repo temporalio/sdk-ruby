@@ -299,6 +299,11 @@ module Temporalio
           def has_time_skipping_state_propagation?: () -> bool
           def clear_time_skipping_state_propagation: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this workflow.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             workflow_type: (::Temporalio::Api::Common::V1::WorkflowType | ::Temporalio::Api::Common::V1::WorkflowType::init_map)?,
             "workflow_type" => (::Temporalio::Api::Common::V1::WorkflowType | ::Temporalio::Api::Common::V1::WorkflowType::init_map)?,
@@ -382,6 +387,8 @@ module Temporalio
             "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
             time_skipping_state_propagation: (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
             "time_skipping_state_propagation" => (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -428,6 +435,7 @@ module Temporalio
             | ("declined_target_version_upgrade" name) -> ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade?
             | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
             | ("time_skipping_state_propagation" name) -> ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("workflow_type" name, ::Temporalio::Api::Common::V1::WorkflowType? value) -> void
@@ -471,6 +479,7 @@ module Temporalio
             | ("declined_target_version_upgrade" name, ::Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade? value) -> void
             | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
             | ("time_skipping_state_propagation" name, ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         # Wrapper for a target deployment version that the SDK declined to upgrade to.

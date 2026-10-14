@@ -9,12 +9,14 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroup
   sig do
     params(
       task_queue_types: T.nilable(T::Array[T.any(Symbol, String, Integer)]),
+      region_ids: T.nilable(T::Array[String]),
       provider: T.nilable(Temporalio::Api::Compute::V1::ComputeProvider),
       scaler: T.nilable(Temporalio::Api::Compute::V1::ComputeScaler)
     ).void
   end
   def initialize(
     task_queue_types: [],
+    region_ids: [],
     provider: nil,
     scaler: nil
   )
@@ -39,6 +41,24 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroup
 # task types.
   sig { void }
   def clear_task_queue_types
+  end
+
+  # Optional. If set, this scaling group is used only while the namespace is
+# active in one of these regions.
+  sig { returns(T::Array[String]) }
+  def region_ids
+  end
+
+  # Optional. If set, this scaling group is used only while the namespace is
+# active in one of these regions.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def region_ids=(value)
+  end
+
+  # Optional. If set, this scaling group is used only while the namespace is
+# active in one of these regions.
+  sig { void }
+  def clear_region_ids
   end
 
   # Stores instructions for a worker control plane controller how to respond
@@ -226,7 +246,7 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroupUpdate
 # - Empty mask for an existing scaling group is no-op: no change.
 # - Non-empty mask for an existing scaling group will update/unset only to the fields
 #   mentioned in the mask.
-# - Accepted paths: "task_queue_types", "provider", "provider.type", "provider.details",
+# - Accepted paths: "task_queue_types", "region_ids", "provider", "provider.type", "provider.details",
 #   "provider.nexus_endpoint", "scaler", "scaler.type", "scaler.details"
   sig { returns(T.nilable(Google::Protobuf::FieldMask)) }
   def update_mask
@@ -237,7 +257,7 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroupUpdate
 # - Empty mask for an existing scaling group is no-op: no change.
 # - Non-empty mask for an existing scaling group will update/unset only to the fields
 #   mentioned in the mask.
-# - Accepted paths: "task_queue_types", "provider", "provider.type", "provider.details",
+# - Accepted paths: "task_queue_types", "region_ids", "provider", "provider.type", "provider.details",
 #   "provider.nexus_endpoint", "scaler", "scaler.type", "scaler.details"
   sig { params(value: T.nilable(Google::Protobuf::FieldMask)).void }
   def update_mask=(value)
@@ -248,7 +268,7 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroupUpdate
 # - Empty mask for an existing scaling group is no-op: no change.
 # - Non-empty mask for an existing scaling group will update/unset only to the fields
 #   mentioned in the mask.
-# - Accepted paths: "task_queue_types", "provider", "provider.type", "provider.details",
+# - Accepted paths: "task_queue_types", "region_ids", "provider", "provider.type", "provider.details",
 #   "provider.nexus_endpoint", "scaler", "scaler.type", "scaler.details"
   sig { void }
   def clear_update_mask
@@ -354,12 +374,14 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroupSummary
   sig do
     params(
       task_queue_types: T.nilable(T::Array[T.any(Symbol, String, Integer)]),
-      provider_type: T.nilable(String)
+      provider_type: T.nilable(String),
+      region_ids: T.nilable(T::Array[String])
     ).void
   end
   def initialize(
     task_queue_types: [],
-    provider_type: ""
+    provider_type: "",
+    region_ids: []
   )
   end
 
@@ -385,6 +407,18 @@ class Temporalio::Api::Compute::V1::ComputeConfigScalingGroupSummary
 
   sig { void }
   def clear_provider_type
+  end
+
+  sig { returns(T::Array[String]) }
+  def region_ids
+  end
+
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def region_ids=(value)
+  end
+
+  sig { void }
+  def clear_region_ids
   end
 
   sig { params(field: String).returns(T.untyped) }

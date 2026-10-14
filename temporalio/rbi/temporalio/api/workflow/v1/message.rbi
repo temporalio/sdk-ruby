@@ -560,7 +560,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
       reset_run_id: T.nilable(String),
       request_id_infos: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Workflow::V1::RequestIdInfo)]),
       pause_info: T.nilable(Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo),
-      time_skipping_info: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)
+      time_skipping_info: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -572,7 +573,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
     reset_run_id: "",
     request_id_infos: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Workflow::V1::RequestIdInfo),
     pause_info: nil,
-    time_skipping_info: nil
+    time_skipping_info: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -724,6 +726,21 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
 # If the execution has never enabled time skipping, it will be nil.
   sig { void }
   def clear_time_skipping_info
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }

@@ -9,6 +9,43 @@ module Temporalio
   module Api
     module Nexus
       module V1
+        # PropagatedSerializationContext represents the context of the Nexus caller that started this execution.
+        class PropagatedSerializationContext < ::Google::Protobuf::AbstractMessage
+
+          attr_reader endpoint(): ::String
+          attr_writer endpoint(): ::String | ::Symbol
+          def clear_endpoint: () -> void
+
+          attr_reader service(): ::String
+          attr_writer service(): ::String | ::Symbol
+          def clear_service: () -> void
+
+          attr_reader operation(): ::String
+          attr_writer operation(): ::String | ::Symbol
+          def clear_operation: () -> void
+
+          type init_map = {
+            endpoint: (::String | ::Symbol)?,
+            "endpoint" => (::String | ::Symbol)?,
+            service: (::String | ::Symbol)?,
+            "service" => (::String | ::Symbol)?,
+            operation: (::String | ::Symbol)?,
+            "operation" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("endpoint" name) -> ::String
+            | ("service" name) -> ::String
+            | ("operation" name) -> ::String
+
+          def []=:
+              ("endpoint" name, (::String | ::Symbol) value) -> void
+            | ("service" name, (::String | ::Symbol) value) -> void
+            | ("operation" name, (::String | ::Symbol) value) -> void
+        end
+
         # A general purpose failure message.
         # See: https://github.com/nexus-rpc/api/blob/main/SPEC.md#failure
         class Failure < ::Google::Protobuf::AbstractMessage

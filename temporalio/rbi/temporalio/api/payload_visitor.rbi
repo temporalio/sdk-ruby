@@ -733,6 +733,9 @@ sig { params(value: Object).void }
   def api_workflowservice_v1_start_activity_execution_request(value); end
   
   sig { params(value: Object).void }
+  def api_workflowservice_v1_start_activity_execution_response(value); end
+  
+  sig { params(value: Object).void }
   def api_workflowservice_v1_start_batch_operation_request(value); end
   
   sig { params(value: Object).void }

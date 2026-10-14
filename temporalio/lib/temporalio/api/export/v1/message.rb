@@ -5,9 +5,10 @@
 require 'google/protobuf'
 
 require 'temporalio/api/history/v1/message'
+require 'temporalio/api/workflowservice/v1/request_response'
 
 
-descriptor_data = "\n$temporal/api/export/v1/message.proto\x12\x16temporal.api.export.v1\x1a%temporal/api/history/v1/message.proto\"F\n\x11WorkflowExecution\x12\x31\n\x07history\x18\x01 \x01(\x0b\x32 .temporal.api.history.v1.History\"N\n\x12WorkflowExecutions\x12\x38\n\x05items\x18\x01 \x03(\x0b\x32).temporal.api.export.v1.WorkflowExecutionB\x89\x01\n\x19io.temporal.api.export.v1B\x0cMessageProtoP\x01Z#go.temporal.io/api/export/v1;export\xaa\x02\x18Temporalio.Api.Export.V1\xea\x02\x1bTemporalio::Api::Export::V1b\x06proto3"
+descriptor_data = "\n$temporal/api/export/v1/message.proto\x12\x16temporal.api.export.v1\x1a%temporal/api/history/v1/message.proto\x1a\x36temporal/api/workflowservice/v1/request_response.proto\"F\n\x11WorkflowExecution\x12\x31\n\x07history\x18\x01 \x01(\x0b\x32 .temporal.api.history.v1.History\"N\n\x12WorkflowExecutions\x12\x38\n\x05items\x18\x01 \x03(\x0b\x32).temporal.api.export.v1.WorkflowExecution\"i\n\x11\x41\x63tivityExecution\x12T\n\x08\x61\x63tivity\x18\x01 \x01(\x0b\x32\x42.temporal.api.workflowservice.v1.DescribeActivityExecutionResponse\"\x91\x01\n\x12\x45xportedExecutions\x12<\n\tworkflows\x18\x01 \x03(\x0b\x32).temporal.api.export.v1.WorkflowExecution\x12=\n\nactivities\x18\x02 \x03(\x0b\x32).temporal.api.export.v1.ActivityExecutionB\x89\x01\n\x19io.temporal.api.export.v1B\x0cMessageProtoP\x01Z#go.temporal.io/api/export/v1;export\xaa\x02\x18Temporalio.Api.Export.V1\xea\x02\x1bTemporalio::Api::Export::V1b\x06proto3"
 
 pool = ::Google::Protobuf::DescriptorPool.generated_pool
 pool.add_serialized_file(descriptor_data)
@@ -18,6 +19,8 @@ module Temporalio
       module V1
         WorkflowExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.export.v1.WorkflowExecution").msgclass
         WorkflowExecutions = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.export.v1.WorkflowExecutions").msgclass
+        ActivityExecution = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.export.v1.ActivityExecution").msgclass
+        ExportedExecutions = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("temporal.api.export.v1.ExportedExecutions").msgclass
       end
     end
   end

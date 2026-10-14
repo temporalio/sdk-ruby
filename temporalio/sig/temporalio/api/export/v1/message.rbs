@@ -29,8 +29,8 @@ module Temporalio
               ("history" name, ::Temporalio::Api::History::V1::History? value) -> void
         end
 
-        # WorkflowExecutions is used by the Cloud Export feature to deserialize 
-        # the exported file. It encapsulates a collection of workflow execution information.
+        # WorkflowExecutions is the legacy Cloud Export file format containing only workflow executions.
+        # New exporters should use ExportedExecutions.
         class WorkflowExecutions < ::Google::Protobuf::AbstractMessage
 
           attr_accessor items(): ::Google::Protobuf::RepeatedField
@@ -48,6 +48,54 @@ module Temporalio
 
           def []=:
               ("items" name, ::Google::Protobuf::RepeatedField value) -> void
+        end
+
+        class ActivityExecution < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor activity(): ::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse?
+          def has_activity?: () -> bool
+          def clear_activity: () -> void
+
+          type init_map = {
+            activity: (::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse | ::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse::init_map)?,
+            "activity" => (::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse | ::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("activity" name) -> ::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse?
+
+          def []=:
+              ("activity" name, ::Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse? value) -> void
+        end
+
+        # ExportedExecutions is used by the Cloud Export feature to deserialize the exported file.
+        # It encapsulates workflow execution information and contains other execution types.
+        class ExportedExecutions < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor workflows(): ::Google::Protobuf::RepeatedField
+          def clear_workflows: () -> void
+
+          attr_accessor activities(): ::Google::Protobuf::RepeatedField
+          def clear_activities: () -> void
+
+          type init_map = {
+            workflows: ::Array[::Temporalio::Api::Export::V1::WorkflowExecution]?,
+            "workflows" => ::Array[::Temporalio::Api::Export::V1::WorkflowExecution]?,
+            activities: ::Array[::Temporalio::Api::Export::V1::ActivityExecution]?,
+            "activities" => ::Array[::Temporalio::Api::Export::V1::ActivityExecution]?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("workflows" name) -> ::Google::Protobuf::RepeatedField
+            | ("activities" name) -> ::Google::Protobuf::RepeatedField
+
+          def []=:
+              ("workflows" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("activities" name, ::Google::Protobuf::RepeatedField value) -> void
         end
       end
     end

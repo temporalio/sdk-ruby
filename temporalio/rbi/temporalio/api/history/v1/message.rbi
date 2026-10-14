@@ -49,7 +49,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
       eager_execution_accepted: T.nilable(T::Boolean),
       declined_target_version_upgrade: T.nilable(Temporalio::Api::History::V1::DeclinedTargetVersionUpgrade),
       time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
-      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)
+      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -93,7 +94,8 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
     eager_execution_accepted: false,
     declined_target_version_upgrade: nil,
     time_skipping_config: nil,
-    time_skipping_state_propagation: nil
+    time_skipping_state_propagation: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -968,6 +970,21 @@ class Temporalio::Api::History::V1::WorkflowExecutionStartedEventAttributes
 # if no time skipping has occurred or there is no previous run.
   sig { void }
   def clear_time_skipping_state_propagation
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
