@@ -1,0 +1,1 @@
+Added experimental `versioning_override:` to `Workflow.start_child_workflow` and `Workflow.execute_child_workflow`, including `VersioningOverride::OneTime`, to route children independently of their parent on Temporal Server 1.32.0 or later. Rejected overrides raise `Error::ChildWorkflowError` with an `Error::InvalidVersioningOverrideError` cause.

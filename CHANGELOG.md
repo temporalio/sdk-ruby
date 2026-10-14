@@ -1,32 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
-### Added
-
-- Added experimental `versioning_override:` to `Workflow.start_child_workflow` and
-  `Workflow.execute_child_workflow` for routing children independently of their parent, including
-  `VersioningOverride::OneTime` for one-time routing. Requires Temporal Server 1.32.0 or later.
-  Rejected overrides raise `Error::ChildWorkflowError` with an `Error::InvalidVersioningOverrideError` cause.
-
-### Changed
-
-- Priority is no longer marked as experimental.
-- The `dev_server_` and `test_server_` options of `Testing::WorkflowEnvironment.start_local` and
-  `start_time_skipping` are no longer described as unstable.
-
-### Deprecated
-
-### :boom: Breaking Changes
-
-- `Schedule::Policy#catchup_window` now defaults to `nil`. If unspecified the server configured default is used.
-
-### Fixed
-
-- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
-
-### Security
-
 ## [v1.9.0] - 2026-09-14
 
 ### Changed
