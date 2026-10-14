@@ -108,27 +108,9 @@ jobs:
         working-directory: ./temporalio
         # Timeout just in case there's a hanging part in rake
         timeout-minutes: 20
-        # Set env vars for cloud tests. If secrets aren't present, tests will be skipped.
         env:
           # Selects the FIPS-mode aws-lc-rs crypto backend for the `fips: true` matrix legs.
           TEMPORALIO_FIPS: ${{ matrix.fips && '1' || '' }}
-
-          # For mTLS tests
-          TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}.tmprl.cloud:7233
-          TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT: ${{ secrets.TEMPORAL_CLIENT_CERT }}
-          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY: ${{ secrets.TEMPORAL_CLIENT_KEY }}
-
-          # For API key tests
-          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: ca-central-1.aws.api.temporal.io:7233
-          TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-
-          # For cloud ops tests
-          TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST: saas-api.tmprl.cloud:443
-          TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-          TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
 
         run: bundle exec rake TESTOPTS="--verbose"
 
@@ -137,25 +119,7 @@ jobs:
         working-directory: ./temporalio
         # Timeout just in case there's a hanging part in rake
         timeout-minutes: 10
-        # Set env vars for cloud tests. If secrets aren't present, tests will be skipped.
         env:
-          # For mTLS tests
-          TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}.tmprl.cloud:7233
-          TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT: ${{ secrets.TEMPORAL_CLIENT_CERT }}
-          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY: ${{ secrets.TEMPORAL_CLIENT_KEY }}
-
-          # For API key tests
-          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: ca-central-1.aws.api.temporal.io:7233
-          TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-
-          # For cloud ops tests
-          TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST: saas-api.tmprl.cloud:443
-          TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ vars.TEMPORAL_CLIENT_NAMESPACE }}
-          TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
-          TEMPORAL_CLOUD_OPS_TEST_API_VERSION: 2024-05-13-00
-
           # Enable Sorbet runtime type checking to verify RBI accuracy.
           TEMPORAL_SORBET_RUNTIME_CHECK: "1"
 
@@ -228,10 +192,17 @@ jobs:
             echo "TEMPORAL_TLS_CLIENT_KEY_PATH=$cert_dir/client.key"
           } >> "$GITHUB_ENV"
 
-      - name: Create Cloud namespace
+      - name: Create Cloud mTLS namespace
         id: create-cloud-namespace
         working-directory: ./temporalio
-        run: bundle exec ruby extra/cloud_namespace.rb create
+        run: bundle exec ruby extra/cloud_namespace.rb create mtls
+        env:
+          TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+
+      - name: Create Cloud API key namespace
+        id: create-cloud-api-key-namespace
+        working-directory: ./temporalio
+        run: bundle exec ruby extra/cloud_namespace.rb create api-key
         env:
           TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
 
@@ -239,13 +210,25 @@ jobs:
         working-directory: ./temporalio
         timeout-minutes: 15
         env:
-          TEMPORAL_ADDRESS: ${{ steps.create-cloud-namespace.outputs.namespace }}.tmprl.cloud:7233
+          TEMPORAL_ADDRESS: ${{ steps.create-cloud-namespace.outputs.address }}
           TEMPORAL_NAMESPACE: ${{ steps.create-cloud-namespace.outputs.namespace }}
+          TEMPORAL_CLOUD_MTLS_TEST_TARGET_HOST: ${{ steps.create-cloud-namespace.outputs.address }}
+          TEMPORAL_CLOUD_MTLS_TEST_NAMESPACE: ${{ steps.create-cloud-namespace.outputs.namespace }}
+          TEMPORAL_CLOUD_API_KEY_TEST_TARGET_HOST: ${{ steps.create-cloud-api-key-namespace.outputs.address }}
+          TEMPORAL_CLOUD_API_KEY_TEST_NAMESPACE: ${{ steps.create-cloud-api-key-namespace.outputs.namespace }}
+          TEMPORAL_CLOUD_API_KEY_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+          TEMPORAL_CLOUD_OPS_TEST_TARGET_HOST: saas-api.tmprl.cloud:443
+          TEMPORAL_CLOUD_OPS_TEST_NAMESPACE: ${{ steps.create-cloud-api-key-namespace.outputs.namespace }}
+          TEMPORAL_CLOUD_OPS_TEST_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+          TEMPORAL_CLOUD_OPS_TEST_API_VERSION: ${{ env.TEMPORAL_CLIENT_CLOUD_API_VERSION }}
         run: |
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT="$(cat "$TEMPORAL_TLS_CLIENT_CERT_PATH")"
+          TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY="$(cat "$TEMPORAL_TLS_CLIENT_KEY_PATH")"
+          export TEMPORAL_CLOUD_MTLS_TEST_CLIENT_CERT TEMPORAL_CLOUD_MTLS_TEST_CLIENT_KEY
           mkdir -p tmp
           TESTOPTS="--verbose" bundle exec rake test:cloud 2>&1 | tee tmp/cloud-test.log
 
-      - name: Delete Cloud namespace
+      - name: Delete Cloud mTLS namespace
         id: delete-cloud-namespace
         if: ${{ always() && steps.create-cloud-namespace.outputs.namespace != '' }}
         continue-on-error: true
@@ -257,6 +240,19 @@ jobs:
       - name: Report Cloud namespace cleanup failure
         if: ${{ always() && steps.delete-cloud-namespace.outcome == 'failure' }}
         run: echo "::warning title=Cloud namespace cleanup failed::Failed to delete Cloud namespace ${{ steps.create-cloud-namespace.outputs.namespace }}"
+
+      - name: Delete Cloud API key namespace
+        id: delete-cloud-api-key-namespace
+        if: ${{ always() && steps.create-cloud-api-key-namespace.outputs.namespace != '' }}
+        continue-on-error: true
+        working-directory: ./temporalio
+        run: bundle exec ruby extra/cloud_namespace.rb delete "${{ steps.create-cloud-api-key-namespace.outputs.namespace }}"
+        env:
+          TEMPORAL_CLIENT_CLOUD_API_KEY: ${{ secrets.TEMPORAL_CLIENT_CLOUD_API_KEY }}
+
+      - name: Report Cloud API key namespace cleanup failure
+        if: ${{ always() && steps.delete-cloud-api-key-namespace.outcome == 'failure' }}
+        run: echo "::warning title=Cloud namespace cleanup failed::Failed to delete Cloud namespace ${{ steps.create-cloud-api-key-namespace.outputs.namespace }}"
 
       - name: Upload Cloud test output
         if: ${{ always() }}
