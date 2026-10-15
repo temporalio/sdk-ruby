@@ -14,8 +14,7 @@ module Temporalio
     #
     # @!attribute [r] max_driver_operations
     #   @return [Integer] Maximum requests in flight at once across every driver registered on the owning
-    #     {ExternalStorage}. The budget belongs to that {ExternalStorage} rather than to this object, so sharing one
-    #     between a client and a worker gives them a single combined budget while separate ones each get their own.
+    #     {ExternalStorage}. Each worker and each client gets its own budget of this size.
     # @!attribute [r] max_operations_per_message
     #   @return [Integer] Maximum requests in flight at once on behalf of a single message, such as one workflow task
     #     activation, activity task, Nexus operation, or client request. Every message gets its own budget of this
