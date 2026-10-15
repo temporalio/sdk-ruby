@@ -639,6 +639,11 @@ module Temporalio
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this workflow.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -698,6 +703,8 @@ module Temporalio
             "eager_worker_deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             time_skipping_config: (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
             "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -732,6 +739,7 @@ module Temporalio
             | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
             | ("eager_worker_deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
             | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -763,6 +771,7 @@ module Temporalio
             | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
             | ("eager_worker_deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
             | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class StartWorkflowExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -924,6 +933,13 @@ module Temporalio
           attr_accessor archived(): bool
           def clear_archived: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this run.
+          # Returned on the initial request (without next_page_token) when present. Clients should
+          # retain it across paginated responses, which may omit it.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             history: (::Temporalio::Api::History::V1::History | ::Temporalio::Api::History::V1::History::init_map)?,
             "history" => (::Temporalio::Api::History::V1::History | ::Temporalio::Api::History::V1::History::init_map)?,
@@ -933,6 +949,8 @@ module Temporalio
             "next_page_token" => ::String?,
             archived: bool?,
             "archived" => bool?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -942,12 +960,14 @@ module Temporalio
             | ("raw_history" name) -> ::Google::Protobuf::RepeatedField
             | ("next_page_token" name) -> ::String
             | ("archived" name) -> bool
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("history" name, ::Temporalio::Api::History::V1::History? value) -> void
             | ("raw_history" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("next_page_token" name, ::String value) -> void
             | ("archived" name, bool value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class GetWorkflowExecutionHistoryReverseRequest < ::Google::Protobuf::AbstractMessage
@@ -1990,6 +2010,11 @@ module Temporalio
           def has_poller_groups_info?: () -> bool
           def clear_poller_groups_info: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this activity.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             task_token: ::String?,
             "task_token" => ::String?,
@@ -2035,6 +2060,8 @@ module Temporalio
             "poller_group_infos" => ::Array[::Temporalio::Api::TaskQueue::V1::PollerGroupInfo]?,
             poller_groups_info: (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
             "poller_groups_info" => (::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo | ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -2062,6 +2089,7 @@ module Temporalio
             | ("activity_run_id" name) -> ::String
             | ("poller_group_infos" name) -> ::Google::Protobuf::RepeatedField
             | ("poller_groups_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("task_token" name, ::String value) -> void
@@ -2086,6 +2114,7 @@ module Temporalio
             | ("activity_run_id" name, (::String | ::Symbol) value) -> void
             | ("poller_group_infos" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("poller_groups_info" name, ::Temporalio::Api::TaskQueue::V1::PollerGroupsInfo? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class RecordActivityTaskHeartbeatRequest < ::Google::Protobuf::AbstractMessage
@@ -11405,6 +11434,18 @@ module Temporalio
           def has_start_delay?: () -> bool
           def clear_start_delay: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this activity.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
+          # Request that the first activity task be returned directly in the start response instead of
+          # being dispatched through a task queue. If set to true, the caller is expected to have a
+          # worker available and capable of processing the task. The returned task will be marked as
+          # started. The server may ignore this request.
+          attr_accessor request_eager_execution(): bool
+          def clear_request_eager_execution: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -11450,6 +11491,10 @@ module Temporalio
             "on_conflict_options" => (::Temporalio::Api::Common::V1::OnConflictOptions | ::Temporalio::Api::Common::V1::OnConflictOptions::init_map)?,
             start_delay: (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             "start_delay" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            request_eager_execution: bool?,
+            "request_eager_execution" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -11477,6 +11522,8 @@ module Temporalio
             | ("links" name) -> ::Google::Protobuf::RepeatedField
             | ("on_conflict_options" name) -> ::Temporalio::Api::Common::V1::OnConflictOptions?
             | ("start_delay" name) -> ::Google::Protobuf::Duration?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+            | ("request_eager_execution" name) -> bool
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -11501,6 +11548,8 @@ module Temporalio
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("on_conflict_options" name, ::Temporalio::Api::Common::V1::OnConflictOptions? value) -> void
             | ("start_delay" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
+            | ("request_eager_execution" name, bool value) -> void
         end
 
         class StartActivityExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -11519,6 +11568,12 @@ module Temporalio
           def has_link?: () -> bool
           def clear_link: () -> void
 
+          # The first activity task when eager execution was requested and accepted.
+          # This is set only for the first attempt of a newly started activity.
+          attr_accessor eager_activity_task(): ::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse?
+          def has_eager_activity_task?: () -> bool
+          def clear_eager_activity_task: () -> void
+
           type init_map = {
             run_id: (::String | ::Symbol)?,
             "run_id" => (::String | ::Symbol)?,
@@ -11526,6 +11581,8 @@ module Temporalio
             "started" => bool?,
             link: (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
             "link" => (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
+            eager_activity_task: (::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse | ::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse::init_map)?,
+            "eager_activity_task" => (::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse | ::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -11534,11 +11591,13 @@ module Temporalio
               ("run_id" name) -> ::String
             | ("started" name) -> bool
             | ("link" name) -> ::Temporalio::Api::Common::V1::Link?
+            | ("eager_activity_task" name) -> ::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse?
 
           def []=:
               ("run_id" name, (::String | ::Symbol) value) -> void
             | ("started" name, bool value) -> void
             | ("link" name, ::Temporalio::Api::Common::V1::Link? value) -> void
+            | ("eager_activity_task" name, ::Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse? value) -> void
         end
 
         class DescribeActivityExecutionRequest < ::Google::Protobuf::AbstractMessage
@@ -11737,11 +11796,18 @@ module Temporalio
           def has_outcome?: () -> bool
           def clear_outcome: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this activity.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             run_id: (::String | ::Symbol)?,
             "run_id" => (::String | ::Symbol)?,
             outcome: (::Temporalio::Api::Activity::V1::ActivityExecutionOutcome | ::Temporalio::Api::Activity::V1::ActivityExecutionOutcome::init_map)?,
             "outcome" => (::Temporalio::Api::Activity::V1::ActivityExecutionOutcome | ::Temporalio::Api::Activity::V1::ActivityExecutionOutcome::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -11749,10 +11815,12 @@ module Temporalio
           def []:
               ("run_id" name) -> ::String
             | ("outcome" name) -> ::Temporalio::Api::Activity::V1::ActivityExecutionOutcome?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("run_id" name, (::String | ::Symbol) value) -> void
             | ("outcome" name, ::Temporalio::Api::Activity::V1::ActivityExecutionOutcome? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class ListActivityExecutionsRequest < ::Google::Protobuf::AbstractMessage
@@ -12279,6 +12347,12 @@ module Temporalio
           attr_writer operation_token(): ::String | ::Symbol
           def clear_operation_token: () -> void
 
+          # Serialization context for this operation's payloads, derived from its stored target.
+          # For a reused operation, this is the original execution's context.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           # The result if the operation completed successfully.
           attr_accessor result(): ::Temporalio::Api::Common::V1::Payload?
           def has_result?: () -> bool
@@ -12301,6 +12375,8 @@ module Temporalio
             "wait_stage" => (::Temporalio::Api::Enums::V1::NexusOperationWaitStage::names | ::Temporalio::Api::Enums::V1::NexusOperationWaitStage::strings | ::Integer | ::Float)?,
             operation_token: (::String | ::Symbol)?,
             "operation_token" => (::String | ::Symbol)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
             result: (::Temporalio::Api::Common::V1::Payload | ::Temporalio::Api::Common::V1::Payload::init_map)?,
             "result" => (::Temporalio::Api::Common::V1::Payload | ::Temporalio::Api::Common::V1::Payload::init_map)?,
             failure: (::Temporalio::Api::Failure::V1::Failure | ::Temporalio::Api::Failure::V1::Failure::init_map)?,
@@ -12313,6 +12389,7 @@ module Temporalio
               ("run_id" name) -> ::String
             | ("wait_stage" name) -> (::Temporalio::Api::Enums::V1::NexusOperationWaitStage::names | ::Integer)
             | ("operation_token" name) -> ::String
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
             | ("result" name) -> ::Temporalio::Api::Common::V1::Payload?
             | ("failure" name) -> ::Temporalio::Api::Failure::V1::Failure?
 
@@ -12320,6 +12397,7 @@ module Temporalio
               ("run_id" name, (::String | ::Symbol) value) -> void
             | ("wait_stage" name, (::Temporalio::Api::Enums::V1::NexusOperationWaitStage::names | ::Temporalio::Api::Enums::V1::NexusOperationWaitStage::strings | ::Integer | ::Float) value) -> void
             | ("operation_token" name, (::String | ::Symbol) value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
             | ("result" name, ::Temporalio::Api::Common::V1::Payload? value) -> void
             | ("failure" name, ::Temporalio::Api::Failure::V1::Failure? value) -> void
         end

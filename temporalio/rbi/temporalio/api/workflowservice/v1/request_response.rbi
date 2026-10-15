@@ -1134,7 +1134,8 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
       on_conflict_options: T.nilable(Temporalio::Api::Workflow::V1::OnConflictOptions),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       eager_worker_deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
-      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -1166,7 +1167,8 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
     on_conflict_options: nil,
     priority: nil,
     eager_worker_deployment_options: nil,
-    time_skipping_config: nil
+    time_skipping_config: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -1647,6 +1649,21 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   def clear_time_skipping_config
   end
 
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this workflow.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -2006,14 +2023,16 @@ class Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse
       history: T.nilable(Temporalio::Api::History::V1::History),
       raw_history: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::DataBlob)]),
       next_page_token: T.nilable(String),
-      archived: T.nilable(T::Boolean)
+      archived: T.nilable(T::Boolean),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
     history: nil,
     raw_history: [],
     next_page_token: "",
-    archived: false
+    archived: false,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -2072,6 +2091,27 @@ class Temporalio::Api::WorkflowService::V1::GetWorkflowExecutionHistoryResponse
 
   sig { void }
   def clear_archived
+  end
+
+  # Serialization context propagated from the Nexus caller that started this run.
+# Returned on the initial request (without next_page_token) when present. Clients should
+# retain it across paginated responses, which may omit it.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this run.
+# Returned on the initial request (without next_page_token) when present. Clients should
+# retain it across paginated responses, which may omit it.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this run.
+# Returned on the initial request (without next_page_token) when present. Clients should
+# retain it across paginated responses, which may omit it.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -4072,7 +4112,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       activity_run_id: T.nilable(String),
       poller_group_infos: T.nilable(T::Array[T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupInfo)]),
-      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo)
+      poller_groups_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerGroupsInfo),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -4097,7 +4138,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
     priority: nil,
     activity_run_id: "",
     poller_group_infos: [],
-    poller_groups_info: nil
+    poller_groups_info: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -4504,6 +4546,21 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse
 #     according to the weights.
   sig { void }
   def clear_poller_groups_info
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -25078,7 +25135,9 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest
       completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
       links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
       on_conflict_options: T.nilable(Temporalio::Api::Common::V1::OnConflictOptions),
-      start_delay: T.nilable(Google::Protobuf::Duration)
+      start_delay: T.nilable(Google::Protobuf::Duration),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
+      request_eager_execution: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -25103,7 +25162,9 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest
     completion_callbacks: [],
     links: [],
     on_conflict_options: nil,
-    start_delay: nil
+    start_delay: nil,
+    propagated_nexus_serialization_context: nil,
+    request_eager_execution: false
   )
   end
 
@@ -25494,6 +25555,45 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionRequest
   def clear_start_delay
   end
 
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
+  end
+
+  # Request that the first activity task be returned directly in the start response instead of
+# being dispatched through a task queue. If set to true, the caller is expected to have a
+# worker available and capable of processing the task. The returned task will be marked as
+# started. The server may ignore this request.
+  sig { returns(T::Boolean) }
+  def request_eager_execution
+  end
+
+  # Request that the first activity task be returned directly in the start response instead of
+# being dispatched through a task queue. If set to true, the caller is expected to have a
+# worker available and capable of processing the task. The returned task will be marked as
+# started. The server may ignore this request.
+  sig { params(value: T::Boolean).void }
+  def request_eager_execution=(value)
+  end
+
+  # Request that the first activity task be returned directly in the start response instead of
+# being dispatched through a task queue. If set to true, the caller is expected to have a
+# worker available and capable of processing the task. The returned task will be marked as
+# started. The server may ignore this request.
+  sig { void }
+  def clear_request_eager_execution
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -25535,13 +25635,15 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse
     params(
       run_id: T.nilable(String),
       started: T.nilable(T::Boolean),
-      link: T.nilable(Temporalio::Api::Common::V1::Link)
+      link: T.nilable(Temporalio::Api::Common::V1::Link),
+      eager_activity_task: T.nilable(Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse)
     ).void
   end
   def initialize(
     run_id: "",
     started: false,
-    link: nil
+    link: nil,
+    eager_activity_task: nil
   )
   end
 
@@ -25588,6 +25690,24 @@ class Temporalio::Api::WorkflowService::V1::StartActivityExecutionResponse
   # Link to the started activity.
   sig { void }
   def clear_link
+  end
+
+  # The first activity task when eager execution was requested and accepted.
+# This is set only for the first attempt of a newly started activity.
+  sig { returns(T.nilable(Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse)) }
+  def eager_activity_task
+  end
+
+  # The first activity task when eager execution was requested and accepted.
+# This is set only for the first attempt of a newly started activity.
+  sig { params(value: T.nilable(Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueResponse)).void }
+  def eager_activity_task=(value)
+  end
+
+  # The first activity task when eager execution was requested and accepted.
+# This is set only for the first attempt of a newly started activity.
+  sig { void }
+  def clear_eager_activity_task
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -26063,12 +26183,14 @@ class Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse
   sig do
     params(
       run_id: T.nilable(String),
-      outcome: T.nilable(Temporalio::Api::Activity::V1::ActivityExecutionOutcome)
+      outcome: T.nilable(Temporalio::Api::Activity::V1::ActivityExecutionOutcome),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
     run_id: "",
-    outcome: nil
+    outcome: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -26097,6 +26219,21 @@ class Temporalio::Api::WorkflowService::V1::PollActivityExecutionResponse
 
   sig { void }
   def clear_outcome
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -27289,6 +27426,7 @@ class Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse
       run_id: T.nilable(String),
       wait_stage: T.nilable(T.any(Symbol, String, Integer)),
       operation_token: T.nilable(String),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
       result: T.nilable(Temporalio::Api::Common::V1::Payload),
       failure: T.nilable(Temporalio::Api::Failure::V1::Failure)
     ).void
@@ -27297,6 +27435,7 @@ class Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse
     run_id: "",
     wait_stage: :NEXUS_OPERATION_WAIT_STAGE_UNSPECIFIED,
     operation_token: "",
+    propagated_nexus_serialization_context: nil,
     result: nil,
     failure: nil
   )
@@ -27345,6 +27484,24 @@ class Temporalio::Api::WorkflowService::V1::PollNexusOperationExecutionResponse
   # Operation token. Only populated for asynchronous operations after a successful StartOperation call.
   sig { void }
   def clear_operation_token
+  end
+
+  # Serialization context for this operation's payloads, derived from its stored target.
+# For a reused operation, this is the original execution's context.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context for this operation's payloads, derived from its stored target.
+# For a reused operation, this is the original execution's context.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context for this operation's payloads, derived from its stored target.
+# For a reused operation, this is the original execution's context.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   # The result if the operation completed successfully.

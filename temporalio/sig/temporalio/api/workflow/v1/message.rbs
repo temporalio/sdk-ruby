@@ -337,6 +337,11 @@ module Temporalio
           def has_time_skipping_info?: () -> bool
           def clear_time_skipping_info: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this workflow.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             execution_expiration_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             "execution_expiration_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
@@ -356,6 +361,8 @@ module Temporalio
             "pause_info" => (::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo | ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo::init_map)?,
             time_skipping_info: (::Temporalio::Api::Common::V1::TimeSkippingInfo | ::Temporalio::Api::Common::V1::TimeSkippingInfo::init_map)?,
             "time_skipping_info" => (::Temporalio::Api::Common::V1::TimeSkippingInfo | ::Temporalio::Api::Common::V1::TimeSkippingInfo::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -370,6 +377,7 @@ module Temporalio
             | ("request_id_infos" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Workflow::V1::RequestIdInfo])
             | ("pause_info" name) -> ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo?
             | ("time_skipping_info" name) -> ::Temporalio::Api::Common::V1::TimeSkippingInfo?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("execution_expiration_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
@@ -381,6 +389,7 @@ module Temporalio
             | ("request_id_infos" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Workflow::V1::RequestIdInfo]) value) -> void
             | ("pause_info" name, ::Temporalio::Api::Workflow::V1::WorkflowExecutionPauseInfo? value) -> void
             | ("time_skipping_info" name, ::Temporalio::Api::Common::V1::TimeSkippingInfo? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         # Holds all the information about worker versioning for a particular workflow execution.

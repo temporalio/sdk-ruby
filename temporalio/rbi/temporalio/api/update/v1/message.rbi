@@ -419,7 +419,8 @@ class Temporalio::Api::Update::V1::Request
       input: T.nilable(Temporalio::Api::Update::V1::Input),
       request_id: T.nilable(String),
       completion_callbacks: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Callback)]),
-      links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)])
+      links: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Link)]),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -427,7 +428,8 @@ class Temporalio::Api::Update::V1::Request
     input: nil,
     request_id: "",
     completion_callbacks: [],
-    links: []
+    links: [],
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -498,6 +500,21 @@ class Temporalio::Api::Update::V1::Request
   # Links to be associated with this update.
   sig { void }
   def clear_links
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }

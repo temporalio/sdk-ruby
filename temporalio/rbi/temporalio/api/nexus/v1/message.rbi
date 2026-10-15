@@ -2,6 +2,94 @@
 # source: temporal/api/nexus/v1/message.proto
 # typed: strict
 
+# PropagatedSerializationContext represents the context of the Nexus caller that started this execution.
+class Temporalio::Api::Nexus::V1::PropagatedSerializationContext
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      endpoint: T.nilable(String),
+      service: T.nilable(String),
+      operation: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    endpoint: "",
+    service: "",
+    operation: ""
+  )
+  end
+
+  sig { returns(String) }
+  def endpoint
+  end
+
+  sig { params(value: String).void }
+  def endpoint=(value)
+  end
+
+  sig { void }
+  def clear_endpoint
+  end
+
+  sig { returns(String) }
+  def service
+  end
+
+  sig { params(value: String).void }
+  def service=(value)
+  end
+
+  sig { void }
+  def clear_service
+  end
+
+  sig { returns(String) }
+  def operation
+  end
+
+  sig { params(value: String).void }
+  def operation=(value)
+  end
+
+  sig { void }
+  def clear_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Nexus::V1::PropagatedSerializationContext) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Nexus::V1::PropagatedSerializationContext).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Nexus::V1::PropagatedSerializationContext) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Nexus::V1::PropagatedSerializationContext, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # A general purpose failure message.
 # See: https://github.com/nexus-rpc/api/blob/main/SPEC.md#failure
 class Temporalio::Api::Nexus::V1::Failure

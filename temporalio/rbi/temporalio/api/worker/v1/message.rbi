@@ -2227,6 +2227,8 @@ module Temporalio::Api::Worker::V1::EnvironmentInfo::Runtime::RuntimeType
   self::RUNTIME_TYPE_DOTNET_CORE = T.let(8, Integer)
   self::RUNTIME_TYPE_NATIVE = T.let(9, Integer)
   self::RUNTIME_TYPE_ROADRUNNER = T.let(10, Integer)
+  self::RUNTIME_TYPE_GRAAL_AOT = T.let(11, Integer)
+  self::RUNTIME_TYPE_KOTLIN = T.let(12, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

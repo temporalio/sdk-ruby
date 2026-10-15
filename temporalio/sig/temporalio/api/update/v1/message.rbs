@@ -193,6 +193,11 @@ module Temporalio
           attr_accessor links(): ::Google::Protobuf::RepeatedField
           def clear_links: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this update.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             meta: (::Temporalio::Api::Update::V1::Meta | ::Temporalio::Api::Update::V1::Meta::init_map)?,
             "meta" => (::Temporalio::Api::Update::V1::Meta | ::Temporalio::Api::Update::V1::Meta::init_map)?,
@@ -204,6 +209,8 @@ module Temporalio
             "completion_callbacks" => ::Array[::Temporalio::Api::Common::V1::Callback]?,
             links: ::Array[::Temporalio::Api::Common::V1::Link]?,
             "links" => ::Array[::Temporalio::Api::Common::V1::Link]?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -214,6 +221,7 @@ module Temporalio
             | ("request_id" name) -> ::String
             | ("completion_callbacks" name) -> ::Google::Protobuf::RepeatedField
             | ("links" name) -> ::Google::Protobuf::RepeatedField
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("meta" name, ::Temporalio::Api::Update::V1::Meta? value) -> void
@@ -221,6 +229,7 @@ module Temporalio
             | ("request_id" name, (::String | ::Symbol) value) -> void
             | ("completion_callbacks" name, ::Google::Protobuf::RepeatedField value) -> void
             | ("links" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         # An Update protocol message indicating that a Workflow Update has been rejected.

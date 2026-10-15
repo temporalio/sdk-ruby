@@ -61,8 +61,8 @@ class Temporalio::Api::Export::V1::WorkflowExecution
   end
 end
 
-# WorkflowExecutions is used by the Cloud Export feature to deserialize
-# the exported file. It encapsulates a collection of workflow execution information.
+# WorkflowExecutions is the legacy Cloud Export file format containing only workflow executions.
+# New exporters should use ExportedExecutions.
 class Temporalio::Api::Export::V1::WorkflowExecutions
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -114,6 +114,140 @@ class Temporalio::Api::Export::V1::WorkflowExecutions
   end
 
   sig { params(msg: Temporalio::Api::Export::V1::WorkflowExecutions, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Export::V1::ActivityExecution
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      activity: T.nilable(Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse)
+    ).void
+  end
+  def initialize(
+    activity: nil
+  )
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse)) }
+  def activity
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::WorkflowService::V1::DescribeActivityExecutionResponse)).void }
+  def activity=(value)
+  end
+
+  sig { void }
+  def clear_activity
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Export::V1::ActivityExecution) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Export::V1::ActivityExecution).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Export::V1::ActivityExecution) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Export::V1::ActivityExecution, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# ExportedExecutions is used by the Cloud Export feature to deserialize the exported file.
+# It encapsulates workflow execution information and contains other execution types.
+class Temporalio::Api::Export::V1::ExportedExecutions
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      workflows: T.nilable(T::Array[T.nilable(Temporalio::Api::Export::V1::WorkflowExecution)]),
+      activities: T.nilable(T::Array[T.nilable(Temporalio::Api::Export::V1::ActivityExecution)])
+    ).void
+  end
+  def initialize(
+    workflows: [],
+    activities: []
+  )
+  end
+
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Export::V1::WorkflowExecution)]) }
+  def workflows
+  end
+
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def workflows=(value)
+  end
+
+  sig { void }
+  def clear_workflows
+  end
+
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Export::V1::ActivityExecution)]) }
+  def activities
+  end
+
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def activities=(value)
+  end
+
+  sig { void }
+  def clear_activities
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Export::V1::ExportedExecutions) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Export::V1::ExportedExecutions).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Export::V1::ExportedExecutions) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Export::V1::ExportedExecutions, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

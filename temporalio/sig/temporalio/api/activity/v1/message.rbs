@@ -385,6 +385,16 @@ module Temporalio
           def has_execution_time?: () -> bool
           def clear_execution_time: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this activity.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
+          # Indicates whether eager execution was requested for this activity and accepted by the server
+          # for its first task.
+          attr_accessor eager_execution_accepted(): bool
+          def clear_eager_execution_accepted: () -> void
+
           type init_map = {
             activity_id: (::String | ::Symbol)?,
             "activity_id" => (::String | ::Symbol)?,
@@ -462,6 +472,10 @@ module Temporalio
             "start_delay" => (::Google::Protobuf::Duration | ::Google::Protobuf::Duration)?,
             execution_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             "execution_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            eager_execution_accepted: bool?,
+            "eager_execution_accepted" => bool?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -505,6 +519,8 @@ module Temporalio
             | ("sdk_version" name) -> ::String
             | ("start_delay" name) -> ::Google::Protobuf::Duration?
             | ("execution_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+            | ("eager_execution_accepted" name) -> bool
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -545,6 +561,8 @@ module Temporalio
             | ("sdk_version" name, (::String | ::Symbol) value) -> void
             | ("start_delay" name, ((::Google::Protobuf::Duration | ::int)?) value) -> void
             | ("execution_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
+            | ("eager_execution_accepted" name, bool value) -> void
         end
 
         # Limited activity information returned in the list response.

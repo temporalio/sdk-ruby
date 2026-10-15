@@ -1619,6 +1619,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_workflowservice_v1_start_activity_execution_response(value)
+        @on_enter&.call(value)
+        api_workflowservice_v1_poll_activity_task_queue_response(value.eager_activity_task) if value.has_eager_activity_task?
+        @on_exit&.call(value)
+      end
+      
       def api_workflowservice_v1_start_batch_operation_request(value)
         @on_enter&.call(value)
         api_batch_v1_batch_operation_termination(value.termination_operation) if value.has_termination_operation?

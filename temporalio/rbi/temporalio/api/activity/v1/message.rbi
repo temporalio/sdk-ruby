@@ -382,7 +382,9 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
       sdk_name: T.nilable(String),
       sdk_version: T.nilable(String),
       start_delay: T.nilable(Google::Protobuf::Duration),
-      execution_time: T.nilable(Google::Protobuf::Timestamp)
+      execution_time: T.nilable(Google::Protobuf::Timestamp),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
+      eager_execution_accepted: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
@@ -423,7 +425,9 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
     sdk_name: "",
     sdk_version: "",
     start_delay: nil,
-    execution_time: nil
+    execution_time: nil,
+    propagated_nexus_serialization_context: nil,
+    eager_execution_accepted: false
   )
   end
 
@@ -1058,6 +1062,39 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
 # `schedule_time + start_delay`. Same as `schedule_time` if `start_delay` is not set.
   sig { void }
   def clear_execution_time
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this activity.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
+  end
+
+  # Indicates whether eager execution was requested for this activity and accepted by the server
+# for its first task.
+  sig { returns(T::Boolean) }
+  def eager_execution_accepted
+  end
+
+  # Indicates whether eager execution was requested for this activity and accepted by the server
+# for its first task.
+  sig { params(value: T::Boolean).void }
+  def eager_execution_accepted=(value)
+  end
+
+  # Indicates whether eager execution was requested for this activity and accepted by the server
+# for its first task.
+  sig { void }
+  def clear_eager_execution_accepted
   end
 
   sig { params(field: String).returns(T.untyped) }
