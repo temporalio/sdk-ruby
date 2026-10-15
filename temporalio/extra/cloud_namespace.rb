@@ -16,30 +16,39 @@ module CloudNamespace
     # Keep command dispatch separate so the lifecycle can run inside the repository's Ruby bundle.
     def run(args)
       case args
-      in ['create']
-        create
+      in ['create', 'mtls']
+        create('mtls')
+      in ['create', 'api-key']
+        create('api-key')
       in ['delete', namespace]
         delete(namespace)
       else
-        raise ArgumentError, 'Usage: cloud_namespace.rb create|delete <namespace>'
+        raise ArgumentError, 'Usage: cloud_namespace.rb create <mtls|api-key> | delete <namespace>'
       end
     end
 
     # Emit the namespace before polling so cleanup can run if provisioning later fails.
-    def create
+    def create(auth_method)
       service = cloud_service
-      namespace_name = "sdk-ruby-ci-#{required_env('GITHUB_RUN_ID')}-#{required_env('GITHUB_RUN_ATTEMPT')}"
+      suffix = auth_method == 'mtls' ? 'mtls' : 'apikey'
+      namespace_name = "sdk-ruby-ci-#{required_env('GITHUB_RUN_ID')}-#{required_env('GITHUB_RUN_ATTEMPT')}-#{suffix}"
+      spec = Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec.new(
+        name: namespace_name,
+        replicas: [Temporalio::Api::Cloud::Namespace::V1::ReplicaSpec.new(region: CLOUD_REGION)],
+        retention_days: 1
+      )
+      # Provision separately so neither test depends on support for combining authentication methods.
+      if auth_method == 'mtls'
+        spec.mtls_auth = Temporalio::Api::Cloud::Namespace::V1::MtlsAuthSpec.new(
+          accepted_client_ca: File.binread(required_env('TEMPORAL_CLOUD_CLIENT_CA_PATH')),
+          enabled: true
+        )
+      else
+        spec.api_key_auth = Temporalio::Api::Cloud::Namespace::V1::ApiKeyAuthSpec.new(enabled: true)
+      end
       result = service.create_namespace(
         Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest.new(
-          spec: Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec.new(
-            name: namespace_name,
-            replicas: [Temporalio::Api::Cloud::Namespace::V1::ReplicaSpec.new(region: CLOUD_REGION)],
-            retention_days: 1,
-            mtls_auth: Temporalio::Api::Cloud::Namespace::V1::MtlsAuthSpec.new(
-              accepted_client_ca: File.binread(required_env('TEMPORAL_CLOUD_CLIENT_CA_PATH')),
-              enabled: true
-            )
-          ),
+          spec:,
           async_operation_id: SecureRandom.uuid
         )
       )
@@ -48,6 +57,17 @@ module CloudNamespace
 
       File.open(required_env('GITHUB_OUTPUT'), 'a') { |output| output.puts("namespace=#{namespace}") }
       wait_for_operation(service, result.async_operation)
+
+      endpoints = service.get_namespace(
+        Temporalio::Api::Cloud::CloudService::V1::GetNamespaceRequest.new(namespace:)
+      ).namespace&.endpoints
+      address = auth_method == 'mtls' ? endpoints&.mtls_grpc_address : endpoints&.grpc_address
+      if address.nil? || address.empty?
+        raise "Cloud namespace #{namespace} did not report a #{auth_method} gRPC address"
+      end
+
+      puts "Namespace #{namespace} #{auth_method} gRPC address: #{address}"
+      File.open(required_env('GITHUB_OUTPUT'), 'a') { |output| output.puts("address=#{address}") }
     end
 
     # Read the current resource version because Cloud uses optimistic concurrency for deletion.
