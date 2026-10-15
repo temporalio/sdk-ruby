@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'temporalio/cancellation'
+require 'temporalio/converters/storage_driver_limiter'
 
 module Temporalio
   module Converters
     StorageDriverStoreContext = Data.define(
       :target,
-      :cancellation
+      :cancellation,
+      :limiter
     )
 
     # Context given to {StorageDriver#store}.
@@ -19,6 +21,9 @@ module Temporalio
     #     on behalf of, or nil when there is no associated execution.
     # @!attribute [r] cancellation
     #   @return [Cancellation] Cancelled when the SDK abandons this store operation.
+    # @!attribute [r] limiter
+    #   @return [StorageDriverLimiter] Bounds how many store requests this driver may have in flight. Take one permit
+    #     per request.
     #
     # @!visibility private
     class StorageDriverStoreContext; end # rubocop:disable Lint/EmptyClass

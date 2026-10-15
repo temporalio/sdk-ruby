@@ -2,8 +2,12 @@ module Temporalio
   module Converters
     class StorageDriverRetrieveContext
       attr_reader cancellation: Cancellation
+      attr_reader limiter: StorageDriverLimiter
 
-      def initialize: (cancellation: Cancellation) -> void
+      def initialize: (
+        cancellation: Cancellation,
+        limiter: StorageDriverLimiter
+      ) -> void
     end
   end
 end

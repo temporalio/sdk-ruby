@@ -1,0 +1,16 @@
+module Temporalio
+  module Converters
+    class ExternalStorageConcurrency
+      DEFAULT_MAX_DRIVER_OPERATIONS: Integer
+      DEFAULT_MAX_OPERATIONS_PER_MESSAGE: Integer
+
+      attr_reader max_driver_operations: Integer
+      attr_reader max_operations_per_message: Integer
+
+      def initialize: (
+        ?max_driver_operations: Integer,
+        ?max_operations_per_message: Integer
+      ) -> void
+    end
+  end
+end

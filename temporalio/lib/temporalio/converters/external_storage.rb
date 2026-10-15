@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'temporalio/converters/external_storage_concurrency'
 require 'temporalio/converters/storage_driver'
 
 module Temporalio
@@ -24,6 +25,9 @@ module Temporalio
       #   Only called for payloads that meet {#payload_size_threshold}, and must return one of {#drivers} or nil.
       attr_reader :driver_selector
 
+      # @return [ExternalStorageConcurrency] Limits on how many storage requests may be in flight at once.
+      attr_reader :concurrency
+
       # @return [Integer] Minimum encoded payload size, in bytes, that is offloaded. Payloads at or above this size are
       #   offloaded; smaller ones are left inline. Zero offloads every payload.
       attr_reader :payload_size_threshold
@@ -38,7 +42,13 @@ module Temporalio
       #   payload.
       # @param payload_size_threshold [Integer] Minimum encoded payload size, in bytes, to offload. Must be a
       #   non-negative Integer.
-      def initialize(drivers:, driver_selector: nil, payload_size_threshold: DEFAULT_PAYLOAD_SIZE_THRESHOLD)
+      # @param concurrency [ExternalStorageConcurrency] Limits on how many storage requests may be in flight at once.
+      def initialize(
+        drivers:,
+        driver_selector: nil,
+        payload_size_threshold: DEFAULT_PAYLOAD_SIZE_THRESHOLD,
+        concurrency: ExternalStorageConcurrency.new
+      )
         raise ArgumentError, 'At least one driver is required' if drivers.empty?
 
         unless payload_size_threshold.is_a?(Integer) && payload_size_threshold >= 0
@@ -65,6 +75,7 @@ module Temporalio
         # Normalized so callers never have to distinguish the single-driver case.
         @driver_selector = driver_selector || ->(_context, _payload) { @drivers.first }
         @payload_size_threshold = payload_size_threshold
+        @concurrency = concurrency
       end
 
       # Get the driver registered under the given name.

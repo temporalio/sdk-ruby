@@ -1,0 +1,7 @@
+module Temporalio
+  module Converters
+    class StorageDriverLimiter
+      def permit: [T] (Api::Common::V1::Payload | StorageDriverClaim item) { () -> T } -> T
+    end
+  end
+end

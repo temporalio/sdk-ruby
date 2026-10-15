@@ -2,9 +2,11 @@
 
 require 'temporalio/converters/data_converter'
 require 'temporalio/converters/external_storage'
+require 'temporalio/converters/external_storage_concurrency'
 require 'temporalio/converters/storage_driver'
 require 'temporalio/converters/storage_driver_activity_info'
 require 'temporalio/converters/storage_driver_claim'
+require 'temporalio/converters/storage_driver_limiter'
 require 'temporalio/converters/storage_driver_retrieve_context'
 require 'temporalio/converters/storage_driver_select_context'
 require 'temporalio/converters/storage_driver_store_context'
