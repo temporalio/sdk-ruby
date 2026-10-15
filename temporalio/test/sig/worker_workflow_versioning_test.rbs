@@ -5,4 +5,18 @@ class WorkerWorkflowVersioningTest < Test
   def set_ramping_version: (untyped client, String task_queue, Temporalio::WorkerDeploymentVersion version, Float rate) -> untyped
   def wait_for_workflow_running_on_version: (untyped handle, String expected_build_id) -> void
   def wait_for_worker_deployment_routing_config_propagation: (untyped client, String deployment_name, String expected_current_build_id, ?String expected_ramping_build_id, ?Float expected_ramping_percentage) -> void
+  def run_child_workflow_versioning_override_test: (String? override_type, use_execute: bool) -> void
+
+  class ChildVersioningOverrideWorkflow < Temporalio::Workflow::Definition
+    def execute: (String? override_type, String deployment_name, String build_id, bool use_execute) -> Array[Object?]
+  end
+
+  class AutoUpgradeVersionedChildWorkflow < Temporalio::Workflow::Definition
+    @finish: bool?
+    def execute: -> String?
+    def do_finish: -> void
+  end
+
+  class PinnedVersionedChildWorkflow < AutoUpgradeVersionedChildWorkflow
+  end
 end

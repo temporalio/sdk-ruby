@@ -63,6 +63,7 @@ module Temporalio
       ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
       ?priority: Priority,
+      ?versioning_override: VersioningOverride?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?
     ) -> Object?
@@ -132,6 +133,7 @@ module Temporalio
       ?memo: Hash[String | Symbol, Object?]?,
       ?search_attributes: SearchAttributes?,
       ?priority: Priority,
+      ?versioning_override: VersioningOverride?,
       ?arg_hints: Array[Object]?,
       ?result_hint: Object?
     ) -> ChildWorkflowHandle
