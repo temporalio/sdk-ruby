@@ -8,7 +8,7 @@ module Temporalio
     #
     # A driver is handed a whole batch and decides for itself how many requests to make of it, so the SDK cannot
     # bound that fan out on the driver's behalf. The limit is cooperative: a driver that never calls {#permit} makes
-    # requests that no budget counts, and the SDK warns when it detects that.
+    # requests that no limit counts, and the SDK warns when it detects that.
     #
     # @note WARNING: This API is experimental and may change in the future.
     #
