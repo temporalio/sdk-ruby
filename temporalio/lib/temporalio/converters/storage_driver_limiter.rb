@@ -6,9 +6,9 @@ module Temporalio
     # {StorageDriverStoreContext} and {StorageDriverRetrieveContext}; a driver calls it rather than
     # implementing it.
     #
-    # A driver is handed a whole batch and decides for itself how many requests to make of it, so the SDK cannot
-    # bound that fan out on the driver's behalf. The limit is cooperative: a driver that never calls {#permit} makes
-    # requests that no budget counts, and the SDK warns when it detects that.
+    # A driver is handed a whole batch and decides for itself how many requests to make of it, so the limit is
+    # cooperative: a driver that never calls {#permit} makes requests that no limit counts, and the SDK warns when
+    # it detects that.
     #
     # @note WARNING: This API is experimental and may change in the future.
     #
@@ -18,11 +18,9 @@ module Temporalio
       # and releasing it when the block returns or raises.
       #
       # Take one permit per request, not one around a whole batch: wrapping a whole fan out in a single permit
-      # satisfies this signature while quietly defeating the limit. Taking a permit while already holding one can
-      # deadlock once the nesting reaches the configured limit, so a driver must not nest these.
+      # satisfies this signature while quietly defeating the limit. Do not take a permit while holding one.
       #
-      # Waiting for a permit observes the cancellation on the context this limiter came from, so a driver that is
-      # waiting when the SDK abandons the operation stops waiting.
+      # Waiting for a permit observes the cancellation on the context this limiter came from.
       #
       # @param item [Api::Common::V1::Payload, StorageDriverClaim] What this one request covers: a payload when
       #   storing, a claim when retrieving.
