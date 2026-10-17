@@ -30,7 +30,7 @@ module Temporalio
           # Only needed to say block is required
           def timeout_after: [T] (
             duration? duration,
-            singleton(Exception) exception_class,
+            (singleton(Exception) | Exception) exception_class,
             *Object? exception_args
           ) { -> T } -> T
 

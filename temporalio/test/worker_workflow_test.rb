@@ -212,6 +212,7 @@ class WorkerWorkflowTest < Test
       assert_nil info.fetch('retry_policy')
       assert_nil info.fetch('root')
       assert_equal handle.result_run_id, info['run_id']
+      assert_equal handle.result_run_id, info['original_execution_run_id']
       assert_nil info.fetch('run_timeout')
       assert_equal desc.start_time.to_s, info['start_time']
       assert_equal worker.task_queue, info['task_queue']

@@ -11,7 +11,8 @@ module Temporalio
         Workflow::Definition::Signal | Symbol | String signal,
         *Object? args,
         ?cancellation: Cancellation,
-        ?arg_hints: Array[Object]?
+        ?arg_hints: Array[Object]?,
+        ?event_groups: Array[EventGroup]?
       ) -> void
     end
   end

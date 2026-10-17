@@ -26,7 +26,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Scheduler
     type_parameters(:T)
       .params(
         duration: T.nilable(T.any(Integer, Float)),
-        exception_class: T.class_of(Exception),
+        exception_class: T.any(T.class_of(Exception), Exception),
         exception_arguments: T.nilable(Object),
         block: T.proc.returns(T.type_parameter(:T))
       )

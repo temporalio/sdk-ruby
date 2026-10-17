@@ -16,7 +16,8 @@ module Temporalio
             ?summary: String?,
             ?cancellation: Cancellation,
             ?arg_hint: Object?,
-            ?result_hint: Object?
+            ?result_hint: Object?,
+            ?event_groups: Array[Workflow::EventGroup]?
           ) -> Workflow::NexusOperationHandle
         end
       end
