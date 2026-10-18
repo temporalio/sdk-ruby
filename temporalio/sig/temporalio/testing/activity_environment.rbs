@@ -42,7 +42,7 @@ module Temporalio
           client: Client?
         ) -> void
 
-        def heartbeat: (*untyped details) -> untyped
+        def heartbeat: (*untyped details, ?detail_hints: Array[Object]?) -> untyped
         def metric_meter: -> Metric::Meter
         def client: -> Client
         def cancellation_details: -> Activity::CancellationDetails?
