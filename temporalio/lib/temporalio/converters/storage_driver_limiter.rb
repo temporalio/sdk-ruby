@@ -17,8 +17,8 @@ module Temporalio
       # and releasing it when the block returns or raises.
       #
       # Wrapping a whole fan out in a single permit satisfies this signature while quietly defeating the limit.
-      # Taking a second permit while handling one request, directly or in a helper, deadlocks at the limit:
-      # every holder would be waiting for a permit only another holder can release.
+      # Do not take more than one permit for a given request: at the limit, every holder would be waiting for a
+      # permit only another holder can release.
       #
       # Waiting for a permit observes the cancellation on the context this limiter came from.
       #
