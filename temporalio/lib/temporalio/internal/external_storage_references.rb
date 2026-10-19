@@ -14,22 +14,52 @@ module Temporalio
     module ExternalStorageReferences
       ENCODING = 'json/protobuf'
       MESSAGE_TYPE = 'temporal.api.sdk.v1.ExternalStorageReference'
+      MARKER = '__temporal_external_storage_reference'
+      MARKER_VALUE = 'true'
 
       class << self
+        # Reads metadata only, so no payload is decoded and one that needs no retrieval is not touched.
+        #
         # @param payload [Api::Common::V1::Payload] Payload to check.
-        # @return [Boolean] Whether the payload is a reference to externally stored data.
-        def reference?(payload)
+        # @return [Boolean] Whether the payload has to be retrieved from external storage.
+        def needs_retrieval?(payload)
+          marked?(payload) || plain_reference?(payload)
+        end
+
+        # A marked payload that a codec encoded must be decoded before it is parsed.
+        #
+        # Both halves are required: +json/protobuf+ on its own is an ordinary encoding for any protobuf payload.
+        #
+        # @param payload [Api::Common::V1::Payload] Payload to check.
+        # @return [Boolean] Whether the payload is a reference in the form a codec has not encoded.
+        def plain_reference?(payload)
           payload.metadata['encoding'] == ENCODING && payload.metadata['messageType'] == MESSAGE_TYPE
         end
 
+        # The value is checked, not just the key.
+        #
+        # @param payload [Api::Common::V1::Payload] Payload to check.
+        # @return [Boolean] Whether the payload carries the reference marker.
+        def marked?(payload)
+          payload.metadata[MARKER] == MARKER_VALUE
+        end
+
+        # The SDK does this after the codec has encoded the reference, so the marker lands on the outermost
+        # payload. With no codec configured the reference is itself outermost and is marked just the same.
+        #
+        # @param payload [Api::Common::V1::Payload] Reference payload to mark, modified in place.
+        def mark(payload)
+          payload.metadata[MARKER] = MARKER_VALUE.b
+        end
+
         # @param payload [Api::Common::V1::Payload] Payload to parse.
-        # @return [Api::Sdk::V1::ExternalStorageReference, nil] Parsed reference, or nil if not a reference.
+        # @return [Api::Sdk::V1::ExternalStorageReference, nil] Parsed reference, or nil if not a plain reference.
         #
         # TODO: Surface parse failures as a Temporal error instead of Google::Protobuf::ParseError. The runner is the
         # right layer for it, since only the caller knows which payload failed; a malformed reference cannot name its
         # own driver.
         def parse_reference(payload)
-          return nil unless reference?(payload)
+          return nil unless plain_reference?(payload)
 
           # Another SDK may add fields to the reference before this one knows about them, and an unknown field must
           # not make an otherwise-valid payload unreadable.

@@ -5,9 +5,20 @@ module Temporalio::Internal::ExternalStorageReferences
 
   ENCODING = T.let(T.unsafe(nil), String)
   MESSAGE_TYPE = T.let(T.unsafe(nil), String)
+  MARKER = T.let(T.unsafe(nil), String)
+  MARKER_VALUE = T.let(T.unsafe(nil), String)
 
   sig { params(payload: Temporalio::Api::Common::V1::Payload).returns(T::Boolean) }
-  def self.reference?(payload); end
+  def self.needs_retrieval?(payload); end
+
+  sig { params(payload: Temporalio::Api::Common::V1::Payload).returns(T::Boolean) }
+  def self.plain_reference?(payload); end
+
+  sig { params(payload: Temporalio::Api::Common::V1::Payload).returns(T::Boolean) }
+  def self.marked?(payload); end
+
+  sig { params(payload: Temporalio::Api::Common::V1::Payload).void }
+  def self.mark(payload); end
 
   sig do
     params(payload: Temporalio::Api::Common::V1::Payload)

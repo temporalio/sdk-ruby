@@ -24,7 +24,7 @@ class ExternalStorageTest < Test
       driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 385
     )
 
-    assert References.reference?(payload)
+    assert References.plain_reference?(payload)
     assert_equal 'json/protobuf', payload.metadata['encoding']
     assert_equal 'temporal.api.sdk.v1.ExternalStorageReference', payload.metadata['messageType']
     assert_equal 385, payload.external_payloads.first.size_bytes
@@ -37,8 +37,41 @@ class ExternalStorageTest < Test
   def test_ordinary_payload_is_not_a_reference
     payload = Temporalio::Api::Common::V1::Payload.new(metadata: { 'encoding' => 'json/plain' }, data: '{}')
 
-    refute References.reference?(payload)
+    refute References.needs_retrieval?(payload)
     assert_nil References.parse_reference(payload)
+  end
+
+  def test_marked_payload_needs_retrieval_whatever_its_encoding
+    # A codec has encoded the reference, so neither the encoding nor the message type still
+    # identifies it; only the marker does.
+    payload = Temporalio::Api::Common::V1::Payload.new(
+      metadata: { 'encoding' => 'binary/encrypted' }, data: 'opaque'
+    )
+    refute References.needs_retrieval?(payload)
+
+    References.mark(payload)
+
+    assert References.needs_retrieval?(payload)
+    # Its data is not a reference until the codec has decoded it.
+    refute References.plain_reference?(payload)
+  end
+
+  def test_marker_value_is_checked_not_just_the_key
+    payload = Temporalio::Api::Common::V1::Payload.new(
+      metadata: { '__temporal_external_storage_reference' => 'false' }, data: '{}'
+    )
+
+    refute References.needs_retrieval?(payload)
+  end
+
+  def test_unmarked_reference_still_needs_retrieval
+    # A history written before the marker existed, or one no codec encoded.
+    payload = References.create_reference_payload(
+      driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 10
+    )
+
+    assert References.needs_retrieval?(payload)
+    assert References.plain_reference?(payload)
   end
 
   def test_reference_with_unknown_field_parses
