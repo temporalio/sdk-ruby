@@ -6,9 +6,8 @@ module Temporalio
     # {StorageDriverStoreContext} and {StorageDriverRetrieveContext}; a driver calls it rather than
     # implementing it.
     #
-    # A driver is handed a whole batch and decides for itself how many requests to make of it, so the limit is
-    # cooperative: a driver that never calls {#permit} makes requests that no limit counts, and the SDK warns when
-    # it detects that.
+    # The SDK cannot see the requests a driver makes, so the limit works only if the driver takes a permit for
+    # each request.
     #
     # @note WARNING: This API is experimental and may change in the future.
     #
@@ -17,8 +16,9 @@ module Temporalio
       # Hold a permit for the duration of the given block, waiting for one to be available before the block runs
       # and releasing it when the block returns or raises.
       #
-      # Take one permit per request, not one around a whole batch: wrapping a whole fan out in a single permit
-      # satisfies this signature while quietly defeating the limit. Do not take a permit while holding one.
+      # Wrapping a whole fan out in a single permit satisfies this signature while quietly defeating the limit.
+      # Taking a second permit while handling one request, directly or in a helper, deadlocks at the limit:
+      # every holder would be waiting for a permit only another holder can release.
       #
       # Waiting for a permit observes the cancellation on the context this limiter came from.
       #
