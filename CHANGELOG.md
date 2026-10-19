@@ -4,17 +4,12 @@
 
 ### Added
 
-- Core: The OTLP metrics exporter can export histograms as OpenTelemetry exponential histograms, which Prometheus-compatible backends store as native histograms, when an SDK enables the option, including through the C bridge. It applies to every histogram, including custom ones, and names each series with a suffix, `_native` by default, so it never shares a name with the fixed-bucket series it replaces. It cannot be combined with histogram bucket overrides. Explicit buckets remain the default.
-
-- Core: Child workflow commands, including those submitted through the C bridge, support pinned, auto-upgrade, and one-time worker deployment versioning overrides on Temporal Server 1.32.0 or later. Child-start resolutions distinguish invalid versioning overrides and missing namespaces from other start failures.
-- Core: External workflow signal and cancellation resolution activations now include the typed server failure cause alongside the existing failure.
-- Core: Language SDKs can opt in to recording local activity arguments in the local activity marker's `input` detail.
-- Core: Workflow completion-as-cancelled commands can now carry details for recording on the terminal history event.
-- Core: Core now supports attaching `EventGroupMarker`s to most workflow commands.
-- Core: The `temporal_activity_execution_failed` and `temporal_local_activity_execution_failed` worker metrics now carry a `failure_reason` attribute. Each is now split into one time series per reason, which may affect existing dashboards.
-- Core: Workflow task completions larger than the gRPC request size limit are now paginated automatically when the namespace supports it. Paginated workflow task completions require Temporal Server 1.32.0 or later.
-
 - Added experimental `versioning_override:` to `Workflow.start_child_workflow` and `Workflow.execute_child_workflow`, including `VersioningOverride::OneTime`, to route children independently of their parent on Temporal Server 1.32.0 or later. Rejected overrides raise `Error::ChildWorkflowError` with an `Error::InvalidVersioningOverrideError` cause.
+- Core: The OTLP metrics exporter can export histograms as OpenTelemetry exponential histograms, which Prometheus-compatible backends store as native histograms, when an SDK enables the option, including through the C bridge. It applies to every histogram, including custom ones, and names each series with a suffix, `_native` by default, so it never shares a name with the fixed-bucket series it replaces. It cannot be combined with histogram bucket overrides. Explicit buckets remain the default.
+- Core: The `temporal_activity_execution_failed` and `temporal_local_activity_execution_failed` worker metrics now carry a `failure_reason` attribute. Each is now split into one time series per reason, which may affect existing dashboards.
+- Core: External workflow signal and cancellation resolution activations now include the typed server failure cause alongside the existing failure.
+- Core: Workflow completion-as-cancelled commands can now carry details for recording on the terminal history event.
+- Core: Workflow task completions larger than the gRPC request size limit are now paginated automatically when the namespace supports it. Paginated workflow task completions require Temporal Server 1.32.0 or later.
 
 ### Stabilized
 
@@ -24,19 +19,13 @@
 ### :boom: Breaking Changes
 
 - `Schedule::Policy#catchup_window` now defaults to `nil`. If unspecified the server configured default is used.
-
-- Core: The following types are now non-exhaustive: `Priority`, `WorkerDeploymentVersion`, `WorkerCallbacks`, `WorkflowExecutionInfo`, `ActivityCloseTimeouts`, `ActivityExecutionDecodeHint`, child-workflow and signal decode hints, `SerializationContext`, `SerializationContextData`, `PayloadConverter`, `IncomingError`, `ScheduleSpec`, and `ScheduleOverlapPolicy`. Construct structs using their respective builders or constructors (`WorkerCallbacks::new`, `ActivityExecutionDecodeHint::new`, or `SerializationContext::new`); use `Default` for `PayloadConverter`; and add wildcard branches when matching enums.
-- Core: Renamed `ActivityCloseTimeouts::Both` to `ActivityCloseTimeouts::ScheduleAndStartToClose`.
-- Core: Removed the unused `ActExitValue` type. Use `ActivityError::WillCompleteAsync` to mark an activity for asynchronous completion.
-- Core: Removed the test-only `FailOnNondeterminismInterceptor` from the public API.
-- Core: `TaskToken` no longer exposes its underlying bytes directly. Use `TaskToken::into_inner()` to consume a token into its bytes.
-
 - Core: Replay detects changes to the service or operation of scheduled Nexus operations, reporting nondeterminism while retaining compatibility with histories recorded before these checks.
 
 ### Fixed
 
+- The test `ActivityEnvironment` no longer adds `detail_hints` to the details it passes to `on_heartbeat`.
+- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 - Core: Workers now replay workflows paused before a scheduled task starts, allowing those workflows to make progress after unpause.
-
 - Core: Task-poll targets no longer decrease after cancelled or timed-out polls. Affected pollers still retain their slot during backoff, while resource-exhaustion errors still reduce the target.
 - Core: Replay now preserves which local activity results were delivered together for newly recorded histories. This prevents local activity scheduling which was conditional on local activity resolution order from assigning recorded results to different handles. Older markers keep their existing behavior.
 - Core: Workflow poll balancing now lets non-sticky pollers use capacity after sticky pollers reach their configured or autoscaled polling limit.
@@ -50,15 +39,10 @@
 - Core: Workers no longer send worker heartbeats or appear in centralized heartbeat reports before they begin polling.
 - Core: Nexus tasks are now timed out locally even when the server sends a `request-timeout` header that falls outside the Nexus duration grammar, such as a negative value for a task whose deadline has already elapsed, a sub-millisecond unit, or a multi-unit value like `1m30s`. Previously such a header was ignored entirely, so the handler was never told the task had timed out, and a task left unanswered could block worker shutdown indefinitely.
 - Core: Workers with a small workflow cache no longer briefly stop accepting new workflows. Sticky workflow-task pollers could consume every workflow-cache permit and starve the non-sticky poller, so the worker would stop picking up new workflows until a poll timed out (up to ~60s). The poll balancer now reserves a non-sticky slot against the workflow cache size rather than the slot supplier size.
-
-- The test `ActivityEnvironment` no longer adds `detail_hints` to the details it passes to `on_heartbeat`.
-
 - Core: Worker heartbeats now report correct task-slot and poller counts when using buffered or custom metrics backends, including the Python SDK's `MetricBuffer`. Previously these counts could remain `0` because heartbeat accounting depended on reading labels from backend-owned attributes.
 - Core: Local activities still running when their workflow is evicted or the worker shuts down now always receive a cancellation. Local activities no longer retry ordinary failures or start-to-close timeouts after cancellation has been requested, matching non-local activities. Workflow code no longer observes a spurious local activity cancellation when its run is evicted or completes while the local activity is backing off between retries.
 - Core: Workers no longer panic when evicting a workflow with buffered local activity results. Completed activations' output is recorded before eviction, without recording eviction-induced cancellations.
 - Core: A workflow task that arrives while a workflow waits on a local activity, such as a legacy query, now waits until the current workflow task is reported. Previously it replaced that workflow task ("Trying to send a new WFT for a run which already has one!"), which then timed out on the server and could leave the workflow stuck on a nondeterminism error.
-
-- Require `json < 3` to prevent JSON payload decoding failures with JSON 3.
 
 ### Security
 
@@ -97,6 +81,7 @@
 - `Description` payload fields are now opt-in: `input`, `outcome`, `heartbeat_details`, `last_failure`.
 
 ### Fixed
+
 - Canceling a fiber-executor activity no longer wedges the worker if using a `Fiber#transfer` based scheduler
   (such as `async`). The exception is now delivered through the scheduler's `fiber_interrupt` hook when it
   provides one.
@@ -183,7 +168,7 @@ Client connections now use gzip transport compression by default. Pass
 #### `Workflow.suggest_continue_as_new_reasons` returns workflow enum values
 
 Workflow activations containing continue-as-new suggestion reasons previously failed because the
-worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now 
+worker tried to call `to_i` on bridge enum symbols. Continue-as-new suggestion reasons are now
 converted from bridge enum symbols to `Temporalio::SuggestContinueAsNewReason` integer enum values before being exposed to workflows.
 
 #### Deadlock errors from workflow futures fail the current workflow task
@@ -245,7 +230,7 @@ and `Client#count_activities` provide visibility-backed queries; and `Client#asy
 accepts a standalone-form `ActivityIDReference` (constructed via `ActivityIDReference.for_standalone`) for
 async completion.
 
-See https://docs.temporal.io/standalone-activity for the cross-SDK feature overview.
+See <https://docs.temporal.io/standalone-activity> for the cross-SDK feature overview.
 
 ### Fixed
 
