@@ -80,7 +80,7 @@ module Temporalio
         return unless block_given?
 
         @fiber = Fiber.schedule do
-          @result = block.call # steep:ignore
+          @result = block.call
         rescue Exception => e # rubocop:disable Lint/RescueException
           # These errors invalidate the whole workflow task. If stored and only raised on wait, the activation may
           # complete successfully with commands that were emitted before the error.

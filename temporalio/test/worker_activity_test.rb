@@ -1239,7 +1239,6 @@ class WorkerActivityTest < Test
     assert_includes err.message, 'Activity execute cannot have keyword arguments'
   end
 
-  # steep:ignore
   def execute_activity(
     activity,
     *args,
