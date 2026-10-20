@@ -255,7 +255,7 @@ module Support
       assert_includes error.message, 'SigApplicator: 1 methods could not be instrumented:'
       assert_includes error.message,
                       'Temporalio::Workflow::Future#initialize: signature parameters ["block"] ' \
-                      'do not match method parameters ["&block"]'
+                      'do not match method parameters [nil]'
     ensure
       parser.send(:define_method, :parse_file, original_parse_file)
     end
