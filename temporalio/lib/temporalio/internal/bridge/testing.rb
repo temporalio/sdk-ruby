@@ -22,7 +22,8 @@ module Temporalio
             :log_format,
             :log_level,
             :extra_args,
-            :download_ttl # Optional
+            :download_ttl, # Optional
+            :startup_timeout # Optional
           )
 
           StartTestServerOptions = Struct.new(
@@ -33,7 +34,8 @@ module Temporalio
             :download_dest_dir, # Optional
             :port, # Optional
             :extra_args,
-            :download_ttl # Optional
+            :download_ttl, # Optional
+            :startup_timeout # Optional
           )
 
           def self.start_dev_server(runtime, options)

@@ -55,6 +55,7 @@ class Temporalio::Testing::WorkflowEnvironment
           dev_server_download_dest_dir: T.nilable(String),
           dev_server_extra_args: T::Array[String],
           dev_server_download_ttl: T.nilable(Float),
+          dev_server_startup_timeout: T.nilable(Float),
           block: T.nilable(T.proc.params(arg0: Temporalio::Testing::WorkflowEnvironment).returns(T.type_parameter(:T)))
         ).returns(T.any(Temporalio::Testing::WorkflowEnvironment, T.type_parameter(:T)))
     end
@@ -78,6 +79,7 @@ class Temporalio::Testing::WorkflowEnvironment
       dev_server_download_dest_dir: T.unsafe(nil),
       dev_server_extra_args: T.unsafe(nil),
       dev_server_download_ttl: T.unsafe(nil),
+      dev_server_startup_timeout: T.unsafe(nil),
       &block
     ); end
 
@@ -95,6 +97,7 @@ class Temporalio::Testing::WorkflowEnvironment
           test_server_download_dest_dir: T.nilable(String),
           test_server_extra_args: T::Array[String],
           test_server_download_ttl: T.nilable(Float),
+          test_server_startup_timeout: T.nilable(Float),
           block: T.nilable(T.proc.params(arg0: Temporalio::Testing::WorkflowEnvironment).returns(T.type_parameter(:T)))
         ).returns(T.any(Temporalio::Testing::WorkflowEnvironment, T.type_parameter(:T)))
     end
@@ -110,6 +113,7 @@ class Temporalio::Testing::WorkflowEnvironment
       test_server_download_dest_dir: T.unsafe(nil),
       test_server_extra_args: T.unsafe(nil),
       test_server_download_ttl: T.unsafe(nil),
+      test_server_startup_timeout: T.unsafe(nil),
       &block
     ); end
   end
