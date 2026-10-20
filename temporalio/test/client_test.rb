@@ -320,14 +320,14 @@ class ClientTest < Test
     #
     # We create a standalone runtime, fork, null the reference in the child,
     # and force GC to trigger extern_free on the inherited object.
-    pre_fork_runtime = Temporalio::Runtime.new
+    _pre_fork_runtime = Temporalio::Runtime.new
 
     reader, writer = IO.pipe
     pid = fork do
       reader.close
       # Drop the only reference and force GC to free the inherited Runtime.
       # Without the fork-safe free, this triggers a Tokio panic.
-      pre_fork_runtime = nil
+      _pre_fork_runtime = nil
       GC.start
       writer.puts('child-ok')
       exit! 0
