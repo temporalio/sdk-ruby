@@ -68,7 +68,8 @@ class Temporalio::Internal::Bridge::Testing::EphemeralServer::StartDevServerOpti
       log_format: String,
       log_level: String,
       extra_args: T::Array[String],
-      download_ttl: T.nilable(T.any(Integer, Float))
+      download_ttl: T.nilable(T.any(Integer, Float)),
+      startup_timeout: T.nilable(T.any(Integer, Float))
     ).void
   end
   def initialize(
@@ -86,7 +87,8 @@ class Temporalio::Internal::Bridge::Testing::EphemeralServer::StartDevServerOpti
     log_format,
     log_level,
     extra_args,
-    download_ttl
+    download_ttl,
+    startup_timeout
   ); end
 end
 
@@ -102,8 +104,19 @@ class Temporalio::Internal::Bridge::Testing::EphemeralServer::StartTestServerOpt
       download_dest_dir: T.nilable(String),
       port: T.nilable(Integer),
       extra_args: T::Array[String],
-      download_ttl: T.nilable(T.any(Integer, Float))
+      download_ttl: T.nilable(T.any(Integer, Float)),
+      startup_timeout: T.nilable(T.any(Integer, Float))
     ).void
   end
-  def initialize(existing_path, sdk_name, sdk_version, download_version, download_dest_dir, port, extra_args, download_ttl); end
+  def initialize(
+    existing_path,
+    sdk_name,
+    sdk_version,
+    download_version,
+    download_dest_dir,
+    port,
+    extra_args,
+    download_ttl,
+    startup_timeout
+  ); end
 end

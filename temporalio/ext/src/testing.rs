@@ -73,6 +73,11 @@ impl EphemeralServer {
                 options.member::<String>(id!("log_level"))?,
             ))
             .extra_args(options.member(id!("extra_args"))?)
+            .maybe_startup_timeout(
+                options
+                    .member::<Option<f64>>(id!("startup_timeout"))?
+                    .map(Duration::from_secs_f64),
+            )
             .build();
 
         // Start
@@ -105,6 +110,11 @@ impl EphemeralServer {
             .exe(EphemeralServer::exe_from_options(&options)?)
             .maybe_port(options.member::<Option<u16>>(id!("port"))?)
             .extra_args(options.member(id!("extra_args"))?)
+            .maybe_startup_timeout(
+                options
+                    .member::<Option<f64>>(id!("startup_timeout"))?
+                    .map(Duration::from_secs_f64),
+            )
             .build();
 
         // Start
