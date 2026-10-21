@@ -130,7 +130,7 @@ module Temporalio
             workflow_definitions: @workflow_definitions
           )
         # If there is a block, we'll go ahead and assume it's for with_replay_worker
-        with_replay_worker(&) if block_given? # steep:ignore
+        with_replay_worker(&) if block_given?
       end
 
       # Replay a workflow history.

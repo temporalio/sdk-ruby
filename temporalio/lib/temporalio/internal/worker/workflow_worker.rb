@@ -148,7 +148,7 @@ module Temporalio
         end
 
         # Returns whether completion was submitted to the bridge
-        # rubocop:disable Naming/PredicateMethod
+        # rubocop:disable-next Naming/PredicateMethod
         def handle_activation_complete(runner:, activation_completion:, encoded:, completion_complete_queue:)
           if @payload_encoding_visitor && !encoded
             if Fiber.current_scheduler
@@ -166,7 +166,6 @@ module Temporalio
             true
           end
         end
-        # rubocop:enable Naming/PredicateMethod
 
         def on_shutdown_complete
           @state.evict_all

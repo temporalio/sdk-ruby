@@ -222,7 +222,7 @@ class PluginTest < Test
       workflows: [SimpleWorkflow],
       run_context: proc do |options, next_call| # steep:ignore
         run_context_calls << options
-        next_call.call(options) # steep:ignore
+        next_call.call(options)
       end
     )
 
