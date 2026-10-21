@@ -12,6 +12,7 @@ AllCops:
     - lib/temporalio/api/**/*
     - lib/temporalio/client/connection/*_service.rb
     - lib/temporalio/internal/bridge/api/**/*
+    - pkg/**/*
     - target/**/*
     - tmp/**/*
     - vendor/**/*

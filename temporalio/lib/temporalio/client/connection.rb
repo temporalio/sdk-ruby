@@ -393,10 +393,10 @@ module Temporalio
         if tls
           options.tls = if tls.is_a?(TLSOptions)
                           Internal::Bridge::Client::TLSOptions.new(
-                            client_cert: tls.client_cert, # steep:ignore
-                            client_private_key: tls.client_private_key, # steep:ignore
-                            server_root_ca_cert: tls.server_root_ca_cert, # steep:ignore
-                            domain: tls.domain # steep:ignore
+                            client_cert: tls.client_cert,
+                            client_private_key: tls.client_private_key,
+                            server_root_ca_cert: tls.server_root_ca_cert,
+                            domain: tls.domain
                           )
                         else
                           Internal::Bridge::Client::TLSOptions.new

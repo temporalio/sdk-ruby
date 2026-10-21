@@ -58,7 +58,7 @@ module Api
       mutator = proc do |value|
         case value
         when Temporalio::Api::Common::V1::Payload
-          value.data += '-single' # steep:ignore
+          value.data += '-single'
         when Enumerable
           value.replace( # steep:ignore
             [Temporalio::Api::Common::V1::Payload.new(data: "#{value.map(&:data).join('-')}-repeated")]

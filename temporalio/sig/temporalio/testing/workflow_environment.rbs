@@ -22,7 +22,8 @@ module Temporalio
         ?dev_server_download_version: String,
         ?dev_server_download_dest_dir: String?,
         ?dev_server_extra_args: Array[String],
-        ?dev_server_download_ttl: Float?
+        ?dev_server_download_ttl: Float?,
+        ?dev_server_startup_timeout: Float?
       ) -> WorkflowEnvironment
       | [T] (
         ?namespace: String,
@@ -43,7 +44,8 @@ module Temporalio
         ?dev_server_download_version: String,
         ?dev_server_download_dest_dir: String?,
         ?dev_server_extra_args: Array[String],
-        ?dev_server_download_ttl: Float?
+        ?dev_server_download_ttl: Float?,
+        ?dev_server_startup_timeout: Float?
       ) { (WorkflowEnvironment) -> T } -> T
 
       def self.start_time_skipping: (
@@ -57,7 +59,8 @@ module Temporalio
         ?test_server_download_version: String,
         ?test_server_download_dest_dir: String?,
         ?test_server_extra_args: Array[String],
-        ?test_server_download_ttl: Float?
+        ?test_server_download_ttl: Float?,
+        ?test_server_startup_timeout: Float?
       ) -> WorkflowEnvironment
       | [T] (
         ?data_converter: Converters::DataConverter,
@@ -70,7 +73,8 @@ module Temporalio
         ?test_server_download_version: String,
         ?test_server_download_dest_dir: String?,
         ?test_server_extra_args: Array[String],
-        ?test_server_download_ttl: Float?
+        ?test_server_download_ttl: Float?,
+        ?test_server_startup_timeout: Float?
       ) { (WorkflowEnvironment) -> T } -> T
 
       def self._with_core_server: (

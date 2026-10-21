@@ -196,7 +196,7 @@ module Temporalio
           address: address,
           namespace: namespace,
           api_key: api_key,
-          tls: tls&.to_h&.then { |tls_hash| tls_hash.empty? ? nil : tls_hash }, # steep:ignore
+          tls: tls&.to_h&.then { |tls_hash| tls_hash.empty? ? nil : tls_hash },
           grpc_meta: grpc_meta && grpc_meta.empty? ? nil : grpc_meta
         }.compact
       end

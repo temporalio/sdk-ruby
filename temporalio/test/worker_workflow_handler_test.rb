@@ -449,7 +449,7 @@ class WorkerWorkflowHandlerTest < Test
     # Check update
     update_lines = lines.select { |l| l.include?('update handlers are still running') }
     assert_equal 1, update_lines.size
-    trailing_arr = update_lines.first[update_lines.first.rindex('[')..] # steep:ignore
+    trailing_arr = update_lines.first[update_lines.first.rindex('[')..]
     assert_equal [
       { 'name' => 'some_update1', 'id' => 'my-update-1' },
       { 'name' => 'some_update1', 'id' => 'my-update-2' },
@@ -459,7 +459,7 @@ class WorkerWorkflowHandlerTest < Test
     # Check update
     signal_lines = lines.select { |l| l.include?('signal handlers are still running') }
     assert_equal 1, signal_lines.size
-    trailing_arr = signal_lines.first[signal_lines.first.rindex('[')..] # steep:ignore
+    trailing_arr = signal_lines.first[signal_lines.first.rindex('[')..]
     assert_equal [{ 'name' => 'some_signal1', 'count' => 2 }, { 'name' => 'some_signal2', 'count' => 1 }],
                  JSON.parse(trailing_arr) # steep:ignore
   end
