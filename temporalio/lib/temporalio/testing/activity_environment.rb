@@ -152,7 +152,7 @@ module Temporalio
         end
 
         # @!visibility private
-        def heartbeat(*details)
+        def heartbeat(*details, detail_hints: nil) # rubocop:disable Lint/UnusedMethodArgument
           @on_heartbeat&.call(details)
         end
 

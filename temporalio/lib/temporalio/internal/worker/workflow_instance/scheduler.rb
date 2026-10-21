@@ -166,7 +166,7 @@ module Temporalio
             end
 
             fiber = Fiber.new do
-              block.call # steep:ignore
+              block.call
             ensure
               @fibers.delete(Fiber.current)
             end

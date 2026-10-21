@@ -160,7 +160,7 @@ module Worker
       results = Temporalio::Worker::WorkflowReplayer.new(workflows: [SayHelloWorkflow])
                                                     .replay_workflows([history1, history2])
       assert_equal 2, results.size
-      assert_nil results.first&.replay_failure # steep:ignore
+      assert_nil results.first&.replay_failure
       assert_instance_of Temporalio::Workflow::NondeterminismError, results.last&.replay_failure
     end
 

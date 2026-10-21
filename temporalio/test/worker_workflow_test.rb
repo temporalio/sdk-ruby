@@ -48,7 +48,7 @@ class WorkerWorkflowTest < Test
       when :thread_new
         Thread.new { 'wut' }.join
       when :time_new
-        Time.new
+        Time.new # rubocop:disable Style/TimeNow -- Test interception of Time.new specifically.
       when :time_new_parse
         Time.new('2000-12-31 23:59:59.5')
       when :time_new_explicit

@@ -82,6 +82,7 @@ module Testing
       def execute
         Temporalio::Activity::Context.current.heartbeat(123, '456')
         Temporalio::Activity::Context.current.heartbeat(Temporalio::Activity::Context.current.info.activity_id)
+        Temporalio::Activity::Context.current.heartbeat('with-hints', detail_hints: [:some_hint])
       end
     end
 
@@ -95,6 +96,7 @@ module Testing
       env.run(HeartbeatingActivity)
       assert_equal [123, '456'], queue.pop
       assert_equal ['other-id'], queue.pop
+      assert_equal ['with-hints'], queue.pop
     end
 
     class CancellationDetailsActivity < Temporalio::Activity::Definition

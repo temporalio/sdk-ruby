@@ -112,7 +112,7 @@ class WorkerTest < Test
     # Run in background
     done = Queue.new
     run_in_background do
-      worker.run  { raise 'Intentional error' }
+      worker.run { raise 'Intentional error' }
     rescue StandardError => e
       done.push(e)
     end

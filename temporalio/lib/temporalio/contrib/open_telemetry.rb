@@ -549,7 +549,7 @@ module Temporalio
               return nil
             end
 
-            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:) # steep:ignore
+            span = root.tracer.start_span(name, attributes:, links:, start_timestamp: time, kind:)
             # Record exception and set status if present
             if exception
               span.record_exception(exception)

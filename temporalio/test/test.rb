@@ -101,7 +101,7 @@ class Test < Minitest::Test
       return exclusion if exclusion
 
       exclusions = ancestor.instance_variable_get(:@cloud_test_exclusions)
-      return exclusions[method_name] if exclusions&.key?(method_name) # steep:ignore
+      return exclusions[method_name] if exclusions&.key?(method_name)
     end
     nil
   end
@@ -177,9 +177,9 @@ class Test < Minitest::Test
 
   def run_in_background(&)
     if Fiber.current_scheduler
-      Fiber.schedule(&) # steep:ignore
+      Fiber.schedule(&)
     else
-      Thread.new(&) # steep:ignore
+      Thread.new(&)
     end
   end
 
