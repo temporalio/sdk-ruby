@@ -21,8 +21,7 @@ module Temporalio
     # @!attribute [r] cancellation
     #   @return [Cancellation] Cancelled when the SDK abandons this retrieve operation.
     # @!attribute [r] limiter
-    #   @return [StorageDriverLimiter] Bounds how many retrieve requests this driver may have in flight. Take one
-    #     permit per request.
+    #   @return [StorageDriverLimiter] Limiter for this driver's retrieve requests.
     #
     # @!visibility private
     class StorageDriverRetrieveContext; end # rubocop:disable Lint/EmptyClass

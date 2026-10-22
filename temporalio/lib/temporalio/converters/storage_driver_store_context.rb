@@ -22,8 +22,7 @@ module Temporalio
     # @!attribute [r] cancellation
     #   @return [Cancellation] Cancelled when the SDK abandons this store operation.
     # @!attribute [r] limiter
-    #   @return [StorageDriverLimiter] Bounds how many store requests this driver may have in flight. Take one permit
-    #     per request.
+    #   @return [StorageDriverLimiter] Limiter for this driver's store requests.
     #
     # @!visibility private
     class StorageDriverStoreContext; end # rubocop:disable Lint/EmptyClass

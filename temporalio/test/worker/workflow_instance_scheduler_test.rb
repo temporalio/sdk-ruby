@@ -16,6 +16,7 @@ module Worker
       end
 
       define_method(:context_frozen) { false }
+      define_method(:check_conditions) { true }
 
       def illegal_call_tracing_disabled
         yield

@@ -367,6 +367,50 @@ class WorkerWorkflowHandlerTest < Test
     end
   end
 
+  class ConditionEvaluationWorkflow < Temporalio::Workflow::Definition
+    workflow_query_attr_reader :condition_evaluations
+
+    def initialize
+      @condition_evaluations = 0
+    end
+
+    def execute
+      Temporalio::Workflow.wait_condition do
+        @condition_evaluations += 1
+        @done
+      end
+    end
+
+    workflow_update
+    def finish(accept)
+      @done = accept
+    end
+
+    workflow_update_validator :finish
+    def validate_finish(accept)
+      raise 'Rejected' unless accept
+    end
+  end
+
+  def test_rejected_update_does_not_evaluate_conditions
+    execute_workflow(ConditionEvaluationWorkflow) do |handle|
+      evaluations = handle.query(ConditionEvaluationWorkflow.condition_evaluations)
+
+      # Neither the rejected update nor the queries can change state, so none of their activations may evaluate the
+      # condition
+      assert_raises(Temporalio::Error::WorkflowUpdateFailedError) do
+        handle.execute_update(ConditionEvaluationWorkflow.finish, false)
+      end
+      assert_equal evaluations, handle.query(ConditionEvaluationWorkflow.condition_evaluations)
+
+      handle.execute_update(ConditionEvaluationWorkflow.finish, true)
+      handle.result
+      assert_nil Temporalio::Worker::WorkflowReplayer.new(workflows: [ConditionEvaluationWorkflow])
+                                                     .replay_workflow(handle.fetch_history)
+                                                     .replay_failure
+    end
+  end
+
   class UnfinishedHandlersWorkflow < Temporalio::Workflow::Definition
     def initialize
       @finish = {}

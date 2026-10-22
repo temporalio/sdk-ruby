@@ -41,6 +41,7 @@ module Temporalio
         attr_reader in_query_or_validator: bool
         attr_reader random_disabled: bool
         attr_reader patch_activation_callback: Proc?
+        attr_reader check_conditions: bool
 
         attr_accessor io_enabled: bool
         attr_accessor current_details: String?
