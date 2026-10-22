@@ -298,8 +298,26 @@ module Temporalio::Workflow
     sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Update]) }
     def update_handlers; end
 
-    sig { params(hash: T::Hash[T.any(Symbol, String), T.nilable(Object)], event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).void }
-    def upsert_memo(hash, event_groups: nil); end
+    sig do
+      overload.params(
+        hash: T::Hash[T.any(Symbol, String), T.nilable(Object)],
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
+      ).void
+    end
+    sig do
+      overload.params(
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
+        memo: T.nilable(Object)
+      ).void
+    end
+    sig do
+      params(
+        hash: T.nilable(T::Hash[T.any(Symbol, String), T.nilable(Object)]),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
+        memo: T.nilable(Object)
+      ).void
+    end
+    def upsert_memo(hash = nil, event_groups: nil, **memo); end
 
     sig { params(updates: Temporalio::SearchAttributes::Update, event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).void }
     def upsert_search_attributes(*updates, event_groups: nil); end
@@ -409,7 +427,7 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
   attr_accessor :initial_versioning_behavior
 
   sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
-  attr_accessor :event_groups
+  attr_reader :event_groups
 
   private
 

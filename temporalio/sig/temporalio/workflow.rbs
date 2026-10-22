@@ -159,6 +159,7 @@ module Temporalio
     def self.update_handlers: -> Hash[String?, Workflow::Definition::Update]
 
     def self.upsert_memo: (Hash[Symbol | String, Object?] hash, ?event_groups: Array[EventGroup]?) -> void
+                        | (?event_groups: Array[EventGroup]?, **Object? memo) -> void
 
     def self.upsert_search_attributes: (*SearchAttributes::Update updates, ?event_groups: Array[EventGroup]?) -> void
 
@@ -194,7 +195,7 @@ module Temporalio
       attr_accessor arg_hints: Array[Object]?
       attr_accessor headers: Hash[String, Object?]
       attr_accessor initial_versioning_behavior: ContinueAsNewVersioningBehavior::enum?
-      attr_accessor event_groups: Array[EventGroup]?
+      attr_reader event_groups: Array[EventGroup]?
 
       private
 

@@ -576,11 +576,25 @@ module Temporalio
 
     # Issue updates to the workflow memo.
     #
-    # @param hash [Hash{String, Symbol => Object, nil}] Updates to apply. Value can be `nil` to effectively remove the
-    #   memo value.
-    # @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the modify-properties command.
-    #   WARNING: This option is experimental.
-    def self.upsert_memo(hash, event_groups: nil)
+    # @overload upsert_memo(hash, event_groups: nil)
+    #   @param hash [Hash{String, Symbol => Object, nil}] Updates to apply. Value can be `nil` to effectively remove the
+    #     memo value.
+    #   @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the modify-properties command.
+    #     WARNING: This option is experimental.
+    # @overload upsert_memo(event_groups: nil, **memo)
+    #   @param memo [Hash{String, Symbol => Object, nil}] Updates to apply. Value can be `nil` to effectively remove the
+    #     memo value.
+    #   @param event_groups [Array<EventGroup>, nil] Event Groups to attach to the modify-properties command.
+    #     WARNING: This option is experimental.
+    def self.upsert_memo(hash = nil, event_groups: nil, **memo)
+      if hash
+        unless memo.empty?
+          raise ArgumentError, 'Memo updates must be passed either as a hash or as keyword arguments, not both'
+        end
+      else
+        hash = memo
+      end
+
       _current.upsert_memo(hash, event_groups:)
     end
 
@@ -728,7 +742,8 @@ module Temporalio
       attr_accessor :args, :workflow, :task_queue, :run_timeout, :task_timeout,
                     :backoff_start_interval,
                     :retry_policy, :memo, :search_attributes, :arg_hints, :headers,
-                    :initial_versioning_behavior, :event_groups
+                    :initial_versioning_behavior
+      attr_reader :event_groups
 
       # Create a continue as new error.
       #

@@ -808,6 +808,42 @@ class WorkerWorkflowEventGroupsTest < Test
     end
   end
 
+  class LocalActivityBackoffLabelWorkflow < EventGroupWorkflow
+    def execute
+      group = Temporalio::Workflow.create_event_group('backoff', label: 'Backoff Label')
+      Temporalio::Workflow.execute_local_activity(
+        FailFirstActivity,
+        start_to_close_timeout: ACT_TIMEOUT,
+        local_retry_threshold: 0.001,
+        retry_policy: Temporalio::RetryPolicy.new(initial_interval: 1, backoff_coefficient: 1, max_attempts: 2),
+        event_groups: [group],
+        activity_id: 'backoff-local-activity'
+      )
+    end
+  end
+
+  def test_local_activity_backoff_rebuilds_label_markers
+    codec = Base64Codec.new
+    client = Temporalio::Client.new(
+      **env.client.options.with(data_converter: Temporalio::Converters::DataConverter.new(payload_codec: codec)).to_h
+    )
+    run_and_events(
+      LocalActivityBackoffLabelWorkflow,
+      activities: [FailFirstActivity],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default,
+      task_timeout: 5
+    ) do |_handle, events|
+      local_acts = markers_named(events, 'core_local_activity')
+      assert_equal 2, local_acts.size
+      local_acts.each do |event|
+        assert_equal 'test/base64', label_payload_of(event, 'backoff').first
+        decoded = codec.decode([raw_label_payload(event, 'backoff')]).first
+        assert_equal 'Backoff Label', Temporalio::Converters::PayloadConverter.default.from_payload(decoded)
+      end
+    end
+  end
+
   class ChildWorkflowCommandsWorkflow < EventGroupWorkflow
     def execute
       direct = Temporalio::Workflow.create_event_group('direct')
@@ -1058,11 +1094,10 @@ class WorkerWorkflowEventGroupsTest < Test
       end
 
       def initialize_continue_as_new_error(input)
-        input.error.event_groups = [
-          *input.error.event_groups,
-          Temporalio::Workflow.create_event_group('interceptor-direct')
-        ]
-        Temporalio::Workflow.with_event_groups(Temporalio::Workflow.create_event_group('from-interceptor')) { super }
+        Temporalio::Workflow.with_event_groups(
+          Temporalio::Workflow.create_event_group('interceptor-direct'),
+          Temporalio::Workflow.create_event_group('from-interceptor')
+        ) { super }
       end
     end
   end

@@ -143,12 +143,12 @@ module Temporalio
             # tradeoff that it makes rescue more difficult (hence the presence of Error.canceled? helper).
             raise Error::CanceledError, 'Activity canceled before scheduled' if cancellation.canceled?
 
-            # Capture at request time. We'll reuse them if a backoff sleep happens later.
-            event_group_markers = Workflow::EventGroup._markers_for_command(event_groups)
-
             # This has to be done in a loop for local activity backoff
             last_local_backoff = nil
             loop do
+              # Rebuild every attempt. The codec encodes label payloads in place, so a marker kept from
+              # the previous attempt would be encoded again. The ambient scope cannot change inside this loop.
+              event_group_markers = Workflow::EventGroup._markers_for_command(event_groups)
               result = execute_activity_once(local:, cancellation:, last_local_backoff:, result_hint:,
                                              event_group_markers:, &block)
               return result unless result.is_a?(Bridge::Api::ActivityResult::DoBackoff)
