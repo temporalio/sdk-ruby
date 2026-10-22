@@ -113,6 +113,9 @@ class Temporalio::Internal::Worker::WorkflowInstance
   attr_reader :patch_activation_callback
 
   sig { returns(T::Boolean) }
+  attr_reader :check_conditions
+
+  sig { returns(T::Boolean) }
   attr_accessor :io_enabled
 
   sig { returns(T.nilable(String)) }

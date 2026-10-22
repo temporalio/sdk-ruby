@@ -42,6 +42,10 @@ module Temporalio
               # wait condition so the condition sees the workflow after all runnable work has settled.
               next if wait_for_thread_blocking_fiber
 
+              # Queries and rejected updates leave nothing in history, so a condition they let through (e.g. one on a
+              # value refreshed every activation) could not unblock on replay.
+              return unless @instance.check_conditions
+
               # Find the _first_ resolvable wait condition and if there, resolve it, and loop again, otherwise return.
               # It is important that we both let fibers get all settled _before_ this and only allow a _single_ wait
               # condition to be satisfied before looping. This allows wait condition users to trust that the line of

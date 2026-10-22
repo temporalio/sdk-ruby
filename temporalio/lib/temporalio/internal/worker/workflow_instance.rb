@@ -61,7 +61,8 @@ module Temporalio
                     :current_deployment_version,
                     :current_history_length, :current_history_size, :replaying, :random,
                     :signal_handlers, :query_handlers, :update_handlers, :context_frozen, :assert_valid_local_activity,
-                    :in_query_or_validator, :random_disabled, :patch_activation_callback
+                    :in_query_or_validator, :random_disabled, :patch_activation_callback,
+                    :check_conditions
         attr_accessor :io_enabled, :current_details
 
         def initialize(details)
@@ -102,6 +103,7 @@ module Temporalio
           @replaying = false
           @context_frozen = false
           @in_query_or_validator = false
+          @check_conditions = false
           @random_disabled = false
           @workflow_failure_exception_types = details.workflow_failure_exception_types
           @signal_handlers = HandlerHash.new(
@@ -194,6 +196,10 @@ module Temporalio
           @current_history_size = activation.history_size_bytes
           @replaying = activation.is_replaying
           @now_timestamp = activation.timestamp
+          # Updates can only change state once accepted, which is recorded when that happens
+          @check_conditions = activation.jobs.any? do |job|
+            !%i[do_update query_workflow].include?(job.variant)
+          end
 
           # Apply jobs and run event loop
           begin
@@ -585,6 +591,7 @@ module Temporalio
               )
             )
             accepted = true
+            @check_conditions = true
 
             # Issue update
             result = @inbound.handle_update(input)
