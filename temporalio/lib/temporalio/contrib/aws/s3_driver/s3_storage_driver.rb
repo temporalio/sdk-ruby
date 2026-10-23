@@ -92,7 +92,9 @@ module Temporalio
           def retrieve(context, claims)
             claims.each { |claim| validate_claim(claim) }
             run_concurrently(claims.to_a, context.cancellation) do |claim, cancellation|
-              bucket, key, expected_hash = claim.claim_data.values_at('bucket', 'key', 'hash_value')
+              bucket = claim.claim_data.fetch('bucket')
+              key = claim.claim_data.fetch('key')
+              expected_hash = claim.claim_data.fetch('hash_value')
               data = context.limiter.permit(claim) do
                 cancellation.check!
                 download(bucket, key)
@@ -157,7 +159,7 @@ module Temporalio
           def run_concurrently(items, parent_cancellation, &block)
             cancellation, cancel_proc = Cancellation.new(parent_cancellation)
             mutex = Mutex.new
-            first_error = nil
+            first_error = nil #: StandardError?
             threads = items.map do |item|
               Thread.new do
                 block.call(item, cancellation)
