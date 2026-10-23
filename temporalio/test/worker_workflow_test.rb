@@ -212,6 +212,7 @@ class WorkerWorkflowTest < Test
       assert_nil info.fetch('retry_policy')
       assert_nil info.fetch('root')
       assert_equal handle.result_run_id, info['run_id']
+      assert_equal handle.result_run_id, info['original_execution_run_id']
       assert_nil info.fetch('run_timeout')
       assert_equal desc.start_time.to_s, info['start_time']
       assert_equal worker.task_queue, info['task_queue']
@@ -536,6 +537,58 @@ class WorkerWorkflowTest < Test
 
       # Check describe
       assert_equal({ 'key1' => 'new-val1', 'key3' => 'val3' }, handle.describe.memo)
+    end
+  end
+
+  class UpsertMemoOverloadWorkflow < Temporalio::Workflow::Definition
+    def execute(scenario)
+      case scenario.to_sym
+      when :hash
+        Temporalio::Workflow.upsert_memo({ key1: 'new-val1', key2: nil })
+      # Braced and bare forms are different calls. RuboCop's AST treats the hashes as equal.
+      when :keywords # rubocop:disable Lint/DuplicateBranch
+        Temporalio::Workflow.upsert_memo(key1: 'new-val1', key2: nil)
+      when :event_groups_memo_key
+        # The runtime signature checker treats this symbol key as the event_groups: keyword. Ruby passes
+        # the hash positionally, and the memo entry is what this scenario asserts.
+        updates = { event_groups: 'memo-value' }
+        if defined?(SigApplicator)
+          SigApplicator.suppress_errors { Temporalio::Workflow.upsert_memo(updates) }
+        else
+          Temporalio::Workflow.upsert_memo(updates)
+        end
+      when :mixed
+        begin
+          # Intentionally pass an unsupported call shape to verify runtime validation.
+          Temporalio::Workflow.upsert_memo({ key1: 'new-val1' }, key2: nil) # steep:ignore UnresolvedOverloading
+          return 'did not raise'
+        rescue ArgumentError => e
+          return e.message
+        end
+      else
+        raise NotImplementedError
+      end
+      Temporalio::Workflow.memo.dup
+    end
+  end
+
+  def test_upsert_memo_accepts_hash_or_keywords
+    initial = { key1: 'val1', key2: 'val2', key3: 'val3' }
+    expected = { 'key1' => 'new-val1', 'key3' => 'val3' }
+
+    %i[hash keywords].each do |scenario|
+      execute_workflow(UpsertMemoOverloadWorkflow, scenario, memo: initial) do |handle|
+        assert_equal expected, handle.result
+        assert_equal expected, handle.describe.memo
+      end
+    end
+
+    execute_workflow(UpsertMemoOverloadWorkflow, :event_groups_memo_key) do |handle|
+      assert_equal({ 'event_groups' => 'memo-value' }, handle.result)
+    end
+
+    execute_workflow(UpsertMemoOverloadWorkflow, :mixed) do |handle|
+      assert_equal 'Memo updates must be passed either as a hash or as keyword arguments, not both', handle.result
     end
   end
 

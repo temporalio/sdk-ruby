@@ -5,6 +5,7 @@ require 'logger'
 require 'minitest/autorun'
 require 'rbi'
 require 'support/sig_applicator'
+require 'tempfile'
 
 module Support
   class SigApplicatorTest < Minitest::Test
@@ -303,6 +304,39 @@ module Support
       parser.send(:define_method, :parse_file, original_parse_file)
       if Support.const_defined?(:SigApplicatorMultiFileTest, false)
         Support.send(:remove_const, :SigApplicatorMultiFileTest)
+      end
+    end
+
+    def test_apply_all_skips_overloads_and_applies_implementation_signature
+      test_class = Class.new do
+        def self.foo(value, _extra = nil)
+          value
+        end
+      end
+      Support.const_set(:SigApplicatorOverloadTest, test_class)
+
+      Tempfile.create(['sig-applicator-overload', '.rbi']) do |file|
+        file.write(<<~RBI)
+          class Support::SigApplicatorOverloadTest
+            sig { overload.params(value: String).returns(String) }
+            sig { params(value: String, _extra: T.nilable(String)).returns(String) }
+            def self.foo(value, _extra = nil); end
+          end
+        RBI
+        file.flush
+
+        with_sig_applicator_rbi_paths([file.path]) { SigApplicator.apply_all! }
+      end
+
+      assert_equal 'ok', test_class.send(:foo, 'ok', 'extra')
+      assert_empty SigApplicator.type_errors
+
+      test_class.send(:foo, 'ok', 123)
+      assert_includes SigApplicator.type_errors.join("\n"),
+                      "Parameter '_extra': Expected type T.nilable(String), got type Integer"
+    ensure
+      if Support.const_defined?(:SigApplicatorOverloadTest, false)
+        Support.send(:remove_const, :SigApplicatorOverloadTest)
       end
     end
 

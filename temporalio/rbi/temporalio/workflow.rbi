@@ -16,6 +16,19 @@ module Temporalio::Workflow
     sig { params(endpoint: T.any(Symbol, String), service: T.any(Symbol, String)).returns(Temporalio::Workflow::NexusClient) }
     def create_nexus_client(endpoint:, service:); end
 
+    sig { params(id: String, label: T.nilable(String)).returns(Temporalio::Workflow::EventGroup) }
+    def create_event_group(id, label: nil); end
+
+    sig do
+      type_parameters(:T)
+        .params(
+          groups: Temporalio::Workflow::EventGroup,
+          block: T.proc.returns(T.type_parameter(:T))
+        )
+        .returns(T.type_parameter(:T))
+    end
+    def with_event_groups(*groups, &block); end
+
     sig { returns(T::Array[Integer]) }
     def suggest_continue_as_new_reasons; end
 
@@ -40,8 +53,8 @@ module Temporalio::Workflow
     sig { returns(T.nilable(Temporalio::Workflow::UpdateInfo)) }
     def current_update_info; end
 
-    sig { params(patch_id: T.any(Symbol, String)).void }
-    def deprecate_patch(patch_id); end
+    sig { params(patch_id: T.any(Symbol, String), event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).void }
+    def deprecate_patch(patch_id, event_groups: nil); end
 
     sig do
       params(
@@ -60,7 +73,8 @@ module Temporalio::Workflow
         disable_eager_execution: T::Boolean,
         priority: Temporalio::Priority,
         arg_hints: T.nilable(T::Array[Object]),
-        result_hint: T.nilable(Object)
+        result_hint: T.nilable(Object),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
       ).returns(T.nilable(Object))
     end
     def execute_activity(
@@ -79,7 +93,8 @@ module Temporalio::Workflow
       disable_eager_execution: T.unsafe(nil),
       priority: T.unsafe(nil),
       arg_hints: T.unsafe(nil),
-      result_hint: T.unsafe(nil)
+      result_hint: T.unsafe(nil),
+      event_groups: T.unsafe(nil)
     ); end
 
     sig do
@@ -104,7 +119,8 @@ module Temporalio::Workflow
         priority: Temporalio::Priority,
         versioning_override: T.nilable(Temporalio::VersioningOverride),
         arg_hints: T.nilable(T::Array[Object]),
-        result_hint: T.nilable(Object)
+        result_hint: T.nilable(Object),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
       ).returns(T.nilable(Object))
     end
     def execute_child_workflow(
@@ -128,7 +144,8 @@ module Temporalio::Workflow
       priority: T.unsafe(nil),
       versioning_override: nil,
       arg_hints: T.unsafe(nil),
-      result_hint: T.unsafe(nil)
+      result_hint: T.unsafe(nil),
+      event_groups: T.unsafe(nil)
     ); end
 
     sig do
@@ -145,7 +162,8 @@ module Temporalio::Workflow
         cancellation_type: Integer,
         activity_id: T.nilable(String),
         arg_hints: T.nilable(T::Array[Object]),
-        result_hint: T.nilable(Object)
+        result_hint: T.nilable(Object),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
       ).returns(T.nilable(Object))
     end
     def execute_local_activity(
@@ -161,7 +179,8 @@ module Temporalio::Workflow
       cancellation_type: T.unsafe(nil),
       activity_id: T.unsafe(nil),
       arg_hints: T.unsafe(nil),
-      result_hint: T.unsafe(nil)
+      result_hint: T.unsafe(nil),
+      event_groups: T.unsafe(nil)
     ); end
 
     sig { params(workflow_id: String, run_id: T.nilable(String)).returns(Temporalio::Workflow::ExternalWorkflowHandle) }
@@ -188,8 +207,8 @@ module Temporalio::Workflow
     sig { returns(Time) }
     def now; end
 
-    sig { params(patch_id: T.any(Symbol, String)).returns(T::Boolean) }
-    def patched(patch_id); end
+    sig { params(patch_id: T.any(Symbol, String), event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).returns(T::Boolean) }
+    def patched(patch_id, event_groups: nil); end
 
     sig { returns(Temporalio::Converters::PayloadConverter) }
     def payload_converter; end
@@ -206,8 +225,8 @@ module Temporalio::Workflow
     sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Signal]) }
     def signal_handlers; end
 
-    sig { params(duration: T.nilable(T.any(Integer, Float)), summary: T.nilable(String), cancellation: Temporalio::Cancellation).void }
-    def sleep(duration, summary: T.unsafe(nil), cancellation: T.unsafe(nil)); end
+    sig { params(duration: T.nilable(T.any(Integer, Float)), summary: T.nilable(String), cancellation: Temporalio::Cancellation, event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).void }
+    def sleep(duration, summary: T.unsafe(nil), cancellation: T.unsafe(nil), event_groups: T.unsafe(nil)); end
 
     sig do
       params(
@@ -231,7 +250,8 @@ module Temporalio::Workflow
         priority: Temporalio::Priority,
         versioning_override: T.nilable(Temporalio::VersioningOverride),
         arg_hints: T.nilable(T::Array[Object]),
-        result_hint: T.nilable(Object)
+        result_hint: T.nilable(Object),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
       ).returns(Temporalio::Workflow::ChildWorkflowHandle)
     end
     def start_child_workflow(
@@ -255,7 +275,8 @@ module Temporalio::Workflow
       priority: T.unsafe(nil),
       versioning_override: nil,
       arg_hints: T.unsafe(nil),
-      result_hint: T.unsafe(nil)
+      result_hint: T.unsafe(nil),
+      event_groups: T.unsafe(nil)
     ); end
 
     sig { returns(T::Hash[Object, Object]) }
@@ -268,19 +289,38 @@ module Temporalio::Workflow
           exception_class: T.class_of(Exception),
           message: String,
           summary: T.nilable(String),
+          event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
           block: T.proc.returns(T.type_parameter(:T))
         ).returns(T.type_parameter(:T))
     end
-    def timeout(duration, exception_class = T.unsafe(nil), message = T.unsafe(nil), summary: T.unsafe(nil), &block); end
+    def timeout(duration, exception_class = T.unsafe(nil), message = T.unsafe(nil), summary: T.unsafe(nil), event_groups: T.unsafe(nil), &block); end
 
     sig { returns(T::Hash[T.nilable(String), Temporalio::Workflow::Definition::Update]) }
     def update_handlers; end
 
-    sig { params(hash: T::Hash[T.any(Symbol, String), T.nilable(Object)]).void }
-    def upsert_memo(hash); end
+    sig do
+      overload.params(
+        hash: T::Hash[T.any(Symbol, String), T.nilable(Object)],
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
+      ).void
+    end
+    sig do
+      overload.params(
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
+        memo: T.nilable(Object)
+      ).void
+    end
+    sig do
+      params(
+        hash: T.nilable(T::Hash[T.any(Symbol, String), T.nilable(Object)]),
+        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
+        memo: T.nilable(Object)
+      ).void
+    end
+    def upsert_memo(hash = nil, event_groups: nil, **memo); end
 
-    sig { params(updates: Temporalio::SearchAttributes::Update).void }
-    def upsert_search_attributes(*updates); end
+    sig { params(updates: Temporalio::SearchAttributes::Update, event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])).void }
+    def upsert_search_attributes(*updates, event_groups: nil); end
 
     sig do
       type_parameters(:T)
@@ -330,7 +370,8 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
       search_attributes: T.nilable(Temporalio::SearchAttributes),
       arg_hints: T.nilable(T::Array[Object]),
       headers: T::Hash[String, T.nilable(Object)],
-      initial_versioning_behavior: T.nilable(Integer)
+      initial_versioning_behavior: T.nilable(Integer),
+      event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
     ).void
   end
   def initialize(
@@ -345,7 +386,8 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
     search_attributes: T.unsafe(nil),
     arg_hints: T.unsafe(nil),
     headers: T.unsafe(nil),
-    initial_versioning_behavior: T.unsafe(nil)
+    initial_versioning_behavior: T.unsafe(nil),
+    event_groups: T.unsafe(nil)
   ); end
 
   sig { returns(T::Array[T.nilable(Object)]) }
@@ -384,6 +426,13 @@ class Temporalio::Workflow::ContinueAsNewError < ::Temporalio::Error
   sig { returns(T.nilable(Integer)) }
   attr_accessor :initial_versioning_behavior
 
+  sig { returns(T.nilable(T::Array[Temporalio::Workflow::EventGroup])) }
+  attr_reader :event_groups
+
+  private
+
+  sig { returns(T.nilable(T::Array[Temporalio::Api::Sdk::V1::EventGroupMarker])) }
+  attr_accessor :_event_group_markers
 end
 
 class Temporalio::Workflow::InvalidWorkflowStateError < ::Temporalio::Error; end

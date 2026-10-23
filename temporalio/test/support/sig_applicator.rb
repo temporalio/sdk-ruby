@@ -211,12 +211,19 @@ module SigApplicator
       raise summary.chomp
     end
 
+    def overload_sig?(sig)
+      sig.loc&.source&.include?('overload')
+    end
+
     def valid_rbi_signatures?(node, acc)
       valid = true
 
       if node.is_a?(RBI::Method)
         method_param_names = node.params.map(&:name).sort
         node.sigs.each do |sig|
+          # Overload signatures describe call shapes, not the implementation parameter list.
+          next if overload_sig?(sig)
+
           sig_param_names = sig.params.map(&:name).sort
           next if sig_param_names == method_param_names
 
@@ -319,7 +326,9 @@ module SigApplicator
       end
 
       has_anon_block = anonymous_block?(original)
-      sig_sources = method_node.sigs.map do |sig|
+      # The rbi gem drops `overload` when reprinting a signature, so those call-shape
+      # signatures cannot be applied. Runtime checking uses the implementation signature.
+      sig_sources = method_node.sigs.reject { |sig| overload_sig?(sig) }.map do |sig|
         # RBI::Sig#string serializes back to valid T::Sig DSL source
         sig_source = sig.string
         # Anonymous block params (def foo(&)) need `"&":` instead of the RBI

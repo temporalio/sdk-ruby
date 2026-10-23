@@ -149,6 +149,8 @@ module Temporalio
                            end,
               has_last_result?: !@init_job.last_completion_result.nil?,
               namespace: details.namespace,
+              original_execution_run_id: ProtoUtils.string_or(@init_job.original_execution_run_id) ||
+                details.initial_activation.run_id,
               parent: if @init_job.parent_workflow_info
                         Workflow::Info::ParentInfo.new(
                           namespace: @init_job.parent_workflow_info.namespace,
@@ -295,7 +297,7 @@ module Temporalio
           end
         end
 
-        def patch(patch_id:, deprecated:)
+        def patch(patch_id:, deprecated:, event_groups: nil)
           # Use memoized result if present. If this is being deprecated, we can still use memoized result and skip the
           # command.
           patch_id = patch_id.to_s
@@ -311,7 +313,8 @@ module Temporalio
             if patched
               add_command(
                 Bridge::Api::WorkflowCommands::WorkflowCommand.new(
-                  set_patch_marker: Bridge::Api::WorkflowCommands::SetPatchMarker.new(patch_id:, deprecated:)
+                  set_patch_marker: Bridge::Api::WorkflowCommands::SetPatchMarker.new(patch_id:, deprecated:),
+                  event_group_markers: Workflow::EventGroup._markers_for_command(event_groups)
                 )
               )
             end
@@ -432,6 +435,10 @@ module Temporalio
         end
 
         def apply_signal(job)
+          if job.originating_event_id.nil? || job.originating_event_id <= 0
+            raise "Signal #{job.signal_name} has invalid originating event ID #{job.originating_event_id}"
+          end
+
           # Get signal definition, falling back to dynamic if not present and not reserved
           defn = signal_handlers[job.signal_name]
           defn = signal_handlers[nil] if !defn && !Internal::ProtoUtils.reserved_name?(job.signal_name)
@@ -442,27 +449,29 @@ module Temporalio
             end
           # Process as a top level handler so that errors are treated as if in primary workflow method
           schedule(top_level: true, handler_exec:) do
-            # Send to interceptor if there is a definition, buffer otherwise
-            if defn
-              @inbound.handle_signal(
-                Temporalio::Worker::Interceptor::Workflow::HandleSignalInput.new(
-                  signal: job.signal_name,
-                  args: begin
-                    convert_handler_args(payload_array: job.input, defn:)
-                  rescue StandardError => e
-                    # Signals argument conversion failure must not fail task
-                    @logger.error("Failed converting signal input arguments for #{job.signal_name}, dropping signal")
-                    @logger.error(e)
-                    next
-                  end,
-                  definition: defn,
-                  headers: ProtoUtils.headers_from_proto_map(job.headers, @payload_converter) || {}
+            Workflow::EventGroup._with_inbound_event(job.originating_event_id) do
+              # Send to interceptor if there is a definition, buffer otherwise
+              if defn
+                @inbound.handle_signal(
+                  Temporalio::Worker::Interceptor::Workflow::HandleSignalInput.new(
+                    signal: job.signal_name,
+                    args: begin
+                      convert_handler_args(payload_array: job.input, defn:)
+                    rescue StandardError => e
+                      # Signals argument conversion failure must not fail task
+                      @logger.error("Failed converting signal input arguments for #{job.signal_name}, dropping signal")
+                      @logger.error(e)
+                      next
+                    end,
+                    definition: defn,
+                    headers: ProtoUtils.headers_from_proto_map(job.headers, @payload_converter) || {}
+                  )
                 )
-              )
-            else
-              buffered = @buffered_signals[job.signal_name]
-              buffered = @buffered_signals[job.signal_name] = [] if buffered.nil?
-              buffered << job
+              else
+                buffered = @buffered_signals[job.signal_name]
+                buffered = @buffered_signals[job.signal_name] = [] if buffered.nil?
+                buffered << job
+              end
             end
           end
         end
@@ -528,6 +537,8 @@ module Temporalio
         end
 
         def apply_update(job)
+          raise "Update #{job.name} has invalid update ID #{job.id.inspect}" if job.id.nil? || job.id.empty?
+
           # Get update definition, falling back to dynamic if not present and not reserved
           defn = update_handlers[job.name]
           defn = update_handlers[nil] if !defn && !Internal::ProtoUtils.reserved_name?(job.name)
@@ -593,8 +604,10 @@ module Temporalio
             accepted = true
             @check_conditions = true
 
-            # Issue update
-            result = @inbound.handle_update(input)
+            # Issue update. Validators are intentionally not wrapped in the EG scope
+            result = Workflow::EventGroup._with_inbound_update(job.id) do
+              @inbound.handle_update(input)
+            end
 
             add_command(
               Bridge::Api::WorkflowCommands::WorkflowCommand.new(
@@ -679,7 +692,8 @@ module Temporalio
                   search_attributes: err.search_attributes&._to_proto,
                   retry_policy: err.retry_policy&._to_proto,
                   initial_versioning_behavior: err.initial_versioning_behavior || 0
-                )
+                ),
+                event_group_markers: err.send(:_event_group_markers) || []
               )
             )
           elsif @cancellation.canceled? && Error.canceled?(err)

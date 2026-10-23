@@ -29,7 +29,8 @@ class Temporalio::Internal::Worker::WorkflowInstance::NexusClient < Temporalio::
       summary: T.nilable(String),
       cancellation: Temporalio::Cancellation,
       arg_hint: T.nilable(Object),
-      result_hint: T.nilable(Object)
+      result_hint: T.nilable(Object),
+      event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
     ).returns(Temporalio::Workflow::NexusOperationHandle)
   end
   def start_operation(
@@ -42,6 +43,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::NexusClient < Temporalio::
     summary: T.unsafe(nil),
     cancellation: T.unsafe(nil),
     arg_hint: T.unsafe(nil),
-    result_hint: T.unsafe(nil)
+    result_hint: T.unsafe(nil),
+    event_groups: T.unsafe(nil)
   ); end
 end

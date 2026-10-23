@@ -218,7 +218,9 @@ module Temporalio
           end
 
           def timeout_after(duration, exception_class, *exception_arguments, &)
-            context.timeout(duration, exception_class, *exception_arguments, summary: 'Timeout timer', &)
+            context.timeout(
+              duration, exception_class, *exception_arguments, summary: 'Timeout timer', event_groups: nil, &
+            )
           end
 
           def unblock(_blocker, fiber)
