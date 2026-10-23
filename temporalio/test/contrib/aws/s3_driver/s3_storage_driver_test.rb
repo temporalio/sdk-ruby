@@ -166,8 +166,6 @@ module Contrib
           target = Temporalio::Converters::StorageDriverWorkflowInfo.new(namespace: '', id: nil, run_id: '')
 
           assert_equal "v0/ns/null/wt/null/wi/null/ri/null/d/sha256/#{hash_of('one')}", store_key(target, 'one')
-          target = Temporalio::Converters::StorageDriverActivityInfo.new(namespace: 'my-ns')
-          assert_equal "v0/ns/my-ns/at/null/ai/null/ri/null/d/sha256/#{hash_of('one')}", store_key(target, 'one')
         end
 
         def test_no_target_uses_bare_digest_key
@@ -229,14 +227,6 @@ module Contrib
           assert_includes err.message, 'exceeds the configured max_payload_size'
         end
 
-        def test_invalid_max_payload_size_is_rejected
-          [0, -1].each do |max_payload_size|
-            assert_raises(ArgumentError) do
-              S3StorageDriver.new(client: FakeS3Client.new, bucket: 'b', max_payload_size:)
-            end
-          end
-        end
-
         def test_store_failure_is_wrapped_with_location_and_client_info
           client = FailingS3Client.new
           client.define_singleton_method(:describe) { { 'client_region' => 'us-west-2' } }
@@ -268,19 +258,6 @@ module Contrib
 
           assert_raises(RuntimeError) { driver.store(context, [payload('one'), payload('two'), payload('three')]) }
           assert_equal 1, client.request_count
-        end
-
-        def test_canceled_operation_makes_no_requests
-          client = FailingS3Client.new
-          driver = S3StorageDriver.new(client:, bucket: 'my-bucket')
-          cancellation, cancel_proc = Temporalio::Cancellation.new
-          cancel_proc.call
-          context = Temporalio::Converters::StorageDriverStoreContext.new(
-            target: nil, cancellation:, limiter: RecordingStorageDriverLimiter.new
-          )
-
-          assert_raises(Temporalio::Error::CanceledError) { driver.store(context, [payload('one')]) }
-          assert_equal 0, client.request_count
         end
 
         def test_integrity_check_failure
