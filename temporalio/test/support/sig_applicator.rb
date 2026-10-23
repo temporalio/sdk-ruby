@@ -212,12 +212,7 @@ module SigApplicator
     end
 
     def overload_sig?(sig)
-      loc = sig.loc
-      return false unless loc&.file && loc.begin_line && loc.end_line
-
-      lines = File.readlines(loc.file)
-      source = lines[(loc.begin_line - 1)..(loc.end_line - 1)]
-      source&.any? { |line| line.include?('overload') }
+      sig.loc&.source&.include?('overload')
     end
 
     def valid_rbi_signatures?(node, acc)

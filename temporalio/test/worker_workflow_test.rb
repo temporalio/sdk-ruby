@@ -559,7 +559,8 @@ class WorkerWorkflowTest < Test
         end
       when :mixed
         begin
-          Temporalio::Workflow.upsert_memo({ key1: 'new-val1' }, key2: nil)
+          # Intentionally pass an unsupported call shape to verify runtime validation.
+          Temporalio::Workflow.upsert_memo({ key1: 'new-val1' }, key2: nil) # steep:ignore UnresolvedOverloading
           return 'did not raise'
         rescue ArgumentError => e
           return e.message
