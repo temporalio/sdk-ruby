@@ -1,0 +1,14 @@
+module Temporalio
+  module Contrib
+    module Aws
+      module S3Driver
+        class S3StorageDriverClient
+          def put_object: (bucket: String, key: String, data: String) -> void
+          def object_exists?: (bucket: String, key: String) -> bool
+          def get_object: (bucket: String, key: String) -> String
+          def describe: -> Hash[String, String]
+        end
+      end
+    end
+  end
+end
