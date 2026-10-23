@@ -33,6 +33,18 @@ gems:
     revision: 291289079f2e89ffb397d73f2da371b2e13555b6
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: aws-sdk-core
+  version: 3.260.0
+  source:
+    type: rubygems
+- name: aws-sdk-kms
+  version: 1.135.0
+  source:
+    type: rubygems
+- name: aws-sdk-s3
+  version: 1.235.0
+  source:
+    type: rubygems
 - name: base64
   version: 0.3.0
   source:
