@@ -7,6 +7,10 @@ module Temporalio
 
           DRIVER_TYPE: String
           DEFAULT_MAX_PAYLOAD_SIZE: Integer
+          CLAIM_BUCKET: String
+          CLAIM_KEY: String
+          CLAIM_HASH_ALGORITHM: String
+          CLAIM_HASH_VALUE: String
           NULL_SEGMENT: String
 
           class StoredObject

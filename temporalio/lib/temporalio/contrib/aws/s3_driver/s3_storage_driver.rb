@@ -29,8 +29,12 @@ module Temporalio
           # Default maximum serialized payload size, in bytes.
           DEFAULT_MAX_PAYLOAD_SIZE = 50 * 1024 * 1024
 
+          CLAIM_BUCKET = 'bucket'
+          CLAIM_KEY = 'key'
+          CLAIM_HASH_ALGORITHM = 'hash_algorithm'
+          CLAIM_HASH_VALUE = 'hash_value'
           NULL_SEGMENT = 'null'
-          private_constant :NULL_SEGMENT
+          private_constant :CLAIM_BUCKET, :CLAIM_KEY, :CLAIM_HASH_ALGORITHM, :CLAIM_HASH_VALUE, :NULL_SEGMENT
 
           StoredObject = Data.define(:payload, :bucket, :key, :hash_value, :data)
           private_constant :StoredObject
@@ -79,10 +83,10 @@ module Temporalio
             objects.map do |object|
               Converters::StorageDriverClaim.new(
                 claim_data: {
-                  'bucket' => object.bucket,
-                  'key' => object.key,
-                  'hash_algorithm' => 'sha256',
-                  'hash_value' => object.hash_value
+                  CLAIM_BUCKET => object.bucket,
+                  CLAIM_KEY => object.key,
+                  CLAIM_HASH_ALGORITHM => 'sha256',
+                  CLAIM_HASH_VALUE => object.hash_value
                 }
               )
             end
@@ -92,9 +96,9 @@ module Temporalio
           def retrieve(context, claims)
             claims.each { |claim| validate_claim(claim) }
             run_concurrently(claims.to_a, context.cancellation) do |claim, cancellation|
-              bucket = claim.claim_data.fetch('bucket')
-              key = claim.claim_data.fetch('key')
-              expected_hash = claim.claim_data.fetch('hash_value')
+              bucket = claim.claim_data.fetch(CLAIM_BUCKET)
+              key = claim.claim_data.fetch(CLAIM_KEY)
+              expected_hash = claim.claim_data.fetch(CLAIM_HASH_VALUE)
               data = context.limiter.permit(claim) do
                 cancellation.check!
                 download(bucket, key)
@@ -137,7 +141,7 @@ module Temporalio
 
           def validate_claim(claim)
             bucket, key, hash_algorithm, hash_value =
-              claim.claim_data.values_at('bucket', 'key', 'hash_algorithm', 'hash_value')
+              claim.claim_data.values_at(CLAIM_BUCKET, CLAIM_KEY, CLAIM_HASH_ALGORITHM, CLAIM_HASH_VALUE)
             if bucket.nil? || bucket.empty? || key.nil? || key.empty?
               raise ArgumentError, 'S3StorageDriver claim is missing required location information: ' \
                                    "claim_data must contain 'bucket' and 'key'"
@@ -199,8 +203,6 @@ module Temporalio
 
           def client_context
             @client.describe.map { |key, value| ", #{key}=#{value}" }.join
-          rescue StandardError
-            ''
           end
         end
       end
