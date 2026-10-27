@@ -147,7 +147,7 @@ GEM
     securerandom (0.4.1)
     semantic_logger (5.1.0)
       concurrent-ruby (~> 1.0)
-    sorbet-runtime (0.6.13528)
+    sorbet-runtime (0.6.13550)
     sqlite3 (2.9.6-arm64-darwin)
     sqlite3 (2.9.6-x86_64-linux-gnu)
     steep (2.1.0)
@@ -272,7 +272,7 @@ CHECKSUMS
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   semantic_logger (5.1.0) sha256=9a8170fc0212ad47ef29e0760219cf416cb5b9973061981733234f7148b6d6ea
-  sorbet-runtime (0.6.13528) sha256=c89d1c6936db4d2107732be5cc6d7649ccf3b5a095ae211a312e21fba82fd53a
+  sorbet-runtime (0.6.13550) sha256=2e1e14d9259063c2020d05652184b831b6a42b2e9d15109954358699e5c25cea
   sqlite3 (2.9.6-arm64-darwin) sha256=849b5d7f795e60fe25076d62c72dd722beb45b3850b516ad978d60ee848ec15b
   sqlite3 (2.9.6-x86_64-linux-gnu) sha256=613188ce02f614126ddbc38c5e217ccffd6306d0dcd9adca9764547aa890a634
   steep (2.1.0) sha256=1daf53573283b0e6d404a7273cca41fe5c15b14ece05167934f5ffc179e171d9
