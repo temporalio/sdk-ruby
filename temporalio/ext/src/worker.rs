@@ -511,21 +511,35 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         })
         .maybe_client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
         .max_cached_workflows(options.member::<usize>(id!("max_cached_workflows"))?)
-        .workflow_task_poller_behavior({
-            let poller_behavior = options
-                .child(id!("workflow_task_poller_behavior"))?
-                .ok_or_else(|| error!("Worker options must have workflow_task_poller_behavior"))?;
-            extract_poller_behavior(poller_behavior)?
-        })
+        // Leave the poller behavior unset (None) when the worker is eligible for auto-enroll, so
+        // core resolves it from the namespace's poller_autoscaling_auto_enroll capability.
+        .maybe_workflow_task_poller_behavior(
+            if options.member::<bool>(id!("workflow_task_poller_behavior_auto_enroll"))? {
+                None
+            } else {
+                let poller_behavior = options
+                    .child(id!("workflow_task_poller_behavior"))?
+                    .ok_or_else(|| {
+                        error!("Worker options must have workflow_task_poller_behavior")
+                    })?;
+                Some(extract_poller_behavior(poller_behavior)?)
+            },
+        )
         .nonsticky_to_sticky_poll_ratio(
             options.member::<f32>(id!("nonsticky_to_sticky_poll_ratio"))?,
         )
-        .activity_task_poller_behavior({
-            let poller_behavior = options
-                .child(id!("activity_task_poller_behavior"))?
-                .ok_or_else(|| error!("Worker options must have activity_task_poller_behavior"))?;
-            extract_poller_behavior(poller_behavior)?
-        })
+        .maybe_activity_task_poller_behavior(
+            if options.member::<bool>(id!("activity_task_poller_behavior_auto_enroll"))? {
+                None
+            } else {
+                let poller_behavior = options
+                    .child(id!("activity_task_poller_behavior"))?
+                    .ok_or_else(|| {
+                        error!("Worker options must have activity_task_poller_behavior")
+                    })?;
+                Some(extract_poller_behavior(poller_behavior)?)
+            },
+        )
         .task_types(WorkerTaskTypes {
             enable_workflows: options.member(id!("enable_workflows"))?,
             enable_local_activities: options.member(id!("enable_local_activities"))?,

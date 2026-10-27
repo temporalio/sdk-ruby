@@ -71,7 +71,9 @@ module Temporalio
       :deployment_options,
       :patch_activation_callback,
       :workflow_task_poller_behavior,
+      :workflow_task_poller_behavior_auto_enroll,
       :activity_task_poller_behavior,
+      :activity_task_poller_behavior_auto_enroll,
       :debug_mode,
       :disable_payload_error_limit
     )
@@ -450,10 +452,14 @@ module Temporalio
     # @param patch_activation_callback [Proc, nil] Experimental callback to decide whether the first non-replay call to
     #   {Workflow.patched} for a patch ID should activate that patch. The callback receives a {PatchActivationInput} and
     #   must return `true` to activate the patch or `false` to leave it inactive.
-    # @param workflow_task_poller_behavior [PollerBehavior] Specify the behavior of workflow task
-    #   polling. Defaults to a 5-poller maximum.
-    # @param activity_task_poller_behavior [PollerBehavior] Specify the behavior of activity task
-    #   polling. Defaults to a 5-poller maximum.
+    # @param workflow_task_poller_behavior [PollerBehavior, nil] Specify the behavior of workflow task
+    #   polling. Defaults to a 5-poller maximum. When left unset (and `max_concurrent_workflow_task_polls`
+    #   is also unset), the worker becomes eligible for automatic enrollment into poller autoscaling if
+    #   the namespace advertises support for it.
+    # @param activity_task_poller_behavior [PollerBehavior, nil] Specify the behavior of activity task
+    #   polling. Defaults to a 5-poller maximum. When left unset (and `max_concurrent_activity_task_polls`
+    #   is also unset), the worker becomes eligible for automatic enrollment into poller autoscaling if
+    #   the namespace advertises support for it.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -473,9 +479,9 @@ module Temporalio
       identity: nil,
       logger: client.options.logger,
       max_cached_workflows: 1000,
-      max_concurrent_workflow_task_polls: 5,
+      max_concurrent_workflow_task_polls: nil,
       nonsticky_to_sticky_poll_ratio: 0.2,
-      max_concurrent_activity_task_polls: 5,
+      max_concurrent_activity_task_polls: nil,
       no_remote_activities: false,
       sticky_queue_schedule_to_start_timeout: 10,
       max_heartbeat_throttle_interval: 60,
@@ -491,12 +497,26 @@ module Temporalio
       unsafe_workflow_io_enabled: false,
       deployment_options: Worker.default_deployment_options,
       patch_activation_callback: nil,
-      workflow_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls),
-      activity_task_poller_behavior: PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls),
+      workflow_task_poller_behavior: nil,
+      activity_task_poller_behavior: nil,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase),
       disable_payload_error_limit: false
     )
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
+
+      # A poller is eligible for automatic enrollment into poller autoscaling when the user
+      # configured neither a fixed poll count nor an explicit poller behavior for it. Compute this
+      # before resolving the defaults below (which would otherwise erase the "unset" signal). Nexus
+      # has no poller option in Ruby yet, so it is always eligible.
+      workflow_task_poller_behavior_auto_enroll =
+        max_concurrent_workflow_task_polls.nil? && workflow_task_poller_behavior.nil?
+      activity_task_poller_behavior_auto_enroll =
+        max_concurrent_activity_task_polls.nil? && activity_task_poller_behavior.nil?
+
+      max_concurrent_workflow_task_polls ||= 5
+      max_concurrent_activity_task_polls ||= 5
+      workflow_task_poller_behavior ||= PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls)
+      activity_task_poller_behavior ||= PollerBehavior::SimpleMaximum.new(max_concurrent_activity_task_polls)
 
       @options = Options.new(
         client:,
@@ -530,7 +550,9 @@ module Temporalio
         deployment_options:,
         patch_activation_callback:,
         workflow_task_poller_behavior:,
+        workflow_task_poller_behavior_auto_enroll:,
         activity_task_poller_behavior:,
+        activity_task_poller_behavior_auto_enroll:,
         debug_mode:,
         disable_payload_error_limit:
       ).freeze
@@ -583,8 +605,11 @@ module Temporalio
           identity_override: @options.identity,
           max_cached_workflows: @options.max_cached_workflows,
           workflow_task_poller_behavior: @options.workflow_task_poller_behavior._to_bridge_options,
+          workflow_task_poller_behavior_auto_enroll: @options.workflow_task_poller_behavior_auto_enroll,
           nonsticky_to_sticky_poll_ratio: @options.nonsticky_to_sticky_poll_ratio,
           activity_task_poller_behavior: @options.activity_task_poller_behavior._to_bridge_options,
+          activity_task_poller_behavior_auto_enroll: @options.activity_task_poller_behavior_auto_enroll,
+          nexus_task_poller_behavior_auto_enroll: true,
           enable_workflows: !@options.workflows.empty?,
           enable_local_activities: !@options.workflows.empty? && !@options.activities.empty?,
           enable_remote_activities: !@options.activities.empty? && !@options.no_remote_activities,
