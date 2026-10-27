@@ -14,6 +14,7 @@ module Temporalio
           attr_reader interceptors: Array[Temporalio::Worker::Interceptor::Workflow]
           attr_reader disable_eager_activity_execution: bool
           attr_reader illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator]
+          attr_reader illegal_call_tracing_on_replay: bool
           attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
           attr_reader unsafe_workflow_io_enabled: bool
           attr_reader patch_activation_callback: Proc?
@@ -31,6 +32,7 @@ module Temporalio
             interceptors: Array[Temporalio::Worker::Interceptor::Workflow],
             disable_eager_activity_execution: bool,
             illegal_calls: Hash[String, :all | Hash[Symbol, TrueClass | Temporalio::Worker::IllegalWorkflowCallValidator] | Temporalio::Worker::IllegalWorkflowCallValidator],
+            illegal_call_tracing_on_replay: bool,
             workflow_failure_exception_types: Array[singleton(Exception)],
             unsafe_workflow_io_enabled: bool,
             patch_activation_callback: Proc?,

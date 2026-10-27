@@ -955,6 +955,11 @@ Ruby workflow threads employ a `TracePoint` to catch illegal calls such as `slee
 set of illegal calls can be configured via the `illegal_workflow_calls` parameter when creating a worker. The default
 set is at `Temporalio::Worker.default_illegal_workflow_calls`.
 
+A worker only traces activations that run workflow code for the first time. Activations that replay history, such as
+after a workflow is evicted from the cache, are not traced, because enabling the `TracePoint` costs time in proportion
+to the size of the Ruby heap. `Temporalio::Worker::WorkflowReplayer` traces every activation, so replay tests still
+catch illegal calls in code paths that only run on replay.
+
 When an illegal call is encountered, an exception is thrown. In advanced cases there may be a need to allow an illegal
 call that is known to be used deterministically. This code can be in a block passed to
 `Temporalio::Workflow::Unsafe.illegal_call_tracing_disabled`. If this has side-effecting behavior that needs to use the

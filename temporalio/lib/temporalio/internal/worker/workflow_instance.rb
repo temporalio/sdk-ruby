@@ -70,6 +70,7 @@ module Temporalio
           @context = Context.new(self)
           if details.illegal_calls && !details.illegal_calls.empty?
             @tracer = IllegalCallTracer.new(details.illegal_calls)
+            @illegal_call_tracing_on_replay = details.illegal_call_tracing_on_replay
           end
           @logger = ReplaySafeLogger.new(logger: details.logger, instance: self)
           @logger.scoped_values_getter = proc { scoped_logger_info }
@@ -215,8 +216,10 @@ module Temporalio
             # the first activation)
             @primary_fiber ||= schedule(top_level: true) { run_workflow }
 
-            # Run the event loop in the tracer if it exists
-            if @tracer
+            # Enabling a TracePoint walks the whole Ruby heap, so tracing every activation makes a full-history
+            # replay after a cache miss cost milliseconds per activation. A live worker already traced these
+            # activations when they first ran, so only the replayer needs to trace them again.
+            if @tracer && (!@replaying || @illegal_call_tracing_on_replay)
               @tracer.enable { @scheduler.run_until_all_yielded }
             else
               @scheduler.run_until_all_yielded

@@ -214,6 +214,7 @@ module Temporalio
                 interceptors: worker_state.workflow_interceptors,
                 disable_eager_activity_execution: worker_state.disable_eager_activity_execution,
                 illegal_calls: worker_state.illegal_calls,
+                illegal_call_tracing_on_replay: worker_state.illegal_call_tracing_on_replay,
                 workflow_failure_exception_types: worker_state.workflow_failure_exception_types,
                 unsafe_workflow_io_enabled: worker_state.unsafe_workflow_io_enabled,
                 patch_activation_callback: worker_state.patch_activation_callback,

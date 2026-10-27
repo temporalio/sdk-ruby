@@ -105,6 +105,7 @@ module Worker
           disable_eager_activity_execution: false,
           illegal_calls:
             Temporalio::Internal::Worker::WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls({}),
+          illegal_call_tracing_on_replay: false,
           workflow_failure_exception_types: [],
           unsafe_workflow_io_enabled: false,
           patch_activation_callback: nil,

@@ -263,6 +263,7 @@ module Temporalio
             workflow_interceptors: options.interceptors.grep(Interceptor::Workflow),
             disable_eager_activity_execution: false,
             illegal_workflow_calls: options.illegal_workflow_calls,
+            illegal_call_tracing_on_replay: true,
             workflow_failure_exception_types: options.workflow_failure_exception_types,
             workflow_payload_codec_thread_pool: options.workflow_payload_codec_thread_pool,
             unsafe_workflow_io_enabled: options.unsafe_workflow_io_enabled,

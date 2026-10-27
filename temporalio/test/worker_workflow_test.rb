@@ -7,6 +7,7 @@ require 'temporalio/client'
 require 'temporalio/error'
 require 'temporalio/testing'
 require 'temporalio/worker'
+require 'temporalio/worker/workflow_replayer'
 require 'temporalio/workflow'
 require 'test'
 require 'timeout'
@@ -116,6 +117,33 @@ class WorkerWorkflowTest < Test
     exec.call(:mutex, 'Thread::Mutex initialize')
     exec.call(:condvar, 'Thread::ConditionVariable initialize')
     exec.call(:monitor, 'Monitor synchronize')
+  end
+
+  class IllegalCallOnReplayWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Time.now if Temporalio::Workflow::Unsafe.replaying?
+      Temporalio::Workflow.wait_condition { @finish }
+    end
+
+    workflow_signal
+    def finish
+      @finish = true
+    end
+  end
+
+  def test_illegal_calls_not_traced_on_live_replay
+    history = execute_workflow(IllegalCallOnReplayWorkflow, max_cached_workflows: 0) do |handle|
+      assert_eventually { assert handle.fetch_history_events.any?(&:workflow_task_completed_event_attributes) }
+      # With no cache, the signal's task replays the first activation, which makes the illegal call
+      handle.signal(IllegalCallOnReplayWorkflow.finish)
+      assert_eventually { assert handle.fetch_history_events.any?(&:workflow_execution_completed_event_attributes) }
+      handle.fetch_history
+    end
+
+    err = assert_raises(Temporalio::Workflow::InvalidWorkflowStateError) do
+      Temporalio::Worker::WorkflowReplayer.new(workflows: [IllegalCallOnReplayWorkflow]).replay_workflow(history)
+    end
+    assert_includes err.message, 'Cannot access Time now from inside a workflow'
   end
 
   class WorkflowInitWorkflow < Temporalio::Workflow::Definition

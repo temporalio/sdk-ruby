@@ -36,6 +36,9 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
   sig { returns(T::Hash[String, Object]) }
   attr_reader :illegal_calls
 
+  sig { returns(T::Boolean) }
+  attr_reader :illegal_call_tracing_on_replay
+
   sig { returns(T::Array[T.class_of(Exception)]) }
   attr_reader :workflow_failure_exception_types
 
@@ -61,6 +64,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
       interceptors: T::Array[Temporalio::Worker::Interceptor::Workflow],
       disable_eager_activity_execution: T::Boolean,
       illegal_calls: T::Hash[String, Object],
+      illegal_call_tracing_on_replay: T::Boolean,
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       unsafe_workflow_io_enabled: T::Boolean,
       patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
@@ -79,6 +83,7 @@ class Temporalio::Internal::Worker::WorkflowInstance::Details
     interceptors:,
     disable_eager_activity_execution:,
     illegal_calls:,
+    illegal_call_tracing_on_replay:,
     workflow_failure_exception_types:,
     unsafe_workflow_io_enabled:,
     patch_activation_callback:,

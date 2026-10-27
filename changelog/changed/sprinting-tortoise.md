@@ -1,0 +1,1 @@
+Workers no longer run the illegal call tracer on replayed workflow activations, which made a full-history replay after a cache miss cost several milliseconds per activation. `WorkflowReplayer` still traces every activation.

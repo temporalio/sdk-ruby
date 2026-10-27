@@ -32,6 +32,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
       workflow_interceptors: T::Array[Temporalio::Worker::Interceptor::Workflow],
       disable_eager_activity_execution: T::Boolean,
       illegal_workflow_calls: T.nilable(T::Hash[String, Object]),
+      illegal_call_tracing_on_replay: T::Boolean,
       workflow_failure_exception_types: T::Array[T.class_of(Exception)],
       workflow_payload_codec_thread_pool: T.nilable(Temporalio::Worker::ThreadPool),
       unsafe_workflow_io_enabled: T::Boolean,
@@ -53,6 +54,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
     workflow_interceptors:,
     disable_eager_activity_execution:,
     illegal_workflow_calls:,
+    illegal_call_tracing_on_replay:,
     workflow_failure_exception_types:,
     workflow_payload_codec_thread_pool:,
     unsafe_workflow_io_enabled:,
@@ -120,6 +122,9 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
   sig { returns(T::Hash[String, Object]) }
   attr_reader :illegal_calls
 
+  sig { returns(T::Boolean) }
+  attr_reader :illegal_call_tracing_on_replay
+
   sig { returns(String) }
   attr_reader :namespace
 
@@ -156,6 +161,7 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
       data_converter: Temporalio::Converters::DataConverter,
       deadlock_timeout: T.nilable(Float),
       illegal_calls: T::Hash[String, Object],
+      illegal_call_tracing_on_replay: T::Boolean,
       namespace: String,
       task_queue: String,
       disable_eager_activity_execution: T::Boolean,
@@ -174,6 +180,7 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
     data_converter:,
     deadlock_timeout:,
     illegal_calls:,
+    illegal_call_tracing_on_replay:,
     namespace:,
     task_queue:,
     disable_eager_activity_execution:,

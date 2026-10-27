@@ -71,6 +71,7 @@ module Temporalio
           workflow_interceptors:,
           disable_eager_activity_execution:,
           illegal_workflow_calls:,
+          illegal_call_tracing_on_replay:,
           workflow_failure_exception_types:,
           workflow_payload_codec_thread_pool:,
           unsafe_workflow_io_enabled:,
@@ -107,6 +108,7 @@ module Temporalio
             illegal_calls: WorkflowInstance::IllegalCallTracer.frozen_validated_illegal_calls(
               illegal_workflow_calls || {}
             ),
+            illegal_call_tracing_on_replay:,
             namespace:,
             task_queue:,
             disable_eager_activity_execution:,
@@ -198,15 +200,15 @@ module Temporalio
 
         class State
           attr_reader :workflow_definitions, :bridge_worker, :logger, :metric_meter, :data_converter, :deadlock_timeout,
-                      :illegal_calls, :namespace, :task_queue, :disable_eager_activity_execution,
-                      :workflow_interceptors, :workflow_failure_exception_types, :unsafe_workflow_io_enabled,
-                      :patch_activation_callback, :assert_valid_local_activity
+                      :illegal_calls, :illegal_call_tracing_on_replay, :namespace, :task_queue,
+                      :disable_eager_activity_execution, :workflow_interceptors, :workflow_failure_exception_types,
+                      :unsafe_workflow_io_enabled, :patch_activation_callback, :assert_valid_local_activity
 
           attr_writer :on_eviction
 
           def initialize(
             workflow_definitions:, bridge_worker:, logger:, metric_meter:, data_converter:, deadlock_timeout:,
-            illegal_calls:, namespace:, task_queue:, disable_eager_activity_execution:,
+            illegal_calls:, illegal_call_tracing_on_replay:, namespace:, task_queue:, disable_eager_activity_execution:,
             workflow_interceptors:, workflow_failure_exception_types:, unsafe_workflow_io_enabled:,
             patch_activation_callback:, assert_valid_local_activity:
           )
@@ -217,6 +219,7 @@ module Temporalio
             @data_converter = data_converter
             @deadlock_timeout = deadlock_timeout
             @illegal_calls = illegal_calls
+            @illegal_call_tracing_on_replay = illegal_call_tracing_on_replay
             @namespace = namespace
             @task_queue = task_queue
             @disable_eager_activity_execution = disable_eager_activity_execution
