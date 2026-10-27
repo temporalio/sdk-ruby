@@ -1,0 +1,8 @@
+module Contrib
+  module Aws
+    module S3Driver
+      class AwsSdkS3StorageDriverClientTest < Test
+      end
+    end
+  end
+end

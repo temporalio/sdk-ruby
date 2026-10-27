@@ -19,6 +19,8 @@ require 'workflow_utils'
 if ENV['TEMPORAL_SORBET_RUNTIME_CHECK']
   # Load modules that are lazy-loaded so their types can be instrumented
   require 'temporalio/common_enums'
+  require 'temporalio/contrib/aws/s3_driver'
+  require 'temporalio/contrib/aws/s3_driver/aws_sdk_s3_storage_driver_client'
   require 'temporalio/contrib/open_telemetry'
   require 'temporalio/converters/payload_codec'
   require 'temporalio/simple_plugin'

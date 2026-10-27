@@ -1,0 +1,48 @@
+module Contrib
+  module Aws
+    module S3Driver
+      class S3StorageDriverTest < Test
+        class FakeS3Client < Temporalio::Contrib::Aws::S3Driver::S3StorageDriverClient
+          attr_reader objects: Hash[[String, String], String]
+          @mutex: Mutex
+          @put_count: Integer
+
+          def put_count: -> Integer
+        end
+
+        class FailingS3Client < Temporalio::Contrib::Aws::S3Driver::S3StorageDriverClient
+          @mutex: Mutex
+          @request_count: Integer
+
+          def request_count: -> Integer
+        end
+
+        class FirstRequestFirstLimiter < Temporalio::Converters::StorageDriverLimiter
+          @mutex: Mutex
+          @first_thread: Thread?
+        end
+
+        def workflow_target: -> Temporalio::Converters::StorageDriverWorkflowInfo
+        def store_context: (
+          ?target: (Temporalio::Converters::StorageDriverWorkflowInfo | Temporalio::Converters::StorageDriverActivityInfo)?,
+          ?limiter: Temporalio::Converters::StorageDriverLimiter
+        ) -> Temporalio::Converters::StorageDriverStoreContext
+        def retrieve_context: (
+          ?limiter: Temporalio::Converters::StorageDriverLimiter
+        ) -> Temporalio::Converters::StorageDriverRetrieveContext
+        def payload: (String data) -> Temporalio::Api::Common::V1::Payload
+        def hash_of: (String data) -> String
+        def store_key: (
+          (Temporalio::Converters::StorageDriverWorkflowInfo | Temporalio::Converters::StorageDriverActivityInfo)? target,
+          String data
+        ) -> String
+        def claim: (
+          ?bucket: String?,
+          ?key: String?,
+          ?hash_algorithm: String?,
+          ?hash_value: String?
+        ) -> Temporalio::Converters::StorageDriverClaim
+      end
+    end
+  end
+end
