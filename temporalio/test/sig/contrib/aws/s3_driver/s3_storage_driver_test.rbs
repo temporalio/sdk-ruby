@@ -17,6 +17,34 @@ module Contrib
           def request_count: -> Integer
         end
 
+        class ConcurrencyTrackingS3Client < Temporalio::Contrib::Aws::S3Driver::S3StorageDriverClient
+          attr_reader max_in_flight: Integer
+          attr_reader request_count: Integer
+          @expected_concurrency: Integer
+          @mutex: Mutex
+          @expected_concurrency_reached: ConditionVariable
+          @reached: bool
+          @in_flight: Integer
+
+          def initialize: (expected_concurrency: Integer) -> void
+        end
+
+        class PermitFlaggingLimiter < Temporalio::Converters::StorageDriverLimiter
+        end
+
+        class PermitCheckingS3Client < FakeS3Client
+          attr_reader request_count: Integer
+          attr_reader requests_without_permit_count: Integer
+
+          def record_request: -> void
+        end
+
+        class SemaphoreLimiter < Temporalio::Converters::StorageDriverLimiter
+          @permits: Thread::SizedQueue[bool]
+
+          def initialize: (Integer permits) -> void
+        end
+
         class FirstRequestFirstLimiter < Temporalio::Converters::StorageDriverLimiter
           @mutex: Mutex
           @first_thread: Thread?

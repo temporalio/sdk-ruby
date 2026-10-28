@@ -90,6 +90,100 @@ module Contrib
           end
         end
 
+        # Holds every existence check until the expected number are in flight together, recording the most that ever
+        # were
+        class ConcurrencyTrackingS3Client < Temporalio::Contrib::Aws::S3Driver::S3StorageDriverClient
+          attr_reader :max_in_flight, :request_count
+
+          def initialize(expected_concurrency:)
+            super()
+            @expected_concurrency = expected_concurrency
+            @mutex = Mutex.new
+            @expected_concurrency_reached = ConditionVariable.new
+            @reached = false
+            @in_flight = 0
+            @max_in_flight = 0
+            @request_count = 0
+          end
+
+          def put_object(**); end
+
+          def object_exists?(**)
+            @mutex.synchronize do
+              @request_count += 1
+              @in_flight += 1
+              @max_in_flight = [@max_in_flight, @in_flight].max
+              if @in_flight == @expected_concurrency
+                @reached = true
+                @expected_concurrency_reached.broadcast
+              end
+              @expected_concurrency_reached.wait(@mutex) until @reached
+              @in_flight -= 1
+            end
+            false
+          end
+        end
+
+        # Marks the thread running the request as holding a permit for as long as the block runs
+        class PermitFlaggingLimiter < Temporalio::Converters::StorageDriverLimiter
+          def permit(_item)
+            Thread.current[:s3_driver_test_permit_held] = true
+            yield
+          ensure
+            Thread.current[:s3_driver_test_permit_held] = false
+          end
+        end
+
+        class PermitCheckingS3Client < FakeS3Client
+          attr_reader :request_count, :requests_without_permit_count
+
+          def initialize
+            super
+            @request_count = 0
+            @requests_without_permit_count = 0
+          end
+
+          def put_object(**)
+            record_request
+            super
+          end
+
+          def object_exists?(**)
+            record_request
+            super
+          end
+
+          def get_object(**)
+            record_request
+            super
+          end
+
+          private
+
+          def record_request
+            @mutex.synchronize do
+              @request_count += 1
+              @requests_without_permit_count += 1 unless Thread.current[:s3_driver_test_permit_held]
+            end
+          end
+        end
+
+        class SemaphoreLimiter < Temporalio::Converters::StorageDriverLimiter
+          def initialize(permits)
+            super()
+            @permits = Thread::SizedQueue.new(permits)
+          end
+
+          def permit(_item)
+            @permits.push(true)
+            begin
+              yield
+            ensure
+              @permits.pop
+            end
+          end
+        end
+
         def test_round_trip
           client = FakeS3Client.new
           driver = S3StorageDriver.new(client:, bucket: 'my-bucket')
@@ -214,6 +308,37 @@ module Contrib
 
           assert_equal [payload('one'), payload('two')].sort_by(&:data), store_limiter.items.sort_by(&:data)
           assert_equal claims.size, retrieve_limiter.items.size
+        end
+
+        def test_every_s3_request_runs_while_holding_a_permit
+          client = PermitCheckingS3Client.new
+          driver = S3StorageDriver.new(client:, bucket: 'my-bucket')
+
+          claims = driver.store(store_context(limiter: PermitFlaggingLimiter.new), [payload('one'), payload('two')])
+          driver.retrieve(retrieve_context(limiter: PermitFlaggingLimiter.new), claims)
+
+          assert_equal 6, client.request_count
+          assert_equal 0, client.requests_without_permit_count
+        end
+
+        def test_runs_as_many_requests_at_once_as_the_limiter_allows
+          client = ConcurrencyTrackingS3Client.new(expected_concurrency: 2)
+          driver = S3StorageDriver.new(client:, bucket: 'my-bucket')
+          payloads = %w[a b c d].map { |data| payload(data) }
+
+          # The client holds requests until two are in flight, so a driver that did not fan out would never finish
+          Timeout.timeout(10) { driver.store(store_context(limiter: SemaphoreLimiter.new(2)), payloads) }
+
+          assert_equal 2, client.max_in_flight
+          assert_equal 4, client.request_count
+        end
+
+        def test_invalid_max_payload_size_is_rejected
+          [0, -1].each do |max_payload_size|
+            assert_raises(ArgumentError) do
+              S3StorageDriver.new(client: FakeS3Client.new, bucket: 'b', max_payload_size:)
+            end
+          end
         end
 
         def test_max_payload_size

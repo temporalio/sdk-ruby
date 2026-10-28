@@ -203,6 +203,8 @@ module Temporalio
 
           def client_context
             @client.describe.map { |key, value| ", #{key}=#{value}" }.join
+          rescue StandardError
+            ''
           end
         end
       end
