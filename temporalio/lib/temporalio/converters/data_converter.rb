@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require 'temporalio/api'
+require 'temporalio/converters/external_storage'
 require 'temporalio/converters/failure_converter'
 require 'temporalio/converters/payload_codec'
 require 'temporalio/converters/payload_converter'
+require 'temporalio/internal/external_storage_runner'
 
 module Temporalio
   module Converters
@@ -18,6 +20,13 @@ module Temporalio
       # @return [PayloadCodec, nil] Optional codec for encoding/decoding payload bytes such as for encryption.
       attr_reader :payload_codec
 
+      # @return [ExternalStorage, nil] Optional storage for offloading large payloads.
+      #
+      # @note WARNING: This API is experimental and may change in the future.
+      #
+      # @!visibility private
+      attr_reader :external_storage
+
       # @return [DataConverter] Default data converter.
       def self.default
         @default ||= DataConverter.new
@@ -28,14 +37,22 @@ module Temporalio
       # @param payload_converter [PayloadConverter] Payload converter to use.
       # @param failure_converter [FailureConverter] Failure converter to use.
       # @param payload_codec [PayloadCodec, nil] Payload codec to use.
+      # @param external_storage [ExternalStorage, nil] External storage to use. WARNING: This is experimental.
       def initialize(
         payload_converter: PayloadConverter.default,
         failure_converter: FailureConverter.default,
-        payload_codec: nil
+        payload_codec: nil,
+        external_storage: nil
       )
         @payload_converter = payload_converter
         @failure_converter = failure_converter
         @payload_codec = payload_codec
+        @external_storage = external_storage
+        # Storage is applied in the payload methods below so every client and activity call gets it without changes at
+        # each call site. This is temporary. It will move to the call sites as a pass over each whole request, which
+        # batches all of a request's payloads into one driver call and can tell drivers which execution they belong to.
+        # Retrieving runs even without storage, so a reference is reported rather than decoded as an ordinary value.
+        @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage)
       end
 
       # Convert a Ruby value to a payload and encode it.
@@ -46,6 +63,7 @@ module Temporalio
       def to_payload(value, hint: nil)
         payload = payload_converter.to_payload(value, hint:)
         payload = payload_codec.encode([payload]).first if payload_codec
+        payload = @external_storage_runner.store([payload]).first if external_storage
         payload
       end
 
@@ -60,6 +78,9 @@ module Temporalio
       def to_payloads(values, hints: nil)
         payloads = payload_converter.to_payloads(values, hints:)
         payloads.payloads.replace(payload_codec.encode(payloads.payloads)) if payload_codec && !payloads.payloads.empty?
+        if external_storage && !payloads.payloads.empty?
+          payloads.payloads.replace(@external_storage_runner.store(payloads.payloads.to_a))
+        end
         payloads
       end
 
@@ -69,6 +90,7 @@ module Temporalio
       # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Object] Decoded and converted Ruby value.
       def from_payload(payload, hint: nil)
+        payload = @external_storage_runner.retrieve([payload]).first
         payload = payload_codec.decode([payload]).first if payload_codec
         payload_converter.from_payload(payload, hint:)
       end
@@ -84,6 +106,7 @@ module Temporalio
       def from_payloads(payloads, hints: nil)
         return [] unless payloads && !payloads.payloads.empty?
 
+        payloads = Api::Common::V1::Payloads.new(payloads: @external_storage_runner.retrieve(payloads.payloads.to_a))
         if payload_codec && !payloads.payloads.empty?
           payloads = Api::Common::V1::Payloads.new(payloads: payload_codec.decode(payloads.payloads))
         end

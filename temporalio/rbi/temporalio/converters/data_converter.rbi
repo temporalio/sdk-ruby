@@ -12,6 +12,9 @@ class Temporalio::Converters::DataConverter
   sig { returns(T.nilable(Temporalio::Converters::PayloadCodec)) }
   attr_reader :payload_codec
 
+  sig { returns(T.nilable(Temporalio::Converters::ExternalStorage)) }
+  attr_reader :external_storage
+
   sig { returns(Temporalio::Converters::DataConverter) }
   def self.default; end
 
@@ -19,10 +22,16 @@ class Temporalio::Converters::DataConverter
     params(
       payload_converter: Temporalio::Converters::PayloadConverter,
       failure_converter: Temporalio::Converters::FailureConverter,
-      payload_codec: T.nilable(Temporalio::Converters::PayloadCodec)
+      payload_codec: T.nilable(Temporalio::Converters::PayloadCodec),
+      external_storage: T.nilable(Temporalio::Converters::ExternalStorage)
     ).void
   end
-  def initialize(payload_converter: T.unsafe(nil), failure_converter: T.unsafe(nil), payload_codec: T.unsafe(nil)); end
+  def initialize(
+    payload_converter: T.unsafe(nil),
+    failure_converter: T.unsafe(nil),
+    payload_codec: T.unsafe(nil),
+    external_storage: T.unsafe(nil)
+  ); end
 
   sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
