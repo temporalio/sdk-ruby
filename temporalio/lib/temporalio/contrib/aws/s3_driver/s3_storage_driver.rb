@@ -116,13 +116,26 @@ module Temporalio
 
           def stored_object(context, payload, context_segments)
             bucket = @bucket.call(context, payload)
-            data = payload.to_proto
+            data = serialize_payload(payload)
             if data.bytesize > @max_payload_size
               raise ArgumentError, "Payload size #{data.bytesize} bytes exceeds the configured max_payload_size " \
                                    "of #{@max_payload_size} bytes"
             end
             hash_value = Digest::SHA256.hexdigest(data)
             StoredObject.new(payload:, bucket:, key: "v0#{context_segments}/d/sha256/#{hash_value}", hash_value:, data:)
+          end
+
+          # Serializes the payload with its metadata entries sorted by key.
+          def serialize_payload(payload)
+            data = String.new(encoding: Encoding::BINARY)
+            payload.metadata.sort.each do |key, value|
+              data << Api::Common::V1::Payload.new(metadata: { key => value }).to_proto
+            end
+            # steep:ignore:start
+            without_metadata = Google::Protobuf.deep_copy(payload)
+            # steep:ignore:end
+            without_metadata.metadata.clear
+            data << without_metadata.to_proto
           end
 
           def upload_if_absent(object)

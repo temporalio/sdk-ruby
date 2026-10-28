@@ -276,6 +276,24 @@ module Contrib
           assert_equal claims.first, claims.last
         end
 
+        def test_equal_payloads_with_metadata_in_different_orders_upload_once
+          entries = (0...8).map { |i| ["key-#{i}", i.chr] }
+          build = lambda do |ordered_entries|
+            payload('same').tap do |built|
+              built.metadata.clear
+              ordered_entries.each { |key, value| built.metadata[key] = value }
+            end
+          end
+          client = FakeS3Client.new
+          driver = S3StorageDriver.new(client:, bucket: 'my-bucket')
+
+          claims = driver.store(store_context, [build.call(entries), build.call(entries.reverse)])
+
+          assert_equal 1, client.put_count
+          assert_equal claims.first, claims.last
+          assert_equal [build.call(entries)] * 2, driver.retrieve(retrieve_context, claims)
+        end
+
         def test_existing_object_is_not_uploaded_again
           client = FakeS3Client.new
           driver = S3StorageDriver.new(client:, bucket: 'my-bucket')

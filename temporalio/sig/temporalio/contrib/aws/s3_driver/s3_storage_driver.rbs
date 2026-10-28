@@ -49,6 +49,7 @@ module Temporalio
             Api::Common::V1::Payload payload,
             String context_segments
           ) -> StoredObject
+          def serialize_payload: (Api::Common::V1::Payload payload) -> String
           def upload_if_absent: (StoredObject object) -> void
           def download: (String bucket, String key) -> String
           def validate_claim: (Converters::StorageDriverClaim claim) -> void
