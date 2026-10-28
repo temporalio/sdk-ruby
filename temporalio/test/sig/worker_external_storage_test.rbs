@@ -1,0 +1,33 @@
+class WorkerExternalStorageTest < Test
+  class StorageActivity < Temporalio::Activity::Definition
+    def execute: (untyped input) -> untyped
+  end
+
+  class StorageWorkflow < Temporalio::Workflow::Definition
+    @signal_input: untyped
+
+    def self.finish: () -> Temporalio::Workflow::Definition::Signal
+    def self.echo_query: () -> Temporalio::Workflow::Definition::Query
+    def self.echo_update: () -> Temporalio::Workflow::Definition::Update
+
+    def execute: (untyped input) -> untyped
+    def finish: (untyped input) -> void
+    def echo_query: (untyped input) -> untyped
+    def echo_update: (untyped input) -> untyped
+  end
+
+  class HeartbeatRetryActivity < Temporalio::Activity::Definition
+    def execute: (*untyped raw_args) -> untyped
+  end
+
+  class HeartbeatRetryWorkflow < Temporalio::Workflow::Definition
+    def execute: (untyped input) -> untyped
+  end
+
+  def client_with_storage: (
+    Temporalio::Converters::StorageDriver driver,
+    ?payload_codec: Temporalio::Converters::PayloadCodec?
+  ) -> Temporalio::Client
+  def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
+  def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
+end

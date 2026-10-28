@@ -50,7 +50,7 @@ module Temporalio
 
         def decode_activation: (MultiRunner runner, untyped activation) -> void
         def encode_activation_completion: (MultiRunner runner, untyped activation_completion) -> void
-        def apply_codec_on_payload_visit: (untyped payload_or_payloads) { (untyped) -> Enumerable[untyped] } -> void
+        def replace_payloads_on_visit: (untyped payload_or_payloads) { (untyped) -> Enumerable[untyped] } -> void
 
         class State
           attr_reader workflow_definitions: Hash[String?, Workflow::Definition::Info]

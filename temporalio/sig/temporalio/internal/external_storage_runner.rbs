@@ -1,0 +1,24 @@
+module Temporalio
+  module Internal
+    class ExternalStorageRunner
+      @storage: Converters::ExternalStorage?
+
+      def initialize: (Converters::ExternalStorage? storage) -> void
+
+      def store: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
+      def retrieve: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
+
+      private def check_result_count: (
+        Converters::StorageDriver driver,
+        String operation,
+        Integer requested,
+        untyped returned
+      ) -> void
+
+      class UnboundedLimiter < Converters::StorageDriverLimiter
+      end
+
+      UNBOUNDED_LIMITER: UnboundedLimiter
+    end
+  end
+end

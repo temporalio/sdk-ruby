@@ -2,6 +2,7 @@
 
 require 'temporalio/api/payload_visitor'
 require 'temporalio/error'
+require 'temporalio/internal/external_storage_runner'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/scoped_logger'
 require 'temporalio/workflow'
@@ -81,18 +82,30 @@ module Temporalio
           @executor = workflow_executor
 
           payload_codec = data_converter.payload_codec
+          external_storage = data_converter.external_storage
           @workflow_payload_codec_thread_pool = workflow_payload_codec_thread_pool
-          if !Fiber.current_scheduler && payload_codec && !@workflow_payload_codec_thread_pool
-            raise ArgumentError, 'Must have workflow payload codec thread pool if providing codec and not using fibers'
+          if !Fiber.current_scheduler && (payload_codec || external_storage) && !@workflow_payload_codec_thread_pool
+            raise ArgumentError, 'Must have workflow payload codec thread pool if providing codec or external ' \
+                                 'storage and not using fibers'
           end
 
-          # If there is a payload codec, we need to build encoding and decoding visitors
-          if payload_codec
+          # If there is a payload codec or external storage, we need to build encoding and decoding visitors. Storage
+          # comes after the codec when encoding and before it when decoding.
+          if payload_codec || external_storage
+            storage_runner = ExternalStorageRunner.new(external_storage) if external_storage
             @payload_encoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
-              apply_codec_on_payload_visit(payload_or_payloads) { |payloads| payload_codec.encode(payloads) }
+              replace_payloads_on_visit(payload_or_payloads) do |payloads|
+                payloads = payload_codec.encode(payloads) if payload_codec
+                payloads = storage_runner.store(payloads.to_a) if storage_runner
+                payloads
+              end
             end
             @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
-              apply_codec_on_payload_visit(payload_or_payloads) { |payloads| payload_codec.decode(payloads) }
+              replace_payloads_on_visit(payload_or_payloads) do |payloads|
+                payloads = storage_runner.retrieve(payloads.to_a) if storage_runner
+                payloads = payload_codec.decode(payloads) if payload_codec
+                payloads
+              end
             end
           end
 
@@ -183,12 +196,14 @@ module Temporalio
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
         end
 
-        def apply_codec_on_payload_visit(payload_or_payloads, &)
+        def replace_payloads_on_visit(payload_or_payloads, &)
           case payload_or_payloads
           when Temporalio::Api::Common::V1::Payload
             new_payloads = yield [payload_or_payloads]
             payload_or_payloads.metadata = new_payloads.first.metadata
             payload_or_payloads.data = new_payloads.first.data
+            # External storage records the original size of a stored payload here
+            payload_or_payloads.external_payloads.replace(new_payloads.first.external_payloads.to_a)
           when Enumerable
             payload_or_payloads.replace(yield payload_or_payloads) # steep:ignore
           else
