@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.10.1] - 2026-10-30
+
+### Security
+
+- Update the bridge's zip dependency to 9.1.3 to address a security vulnerability in zip.
+
 ## [1.10.0] - 2026-10-19
 
 ### Added
