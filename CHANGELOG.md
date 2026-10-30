@@ -2,9 +2,9 @@
 
 ## [1.10.1] - 2026-10-30
 
-### Fixed
+### Security
 
-- Update the bridge's zip dependency to 9.1.3 to resolve dependency issues.
+- Update the bridge's zip dependency to 9.1.3 to address a security vulnerability in zip.
 
 ## [1.10.0] - 2026-10-19
 
