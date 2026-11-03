@@ -58,15 +58,15 @@ class Temporalio::Internal::Bridge::Worker::Options < ::Struct
       tuner: Temporalio::Internal::Bridge::Worker::TunerOptions,
       identity_override: T.nilable(String),
       max_cached_workflows: Integer,
-      workflow_task_poller_behavior: T.any(
+      workflow_task_poller_behavior: T.nilable(T.any(
         Temporalio::Internal::Bridge::Worker::PollerBehaviorSimpleMaximum,
         Temporalio::Internal::Bridge::Worker::PollerBehaviorAutoscaling
-      ),
+      )),
       nonsticky_to_sticky_poll_ratio: T.any(Integer, Float),
-      activity_task_poller_behavior: T.any(
+      activity_task_poller_behavior: T.nilable(T.any(
         Temporalio::Internal::Bridge::Worker::PollerBehaviorSimpleMaximum,
         Temporalio::Internal::Bridge::Worker::PollerBehaviorAutoscaling
-      ),
+      )),
       enable_workflows: T::Boolean,
       enable_local_activities: T::Boolean,
       enable_remote_activities: T::Boolean,
