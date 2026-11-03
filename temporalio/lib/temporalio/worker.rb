@@ -451,9 +451,9 @@ module Temporalio
     #   {Workflow.patched} for a patch ID should activate that patch. The callback receives a {PatchActivationInput} and
     #   must return `true` to activate the patch or `false` to leave it inactive.
     # @param workflow_task_poller_behavior [PollerBehavior, nil] Specify the behavior of workflow task
-    #   polling. Defaults to a 5-poller maximum, or autoscaling if the namespace auto-enrolls workers.
+    #   polling. Defaults to a 5-poller maximum.
     # @param activity_task_poller_behavior [PollerBehavior, nil] Specify the behavior of activity task
-    #   polling. Defaults to a 5-poller maximum, or autoscaling if the namespace auto-enrolls workers.
+    #   polling. Defaults to a 5-poller maximum.
     # @param debug_mode [Boolean] If true, deadlock detection is disabled. Deadlock detection will fail workflow tasks
     #   if they block the thread for too long. This defaults to true if the `TEMPORAL_DEBUG` environment variable is
     #   `true` or `1`.
@@ -498,7 +498,6 @@ module Temporalio
     )
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
-      # Left nil when neither is set, so core can auto-enroll the poller into autoscaling
       if max_concurrent_workflow_task_polls
         workflow_task_poller_behavior ||= PollerBehavior::SimpleMaximum.new(max_concurrent_workflow_task_polls)
       end

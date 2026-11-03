@@ -511,7 +511,6 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         })
         .maybe_client_identity_override(options.member::<Option<String>>(id!("identity_override"))?)
         .max_cached_workflows(options.member::<usize>(id!("max_cached_workflows"))?)
-        // None lets core auto-enroll the poller into autoscaling when the namespace supports it
         .maybe_workflow_task_poller_behavior(
             options
                 .child(id!("workflow_task_poller_behavior"))?
@@ -521,7 +520,6 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
         .nonsticky_to_sticky_poll_ratio(
             options.member::<f32>(id!("nonsticky_to_sticky_poll_ratio"))?,
         )
-        // None lets core auto-enroll the poller into autoscaling when the namespace supports it
         .maybe_activity_task_poller_behavior(
             options
                 .child(id!("activity_task_poller_behavior"))?
