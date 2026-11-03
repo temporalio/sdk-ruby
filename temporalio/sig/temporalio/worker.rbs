@@ -21,9 +21,9 @@ module Temporalio
       attr_reader identity: String
       attr_reader logger: Logger
       attr_reader max_cached_workflows: Integer
-      attr_reader max_concurrent_workflow_task_polls: Integer
+      attr_reader max_concurrent_workflow_task_polls: Integer?
       attr_reader nonsticky_to_sticky_poll_ratio: Float
-      attr_reader max_concurrent_activity_task_polls: Integer
+      attr_reader max_concurrent_activity_task_polls: Integer?
       attr_reader no_remote_activities: bool
       attr_reader sticky_queue_schedule_to_start_timeout: Float
       attr_reader max_heartbeat_throttle_interval: Float
@@ -37,8 +37,8 @@ module Temporalio
       attr_reader workflow_failure_exception_types: Array[singleton(Exception)]
       attr_reader workflow_payload_codec_thread_pool: ThreadPool?
       attr_reader unsafe_workflow_io_enabled: bool
-      attr_reader workflow_task_poller_behavior: PollerBehavior
-      attr_reader activity_task_poller_behavior: PollerBehavior
+      attr_reader workflow_task_poller_behavior: PollerBehavior?
+      attr_reader activity_task_poller_behavior: PollerBehavior?
       attr_reader deployment_options: Worker::DeploymentOptions
       attr_reader patch_activation_callback: Proc?
       attr_reader debug_mode: bool
@@ -57,9 +57,9 @@ module Temporalio
         identity: String?,
         logger: Logger,
         max_cached_workflows: Integer,
-        max_concurrent_workflow_task_polls: Integer,
+        max_concurrent_workflow_task_polls: Integer?,
         nonsticky_to_sticky_poll_ratio: Float,
-        max_concurrent_activity_task_polls: Integer,
+        max_concurrent_activity_task_polls: Integer?,
         no_remote_activities: bool,
         sticky_queue_schedule_to_start_timeout: Float,
         max_heartbeat_throttle_interval: Float,
@@ -73,8 +73,8 @@ module Temporalio
         workflow_failure_exception_types: Array[singleton(Exception)],
         workflow_payload_codec_thread_pool: ThreadPool?,
         unsafe_workflow_io_enabled: bool,
-        workflow_task_poller_behavior: PollerBehavior,
-        activity_task_poller_behavior: PollerBehavior,
+        workflow_task_poller_behavior: PollerBehavior?,
+        activity_task_poller_behavior: PollerBehavior?,
         deployment_options: Worker::DeploymentOptions,
         patch_activation_callback: Proc?,
         debug_mode: bool,
@@ -123,9 +123,9 @@ module Temporalio
       ?identity: String?,
       ?logger: Logger,
       ?max_cached_workflows: Integer,
-      ?max_concurrent_workflow_task_polls: Integer,
+      ?max_concurrent_workflow_task_polls: Integer?,
       ?nonsticky_to_sticky_poll_ratio: Float,
-      ?max_concurrent_activity_task_polls: Integer,
+      ?max_concurrent_activity_task_polls: Integer?,
       ?no_remote_activities: bool,
       ?sticky_queue_schedule_to_start_timeout: Float,
       ?max_heartbeat_throttle_interval: Float,
@@ -139,8 +139,8 @@ module Temporalio
       ?workflow_failure_exception_types: Array[singleton(Exception)],
       ?workflow_payload_codec_thread_pool: ThreadPool?,
       ?unsafe_workflow_io_enabled: bool,
-      ?workflow_task_poller_behavior: PollerBehavior,
-      ?activity_task_poller_behavior: PollerBehavior,
+      ?workflow_task_poller_behavior: PollerBehavior?,
+      ?activity_task_poller_behavior: PollerBehavior?,
       ?deployment_options: Worker::DeploymentOptions,
       ?patch_activation_callback: Proc?,
       ?debug_mode: bool,
