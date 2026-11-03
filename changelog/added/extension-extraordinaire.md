@@ -1,0 +1,1 @@
+Added experimental envconfig extensions. Pass `extensions:` to `Temporalio::EnvConfig::ClientConfig.load_client_connect_options` to let separately packaged extensions read their own config from `profile.<name>.ext` and environment variables and apply it through client plugins.
