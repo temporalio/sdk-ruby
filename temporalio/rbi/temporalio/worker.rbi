@@ -20,9 +20,9 @@ class Temporalio::Worker
       identity: T.nilable(String),
       logger: Logger,
       max_cached_workflows: Integer,
-      max_concurrent_workflow_task_polls: Integer,
+      max_concurrent_workflow_task_polls: T.nilable(Integer),
       nonsticky_to_sticky_poll_ratio: Numeric,
-      max_concurrent_activity_task_polls: Integer,
+      max_concurrent_activity_task_polls: T.nilable(Integer),
       no_remote_activities: T::Boolean,
       sticky_queue_schedule_to_start_timeout: Numeric,
       max_heartbeat_throttle_interval: Numeric,
@@ -38,8 +38,8 @@ class Temporalio::Worker
       unsafe_workflow_io_enabled: T::Boolean,
       deployment_options: Temporalio::Worker::DeploymentOptions,
       patch_activation_callback: T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean)),
-      workflow_task_poller_behavior: Temporalio::Worker::PollerBehavior,
-      activity_task_poller_behavior: Temporalio::Worker::PollerBehavior,
+      workflow_task_poller_behavior: T.nilable(Temporalio::Worker::PollerBehavior),
+      activity_task_poller_behavior: T.nilable(Temporalio::Worker::PollerBehavior),
       debug_mode: T::Boolean,
       disable_payload_error_limit: T::Boolean
     ).void
@@ -197,13 +197,13 @@ class Temporalio::Worker::Options < ::Data
   sig { returns(Integer) }
   def max_cached_workflows; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def max_concurrent_workflow_task_polls; end
 
   sig { returns(Numeric) }
   def nonsticky_to_sticky_poll_ratio; end
 
-  sig { returns(Integer) }
+  sig { returns(T.nilable(Integer)) }
   def max_concurrent_activity_task_polls; end
 
   sig { returns(T::Boolean) }
@@ -248,10 +248,10 @@ class Temporalio::Worker::Options < ::Data
   sig { returns(T.nilable(T.proc.params(input: Temporalio::Worker::PatchActivationInput).returns(T::Boolean))) }
   def patch_activation_callback; end
 
-  sig { returns(Temporalio::Worker::PollerBehavior) }
+  sig { returns(T.nilable(Temporalio::Worker::PollerBehavior)) }
   def workflow_task_poller_behavior; end
 
-  sig { returns(Temporalio::Worker::PollerBehavior) }
+  sig { returns(T.nilable(Temporalio::Worker::PollerBehavior)) }
   def activity_task_poller_behavior; end
 
   sig { returns(Temporalio::Worker::DeploymentOptions) }
