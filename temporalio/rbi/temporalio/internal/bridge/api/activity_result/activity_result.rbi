@@ -565,22 +565,3 @@ class Temporalio::Internal::Bridge::Api::ActivityResult::DoBackoff
   def self.descriptor
   end
 end
-
-module Temporalio::Internal::Bridge::Api::ActivityResult::ActivityTaskFailedCause
-  self::ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED = T.let(0, Integer)
-  self::ACTIVITY_TASK_FAILED_CAUSE_PAYLOADS_TOO_LARGE = T.let(1, Integer)
-  self::ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE = T.let(2, Integer)
-  self::ACTIVITY_TASK_FAILED_CAUSE_ACTIVITY_WORKER_UNHANDLED_FAILURE = T.let(3, Integer)
-
-  sig { params(value: Integer).returns(T.nilable(Symbol)) }
-  def self.lookup(value)
-  end
-
-  sig { params(value: Symbol).returns(T.nilable(Integer)) }
-  def self.resolve(value)
-  end
-
-  sig { returns(::Google::Protobuf::EnumDescriptor) }
-  def self.descriptor
-  end
-end

@@ -384,7 +384,10 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
       start_delay: T.nilable(Google::Protobuf::Duration),
       execution_time: T.nilable(Google::Protobuf::Timestamp),
       propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
-      eager_execution_accepted: T.nilable(T::Boolean)
+      eager_execution_accepted: T.nilable(T::Boolean),
+      started_by_principal: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal),
+      closed_by_principal: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal),
+      last_worker_principal: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)
     ).void
   end
   def initialize(
@@ -427,7 +430,10 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
     start_delay: nil,
     execution_time: nil,
     propagated_nexus_serialization_context: nil,
-    eager_execution_accepted: false
+    eager_execution_accepted: false,
+    started_by_principal: nil,
+    closed_by_principal: nil,
+    last_worker_principal: nil
   )
   end
 
@@ -1095,6 +1101,69 @@ class Temporalio::Api::Activity::V1::ActivityExecutionInfo
 # for its first task.
   sig { void }
   def clear_eager_execution_accepted
+  end
+
+  # Authenticated principal by which this activity execution was started.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)) }
+  def started_by_principal
+  end
+
+  # Authenticated principal by which this activity execution was started.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)).void }
+  def started_by_principal=(value)
+  end
+
+  # Authenticated principal by which this activity execution was started.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { void }
+  def clear_started_by_principal
+  end
+
+  # Authenticated principal by which this activity execution was closed.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)) }
+  def closed_by_principal
+  end
+
+  # Authenticated principal by which this activity execution was closed.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)).void }
+  def closed_by_principal=(value)
+  end
+
+  # Authenticated principal by which this activity execution was closed.
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+  sig { void }
+  def clear_closed_by_principal
+  end
+
+  # Authenticated principal of the worker that most recently interacted with this activity execution.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)) }
+  def last_worker_principal
+  end
+
+  # Authenticated principal of the worker that most recently interacted with this activity execution.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::ResolvedPrincipal)).void }
+  def last_worker_principal=(value)
+  end
+
+  # Authenticated principal of the worker that most recently interacted with this activity execution.
+  sig { void }
+  def clear_last_worker_principal
   end
 
   sig { params(field: String).returns(T.untyped) }

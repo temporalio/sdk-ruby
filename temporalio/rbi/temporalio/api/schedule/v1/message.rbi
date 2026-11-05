@@ -1630,14 +1630,16 @@ class Temporalio::Api::Schedule::V1::SchedulePatch
       trigger_immediately: T.nilable(Temporalio::Api::Schedule::V1::TriggerImmediatelyRequest),
       backfill_request: T.nilable(T::Array[T.nilable(Temporalio::Api::Schedule::V1::BackfillRequest)]),
       pause: T.nilable(String),
-      unpause: T.nilable(String)
+      unpause: T.nilable(String),
+      time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)
     ).void
   end
   def initialize(
     trigger_immediately: nil,
     backfill_request: [],
     pause: "",
-    unpause: ""
+    unpause: "",
+    time_skipping_config: nil
   )
   end
 
@@ -1707,6 +1709,24 @@ class Temporalio::Api::Schedule::V1::SchedulePatch
   def clear_unpause
   end
 
+  # If set, applies the specified time-skipping configuration to this schedule,
+# replacing any existing time-skipping configuration.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
+  def time_skipping_config
+  end
+
+  # If set, applies the specified time-skipping configuration to this schedule,
+# replacing any existing time-skipping configuration.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
+  def time_skipping_config=(value)
+  end
+
+  # If set, applies the specified time-skipping configuration to this schedule,
+# replacing any existing time-skipping configuration.
+  sig { void }
+  def clear_time_skipping_config
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -1757,7 +1777,8 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
       create_time: T.nilable(Google::Protobuf::Timestamp),
       update_time: T.nilable(Google::Protobuf::Timestamp),
       invalid_schedule_error: T.nilable(String),
-      state_size_bytes: T.nilable(Integer)
+      state_size_bytes: T.nilable(Integer),
+      time_skipping_info: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)
     ).void
   end
   def initialize(
@@ -1772,7 +1793,8 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
     create_time: nil,
     update_time: nil,
     invalid_schedule_error: "",
-    state_size_bytes: 0
+    state_size_bytes: 0,
+    time_skipping_info: nil
   )
   end
 
@@ -1969,6 +1991,24 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
   # Size of the schedule's internal state (including payloads) in bytes.
   sig { void }
   def clear_state_size_bytes
+  end
+
+  # Information about time skipping for this schedule.
+# If the schedule has never enabled time skipping, this will be unset.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)) }
+  def time_skipping_info
+  end
+
+  # Information about time skipping for this schedule.
+# If the schedule has never enabled time skipping, this will be unset.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)).void }
+  def time_skipping_info=(value)
+  end
+
+  # Information about time skipping for this schedule.
+# If the schedule has never enabled time skipping, this will be unset.
+  sig { void }
+  def clear_time_skipping_info
   end
 
   sig { params(field: String).returns(T.untyped) }

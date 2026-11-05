@@ -494,6 +494,13 @@ module Temporalio
             attr_writer original_execution_run_id(): ::String | ::Symbol
             def clear_original_execution_run_id: () -> void
 
+            # Serialization context of the Nexus operation handler that started this workflow, if any.
+            # Lang should use it to serialize the workflow's result and failure, which are returned to the
+            # Nexus caller.
+            attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+            def has_propagated_nexus_serialization_context?: () -> bool
+            def clear_propagated_nexus_serialization_context: () -> void
+
             type init_map = {
               workflow_type: (::String | ::Symbol)?,
               "workflow_type" => (::String | ::Symbol)?,
@@ -547,6 +554,8 @@ module Temporalio
               "priority" => (::Temporalio::Api::Common::V1::Priority | ::Temporalio::Api::Common::V1::Priority::init_map)?,
               original_execution_run_id: (::String | ::Symbol)?,
               "original_execution_run_id" => (::String | ::Symbol)?,
+              propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+              "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -578,6 +587,7 @@ module Temporalio
               | ("root_workflow" name) -> ::Temporalio::Api::Common::V1::WorkflowExecution?
               | ("priority" name) -> ::Temporalio::Api::Common::V1::Priority?
               | ("original_execution_run_id" name) -> ::String
+              | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
             def []=:
                 ("workflow_type" name, (::String | ::Symbol) value) -> void
@@ -606,6 +616,7 @@ module Temporalio
               | ("root_workflow" name, ::Temporalio::Api::Common::V1::WorkflowExecution? value) -> void
               | ("priority" name, ::Temporalio::Api::Common::V1::Priority? value) -> void
               | ("original_execution_run_id" name, (::String | ::Symbol) value) -> void
+              | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
           end
 
           # Notify a workflow that a timer has fired
@@ -1124,6 +1135,13 @@ module Temporalio
             attr_accessor run_validator(): bool
             def clear_run_validator: () -> void
 
+            # Serialization context of the Nexus operation handler that sent this update, if any. Lang
+            # should use it to serialize the update's result and failure, which are returned to the Nexus
+            # caller.
+            attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+            def has_propagated_nexus_serialization_context?: () -> bool
+            def clear_propagated_nexus_serialization_context: () -> void
+
             type init_map = {
               id: (::String | ::Symbol)?,
               "id" => (::String | ::Symbol)?,
@@ -1139,6 +1157,8 @@ module Temporalio
               "meta" => (::Temporalio::Api::Update::V1::Meta | ::Temporalio::Api::Update::V1::Meta::init_map)?,
               run_validator: bool?,
               "run_validator" => bool?,
+              propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+              "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1151,6 +1171,7 @@ module Temporalio
               | ("headers" name) -> (::Google::Protobuf::Map[::String, ::Temporalio::Api::Common::V1::Payload])
               | ("meta" name) -> ::Temporalio::Api::Update::V1::Meta?
               | ("run_validator" name) -> bool
+              | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
             def []=:
                 ("id" name, (::String | ::Symbol) value) -> void
@@ -1160,6 +1181,7 @@ module Temporalio
               | ("headers" name, (::Google::Protobuf::Map[::String, ::Temporalio::Api::Common::V1::Payload]) value) -> void
               | ("meta" name, ::Temporalio::Api::Update::V1::Meta? value) -> void
               | ("run_validator" name, bool value) -> void
+              | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
           end
 
           class ResolveNexusOperationStart < ::Google::Protobuf::AbstractMessage
