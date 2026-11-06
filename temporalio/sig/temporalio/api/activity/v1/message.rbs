@@ -395,6 +395,25 @@ module Temporalio
           attr_accessor eager_execution_accepted(): bool
           def clear_eager_execution_accepted: () -> void
 
+          # Authenticated principal by which this activity execution was started.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+          attr_accessor started_by_principal(): ::Temporalio::Api::Common::V1::ResolvedPrincipal?
+          def has_started_by_principal?: () -> bool
+          def clear_started_by_principal: () -> void
+
+          # Authenticated principal by which this activity execution was closed.
+          # (-- api-linter: core::0140::prepositions=disabled
+          #     aip.dev/not-precedent: "by" identifies the authenticated actor. --)
+          attr_accessor closed_by_principal(): ::Temporalio::Api::Common::V1::ResolvedPrincipal?
+          def has_closed_by_principal?: () -> bool
+          def clear_closed_by_principal: () -> void
+
+          # Authenticated principal of the worker that most recently interacted with this activity execution.
+          attr_accessor last_worker_principal(): ::Temporalio::Api::Common::V1::ResolvedPrincipal?
+          def has_last_worker_principal?: () -> bool
+          def clear_last_worker_principal: () -> void
+
           type init_map = {
             activity_id: (::String | ::Symbol)?,
             "activity_id" => (::String | ::Symbol)?,
@@ -476,6 +495,12 @@ module Temporalio
             "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
             eager_execution_accepted: bool?,
             "eager_execution_accepted" => bool?,
+            started_by_principal: (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
+            "started_by_principal" => (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
+            closed_by_principal: (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
+            "closed_by_principal" => (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
+            last_worker_principal: (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
+            "last_worker_principal" => (::Temporalio::Api::Common::V1::ResolvedPrincipal | ::Temporalio::Api::Common::V1::ResolvedPrincipal::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -521,6 +546,9 @@ module Temporalio
             | ("execution_time" name) -> ::Google::Protobuf::Timestamp?
             | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
             | ("eager_execution_accepted" name) -> bool
+            | ("started_by_principal" name) -> ::Temporalio::Api::Common::V1::ResolvedPrincipal?
+            | ("closed_by_principal" name) -> ::Temporalio::Api::Common::V1::ResolvedPrincipal?
+            | ("last_worker_principal" name) -> ::Temporalio::Api::Common::V1::ResolvedPrincipal?
 
           def []=:
               ("activity_id" name, (::String | ::Symbol) value) -> void
@@ -563,6 +591,9 @@ module Temporalio
             | ("execution_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
             | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
             | ("eager_execution_accepted" name, bool value) -> void
+            | ("started_by_principal" name, ::Temporalio::Api::Common::V1::ResolvedPrincipal? value) -> void
+            | ("closed_by_principal" name, ::Temporalio::Api::Common::V1::ResolvedPrincipal? value) -> void
+            | ("last_worker_principal" name, ::Temporalio::Api::Common::V1::ResolvedPrincipal? value) -> void
         end
 
         # Limited activity information returned in the list response.

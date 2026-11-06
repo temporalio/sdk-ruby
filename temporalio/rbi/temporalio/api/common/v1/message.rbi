@@ -1634,6 +1634,101 @@ class Temporalio::Api::Common::V1::Principal
   end
 end
 
+# ResolvedPrincipal is a principal returned to an API caller.
+class Temporalio::Api::Common::V1::ResolvedPrincipal
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      type: T.nilable(String),
+      name_at_write_time: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    type: "",
+    name_at_write_time: ""
+  )
+  end
+
+  # Low-cardinality category of the principal (e.g., "jwt", "users").
+  sig { returns(String) }
+  def type
+  end
+
+  # Low-cardinality category of the principal (e.g., "jwt", "users").
+  sig { params(value: String).void }
+  def type=(value)
+  end
+
+  # Low-cardinality category of the principal (e.g., "jwt", "users").
+  sig { void }
+  def clear_type
+  end
+
+  # Identifier within that category (e.g., sub JWT claim, email address).
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: Identifies the principal name snapshot used for this response. --)
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: This string is a principal name snapshot, not a timestamp. --)
+  sig { returns(String) }
+  def name_at_write_time
+  end
+
+  # Identifier within that category (e.g., sub JWT claim, email address).
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: Identifies the principal name snapshot used for this response. --)
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: This string is a principal name snapshot, not a timestamp. --)
+  sig { params(value: String).void }
+  def name_at_write_time=(value)
+  end
+
+  # Identifier within that category (e.g., sub JWT claim, email address).
+#
+# (-- api-linter: core::0140::prepositions=disabled
+#     aip.dev/not-precedent: Identifies the principal name snapshot used for this response. --)
+# (-- api-linter: core::0142::time-field-type=disabled
+#     aip.dev/not-precedent: This string is a principal name snapshot, not a timestamp. --)
+  sig { void }
+  def clear_name_at_write_time
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Common::V1::ResolvedPrincipal) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::ResolvedPrincipal).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Common::V1::ResolvedPrincipal) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Common::V1::ResolvedPrincipal, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 # Priority contains metadata that controls relative ordering of task processing
 # when tasks are backed up in a queue. Initially, Priority will be used in
 # matching (workflow and activity) task queues. Later it may be used in history

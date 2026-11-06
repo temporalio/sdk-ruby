@@ -705,7 +705,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
       start_time: T.nilable(Google::Protobuf::Timestamp),
       root_workflow: T.nilable(Temporalio::Api::Common::V1::WorkflowExecution),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
-      original_execution_run_id: T.nilable(String)
+      original_execution_run_id: T.nilable(String),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -734,7 +735,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
     start_time: nil,
     root_workflow: nil,
     priority: nil,
-    original_execution_run_id: ""
+    original_execution_run_id: "",
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -1171,6 +1173,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::InitializeWorkflow
 # field from `WorkflowExecutionStartedEventAttributes`.
   sig { void }
   def clear_original_execution_run_id
+  end
+
+  # Serialization context of the Nexus operation handler that started this workflow, if any.
+# Lang should use it to serialize the workflow's result and failure, which are returned to the
+# Nexus caller.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context of the Nexus operation handler that started this workflow, if any.
+# Lang should use it to serialize the workflow's result and failure, which are returned to the
+# Nexus caller.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context of the Nexus operation handler that started this workflow, if any.
+# Lang should use it to serialize the workflow's result and failure, which are returned to the
+# Nexus caller.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2413,7 +2436,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::DoUpdate
       input: T.nilable(T::Array[T.nilable(Temporalio::Api::Common::V1::Payload)]),
       headers: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Common::V1::Payload)]),
       meta: T.nilable(Temporalio::Api::Update::V1::Meta),
-      run_validator: T.nilable(T::Boolean)
+      run_validator: T.nilable(T::Boolean),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
@@ -2423,7 +2447,8 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::DoUpdate
     input: [],
     headers: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Common::V1::Payload),
     meta: nil,
-    run_validator: false
+    run_validator: false,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -2539,6 +2564,27 @@ class Temporalio::Internal::Bridge::Api::WorkflowActivation::DoUpdate
 # set false during replay, since validation is not re-run during replay.
   sig { void }
   def clear_run_validator
+  end
+
+  # Serialization context of the Nexus operation handler that sent this update, if any. Lang
+# should use it to serialize the update's result and failure, which are returned to the Nexus
+# caller.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context of the Nexus operation handler that sent this update, if any. Lang
+# should use it to serialize the update's result and failure, which are returned to the Nexus
+# caller.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context of the Nexus operation handler that sent this update, if any. Lang
+# should use it to serialize the update's result and failure, which are returned to the Nexus
+# caller.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }

@@ -1135,7 +1135,8 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       eager_worker_deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
       time_skipping_config: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig),
-      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
+      time_skipping_state_propagation: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)
     ).void
   end
   def initialize(
@@ -1168,7 +1169,8 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
     priority: nil,
     eager_worker_deployment_options: nil,
     time_skipping_config: nil,
-    propagated_nexus_serialization_context: nil
+    propagated_nexus_serialization_context: nil,
+    time_skipping_state_propagation: nil
   )
   end
 
@@ -1662,6 +1664,27 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   # Serialization context propagated from the Nexus caller that started this workflow.
   sig { void }
   def clear_propagated_nexus_serialization_context
+  end
+
+  # Time-skipping state propagated by the execution that started this workflow.
+# This field is intended for use by the Temporal server, for example when a schedule
+# starts a workflow, and is not intended to be set by external clients.
+  sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)) }
+  def time_skipping_state_propagation
+  end
+
+  # Time-skipping state propagated by the execution that started this workflow.
+# This field is intended for use by the Temporal server, for example when a schedule
+# starts a workflow, and is not intended to be set by external clients.
+  sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)).void }
+  def time_skipping_state_propagation=(value)
+  end
+
+  # Time-skipping state propagated by the execution that started this workflow.
+# This field is intended for use by the Temporal server, for example when a schedule
+# starts a workflow, and is not intended to be set by external clients.
+  sig { void }
+  def clear_time_skipping_state_propagation
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -14318,14 +14341,16 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
       update_ref: T.nilable(Temporalio::Api::Update::V1::UpdateRef),
       outcome: T.nilable(Temporalio::Api::Update::V1::Outcome),
       stage: T.nilable(T.any(Symbol, String, Integer)),
-      link: T.nilable(Temporalio::Api::Common::V1::Link)
+      link: T.nilable(Temporalio::Api::Common::V1::Link),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
     update_ref: nil,
     outcome: nil,
     stage: :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED,
-    link: nil
+    link: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -14420,6 +14445,21 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionResponse
   # Link to the update event. May be null if the update has not yet been accepted.
   sig { void }
   def clear_link
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -15638,13 +15678,15 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateResponse
     params(
       outcome: T.nilable(Temporalio::Api::Update::V1::Outcome),
       stage: T.nilable(T.any(Symbol, String, Integer)),
-      update_ref: T.nilable(Temporalio::Api::Update::V1::UpdateRef)
+      update_ref: T.nilable(Temporalio::Api::Update::V1::UpdateRef),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)
     ).void
   end
   def initialize(
     outcome: nil,
     stage: :UPDATE_WORKFLOW_EXECUTION_LIFECYCLE_STAGE_UNSPECIFIED,
-    update_ref: nil
+    update_ref: nil,
+    propagated_nexus_serialization_context: nil
   )
   end
 
@@ -15730,6 +15772,21 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionUpdateResponse
   # Sufficient information to address this Update.
   sig { void }
   def clear_update_ref
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context propagated from the Nexus caller that started this update.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
   end
 
   sig { params(field: String).returns(T.untyped) }

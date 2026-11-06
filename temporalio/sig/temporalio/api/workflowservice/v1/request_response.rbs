@@ -644,6 +644,13 @@ module Temporalio
           def has_propagated_nexus_serialization_context?: () -> bool
           def clear_propagated_nexus_serialization_context: () -> void
 
+          # Time-skipping state propagated by the execution that started this workflow.
+          # This field is intended for use by the Temporal server, for example when a schedule
+          # starts a workflow, and is not intended to be set by external clients.
+          attr_accessor time_skipping_state_propagation(): ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
+          def has_time_skipping_state_propagation?: () -> bool
+          def clear_time_skipping_state_propagation: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -705,6 +712,8 @@ module Temporalio
             "time_skipping_config" => (::Temporalio::Api::Common::V1::TimeSkippingConfig | ::Temporalio::Api::Common::V1::TimeSkippingConfig::init_map)?,
             propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
             "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            time_skipping_state_propagation: (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
+            "time_skipping_state_propagation" => (::Temporalio::Api::Common::V1::TimeSkippingStatePropagation | ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -740,6 +749,7 @@ module Temporalio
             | ("eager_worker_deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
             | ("time_skipping_config" name) -> ::Temporalio::Api::Common::V1::TimeSkippingConfig?
             | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+            | ("time_skipping_state_propagation" name) -> ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -772,6 +782,7 @@ module Temporalio
             | ("eager_worker_deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
             | ("time_skipping_config" name, ::Temporalio::Api::Common::V1::TimeSkippingConfig? value) -> void
             | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
+            | ("time_skipping_state_propagation" name, ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation? value) -> void
         end
 
         class StartWorkflowExecutionResponse < ::Google::Protobuf::AbstractMessage
@@ -6677,6 +6688,11 @@ module Temporalio
           def has_link?: () -> bool
           def clear_link: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this update.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             update_ref: (::Temporalio::Api::Update::V1::UpdateRef | ::Temporalio::Api::Update::V1::UpdateRef::init_map)?,
             "update_ref" => (::Temporalio::Api::Update::V1::UpdateRef | ::Temporalio::Api::Update::V1::UpdateRef::init_map)?,
@@ -6686,6 +6702,8 @@ module Temporalio
             "stage" => (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::strings | ::Integer | ::Float)?,
             link: (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
             "link" => (::Temporalio::Api::Common::V1::Link | ::Temporalio::Api::Common::V1::Link::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -6695,12 +6713,14 @@ module Temporalio
             | ("outcome" name) -> ::Temporalio::Api::Update::V1::Outcome?
             | ("stage" name) -> (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Integer)
             | ("link" name) -> ::Temporalio::Api::Common::V1::Link?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("update_ref" name, ::Temporalio::Api::Update::V1::UpdateRef? value) -> void
             | ("outcome" name, ::Temporalio::Api::Update::V1::Outcome? value) -> void
             | ("stage" name, (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::strings | ::Integer | ::Float) value) -> void
             | ("link" name, ::Temporalio::Api::Common::V1::Link? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class StartBatchOperationRequest < ::Google::Protobuf::AbstractMessage
@@ -7250,6 +7270,11 @@ module Temporalio
           def has_update_ref?: () -> bool
           def clear_update_ref: () -> void
 
+          # Serialization context propagated from the Nexus caller that started this update.
+          attr_accessor propagated_nexus_serialization_context(): ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
+          def has_propagated_nexus_serialization_context?: () -> bool
+          def clear_propagated_nexus_serialization_context: () -> void
+
           type init_map = {
             outcome: (::Temporalio::Api::Update::V1::Outcome | ::Temporalio::Api::Update::V1::Outcome::init_map)?,
             "outcome" => (::Temporalio::Api::Update::V1::Outcome | ::Temporalio::Api::Update::V1::Outcome::init_map)?,
@@ -7257,6 +7282,8 @@ module Temporalio
             "stage" => (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::strings | ::Integer | ::Float)?,
             update_ref: (::Temporalio::Api::Update::V1::UpdateRef | ::Temporalio::Api::Update::V1::UpdateRef::init_map)?,
             "update_ref" => (::Temporalio::Api::Update::V1::UpdateRef | ::Temporalio::Api::Update::V1::UpdateRef::init_map)?,
+            propagated_nexus_serialization_context: (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
+            "propagated_nexus_serialization_context" => (::Temporalio::Api::Nexus::V1::PropagatedSerializationContext | ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -7265,11 +7292,13 @@ module Temporalio
               ("outcome" name) -> ::Temporalio::Api::Update::V1::Outcome?
             | ("stage" name) -> (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Integer)
             | ("update_ref" name) -> ::Temporalio::Api::Update::V1::UpdateRef?
+            | ("propagated_nexus_serialization_context" name) -> ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext?
 
           def []=:
               ("outcome" name, ::Temporalio::Api::Update::V1::Outcome? value) -> void
             | ("stage" name, (::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::names | ::Temporalio::Api::Enums::V1::UpdateWorkflowExecutionLifecycleStage::strings | ::Integer | ::Float) value) -> void
             | ("update_ref" name, ::Temporalio::Api::Update::V1::UpdateRef? value) -> void
+            | ("propagated_nexus_serialization_context" name, ::Temporalio::Api::Nexus::V1::PropagatedSerializationContext? value) -> void
         end
 
         class PollNexusTaskQueueRequest < ::Google::Protobuf::AbstractMessage
