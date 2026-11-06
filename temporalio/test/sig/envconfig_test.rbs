@@ -4,9 +4,38 @@ class EnvConfigTest < Test
   TOML_CONFIG_MALFORMED: String
   TOML_CONFIG_TLS_DETAILED: String
   TOML_CONFIG_GRPC_META: String
+  TOML_CONFIG_EXT: String
+
+  class TestExtension
+    include Temporalio::EnvConfig::ClientConfigExtension
+
+    attr_reader name: String
+
+    def initialize: (
+      String name
+    ) ?{ (Temporalio::EnvConfig::ClientConfigExtensionRequest request) -> Temporalio::Client::Plugin? } -> void
+  end
+
+  class TestPlugin
+    include Temporalio::Client::Plugin
+
+    attr_reader name: String
+
+    def initialize: (String name) -> void
+  end
+
+  class ApiKeyFileExtension
+    include Temporalio::EnvConfig::ClientConfigExtension
+
+    class Plugin
+      include Temporalio::Client::Plugin
+
+      def initialize: (String api_key) -> void
+    end
+  end
 
   private
 
   def with_temp_config_file: [T] (String content) { (String config_file) -> T } -> T
   def with_system_env_vars: [T] (Hash[String, String] env_vars) { () -> T } -> T
-end 
+end

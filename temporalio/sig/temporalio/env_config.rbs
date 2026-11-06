@@ -35,6 +35,7 @@ module Temporalio
       attr_reader api_key: String?
       attr_reader tls: ClientConfigTLS?
       attr_reader grpc_meta: Hash[String, String]
+      attr_reader ext: Hash[String, Hash[String, untyped]]
 
       def self.from_h: (Hash[untyped, untyped] hash) -> ClientConfigProfile
 
@@ -52,11 +53,25 @@ module Temporalio
         ?namespace: String?,
         ?api_key: String?,
         ?tls: ClientConfigTLS?,
-        ?grpc_meta: Hash[String, String]
+        ?grpc_meta: Hash[String, String],
+        ?ext: Hash[String, Hash[String, untyped]]
       ) -> void
 
       def to_h: -> Hash[Symbol, untyped]
       def to_client_connect_options: -> [Array[untyped], Hash[Symbol, untyped]]
+    end
+
+    module ClientConfigExtension
+      def name: -> String
+
+      def client_plugin: (ClientConfigExtensionRequest request) -> Client::Plugin?
+    end
+
+    class ClientConfigExtensionRequest
+      attr_reader profile: ClientConfigProfile
+      attr_reader env: Hash[String, String]?
+
+      def initialize: (profile: ClientConfigProfile, env: Hash[String, String]?) -> void
     end
 
     class ClientConfig
@@ -76,8 +91,11 @@ module Temporalio
         ?disable_file: bool,
         ?disable_env: bool,
         ?config_file_strict: bool,
-        ?override_env_vars: Hash[String, String]?
+        ?override_env_vars: Hash[String, String]?,
+        ?extensions: Array[ClientConfigExtension]
       ) -> [Array[untyped], Hash[Symbol, untyped]]
+
+      def self._validate_extensions!: (Array[ClientConfigExtension] extensions) -> void
 
       def initialize: (?profiles: Hash[String, ClientConfigProfile]) -> void
       def to_h: -> Hash[String, Hash[Symbol, untyped]]
