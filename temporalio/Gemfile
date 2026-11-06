@@ -8,6 +8,7 @@ group :development do
   gem 'activemodel'
   gem 'activerecord'
   gem 'async'
+  gem 'aws-sdk-s3'
   gem 'base64'
   gem 'googleapis-common-protos-types'
   gem 'irb'

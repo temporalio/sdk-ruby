@@ -8,9 +8,9 @@ module Temporalio
           attr_accessor tuner: TunerOptions
           attr_accessor identity_override: String?
           attr_accessor max_cached_workflows: Integer
-          attr_accessor workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
+          attr_accessor workflow_task_poller_behavior: (PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling)?
           attr_accessor nonsticky_to_sticky_poll_ratio: Float
-          attr_accessor activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling
+          attr_accessor activity_task_poller_behavior: (PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling)?
           attr_accessor enable_workflows: bool
           attr_accessor enable_local_activities: bool
           attr_accessor enable_remote_activities: bool
@@ -34,9 +34,9 @@ module Temporalio
             tuner: TunerOptions,
             identity_override: String?,
             max_cached_workflows: Integer,
-            workflow_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
+            workflow_task_poller_behavior: (PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling)?,
             nonsticky_to_sticky_poll_ratio: Float,
-            activity_task_poller_behavior: PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling,
+            activity_task_poller_behavior: (PollerBehaviorSimpleMaximum | PollerBehaviorAutoscaling)?,
             enable_workflows: bool,
             enable_local_activities: bool,
             enable_remote_activities: bool,

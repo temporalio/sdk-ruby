@@ -1,0 +1,68 @@
+module Temporalio
+  module Contrib
+    module Aws
+      module S3Driver
+        class S3StorageDriver < Converters::StorageDriver
+          type bucketSelector = ^(Converters::StorageDriverStoreContext, Api::Common::V1::Payload) -> String
+
+          DRIVER_TYPE: String
+          DEFAULT_MAX_PAYLOAD_SIZE: Integer
+          CLAIM_BUCKET: String
+          CLAIM_KEY: String
+          CLAIM_HASH_ALGORITHM: String
+          CLAIM_HASH_VALUE: String
+          NULL_SEGMENT: String
+
+          class StoredObject
+            attr_reader payload: Api::Common::V1::Payload
+            attr_reader bucket: String
+            attr_reader key: String
+            attr_reader hash_value: String
+            attr_reader data: String
+
+            def initialize: (
+              payload: Api::Common::V1::Payload,
+              bucket: String,
+              key: String,
+              hash_value: String,
+              data: String
+            ) -> void
+          end
+
+          @client: S3StorageDriverClient
+          @bucket: bucketSelector
+          @max_payload_size: Integer
+
+          attr_reader name: String
+
+          def initialize: (
+            client: S3StorageDriverClient,
+            bucket: String | bucketSelector,
+            ?driver_name: String,
+            ?max_payload_size: Integer
+          ) -> void
+
+          private
+
+          def stored_object: (
+            Converters::StorageDriverStoreContext context,
+            Api::Common::V1::Payload payload,
+            String context_segments
+          ) -> StoredObject
+          def upload_if_absent: (StoredObject object) -> void
+          def download: (String bucket, String key) -> String
+          def validate_claim: (Converters::StorageDriverClaim claim) -> void
+          def run_concurrently: [I, R] (
+            Array[I] items,
+            Cancellation parent_cancellation
+          ) { (I, Cancellation) -> R } -> Array[R]
+          def context_key_segments: (
+            (Converters::StorageDriverWorkflowInfo | Converters::StorageDriverActivityInfo)? target
+          ) -> String
+          def encode_key_segment: (String? value) -> String
+          def client_context: -> String
+        end
+      end
+    end
+  end
+end

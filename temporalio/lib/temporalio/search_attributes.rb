@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'temporalio/api'
+require 'time'
 
 module Temporalio
   # Collection of typed search attributes.
@@ -142,8 +143,9 @@ module Temporalio
 
     # @!visibility private
     def self._to_proto_pair(key, value)
-      # We use a default converter, but if type is a time, we need ISO format
-      value = value.iso8601 if key.type == IndexedValueType::TIME && value.is_a?(Time)
+      # We use a default converter, but if type is a time, we need ISO format with nanoseconds since the server keeps
+      # sub-second precision
+      value = value.iso8601(9) if key.type == IndexedValueType::TIME && value.is_a?(Time)
 
       # Convert to payload
       payload = Converters::PayloadConverter.default.to_payload(value)

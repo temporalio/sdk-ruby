@@ -63,6 +63,20 @@ class EnvConfigTest < Test
     "mixed_Case-header" = "mixed-value"
   TOML
 
+  # TOML config with extension tables
+  TOML_CONFIG_EXT = <<~TOML
+    [profile.default]
+    address = "default-address"
+    [profile.default.ext.first]
+    value = "first-value"
+    nested = { list = [1, "two"], flag = true }
+    [profile.default.ext.second.deeper]
+    value = 5
+
+    [profile.other]
+    address = "other-address"
+  TOML
+
   def setup
     super
     @original_temporal_env = ENV.to_h.select { |key, _| key.start_with?('TEMPORAL_') }
@@ -953,6 +967,305 @@ class EnvConfigTest < Test
     assert_equal 'prod', prod_client.namespace
     assert_equal 'prod-key', prod_client.connection.options.api_key
     refute_nil prod_client.connection.options.tls # TLS enabled with API key
+  end
+
+  # =============================================================================
+  # EXTENSION TESTS
+  # =============================================================================
+
+  # Extension that returns whatever the given block returns
+  class TestExtension
+    include Temporalio::EnvConfig::ClientConfigExtension
+
+    attr_reader :name
+
+    def initialize(name, &block)
+      @name = name
+      @block = block
+    end
+
+    def client_plugin(request)
+      @block&.call(request)
+    end
+  end
+
+  class TestPlugin
+    include Temporalio::Client::Plugin
+
+    attr_reader :name
+
+    def initialize(name)
+      @name = name
+    end
+  end
+
+  def test_load_profile_with_ext
+    [false, true].each do |strict|
+      profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: TOML_CONFIG_EXT,
+                                                                config_file_strict: strict)
+      assert_equal 'default-address', profile.address
+      assert_equal(
+        {
+          'first' => { 'value' => 'first-value', 'nested' => { 'list' => [1, 'two'], 'flag' => true } },
+          'second' => { 'deeper' => { 'value' => 5 } }
+        },
+        profile.ext
+      )
+
+      config = Temporalio::EnvConfig::ClientConfig.load(config_source: TOML_CONFIG_EXT, config_file_strict: strict)
+      assert_equal profile.ext, config.profiles['default']&.ext
+      assert_empty config.profiles['other']&.ext
+    end
+  end
+
+  def test_load_profile_ext_value_conversion
+    profile = Temporalio::EnvConfig::ClientConfigProfile.load(config_source: <<~TOML)
+      [profile.default.ext.my_ext]
+      float = 1.5
+      datetime = 1979-05-27T07:32:00Z
+      local_datetime = 1979-05-27T07:32:00
+      local_date = 1979-05-27
+      local_time = 07:32:00
+      nan = nan
+      inf = -inf
+    TOML
+    ext = profile.ext['my_ext']
+    assert ext['nan'].nan?
+    assert_equal(
+      {
+        'float' => 1.5,
+        'datetime' => '1979-05-27T07:32:00Z',
+        'local_datetime' => '1979-05-27T07:32:00',
+        'local_date' => '1979-05-27',
+        'local_time' => '07:32:00',
+        'inf' => -Float::INFINITY
+      },
+      ext.except('nan')
+    )
+  end
+
+  def test_strict_mode_rejects_unknown_non_ext_keys_alongside_ext
+    err = assert_raises(Temporalio::Internal::Bridge::Error) do
+      Temporalio::EnvConfig::ClientConfigProfile.load(config_source: <<~TOML, config_file_strict: true)
+        [profile.default]
+        unrecognized_field = "should-fail"
+        [profile.default.ext.first]
+        value = "first-value"
+      TOML
+    end
+    assert_includes err.message, 'unrecognized_field'
+  end
+
+  def test_ext_ignores_env_vars
+    profile = Temporalio::EnvConfig::ClientConfigProfile.load(
+      config_source: "[profile.default.ext.first]\nvalue = \"file-value\"",
+      override_env_vars: { 'TEMPORAL_EXT_FIRST_VALUE' => 'env-value' }
+    )
+    assert_equal({ 'first' => { 'value' => 'file-value' } }, profile.ext)
+  end
+
+  def test_client_config_profile_ext_to_from_h
+    ext = { 'first' => { 'value' => 'first-value' } }
+    profile = Temporalio::EnvConfig::ClientConfigProfile.new(address: 'some-address', ext:)
+    assert_equal({ address: 'some-address', ext: }, profile.to_h)
+    assert_equal ext, Temporalio::EnvConfig::ClientConfigProfile.from_h(profile.to_h).ext
+  end
+
+  def test_load_client_connect_options_calls_extensions_in_order
+    env = { 'TEMPORAL_ADDRESS' => 'env-address', 'TEMPORAL_EXT_FIRST_VALUE' => 'env-value' }
+    calls = []
+    first = TestExtension.new('first') do |req|
+      calls << 'first'
+      # Env vars have already been applied to the profile
+      assert_equal 'env-address', req.profile.address
+      assert_equal({ 'value' => 'file-value' }, req.profile.ext['first'])
+      assert_same env, req.env
+      TestPlugin.new("first-#{req.env&.[]('TEMPORAL_EXT_FIRST_VALUE')}")
+    end
+    noop = TestExtension.new('noop') do |req|
+      calls << 'noop'
+      assert_nil req.profile.ext['noop']
+      nil
+    end
+    second = TestExtension.new('second') do
+      calls << 'second'
+      TestPlugin.new('second')
+    end
+
+    args, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+      config_source: <<~TOML,
+        [profile.default]
+        address = "file-address"
+        [profile.default.ext.first]
+        value = "file-value"
+      TOML
+      config_file_strict: true,
+      override_env_vars: env,
+      extensions: [second, first, noop]
+    )
+    assert_equal %w[second first noop], calls
+    assert_equal(%w[second first-env-value], kwargs[:plugins].map(&:name))
+    assert_equal 'env-address', args[0]
+  end
+
+  def test_load_client_connect_options_omits_plugins_without_any
+    [[], [TestExtension.new('noop')]].each do |extensions|
+      _, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: TOML_CONFIG_EXT, override_env_vars: {}, extensions:
+      )
+      refute_includes kwargs, :plugins
+    end
+  end
+
+  def test_load_client_connect_options_passes_env_to_extensions
+    got_envs = []
+    ext = TestExtension.new('ext') do |req|
+      got_envs << req.env
+      nil
+    end
+    env = { 'TEMPORAL_EXT_EXT_VALUE' => 'value' }
+
+    with_system_env_vars({ 'TEMPORAL_EXT_EXT_VALUE' => 'system-value' }) do
+      # Defaults to system env
+      Temporalio::EnvConfig::ClientConfig.load_client_connect_options(config_source: '', extensions: [ext])
+      # Uses override env when given
+      Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: '', override_env_vars: env, extensions: [ext]
+      )
+      # nil when env is disabled
+      Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: '', disable_env: true, override_env_vars: env, extensions: [ext]
+      )
+    end
+
+    assert_equal 3, got_envs.size
+    assert_equal 'system-value', got_envs[0]&.[]('TEMPORAL_EXT_EXT_VALUE')
+    assert_same env, got_envs[1]
+    assert_nil got_envs[2]
+  end
+
+  def test_load_client_connect_options_rejects_invalid_extensions_before_calling_any
+    new_ext = ->(name) { TestExtension.new(name) { flunk 'extension should not be called' } }
+    [
+      [[new_ext.call('a'), new_ext.call('b'), new_ext.call('a')], 'duplicate client config extension name "a"'],
+      [[new_ext.call('a'), new_ext.call('')], 'client config extension at index 1 has empty name']
+    ].each do |extensions, expected_message|
+      err = assert_raises(ArgumentError) do
+        Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+          config_source: '', override_env_vars: {}, extensions: # steep:ignore
+        )
+      end
+      assert_equal expected_message, err.message
+    end
+
+    block = proc do
+      err = assert_raises(ArgumentError) do
+        Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+          config_source: '', override_env_vars: {}, extensions: [nil] # steep:ignore
+        )
+      end
+      assert_equal 'NilClass does not implement EnvConfig::ClientConfigExtension', err.message
+    end
+    # Passing the wrong type is the point of this check, so the runtime signature check must not record it.
+    if defined?(SigApplicator)
+      SigApplicator.suppress_errors { block.call }
+    else
+      block.call
+    end
+  end
+
+  def test_load_client_connect_options_wraps_extension_errors
+    ext_err = RuntimeError.new('bad config')
+    err = assert_raises(Temporalio::Error) do
+      Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: '', override_env_vars: {}, extensions: [TestExtension.new('bad') { raise ext_err }]
+      )
+    end
+    assert_equal 'client config extension "bad": bad config', err.message
+    assert_same ext_err, err.cause
+  end
+
+  # Example extension that reads an API key from a file, configured like:
+  #
+  #   [profile.default.ext.api_key_file]
+  #   path = "/path/to/api-key"
+  #
+  # or with the TEMPORAL_EXT_API_KEY_FILE_PATH env var, which takes precedence.
+  class ApiKeyFileExtension
+    include Temporalio::EnvConfig::ClientConfigExtension
+
+    def name
+      'api_key_file'
+    end
+
+    def client_plugin(request)
+      key_path = request.profile.ext.dig(name, 'path')
+      raise TypeError, "path must be a string, got #{key_path.class}" unless key_path.nil? || key_path.is_a?(String)
+
+      key_path = request.env&.fetch('TEMPORAL_EXT_API_KEY_FILE_PATH', nil) || key_path
+      return nil if key_path.nil?
+
+      Plugin.new(File.read(key_path).strip)
+    end
+
+    class Plugin
+      include Temporalio::Client::Plugin
+
+      def initialize(api_key)
+        @api_key = api_key
+      end
+
+      def name
+        'example.ApiKeyFileExtension'
+      end
+
+      def configure_client(options)
+        options
+      end
+
+      def connect_client(options, next_call)
+        next_call.call(options.with(api_key: @api_key, tls: options.tls || true))
+      end
+    end
+  end
+
+  def test_example_extension
+    Dir.mktmpdir do |tmpdir| # steep:ignore
+      key_path = File.join(tmpdir, 'api-key')
+      File.write(key_path, "my-api-key\n")
+
+      args, kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: <<~TOML,
+          [profile.default]
+          address = "localhost:7233"
+          namespace = "my-namespace"
+          [profile.default.ext.api_key_file]
+          path = #{key_path.inspect}
+        TOML
+        config_file_strict: true,
+        override_env_vars: {},
+        extensions: [ApiKeyFileExtension.new]
+      )
+      client = Temporalio::Client.connect(*args, **kwargs, lazy_connect: true) # steep:ignore
+      assert_equal 'my-api-key', client.connection.options.api_key
+      assert client.connection.options.tls
+
+      # Nothing configured
+      _, unconfigured_kwargs = Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+        config_source: '', override_env_vars: {}, extensions: [ApiKeyFileExtension.new]
+      )
+      refute_includes unconfigured_kwargs, :plugins
+
+      # Invalid config
+      err = assert_raises(Temporalio::Error) do
+        Temporalio::EnvConfig::ClientConfig.load_client_connect_options(
+          config_source: "[profile.default.ext.api_key_file]\npath = 5",
+          override_env_vars: {},
+          extensions: [ApiKeyFileExtension.new]
+        )
+      end
+      assert_equal 'client config extension "api_key_file": path must be a string, got Integer', err.message
+    end
   end
 
   private

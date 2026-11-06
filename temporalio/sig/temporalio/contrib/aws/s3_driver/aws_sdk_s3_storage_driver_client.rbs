@@ -1,0 +1,13 @@
+module Temporalio
+  module Contrib
+    module Aws
+      module S3Driver
+        class AwsSdkS3StorageDriverClient < S3StorageDriverClient
+          @client: ::Aws::S3::Client
+
+          def initialize: (::Aws::S3::Client client) -> void
+        end
+      end
+    end
+  end
+end

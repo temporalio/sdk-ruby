@@ -1,0 +1,8 @@
+module Temporalio
+  module Contrib
+    module Aws
+      module S3Driver
+      end
+    end
+  end
+end

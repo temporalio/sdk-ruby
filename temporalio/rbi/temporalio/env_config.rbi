@@ -65,13 +65,17 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
   sig { returns(T::Hash[String, String]) }
   def grpc_meta; end
 
+  sig { returns(T::Hash[String, T::Hash[String, Object]]) }
+  def ext; end
+
   sig do
     params(
       address: T.nilable(String),
       namespace: T.nilable(String),
       api_key: T.nilable(String),
       tls: T.nilable(Temporalio::EnvConfig::ClientConfigTLS),
-      grpc_meta: T::Hash[String, String]
+      grpc_meta: T::Hash[String, String],
+      ext: T::Hash[String, T::Hash[String, Object]]
     ).void
   end
   def initialize(
@@ -79,7 +83,8 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
     namespace: T.unsafe(nil),
     api_key: T.unsafe(nil),
     tls: T.unsafe(nil),
-    grpc_meta: T.unsafe(nil)
+    grpc_meta: T.unsafe(nil),
+    ext: T.unsafe(nil)
   ); end
 
   sig { params(hash: T::Hash[Symbol, Object]).returns(Temporalio::EnvConfig::ClientConfigProfile) }
@@ -111,6 +116,34 @@ class Temporalio::EnvConfig::ClientConfigProfile < ::Data
   def to_client_connect_options; end
 end
 
+module Temporalio::EnvConfig::ClientConfigExtension
+  sig { returns(String) }
+  def name; end
+
+  sig do
+    params(request: Temporalio::EnvConfig::ClientConfigExtensionRequest).returns(T.nilable(Temporalio::Client::Plugin))
+  end
+  def client_plugin(request); end
+end
+
+class Temporalio::EnvConfig::ClientConfigExtensionRequest < ::Data
+  extend T::Sig
+
+  sig { returns(Temporalio::EnvConfig::ClientConfigProfile) }
+  def profile; end
+
+  sig { returns(T.nilable(T::Hash[String, String])) }
+  def env; end
+
+  sig do
+    params(
+      profile: Temporalio::EnvConfig::ClientConfigProfile,
+      env: T.nilable(T::Hash[String, String])
+    ).void
+  end
+  def initialize(profile:, env:); end
+end
+
 class Temporalio::EnvConfig::ClientConfig < ::Data
   extend T::Sig
 
@@ -139,7 +172,8 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
       disable_file: T::Boolean,
       disable_env: T::Boolean,
       config_file_strict: T::Boolean,
-      override_env_vars: T.nilable(T::Hash[String, String])
+      override_env_vars: T.nilable(T::Hash[String, String]),
+      extensions: T::Array[Temporalio::EnvConfig::ClientConfigExtension]
     ).returns([T::Array[T.nilable(String)], T::Hash[Symbol, Object]])
   end
   def self.load_client_connect_options(
@@ -148,7 +182,8 @@ class Temporalio::EnvConfig::ClientConfig < ::Data
     disable_file: T.unsafe(nil),
     disable_env: T.unsafe(nil),
     config_file_strict: T.unsafe(nil),
-    override_env_vars: T.unsafe(nil)
+    override_env_vars: T.unsafe(nil),
+    extensions: T.unsafe(nil)
   ); end
 
   sig { override(allow_incompatible: true).returns(T::Hash[String, T::Hash[Symbol, Object]]) }

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pathname'
+require 'temporalio/error'
 require 'temporalio/internal/bridge'
 
 module Temporalio
@@ -136,7 +137,12 @@ module Temporalio
     #   @return [Boolean, ClientConfigTLS, nil] TLS configuration
     # @!attribute [r] grpc_meta
     #   @return [Hash] gRPC metadata
-    ClientConfigProfile = Data.define(:address, :namespace, :api_key, :tls, :grpc_meta)
+    # @!attribute [r] ext
+    #   @return [Hash<String, Hash<String, Object>>] Raw extension config from +profile.<profile>.ext+, keyed by
+    #     extension name. Each extension decodes its own table. TOML datetimes are ISO 8601 strings. Not modified by
+    #     environment variables. This should be treated as read-only, since copies of a
+    #     profile may share it. WARNING: Extensions are experimental.
+    ClientConfigProfile = Data.define(:address, :namespace, :api_key, :tls, :grpc_meta, :ext)
 
     # A client configuration profile loaded from environment and files.
     #
@@ -153,7 +159,8 @@ module Temporalio
           namespace: hash[:namespace],
           api_key: hash[:api_key],
           tls: ClientConfigTLS.from_h(hash[:tls]),
-          grpc_meta: hash[:grpc_meta] || {}
+          grpc_meta: hash[:grpc_meta] || {},
+          ext: hash[:ext] || {}
         )
       end
 
@@ -185,7 +192,7 @@ module Temporalio
       end
 
       # Create a ClientConfigProfile instance with defaults
-      def initialize(address: nil, namespace: nil, api_key: nil, tls: nil, grpc_meta: {})
+      def initialize(address: nil, namespace: nil, api_key: nil, tls: nil, grpc_meta: {}, ext: {})
         super
       end
 
@@ -197,7 +204,8 @@ module Temporalio
           namespace: namespace,
           api_key: api_key,
           tls: tls&.to_h&.then { |tls_hash| tls_hash.empty? ? nil : tls_hash },
-          grpc_meta: grpc_meta && grpc_meta.empty? ? nil : grpc_meta
+          grpc_meta: grpc_meta && grpc_meta.empty? ? nil : grpc_meta,
+          ext: ext && ext.empty? ? nil : ext
         }.compact
       end
 
@@ -221,6 +229,46 @@ module Temporalio
         [positional_args, keyword_args]
       end
     end
+
+    # Extension mixin to include for extending client configuration with extra TOML properties and environment
+    # variables, and applying them to the client created from the configuration.
+    #
+    # Each extension owns a TOML table under +profile.<profile>.ext.<name>+, e.g.:
+    #
+    #   [profile.default.ext.my_extension]
+    #   some_field = "value"
+    #
+    # Extensions are recommended to use a +TEMPORAL_EXT_<NAME>_+ prefix for any environment variables they read.
+    #
+    # WARNING: Extensions are experimental.
+    module ClientConfigExtension
+      # @abstract
+      # @return [String] The extension's table key under +profile.<profile>.ext+. Must be unique among loaded
+      #   extensions.
+      def name
+        raise NotImplementedError
+      end
+
+      # Read this extension's config from the profile and env, and return a plugin that applies it.
+      #
+      # @abstract
+      # @param request [ClientConfigExtensionRequest] Loaded profile and env.
+      # @return [Client::Plugin, nil] Plugin, or nil if there's nothing to apply.
+      def client_plugin(request)
+        raise NotImplementedError
+      end
+    end
+
+    # Input to {ClientConfigExtension#client_plugin}.
+    #
+    # WARNING: Extensions are experimental.
+    #
+    # @!attribute [r] profile
+    #   @return [ClientConfigProfile] Loaded profile, with environment variable overrides applied.
+    # @!attribute [r] env
+    #   @return [Hash<String, String>, nil] Environment variables to read extension env vars from, or nil if
+    #     environment variable loading is disabled.
+    ClientConfigExtensionRequest = Data.define(:profile, :env)
 
     # Client configuration loaded from TOML and environment variables.
     #
@@ -273,7 +321,7 @@ module Temporalio
       # Load a single client profile and convert to connect config
       #
       # This is a convenience function that combines loading a profile and
-      # converting it to a connect config hash.
+      # converting it to a connect config hash, plus applying extensions.
       #
       # @param profile [String, nil] The profile to load from the config
       # @param config_source [Pathname, String, nil] Configuration source
@@ -281,6 +329,8 @@ module Temporalio
       # @param disable_env [Boolean] If true, environment variable loading and overriding is disabled
       # @param config_file_strict [Boolean] If true, will error on unrecognized keys
       # @param override_env_vars [Hash, nil] Environment variables to use for loading and overrides
+      # @param extensions [Array<ClientConfigExtension>] Extensions to call, in order, with the loaded profile. Plugins
+      #   they return are included as +plugins+ in the keyword args. WARNING: Extensions are experimental.
       # @return [Array] Tuple of [positional_args, keyword_args] that can be splatted to Client.connect
       def self.load_client_connect_options(
         profile: nil,
@@ -288,8 +338,10 @@ module Temporalio
         disable_file: false,
         disable_env: false,
         config_file_strict: false,
-        override_env_vars: nil
+        override_env_vars: nil,
+        extensions: []
       )
+        _validate_extensions!(extensions)
         prof = ClientConfigProfile.load(
           profile: profile,
           config_source: config_source,
@@ -298,7 +350,36 @@ module Temporalio
           config_file_strict: config_file_strict,
           override_env_vars: override_env_vars
         )
-        prof.to_client_connect_options
+        positional_args, keyword_args = prof.to_client_connect_options
+        return [positional_args, keyword_args] if extensions.empty?
+
+        request = ClientConfigExtensionRequest.new(
+          profile: prof,
+          env: disable_env ? nil : override_env_vars || ENV.to_h
+        )
+        plugins = extensions.filter_map do |extension|
+          extension.client_plugin(request)
+        rescue StandardError => e
+          raise Error, "client config extension \"#{extension.name}\": #{e.message}"
+        end
+        keyword_args[:plugins] = plugins unless plugins.empty?
+        [positional_args, keyword_args]
+      end
+
+      # @!visibility private
+      def self._validate_extensions!(extensions)
+        names = {}
+        extensions.each_with_index do |extension, index|
+          unless extension.is_a?(ClientConfigExtension)
+            raise ArgumentError, "#{extension.class} does not implement EnvConfig::ClientConfigExtension"
+          end
+
+          name = extension.name
+          raise ArgumentError, "client config extension at index #{index} has empty name" if name.empty?
+          raise ArgumentError, "duplicate client config extension name \"#{name}\"" if names.key?(name)
+
+          names[name] = true
+        end
       end
 
       # Create a ClientConfig instance with defaults

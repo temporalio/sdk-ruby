@@ -123,6 +123,23 @@ class ClientWorkflowTest < Test
   end
 
   exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires custom search attributes that the Cloud harness does not provision.'
+  def test_search_attribute_time_sub_second
+    env.ensure_common_search_attribute_keys
+
+    time = Time.at(1_800_000_000, 123_456_789, :nanosecond, in: 'UTC')
+    handle = env.client.start_workflow(
+      'does-not-exist',
+      id: "wf-#{SecureRandom.uuid}",
+      task_queue: "tq-#{SecureRandom.uuid}",
+      search_attributes: Temporalio::SearchAttributes.new({ ATTR_KEY_TIME => time })
+    )
+    assert_equal time, handle.describe.search_attributes&.[](ATTR_KEY_TIME)
+  ensure
+    handle&.terminate
+  end
+
+  exclude_from_cloud :needs_cloud_adaptation,
                      'Requires custom search attributes and a Go worker with Cloud TLS configuration.'
   def test_describe
     # Make sure all keys on server

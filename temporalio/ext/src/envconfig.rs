@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
-use magnus::{Error, RHash, RString, Ruby, function, prelude::*, scan_args};
+use magnus::{Error, IntoValue, RHash, RString, Ruby, Value, function, prelude::*, scan_args};
 use temporalio_common::envconfig::{
     ClientConfig as CoreClientConfig, ClientConfigCodec,
     ClientConfigProfile as CoreClientConfigProfile, ClientConfigTLS as CoreClientConfigTLS,
     DataSource, LoadClientConfigOptions, LoadClientConfigProfileOptions,
     load_client_config as core_load_client_config,
-    load_client_config_profile as core_load_client_config_profile,
+    load_client_config_profile as core_load_client_config_profile, toml,
 };
 
 use crate::{ROOT_MOD, error};
@@ -105,8 +105,43 @@ fn profile_to_hash(ruby: &Ruby, profile: &CoreClientConfigProfile) -> Result<RHa
         }
         hash.aset(ruby.sym_new("grpc_meta"), grpc_meta_hash)?;
     }
+    if !profile.ext.is_empty() {
+        let ext_hash = ruby.hash_new();
+        for (name, table) in &profile.ext {
+            ext_hash.aset(ruby.str_new(name), toml_table_to_hash(ruby, table)?)?;
+        }
+        hash.aset(ruby.sym_new("ext"), ext_hash)?;
+    }
 
     Ok(hash)
+}
+
+fn toml_table_to_hash(ruby: &Ruby, table: &toml::Table) -> Result<RHash, Error> {
+    let hash = ruby.hash_new();
+    for (k, v) in table {
+        hash.aset(ruby.str_new(k), toml_value_to_ruby(ruby, v)?)?;
+    }
+    Ok(hash)
+}
+
+// Datetimes become ISO 8601 strings (e.g. `1979-05-27T07:32:00Z`, or `1979-05-27` for a local
+// date), since Ruby has no native types for TOML's local datetimes and local times.
+fn toml_value_to_ruby(ruby: &Ruby, value: &toml::Value) -> Result<Value, Error> {
+    Ok(match value {
+        toml::Value::String(s) => ruby.str_new(s).as_value(),
+        toml::Value::Integer(i) => i.into_value_with(ruby),
+        toml::Value::Float(f) => f.into_value_with(ruby),
+        toml::Value::Boolean(b) => b.into_value_with(ruby),
+        toml::Value::Datetime(dt) => ruby.str_new(&dt.to_string()).as_value(),
+        toml::Value::Array(a) => {
+            let ary = ruby.ary_new_capa(a.len());
+            for v in a {
+                ary.push(toml_value_to_ruby(ruby, v)?)?;
+            }
+            ary.as_value()
+        }
+        toml::Value::Table(t) => toml_table_to_hash(ruby, t)?.as_value(),
+    })
 }
 
 fn core_config_to_hash(ruby: &Ruby, core_config: &CoreClientConfig) -> Result<RHash, Error> {

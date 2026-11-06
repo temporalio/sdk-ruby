@@ -127,7 +127,9 @@ class Temporalio::Internal::Bridge::Api::ActivityTask::Start
       retry_policy: T.nilable(Temporalio::Api::Common::V1::RetryPolicy),
       priority: T.nilable(Temporalio::Api::Common::V1::Priority),
       is_local: T.nilable(T::Boolean),
-      run_id: T.nilable(String)
+      run_id: T.nilable(String),
+      propagated_nexus_serialization_context: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext),
+      workflow_task: T.nilable(Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt)
     ).void
   end
   def initialize(
@@ -149,7 +151,9 @@ class Temporalio::Internal::Bridge::Api::ActivityTask::Start
     retry_policy: nil,
     priority: nil,
     is_local: false,
-    run_id: ""
+    run_id: "",
+    propagated_nexus_serialization_context: nil,
+    workflow_task: nil
   )
   end
 
@@ -441,6 +445,45 @@ class Temporalio::Internal::Bridge::Api::ActivityTask::Start
   def clear_run_id
   end
 
+  # Serialization context of the Nexus operation handler that started this activity, if any.
+# Only set for standalone activities. Lang should use it to serialize the activity's result and
+# failure, which are returned to the Nexus caller.
+  sig { returns(T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)) }
+  def propagated_nexus_serialization_context
+  end
+
+  # Serialization context of the Nexus operation handler that started this activity, if any.
+# Only set for standalone activities. Lang should use it to serialize the activity's result and
+# failure, which are returned to the Nexus caller.
+  sig { params(value: T.nilable(Temporalio::Api::Nexus::V1::PropagatedSerializationContext)).void }
+  def propagated_nexus_serialization_context=(value)
+  end
+
+  # Serialization context of the Nexus operation handler that started this activity, if any.
+# Only set for standalone activities. Lang should use it to serialize the activity's result and
+# failure, which are returned to the Nexus caller.
+  sig { void }
+  def clear_propagated_nexus_serialization_context
+  end
+
+  # For a local activity, the workflow task in which Core dispatched this execution. Retries that
+# Core runs locally keep the value. Unset for other activities.
+  sig { returns(T.nilable(Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt)) }
+  def workflow_task
+  end
+
+  # For a local activity, the workflow task in which Core dispatched this execution. Retries that
+# Core runs locally keep the value. Unset for other activities.
+  sig { params(value: T.nilable(Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt)).void }
+  def workflow_task=(value)
+  end
+
+  # For a local activity, the workflow task in which Core dispatched this execution. Retries that
+# Core runs locally keep the value. Unset for other activities.
+  sig { void }
+  def clear_workflow_task
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -466,6 +509,174 @@ class Temporalio::Internal::Bridge::Api::ActivityTask::Start
   end
 
   sig { params(msg: Temporalio::Internal::Bridge::Api::ActivityTask::Start, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# One attempt of a workflow task, from the poll response and the history of that attempt.
+class Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      started_event_id: T.nilable(Integer),
+      attempt: T.nilable(Integer),
+      started_time: T.nilable(Google::Protobuf::Timestamp),
+      previous_started_event_id: T.nilable(Integer),
+      failed_tasks: T.nilable(T::Array[Integer]),
+      previous_attempt: T.nilable(Integer),
+      previous_started_time: T.nilable(Google::Protobuf::Timestamp)
+    ).void
+  end
+  def initialize(
+    started_event_id: 0,
+    attempt: 0,
+    started_time: nil,
+    previous_started_event_id: 0,
+    failed_tasks: [],
+    previous_attempt: 0,
+    previous_started_time: nil
+  )
+  end
+
+  # The event id of the task's WorkflowTaskStarted event.
+  sig { returns(Integer) }
+  def started_event_id
+  end
+
+  # The event id of the task's WorkflowTaskStarted event.
+  sig { params(value: Integer).void }
+  def started_event_id=(value)
+  end
+
+  # The event id of the task's WorkflowTaskStarted event.
+  sig { void }
+  def clear_started_event_id
+  end
+
+  sig { returns(Integer) }
+  def attempt
+  end
+
+  sig { params(value: Integer).void }
+  def attempt=(value)
+  end
+
+  sig { void }
+  def clear_attempt
+  end
+
+  # When the server started the task.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def started_time
+  end
+
+  # When the server started the task.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def started_time=(value)
+  end
+
+  # When the server started the task.
+  sig { void }
+  def clear_started_time
+  end
+
+  # The started event id of the run's last completed workflow task, from the poll response.
+# 0 when no task of the run has completed.
+  sig { returns(Integer) }
+  def previous_started_event_id
+  end
+
+  # The started event id of the run's last completed workflow task, from the poll response.
+# 0 when no task of the run has completed.
+  sig { params(value: Integer).void }
+  def previous_started_event_id=(value)
+  end
+
+  # The started event id of the run's last completed workflow task, from the poll response.
+# 0 when no task of the run has completed.
+  sig { void }
+  def clear_previous_started_event_id
+  end
+
+  # The started event ids of the run's last 100 failed and timed out workflow tasks in history,
+# in event order. The cap keeps each start small. A transient attempt has no such event.
+  sig { returns(T::Array[Integer]) }
+  def failed_tasks
+  end
+
+  # The started event ids of the run's last 100 failed and timed out workflow tasks in history,
+# in event order. The cap keeps each start small. A transient attempt has no such event.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def failed_tasks=(value)
+  end
+
+  # The started event ids of the run's last 100 failed and timed out workflow tasks in history,
+# in event order. The cap keeps each start small. A transient attempt has no such event.
+  sig { void }
+  def clear_failed_tasks
+  end
+
+  # The attempt and the started time of the task at previous_started_event_id, from its
+# WorkflowTaskScheduled and WorkflowTaskStarted events. Unset when no task has completed.
+  sig { returns(Integer) }
+  def previous_attempt
+  end
+
+  # The attempt and the started time of the task at previous_started_event_id, from its
+# WorkflowTaskScheduled and WorkflowTaskStarted events. Unset when no task has completed.
+  sig { params(value: Integer).void }
+  def previous_attempt=(value)
+  end
+
+  # The attempt and the started time of the task at previous_started_event_id, from its
+# WorkflowTaskScheduled and WorkflowTaskStarted events. Unset when no task has completed.
+  sig { void }
+  def clear_previous_attempt
+  end
+
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def previous_started_time
+  end
+
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def previous_started_time=(value)
+  end
+
+  sig { void }
+  def clear_previous_started_time
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Internal::Bridge::Api::ActivityTask::WorkflowTaskAttempt, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
