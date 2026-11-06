@@ -1,0 +1,7 @@
+class ExternalStorageRunnerTest < Test
+  def storage: (
+    Temporalio::Converters::StorageDriver driver,
+    ?payload_size_threshold: Integer
+  ) -> Temporalio::Converters::ExternalStorage
+  def payload: (String value) -> Temporalio::Api::Common::V1::Payload
+end

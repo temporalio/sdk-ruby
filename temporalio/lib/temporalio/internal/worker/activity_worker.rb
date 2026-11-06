@@ -5,6 +5,7 @@ require 'temporalio/activity/definition'
 require 'temporalio/cancellation'
 require 'temporalio/converters/raw_value'
 require 'temporalio/internal/bridge/api'
+require 'temporalio/internal/external_storage_runner'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/scoped_logger'
 require 'temporalio/worker/interceptor'
@@ -191,7 +192,9 @@ module Temporalio
             priority: Priority._from_proto(start.priority),
             raw_heartbeat_details: begin
               payloads = start.heartbeat_details.to_ary
-              codec = @worker.options.client.data_converter.payload_codec
+              data_converter = @worker.options.client.data_converter
+              payloads = ExternalStorageRunner.new(data_converter.external_storage).retrieve(payloads)
+              codec = data_converter.payload_codec
               payloads = codec.decode(payloads) if codec
               payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
             end,
@@ -214,7 +217,9 @@ module Temporalio
             # If the activity wants raw_args, we only decode we don't convert
             args: if defn.raw_args
                     payloads = start.input.to_ary
-                    codec = @worker.options.client.data_converter.payload_codec
+                    data_converter = @worker.options.client.data_converter
+                    payloads = ExternalStorageRunner.new(data_converter.external_storage).retrieve(payloads)
+                    codec = data_converter.payload_codec
                     payloads = codec.decode(payloads) if codec
                     payloads.map { |p| Temporalio::Converters::RawValue.new(p) }
                   else

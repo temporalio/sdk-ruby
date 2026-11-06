@@ -1,0 +1,49 @@
+class WorkerExternalStorageTest < Test
+  class StorageActivity < Temporalio::Activity::Definition
+    def execute: (untyped input) -> untyped
+  end
+
+  class StorageWorkflow < Temporalio::Workflow::Definition
+    @signal_input: untyped
+
+    def self.finish: () -> Temporalio::Workflow::Definition::Signal
+    def self.echo_query: () -> Temporalio::Workflow::Definition::Query
+    def self.echo_update: () -> Temporalio::Workflow::Definition::Update
+
+    def execute: (untyped input) -> untyped
+    def finish: (untyped input) -> void
+    def echo_query: (untyped input) -> untyped
+    def echo_update: (untyped input) -> untyped
+  end
+
+  class HeartbeatRetryActivity < Temporalio::Activity::Definition
+    def execute: (*untyped raw_args) -> untyped
+  end
+
+  class HeartbeatRetryWorkflow < Temporalio::Workflow::Definition
+    def execute: (untyped input) -> untyped
+  end
+
+  class EchoWorkflow < Temporalio::Workflow::Definition
+    def execute: (String input) -> String
+  end
+
+  class AsyncCompletionActivity < Temporalio::Activity::Definition
+    @task_token: Queue
+
+    def execute: () -> untyped
+    def wait_task_token: () -> String
+  end
+
+  class AsyncCompletionWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  def assert_storage_failure_retried: (Temporalio::Converters::StorageDriver driver, String failure_message) -> void
+  def client_with_storage: (
+    Temporalio::Converters::StorageDriver driver,
+    ?payload_codec: Temporalio::Converters::PayloadCodec?
+  ) -> Temporalio::Client
+  def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
+  def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
+end
