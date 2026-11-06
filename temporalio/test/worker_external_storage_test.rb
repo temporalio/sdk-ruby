@@ -2,6 +2,7 @@
 
 require 'base64_codec'
 require 'in_memory_storage_driver'
+require 'securerandom'
 require 'temporalio/client'
 require 'temporalio/converters/external_storage'
 require 'temporalio/error'
@@ -147,7 +148,143 @@ class WorkerExternalStorageTest < Test
     )
   end
 
+  # Fails once: either the first retrieve, or the first store of a payload containing the given text
+  class FailOnceStorageDriver < InMemoryStorageDriver
+    def initialize(fail_retrieve: false, fail_store_containing: nil)
+      super()
+      @fail_retrieve = fail_retrieve
+      @fail_store_containing = fail_store_containing
+    end
+
+    def store(context, payloads)
+      text = @fail_store_containing
+      if text && payloads.any? { |payload| payload.data.include?(text) }
+        @fail_store_containing = nil
+        raise 'Intentional store failure'
+      end
+      super
+    end
+
+    def retrieve(context, claims)
+      if @fail_retrieve
+        @fail_retrieve = false
+        raise 'Intentional retrieve failure'
+      end
+      super
+    end
+  end
+
+  class EchoWorkflow < Temporalio::Workflow::Definition
+    def execute(input)
+      "#{input} done"
+    end
+  end
+
+  def test_worker_retrieve_failure_fails_the_task_and_is_retried
+    assert_storage_failure_retried(FailOnceStorageDriver.new(fail_retrieve: true), 'Intentional retrieve failure')
+  end
+
+  def test_worker_store_failure_fails_the_task_and_is_retried
+    assert_storage_failure_retried(
+      FailOnceStorageDriver.new(fail_store_containing: 'done'), 'Intentional store failure'
+    )
+  end
+
+  def test_worker_without_storage_fails_the_task_on_a_reference
+    execute_workflow(
+      EchoWorkflow, 'start-input',
+      start_workflow_client: client_with_storage(InMemoryStorageDriver.new)
+    ) do |handle|
+      assert_eventually do
+        failure = handle.fetch_history_events.filter_map(&:workflow_task_failed_event_attributes).first
+        refute_nil failure
+        assert_includes failure.failure.message, 'TMPRL1105'
+      end
+    end
+  end
+
+  class AsyncCompletionActivity < Temporalio::Activity::Definition
+    def initialize
+      @task_token = Queue.new
+    end
+
+    def execute
+      @task_token.push(Temporalio::Activity::Context.current.info.task_token)
+      raise Temporalio::Activity::CompleteAsyncError
+    end
+
+    def wait_task_token
+      @task_token.pop
+    end
+  end
+
+  class AsyncCompletionWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(AsyncCompletionActivity, start_to_close_timeout: 10)
+    end
+  end
+
+  def test_async_activity_completion_is_stored
+    client = client_with_storage(InMemoryStorageDriver.new)
+    activity = AsyncCompletionActivity.new
+    execute_workflow(
+      AsyncCompletionWorkflow,
+      activities: [activity],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      client.async_activity_handle(activity.wait_task_token).complete('async-result')
+
+      assert_equal 'async-result', handle.result
+      assert_reference first_attrs(handle.fetch_history_events, :activity_task_completed_event_attributes)
+        .result.payloads.first
+    end
+  end
+
+  def test_schedule_arguments_are_stored
+    client = client_with_storage(InMemoryStorageDriver.new)
+    handle = client.create_schedule(
+      "sched-#{SecureRandom.uuid}",
+      Temporalio::Client::Schedule.new(
+        action: Temporalio::Client::Schedule::Action::StartWorkflow.new(
+          EchoWorkflow, 'schedule-input', id: "wf-#{SecureRandom.uuid}", task_queue: "tq-#{SecureRandom.uuid}"
+        ),
+        spec: Temporalio::Client::Schedule::Spec.new,
+        state: Temporalio::Client::Schedule::State.new(paused: true)
+      )
+    )
+    begin
+      description = handle.describe
+      action = description.schedule.action #: Temporalio::Client::Schedule::Action::StartWorkflow
+      assert_equal ['schedule-input'], action.args
+      assert_reference description.raw_description.schedule.action.start_workflow.input.payloads.first
+    ensure
+      handle.delete
+    end
+  end
+
+  def test_driver_store_failure_surfaces_to_the_client
+    client = client_with_storage(FailOnceStorageDriver.new(fail_store_containing: 'start-input'))
+
+    error = assert_raises(RuntimeError) do
+      client.start_workflow(EchoWorkflow, 'start-input', id: "wf-#{SecureRandom.uuid}", task_queue: 'unused')
+    end
+    assert_equal 'Intentional store failure', error.message
+  end
+
   private
+
+  def assert_storage_failure_retried(driver, failure_message)
+    execute_workflow(
+      EchoWorkflow, 'start-input',
+      client: client_with_storage(driver),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'start-input done', handle.result
+      failure = first_attrs(handle.fetch_history_events, :workflow_task_failed_event_attributes).failure
+      assert_equal failure_message, failure.message
+    end
+  end
 
   def client_with_storage(driver, payload_codec: nil)
     data_converter = Temporalio::Converters::DataConverter.new(

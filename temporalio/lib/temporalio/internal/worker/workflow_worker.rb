@@ -186,13 +186,30 @@ module Temporalio
 
         private
 
+        # Decoding and encoding run in a thread pool that only warns about errors, so a failure must complete the
+        # activation as failed. Otherwise the run waits forever for a completion that never comes.
+
         def decode_activation(runner, activation)
           @payload_decoding_visitor.run(activation)
           runner.apply_workflow_activation_decoded(workflow_worker: self, activation:)
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          fail_activation(runner, activation.run_id, e)
         end
 
         def encode_activation_completion(runner, activation_completion)
           @payload_encoding_visitor.run(activation_completion)
+          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
+        rescue Exception => e # rubocop:disable Lint/RescueException
+          fail_activation(runner, activation_completion.run_id, e)
+        end
+
+        def fail_activation(runner, run_id, error)
+          activation_completion = WorkflowInstance.new_completion_with_failure(
+            run_id:,
+            error:,
+            failure_converter: @state.data_converter.failure_converter,
+            payload_converter: @state.data_converter.payload_converter
+          )
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
         end
 

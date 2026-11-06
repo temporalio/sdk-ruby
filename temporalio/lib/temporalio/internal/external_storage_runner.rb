@@ -37,11 +37,11 @@ module Temporalio
 
         select_context = Converters::StorageDriverSelectContext.new(target: nil, cancellation: Cancellation.new)
 
-        # Driver => [[index, size], ...] for each payload that driver stores
+        # Driver => [[index, serialized payload], ...] for each payload that driver stores
         payloads_by_driver = Hash.new { |hash, driver| hash[driver] = [] }
         payloads.each_with_index do |payload, index|
-          size = payload.to_proto.bytesize
-          next if size < storage.payload_size_threshold
+          serialized = payload.to_proto
+          next if serialized.bytesize < storage.payload_size_threshold
 
           driver = storage.driver_selector.call(select_context, payload)
           next unless driver
@@ -51,20 +51,23 @@ module Temporalio
             raise Error, "External storage driver selector returned a driver that is not registered: #{driver.inspect}"
           end
 
-          payloads_by_driver[driver] << [index, size]
+          payloads_by_driver[driver] << [index, serialized]
         end
 
         result = payloads.dup
-        payloads_by_driver.each do |driver, indexes_and_sizes|
+        payloads_by_driver.each do |driver, indexes_and_serialized|
           context = Converters::StorageDriverStoreContext.new(
             target: nil, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
           )
-          claims = driver.store(context, indexes_and_sizes.map { |index, _size| payloads[index] })
-          check_result_count(driver, 'store', indexes_and_sizes.size, claims)
+          # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
+          # place
+          copies = indexes_and_serialized.map { |_index, serialized| Api::Common::V1::Payload.decode(serialized) }
+          claims = driver.store(context, copies)
+          check_result_count(driver, 'store', indexes_and_serialized.size, claims)
 
-          indexes_and_sizes.zip(claims) do |(index, size), claim|
+          indexes_and_serialized.zip(claims) do |(index, serialized), claim|
             result[index] = ExternalStorageReferences.create_reference_payload(
-              driver_name: driver.name, claim_data: claim.claim_data, original_size_bytes: size
+              driver_name: driver.name, claim_data: claim.claim_data, original_size_bytes: serialized.bytesize
             )
           end
         end
