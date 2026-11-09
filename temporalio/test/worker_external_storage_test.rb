@@ -186,7 +186,7 @@ class WorkerExternalStorageTest < Test
 
   def test_worker_store_failure_fails_the_task_and_is_retried
     assert_storage_failure_retried(
-      FailOnceStorageDriver.new(fail_store_containing: 'done'), 'Intentional store failure'
+      FailOnceStorageDriver.new(fail_store_containing: 'done'), 'Failed encoding completion: Intentional store failure'
     )
   end
 

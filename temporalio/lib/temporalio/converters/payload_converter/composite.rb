@@ -4,7 +4,6 @@ require 'temporalio/api'
 require 'temporalio/converters/payload_converter'
 require 'temporalio/converters/raw_value'
 require 'temporalio/error'
-require 'temporalio/internal/external_storage_references'
 
 module Temporalio
   module Converters
@@ -57,9 +56,6 @@ module Temporalio
         # @raise [ConverterNotFound] If no converter found for the encoding.
         def from_payload(payload, hint: nil)
           return nil unless payload
-          # A reference that reaches conversion was never retrieved, and would otherwise be converted into the reference
-          # message itself
-          raise Error::ExternalStorageNotConfiguredError if Internal::ExternalStorageReferences.reference?(payload)
 
           encoding = payload.metadata['encoding']
           raise EncodingNotSet, 'Missing payload encoding' unless encoding

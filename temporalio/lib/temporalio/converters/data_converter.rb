@@ -37,7 +37,6 @@ module Temporalio
       # @param payload_converter [PayloadConverter] Payload converter to use.
       # @param failure_converter [FailureConverter] Failure converter to use.
       # @param payload_codec [PayloadCodec, nil] Payload codec to use.
-      # @param external_storage [ExternalStorage, nil] External storage to use. WARNING: This is experimental.
       def initialize(
         payload_converter: PayloadConverter.default,
         failure_converter: FailureConverter.default,

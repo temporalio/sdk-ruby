@@ -2,6 +2,7 @@
 
 require 'temporalio/api/payload_visitor'
 require 'temporalio/error'
+require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/external_storage_runner'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/scoped_logger'
@@ -90,22 +91,32 @@ module Temporalio
           end
 
           # If there is a payload codec or external storage, we need to build encoding and decoding visitors. Storage
-          # comes after the codec when encoding and before it when decoding.
-          if payload_codec || external_storage
-            storage_runner = ExternalStorageRunner.new(external_storage) if external_storage
+          # comes after the codec when encoding and before it when decoding. These may block, so they run in the
+          # background.
+          storage_runner = ExternalStorageRunner.new(external_storage)
+          @decode_in_background = !payload_codec.nil? || !external_storage.nil?
+          if @decode_in_background
             @payload_encoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
               replace_payloads_on_visit(payload_or_payloads) do |payloads|
                 payloads = payload_codec.encode(payloads) if payload_codec
-                payloads = storage_runner.store(payloads.to_a) if storage_runner
+                payloads = storage_runner.store(payloads.to_a) if external_storage
                 payloads
               end
             end
             @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
               replace_payloads_on_visit(payload_or_payloads) do |payloads|
-                payloads = storage_runner.retrieve(payloads.to_a) if storage_runner
+                payloads = storage_runner.retrieve(payloads.to_a)
                 payloads = payload_codec.decode(payloads) if payload_codec
                 payloads
               end
+            end
+          else
+            # Without a codec or storage, decoding only rejects references that were never retrieved. That needs no
+            # I/O, so it runs inline and existing workers need no thread pool.
+            @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
+              storage_runner.retrieve(
+                payload_or_payloads.is_a?(Api::Common::V1::Payload) ? [payload_or_payloads] : payload_or_payloads.to_a
+              )
             end
           end
 
@@ -142,8 +153,10 @@ module Temporalio
         end
 
         def handle_activation(runner:, activation:, decoded:)
-          # Encode in background if not encoded but it needs to be
-          if @payload_encoding_visitor && !decoded
+          if !decoded && !@decode_in_background
+            decode_activation(runner, activation)
+          # Decode in background if not decoded but it needs to be
+          elsif !decoded
             if Fiber.current_scheduler
               Fiber.schedule { decode_activation(runner, activation) }
             else
@@ -193,22 +206,27 @@ module Temporalio
           @payload_decoding_visitor.run(activation)
           runner.apply_workflow_activation_decoded(workflow_worker: self, activation:)
         rescue Exception => e # rubocop:disable Lint/RescueException
-          fail_activation(runner, activation.run_id, e)
+          activation_completion = WorkflowInstance.new_completion_with_failure(
+            run_id: activation.run_id,
+            error: e,
+            failure_converter: @state.data_converter.failure_converter,
+            payload_converter: @state.data_converter.payload_converter
+          )
+          # Not yet encoded, so the failure goes through the codec and storage like any other completion
+          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: false)
         end
 
         def encode_activation_completion(runner, activation_completion)
           @payload_encoding_visitor.run(activation_completion)
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
         rescue Exception => e # rubocop:disable Lint/RescueException
-          fail_activation(runner, activation_completion.run_id, e)
-        end
-
-        def fail_activation(runner, run_id, error)
-          activation_completion = WorkflowInstance.new_completion_with_failure(
-            run_id:,
-            error:,
-            failure_converter: @state.data_converter.failure_converter,
-            payload_converter: @state.data_converter.payload_converter
+          # Only the message is sent, and it is marked encoded, because encoding a failure that carries payloads could
+          # fail the same way and retry forever
+          activation_completion = Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
+            run_id: activation_completion.run_id,
+            failed: Bridge::Api::WorkflowCompletion::Failure.new(
+              failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}")
+            )
           )
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
         end
