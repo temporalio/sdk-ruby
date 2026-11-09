@@ -228,7 +228,7 @@ module Temporalio
               failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}")
             )
           )
-          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
+          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: false)
         end
 
         def replace_payloads_on_visit(payload_or_payloads, &)
