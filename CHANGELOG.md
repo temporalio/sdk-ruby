@@ -1,5 +1,50 @@
 # Changelog
 
+## [1.11.0] - 2026-11-10
+
+### Added
+
+- Workers that don't configure poller behavior now auto-enroll in poller autoscaling when the server enables it (`frontend.pollerAutoscalingAutoEnroll`); otherwise they keep using a fixed 5-poller maximum.
+
+- Added experimental envconfig extensions. Pass `extensions:` to `Temporalio::EnvConfig::ClientConfig.load_client_connect_options` to let separately packaged extensions read their own config from `profile.<name>.ext` and environment variables and apply it through client plugins.
+
+- Added experimental Event Groups support: `Workflow.create_event_group`, `Workflow.with_event_groups`, and `event_groups:` on workflow command APIs. Signal and update handlers get implicit inbound groups.
+- `Workflow::Info#original_execution_run_id` is the run ID recorded on the workflow execution started event and is preserved across workflow resets.
+
+- Core: A local activity's `ActivityTask.Start` has `workflow_task` (field 21), with the started event id, attempt and start time of the workflow task in which Core dispatched it. `workflow_task` also has `previous_started_event_id`, `previous_attempt` and `previous_started_time`, which name the run's last completed workflow task, and `failed_tasks`, the started event ids of the run's last 100 failed or timed out workflow tasks. Retries that Core runs locally keep the value. Core leaves it unset for other activities.
+- Core: Client environment config profiles include the raw TOML tables under `profile.<name>.ext`, keyed by extension name, for SDK envconfig extensions. Strict mode accepts any content under `ext`. The C bridge's profile JSON includes them as an `ext` object, with TOML datetimes as strings.
+
+- Added `dev_server_startup_timeout` to `Temporalio::Testing::WorkflowEnvironment.start_local` and `test_server_startup_timeout` to `Temporalio::Testing::WorkflowEnvironment.start_time_skipping` to control server startup timeout.
+
+### Changed
+
+- Core: Poller pools now report their poller target to the server on each poll and in the worker heartbeat: the current target for autoscaling pools, the configured maximum for fixed-size pools. (We'll use this count on the server side for now for load balancing pollers between workers, and for creating a per-worker poller count metric.)
+
+### :boom: Breaking Changes
+
+- Core: Core now rejects activation responses with a nondeterminism error if the activation contained only updates and the response rejects every update but also includes another workflow command. SDKs must return only update rejections when all validators reject an update-only activation.
+
+### Fixed
+
+- Core: Ephemeral dev and test servers now complete the automatic port reservation handshake on Linux and macOS before starting, preventing intermittent address-in-use errors during TCP teardown.
+- Core: Resource-based worker tuners now read CPU usage and quotas from standard cgroup v1 mounts. Workers on cgroup v1 systems no longer fall back to host CPU usage and admit work based on understated container load.
+- Core: Preserve queued queries across workflow eviction so requests for the same run are answered instead of silently dropped.
+- Core: Rejection-only update tasks no longer dispatch local activities resumed from replay before validation, allowing those tasks to remain unrecorded in workflow history.
+- Core: Preparing a legacy query now remains in replay mode, preventing unrecorded local activity attempts that could execute twice or leave the workflow stuck.
+
+- Workflow wait conditions are no longer evaluated for queries, or in a workflow task that only delivers updates and rejects all of them.
+
+- Time search attribute values now keep sub-second precision, and setting one no longer raises `NoMethodError` when the application has not required `time`.
+
+- Dev and test server startup now stops waiting at the configured deadline even if a readiness request stalls. Timeout messages include the last connection failure when available.
+- Core: Workers with large workflow caches avoid unnecessary CPU usage when no workflow tasks are waiting for a cache slot.
+
+- Core: Downloading an ephemeral dev or test server binary now retries transient HTTP failures, such as a `503` returned while a release is rolling out, with backoff instead of failing on the first attempt.
+
+### Security
+
+- Upgrade Rustls to 0.23.46 to address security vulnerabilities in the native bridge's dependencies.
+
 ## [1.10.0] - 2026-10-19
 
 ### Added
