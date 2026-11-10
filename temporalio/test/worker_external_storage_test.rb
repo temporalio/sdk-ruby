@@ -272,6 +272,171 @@ class WorkerExternalStorageTest < Test
     assert_equal 'Intentional store failure', error.message
   end
 
+  class ChildWorkflow < Temporalio::Workflow::Definition
+    def execute(input)
+      "child got #{input}"
+    end
+  end
+
+  class ParentWorkflow < Temporalio::Workflow::Definition
+    def execute(input)
+      Temporalio::Workflow.execute_child_workflow(ChildWorkflow, input)
+    end
+  end
+
+  def test_child_workflow_input_and_result_are_stored
+    execute_workflow(
+      ParentWorkflow, 'child-input',
+      more_workflows: [ChildWorkflow],
+      client: client_with_storage(InMemoryStorageDriver.new),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'child got child-input', handle.result
+
+      events = handle.fetch_history_events
+      assert_reference first_attrs(events, :start_child_workflow_execution_initiated_event_attributes)
+        .input.payloads.first
+      assert_reference first_attrs(events, :child_workflow_execution_completed_event_attributes)
+        .result.payloads.first
+    end
+  end
+
+  class LocalActivityWorkflow < Temporalio::Workflow::Definition
+    def execute(input)
+      Temporalio::Workflow.execute_local_activity(StorageActivity, input, start_to_close_timeout: 10)
+    end
+  end
+
+  def test_local_activity_result_is_stored
+    execute_workflow(
+      LocalActivityWorkflow, 'local-input',
+      activities: [StorageActivity],
+      client: client_with_storage(InMemoryStorageDriver.new),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'activity got local-input', handle.result
+
+      # Core records a local activity's result in the marker's details
+      marker = first_attrs(handle.fetch_history_events, :marker_recorded_event_attributes)
+      assert_reference marker.details['result'].payloads.first
+    end
+  end
+
+  class FailingActivity < Temporalio::Activity::Definition
+    def execute
+      raise Temporalio::Error::ApplicationError.new('Activity failed', 'activity-detail', non_retryable: true)
+    end
+  end
+
+  class ActivityFailureWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(FailingActivity, start_to_close_timeout: 10)
+    rescue Temporalio::Error::ActivityError => e
+      cause = e.cause #: Temporalio::Error::ApplicationError
+      cause.details.first
+    end
+  end
+
+  def test_activity_failure_details_are_stored
+    execute_workflow(
+      ActivityFailureWorkflow,
+      activities: [FailingActivity],
+      client: client_with_storage(InMemoryStorageDriver.new),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'activity-detail', handle.result
+
+      failure = first_attrs(handle.fetch_history_events, :activity_task_failed_event_attributes).failure
+      assert_equal 'Activity failed', failure.message
+      assert_reference failure.application_failure_info.details.payloads.first
+    end
+  end
+
+  class FailingWorkflow < Temporalio::Workflow::Definition
+    def execute
+      raise Temporalio::Error::ApplicationError.new('Workflow failed', 'workflow-detail')
+    end
+  end
+
+  def test_workflow_failure_details_are_stored
+    execute_workflow(
+      FailingWorkflow,
+      client: client_with_storage(InMemoryStorageDriver.new),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+      assert_equal ['workflow-detail'], error.cause.details
+
+      failure = first_attrs(handle.fetch_history_events, :workflow_execution_failed_event_attributes).failure
+      assert_reference failure.application_failure_info.details.payloads.first
+    end
+  end
+
+  class NexusWorkflow < Temporalio::Workflow::Definition
+    def execute(endpoint)
+      client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
+      client.start_operation('echo', 'nexus-input')
+      # The handler worker has no storage, so only the stored input is checked, not the operation's outcome
+      Temporalio::Workflow.wait_condition { false }
+    end
+  end
+
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'Requires Cloud Nexus endpoint setup and a Go worker with Cloud TLS configuration.'
+  def test_nexus_operation_input_is_stored
+    env.with_kitchen_sink_worker(nexus: true) do |task_queue|
+      execute_workflow(
+        NexusWorkflow, "nexus-endpoint-#{task_queue}",
+        client: client_with_storage(InMemoryStorageDriver.new),
+        workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+      ) do |handle|
+        scheduled = assert_eventually do
+          first_attrs(handle.fetch_history_events, :nexus_operation_scheduled_event_attributes)
+        end
+        assert_reference scheduled.input
+        handle.terminate
+      end
+    end
+  end
+
+  class HandlerWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.wait_condition { false }
+    end
+
+    workflow_signal
+    def notify(input); end
+
+    workflow_update
+    def change(input)
+      input
+    end
+  end
+
+  def test_worker_without_storage_fails_the_task_on_a_signal_reference
+    execute_workflow(HandlerWorkflow) do |handle|
+      client_with_storage(InMemoryStorageDriver.new).workflow_handle(handle.id)
+                                                    .signal(HandlerWorkflow.notify, 'signal-input')
+
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1105')
+    end
+  end
+
+  def test_worker_without_storage_fails_the_task_on_an_update_reference
+    execute_workflow(HandlerWorkflow) do |handle|
+      storage_handle = client_with_storage(InMemoryStorageDriver.new).workflow_handle(handle.id)
+      # The update is never accepted, so wait for it in the background until the workflow is terminated
+      run_in_background do
+        storage_handle.execute_update(HandlerWorkflow.change, 'update-input')
+      rescue Temporalio::Error
+        nil
+      end
+
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1105')
+      handle.terminate
+    end
+  end
+
   private
 
   def assert_storage_failure_retried(driver, failure_message)

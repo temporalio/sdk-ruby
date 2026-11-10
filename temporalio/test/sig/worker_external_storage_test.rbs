@@ -39,6 +39,43 @@ class WorkerExternalStorageTest < Test
     def execute: () -> untyped
   end
 
+  class ChildWorkflow < Temporalio::Workflow::Definition
+    def execute: (String input) -> String
+  end
+
+  class ParentWorkflow < Temporalio::Workflow::Definition
+    def execute: (String input) -> untyped
+  end
+
+  class LocalActivityWorkflow < Temporalio::Workflow::Definition
+    def execute: (String input) -> untyped
+  end
+
+  class FailingActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class ActivityFailureWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  class FailingWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  class NexusWorkflow < Temporalio::Workflow::Definition
+    def execute: (String endpoint) -> untyped
+  end
+
+  class HandlerWorkflow < Temporalio::Workflow::Definition
+    def self.notify: () -> Temporalio::Workflow::Definition::Signal
+    def self.change: () -> Temporalio::Workflow::Definition::Update
+
+    def execute: () -> untyped
+    def notify: (untyped input) -> void
+    def change: (untyped input) -> untyped
+  end
+
   def assert_storage_failure_retried: (Temporalio::Converters::StorageDriver driver, String failure_message) -> void
   def client_with_storage: (
     Temporalio::Converters::StorageDriver driver,

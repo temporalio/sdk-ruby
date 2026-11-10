@@ -35,6 +35,8 @@ module Temporalio
         storage = @storage
         return payloads unless storage
 
+        # TODO: Populate the target with the workflow or activity the payloads belong to, here and in the store context.
+        # That needs callers to pass it in, which happens once storage moves to per-request passes.
         select_context = Converters::StorageDriverSelectContext.new(target: nil, cancellation: Cancellation.new)
 
         # Driver => [[index, serialized payload], ...] for each payload that driver stores
