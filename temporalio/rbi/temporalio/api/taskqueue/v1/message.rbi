@@ -162,6 +162,73 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueMetadata
   end
 end
 
+# Worker-reported state about the poller pool issuing a poll, used by the server to spread
+# poller scaling suggestions across a fleet.
+class Temporalio::Api::TaskQueue::V1::PollerPoolInfo
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      target_pollers: T.nilable(Integer)
+    ).void
+  end
+  def initialize(
+    target_pollers: 0
+  )
+  end
+
+  # Number of concurrent poll requests this worker is currently targeting for this task
+# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  sig { returns(Integer) }
+  def target_pollers
+  end
+
+  # Number of concurrent poll requests this worker is currently targeting for this task
+# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  sig { params(value: Integer).void }
+  def target_pollers=(value)
+  end
+
+  # Number of concurrent poll requests this worker is currently targeting for this task
+# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  sig { void }
+  def clear_target_pollers
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::TaskQueue::V1::PollerPoolInfo) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::PollerPoolInfo).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::TaskQueue::V1::PollerPoolInfo) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::PollerPoolInfo, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::TaskQueue::V1::TaskQueueVersioningInfo
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods

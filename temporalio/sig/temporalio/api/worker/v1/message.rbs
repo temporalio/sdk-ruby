@@ -25,6 +25,12 @@ module Temporalio
           attr_accessor is_autoscaling(): bool
           def clear_is_autoscaling: () -> void
 
+          # Number of concurrent poll requests this poller pool is currently targeting, which may
+          # differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+          attr_reader target_pollers(): ::Integer
+          attr_writer target_pollers(): ::Integer | ::Float
+          def clear_target_pollers: () -> void
+
           type init_map = {
             current_pollers: (::Integer | ::Float)?,
             "current_pollers" => (::Integer | ::Float)?,
@@ -32,6 +38,8 @@ module Temporalio
             "last_successful_poll_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
             is_autoscaling: bool?,
             "is_autoscaling" => bool?,
+            target_pollers: (::Integer | ::Float)?,
+            "target_pollers" => (::Integer | ::Float)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -40,11 +48,13 @@ module Temporalio
               ("current_pollers" name) -> ::Integer
             | ("last_successful_poll_time" name) -> ::Google::Protobuf::Timestamp?
             | ("is_autoscaling" name) -> bool
+            | ("target_pollers" name) -> ::Integer
 
           def []=:
               ("current_pollers" name, (::Integer | ::Float) value) -> void
             | ("last_successful_poll_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
             | ("is_autoscaling" name, bool value) -> void
+            | ("target_pollers" name, (::Integer | ::Float) value) -> void
         end
 
         class WorkerSlotsInfo < ::Google::Protobuf::AbstractMessage

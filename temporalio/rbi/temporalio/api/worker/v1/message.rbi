@@ -10,13 +10,15 @@ class Temporalio::Api::Worker::V1::WorkerPollerInfo
     params(
       current_pollers: T.nilable(Integer),
       last_successful_poll_time: T.nilable(Google::Protobuf::Timestamp),
-      is_autoscaling: T.nilable(T::Boolean)
+      is_autoscaling: T.nilable(T::Boolean),
+      target_pollers: T.nilable(Integer)
     ).void
   end
   def initialize(
     current_pollers: 0,
     last_successful_poll_time: nil,
-    is_autoscaling: false
+    is_autoscaling: false,
+    target_pollers: 0
   )
   end
 
@@ -60,6 +62,24 @@ class Temporalio::Api::Worker::V1::WorkerPollerInfo
   # Set true if the number of concurrent pollers is auto-scaled
   sig { void }
   def clear_is_autoscaling
+  end
+
+  # Number of concurrent poll requests this poller pool is currently targeting, which may
+# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  sig { returns(Integer) }
+  def target_pollers
+  end
+
+  # Number of concurrent poll requests this poller pool is currently targeting, which may
+# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  sig { params(value: Integer).void }
+  def target_pollers=(value)
+  end
+
+  # Number of concurrent poll requests this poller pool is currently targeting, which may
+# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  sig { void }
+  def clear_target_pollers
   end
 
   sig { params(field: String).returns(T.untyped) }
