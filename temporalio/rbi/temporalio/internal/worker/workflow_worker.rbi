@@ -93,7 +93,7 @@ class Temporalio::Internal::Worker::WorkflowWorker
   def encode_activation_completion(runner, activation_completion); end
 
   sig { params(payload_or_payloads: Object, block: T.proc.params(arg0: Object).returns(Object)).void }
-  def apply_codec_on_payload_visit(payload_or_payloads, &block); end
+  def replace_payloads_on_visit(payload_or_payloads, &block); end
 end
 
 class Temporalio::Internal::Worker::WorkflowWorker::State
