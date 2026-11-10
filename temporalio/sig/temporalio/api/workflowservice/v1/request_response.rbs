@@ -1108,6 +1108,12 @@ module Temporalio
           def has_deployment_options?: () -> bool
           def clear_deployment_options: () -> void
 
+          # Worker-reported poller pool state, used to spread poller scaling suggestions across
+          # a fleet. Optional.
+          attr_accessor poller_pool_info(): ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
+          def has_poller_pool_info?: () -> bool
+          def clear_poller_pool_info: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -1127,6 +1133,8 @@ module Temporalio
             "worker_version_capabilities" => (::Temporalio::Api::Common::V1::WorkerVersionCapabilities | ::Temporalio::Api::Common::V1::WorkerVersionCapabilities::init_map)?,
             deployment_options: (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             "deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
+            poller_pool_info: (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
+            "poller_pool_info" => (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1141,6 +1149,7 @@ module Temporalio
             | ("binary_checksum" name) -> ::String
             | ("worker_version_capabilities" name) -> ::Temporalio::Api::Common::V1::WorkerVersionCapabilities?
             | ("deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
+            | ("poller_pool_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -1152,6 +1161,7 @@ module Temporalio
             | ("binary_checksum" name, (::String | ::Symbol) value) -> void
             | ("worker_version_capabilities" name, ::Temporalio::Api::Common::V1::WorkerVersionCapabilities? value) -> void
             | ("deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
+            | ("poller_pool_info" name, ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo? value) -> void
         end
 
         class PollWorkflowTaskQueueResponse < ::Google::Protobuf::AbstractMessage
@@ -1835,6 +1845,12 @@ module Temporalio
           def has_deployment_options?: () -> bool
           def clear_deployment_options: () -> void
 
+          # Worker-reported poller pool state, used to spread poller scaling suggestions across
+          # a fleet. Optional.
+          attr_accessor poller_pool_info(): ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
+          def has_poller_pool_info?: () -> bool
+          def clear_poller_pool_info: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -1854,6 +1870,8 @@ module Temporalio
             "worker_version_capabilities" => (::Temporalio::Api::Common::V1::WorkerVersionCapabilities | ::Temporalio::Api::Common::V1::WorkerVersionCapabilities::init_map)?,
             deployment_options: (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             "deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
+            poller_pool_info: (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
+            "poller_pool_info" => (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1868,6 +1886,7 @@ module Temporalio
             | ("task_queue_metadata" name) -> ::Temporalio::Api::TaskQueue::V1::TaskQueueMetadata?
             | ("worker_version_capabilities" name) -> ::Temporalio::Api::Common::V1::WorkerVersionCapabilities?
             | ("deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
+            | ("poller_pool_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -1879,6 +1898,7 @@ module Temporalio
             | ("task_queue_metadata" name, ::Temporalio::Api::TaskQueue::V1::TaskQueueMetadata? value) -> void
             | ("worker_version_capabilities" name, ::Temporalio::Api::Common::V1::WorkerVersionCapabilities? value) -> void
             | ("deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
+            | ("poller_pool_info" name, ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo? value) -> void
         end
 
         class PollActivityTaskQueueResponse < ::Google::Protobuf::AbstractMessage
@@ -7347,6 +7367,11 @@ module Temporalio
           attr_accessor worker_heartbeat(): ::Google::Protobuf::RepeatedField
           def clear_worker_heartbeat: () -> void
 
+          # Worker-reported poller pool state. Optional.
+          attr_accessor poller_pool_info(): ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
+          def has_poller_pool_info?: () -> bool
+          def clear_poller_pool_info: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -7364,6 +7389,8 @@ module Temporalio
             "deployment_options" => (::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions | ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions::init_map)?,
             worker_heartbeat: ::Array[::Temporalio::Api::Worker::V1::WorkerHeartbeat]?,
             "worker_heartbeat" => ::Array[::Temporalio::Api::Worker::V1::WorkerHeartbeat]?,
+            poller_pool_info: (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
+            "poller_pool_info" => (::Temporalio::Api::TaskQueue::V1::PollerPoolInfo | ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -7377,6 +7404,7 @@ module Temporalio
             | ("worker_version_capabilities" name) -> ::Temporalio::Api::Common::V1::WorkerVersionCapabilities?
             | ("deployment_options" name) -> ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions?
             | ("worker_heartbeat" name) -> ::Google::Protobuf::RepeatedField
+            | ("poller_pool_info" name) -> ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -7387,6 +7415,7 @@ module Temporalio
             | ("worker_version_capabilities" name, ::Temporalio::Api::Common::V1::WorkerVersionCapabilities? value) -> void
             | ("deployment_options" name, ::Temporalio::Api::Deployment::V1::WorkerDeploymentOptions? value) -> void
             | ("worker_heartbeat" name, ::Google::Protobuf::RepeatedField value) -> void
+            | ("poller_pool_info" name, ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo? value) -> void
         end
 
         class PollNexusTaskQueueResponse < ::Google::Protobuf::AbstractMessage
