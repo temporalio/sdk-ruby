@@ -153,16 +153,6 @@ class Test < Minitest::Test
     end
   end
 
-  def self.build_cloud_test_exclusion(reason, note)
-    unless CLOUD_TEST_EXCLUSION_REASONS.key?(reason)
-      raise ArgumentError, "Unknown Cloud test exclusion reason: #{reason.inspect}"
-    end
-    raise ArgumentError, 'Cloud test exclusion note cannot be blank' unless note.is_a?(String) && !note.strip.empty?
-
-    CloudTestExclusion.new(reason, note.dup.freeze)
-  end
-  private_class_method :build_cloud_test_exclusion
-
   def skip_if_fibers_not_supported!
     return if Temporalio::Internal::Bridge.fibers_supported
 
@@ -227,6 +217,16 @@ class Test < Minitest::Test
     err.encode!('UTF-8', invalid: :replace)
     [out, err]
   end
+
+  def self.build_cloud_test_exclusion(reason, note)
+    unless CLOUD_TEST_EXCLUSION_REASONS.key?(reason)
+      raise ArgumentError, "Unknown Cloud test exclusion reason: #{reason.inspect}"
+    end
+    raise ArgumentError, 'Cloud test exclusion note cannot be blank' unless note.is_a?(String) && !note.strip.empty?
+
+    CloudTestExclusion.new(reason, note.dup.freeze)
+  end
+  private_class_method :build_cloud_test_exclusion
 
   class TestEnvironment
     include Singleton

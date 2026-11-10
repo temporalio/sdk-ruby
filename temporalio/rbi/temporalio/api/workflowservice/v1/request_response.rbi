@@ -2361,7 +2361,8 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
       worker_control_task_queue: T.nilable(String),
       binary_checksum: T.nilable(String),
       worker_version_capabilities: T.nilable(Temporalio::Api::Common::V1::WorkerVersionCapabilities),
-      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions)
+      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
+      poller_pool_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)
     ).void
   end
   def initialize(
@@ -2373,7 +2374,8 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
     worker_control_task_queue: "",
     binary_checksum: "",
     worker_version_capabilities: nil,
-    deployment_options: nil
+    deployment_options: nil,
+    poller_pool_info: nil
   )
   end
 
@@ -2531,6 +2533,24 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
   # Worker deployment options that user has set in the worker.
   sig { void }
   def clear_deployment_options
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)) }
+  def poller_pool_info
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)).void }
+  def poller_pool_info=(value)
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { void }
+  def clear_poller_pool_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -3912,7 +3932,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
       worker_control_task_queue: T.nilable(String),
       task_queue_metadata: T.nilable(Temporalio::Api::TaskQueue::V1::TaskQueueMetadata),
       worker_version_capabilities: T.nilable(Temporalio::Api::Common::V1::WorkerVersionCapabilities),
-      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions)
+      deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
+      poller_pool_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)
     ).void
   end
   def initialize(
@@ -3924,7 +3945,8 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
     worker_control_task_queue: "",
     task_queue_metadata: nil,
     worker_version_capabilities: nil,
-    deployment_options: nil
+    deployment_options: nil,
+    poller_pool_info: nil
   )
   end
 
@@ -4073,6 +4095,24 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
   # Worker deployment options that user has set in the worker.
   sig { void }
   def clear_deployment_options
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)) }
+  def poller_pool_info
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)).void }
+  def poller_pool_info=(value)
+  end
+
+  # Worker-reported poller pool state, used to spread poller scaling suggestions across
+# a fleet. Optional.
+  sig { void }
+  def clear_poller_pool_info
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -15835,7 +15875,8 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
       worker_instance_key: T.nilable(String),
       worker_version_capabilities: T.nilable(Temporalio::Api::Common::V1::WorkerVersionCapabilities),
       deployment_options: T.nilable(Temporalio::Api::Deployment::V1::WorkerDeploymentOptions),
-      worker_heartbeat: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::WorkerHeartbeat)])
+      worker_heartbeat: T.nilable(T::Array[T.nilable(Temporalio::Api::Worker::V1::WorkerHeartbeat)]),
+      poller_pool_info: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)
     ).void
   end
   def initialize(
@@ -15846,7 +15887,8 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
     worker_instance_key: "",
     worker_version_capabilities: nil,
     deployment_options: nil,
-    worker_heartbeat: []
+    worker_heartbeat: [],
+    poller_pool_info: nil
   )
   end
 
@@ -15980,6 +16022,21 @@ class Temporalio::Api::WorkflowService::V1::PollNexusTaskQueueRequest
   # Worker info to be sent to the server.
   sig { void }
   def clear_worker_heartbeat
+  end
+
+  # Worker-reported poller pool state. Optional.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)) }
+  def poller_pool_info
+  end
+
+  # Worker-reported poller pool state. Optional.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)).void }
+  def poller_pool_info=(value)
+  end
+
+  # Worker-reported poller pool state. Optional.
+  sig { void }
+  def clear_poller_pool_info
   end
 
   sig { params(field: String).returns(T.untyped) }
