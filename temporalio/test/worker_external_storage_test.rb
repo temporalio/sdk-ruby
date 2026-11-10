@@ -375,9 +375,7 @@ class WorkerExternalStorageTest < Test
   class NexusWorkflow < Temporalio::Workflow::Definition
     def execute(endpoint)
       client = Temporalio::Workflow.create_nexus_client(endpoint:, service: 'test-service')
-      client.start_operation('echo', 'nexus-input')
-      # The handler worker has no storage, so only the stored input is checked, not the operation's outcome
-      Temporalio::Workflow.wait_condition { false }
+      client.execute_operation('echo', 'nexus-input')
     end
   end
 
@@ -390,11 +388,12 @@ class WorkerExternalStorageTest < Test
         client: client_with_storage(InMemoryStorageDriver.new),
         workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
       ) do |handle|
-        scheduled = assert_eventually do
-          first_attrs(handle.fetch_history_events, :nexus_operation_scheduled_event_attributes)
-        end
+        # The Go handler worker has no storage, so it rejects the reference it receives and the operation fails
+        error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+        assert_instance_of Temporalio::Error::NexusOperationError, error.cause
+
+        scheduled = first_attrs(handle.fetch_history_events, :nexus_operation_scheduled_event_attributes)
         assert_reference scheduled.input
-        handle.terminate
       end
     end
   end
