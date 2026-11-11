@@ -26,6 +26,9 @@ jobs:
           cargo-cache: true
           working-directory: ./temporalio
 
+      - name: Setup development tools
+        uses: ./.github/actions/setup-tools
+
       - name: Install bundle
         run: bundle install
 

@@ -1,0 +1,6 @@
+min_version = "2026.6.14"
+
+[tools]
+go = "latest"
+protoc = "34.0"
+"go:github.com/coinbase/protoc-gen-rbi" = "v0.1.1"

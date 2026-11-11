@@ -6,10 +6,14 @@ require 'open3'
 
 # Generator for the proto files.
 class ProtoGen
-  PROTOC_VERSION_FILE = File.expand_path('../../.protoc-version', __dir__)
-  PROTOC_GEN_RBI_VERSION_FILE = File.expand_path('../../.protoc-gen-rbi-version', __dir__)
-  MINIMUM_PROTOC_VERSION = Gem::Version.new(File.read(PROTOC_VERSION_FILE).strip)
-  PROTOC_GEN_RBI_VERSION = File.read(PROTOC_GEN_RBI_VERSION_FILE).strip
+  MINIMUM_PROTOC_VERSION = begin
+    version, status = Open3.capture2(
+      'mise', 'config', 'get', '--file', File.expand_path('../../mise.toml', __dir__), 'tools.protoc'
+    )
+    raise 'Failed reading protoc version from mise.toml' unless status.success?
+
+    Gem::Version.new(version.strip)
+  end
   SERVICE_DEFINITIONS = [
     {
       require_path: './lib/temporalio/api/workflowservice/v1/service',
@@ -570,8 +574,7 @@ class ProtoGen
   def verify_protoc_gen_rbi!
     return if protoc_gen_rbi_command
 
-    raise "protoc-gen-rbi #{PROTOC_GEN_RBI_VERSION} is required and was not found. " \
-          "Install with: go install github.com/coinbase/protoc-gen-rbi@#{PROTOC_GEN_RBI_VERSION}"
+    raise 'protoc-gen-rbi is required and was not found. Install with: mise install'
   end
 
   def find_executable(command)

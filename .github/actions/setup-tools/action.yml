@@ -1,0 +1,28 @@
+name: Setup development tools
+description: Install the shared development tools declared in mise.toml.
+
+inputs:
+  install:
+    description: Set to 'false' to install only mise when tools are installed inside a build container.
+    required: false
+    default: "true"
+
+runs:
+  using: composite
+  steps:
+    - name: Read mise version
+      id: mise-version
+      shell: bash
+      run: |
+        version=$(sed -n 's/^min_version = "\([^"]*\)".*/\1/p' mise.toml)
+        if [ -z "$version" ]; then
+          echo "::error::Could not read min_version from mise.toml"
+          exit 1
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Install development tools
+      uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5.2.4
+      with:
+        version: ${{ steps.mise-version.outputs.version }}
+        install: ${{ inputs.install }}

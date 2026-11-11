@@ -47,9 +47,12 @@ TEMPORAL_SORBET_RUNTIME_CHECK=1 bundle exec rake test TESTOPTS="--name=test_some
   `TEMPORAL_TEST_ENV_CONFIG_SERVER=1` and configure the standard `TEMPORAL_*` variables or a
   `TEMPORAL_CONFIG_FILE`/`TEMPORAL_PROFILE`. The legacy `TEMPORAL_TEST_CLIENT_TARGET_HOST` and
   optional `TEMPORAL_TEST_CLIENT_TARGET_NAMESPACE` path remains supported.
-- Proto generation requires `protoc >= 34.0` and `protoc-gen-rbi`. From `temporalio/`, install the
-  RBI plugin with `go install github.com/coinbase/protoc-gen-rbi@$(cat ../.protoc-gen-rbi-version)`,
-  or set `PROTOC_GEN_RBI` to an executable path.
+- Install development tools with `mise trust` and `mise install` from the repository root, with
+  mise activated in your shell. Go, protoc, and protoc-gen-rbi are declared in `mise.toml`;
+  a supported Ruby runtime, Rust, and native build prerequisites are installed separately.
+  Then run SDK commands from `temporalio/`.
+- Proto generation requires `protoc >= 34.0` and `protoc-gen-rbi`, installed by mise using the
+  versions in `mise.toml`. `PROTOC_GEN_RBI` can override the plugin executable path.
 
 ## Building and Testing
 
