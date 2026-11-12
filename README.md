@@ -1407,13 +1407,18 @@ This is just a high-level overview, there are many more differences on more spec
 Prerequisites:
 
 * [Ruby](https://www.ruby-lang.org/) >= 3.2 (i.e. `ruby` and `bundle` on the `PATH`)
+* [mise](https://mise.jdx.dev/getting-started.html), installed and [activated in your shell](https://mise.jdx.dev/getting-started.html#activate-mise)
 * [Rust](https://www.rust-lang.org/) latest stable (i.e. `cargo` on the `PATH`)
-* [protoc](https://protobuf.dev/installation/) >= 34.0 (i.e. `protoc` on the `PATH`)
 * This repository, cloned recursively
-* Change to the `temporalio/` directory
 
-First, install dependencies:
+From the repository root, trust the mise configuration and install the development tools:
 
+    mise trust
+    mise install
+
+Then, change to the `temporalio` directory and install the gem dependencies:
+
+    cd temporalio
     # Optional: Change bundler install path to be local
     bundle config --local path $(pwd)/.bundle
     bundle install
@@ -1533,11 +1538,4 @@ Run:
 
     bundle exec rake proto:generate
 
-`proto:generate` now requires `protoc >= 34.0` because we generate RBS alongside the generated Ruby
-protobuf files.
-
-We use `protoc-gen-rbi` to generated protobuf RBI.
-
-It can be installed via `go install`:
-
-    go install github.com/coinbase/protoc-gen-rbi@$(cat ../.protoc-gen-rbi-version)
+The development setup's `mise install` installs the required protoc and protoc-gen-rbi versions.

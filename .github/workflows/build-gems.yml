@@ -34,10 +34,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Read protoc version
-        shell: bash
-        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
-
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
@@ -48,6 +44,11 @@ jobs:
           working-directory: ./temporalio
           cache-version: v1-${{ matrix.rubyPlatform }}
 
+      - name: Setup mise
+        uses: ./.github/actions/setup-tools
+        with:
+          install: "false"
+
       # rb-sys-dock runs the native gem build inside a Docker container and does
       # not inherit arbitrary host tools, so we derive a pinned image with the
       # exact protoc version baked in for release builds.
@@ -55,6 +56,7 @@ jobs:
         id: build-rb-sys-dock-image
         working-directory: ./temporalio
         run: |
+          PROTOC_VERSION=$(mise config get tools.protoc)
           gem install rb_sys --no-document
           rb_sys_version="$(ruby -e 'require "rb_sys/version"; puts RbSys::VERSION')"
           custom_image="temporalio-rbsys/${{ matrix.rubyPlatform }}:${rb_sys_version}-protoc-${PROTOC_VERSION}"
@@ -93,10 +95,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Read protoc version
-        shell: bash
-        run: echo "PROTOC_VERSION=$(tr -d '\n' < .protoc-version)" >> "$GITHUB_ENV"
-
       - name: Setup Ruby and Rust
         uses: oxidize-rb/actions/setup-ruby-and-rust@ec90b4aa48795518d79be3f5cc478d1d7ccd02a8 # v1
         with:
@@ -105,11 +103,8 @@ jobs:
           cargo-cache: true
           cache-version: v1-source
 
-      - name: Install protoc
-        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3
-        with:
-          version: ${{ env.PROTOC_VERSION }}
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup development tools
+        uses: ./.github/actions/setup-tools
 
       - name: Fix gem directory permissions
         run: chmod -R o-w "$RUNNER_TOOL_CACHE/Ruby" || true
