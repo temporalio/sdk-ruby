@@ -25,8 +25,11 @@ module Temporalio
     class ExternalStorageRunner
       # @param storage [Converters::ExternalStorage, nil] Configured storage. When nil, storing does nothing and
       #   retrieving raises if it finds a reference, so a reference is never mistaken for an ordinary payload.
-      def initialize(storage)
+      # @param namespace [String, nil] Namespace of the client or worker storing through this runner, or nil when it is
+      #   not known.
+      def initialize(storage, namespace:)
         @storage = storage
+        @namespace = namespace
       end
 
       # @param payloads [Array<Api::Common::V1::Payload>] Codec-encoded payloads. Not mutated.
@@ -37,7 +40,9 @@ module Temporalio
 
         # TODO: Populate the target with the workflow or activity the payloads belong to, here and in the store context.
         # That needs callers to pass it in, which happens once storage moves to per-request passes.
-        select_context = Converters::StorageDriverSelectContext.new(target: nil, cancellation: Cancellation.new)
+        select_context = Converters::StorageDriverSelectContext.new(
+          target: nil, cancellation: Cancellation.new, namespace: @namespace
+        )
 
         # Driver => [[index, serialized payload], ...] for each payload that driver stores
         payloads_by_driver = Hash.new { |hash, driver| hash[driver] = [] }
@@ -59,7 +64,7 @@ module Temporalio
         result = payloads.dup
         payloads_by_driver.each do |driver, indexes_and_serialized|
           context = Converters::StorageDriverStoreContext.new(
-            target: nil, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
+            target: nil, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER, namespace: @namespace
           )
           # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
           # place

@@ -93,7 +93,7 @@ module Temporalio
           # If there is a payload codec or external storage, we need to build encoding and decoding visitors. Storage
           # comes after the codec when encoding and before it when decoding. These may block, so they run in the
           # background.
-          storage_runner = ExternalStorageRunner.new(external_storage)
+          storage_runner = ExternalStorageRunner.new(external_storage, namespace:)
           @decode_in_background = !payload_codec.nil? || !external_storage.nil?
           if @decode_in_background
             @payload_encoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|

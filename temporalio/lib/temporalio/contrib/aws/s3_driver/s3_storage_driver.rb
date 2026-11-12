@@ -71,7 +71,7 @@ module Temporalio
 
           # (see Converters::StorageDriver#store)
           def store(context, payloads)
-            context_segments = context_key_segments(context.target)
+            context_segments = context_key_segments(context.target, context.namespace)
             objects = payloads.map { |payload| stored_object(context, payload, context_segments) }
             uploads = objects.uniq { |object| [object.bucket, object.key] }
             run_concurrently(uploads, context.cancellation) do |object, cancellation|
@@ -179,7 +179,7 @@ module Temporalio
             results
           end
 
-          def context_key_segments(target)
+          def context_key_segments(target, namespace)
             case target
             when Converters::StorageDriverWorkflowInfo
               "/ns/#{encode_key_segment(target.namespace)}/wt/#{encode_key_segment(target.type)}" \
@@ -188,7 +188,7 @@ module Temporalio
               "/ns/#{encode_key_segment(target.namespace)}/at/#{encode_key_segment(target.type)}" \
               "/ai/#{encode_key_segment(target.id)}/ri/#{encode_key_segment(target.run_id)}"
             else
-              ''
+              "/ns/#{encode_key_segment(namespace)}"
             end
           end
 

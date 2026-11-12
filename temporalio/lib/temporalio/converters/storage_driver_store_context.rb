@@ -8,7 +8,8 @@ module Temporalio
     StorageDriverStoreContext = Data.define(
       :target,
       :cancellation,
-      :limiter
+      :limiter,
+      :namespace
     )
 
     # Context given to {StorageDriver#store}.
@@ -23,8 +24,14 @@ module Temporalio
     #   @return [Cancellation] Cancelled when the SDK abandons this store operation.
     # @!attribute [r] limiter
     #   @return [StorageDriverLimiter] Limiter for this driver's store requests.
+    # @!attribute [r] namespace
+    #   @return [String, nil] Namespace of the client or worker performing the store, or nil when it is not known.
     #
     # @!visibility private
-    class StorageDriverStoreContext; end # rubocop:disable Lint/EmptyClass
+    class StorageDriverStoreContext
+      def initialize(target:, cancellation:, limiter:, namespace: nil)
+        super
+      end
+    end
   end
 end

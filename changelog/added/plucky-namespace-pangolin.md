@@ -1,0 +1,1 @@
+Added experimental `namespace` to `Converters::StorageDriverStoreContext` and `Converters::StorageDriverSelectContext`, holding the namespace of the worker performing the store. Workflow worker stores set it; client and activity stores leave it `nil` for now.

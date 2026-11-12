@@ -6,7 +6,8 @@ module Temporalio
   module Converters
     StorageDriverSelectContext = Data.define(
       :target,
-      :cancellation
+      :cancellation,
+      :namespace
     )
 
     # Context given to the driver selector.
@@ -19,8 +20,14 @@ module Temporalio
     #     on behalf of, or nil when there is no associated execution.
     # @!attribute [r] cancellation
     #   @return [Cancellation] Cancelled when the SDK abandons the operation this selection is part of.
+    # @!attribute [r] namespace
+    #   @return [String, nil] Namespace of the client or worker performing the store, or nil when it is not known.
     #
     # @!visibility private
-    class StorageDriverSelectContext; end # rubocop:disable Lint/EmptyClass
+    class StorageDriverSelectContext
+      def initialize(target:, cancellation:, namespace: nil)
+        super
+      end
+    end
   end
 end

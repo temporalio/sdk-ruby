@@ -25,7 +25,8 @@ module Contrib
         def workflow_target: -> Temporalio::Converters::StorageDriverWorkflowInfo
         def store_context: (
           ?target: (Temporalio::Converters::StorageDriverWorkflowInfo | Temporalio::Converters::StorageDriverActivityInfo)?,
-          ?limiter: Temporalio::Converters::StorageDriverLimiter
+          ?limiter: Temporalio::Converters::StorageDriverLimiter,
+          ?namespace: String?
         ) -> Temporalio::Converters::StorageDriverStoreContext
         def retrieve_context: (
           ?limiter: Temporalio::Converters::StorageDriverLimiter
@@ -34,7 +35,8 @@ module Contrib
         def hash_of: (String data) -> String
         def store_key: (
           (Temporalio::Converters::StorageDriverWorkflowInfo | Temporalio::Converters::StorageDriverActivityInfo)? target,
-          String data
+          String data,
+          ?namespace: String?
         ) -> String
         def claim: (
           ?bucket: String?,

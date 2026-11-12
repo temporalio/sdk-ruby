@@ -2,8 +2,9 @@ module Temporalio
   module Internal
     class ExternalStorageRunner
       @storage: Converters::ExternalStorage?
+      @namespace: String?
 
-      def initialize: (Converters::ExternalStorage? storage) -> void
+      def initialize: (Converters::ExternalStorage? storage, namespace: String?) -> void
 
       def store: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
       def retrieve: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]

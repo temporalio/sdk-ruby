@@ -180,6 +180,26 @@ class WorkerExternalStorageTest < Test
     end
   end
 
+  class NoInputWorkflow < Temporalio::Workflow::Definition
+    def execute
+      'no-input result'
+    end
+  end
+
+  def test_workflow_worker_stores_carry_the_worker_namespace
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      NoInputWorkflow, client:, workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'no-input result', handle.result
+    end
+
+    # With no input, every store here is the workflow worker's, not the client's.
+    refute_empty driver.store_calls
+    assert_equal [client.namespace], driver.store_calls.map { |context, _size| context.namespace }.uniq
+  end
+
   def test_worker_retrieve_failure_fails_the_task_and_is_retried
     assert_storage_failure_retried(FailOnceStorageDriver.new(fail_retrieve: true), 'Intentional retrieve failure')
   end
