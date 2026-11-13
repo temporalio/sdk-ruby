@@ -57,7 +57,8 @@ module Temporalio
             Cancellation parent_cancellation
           ) { (I, Cancellation) -> R } -> Array[R]
           def context_key_segments: (
-            (Converters::StorageDriverWorkflowInfo | Converters::StorageDriverActivityInfo)? target
+            (Converters::StorageDriverWorkflowInfo | Converters::StorageDriverActivityInfo)? target,
+            String? namespace
           ) -> String
           def encode_key_segment: (String? value) -> String
           def client_context: -> String

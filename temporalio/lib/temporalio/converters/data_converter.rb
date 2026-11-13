@@ -51,7 +51,7 @@ module Temporalio
         # each call site. This is temporary. It will move to the call sites as a pass over each whole request, which
         # batches all of a request's payloads into one driver call and can tell drivers which execution they belong to.
         # Retrieving runs even without storage, so a reference is reported rather than decoded as an ordinary value.
-        @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage)
+        @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage, namespace: nil)
       end
 
       # Convert a Ruby value to a payload and encode it.

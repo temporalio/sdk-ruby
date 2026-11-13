@@ -28,6 +28,10 @@ class WorkerExternalStorageTest < Test
     def execute: (String input) -> String
   end
 
+  class NoInputWorkflow < Temporalio::Workflow::Definition
+    def execute: -> String
+  end
+
   class AsyncCompletionActivity < Temporalio::Activity::Definition
     @task_token: Queue
 

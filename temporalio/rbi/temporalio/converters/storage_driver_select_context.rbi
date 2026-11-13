@@ -9,10 +9,11 @@ class Temporalio::Converters::StorageDriverSelectContext < ::Data
           Temporalio::Converters::StorageDriverActivityInfo
         )
       ),
-      cancellation: Temporalio::Cancellation
+      cancellation: Temporalio::Cancellation,
+      namespace: T.nilable(String)
     ).void
   end
-  def initialize(target:, cancellation:); end
+  def initialize(target:, cancellation:, namespace: nil); end
 
   sig do
     returns(
@@ -28,6 +29,9 @@ class Temporalio::Converters::StorageDriverSelectContext < ::Data
 
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end
+
+  sig { returns(T.nilable(String)) }
+  def namespace; end
 
   class << self
     sig { params(args: T.untyped).returns(Temporalio::Converters::StorageDriverSelectContext) }

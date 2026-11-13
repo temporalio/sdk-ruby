@@ -10,10 +10,11 @@ class Temporalio::Converters::StorageDriverStoreContext < ::Data
         )
       ),
       cancellation: Temporalio::Cancellation,
-      limiter: Temporalio::Converters::StorageDriverLimiter
+      limiter: Temporalio::Converters::StorageDriverLimiter,
+      namespace: T.nilable(String)
     ).void
   end
-  def initialize(target:, cancellation:, limiter:); end
+  def initialize(target:, cancellation:, limiter:, namespace: nil); end
 
   sig do
     returns(
@@ -32,6 +33,9 @@ class Temporalio::Converters::StorageDriverStoreContext < ::Data
 
   sig { returns(Temporalio::Converters::StorageDriverLimiter) }
   def limiter; end
+
+  sig { returns(T.nilable(String)) }
+  def namespace; end
 
   class << self
     sig { params(args: T.untyped).returns(Temporalio::Converters::StorageDriverStoreContext) }

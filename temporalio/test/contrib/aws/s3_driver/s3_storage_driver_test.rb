@@ -168,8 +168,20 @@ module Contrib
           assert_equal "v0/ns/null/wt/null/wi/null/ri/null/d/sha256/#{hash_of('one')}", store_key(target, 'one')
         end
 
-        def test_no_target_uses_bare_digest_key
-          assert_equal "v0/d/sha256/#{hash_of('one')}", store_key(nil, 'one')
+        def test_no_target_or_namespace_writes_null_namespace
+          assert_equal "v0/ns/null/d/sha256/#{hash_of('one')}", store_key(nil, 'one')
+        end
+
+        def test_no_target_uses_context_namespace
+          assert_equal "v0/ns/my%20ns/d/sha256/#{hash_of('one')}", store_key(nil, 'one', namespace: 'my ns')
+        end
+
+        def test_target_namespace_overrides_context_namespace
+          target = Temporalio::Converters::StorageDriverWorkflowInfo.new(
+            namespace: 'target-ns', id: 'wf', run_id: 'run', type: 'WF'
+          )
+
+          assert store_key(target, 'one', namespace: 'other').start_with?('v0/ns/target-ns/wt/')
         end
 
         def test_identical_payloads_in_batch_upload_once
@@ -235,7 +247,7 @@ module Contrib
           err = assert_raises(RuntimeError) { driver.store(store_context, [payload('one')]) }
 
           assert_equal(
-            "S3StorageDriver store failed [bucket=my-bucket, key=v0/d/sha256/#{hash_of('one')}, " \
+            "S3StorageDriver store failed [bucket=my-bucket, key=v0/ns/null/d/sha256/#{hash_of('one')}, " \
             'client_region=us-west-2]',
             err.message
           )
@@ -296,9 +308,9 @@ module Contrib
           )
         end
 
-        def store_context(target: nil, limiter: RecordingStorageDriverLimiter.new)
+        def store_context(target: nil, limiter: RecordingStorageDriverLimiter.new, namespace: nil)
           Temporalio::Converters::StorageDriverStoreContext.new(
-            target:, cancellation: Temporalio::Cancellation.new, limiter:
+            target:, cancellation: Temporalio::Cancellation.new, limiter:, namespace:
           )
         end
 
@@ -314,9 +326,9 @@ module Contrib
           Digest::SHA256.hexdigest(payload(data).to_proto)
         end
 
-        def store_key(target, data)
+        def store_key(target, data, namespace: nil)
           driver = S3StorageDriver.new(client: FakeS3Client.new, bucket: 'my-bucket')
-          driver.store(store_context(target:), [payload(data)]).first.claim_data['key']
+          driver.store(store_context(target:, namespace:), [payload(data)]).first.claim_data['key']
         end
 
         def claim(bucket: 'my-bucket', key: 'my-key', hash_algorithm: 'sha256', hash_value: 'abc')

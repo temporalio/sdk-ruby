@@ -16,7 +16,7 @@ class ExternalStorageRunnerTest < Test
     small = payload('a')
     at_threshold = payload('bb')
     threshold = at_threshold.to_proto.bytesize
-    runner = Runner.new(storage(driver, payload_size_threshold: threshold))
+    runner = Runner.new(storage(driver, payload_size_threshold: threshold), namespace: nil)
 
     stored = runner.store([small, at_threshold])
 
@@ -28,7 +28,7 @@ class ExternalStorageRunnerTest < Test
 
   def test_store_then_retrieve_returns_original_payloads_in_one_batch
     driver = InMemoryStorageDriver.new
-    runner = Runner.new(storage(driver))
+    runner = Runner.new(storage(driver), namespace: nil)
     originals = [payload('a'), payload('b'), payload('c')]
 
     stored = runner.store(originals)
@@ -46,7 +46,7 @@ class ExternalStorageRunnerTest < Test
                           drivers: [one, two],
                           driver_selector: ->(_context, payload) { payload.data == '"a"' ? one : two },
                           payload_size_threshold: 0
-                        ))
+                        ), namespace: nil)
 
     stored = runner.store([payload('a'), payload('b'), payload('c')])
 
@@ -55,11 +55,29 @@ class ExternalStorageRunnerTest < Test
     assert_equal([2], two.store_calls.map { |_, count| count })
   end
 
+  def test_store_gives_selector_and_driver_the_namespace
+    driver = InMemoryStorageDriver.new
+    select_contexts = []
+    runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
+                          drivers: [driver],
+                          driver_selector: lambda { |context, _payload|
+                            select_contexts << context
+                            driver
+                          },
+                          payload_size_threshold: 0
+                        ), namespace: 'my-namespace')
+
+    runner.store([payload('a')])
+
+    assert_equal ['my-namespace'], select_contexts.map(&:namespace)
+    assert_equal(['my-namespace'], driver.store_calls.map { |context, _size| context.namespace })
+  end
+
   def test_store_keeps_payload_inline_when_selector_returns_nil
     driver = InMemoryStorageDriver.new
     runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
                           drivers: [driver], driver_selector: ->(_context, _payload) {}, payload_size_threshold: 0
-                        ))
+                        ), namespace: nil)
     original = payload('a')
 
     assert_same original, runner.store([original]).first
@@ -72,7 +90,7 @@ class ExternalStorageRunnerTest < Test
                           drivers: [InMemoryStorageDriver.new],
                           driver_selector: ->(_context, _payload) { lookalike },
                           payload_size_threshold: 0
-                        ))
+                        ), namespace: nil)
 
     err = assert_raises(Temporalio::Error) { runner.store([payload('a')]) }
     assert_includes err.message, 'not registered'
@@ -83,7 +101,7 @@ class ExternalStorageRunnerTest < Test
       driver_name: 'missing', claim_data: { 'key' => 'k' }, original_size_bytes: 1
     )
 
-    err = assert_raises(Temporalio::Error) { Runner.new(storage(InMemoryStorageDriver.new)).retrieve([reference]) }
+    err = assert_raises(Temporalio::Error) { Runner.new(storage(InMemoryStorageDriver.new), namespace: nil).retrieve([reference]) }
     assert_includes err.message, "'missing'"
   end
 
@@ -91,13 +109,13 @@ class ExternalStorageRunnerTest < Test
     driver = InMemoryStorageDriver.new
     driver.define_singleton_method(:store) { |_context, _payloads| [] }
 
-    err = assert_raises(Temporalio::Error) { Runner.new(storage(driver)).store([payload('a')]) }
+    err = assert_raises(Temporalio::Error) { Runner.new(storage(driver), namespace: nil).store([payload('a')]) }
     assert_includes err.message, 'given 1 item(s) but returned 0'
   end
 
   def test_without_storage_store_and_retrieve_leave_payloads_unchanged
     original = payload('a')
-    runner = Runner.new(nil)
+    runner = Runner.new(nil, namespace: nil)
 
     assert_same original, runner.store([original]).first
     assert_same original, runner.retrieve([original]).first
@@ -108,7 +126,7 @@ class ExternalStorageRunnerTest < Test
       driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 1
     )
 
-    assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) { Runner.new(nil).retrieve([reference]) }
+    assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) { Runner.new(nil, namespace: nil).retrieve([reference]) }
   end
 
   private
