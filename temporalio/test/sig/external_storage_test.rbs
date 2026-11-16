@@ -1,4 +1,5 @@
 class ExternalStorageTest < Test
+  def encoded_reference: (Temporalio::Api::Common::V1::Payload reference) -> Temporalio::Api::Common::V1::Payload
   def cancellation: -> Temporalio::Cancellation
   def limiter: -> Temporalio::Converters::StorageDriverLimiter
   def select_context: -> Temporalio::Converters::StorageDriverSelectContext

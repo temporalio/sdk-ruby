@@ -85,6 +85,10 @@ class WorkerExternalStorageTest < Test
     Temporalio::Converters::StorageDriver driver,
     ?payload_codec: Temporalio::Converters::PayloadCodec?
   ) -> Temporalio::Client
-  def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
+  def encoded_reference: (
+    Temporalio::Converters::StorageDriver driver,
+    String value
+  ) -> Temporalio::Api::Common::V1::Payload
+  def first_attrs:(Enumerable[untyped] events, Symbol attrs_method) -> untyped
   def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
 end

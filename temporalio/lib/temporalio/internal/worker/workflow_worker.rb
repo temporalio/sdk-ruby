@@ -3,6 +3,7 @@
 require 'temporalio/api/payload_visitor'
 require 'temporalio/error'
 require 'temporalio/internal/bridge/api'
+require 'temporalio/internal/external_storage_references'
 require 'temporalio/internal/external_storage_runner'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/scoped_logger'
@@ -105,7 +106,9 @@ module Temporalio
             end
             @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
               replace_payloads_on_visit(payload_or_payloads) do |payloads|
-                payloads = storage_runner.retrieve(payloads.to_a)
+                payloads = payloads.to_a
+                payloads = ExternalStorageReferences.decode_references(payloads, payload_codec:) if external_storage
+                payloads = storage_runner.retrieve(payloads)
                 payloads = payload_codec.decode(payloads) if payload_codec
                 payloads
               end

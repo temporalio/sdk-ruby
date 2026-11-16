@@ -89,6 +89,9 @@ module Temporalio
       # @param hint [Object, nil] Hint, if any, to assist conversion.
       # @return [Object] Decoded and converted Ruby value.
       def from_payload(payload, hint: nil)
+        if external_storage
+          payload = Internal::ExternalStorageReferences.decode_references([payload], payload_codec:).first
+        end
         payload = @external_storage_runner.retrieve([payload]).first
         payload = payload_codec.decode([payload]).first if payload_codec
         payload_converter.from_payload(payload, hint:)
@@ -105,7 +108,9 @@ module Temporalio
       def from_payloads(payloads, hints: nil)
         return [] unless payloads && !payloads.payloads.empty?
 
-        payloads = Api::Common::V1::Payloads.new(payloads: @external_storage_runner.retrieve(payloads.payloads.to_a))
+        payloads = payloads.payloads.to_a
+        payloads = Internal::ExternalStorageReferences.decode_references(payloads, payload_codec:) if external_storage
+        payloads = Api::Common::V1::Payloads.new(payloads: @external_storage_runner.retrieve(payloads))
         if payload_codec && !payloads.payloads.empty?
           payloads = Api::Common::V1::Payloads.new(payloads: payload_codec.decode(payloads.payloads))
         end

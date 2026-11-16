@@ -7,6 +7,7 @@ require 'temporalio/client'
 require 'temporalio/converters/external_storage'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
+require 'temporalio/internal/external_storage_runner'
 require 'temporalio/worker'
 require 'temporalio/workflow'
 require 'test'
@@ -220,6 +221,32 @@ class WorkerExternalStorageTest < Test
         refute_nil failure
         assert_includes failure.failure.message, 'TMPRL1105'
       end
+    end
+  end
+
+  def test_worker_reads_encoded_reference
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    # Ruby does not write encoded references yet, so the input is written as another SDK would
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'start-input')),
+      client:,
+      start_workflow_client: env.client,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'start-input done', client.workflow_handle(handle.id).result
+    end
+  end
+
+  def test_worker_without_the_writing_codec_fails_the_task_on_an_encoded_reference
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'start-input')),
+      client: client_with_storage(driver),
+      start_workflow_client: env.client,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1106')
     end
   end
 
@@ -476,6 +503,18 @@ class WorkerExternalStorageTest < Test
       external_storage: Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
     )
     Temporalio::Client.new(**env.client.options.with(data_converter:).to_h) # steep:ignore InsufficientKeywordArguments
+  end
+
+  # Stores the value encoded with Base64Codec, then encodes and marks its reference
+  def encoded_reference(driver, value)
+    codec = Base64Codec.new
+    storage = Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
+    stored = Temporalio::Converters::DataConverter.new(payload_codec: codec).to_payload(value)
+    reference = Temporalio::Internal::ExternalStorageRunner.new(storage, namespace: nil).store([stored]).first
+    encoded = codec.encode([reference]).first
+    encoded.metadata[References::MARKER_KEY] = 'true'
+    encoded.external_payloads.push(*reference.external_payloads.map(&:dup))
+    encoded
   end
 
   def first_attrs(events, attrs_method)
