@@ -92,6 +92,12 @@ class Temporalio::Internal::Worker::WorkflowWorker
   sig { params(runner: Temporalio::Internal::Worker::MultiRunner, activation_completion: Object).void }
   def encode_activation_completion(runner, activation_completion); end
 
+  sig { params(metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics)).returns(Temporalio::Api::PayloadVisitor) }
+  def payload_encoding_visitor(metrics); end
+
+  sig { params(metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics)).returns(Temporalio::Api::PayloadVisitor) }
+  def payload_decoding_visitor(metrics); end
+
   sig { params(payload_or_payloads: Object, block: T.proc.params(arg0: Object).returns(Object)).void }
   def replace_payloads_on_visit(payload_or_payloads, &block); end
 end

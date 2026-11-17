@@ -13,10 +13,12 @@ require 'temporalio/converters/storage_driver_claim'
 class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
   attr_reader :name, :type
 
-  def initialize(name: 'mem', type: 'test.memdriver')
+  # @param delay [Float] Seconds each store and retrieve sleeps, so tests can assert a lower bound on measured time.
+  def initialize(name: 'mem', type: 'test.memdriver', delay: 0)
     super()
     @name = name
     @type = type
+    @delay = delay
     @mutex = Mutex.new
     @stored = {}
     @store_calls = []
@@ -37,6 +39,7 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
 
   def store(context, payloads)
     @mutex.synchronize { @store_calls << [context, payloads.size] }
+    sleep(@delay) if @delay.positive?
     payloads.map do |payload|
       key = SecureRandom.uuid
       @mutex.synchronize { @stored[key] = payload.to_proto }
@@ -46,6 +49,7 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
 
   def retrieve(_context, claims)
     @mutex.synchronize { @retrieve_calls << claims.size }
+    sleep(@delay) if @delay.positive?
     claims.map do |claim|
       bytes = @mutex.synchronize { @stored.fetch(claim.claim_data.fetch('key')) }
       Temporalio::Api::Common::V1::Payload.decode(bytes)

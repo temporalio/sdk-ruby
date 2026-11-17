@@ -6,8 +6,14 @@ module Temporalio
 
       def initialize: (Converters::ExternalStorage? storage, namespace: String?) -> void
 
-      def store: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
-      def retrieve: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
+      def store: (
+        Array[Api::Common::V1::Payload] payloads,
+        ?metrics: StorageOperationMetrics?
+      ) -> Array[Api::Common::V1::Payload]
+      def retrieve: (
+        Array[Api::Common::V1::Payload] payloads,
+        ?metrics: StorageOperationMetrics?
+      ) -> Array[Api::Common::V1::Payload]
 
       private def check_result_count: (
         Converters::StorageDriver driver,

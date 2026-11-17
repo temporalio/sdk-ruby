@@ -1,0 +1,25 @@
+module Temporalio
+  module Internal
+    class StorageOperationMetrics
+      @mutex: Mutex
+      @payload_count: Integer
+      @total_size_bytes: Integer
+      @driver_names: Set[String]
+      @spans: Array[[Float, Float]]
+
+      def initialize: -> void
+
+      def record: (
+        driver_name: String,
+        payload_count: Integer,
+        total_size_bytes: Integer,
+        start_time: Float,
+        end_time: Float
+      ) -> void
+
+      def to_proto: -> Bridge::Api::Common::ExternalStorageMetrics?
+
+      private def union_seconds: -> Float
+    end
+  end
+end

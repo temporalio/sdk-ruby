@@ -5,6 +5,7 @@ require 'temporalio/converters/external_storage'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
 require 'temporalio/internal/external_storage_runner'
+require 'temporalio/internal/storage_operation_metrics'
 require 'test'
 
 class ExternalStorageRunnerTest < Test
@@ -127,6 +128,52 @@ class ExternalStorageRunnerTest < Test
     )
 
     assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) { Runner.new(nil, namespace: nil).retrieve([reference]) }
+  end
+
+  def test_store_and_retrieve_record_metrics_for_each_driver
+    delay = 0.05
+    one = InMemoryStorageDriver.new(name: 'one', delay:)
+    two = InMemoryStorageDriver.new(name: 'two', delay:)
+    runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
+                          drivers: [two, one],
+                          driver_selector: ->(_context, payload) { payload.data == '"a"' ? one : two },
+                          payload_size_threshold: 0
+                        ), namespace: nil)
+    originals = [payload('a'), payload('b'), payload('c')]
+    original_size = originals.sum { |p| p.to_proto.bytesize }
+
+    store_metrics = Temporalio::Internal::StorageOperationMetrics.new
+    stored = runner.store(originals, metrics: store_metrics)
+    retrieve_metrics = Temporalio::Internal::StorageOperationMetrics.new
+    runner.retrieve(stored, metrics: retrieve_metrics)
+
+    [store_metrics, retrieve_metrics].each do |metrics|
+      proto = metrics.to_proto or flunk('Expected metrics')
+      assert_equal 3, proto.payload_count
+      assert_equal original_size, proto.total_size_bytes
+      assert_equal %w[one two], proto.driver_names.to_a
+      # Drivers are called one after another, so both calls' time counts
+      assert_operator Temporalio::Internal::ProtoUtils.duration_to_seconds(proto.total_duration).to_f, :>=, 2 * delay
+    end
+  end
+
+  def test_metrics_are_unset_when_nothing_is_moved
+    runner = Runner.new(storage(InMemoryStorageDriver.new, payload_size_threshold: 1_000_000), namespace: nil)
+    metrics = Temporalio::Internal::StorageOperationMetrics.new
+
+    runner.retrieve(runner.store([payload('a')], metrics:), metrics:)
+
+    assert_nil metrics.to_proto
+  end
+
+  def test_metrics_duration_counts_overlapping_calls_once
+    metrics = Temporalio::Internal::StorageOperationMetrics.new
+    metrics.record(driver_name: 'a', payload_count: 1, total_size_bytes: 1, start_time: 10.0, end_time: 12.0)
+    metrics.record(driver_name: 'b', payload_count: 1, total_size_bytes: 1, start_time: 11.0, end_time: 13.0)
+    metrics.record(driver_name: 'a', payload_count: 1, total_size_bytes: 1, start_time: 20.0, end_time: 20.5)
+
+    duration = metrics.to_proto&.total_duration or flunk('Expected a duration')
+    assert_equal 3.5, Temporalio::Internal::ProtoUtils.duration_to_seconds(duration)
   end
 
   private
