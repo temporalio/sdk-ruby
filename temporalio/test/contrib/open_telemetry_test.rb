@@ -198,6 +198,7 @@ module Contrib
       trace(tracer_and_exporter:, always_create_workflow_spans:, check_root:, append_finished_spans_to:) do |client|
         # Must capture and attach outer context
         outer_context = OpenTelemetry::Context.current
+        # @type var attach_token: Integer?
         attach_token = nil
         execute_workflow(
           TestWorkflow,
@@ -210,7 +211,7 @@ module Contrib
         ) do |handle|
           yield handle
         ensure
-          OpenTelemetry::Context.detach(attach_token)
+          OpenTelemetry::Context.detach(attach_token) if attach_token
         end
       end
     end
@@ -616,6 +617,7 @@ module Contrib
       exp_root = ExpectedSpan.new(name: 'root')
       act_root = trace do |client|
         outer_context = OpenTelemetry::Context.current
+        # @type var attach_token: Integer?
         attach_token = nil
         task_queue = "tq-#{SecureRandom.uuid}"
         worker = Temporalio::Worker.new(
