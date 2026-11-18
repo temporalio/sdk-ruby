@@ -15,6 +15,8 @@ class Base64Codec < Temporalio::Converters::PayloadCodec
 
   def decode(payloads)
     payloads.map do |p|
+      next p unless p.metadata['encoding'] == 'test/base64'
+
       Temporalio::Api::Common::V1::Payload.decode(
         Base64.strict_decode64(p.data)
       )

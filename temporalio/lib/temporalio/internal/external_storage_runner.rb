@@ -93,7 +93,6 @@ module Temporalio
           reference = ExternalStorageReferences.parse_reference(payload)
           next unless reference || ExternalStorageReferences.marked_reference?(payload)
           raise Error::ExternalStorageNotConfiguredError unless storage
-          # With storage configured, callers decode marked references before retrieving them
           raise Error::ExternalStorageReferenceDecodeError unless reference
 
           driver = storage.driver(reference.driver_name)

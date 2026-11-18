@@ -302,16 +302,7 @@ class ExternalStorageTest < Test
     assert_same ordinary, decoded[1]
   end
 
-  def test_decode_references_raises_when_marked_payload_does_not_decode_to_a_reference
-    reference = References.create_reference_payload(driver_name: 'mem', claim_data: {}, original_size_bytes: 1)
-
-    # Read without the codec that wrote it
-    err = assert_raises(Temporalio::Error::ExternalStorageReferenceDecodeError) do
-      References.decode_references([encoded_reference(reference)], payload_codec: nil)
-    end
-    assert_includes err.message, 'TMPRL1106'
-
-    # Decodes, but not to a reference
+  def test_decode_references_raises_when_marked_payload_decodes_to_something_else
     assert_raises(Temporalio::Error::ExternalStorageReferenceDecodeError) do
       References.decode_references(
         [encoded_reference(payload('"not a reference"'))], payload_codec: Base64Codec.new
@@ -319,13 +310,21 @@ class ExternalStorageTest < Test
     end
   end
 
-  def test_decode_references_accepts_marked_reference_that_was_not_encoded
+  def test_decode_references_accepts_marked_reference_the_codec_passes_through
     reference = References.create_reference_payload(driver_name: 'mem', claim_data: {}, original_size_bytes: 1)
     reference.metadata[References::MARKER_KEY] = 'true'
 
-    assert_same reference, References.decode_references(
-      [reference], payload_codec: nil
+    assert_equal reference, References.decode_references(
+      [reference], payload_codec: Base64Codec.new
     ).first
+  end
+
+  def test_decode_references_without_codec_returns_payloads_unchanged
+    encoded = encoded_reference(
+      References.create_reference_payload(driver_name: 'mem', claim_data: {}, original_size_bytes: 1)
+    )
+
+    assert_same encoded, References.decode_references([encoded], payload_codec: nil).first
   end
 
   def test_data_converter_reads_encoded_reference

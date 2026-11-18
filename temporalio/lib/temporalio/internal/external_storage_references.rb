@@ -49,16 +49,19 @@ module Temporalio
         # Replace each marked reference with the plain reference it encodes, so it can be retrieved.
         #
         # @param payloads [Array<Api::Common::V1::Payload>] Payloads that may contain marked references. Not mutated.
-        # @param payload_codec [Converters::PayloadCodec, nil] Codec that encoded the references.
+        # @param payload_codec [Converters::PayloadCodec, nil] Codec that encoded the references. Without one, payloads
+        #   are returned as is and the storage runner rejects a marked payload that is not a plain reference.
         # @return [Array<Api::Common::V1::Payload>] Payloads with every marked reference decoded.
         # @raise [Error::ExternalStorageReferenceDecodeError] If a marked reference does not decode to a reference.
         def decode_references(payloads, payload_codec:)
+          return payloads unless payload_codec
+
           payloads.map do |payload|
             next payload unless marked_reference?(payload)
 
             # The payload is decoded as it appears in history, marker included, since that is what a codec server
             # receives too.
-            reference = payload_codec ? payload_codec.decode([payload]).first : payload
+            reference = payload_codec.decode([payload]).first
             raise Error::ExternalStorageReferenceDecodeError unless reference && reference?(reference)
 
             if reference.external_payloads.empty?

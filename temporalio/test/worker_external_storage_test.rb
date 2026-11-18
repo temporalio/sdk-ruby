@@ -250,6 +250,64 @@ class WorkerExternalStorageTest < Test
     end
   end
 
+  def test_worker_without_storage_or_codec_fails_the_task_on_an_encoded_reference
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(InMemoryStorageDriver.new, 'start-input'))
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1105')
+    end
+  end
+
+  def test_activity_reads_encoded_reference_input
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    worker = Temporalio::Worker.new(
+      client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [HeartbeatRetryActivity]
+    )
+    worker.run do
+      # Started with a plain client so the raw input reaches history as another SDK would write it
+      handle = env.client.start_activity(
+        HeartbeatRetryActivity, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'activity-input')),
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 2, initial_interval: 0.1)
+      )
+      assert_equal 'activity-input heartbeat-detail', client.activity_handle(handle.id).result
+    end
+  end
+
+  # Heartbeats through a client without codec or storage, so the details reach the server as written
+  class EncodedHeartbeatActivity < Temporalio::Activity::Definition
+    def initialize(plain_client, encoded_detail)
+      @plain_client = plain_client
+      @encoded_detail = encoded_detail
+    end
+
+    def execute
+      info = Temporalio::Activity::Context.current.info
+      if info.attempt == 1
+        @plain_client.async_activity_handle(info.task_token)
+                     .heartbeat(Temporalio::Converters::RawValue.new(@encoded_detail))
+        raise 'Intentional error'
+      end
+      info.heartbeat_details.first
+    end
+  end
+
+  def test_activity_reads_encoded_reference_heartbeat_details
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    activity = EncodedHeartbeatActivity.new(env.client, encoded_reference(driver, 'heartbeat-detail'))
+    worker = Temporalio::Worker.new(client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [activity])
+    worker.run do
+      handle = client.start_activity(
+        EncodedHeartbeatActivity,
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 2, initial_interval: 0.1)
+      )
+      assert_equal 'heartbeat-detail', handle.result
+    end
+  end
+
   class AsyncCompletionActivity < Temporalio::Activity::Definition
     def initialize
       @task_token = Queue.new
