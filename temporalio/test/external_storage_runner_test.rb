@@ -12,6 +12,39 @@ class ExternalStorageRunnerTest < Test
   Runner = Temporalio::Internal::ExternalStorageRunner
   References = Temporalio::Internal::ExternalStorageReferences
 
+  class FakeClock
+    def initialize
+      @now = 0.0
+    end
+
+    def call
+      @now
+    end
+
+    def advance(seconds)
+      @now += seconds
+    end
+  end
+
+  # Moves the fake clock forward during each call, so the time measured around a call is exactly the given seconds.
+  class ClockAdvancingDriver < InMemoryStorageDriver
+    def initialize(clock:, seconds:, name:)
+      super(name:)
+      @clock = clock
+      @seconds = seconds
+    end
+
+    def store(context, payloads)
+      @clock.advance(@seconds)
+      super
+    end
+
+    def retrieve(context, claims)
+      @clock.advance(@seconds)
+      super
+    end
+  end
+
   def test_store_replaces_only_payloads_at_or_above_threshold
     driver = InMemoryStorageDriver.new
     small = payload('a')
@@ -131,14 +164,14 @@ class ExternalStorageRunnerTest < Test
   end
 
   def test_store_and_retrieve_record_metrics_for_each_driver
-    delay = 0.05
-    one = InMemoryStorageDriver.new(name: 'one', delay:)
-    two = InMemoryStorageDriver.new(name: 'two', delay:)
+    clock = FakeClock.new
+    one = ClockAdvancingDriver.new(clock:, seconds: 2.0, name: 'one')
+    two = ClockAdvancingDriver.new(clock:, seconds: 3.0, name: 'two')
     runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
                           drivers: [two, one],
                           driver_selector: ->(_context, payload) { payload.data == '"a"' ? one : two },
                           payload_size_threshold: 0
-                        ), namespace: nil)
+                        ), namespace: nil, clock:)
     originals = [payload('a'), payload('b'), payload('c')]
     original_size = originals.sum { |p| p.to_proto.bytesize }
 
@@ -152,8 +185,7 @@ class ExternalStorageRunnerTest < Test
       assert_equal 3, proto.payload_count
       assert_equal original_size, proto.total_size_bytes
       assert_equal %w[one two], proto.driver_names.to_a
-      # Drivers are called one after another, so both calls' time counts
-      assert_operator Temporalio::Internal::ProtoUtils.duration_to_seconds(proto.total_duration).to_f, :>=, 2 * delay
+      assert_equal 5.0, Temporalio::Internal::ProtoUtils.duration_to_seconds(proto.total_duration)
     end
   end
 

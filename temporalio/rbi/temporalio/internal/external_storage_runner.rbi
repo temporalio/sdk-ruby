@@ -4,9 +4,13 @@ class Temporalio::Internal::ExternalStorageRunner
   extend T::Sig
 
   sig do
-    params(storage: T.nilable(Temporalio::Converters::ExternalStorage), namespace: T.nilable(String)).void
+    params(
+      storage: T.nilable(Temporalio::Converters::ExternalStorage),
+      namespace: T.nilable(String),
+      clock: T.proc.returns(Float)
+    ).void
   end
-  def initialize(storage, namespace:); end
+  def initialize(storage, namespace:, clock: T.unsafe(nil)); end
 
   sig do
     params(

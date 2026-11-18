@@ -457,8 +457,7 @@ class WorkerExternalStorageTest < Test
   end
 
   def test_workflow_task_completions_report_storage_metrics
-    delay = 0.05
-    driver = InMemoryStorageDriver.new(delay:)
+    driver = InMemoryStorageDriver.new
     completions = run_echo_workflow_capturing_completions(driver)
 
     # The first task retrieves the input and stores the result
@@ -471,8 +470,6 @@ class WorkerExternalStorageTest < Test
     assert_equal stored_sizes, [download.total_size_bytes, upload.total_size_bytes].sort
     assert_equal ['mem'], download.driver_names.to_a
     assert_equal ['mem'], upload.driver_names.to_a
-    assert_operator Temporalio::Internal::ProtoUtils.duration_to_seconds(download.total_duration).to_f, :>=, delay
-    assert_operator Temporalio::Internal::ProtoUtils.duration_to_seconds(upload.total_duration).to_f, :>=, delay
   end
 
   def test_failed_store_still_reports_download_metrics

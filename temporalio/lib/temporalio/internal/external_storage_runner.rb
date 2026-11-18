@@ -24,13 +24,18 @@ module Temporalio
     #
     # @!visibility private
     class ExternalStorageRunner
+      MONOTONIC_CLOCK = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+      private_constant :MONOTONIC_CLOCK
+
       # @param storage [Converters::ExternalStorage, nil] Configured storage. When nil, storing does nothing and
       #   retrieving raises if it finds a reference, so a reference is never mistaken for an ordinary payload.
       # @param namespace [String, nil] Namespace of the client or worker storing through this runner, or nil when it is
       #   not known.
-      def initialize(storage, namespace:)
+      # @param clock [Proc] Returns monotonic seconds, read around each driver call to time it.
+      def initialize(storage, namespace:, clock: MONOTONIC_CLOCK)
         @storage = storage
         @namespace = namespace
+        @clock = clock
       end
 
       # @param payloads [Array<Api::Common::V1::Payload>] Codec-encoded payloads. Not mutated.
@@ -71,9 +76,9 @@ module Temporalio
           # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
           # place
           copies = indexes_and_serialized.map { |_index, serialized| Api::Common::V1::Payload.decode(serialized) }
-          start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          start_time = @clock.call
           claims = driver.store(context, copies)
-          end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          end_time = @clock.call
           check_result_count(driver, 'store', indexes_and_serialized.size, claims)
           metrics&.record(
             driver_name: driver.name,
@@ -117,9 +122,9 @@ module Temporalio
           context = Converters::StorageDriverRetrieveContext.new(
             cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
           )
-          start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          start_time = @clock.call
           retrieved = driver.retrieve(context, indexes_and_claims.map { |_index, claim| claim })
-          end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+          end_time = @clock.call
           check_result_count(driver, 'retrieve', indexes_and_claims.size, retrieved)
           metrics&.record(
             driver_name: driver.name,

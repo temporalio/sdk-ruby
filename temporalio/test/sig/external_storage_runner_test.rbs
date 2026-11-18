@@ -1,4 +1,18 @@
 class ExternalStorageRunnerTest < Test
+  class FakeClock
+    @now: Float
+
+    def call: -> Float
+    def advance: (Float seconds) -> Float
+  end
+
+  class ClockAdvancingDriver < InMemoryStorageDriver
+    @clock: FakeClock
+    @seconds: Float
+
+    def initialize: (clock: FakeClock, seconds: Float, name: String) -> void
+  end
+
   def storage: (
     Temporalio::Converters::StorageDriver driver,
     ?payload_size_threshold: Integer
