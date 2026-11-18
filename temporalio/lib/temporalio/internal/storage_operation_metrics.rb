@@ -37,16 +37,19 @@ module Temporalio
       # @return [Bridge::Api::Common::ExternalStorageMetrics, nil] Metrics for the pass, or nil when it moved nothing,
       #   so the completion field stays unset.
       def to_proto
-        @mutex.synchronize do
+        payload_count, total_size_bytes, duration_seconds, driver_names = @mutex.synchronize do
           return nil if @payload_count.zero?
 
-          Bridge::Api::Common::ExternalStorageMetrics.new(
-            payload_count: @payload_count,
-            total_size_bytes: @total_size_bytes,
-            total_duration: ProtoUtils.seconds_to_duration(union_seconds),
-            driver_names: @driver_names.sort
-          )
+          [@payload_count, @total_size_bytes, union_seconds, @driver_names.sort]
         end
+        # Built outside the lock, since creating a protobuf message takes a process-wide lock that would otherwise also
+        # hold up record
+        Bridge::Api::Common::ExternalStorageMetrics.new(
+          payload_count:,
+          total_size_bytes:,
+          total_duration: ProtoUtils.seconds_to_duration(duration_seconds),
+          driver_names:
+        )
       end
 
       private
