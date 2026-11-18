@@ -310,13 +310,19 @@ class ExternalStorageTest < Test
     end
   end
 
-  def test_decode_references_accepts_marked_reference_the_codec_passes_through
-    reference = References.create_reference_payload(driver_name: 'mem', claim_data: {}, original_size_bytes: 1)
+  def test_decode_references_keeps_marked_reference_the_codec_passes_through
+    reference = References.create_reference_payload(
+      driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 385
+    )
     reference.metadata[References::MARKER_KEY] = 'true'
+    ordinary = payload('"ordinary"')
 
-    assert_equal reference, References.decode_references(
-      [reference], payload_codec: Base64Codec.new
-    ).first
+    decoded = References.decode_references(
+      [reference, ordinary], payload_codec: Base64Codec.new
+    )
+
+    assert_equal reference, decoded[0]
+    assert_same ordinary, decoded[1]
   end
 
   def test_decode_references_without_codec_returns_payloads_unchanged
