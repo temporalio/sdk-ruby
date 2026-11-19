@@ -18,7 +18,10 @@ module Temporalio
         ?state: State
       ) -> void
 
-      def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::Schedule
+      def _to_proto: (
+        Converters::DataConverter data_converter,
+        ?Internal::Client::DescribedScheduleAction? described_action
+      ) -> Api::Schedule::V1::Schedule
 
       def with: (**untyped) -> Schedule
 
@@ -57,7 +60,12 @@ module Temporalio
           Converters::DataConverter data_converter
         ) -> Action
 
-        def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::ScheduleAction
+        def _to_proto: (
+          Converters::DataConverter data_converter,
+          ?Internal::Client::DescribedScheduleAction? described
+        ) -> Api::Schedule::V1::ScheduleAction
+
+        def _described: (Api::Schedule::V1::ScheduleAction raw_action) -> Internal::Client::DescribedScheduleAction?
 
         class StartWorkflow
           include Action
@@ -103,7 +111,17 @@ module Temporalio
 
           def with: (**untyped) -> StartWorkflow
 
-          def _to_proto: (Converters::DataConverter data_converter) -> Api::Schedule::V1::ScheduleAction
+          def _to_proto: (
+            Converters::DataConverter data_converter,
+            ?Internal::Client::DescribedScheduleAction? described
+          ) -> Api::Schedule::V1::ScheduleAction
+
+          def _described: (Api::Schedule::V1::ScheduleAction raw_action) -> Internal::Client::DescribedScheduleAction
+
+          private def _user_metadata_to_proto: (
+            Converters::DataConverter data_converter,
+            Internal::Client::DescribedScheduleAction? described
+          ) -> Api::Sdk::V1::UserMetadata?
         end
       end
 

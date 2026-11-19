@@ -802,21 +802,20 @@ module Temporalio
           # TODO(cretz): This is supposed to be a retry-conflict loop, but we do
           # not yet have a way to know update failure is due to conflict token
           # mismatch
-          update = input.updater.call(
-            Temporalio::Client::Schedule::Update::Input.new(
-              description: Temporalio::Client::Schedule::Description.new(
-                id: input.id,
-                raw_description: @client.workflow_service.describe_schedule(
-                  Api::WorkflowService::V1::DescribeScheduleRequest.new(
-                    namespace: @client.namespace,
-                    schedule_id: input.id
-                  ),
-                  rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
-                ),
-                data_converter: @client.data_converter
-              )
-            )
+          description = Temporalio::Client::Schedule::Description.new(
+            id: input.id,
+            raw_description: @client.workflow_service.describe_schedule(
+              Api::WorkflowService::V1::DescribeScheduleRequest.new(
+                namespace: @client.namespace,
+                schedule_id: input.id
+              ),
+              rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
+            ),
+            data_converter: @client.data_converter
           )
+          # Captured before the updater runs, since it may change the described action in place.
+          described_action = description.schedule.action._described(description.raw_description.schedule.action)
+          update = input.updater.call(Temporalio::Client::Schedule::Update::Input.new(description:))
           # Do nothing if update is nil, fail if not an expected update
           return nil if update.nil?
 
@@ -829,7 +828,7 @@ module Temporalio
             Api::WorkflowService::V1::UpdateScheduleRequest.new(
               namespace: @client.namespace,
               schedule_id: input.id,
-              schedule: update.schedule._to_proto(@client.data_converter),
+              schedule: update.schedule._to_proto(@client.data_converter, described_action),
               search_attributes: update.search_attributes&._to_proto,
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid

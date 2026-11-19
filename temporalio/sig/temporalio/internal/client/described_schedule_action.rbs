@@ -1,0 +1,18 @@
+module Temporalio
+  module Internal
+    module Client
+      class DescribedScheduleAction
+        attr_reader raw_info: Api::Workflow::V1::NewWorkflowExecutionInfo
+
+        def initialize: (
+          Temporalio::Client::Schedule::Action::StartWorkflow action,
+          Api::Workflow::V1::NewWorkflowExecutionInfo raw_info
+        ) -> void
+
+        def unchanged?: (Symbol name, Object? value) -> bool
+
+        def unchanged_text?: (Symbol name, String? value) -> bool
+      end
+    end
+  end
+end

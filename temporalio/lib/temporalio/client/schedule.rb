@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/converters'
+require 'temporalio/internal/client/described_schedule_action'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/priority'
 require 'temporalio/retry_policy'
@@ -48,10 +49,10 @@ module Temporalio
       end
 
       # @!visibility private
-      def _to_proto(data_converter)
+      def _to_proto(data_converter, described_action = nil)
         Api::Schedule::V1::Schedule.new(
           spec: spec._to_proto,
-          action: action._to_proto(data_converter),
+          action: action._to_proto(data_converter, described_action),
           policies: policy._to_proto,
           state: state._to_proto
         )
@@ -159,8 +160,13 @@ module Temporalio
         end
 
         # @!visibility private
-        def _to_proto(data_converter)
+        def _to_proto(data_converter, described = nil)
           raise NotImplementedError
+        end
+
+        # @!visibility private
+        def _described(_raw_action)
+          nil
         end
 
         StartWorkflow = Data.define(
@@ -305,24 +311,61 @@ module Temporalio
           end
 
           # @!visibility private
-          def _to_proto(data_converter)
+          def _to_proto(data_converter, described = nil)
+            raw_info = described&.raw_info
             Api::Schedule::V1::ScheduleAction.new(
               start_workflow: Api::Workflow::V1::NewWorkflowExecutionInfo.new(
                 workflow_id: id,
                 workflow_type: Api::Common::V1::WorkflowType.new(name: workflow),
                 task_queue: Api::TaskQueue::V1::TaskQueue.new(name: task_queue),
-                input: data_converter.to_payloads(args, hints: arg_hints),
+                input: if described&.unchanged?(:args, args)
+                         raw_info&.input
+                       else
+                         data_converter.to_payloads(args, hints: arg_hints)
+                       end,
                 workflow_execution_timeout: Internal::ProtoUtils.seconds_to_duration(execution_timeout),
                 workflow_run_timeout: Internal::ProtoUtils.seconds_to_duration(run_timeout),
                 workflow_task_timeout: Internal::ProtoUtils.seconds_to_duration(task_timeout),
                 retry_policy: retry_policy&._to_proto,
-                memo: Internal::ProtoUtils.memo_to_proto(memo, data_converter),
+                memo: if described&.unchanged?(:memo, memo)
+                        raw_info&.memo
+                      else
+                        Internal::ProtoUtils.memo_to_proto(memo, data_converter)
+                      end,
                 search_attributes: search_attributes&._to_proto,
-                header: Internal::ProtoUtils.headers_to_proto(headers, data_converter),
+                header: if described&.unchanged?(:headers, headers)
+                          raw_info&.header
+                        else
+                          Internal::ProtoUtils.headers_to_proto(headers, data_converter)
+                        end,
                 priority: priority._to_proto,
-                user_metadata: Internal::ProtoUtils.to_user_metadata(static_summary, static_details, data_converter)
+                user_metadata: _user_metadata_to_proto(data_converter, described)
               )
             )
+          end
+
+          # @!visibility private
+          def _described(raw_action)
+            Internal::Client::DescribedScheduleAction.new(self, raw_action.start_workflow)
+          end
+
+          private
+
+          def _user_metadata_to_proto(data_converter, described)
+            summary_unchanged = described&.unchanged_text?(:static_summary, static_summary)
+            details_unchanged = described&.unchanged_text?(:static_details, static_details)
+            metadata = Internal::ProtoUtils.to_user_metadata(
+              (static_summary unless summary_unchanged),
+              (static_details unless details_unchanged),
+              data_converter
+            )
+            return metadata unless summary_unchanged || details_unchanged
+
+            raw_metadata = described&.raw_info&.user_metadata
+            metadata ||= Api::Sdk::V1::UserMetadata.new
+            metadata.summary = raw_metadata&.summary if summary_unchanged
+            metadata.details = raw_metadata&.details if details_unchanged
+            metadata
           end
         end
       end
