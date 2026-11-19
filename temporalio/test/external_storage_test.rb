@@ -318,7 +318,7 @@ class ExternalStorageTest < Test
     ordinary = payload('"ordinary"')
 
     decoded = References.decode_references(
-      [reference, ordinary], payload_codec: Base64Codec.new
+      [reference, ordinary], payload_codec: Base64Codec.new(pass_through_other_encodings: true)
     )
 
     assert_equal reference, decoded[0]
