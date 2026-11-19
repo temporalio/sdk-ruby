@@ -73,7 +73,8 @@ module Temporalio
       :workflow_task_poller_behavior,
       :activity_task_poller_behavior,
       :debug_mode,
-      :disable_payload_error_limit
+      :disable_payload_error_limit,
+      :disable_local_heartbeat_timeout_for_activities
     )
 
     # Options as returned from {options} for `**to_h` splat use in {initialize}. See {initialize} for details.
@@ -460,6 +461,15 @@ module Temporalio
     # @param disable_payload_error_limit [Boolean] If true, the worker will not proactively fail workflow/activity
     #   tasks whose payloads exceed the namespace error limits; oversized payloads are sent to the server, which
     #   enforces the limit. Defaults to false (the worker fails such tasks before sending).
+    # @param disable_local_heartbeat_timeout_for_activities [Boolean] If true, the worker does not use its own heartbeat
+    #   timer to time out activities. By default it does: when no heartbeat made through the activity's context
+    #   ({Activity::Context#heartbeat}) has been acknowledged for the activity's heartbeat timeout plus about five
+    #   seconds, the worker cancels the activity as timed out (the cancellation details report `timed_out?`) and discards
+    #   its result, since the server is assumed to have timed it out too. Heartbeats sent some other way, for example by
+    #   ID from another process (so that a long native call holding the global VM lock cannot starve them), reach the
+    #   server but not this worker, so without this option the activity is cancelled while the server still considers
+    #   it alive and its finished result is lost. Set this to leave heartbeat timeouts to the server alone. The local
+    #   start-to-close timer is unaffected. Defaults to false.
     def initialize(
       client:,
       task_queue:,
@@ -494,7 +504,8 @@ module Temporalio
       workflow_task_poller_behavior: nil,
       activity_task_poller_behavior: nil,
       debug_mode: %w[true 1].include?(ENV['TEMPORAL_DEBUG'].to_s.downcase),
-      disable_payload_error_limit: false
+      disable_payload_error_limit: false,
+      disable_local_heartbeat_timeout_for_activities: false
     )
       Internal::ProtoUtils.assert_non_reserved_name(task_queue)
 
@@ -539,7 +550,8 @@ module Temporalio
         workflow_task_poller_behavior:,
         activity_task_poller_behavior:,
         debug_mode:,
-        disable_payload_error_limit:
+        disable_payload_error_limit:,
+        disable_local_heartbeat_timeout_for_activities:
       ).freeze
       # Collect applicable client plugins and worker plugins, then validate and apply to options
       @plugins = client.options.plugins.grep(Plugin) + plugins
@@ -608,7 +620,8 @@ module Temporalio
           nondeterminism_as_workflow_fail_for_types:,
           deployment_options: @options.deployment_options._to_bridge_options,
           plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort,
-          disable_payload_error_limit: @options.disable_payload_error_limit
+          disable_payload_error_limit: @options.disable_payload_error_limit,
+          disable_local_heartbeat_timeout_for_activities: @options.disable_local_heartbeat_timeout_for_activities
         )
       )
 

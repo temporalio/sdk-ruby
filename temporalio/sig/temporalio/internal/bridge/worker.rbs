@@ -27,6 +27,7 @@ module Temporalio
           attr_accessor deployment_options: DeploymentOptions?
           attr_accessor plugins: Array[String]
           attr_accessor disable_payload_error_limit: bool
+          attr_accessor disable_local_heartbeat_timeout_for_activities: bool
 
           def initialize: (
             namespace: String,
@@ -52,7 +53,8 @@ module Temporalio
             nondeterminism_as_workflow_fail_for_types: Array[String],
             deployment_options: DeploymentOptions?,
             plugins: Array[String],
-            disable_payload_error_limit: bool
+            disable_payload_error_limit: bool,
+            disable_local_heartbeat_timeout_for_activities: bool
           ) -> void
         end
 

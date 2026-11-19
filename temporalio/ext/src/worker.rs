@@ -584,6 +584,9 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 .collect::<HashSet<_>>(),
         )
         .disable_payload_error_limit(options.member::<bool>(id!("disable_payload_error_limit"))?)
+        .disable_local_heartbeat_timeout_for_activities(
+            options.member::<bool>(id!("disable_local_heartbeat_timeout_for_activities"))?,
+        )
         .build()
         .map_err(|err| error!("Invalid worker options: {}", err))
 }

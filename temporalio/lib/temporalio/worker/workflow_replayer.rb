@@ -246,6 +246,7 @@ module Temporalio
               nondeterminism_as_workflow_fail_for_types:,
               deployment_options: Worker.default_deployment_options._to_bridge_options,
               disable_payload_error_limit: true,
+              disable_local_heartbeat_timeout_for_activities: false,
               plugins: options.plugins.map(&:name).uniq.sort
             )
           )

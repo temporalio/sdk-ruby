@@ -910,6 +910,83 @@ class WorkerActivityTest < Test
                  execute_activity(CustomExecutorActivity, activity_executors: { my_executor: CustomExecutor.new })
   end
 
+  # Never heartbeats through its own context. Something else (see #heartbeat_by_id_until_ended) heartbeats it by ID.
+  class HeartbeatedFromElsewhereActivity < Temporalio::Activity::Definition
+    def initialize
+      @started = Queue.new
+      @ended = Queue.new
+    end
+
+    def execute(seconds)
+      @started.push(nil)
+      sleep(seconds)
+      'completed'
+    ensure
+      @ended.push(nil)
+    end
+
+    def wait_started
+      @started.pop
+    end
+
+    def wait_ended
+      @ended.pop
+    end
+  end
+
+  # Heartbeats the running activity by ID from a thread (in real use another process, so that a long native call holding
+  # the VM lock cannot starve it) until the activity ends, so the server always has a recent heartbeat for it.
+  def heartbeat_by_id_until_ended(handle, activity)
+    activity.wait_started
+    pending = handle.describe.raw_description.pending_activities.first
+    reference = Temporalio::Client::ActivityIDReference.new(
+      workflow_id: handle.id,
+      run_id: handle.result_run_id,
+      activity_id: pending.activity_id
+    )
+    heartbeater = Thread.new do
+      loop do
+        env.client.async_activity_handle(reference).heartbeat('from elsewhere')
+        sleep 0.2
+      end
+    end
+    begin
+      activity.wait_ended
+    ensure
+      heartbeater.kill
+    end
+  end
+
+  # By default the worker times out an activity that has not heartbeated through its own context for the heartbeat timeout
+  # plus a five second buffer, even though the server has been getting heartbeats for it, and the result is lost.
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
+  def test_local_heartbeat_timeout_cancels_activity_heartbeated_from_elsewhere
+    act = HeartbeatedFromElsewhereActivity.new
+    execute_activity(act, 8, heartbeat_timeout: 0.8) do |handle|
+      heartbeat_by_id_until_ended(handle, act)
+      error = assert_raises(Temporalio::Error::WorkflowFailedError) { handle.result }
+      assert_kind_of Temporalio::Error::ActivityError, error.cause
+      assert_kind_of Temporalio::Error::TimeoutError, error.cause.cause
+      assert_equal Temporalio::Error::TimeoutError::TimeoutType::HEARTBEAT, error.cause.cause.type
+    end
+  end
+
+  exclude_from_cloud :needs_cloud_adaptation,
+                     'The Go kitchen-sink worker does not receive Cloud TLS configuration.'
+  def test_disable_local_heartbeat_timeout_for_activities
+    act = HeartbeatedFromElsewhereActivity.new
+    execute_activity(
+      act,
+      8,
+      heartbeat_timeout: 0.8,
+      worker_options: { disable_local_heartbeat_timeout_for_activities: true }
+    ) do |handle|
+      heartbeat_by_id_until_ended(handle, act)
+      assert_equal 'completed', handle.result
+    end
+  end
+
   class ConcurrentActivity < Temporalio::Activity::Definition
     def initialize
       @started = Queue.new
@@ -1252,12 +1329,14 @@ class WorkerActivityTest < Test
     cancellation: nil,
     raise_in_block_on_shutdown: true,
     activity_executors: nil,
+    worker_options: nil,
     interceptors: [],
     client: env.client
   )
     activity_defn = Temporalio::Activity::Definition::Info.from_activity(activity)
     extra_worker_args = {}
     extra_worker_args[:activity_executors] = activity_executors if activity_executors
+    extra_worker_args.merge!(worker_options) if worker_options
     worker = Temporalio::Worker.new(
       client:,
       task_queue: "tq-#{SecureRandom.uuid}",
