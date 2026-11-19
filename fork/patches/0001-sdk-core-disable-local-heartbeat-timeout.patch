@@ -1,0 +1,226 @@
+diff --git a/crates/sdk-core/src/worker/activities.rs b/crates/sdk-core/src/worker/activities.rs
+index db743b6d..4c45dc24 100644
+--- a/crates/sdk-core/src/worker/activities.rs
++++ b/crates/sdk-core/src/worker/activities.rs
+@@ -212,6 +212,7 @@ impl WorkerActivityTasks {
+         default_heartbeat_throttle_interval: Duration,
+         graceful_shutdown: Option<Duration>,
+         local_timeout_buffer: Duration,
++        disable_local_heartbeat_timeout: bool,
+     ) -> Self {
+         let shutdown_initiated_token = CancellationToken::new();
+         let outstanding_activity_tasks = Arc::new(parking_lot::Mutex::new(HashMap::new()));
+@@ -245,6 +246,7 @@ impl WorkerActivityTasks {
+             grace_period: graceful_shutdown,
+             cancels_tx,
+             local_timeout_buffer,
++            disable_local_heartbeat_timeout,
+             shutdown_initiated_token: shutdown_initiated_token.clone(),
+             metrics: metrics.clone(),
+         }
+@@ -649,6 +651,8 @@ struct ActivityTaskStream<SrcStrm> {
+     cancels_tx: UnboundedSender<PendingActivityCancel>,
+     /// The extra time we'll wait for local timeouts before firing them, to avoid racing with server
+     local_timeout_buffer: Duration,
++    /// If true, no local heartbeat timer is run: heartbeat timeouts are left to the server
++    disable_local_heartbeat_timeout: bool,
+     /// Token which is cancelled once shutdown is beginning
+     shutdown_initiated_token: CancellationToken,
+     metrics: MetricsContext,
+@@ -755,9 +759,15 @@ where
+                                 // activities can still get cleaned up even if the user isn't
+                                 // heartbeating. Schedule to closed is not tracked due to the
+                                 // possibility of clock skew messing things up, and it's relative
+-                                // unlikeliness compared to the other timeouts.
++                                // unlikeliness compared to the other timeouts. The heartbeat timer is
++                                // left out when the user asked for heartbeat timeouts to be enforced
++                                // by the server alone.
+                                 if let Some(timers) = ActivityLocalTimers::new(
+-                                    task.resp.heartbeat_timeout,
++                                    if self.disable_local_heartbeat_timeout {
++                                        None
++                                    } else {
++                                        task.resp.heartbeat_timeout
++                                    },
+                                     task.resp.start_to_close_timeout,
+                                     self.local_timeout_buffer,
+                                 ) {
+@@ -1042,6 +1052,7 @@ mod tests {
+     fn build_local_timeout_test_atm(
+         mock_client: Arc<MockWorkerClient>,
+         local_timeout_buffer: Duration,
++        disable_local_heartbeat_timeout: bool,
+     ) -> WorkerActivityTasks {
+         let sem = fixed_size_permit_dealer(1);
+         let shutdown_token = CancellationToken::new();
+@@ -1068,6 +1079,7 @@ mod tests {
+             Duration::from_secs(1),
+             None,
+             local_timeout_buffer,
++            disable_local_heartbeat_timeout,
+         )
+     }
+ 
+@@ -1155,6 +1167,7 @@ mod tests {
+             Duration::from_secs(1),
+             None,
+             Duration::from_secs(5),
++            false,
+         );
+         let start = Instant::now();
+         let t1 = atm.poll().await.unwrap();
+@@ -1223,7 +1236,7 @@ mod tests {
+                 })
+             });
+         let mock_client = Arc::new(mock_client);
+-        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(100));
++        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(100), false);
+ 
+         for _ in 1..=3 {
+             let start = Instant::now();
+@@ -1273,7 +1286,7 @@ mod tests {
+             .times(2)
+             .returning(|_, _| Ok(Default::default()));
+         let mock_client = Arc::new(mock_client);
+-        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0));
++        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0), false);
+ 
+         let t = atm.poll().await.unwrap();
+ 
+@@ -1313,6 +1326,95 @@ mod tests {
+         atm.shutdown().await;
+     }
+ 
++    // With the local heartbeat timer disabled, an activity that never heartbeats through this worker is not timed out
++    // locally, however long its heartbeat timeout has elapsed: only the server enforces it.
++    #[tokio::test]
++    async fn local_heartbeat_timeout_can_be_disabled() {
++        let mut mock_client = mock_worker_client();
++        mock_client
++            .expect_poll_activity_task()
++            .times(1)
++            .returning(move |_, _| {
++                Ok(PollActivityTaskQueueResponse {
++                    task_token: vec![1],
++                    activity_id: "act1".to_string(),
++                    heartbeat_timeout: Some(prost_dur!(from_millis(100))),
++                    ..Default::default()
++                })
++            });
++        mock_client // We can end up polling again - just return nothing.
++            .expect_poll_activity_task()
++            .returning(|_, _| Ok(Default::default()));
++        let mock_client = Arc::new(mock_client);
++        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0), true);
++
++        let t = atm.poll().await.unwrap();
++        // Six times the heartbeat timeout. With the timer enabled the timeout cancel would have arrived by now.
++        assert!(
++            tokio::time::timeout(Duration::from_millis(600), atm.poll())
++                .await
++                .is_err(),
++            "the activity was timed out locally"
++        );
++
++        atm.complete(
++            t.task_token.into(),
++            ActivityExecutionResult::will_complete_async()
++                .status
++                .unwrap(),
++            mock_client.as_ref(),
++        )
++        .await;
++        atm.initiate_shutdown();
++        assert_matches!(atm.poll().await.unwrap_err(), PollError::ShutDown);
++        atm.shutdown().await;
++    }
++
++    // Disabling the local heartbeat timer leaves the local start_to_close timer alone.
++    #[tokio::test]
++    async fn disabling_local_heartbeat_timeout_keeps_start_to_close() {
++        let mut mock_client = mock_worker_client();
++        mock_client
++            .expect_poll_activity_task()
++            .times(1)
++            .returning(move |_, _| {
++                Ok(PollActivityTaskQueueResponse {
++                    task_token: vec![1],
++                    activity_id: "act1".to_string(),
++                    start_to_close_timeout: Some(prost_dur!(from_millis(300))),
++                    heartbeat_timeout: Some(prost_dur!(from_millis(100))),
++                    ..Default::default()
++                })
++            });
++        mock_client
++            .expect_poll_activity_task()
++            .returning(|_, _| Ok(Default::default()));
++        let mock_client = Arc::new(mock_client);
++        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0), true);
++
++        let t = atm.poll().await.unwrap();
++        let start = Instant::now();
++        let timed_out = tokio::time::timeout(Duration::from_secs(2), atm.poll())
++            .await
++            .expect("start_to_close_timeout was not enforced locally")
++            .unwrap();
++        assert!(timed_out.is_timeout());
++        // It was the 300ms start_to_close timer, not the (disabled) 100ms heartbeat timer.
++        assert!(start.elapsed() >= Duration::from_millis(250));
++
++        atm.complete(
++            t.task_token.into(),
++            ActivityExecutionResult::fail("unimportant".into())
++                .status
++                .unwrap(),
++            mock_client.as_ref(),
++        )
++        .await;
++        atm.initiate_shutdown();
++        assert_matches!(atm.poll().await.unwrap_err(), PollError::ShutDown);
++        atm.shutdown().await;
++    }
++
+     // Regression test for https://github.com/temporalio/sdk-rust/issues/1188.
+     #[tokio::test]
+     async fn start_to_close_fires_when_heartbeat_timeout_shorter() {
+@@ -1336,7 +1438,7 @@ mod tests {
+             .expect_record_activity_heartbeat()
+             .returning(|_, _| Ok(Default::default()));
+         let mock_client = Arc::new(mock_client);
+-        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0));
++        let atm = build_local_timeout_test_atm(mock_client.clone(), Duration::from_millis(0), false);
+ 
+         let t = atm.poll().await.unwrap();
+         let tt = t.task_token.clone();
+diff --git a/crates/sdk-core/src/worker/mod.rs b/crates/sdk-core/src/worker/mod.rs
+index e4629ed9..f841aeeb 100644
+--- a/crates/sdk-core/src/worker/mod.rs
++++ b/crates/sdk-core/src/worker/mod.rs
+@@ -241,6 +241,19 @@ pub struct WorkerConfig {
+     #[builder(default = Duration::from_secs(5))]
+     pub local_timeout_buffer_for_activities: Duration,
+ 
++    /// If true, core does not use its own heartbeat timer to time out activities.
++    ///
++    /// By default it does: when no heartbeat recorded through this worker has been acknowledged for an
++    /// activity's heartbeat timeout plus [WorkerConfig::local_timeout_buffer_for_activities], core
++    /// cancels the activity as timed out and discards its result, since the server is assumed to have
++    /// timed it out too. Heartbeats sent some other way (for example by ID from another process, so that
++    /// a long native call holding the language's global lock cannot starve them) reach the server but
++    /// not this worker, so the activity is cancelled while the server still considers it alive and its
++    /// finished result is lost. Set this to leave heartbeat timeouts to the server alone. The local
++    /// start-to-close timer is unaffected.
++    #[builder(default = false)]
++    pub disable_local_heartbeat_timeout_for_activities: bool,
++
+     /// Any error types listed here will cause any workflow being processed by this worker to fail,
+     /// rather than simply failing the workflow task.
+     #[builder(default)]
+@@ -1074,6 +1087,7 @@ impl Worker {
+                         config.default_heartbeat_throttle_interval,
+                         config.graceful_shutdown_period,
+                         config.local_timeout_buffer_for_activities,
++                        config.disable_local_heartbeat_timeout_for_activities,
+                     )
+                 });
+ 

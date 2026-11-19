@@ -1,0 +1,6 @@
+.git
+.claude
+**/target
+**/*.bundle
+**/*.so
+fork/dist
