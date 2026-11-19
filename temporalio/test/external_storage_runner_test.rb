@@ -13,12 +13,10 @@ class ExternalStorageRunnerTest < Test
   References = Temporalio::Internal::ExternalStorageReferences
 
   class FakeClock
+    attr_reader :now
+
     def initialize
       @now = 0.0
-    end
-
-    def call
-      @now
     end
 
     def advance(seconds)
@@ -171,7 +169,7 @@ class ExternalStorageRunnerTest < Test
                           drivers: [two, one],
                           driver_selector: ->(_context, payload) { payload.data == '"a"' ? one : two },
                           payload_size_threshold: 0
-                        ), namespace: nil, clock:)
+                        ), namespace: nil, clock: -> { clock.now })
     originals = [payload('a'), payload('b'), payload('c')]
     original_size = originals.sum { |p| p.to_proto.bytesize }
 

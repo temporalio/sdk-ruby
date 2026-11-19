@@ -2,7 +2,7 @@ class ExternalStorageRunnerTest < Test
   class FakeClock
     @now: Float
 
-    def call: -> Float
+    attr_reader now: Float
     def advance: (Float seconds) -> Float
   end
 
