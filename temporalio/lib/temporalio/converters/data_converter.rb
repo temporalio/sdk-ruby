@@ -50,7 +50,7 @@ module Temporalio
         # Storage is applied in the payload methods below so every client and activity call gets it without changes at
         # each call site. This is temporary. It will move to the call sites as a pass over each whole request, which
         # batches all of a request's payloads into one driver call and can tell drivers which execution they belong to.
-        # Retrieving runs even without storage, so a reference is reported rather than decoded as an ordinary value.
+        # References are checked even without storage, so they are never decoded as ordinary values.
         @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage, namespace: nil)
       end
 
@@ -105,7 +105,7 @@ module Temporalio
       def from_payloads(payloads, hints: nil)
         return [] unless payloads && !payloads.payloads.empty?
 
-        payloads = Api::Common::V1::Payloads.new(payloads: @external_storage_runner.retrieve(payloads.payloads.to_a))
+        payloads = @external_storage_runner.retrieve(payloads)
         if payload_codec && !payloads.payloads.empty?
           payloads = Api::Common::V1::Payloads.new(payloads: payload_codec.decode(payloads.payloads))
         end
