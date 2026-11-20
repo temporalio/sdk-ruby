@@ -1,0 +1,3 @@
+class ClientScheduleExternalStorageTest < Test
+  def with_stored_schedule: () { (Temporalio::Client::ScheduleHandle, untyped) -> void } -> void
+end

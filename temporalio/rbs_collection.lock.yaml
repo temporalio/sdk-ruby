@@ -149,6 +149,22 @@ gems:
   version: '0'
   source:
     type: stdlib
+- name: opentelemetry-api
+  version: '1.11'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: b1e941e6f9ea54a36694ed7913f12db8ffb9c432
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: opentelemetry-sdk
+  version: '1.13'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: b1e941e6f9ea54a36694ed7913f12db8ffb9c432
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
 - name: optparse
   version: '0'
   source:
