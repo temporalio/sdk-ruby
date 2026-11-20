@@ -4,6 +4,7 @@ require 'temporalio/api/payload_visitor'
 require 'temporalio/error'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/external_storage_runner'
+require 'temporalio/internal/storage_operation_metrics'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/scoped_logger'
 require 'temporalio/workflow'
@@ -90,30 +91,22 @@ module Temporalio
                                  'storage and not using fibers'
           end
 
-          # If there is a payload codec or external storage, we need to build encoding and decoding visitors. Storage
-          # comes after the codec when encoding and before it when decoding. These may block, so they run in the
-          # background.
-          storage_runner = ExternalStorageRunner.new(external_storage, namespace:)
+          # If there is a payload codec or external storage, payloads are encoded and decoded by visitors built per
+          # pass, so each pass can measure its own storage operations. Storage comes after the codec when encoding and
+          # before it when decoding. These may block, so they run in the background.
+          @payload_codec = payload_codec
+          @external_storage = external_storage
+          @storage_runner = ExternalStorageRunner.new(external_storage, namespace:)
           @decode_in_background = !payload_codec.nil? || !external_storage.nil?
-          if @decode_in_background
-            @payload_encoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
-              replace_payloads_on_visit(payload_or_payloads) do |payloads|
-                payloads = payload_codec.encode(payloads) if payload_codec
-                payloads = storage_runner.store(payloads.to_a) if external_storage
-                payloads
-              end
-            end
-            @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
-              replace_payloads_on_visit(payload_or_payloads) do |payloads|
-                payloads = storage_runner.retrieve(payloads.to_a)
-                payloads = payload_codec.decode(payloads) if payload_codec
-                payloads
-              end
-            end
-          else
+          # Download metrics by run ID, waiting for the completion of the activation that measured them. Core never has
+          # two activations of one run outstanding, so the run ID identifies the activation.
+          @pending_download_metrics = {}
+          @pending_download_metrics_mutex = Mutex.new
+          unless @decode_in_background
             # Without a codec or storage, decoding only rejects references that were never retrieved. That needs no
             # I/O, so it runs inline and existing workers need no thread pool.
-            @payload_decoding_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
+            storage_runner = @storage_runner
+            @payload_rejecting_visitor = Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
               storage_runner.retrieve(
                 payload_or_payloads.is_a?(Api::Common::V1::Payload) ? [payload_or_payloads] : payload_or_payloads.to_a
               )
@@ -176,7 +169,7 @@ module Temporalio
         # Returns whether completion was submitted to the bridge
         # rubocop:disable-next Naming/PredicateMethod
         def handle_activation_complete(runner:, activation_completion:, encoded:, completion_complete_queue:)
-          if @payload_encoding_visitor && !encoded
+          if @decode_in_background && !encoded
             if Fiber.current_scheduler
               Fiber.schedule { encode_activation_completion(runner, activation_completion) }
             else
@@ -203,7 +196,17 @@ module Temporalio
         # activation as failed. Otherwise the run waits forever for a completion that never comes.
 
         def decode_activation(runner, activation)
-          @payload_decoding_visitor.run(activation)
+          if @decode_in_background
+            metrics = nil
+            if @external_storage
+              metrics = StorageOperationMetrics.new
+              # Stored before the visit, so the completion reports what was retrieved even if decoding then fails
+              @pending_download_metrics_mutex.synchronize { @pending_download_metrics[activation.run_id] = metrics }
+            end
+            payload_decoding_visitor(metrics).run(activation)
+          else
+            @payload_rejecting_visitor&.run(activation)
+          end
           runner.apply_workflow_activation_decoded(workflow_worker: self, activation:)
         rescue Exception => e # rubocop:disable Lint/RescueException
           activation_completion = WorkflowInstance.new_completion_with_failure(
@@ -217,18 +220,51 @@ module Temporalio
         end
 
         def encode_activation_completion(runner, activation_completion)
-          @payload_encoding_visitor.run(activation_completion)
-          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
-        rescue Exception => e # rubocop:disable Lint/RescueException
-          # Only the message is sent, and it is marked encoded, because encoding a failure that carries payloads could
-          # fail the same way and retry forever
-          activation_completion = Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
-            run_id: activation_completion.run_id,
-            failed: Bridge::Api::WorkflowCompletion::Failure.new(
-              failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}")
+          download_metrics = @pending_download_metrics_mutex.synchronize do
+            @pending_download_metrics.delete(activation_completion.run_id)
+          end
+          upload_metrics = StorageOperationMetrics.new if @external_storage
+          begin
+            payload_encoding_visitor(upload_metrics).run(activation_completion)
+          rescue Exception => e # rubocop:disable Lint/RescueException
+            # Only the message is sent, and it is marked encoded, because encoding a failure that carries payloads
+            # could fail the same way and retry forever
+            activation_completion = Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
+              run_id: activation_completion.run_id,
+              failed: Bridge::Api::WorkflowCompletion::Failure.new(
+                failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}")
+              )
             )
-          )
-          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: false)
+          end
+          # Reported even when a pass failed, since what it moved before failing still took time
+          activation_completion.payload_download_metrics = download_metrics&.to_proto
+          activation_completion.payload_upload_metrics = upload_metrics&.to_proto
+          runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
+        end
+
+        def payload_encoding_visitor(metrics)
+          payload_codec = @payload_codec
+          external_storage = @external_storage
+          storage_runner = @storage_runner
+          Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
+            replace_payloads_on_visit(payload_or_payloads) do |payloads|
+              payloads = payload_codec.encode(payloads) if payload_codec
+              payloads = storage_runner.store(payloads.to_a, metrics:) if external_storage
+              payloads
+            end
+          end
+        end
+
+        def payload_decoding_visitor(metrics)
+          payload_codec = @payload_codec
+          storage_runner = @storage_runner
+          Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
+            replace_payloads_on_visit(payload_or_payloads) do |payloads|
+              payloads = storage_runner.retrieve(payloads.to_a, metrics:)
+              payloads = payload_codec.decode(payloads) if payload_codec
+              payloads
+            end
+          end
         end
 
         def replace_payloads_on_visit(payload_or_payloads, &)

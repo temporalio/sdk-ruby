@@ -9,6 +9,7 @@ require 'temporalio/converters/storage_driver_select_context'
 require 'temporalio/converters/storage_driver_store_context'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
+require 'temporalio/internal/storage_operation_metrics'
 
 module Temporalio
   module Internal
@@ -23,18 +24,24 @@ module Temporalio
     #
     # @!visibility private
     class ExternalStorageRunner
+      MONOTONIC_CLOCK = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+      private_constant :MONOTONIC_CLOCK
+
       # @param storage [Converters::ExternalStorage, nil] Configured storage. When nil, storing does nothing and
       #   retrieving raises if it finds a reference, so a reference is never mistaken for an ordinary payload.
       # @param namespace [String, nil] Namespace of the client or worker storing through this runner, or nil when it is
       #   not known.
-      def initialize(storage, namespace:)
+      # @param clock [Proc] Returns monotonic seconds, read around each driver call to time it.
+      def initialize(storage, namespace:, clock: MONOTONIC_CLOCK)
         @storage = storage
         @namespace = namespace
+        @clock = clock
       end
 
       # @param payloads [Array<Api::Common::V1::Payload>] Codec-encoded payloads. Not mutated.
+      # @param metrics [StorageOperationMetrics, nil] Records each driver call that stores payloads.
       # @return [Array<Api::Common::V1::Payload>] Payloads with every eligible one replaced by a reference.
-      def store(payloads)
+      def store(payloads, metrics: nil)
         storage = @storage
         return payloads unless storage
 
@@ -69,8 +76,17 @@ module Temporalio
           # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
           # place
           copies = indexes_and_serialized.map { |_index, serialized| Api::Common::V1::Payload.decode(serialized) }
+          start_time = @clock.call
           claims = driver.store(context, copies)
+          end_time = @clock.call
           check_result_count(driver, 'store', indexes_and_serialized.size, claims)
+          metrics&.record(
+            driver_name: driver.name,
+            payload_count: claims.size,
+            total_size_bytes: indexes_and_serialized.sum { |_index, serialized| serialized.bytesize },
+            start_time:,
+            end_time:
+          )
 
           indexes_and_serialized.zip(claims) do |(index, serialized), claim|
             result[index] = ExternalStorageReferences.create_reference_payload(
@@ -82,9 +98,10 @@ module Temporalio
       end
 
       # @param payloads [Array<Api::Common::V1::Payload>] Payloads that may contain references. Not mutated.
+      # @param metrics [StorageOperationMetrics, nil] Records each driver call that retrieves payloads.
       # @return [Array<Api::Common::V1::Payload>] Payloads with every reference replaced by what it points at.
       # @raise [Error::ExternalStorageNotConfiguredError] If there is a reference but no storage is configured.
-      def retrieve(payloads)
+      def retrieve(payloads, metrics: nil)
         storage = @storage
         # Driver => [[index, claim], ...] for each reference that driver stored. Every driver is looked up here, so an
         # unregistered name fails before any request is made.
@@ -105,8 +122,17 @@ module Temporalio
           context = Converters::StorageDriverRetrieveContext.new(
             cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
           )
+          start_time = @clock.call
           retrieved = driver.retrieve(context, indexes_and_claims.map { |_index, claim| claim })
+          end_time = @clock.call
           check_result_count(driver, 'retrieve', indexes_and_claims.size, retrieved)
+          metrics&.record(
+            driver_name: driver.name,
+            payload_count: retrieved.size,
+            total_size_bytes: retrieved.sum { |payload| payload.to_proto.bytesize },
+            start_time:,
+            end_time:
+          )
 
           indexes_and_claims.zip(retrieved) { |(index, _claim), payload| result[index] = payload }
         end

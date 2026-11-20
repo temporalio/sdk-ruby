@@ -3,11 +3,20 @@ module Temporalio
     class ExternalStorageRunner
       @storage: Converters::ExternalStorage?
       @namespace: String?
+      @clock: ^() -> Float
 
-      def initialize: (Converters::ExternalStorage? storage, namespace: String?) -> void
+      MONOTONIC_CLOCK: ^() -> Float
 
-      def store: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
-      def retrieve: (Array[Api::Common::V1::Payload] payloads) -> Array[Api::Common::V1::Payload]
+      def initialize: (Converters::ExternalStorage? storage, namespace: String?, ?clock: ^() -> Float) -> void
+
+      def store: (
+        Array[Api::Common::V1::Payload] payloads,
+        ?metrics: StorageOperationMetrics?
+      ) -> Array[Api::Common::V1::Payload]
+      def retrieve: (
+        Array[Api::Common::V1::Payload] payloads,
+        ?metrics: StorageOperationMetrics?
+      ) -> Array[Api::Common::V1::Payload]
 
       private def check_result_count: (
         Converters::StorageDriver driver,

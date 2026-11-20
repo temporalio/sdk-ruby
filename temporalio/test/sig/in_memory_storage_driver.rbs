@@ -1,0 +1,17 @@
+class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
+  @name: String
+  @type: String
+  @mutex: Mutex
+  @stored: Hash[String, String]
+  @store_calls: Array[[Temporalio::Converters::StorageDriverStoreContext, Integer]]
+  @retrieve_calls: Array[Integer]
+
+  attr_reader name: String
+  attr_reader type: String
+
+  def initialize: (?name: String, ?type: String) -> void
+
+  def stored: -> Hash[String, String]
+  def store_calls: -> Array[[Temporalio::Converters::StorageDriverStoreContext, Integer]]
+  def retrieve_calls: -> Array[Integer]
+end

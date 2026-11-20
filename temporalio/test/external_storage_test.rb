@@ -121,7 +121,9 @@ class ExternalStorageTest < Test
   def test_symbol_driver_name_rejected
     # A Symbol passes a bare empty? check but cannot be looked up by String or written to the proto.
     err = assert_raises(ArgumentError) do
-      Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new(name: :mem)])
+      Temporalio::Converters::ExternalStorage.new(
+        drivers: [InMemoryStorageDriver.new(name: :mem)] # steep:ignore ArgumentTypeMismatch
+      )
     end
     assert_includes err.message, 'must be a non-empty String'
   end

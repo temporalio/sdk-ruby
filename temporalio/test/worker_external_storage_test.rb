@@ -456,7 +456,57 @@ class WorkerExternalStorageTest < Test
     end
   end
 
+  def test_workflow_task_completions_report_storage_metrics
+    driver = InMemoryStorageDriver.new
+    completions = run_echo_workflow_capturing_completions(driver)
+
+    # The first task retrieves the input and stores the result
+    first = completions.first or flunk('No completions')
+    stored_sizes = driver.stored.values.map(&:bytesize).sort
+    download = first.payload_download_metrics or flunk('No download metrics')
+    upload = first.payload_upload_metrics or flunk('No upload metrics')
+    assert_equal 1, download.payload_count
+    assert_equal 1, upload.payload_count
+    assert_equal stored_sizes, [download.total_size_bytes, upload.total_size_bytes].sort
+    assert_equal ['mem'], download.driver_names.to_a
+    assert_equal ['mem'], upload.driver_names.to_a
+  end
+
+  def test_failed_store_still_reports_download_metrics
+    completions = run_echo_workflow_capturing_completions(FailOnceStorageDriver.new(fail_store_containing: 'done'))
+
+    failed = completions.find(&:failed) or flunk('No failed completion')
+    download = failed.payload_download_metrics or flunk('No download metrics')
+    assert_equal 1, download.payload_count
+    assert_equal ['mem'], download.driver_names.to_a
+    assert_nil failed.payload_upload_metrics
+  end
+
   private
+
+  def run_echo_workflow_capturing_completions(driver)
+    client = client_with_storage(driver)
+    worker = Temporalio::Worker.new(
+      client:,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [EchoWorkflow],
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    )
+    completions = Queue.new
+    bridge_worker = worker._bridge_worker
+    complete = bridge_worker.method(:async_complete_workflow_activation)
+    bridge_worker.define_singleton_method(:async_complete_workflow_activation) do |run_id, proto, queue|
+      completions << Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.decode(proto)
+      complete.call(run_id, proto, queue)
+    end
+    worker.run do
+      result = client.execute_workflow(
+        EchoWorkflow, 'start-input', id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue
+      )
+      assert_equal 'start-input done', result
+    end
+    Array.new(completions.size) { completions.pop }
+  end
 
   def assert_storage_failure_retried(driver, failure_message)
     execute_workflow(

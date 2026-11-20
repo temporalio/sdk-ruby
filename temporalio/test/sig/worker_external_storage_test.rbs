@@ -80,6 +80,9 @@ class WorkerExternalStorageTest < Test
     def change: (untyped input) -> untyped
   end
 
+  def run_echo_workflow_capturing_completions: (
+    Temporalio::Converters::StorageDriver driver
+  ) -> Array[Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion]
   def assert_storage_failure_retried: (Temporalio::Converters::StorageDriver driver, String failure_message) -> void
   def client_with_storage: (
     Temporalio::Converters::StorageDriver driver,

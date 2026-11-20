@@ -36,7 +36,7 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
   end
 
   def store(context, payloads)
-    @mutex.synchronize { @store_calls << [context, payloads.size] }
+    @mutex.synchronize { @store_calls << [context, payloads.count] }
     payloads.map do |payload|
       key = SecureRandom.uuid
       @mutex.synchronize { @stored[key] = payload.to_proto }
@@ -45,7 +45,7 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
   end
 
   def retrieve(_context, claims)
-    @mutex.synchronize { @retrieve_calls << claims.size }
+    @mutex.synchronize { @retrieve_calls << claims.count }
     claims.map do |claim|
       bytes = @mutex.synchronize { @stored.fetch(claim.claim_data.fetch('key')) }
       Temporalio::Api::Common::V1::Payload.decode(bytes)
