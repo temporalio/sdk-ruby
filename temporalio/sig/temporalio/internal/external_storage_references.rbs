@@ -3,8 +3,14 @@ module Temporalio
     module ExternalStorageReferences
       ENCODING: String
       MESSAGE_TYPE: String
+      MARKER_KEY: String
 
       def self.reference?: (Api::Common::V1::Payload payload) -> bool
+      def self.marked_reference?: (Api::Common::V1::Payload payload) -> bool
+      def self.decode_references: (
+        Array[Api::Common::V1::Payload] payloads,
+        payload_codec: Converters::PayloadCodec?
+      ) -> Array[Api::Common::V1::Payload]
       def self.parse_reference: (
         Api::Common::V1::Payload payload
       ) -> Api::Sdk::V1::ExternalStorageReference?

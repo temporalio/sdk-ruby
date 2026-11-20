@@ -7,6 +7,7 @@ require 'temporalio/client'
 require 'temporalio/converters/external_storage'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
+require 'temporalio/internal/external_storage_runner'
 require 'temporalio/worker'
 require 'temporalio/workflow'
 require 'test'
@@ -220,6 +221,90 @@ class WorkerExternalStorageTest < Test
         refute_nil failure
         assert_includes failure.failure.message, 'TMPRL1105'
       end
+    end
+  end
+
+  def test_worker_reads_encoded_reference
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    # Ruby does not write encoded references yet, so the input is written as another SDK would
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'start-input')),
+      client:,
+      start_workflow_client: env.client,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'start-input done', client.workflow_handle(handle.id).result
+    end
+  end
+
+  def test_worker_without_the_writing_codec_fails_the_task_on_an_encoded_reference
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'start-input')),
+      client: client_with_storage(driver),
+      start_workflow_client: env.client,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1106')
+    end
+  end
+
+  def test_worker_without_storage_or_codec_fails_the_task_on_an_encoded_reference
+    execute_workflow(
+      EchoWorkflow, Temporalio::Converters::RawValue.new(encoded_reference(InMemoryStorageDriver.new, 'start-input'))
+    ) do |handle|
+      assert_eventually_task_fail(handle:, message_contains: 'TMPRL1105')
+    end
+  end
+
+  def test_activity_reads_encoded_reference_input
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    worker = Temporalio::Worker.new(
+      client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [HeartbeatRetryActivity]
+    )
+    worker.run do
+      # Started with a plain client so the raw input reaches history as another SDK would write it
+      handle = env.client.start_activity(
+        HeartbeatRetryActivity, Temporalio::Converters::RawValue.new(encoded_reference(driver, 'activity-input')),
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 2, initial_interval: 0.1)
+      )
+      assert_equal 'activity-input heartbeat-detail', client.activity_handle(handle.id).result
+    end
+  end
+
+  # Heartbeats through a client without codec or storage, so the details reach the server as written
+  class EncodedHeartbeatActivity < Temporalio::Activity::Definition
+    def initialize(plain_client, encoded_detail)
+      @plain_client = plain_client
+      @encoded_detail = encoded_detail
+    end
+
+    def execute
+      info = Temporalio::Activity::Context.current.info
+      if info.attempt == 1
+        @plain_client.async_activity_handle(info.task_token)
+                     .heartbeat(Temporalio::Converters::RawValue.new(@encoded_detail))
+        raise 'Intentional error'
+      end
+      info.heartbeat_details.first
+    end
+  end
+
+  def test_activity_reads_encoded_reference_heartbeat_details
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver, payload_codec: Base64Codec.new)
+    activity = EncodedHeartbeatActivity.new(env.client, encoded_reference(driver, 'heartbeat-detail'))
+    worker = Temporalio::Worker.new(client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [activity])
+    worker.run do
+      handle = client.start_activity(
+        EncodedHeartbeatActivity,
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 2, initial_interval: 0.1)
+      )
+      assert_equal 'heartbeat-detail', handle.result
     end
   end
 
@@ -476,6 +561,18 @@ class WorkerExternalStorageTest < Test
       external_storage: Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
     )
     Temporalio::Client.new(**env.client.options.with(data_converter:).to_h) # steep:ignore InsufficientKeywordArguments
+  end
+
+  # Stores the value encoded with Base64Codec, then encodes and marks its reference
+  def encoded_reference(driver, value)
+    codec = Base64Codec.new
+    storage = Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
+    stored = Temporalio::Converters::DataConverter.new(payload_codec: codec).to_payload(value)
+    reference = Temporalio::Internal::ExternalStorageRunner.new(storage, namespace: nil).store([stored]).first
+    encoded = codec.encode([reference]).first
+    encoded.metadata[References::MARKER_KEY] = 'true'
+    encoded.external_payloads.push(*reference.external_payloads.map(&:dup))
+    encoded
   end
 
   def first_attrs(events, attrs_method)

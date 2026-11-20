@@ -32,6 +32,14 @@ class WorkerExternalStorageTest < Test
     def execute: -> String
   end
 
+  class EncodedHeartbeatActivity < Temporalio::Activity::Definition
+    @plain_client: Temporalio::Client
+    @encoded_detail: Temporalio::Api::Common::V1::Payload
+
+    def initialize: (Temporalio::Client plain_client, Temporalio::Api::Common::V1::Payload encoded_detail) -> void
+    def execute: () -> untyped
+  end
+
   class AsyncCompletionActivity < Temporalio::Activity::Definition
     @task_token: Queue
 
@@ -85,6 +93,10 @@ class WorkerExternalStorageTest < Test
     Temporalio::Converters::StorageDriver driver,
     ?payload_codec: Temporalio::Converters::PayloadCodec?
   ) -> Temporalio::Client
+  def encoded_reference: (
+    Temporalio::Converters::StorageDriver driver,
+    String value
+  ) -> Temporalio::Api::Common::V1::Payload
   def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
   def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
 end

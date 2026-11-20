@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 require 'base64'
+require 'base64_codec'
 require 'in_memory_storage_driver'
 require 'recording_storage_driver_limiter'
 require 'securerandom'
 require 'temporalio/cancellation'
+require 'temporalio/converters/data_converter'
 require 'temporalio/converters/external_storage'
 require 'temporalio/converters/storage_driver_activity_info'
 require 'temporalio/converters/storage_driver_claim'
@@ -14,6 +16,7 @@ require 'temporalio/converters/storage_driver_store_context'
 require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
+require 'temporalio/internal/external_storage_runner'
 require 'test'
 
 class ExternalStorageTest < Test
@@ -285,7 +288,76 @@ class ExternalStorageTest < Test
     assert_includes err.message, 'TMPRL1105'
   end
 
+  def test_decode_references_decodes_marked_reference_and_keeps_its_size
+    reference = References.create_reference_payload(
+      driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 385
+    )
+    ordinary = payload('"ordinary"')
+
+    decoded = References.decode_references(
+      [encoded_reference(reference), ordinary], payload_codec: Base64Codec.new
+    )
+
+    assert_equal reference, decoded[0]
+    assert_same ordinary, decoded[1]
+  end
+
+  def test_decode_references_raises_when_marked_payload_decodes_to_something_else
+    assert_raises(Temporalio::Error::ExternalStorageReferenceDecodeError) do
+      References.decode_references(
+        [encoded_reference(payload('"not a reference"'))], payload_codec: Base64Codec.new
+      )
+    end
+  end
+
+  def test_decode_references_keeps_marked_reference_the_codec_passes_through
+    reference = References.create_reference_payload(
+      driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 385
+    )
+    reference.metadata[References::MARKER_KEY] = 'true'
+    ordinary = payload('"ordinary"')
+
+    decoded = References.decode_references(
+      [reference, ordinary], payload_codec: Base64Codec.new(pass_through_other_encodings: true)
+    )
+
+    assert_equal reference, decoded[0]
+    assert_same ordinary, decoded[1]
+  end
+
+  def test_decode_references_without_codec_returns_payloads_unchanged
+    encoded = encoded_reference(
+      References.create_reference_payload(driver_name: 'mem', claim_data: {}, original_size_bytes: 1)
+    )
+
+    assert_same encoded, References.decode_references([encoded], payload_codec: nil).first
+  end
+
+  def test_data_converter_reads_encoded_reference
+    driver = InMemoryStorageDriver.new
+    storage = Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
+    codec = Base64Codec.new
+    stored = Temporalio::Converters::DataConverter.new(payload_codec: codec).to_payload('stored-value')
+    reference = Temporalio::Internal::ExternalStorageRunner.new(storage, namespace: nil).store([stored]).first
+    converter = Temporalio::Converters::DataConverter.new(payload_codec: codec, external_storage: storage)
+
+    assert_equal 'stored-value', converter.from_payload(encoded_reference(reference))
+    assert_equal ['stored-value'], converter.from_payloads(
+      Temporalio::Api::Common::V1::Payloads.new(payloads: [encoded_reference(reference)])
+    )
+  end
+
   private
+
+  # Encodes the payload without its size and marks it, so decoding must restore the size from the outer payload
+  def encoded_reference(reference)
+    without_size = Temporalio::Api::Common::V1::Payload.decode(reference.to_proto)
+    without_size.external_payloads.clear
+    encoded = Base64Codec.new.encode([without_size]).first
+    encoded.metadata[References::MARKER_KEY] = 'true'
+    encoded.external_payloads.push(*reference.external_payloads.map(&:dup))
+    encoded
+  end
 
   def cancellation
     Temporalio::Cancellation.new

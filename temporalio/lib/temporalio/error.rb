@@ -133,6 +133,22 @@ module Temporalio
       end
     end
 
+    # Error that occurs when a payload marked as an encoded external storage reference does not decode to a reference.
+    # This usually means the payload codec configured to read it is not the one that wrote it.
+    #
+    # @note WARNING: This API is experimental and may change in the future.
+    #
+    # @!visibility private
+    class ExternalStorageReferenceDecodeError < Error
+      # @!visibility private
+      def initialize(
+        message = '[TMPRL1106] Encountered an encoded external storage reference that could not be decoded. ' \
+                  'Check that the payload codec used to write it is configured.'
+      )
+        super
+      end
+    end
+
     # Error raised by a client for a general RPC failure.
     class RPCError < Error
       # @return [Code] Status code for the error.

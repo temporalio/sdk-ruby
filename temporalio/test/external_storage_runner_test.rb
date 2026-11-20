@@ -129,6 +129,27 @@ class ExternalStorageRunnerTest < Test
     assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) { Runner.new(nil, namespace: nil).retrieve([reference]) }
   end
 
+  def test_without_storage_retrieve_raises_on_marked_reference
+    # Opaque to the runner, as a codec-encoded reference is
+    marked = Temporalio::Api::Common::V1::Payload.new(
+      metadata: { 'encoding' => 'binary/encrypted', References::MARKER_KEY => 'true' }, data: 'encrypted'
+    )
+
+    assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) { Runner.new(nil, namespace: nil).retrieve([marked]) }
+  end
+
+  def test_retrieve_raises_on_marked_payload_that_is_not_a_reference
+    # A reference encoded by a codec this side does not have
+    marked = Temporalio::Api::Common::V1::Payload.new(
+      metadata: { 'encoding' => 'binary/encrypted', References::MARKER_KEY => 'true' }, data: 'encrypted'
+    )
+
+    err = assert_raises(Temporalio::Error::ExternalStorageReferenceDecodeError) do
+      Runner.new(storage(InMemoryStorageDriver.new), namespace: nil).retrieve([marked])
+    end
+    assert_includes err.message, 'TMPRL1106'
+  end
+
   private
 
   def storage(driver, payload_size_threshold: 0)

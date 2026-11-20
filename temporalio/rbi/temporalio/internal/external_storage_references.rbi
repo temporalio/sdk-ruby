@@ -5,6 +5,7 @@ module Temporalio::Internal::ExternalStorageReferences
 
   ENCODING = T.let(T.unsafe(nil), String)
   MESSAGE_TYPE = T.let(T.unsafe(nil), String)
+  MARKER_KEY = T.let(T.unsafe(nil), String)
 
   sig { params(payload: Temporalio::Api::Common::V1::Payload).returns(T::Boolean) }
   def self.reference?(payload); end
@@ -14,6 +15,17 @@ module Temporalio::Internal::ExternalStorageReferences
       .returns(T.nilable(Temporalio::Api::Sdk::V1::ExternalStorageReference))
   end
   def self.parse_reference(payload); end
+
+  sig { params(payload: Temporalio::Api::Common::V1::Payload).returns(T::Boolean) }
+  def self.marked_reference?(payload); end
+
+  sig do
+    params(
+      payloads: T::Array[Temporalio::Api::Common::V1::Payload],
+      payload_codec: T.nilable(Temporalio::Converters::PayloadCodec)
+    ).returns(T::Array[Temporalio::Api::Common::V1::Payload])
+  end
+  def self.decode_references(payloads, payload_codec:); end
 
   sig do
     params(

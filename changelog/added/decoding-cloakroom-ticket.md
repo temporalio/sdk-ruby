@@ -1,0 +1,1 @@
+Added experimental support for reading external storage reference payloads that are encoded with the configured payload codec and marked with `__temporal_external_storage_reference` metadata. This release does not write them yet. A later release will, once workers have had time to upgrade.

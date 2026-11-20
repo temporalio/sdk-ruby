@@ -53,6 +53,10 @@ module Temporalio
       def initialize: (?String message) -> void
     end
 
+    class ExternalStorageReferenceDecodeError < Error
+      def initialize: (?String message) -> void
+    end
+
     class RPCError < Error
       attr_reader code: Code::enum
 

@@ -91,8 +91,9 @@ module Temporalio
         claims_by_driver = Hash.new { |hash, driver| hash[driver] = [] }
         payloads.each_with_index do |payload, index|
           reference = ExternalStorageReferences.parse_reference(payload)
-          next unless reference
+          next unless reference || ExternalStorageReferences.marked_reference?(payload)
           raise Error::ExternalStorageNotConfiguredError unless storage
+          raise Error::ExternalStorageReferenceDecodeError unless reference
 
           driver = storage.driver(reference.driver_name)
           raise Error, "No external storage driver registered with name '#{reference.driver_name}'" unless driver
