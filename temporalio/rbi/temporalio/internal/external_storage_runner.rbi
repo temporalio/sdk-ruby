@@ -15,8 +15,9 @@ class Temporalio::Internal::ExternalStorageRunner
   def store(payloads); end
 
   sig do
-    params(payloads: T::Array[Temporalio::Api::Common::V1::Payload])
-      .returns(T::Array[Temporalio::Api::Common::V1::Payload])
+    params(
+      payloads: T.any(T::Array[Temporalio::Api::Common::V1::Payload], Temporalio::Api::Common::V1::Payloads)
+    ).returns(T.any(T::Array[Temporalio::Api::Common::V1::Payload], Temporalio::Api::Common::V1::Payloads))
   end
   def retrieve(payloads); end
 end

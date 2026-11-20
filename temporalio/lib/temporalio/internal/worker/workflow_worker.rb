@@ -203,8 +203,12 @@ module Temporalio
         # activation as failed. Otherwise the run waits forever for a completion that never comes.
 
         def decode_activation(runner, activation)
-          @payload_decoding_visitor.run(activation)
-          runner.apply_workflow_activation_decoded(workflow_worker: self, activation:)
+          @payload_decoding_visitor._run_activation(activation)
+          if @decode_in_background
+            runner.apply_workflow_activation_decoded(workflow_worker: self, activation:)
+          else
+            handle_activation(runner:, activation:, decoded: true)
+          end
         rescue Exception => e # rubocop:disable Lint/RescueException
           activation_completion = WorkflowInstance.new_completion_with_failure(
             run_id: activation.run_id,

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require 'base64'
 require 'base64_codec'
+require 'in_memory_storage_driver'
 require 'temporalio/api'
 require 'temporalio/converters/data_converter'
 require 'temporalio/converters/payload_codec'
@@ -9,6 +11,59 @@ require 'test'
 
 module Converters
   class DataConverterTest < Test
+    def test_inline_payloads_are_not_rewrapped_with_or_without_storage
+      driver = InMemoryStorageDriver.new
+      storage = Temporalio::Converters::ExternalStorage.new(drivers: [driver])
+      [nil, storage].each do |external_storage|
+        payload_converter = Temporalio::Converters::PayloadConverter.default.dup
+        received = []
+        payload_converter.define_singleton_method(:from_payloads) do |payloads, hints: nil|
+          received << payloads
+          super(payloads, hints:)
+        end
+        converter = Temporalio::Converters::DataConverter.new(payload_converter:, external_storage:)
+        payloads = converter.to_payloads(['abc', 123])
+
+        assert_equal ['abc', 123], converter.from_payloads(payloads)
+        # Value equality misses a new container whose native arena is retained by the original payloads.
+        assert_same payloads, received.fetch(0)
+      end
+      assert_empty driver.retrieve_calls
+    end
+
+    def test_retrieval_preserves_the_original_reference_container
+      converter = Temporalio::Converters::DataConverter.new(
+        external_storage: Temporalio::Converters::ExternalStorage.new(
+          drivers: [InMemoryStorageDriver.new], payload_size_threshold: 0
+        )
+      )
+      reference = converter.to_payload('stored')
+      inline = converter.payload_converter.to_payload('inline')
+      payloads = Temporalio::Api::Common::V1::Payloads.new(payloads: [inline, reference])
+      original_wire = payloads.to_proto
+
+      assert_equal 'stored', converter.from_payload(reference)
+      assert_equal %w[inline stored], converter.from_payloads(payloads)
+      assert_equal original_wire, payloads.to_proto
+    end
+
+    def test_without_storage_rejects_references_before_conversion
+      converter = Temporalio::Converters::DataConverter.new
+      reference = Temporalio::Internal::ExternalStorageReferences.create_reference_payload(
+        driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 1
+      )
+      payloads = Temporalio::Api::Common::V1::Payloads.new(
+        payloads: [converter.to_payload('ordinary'), reference]
+      )
+
+      assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) do
+        converter.from_payload(reference, hint: Temporalio::Converters::RawValue)
+      end
+      assert_raises(Temporalio::Error::ExternalStorageNotConfiguredError) do
+        converter.from_payloads(payloads, hints: [String, Temporalio::Converters::RawValue])
+      end
+    end
+
     def test_with_codec
       converter = Temporalio::Converters::DataConverter.new(
         failure_converter: Temporalio::Converters::FailureConverter.new(encode_common_attributes: true),

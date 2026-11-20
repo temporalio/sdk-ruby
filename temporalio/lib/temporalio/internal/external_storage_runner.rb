@@ -81,18 +81,26 @@ module Temporalio
         result
       end
 
-      # @param payloads [Array<Api::Common::V1::Payload>] Payloads that may contain references. Not mutated.
-      # @return [Array<Api::Common::V1::Payload>] Payloads with every reference replaced by what it points at.
+      # @param payloads [Array<Api::Common::V1::Payload>, Api::Common::V1::Payloads] Payloads that may contain
+      #   references. Not mutated.
+      # @return [Array<Api::Common::V1::Payload>, Api::Common::V1::Payloads] Retrieved payloads in the same container
+      #   type as the input, or the original object if none are references.
       # @raise [Error::ExternalStorageNotConfiguredError] If there is a reference but no storage is configured.
       def retrieve(payloads)
+        source = payloads.is_a?(Api::Common::V1::Payloads) ? payloads.payloads : payloads
+        # Preserve unchanged containers so a new protobuf arena does not become tied to the original payloads'
+        # lifetime. This also avoids the batching hash and array copy when no retrieval is needed.
+        return payloads unless source.any? { |payload| ExternalStorageReferences.reference?(payload) }
+
         storage = @storage
+        raise Error::ExternalStorageNotConfiguredError unless storage
+
         # Driver => [[index, claim], ...] for each reference that driver stored. Every driver is looked up here, so an
         # unregistered name fails before any request is made.
         claims_by_driver = Hash.new { |hash, driver| hash[driver] = [] }
-        payloads.each_with_index do |payload, index|
+        source.each_with_index do |payload, index|
           reference = ExternalStorageReferences.parse_reference(payload)
           next unless reference
-          raise Error::ExternalStorageNotConfiguredError unless storage
 
           driver = storage.driver(reference.driver_name)
           raise Error, "No external storage driver registered with name '#{reference.driver_name}'" unless driver
@@ -100,7 +108,7 @@ module Temporalio
           claims_by_driver[driver] << [index, Converters::StorageDriverClaim.new(claim_data: reference.claim_data.to_h)]
         end
 
-        result = payloads.dup
+        result = source.to_a.dup
         claims_by_driver.each do |driver, indexes_and_claims|
           context = Converters::StorageDriverRetrieveContext.new(
             cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
@@ -110,7 +118,7 @@ module Temporalio
 
           indexes_and_claims.zip(retrieved) { |(index, _claim), payload| result[index] = payload }
         end
-        result
+        payloads.is_a?(Api::Common::V1::Payloads) ? Api::Common::V1::Payloads.new(payloads: result) : result
       end
 
       private
