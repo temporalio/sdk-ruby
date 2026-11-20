@@ -34,6 +34,10 @@ A runnable reproduction: <https://github.com/fivetran-ryanrapp/temporalio-ruby-h
   `cargo test -p temporalio-sdk-core --lib worker::activities`). Two Ruby tests are in `temporalio/test/worker_activity_test.rb`
   (`test_local_heartbeat_timeout_cancels_activity_heartbeated_from_elsewhere` and
   `test_disable_local_heartbeat_timeout_for_activities`); they need the repository's test harness.
+- The gems ship upstream's `rbi/` with two fixes applied at packaging time by `fork/patch_rbi.rb` (the repository's `rbi/` is
+  untouched): `Google::Protobuf::Map` and `RepeatedField` get type arguments, and the keyword-argument `overload` signatures on
+  `Workflow.upsert_memo` are dropped. Without them an application that runs `srb tc` over a Tapioca-generated gem RBI (which
+  merges the shipped RBIs) fails with a few hundred errors.
 
 ## Building the gems
 
@@ -85,6 +89,7 @@ worker = Temporalio::Worker.new(
 2. `fork/apply-core-patches.sh`. If it conflicts, redo the change in `temporalio/ext/sdk-core` (it is small: one config field,
    threaded to where `ActivityLocalTimers::new` is called), then
    `git -C temporalio/ext/sdk-core diff > fork/patches/0001-sdk-core-disable-local-heartbeat-timeout.patch`.
-3. Bump the fourth number in `temporalio/lib/temporalio/version.rb` and rebuild the gems.
+3. Check that `temporalio/lib/temporalio/version.rb` matches the upstream release (do not add a fourth number, see the top of
+   this file), rebuild the gems, and check `fork/patch_rbi.rb` still leaves no bare `Google::Protobuf::Map`/`RepeatedField`.
 
 If upstream adds an equivalent option, drop the patch and use theirs.
