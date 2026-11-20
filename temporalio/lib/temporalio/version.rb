@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Temporalio
-  # 1.11.0 plus the fork's patch (see fork/README.md); the fourth number is the fork's revision.
-  VERSION = '1.11.0.1'
+  # The fork's gems keep upstream's version on purpose (see fork/README.md): a consumer's lockfile and gemset then still
+  # resolve from rubygems.org, and only the gem files themselves are swapped for the fork's.
+  VERSION = '1.11.0'
 end

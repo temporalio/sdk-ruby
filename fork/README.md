@@ -1,7 +1,11 @@
 # Fork notes: heartbeat timeouts left to the server
 
 This fork is upstream [temporalio/sdk-ruby](https://github.com/temporalio/sdk-ruby) `v1.11.0` plus one opt-in worker
-option. The gem version is `1.11.0.1`: upstream's version with a fourth number for the fork's revision.
+option. The gem version is **`1.11.0`, deliberately the same as upstream's**: an application's `Gemfile.lock` and bundix
+`gemset.nix` then still resolve from rubygems.org (`bundle add`, `bundle update` and bundix keep working), and the application
+only swaps in these gem files in place of the downloaded ones (see "Using the gems"). A distinct version such as `1.11.0.1`
+would make every later `bundle lock` fail looking for a gem that is not on rubygems.org. Releases are tagged
+`v1.11.0-heartbeat.N` to tell them apart.
 
 ## What it changes
 
@@ -38,9 +42,9 @@ default) and requires exactly that minor.
 
 | Gem | Built by |
 |---|---|
-| `temporalio-1.11.0.1-arm64-darwin.gem` | `fork/build-macos-gem.sh`, natively on the Mac. Needs Rust and `protoc`. |
-| `temporalio-1.11.0.1-aarch64-linux.gem` | `fork/build-linux-gems.sh linux/arm64`, in Docker. |
-| `temporalio-1.11.0.1-x86_64-linux.gem` | `fork/build-linux-gems.sh linux/amd64`, in Docker. |
+| `temporalio-1.11.0-arm64-darwin.gem` | `fork/build-macos-gem.sh`, natively on the Mac. Needs Rust and `protoc`. |
+| `temporalio-1.11.0-aarch64-linux.gem` | `fork/build-linux-gems.sh linux/arm64`, in Docker. |
+| `temporalio-1.11.0-x86_64-linux.gem` | `fork/build-linux-gems.sh linux/amd64`, in Docker. |
 
 ```sh
 git submodule update --init temporalio/ext/sdk-core
@@ -65,7 +69,7 @@ bundle install --local
 
 ```ruby
 # Gemfile
-gem 'temporalio', '1.11.0.1'
+gem 'temporalio', '1.11.0'
 ```
 
 ```ruby
