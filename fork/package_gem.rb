@@ -25,6 +25,8 @@ minors = binaries.to_h { |pair| pair.split('=', 2).then { |minor, path| [minor, 
 
 Dir.mktmpdir('temporalio-gem') do |stage|
   %w[lib sig rbi].each { |dir| FileUtils.cp_r(File.join(root, dir), stage) }
+  # The shipped RBIs are patched in the copy that goes into the gem (see fork/patch_rbi.rb), not in the repository.
+  abort 'patching the RBI files failed' unless system(RbConfig.ruby, File.join(__dir__, 'patch_rbi.rb'), File.join(stage, 'rbi'))
   %w[LICENSE README.md .yardopts temporalio.gemspec].each do |file|
     source = File.join(root, file)
     FileUtils.cp(source, stage) if File.exist?(source)
