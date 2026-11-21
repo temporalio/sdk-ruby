@@ -291,7 +291,9 @@ class Temporalio::Error::ScheduleAlreadyRunningError < ::Temporalio::Error
   def initialize; end
 end
 
-class Temporalio::Error::ExternalStorageNotConfiguredError < ::Temporalio::Error
+class Temporalio::Error::ExternalStorageError < ::Temporalio::Error; end
+
+class Temporalio::Error::ExternalStorageNotConfiguredError < ::Temporalio::Error::ExternalStorageError
   extend T::Sig
 
   sig { params(message: String).void }
