@@ -1,3 +1,4 @@
 class ClientScheduleExternalStorageTest < Test
+  def client_with_storage: (InMemoryStorageDriver driver) -> Temporalio::Client
   def with_stored_schedule: () { (Temporalio::Client::ScheduleHandle, untyped) -> void } -> void
 end
