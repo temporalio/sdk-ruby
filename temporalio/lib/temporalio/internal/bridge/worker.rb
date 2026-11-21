@@ -30,6 +30,7 @@ module Temporalio
           :nondeterminism_as_workflow_fail_for_types,
           :deployment_options,
           :plugins,
+          :storage_drivers,
           :disable_payload_error_limit
         )
 

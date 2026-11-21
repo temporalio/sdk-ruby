@@ -26,7 +26,7 @@ use magnus::{
 };
 use prost::Message;
 use temporalio_common::protos::temporal::api::history::v1::History;
-use temporalio_common::protos::temporal::api::worker::v1::PluginInfo;
+use temporalio_common::protos::temporal::api::worker::v1::{PluginInfo, StorageDriverInfo};
 use temporalio_common::protos::{
     coresdk::{
         ActivityHeartbeat, ActivitySlotInfo, ActivityTaskCompletion, LocalActivitySlotInfo,
@@ -580,6 +580,15 @@ fn build_config(options: Struct, runtime_handle: &RuntimeHandle) -> Result<Worke
                 .map(|name| PluginInfo {
                     name,
                     version: String::new(),
+                })
+                .collect::<HashSet<_>>(),
+        )
+        .storage_drivers(
+            options
+                .member::<Vec<String>>(id!("storage_drivers"))?
+                .into_iter()
+                .map(|driver_type| StorageDriverInfo {
+                    r#type: driver_type,
                 })
                 .collect::<HashSet<_>>(),
         )
