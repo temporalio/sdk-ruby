@@ -35,6 +35,10 @@ Also see:
     - [Data Conversion](#data-conversion)
       - [ActiveModel](#activemodel)
       - [Converter Hints](#converter-hints)
+      - [External Storage](#external-storage)
+        - [Driver Selection](#driver-selection)
+        - [S3 Driver](#s3-driver)
+        - [Custom Drivers](#custom-drivers)
   - [Workers](#workers)
   - [Workflows](#workflows)
     - [Workflow Definition](#workflow-definition)
@@ -351,6 +355,161 @@ There are some advanced payload uses in the SDK that do not currently have a way
 workflow/schedule memo, workflow get/upsert memo, and application error details. In some cases, users can use
 `Temporalio::Converters::RawValue` and then manually convert with hints. For others, hints can be added as needed,
 please open an issue or otherwise contact Temporal.
+
+##### External Storage
+
+> **NOTE**: External storage is **Experimental**. The API may change in the future.
+
+External storage offloads large payloads to an external storage system, such as Amazon S3, instead of storing them
+inline in workflow history. Each offloaded payload is replaced in history by a small reference. This is useful when
+workflows or activities work with data that would otherwise exceed Temporal's payload size limits.
+
+External storage is set via the `external_storage` keyword argument when creating a data converter. A
+`Temporalio::Converters::StorageDriver` stores and retrieves payloads. The SDK ships an Amazon S3 driver, or a custom
+driver can be implemented. For example, using the S3 driver with the official `aws-sdk-s3` gem (which must be added to
+your Gemfile, since the SDK does not depend on it):
+
+```ruby
+require 'temporalio/client'
+require 'temporalio/contrib/aws/s3_driver'
+require 'temporalio/contrib/aws/s3_driver/aws_sdk_s3_storage_driver_client'
+
+driver = Temporalio::Contrib::Aws::S3Driver::S3StorageDriver.new(
+  client: Temporalio::Contrib::Aws::S3Driver::AwsSdkS3StorageDriverClient.new(Aws::S3::Client.new),
+  bucket: 'my-temporal-payloads'
+)
+
+client = Temporalio::Client.connect(
+  'localhost:7233',
+  'my-namespace',
+  data_converter: Temporalio::Converters::DataConverter.new(
+    external_storage: Temporalio::Converters::ExternalStorage.new(drivers: [driver])
+  )
+)
+```
+
+Notes about external storage:
+
+* Every client and worker that reads the payloads must have external storage configured with a driver of the same
+  name. A worker uses the data converter of its client. When a payload reference is read without external storage
+  configured, `Temporalio::Error::ExternalStorageNotConfiguredError` (`TMPRL1105`) is raised. When storage is configured
+  but no driver has the name recorded in the reference, an error is also raised.
+* Only payloads whose encoded size is at or above `payload_size_threshold` are offloaded. The default is 256 KiB
+  (`Temporalio::Converters::ExternalStorage::DEFAULT_PAYLOAD_SIZE_THRESHOLD`). Smaller payloads stay inline. Setting
+  `payload_size_threshold: 0` offloads every payload.
+* External storage applies to the same payloads a payload codec does, such as workflow and activity inputs and results,
+  signal, query, and update arguments and results, and failure details. Search attributes are never offloaded.
+* The payload codec, if any, runs before storage. The driver receives and stores codec-encoded payloads, and the
+  reference written to history is not passed through the codec. On read, the payload is retrieved and then decoded.
+* Like a payload codec, external storage may block, so a worker that is not fiber based must set
+  `workflow_payload_codec_thread_pool`.
+
+###### Driver Selection
+
+To use more than one driver, register all of them in `drivers` and give a `driver_selector` that chooses which driver
+stores each payload. The selector is called with a `Temporalio::Converters::StorageDriverSelectContext` and the payload,
+and is only called for payloads at or above the size threshold. It returns one of the registered drivers, or `nil` to
+leave the payload inline. A driver that is registered but no longer selected can still retrieve the payloads it stored,
+which is useful when migrating between storage systems.
+
+```ruby
+storage = Temporalio::Converters::ExternalStorage.new(
+  drivers: [small_payload_driver, large_payload_driver],
+  driver_selector: lambda do |_context, payload|
+    payload.to_proto.bytesize < 5 * 1024 * 1024 ? small_payload_driver : large_payload_driver
+  end
+)
+```
+
+Notes about driver selection:
+
+* `driver_selector` is required when more than one driver is given. With a single driver it may be omitted, and that
+  driver stores every payload at or above the size threshold.
+* Every driver must have a unique, non-empty `name`. The selector must return one of the registered driver instances,
+  otherwise an error is raised.
+* `context.target` is a `Temporalio::Converters::StorageDriverWorkflowInfo` or
+  `Temporalio::Converters::StorageDriverActivityInfo` describing the execution the payload is stored for, or `nil` when
+  the payload is not stored for a specific execution, such as headers or an activity completed by task token.
+  `context.namespace` is the namespace of the client or worker performing the store, or `nil` when it is not known.
+
+###### S3 Driver
+
+`Temporalio::Contrib::Aws::S3Driver::S3StorageDriver` stores payloads in an existing Amazon S3 bucket. It makes
+requests through a `Temporalio::Contrib::Aws::S3Driver::S3StorageDriverClient`. `AwsSdkS3StorageDriverClient` wraps an
+`Aws::S3::Client`. Requiring `temporalio/contrib/aws/s3_driver` alone does not load `aws-sdk-s3`, so another S3 library
+can be used by subclassing `S3StorageDriverClient` and implementing `put_object`, `object_exists?`, and `get_object`.
+
+Notes about the S3 driver:
+
+* `bucket` is a bucket name, or a proc called with the `Temporalio::Converters::StorageDriverStoreContext` and the
+  payload that returns the bucket name for that payload.
+* Objects are keyed the same way as by the S3 drivers of the other Temporal SDKs, by the lower-case hex SHA-256 hash
+  of the serialized payload under a prefix built from the payload's `context.target`:
+  * `v0/ns/{namespace}/wt/{workflow-type}/wi/{workflow-id}/ri/{run-id}/d/sha256/{hash}` for a workflow target. This
+    covers payloads of workflows, of activities started by workflows, and of client calls on a workflow.
+  * `v0/ns/{namespace}/at/{activity-type}/ai/{activity-id}/ri/{run-id}/d/sha256/{hash}` for a standalone activity
+    target.
+  * `v0/ns/{namespace}/d/sha256/{hash}` when there is no target, such as for headers or an activity completed by task
+    token. The namespace is that of the storing client or worker.
+* With a target, the target's namespace is used. Each key segment is percent-encoded per UTF-8 byte outside S3's safe
+  characters (letters, digits, and `!-_.*'()`). Unknown or empty values are written as `null`.
+* Identical payloads stored for the same target share one object.
+* Retrieval reads the bucket and key recorded in history, and checks the downloaded data against the recorded hash.
+* `max_payload_size` (default 50 MiB) limits the serialized size of a single payload. Storing a larger payload raises.
+* `driver_name` defaults to `aws.s3driver`. Only change it when registering more than one S3 driver on the same
+  external storage.
+* The driver never deletes objects. Use S3 lifecycle rules to expire them after workflow history is no longer needed.
+* With `AwsSdkS3StorageDriverClient`, storing needs `s3:PutObject`, `s3:GetObject`, and `s3:ListBucket`, and retrieving
+  needs `s3:GetObject`. Without `s3:ListBucket`, S3 reports a missing object as access denied, and storing fails.
+
+###### Custom Drivers
+
+A custom driver subclasses `Temporalio::Converters::StorageDriver`:
+
+```ruby
+class MyStorageDriver < Temporalio::Converters::StorageDriver
+  def name
+    'my-driver'
+  end
+
+  def type
+    'my-org.my-driver'
+  end
+
+  def store(_context, payloads)
+    payloads.map do |payload|
+      key = MyStorage.put(payload.to_proto)
+      Temporalio::Converters::StorageDriverClaim.new(claim_data: { 'key' => key })
+    end
+  end
+
+  def retrieve(_context, claims)
+    claims.map do |claim|
+      Temporalio::Api::Common::V1::Payload.decode(MyStorage.get(claim.claim_data['key']))
+    end
+  end
+end
+```
+
+Notes about custom drivers:
+
+* `store` is given a `Temporalio::Converters::StorageDriverStoreContext` and the payloads, and must return an `Array`
+  with one `Temporalio::Converters::StorageDriverClaim` per payload, in the same order. `retrieve` is given a
+  `Temporalio::Converters::StorageDriverRetrieveContext` and the claims, and must return an `Array` with one payload
+  per claim, in the same order.
+* A claim's `claim_data` is a `Hash` of `String` to `String` that is written into workflow history. It must contain
+  everything needed to retrieve the payload and must not contain secrets. A payload must be retrievable from its claim
+  alone, since it can be read from a different execution than the one that stored it.
+* `name` identifies the driver instance. It is written into history with every payload the driver stores and used to
+  route retrieval back to the driver. Renaming a deployed driver makes payloads stored under the old name
+  unretrievable.
+* `type` is a stable identifier for the driver implementation, such as `aws.s3driver`. Unlike `name`, it is the same
+  across instances and SDK languages.
+* Drivers are called concurrently and must be thread safe. They may block and perform I/O directly. To work on a batch
+  concurrently, use threads rather than `Fiber.schedule`. `Temporalio::Worker::ThreadPool` can bound the number of
+  threads.
+* The store context has the same `target` and `namespace` as the selector context described in
+  [Driver Selection](#driver-selection). When there is a target, prefer the target's namespace.
 
 ### Workers
 

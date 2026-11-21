@@ -11,8 +11,6 @@ module Temporalio
     # @!attribute [r] claim_data
     #   @return [Hash<String, String>] Data the driver needs to retrieve the payload. This is written into history, so
     #     it must contain everything required for retrieval and must not contain secrets.
-    #
-    # @!visibility private
     class StorageDriverClaim
       # Create a claim.
       #

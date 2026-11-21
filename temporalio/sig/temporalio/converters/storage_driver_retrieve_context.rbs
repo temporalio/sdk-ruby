@@ -6,7 +6,7 @@ module Temporalio
 
       def initialize: (
         cancellation: Cancellation,
-        limiter: StorageDriverLimiter
+        ?limiter: StorageDriverLimiter
       ) -> void
     end
   end

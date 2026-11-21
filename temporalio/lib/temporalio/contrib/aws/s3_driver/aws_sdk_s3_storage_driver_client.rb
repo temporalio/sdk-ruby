@@ -10,8 +10,6 @@ module Temporalio
         # {S3StorageDriverClient} backed by an +Aws::S3::Client+ from the official +aws-sdk-s3+ gem.
         #
         # @note WARNING: This API is experimental and may change in the future.
-        #
-        # @!visibility private
         class AwsSdkS3StorageDriverClient < S3StorageDriverClient
           # Create a client.
           #

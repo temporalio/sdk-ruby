@@ -23,8 +23,6 @@ module Temporalio
       # @return [ExternalStorage, nil] Optional storage for offloading large payloads.
       #
       # @note WARNING: This API is experimental and may change in the future.
-      #
-      # @!visibility private
       attr_reader :external_storage
 
       # @return [DataConverter] Default data converter.
@@ -37,6 +35,8 @@ module Temporalio
       # @param payload_converter [PayloadConverter] Payload converter to use.
       # @param failure_converter [FailureConverter] Failure converter to use.
       # @param payload_codec [PayloadCodec, nil] Payload codec to use.
+      # @param external_storage [ExternalStorage, nil] External storage for offloading large payloads. WARNING: External
+      #   storage is experimental.
       def initialize(
         payload_converter: PayloadConverter.default,
         failure_converter: FailureConverter.default,

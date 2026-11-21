@@ -13,8 +13,6 @@ module Temporalio
       # +temporalio/contrib/aws/s3_driver/aws_sdk_s3_storage_driver_client+ to use the official AWS client.
       #
       # @note WARNING: This API is experimental and may change in the future.
-      #
-      # @!visibility private
       module S3Driver
       end
     end

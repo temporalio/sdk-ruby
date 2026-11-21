@@ -19,11 +19,10 @@ module Temporalio
     #   @return [StorageDriverWorkflowInfo, StorageDriverActivityInfo, nil] The execution the payload is being stored
     #     on behalf of, or nil when there is no associated execution.
     # @!attribute [r] cancellation
-    #   @return [Cancellation] Cancelled when the SDK abandons the operation this selection is part of.
+    #   @return [Cancellation] Cancellation for the operation this selection is part of. The SDK does not cancel it
+    #     yet.
     # @!attribute [r] namespace
     #   @return [String, nil] Namespace of the client or worker performing the store, or nil when it is not known.
-    #
-    # @!visibility private
     class StorageDriverSelectContext
       def initialize(target:, cancellation:, namespace: nil)
         super

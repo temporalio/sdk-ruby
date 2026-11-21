@@ -21,8 +21,6 @@ module Temporalio
     #   @return [String, nil] Run ID, if known.
     # @!attribute [r] type
     #   @return [String, nil] Activity type name, if known.
-    #
-    # @!visibility private
     class StorageDriverActivityInfo
       # Create activity target information.
       #

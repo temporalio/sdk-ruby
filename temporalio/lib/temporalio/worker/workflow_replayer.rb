@@ -69,8 +69,9 @@ module Temporalio
       #   `workflow_failure_exception_type` on the workflow definition class itself. If {::Exception} is set, it
       #   effectively will fail a workflow/update in all user exception cases.
       # @param workflow_payload_codec_thread_pool [ThreadPool, nil] Thread pool to run payload codec encode/decode
-      #   within. This is required if a payload codec exists and the worker is not fiber based. Codecs can potentially
-      #   block execution which is why they need to be run in the background.
+      #   within. This is also used for external storage. It is required if a payload codec or external storage exists
+      #   and the worker is not fiber based. Codecs and storage drivers can potentially block execution which is why
+      #   they need to be run in the background.
       # @param unsafe_workflow_io_enabled [Boolean] If false, the default, workflow code that invokes io_wait on the
       #   fiber scheduler will fail. Instead of setting this to true, users are encouraged to use
       #   {Workflow::Unsafe.io_enabled} with a block for narrower enabling of IO.

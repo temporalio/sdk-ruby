@@ -19,11 +19,12 @@ module Temporalio
     #   arguments defensively if constructing this yourself.
     #
     # @!attribute [r] cancellation
-    #   @return [Cancellation] Cancelled when the SDK abandons this retrieve operation.
-    # @!attribute [r] limiter
-    #   @return [StorageDriverLimiter] Limiter for this driver's retrieve requests.
-    #
-    # @!visibility private
-    class StorageDriverRetrieveContext; end # rubocop:disable Lint/EmptyClass
+    #   @return [Cancellation] Cancellation for this retrieve operation. The SDK does not cancel it yet. Drivers may
+    #     still check it, so that they stop early once the SDK does.
+    class StorageDriverRetrieveContext
+      def initialize(cancellation:, limiter: StorageDriverLimiter::UNBOUNDED)
+        super
+      end
+    end
   end
 end

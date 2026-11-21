@@ -6,6 +6,7 @@ require 'recording_storage_driver_limiter'
 require 'securerandom'
 require 'temporalio/cancellation'
 require 'temporalio/converters/external_storage'
+require 'temporalio/converters/external_storage_concurrency'
 require 'temporalio/converters/storage_driver_activity_info'
 require 'temporalio/converters/storage_driver_claim'
 require 'temporalio/converters/storage_driver_retrieve_context'
@@ -174,10 +175,10 @@ class ExternalStorageTest < Test
   end
 
   def test_default_concurrency_matches_the_other_sdks
-    storage = Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new])
+    concurrency = Temporalio::Converters::ExternalStorageConcurrency.new
 
-    assert_equal 64, storage.concurrency.max_driver_operations
-    assert_equal 8, storage.concurrency.max_operations_per_message
+    assert_equal 64, concurrency.max_driver_operations
+    assert_equal 8, concurrency.max_operations_per_message
   end
 
   def test_concurrency_budgets_must_be_positive
@@ -207,6 +208,15 @@ class ExternalStorageTest < Test
 
     assert_equal :done, result
     assert_equal [item], recording.items
+  end
+
+  def test_contexts_built_without_a_limiter_grant_every_permit
+    store_context = Temporalio::Converters::StorageDriverStoreContext.new(target: nil, cancellation:)
+    retrieve_context = Temporalio::Converters::StorageDriverRetrieveContext.new(cancellation:)
+    claim = Temporalio::Converters::StorageDriverClaim.new(claim_data: {})
+
+    assert_equal :stored, store_context.limiter.permit(payload('x')) { :stored }
+    assert_equal :retrieved, retrieve_context.limiter.permit(claim) { :retrieved }
   end
 
   def test_zero_threshold_allowed

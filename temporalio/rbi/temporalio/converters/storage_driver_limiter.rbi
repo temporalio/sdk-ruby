@@ -1,6 +1,8 @@
 # typed: true
 
 class Temporalio::Converters::StorageDriverLimiter
+  UNBOUNDED = T.let(T.unsafe(nil), Temporalio::Converters::StorageDriverLimiter::Unbounded)
+
   sig do
     type_parameters(:T)
       .params(
@@ -11,3 +13,5 @@ class Temporalio::Converters::StorageDriverLimiter
   end
   def permit(item, &blk); end
 end
+
+class Temporalio::Converters::StorageDriverLimiter::Unbounded < Temporalio::Converters::StorageDriverLimiter; end

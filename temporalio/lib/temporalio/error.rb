@@ -121,8 +121,6 @@ module Temporalio
     # differently from the one that wrote it.
     #
     # @note WARNING: This API is experimental and may change in the future.
-    #
-    # @!visibility private
     class ExternalStorageNotConfiguredError < Error
       # @!visibility private
       def initialize(

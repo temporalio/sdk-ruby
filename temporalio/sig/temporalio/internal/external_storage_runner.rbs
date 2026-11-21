@@ -25,11 +25,6 @@ module Temporalio
         Integer requested,
         untyped returned
       ) -> void
-
-      class UnboundedLimiter < Converters::StorageDriverLimiter
-      end
-
-      UNBOUNDED_LIMITER: UnboundedLimiter
     end
   end
 end

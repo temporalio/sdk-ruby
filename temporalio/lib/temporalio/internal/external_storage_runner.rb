@@ -3,7 +3,6 @@
 require 'temporalio/api'
 require 'temporalio/cancellation'
 require 'temporalio/converters/storage_driver_claim'
-require 'temporalio/converters/storage_driver_limiter'
 require 'temporalio/converters/storage_driver_retrieve_context'
 require 'temporalio/converters/storage_driver_select_context'
 require 'temporalio/converters/storage_driver_store_context'
@@ -19,8 +18,8 @@ module Temporalio
     # swaps references back for the payloads they point at. Payloads are expected to already be codec-encoded when
     # stored, and are returned still encoded when retrieved.
     #
-    # Each driver gets one batched request per call, and requests to different drivers run one after another. The
-    # configured concurrency limits are not enforced.
+    # Each driver gets one batched request per call, and requests to different drivers run one after another.
+    # Concurrency limits are not enforced. Drivers get the contexts' default limiter, which grants every permit.
     #
     # @!visibility private
     class ExternalStorageRunner
@@ -71,7 +70,7 @@ module Temporalio
         result = payloads.dup
         payloads_by_driver.each do |driver, indexes_and_serialized|
           context = Converters::StorageDriverStoreContext.new(
-            target:, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER, namespace: @namespace
+            target:, cancellation: Cancellation.new, namespace: @namespace
           )
           # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
           # place
@@ -119,9 +118,7 @@ module Temporalio
 
         result = payloads.dup
         claims_by_driver.each do |driver, indexes_and_claims|
-          context = Converters::StorageDriverRetrieveContext.new(
-            cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
-          )
+          context = Converters::StorageDriverRetrieveContext.new(cancellation: Cancellation.new)
           start_time = @clock.call
           retrieved = driver.retrieve(context, indexes_and_claims.map { |_index, claim| claim })
           end_time = @clock.call
@@ -147,16 +144,6 @@ module Temporalio
         raise Error, "External storage driver '#{driver.name}' #{operation} was given #{requested} item(s) but " \
                      "returned #{returned.is_a?(Array) ? returned.size : returned.inspect}"
       end
-
-      # Grants every permit immediately, since concurrency limits are not enforced yet.
-      class UnboundedLimiter < Converters::StorageDriverLimiter
-        def permit(_item)
-          yield
-        end
-      end
-
-      UNBOUNDED_LIMITER = UnboundedLimiter.new
-      private_constant :UnboundedLimiter, :UNBOUNDED_LIMITER
     end
   end
 end
