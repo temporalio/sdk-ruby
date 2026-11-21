@@ -46,6 +46,9 @@ class Temporalio::Converters::DataConverter
   end
   def _with_storage_target(namespace:, target:); end
 
+  sig { returns(Temporalio::Converters::DataConverter) }
+  def _without_storage; end
+
   sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 

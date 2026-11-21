@@ -32,10 +32,17 @@ module Temporalio
         def storage_data_converter: (untyped start) -> Converters::DataConverter
         def storage_target_for_task: (untyped start) -> Converters::storageDriverTargetInfo
 
+        def failed_result: (
+          Exception error,
+          Converters::DataConverter data_converter
+        ) -> Bridge::Api::ActivityResult::ActivityExecutionResult
+
         def assert_valid_activity: (String activity) -> void
 
         class RunningActivity < Activity::Context
           attr_reader _server_requested_cancel: bool
+          attr_reader _heartbeat_failure: Exception?
+          attr_reader _execution_finished: bool
           attr_accessor instance: Activity::Definition?
           attr_accessor _outbound_impl: Temporalio::Worker::Interceptor::Activity::Outbound?
 
@@ -53,6 +60,10 @@ module Temporalio
             reason: String,
             details: Activity::CancellationDetails
           ) -> void
+
+          def _mark_execution_finished: -> void
+
+          def _cancel_due_to_heartbeat_failure: (Exception error) -> void
         end
 
         class InboundImplementation < Temporalio::Worker::Interceptor::Activity::Inbound
@@ -60,7 +71,14 @@ module Temporalio
         end
 
         class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
-          def initialize: (ActivityWorker worker, String task_token, Converters::DataConverter data_converter) -> void
+          def initialize: (
+            ActivityWorker worker,
+            RunningActivity activity,
+            Converters::DataConverter data_converter
+          ) -> void
+
+          private def handle_heartbeat_conversion_failure: (Exception error) -> void
+          private def cancel_activity_deferring_raise_until_cancel_callbacks_run: (Exception error) -> void
         end
       end
     end

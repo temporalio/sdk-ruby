@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/api/sdk/v1/external_storage'
+require 'temporalio/error'
 
 module Temporalio
   module Internal
@@ -24,10 +25,7 @@ module Temporalio
 
         # @param payload [Api::Common::V1::Payload] Payload to parse.
         # @return [Api::Sdk::V1::ExternalStorageReference, nil] Parsed reference, or nil if not a reference.
-        #
-        # TODO: Surface parse failures as a Temporal error instead of Google::Protobuf::ParseError. The runner is the
-        # right layer for it, since only the caller knows which payload failed; a malformed reference cannot name its
-        # own driver.
+        # @raise [Error::ExternalStorageError] If the payload is a reference but cannot be read as one.
         def parse_reference(payload)
           return nil unless reference?(payload)
 
@@ -36,6 +34,9 @@ module Temporalio
           Api::Sdk::V1::ExternalStorageReference.decode_json(
             payload.data, ignore_unknown_fields: true
           )
+        rescue Google::Protobuf::ParseError => e
+          raise Error::ExternalStorageError,
+                "Payload is marked as an external storage reference but could not be read as one: #{e.message}"
         end
 
         # @param driver_name [String] Name of the driver that stored the payload.

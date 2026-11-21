@@ -150,7 +150,7 @@ class ExternalStorageRunnerTest < Test
                           payload_size_threshold: 0
                         ), namespace: nil)
 
-    err = assert_raises(Temporalio::Error) { runner.store([payload('a')]) }
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { runner.store([payload('a')]) }
     assert_includes err.message, 'not registered'
   end
 
@@ -159,7 +159,7 @@ class ExternalStorageRunnerTest < Test
       driver_name: 'missing', claim_data: { 'key' => 'k' }, original_size_bytes: 1
     )
 
-    err = assert_raises(Temporalio::Error) { Runner.new(storage(InMemoryStorageDriver.new), namespace: nil).retrieve([reference]) }
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { Runner.new(storage(InMemoryStorageDriver.new), namespace: nil).retrieve([reference]) }
     assert_includes err.message, "'missing'"
   end
 
@@ -167,8 +167,97 @@ class ExternalStorageRunnerTest < Test
     driver = InMemoryStorageDriver.new
     driver.define_singleton_method(:store) { |_context, _payloads| [] }
 
-    err = assert_raises(Temporalio::Error) { Runner.new(storage(driver), namespace: nil).store([payload('a')]) }
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { Runner.new(storage(driver), namespace: nil).store([payload('a')]) }
     assert_includes err.message, 'given 1 item(s) but returned 0'
+  end
+
+  def test_store_wraps_driver_error_naming_the_driver
+    driver = InMemoryStorageDriver.new
+    driver.define_singleton_method(:store) { |_context, _payloads| raise 'Intentional store failure' }
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) do
+      Runner.new(storage(driver), namespace: nil).store([payload('a')])
+    end
+    assert_equal "External storage driver 'mem' failed to store payloads: Intentional store failure", err.message
+    assert_instance_of RuntimeError, err.cause
+  end
+
+  def test_retrieve_wraps_driver_error_naming_the_driver
+    driver = InMemoryStorageDriver.new
+    runner = Runner.new(storage(driver), namespace: nil)
+    stored = runner.store([payload('a')])
+    driver.define_singleton_method(:retrieve) { |_context, _claims| raise 'Intentional retrieve failure' }
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { runner.retrieve(stored) }
+    assert_equal "External storage driver 'mem' failed to retrieve payloads: Intentional retrieve failure",
+                 err.message
+    assert_instance_of RuntimeError, err.cause
+  end
+
+  def test_driver_cancellation_is_not_wrapped
+    driver = InMemoryStorageDriver.new
+    driver.define_singleton_method(:store) do |_context, _payloads|
+      raise Temporalio::Error::CanceledError, 'Activity canceled'
+    end
+
+    assert_raises(Temporalio::Error::CanceledError) { Runner.new(storage(driver), namespace: nil).store([payload('a')]) }
+  end
+
+  def test_driver_storage_error_is_not_wrapped_again
+    driver = InMemoryStorageDriver.new
+    driver.define_singleton_method(:store) do |_context, _payloads|
+      raise Temporalio::Error::ExternalStorageError, 'Driver storage error'
+    end
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) do
+      Runner.new(storage(driver), namespace: nil).store([payload('a')])
+    end
+    assert_equal 'Driver storage error', err.message
+    assert_nil err.cause
+  end
+
+  def test_store_wraps_selector_error
+    runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
+                          drivers: [InMemoryStorageDriver.new],
+                          driver_selector: ->(_context, _payload) { raise 'Intentional selector failure' },
+                          payload_size_threshold: 0
+                        ), namespace: nil)
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { runner.store([payload('a')]) }
+    assert_equal 'External storage driver selector failed: Intentional selector failure', err.message
+    assert_instance_of RuntimeError, err.cause
+  end
+
+  def test_store_raises_when_driver_returns_something_other_than_claims
+    driver = InMemoryStorageDriver.new
+    driver.define_singleton_method(:store) { |_context, _payloads| [{ 'key' => 'k' }] }
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) do
+      Runner.new(storage(driver), namespace: nil).store([payload('a')])
+    end
+    assert_includes err.message, 'instead of a Temporalio::Converters::StorageDriverClaim'
+  end
+
+  def test_retrieve_raises_when_driver_returns_something_other_than_payloads
+    driver = InMemoryStorageDriver.new
+    runner = Runner.new(storage(driver), namespace: nil)
+    stored = runner.store([payload('a')])
+    driver.define_singleton_method(:retrieve) { |_context, _claims| ['not a payload'] }
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) { runner.retrieve(stored) }
+    assert_includes err.message, 'instead of a Temporalio::Api::Common::V1::Payload'
+  end
+
+  def test_retrieve_raises_storage_error_on_malformed_reference
+    reference = References.create_reference_payload(
+      driver_name: 'mem', claim_data: { 'key' => 'k' }, original_size_bytes: 1
+    )
+    reference.data = 'not json'
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) do
+      Runner.new(storage(InMemoryStorageDriver.new), namespace: nil).retrieve([reference])
+    end
+    assert_instance_of Google::Protobuf::ParseError, err.cause
   end
 
   def test_without_storage_store_and_retrieve_leave_payloads_unchanged

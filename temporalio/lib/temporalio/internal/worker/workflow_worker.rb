@@ -220,6 +220,7 @@ module Temporalio
             failure_converter: @state.data_converter.failure_converter,
             payload_converter: @state.data_converter.payload_converter
           )
+          activation_completion.failed.force_cause = task_failed_cause(e)
           # Not yet encoded, so the failure goes through the codec and storage like any other completion
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: false)
         end
@@ -240,7 +241,8 @@ module Temporalio
             activation_completion = Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion.new(
               run_id: activation_completion.run_id,
               failed: Bridge::Api::WorkflowCompletion::Failure.new(
-                failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}")
+                failure: Api::Failure::V1::Failure.new(message: "Failed encoding completion: #{e.message}"),
+                force_cause: encoding_failure_cause(e, activation_completion)
               )
             )
           end
@@ -248,6 +250,22 @@ module Temporalio
           activation_completion.payload_download_metrics = download_metrics&.to_proto
           activation_completion.payload_upload_metrics = upload_metrics&.to_proto
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
+        end
+
+        def task_failed_cause(error)
+          if error.is_a?(Error::ExternalStorageError)
+            :WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE
+          else
+            :WORKFLOW_TASK_FAILED_CAUSE_UNSPECIFIED
+          end
+        end
+
+        def encoding_failure_cause(encoding_error, activation_completion)
+          if encoding_error.is_a?(Error::ExternalStorageError)
+            :WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE
+          else
+            activation_completion.failed&.force_cause || :WORKFLOW_TASK_FAILED_CAUSE_UNSPECIFIED
+          end
         end
 
         def remember_initial_target(activation)

@@ -19,11 +19,13 @@ module Temporalio
         ?metrics: StorageOperationMetrics?
       ) -> Array[Api::Common::V1::Payload]
 
-      private def check_result_count: (
+      private def raise_as_storage_error: [T] (String failure_message) { () -> T } -> T
+      private def check_driver_result: (
         Converters::StorageDriver driver,
         String operation,
         Integer requested,
-        untyped returned
+        untyped returned,
+        Class expected_item_class
       ) -> void
 
       class UnboundedLimiter < Converters::StorageDriverLimiter
