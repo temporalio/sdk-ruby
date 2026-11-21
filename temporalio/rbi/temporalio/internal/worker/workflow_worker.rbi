@@ -92,8 +92,53 @@ class Temporalio::Internal::Worker::WorkflowWorker
   sig { params(runner: Temporalio::Internal::Worker::MultiRunner, activation_completion: Object).void }
   def encode_activation_completion(runner, activation_completion); end
 
-  sig { params(metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics)).returns(Temporalio::Api::PayloadVisitor) }
-  def payload_encoding_visitor(metrics); end
+  sig { params(activation: Object).void }
+  def remember_initial_target(activation); end
+
+  sig do
+    params(
+      activation_completion: Object,
+      metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics),
+      initial_target: T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo)
+    ).void
+  end
+  def encode_completion_payloads(activation_completion, metrics, initial_target); end
+
+  sig { params(workflow_info: Temporalio::Workflow::Info).returns(Temporalio::Converters::StorageDriverWorkflowInfo) }
+  def storage_target_for_workflow(workflow_info); end
+
+  sig do
+    params(
+      command: Object,
+      workflow_info: T.nilable(Temporalio::Workflow::Info),
+      current_workflow_target: T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo)
+    ).returns(T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo))
+  end
+  def storage_target_for_command(command, workflow_info, current_workflow_target); end
+
+  sig do
+    params(
+      signal: Object,
+      workflow_info: Temporalio::Workflow::Info
+    ).returns(T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo))
+  end
+  def storage_target_for_signaled_workflow(signal, workflow_info); end
+
+  sig do
+    params(
+      workflow_info: Temporalio::Workflow::Info,
+      current_workflow_target: T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo)
+    ).returns(T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo))
+  end
+  def storage_target_for_result(workflow_info, current_workflow_target); end
+
+  sig do
+    params(
+      metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics),
+      target: T.nilable(Temporalio::Converters::StorageDriverWorkflowInfo)
+    ).returns(Temporalio::Api::PayloadVisitor)
+  end
+  def payload_encoding_visitor(metrics, target); end
 
   sig { params(metrics: T.nilable(Temporalio::Internal::StorageOperationMetrics)).returns(Temporalio::Api::PayloadVisitor) }
   def payload_decoding_visitor(metrics); end
@@ -196,6 +241,9 @@ class Temporalio::Internal::Worker::WorkflowWorker::State
       .returns(T.type_parameter(:T))
   end
   def get_or_create_running_workflow(run_id, &block); end
+
+  sig { params(run_id: String).returns(T.nilable(Temporalio::Workflow::Info)) }
+  def running_workflow_info(run_id); end
 
   sig { params(run_id: String, cache_remove_job: Object).void }
   def evict_running_workflow(run_id, cache_remove_job); end

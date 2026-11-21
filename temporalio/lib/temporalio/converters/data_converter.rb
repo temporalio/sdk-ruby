@@ -47,11 +47,28 @@ module Temporalio
         @failure_converter = failure_converter
         @payload_codec = payload_codec
         @external_storage = external_storage
-        # Storage is applied in the payload methods below so every client and activity call gets it without changes at
-        # each call site. This is temporary. It will move to the call sites as a pass over each whole request, which
-        # batches all of a request's payloads into one driver call and can tell drivers which execution they belong to.
         # Retrieving runs even without storage, so a reference is reported rather than decoded as an ordinary value.
         @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage, namespace: nil)
+        @storage_target = nil
+      end
+
+      # Copy of this converter whose stores tell drivers the namespace and the execution the payloads belong to.
+      #
+      # @param namespace [String, nil] Namespace of the client or worker storing through the copy.
+      # @param target [StorageDriverWorkflowInfo, StorageDriverActivityInfo, nil] Execution the payloads are stored on
+      #   behalf of.
+      # @return [DataConverter] The copy.
+      #
+      # @!visibility private
+      def _with_storage_target(namespace:, target:)
+        return self unless external_storage
+
+        dup.tap do |converter|
+          converter.instance_variable_set(
+            :@external_storage_runner, Internal::ExternalStorageRunner.new(external_storage, namespace:)
+          )
+          converter.instance_variable_set(:@storage_target, target)
+        end
       end
 
       # Convert a Ruby value to a payload and encode it.
@@ -62,7 +79,7 @@ module Temporalio
       def to_payload(value, hint: nil)
         payload = payload_converter.to_payload(value, hint:)
         payload = payload_codec.encode([payload]).first if payload_codec
-        payload = @external_storage_runner.store([payload]).first if external_storage
+        payload = @external_storage_runner.store([payload], target: @storage_target).first if external_storage
         payload
       end
 
@@ -78,7 +95,7 @@ module Temporalio
         payloads = payload_converter.to_payloads(values, hints:)
         payloads.payloads.replace(payload_codec.encode(payloads.payloads)) if payload_codec && !payloads.payloads.empty?
         if external_storage && !payloads.payloads.empty?
-          payloads.payloads.replace(@external_storage_runner.store(payloads.payloads.to_a))
+          payloads.payloads.replace(@external_storage_runner.store(payloads.payloads.to_a, target: @storage_target))
         end
         payloads
       end

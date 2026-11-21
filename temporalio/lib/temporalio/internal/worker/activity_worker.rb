@@ -4,6 +4,8 @@ require 'temporalio/activity'
 require 'temporalio/activity/definition'
 require 'temporalio/cancellation'
 require 'temporalio/converters/raw_value'
+require 'temporalio/converters/storage_driver_activity_info'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/external_storage_runner'
 require 'temporalio/internal/proto_utils'
@@ -132,7 +134,7 @@ module Temporalio
                   failed: Bridge::Api::ActivityResult::Failure.new(
                     # TODO(cretz): If failure conversion does slow failure
                     # encoding, it can gum up the system
-                    failure: @worker.options.client.data_converter.to_failure(e)
+                    failure: storage_data_converter(start).to_failure(e)
                   )
                 )
               )
@@ -246,7 +248,7 @@ module Temporalio
           )
           Activity::Context._current_executor&.set_activity_context(defn, activity)
           set_running_activity(task_token, activity)
-          run_activity(defn, activity, input)
+          run_activity(defn, activity, input, storage_data_converter(start))
         rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
           @scoped_logger.warn("Failed starting or sending completion for activity #{start.activity_type}")
           @scoped_logger.warn(e)
@@ -258,7 +260,7 @@ module Temporalio
                 task_token:,
                 result: Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                   failed: Bridge::Api::ActivityResult::Failure.new(
-                    failure: @worker.options.client.data_converter.to_failure(e)
+                    failure: storage_data_converter(start).to_failure(e)
                   )
                 )
               )
@@ -272,7 +274,7 @@ module Temporalio
           remove_running_activity(task_token)
         end
 
-        def run_activity(defn, activity, input)
+        def run_activity(defn, activity, input, data_converter)
           result = begin
             # Create the instance. We choose to do this before interceptors so that it is available in the interceptor.
             activity.instance = defn.instance.is_a?(Proc) ? defn.instance.call : defn.instance # steep:ignore
@@ -283,7 +285,7 @@ module Temporalio
             impl = @worker._activity_interceptors.reverse_each.reduce(impl) do |acc, int|
               int.intercept_activity(acc)
             end
-            impl.init(OutboundImplementation.new(self, activity.info.task_token))
+            impl.init(OutboundImplementation.new(self, activity.info.task_token, data_converter))
 
             # Execute
             result = impl.execute(input)
@@ -291,7 +293,7 @@ module Temporalio
             # Success
             Bridge::Api::ActivityResult::ActivityExecutionResult.new(
               completed: Bridge::Api::ActivityResult::Success.new(
-                result: @worker.options.client.data_converter.to_payload(result, hint: input.result_hint)
+                result: data_converter.to_payload(result, hint: input.result_hint)
               )
             )
           rescue Exception => e # rubocop:disable Lint/RescueException -- We are intending to catch everything here
@@ -306,7 +308,7 @@ module Temporalio
               @scoped_logger.debug('Completing activity as failed due to exception caused by pause')
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 failed: Bridge::Api::ActivityResult::Failure.new(
-                  failure: @worker.options.client.data_converter.to_failure(
+                  failure: data_converter.to_failure(
                     Error._with_backtrace_and_cause(
                       Error::ApplicationError.new('Activity paused', type: 'ActivityPause'), backtrace: nil, cause: e
                     )
@@ -318,7 +320,7 @@ module Temporalio
               @scoped_logger.debug('Completing activity as failed due to exception caused by reset')
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 failed: Bridge::Api::ActivityResult::Failure.new(
-                  failure: @worker.options.client.data_converter.to_failure(
+                  failure: data_converter.to_failure(
                     Error._with_backtrace_and_cause(
                       Error::ApplicationError.new('Activity reset', type: 'ActivityReset'), backtrace: nil, cause: e
                     )
@@ -330,7 +332,7 @@ module Temporalio
               @scoped_logger.debug('Completing activity as canceled')
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 cancelled: Bridge::Api::ActivityResult::Cancellation.new(
-                  failure: @worker.options.client.data_converter.to_failure(e)
+                  failure: data_converter.to_failure(e)
                 )
               )
             else
@@ -344,7 +346,7 @@ module Temporalio
               @scoped_logger.add(log_level, e)
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 failed: Bridge::Api::ActivityResult::Failure.new(
-                  failure: @worker.options.client.data_converter.to_failure(e)
+                  failure: data_converter.to_failure(e)
                 )
               )
             end
@@ -357,6 +359,27 @@ module Temporalio
               result:
             )
           )
+        end
+
+        def storage_data_converter(start)
+          @worker.options.client.data_converter._with_storage_target(
+            namespace: @worker.options.client.namespace, target: storage_target_for_task(start)
+          )
+        end
+
+        def storage_target_for_task(start)
+          namespace = ProtoUtils.string_or(start.workflow_namespace, @worker.options.client.namespace)
+          scheduling_workflow_id = ProtoUtils.string_or(start.workflow_execution&.workflow_id)
+          if scheduling_workflow_id
+            Converters::StorageDriverWorkflowInfo.new(
+              namespace:, id: scheduling_workflow_id, run_id: ProtoUtils.string_or(start.workflow_execution&.run_id),
+              type: ProtoUtils.string_or(start.workflow_type)
+            )
+          else
+            Converters::StorageDriverActivityInfo.new(
+              namespace:, id: start.activity_id, run_id: ProtoUtils.string_or(start.run_id), type: start.activity_type
+            )
+          end
         end
 
         def assert_valid_activity(activity)
@@ -452,19 +475,18 @@ module Temporalio
         end
 
         class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
-          def initialize(worker, task_token)
+          def initialize(worker, task_token, data_converter)
             super(nil) # steep:ignore
             @worker = worker
             @task_token = task_token
+            @data_converter = data_converter
           end
 
           def heartbeat(input)
             @worker.bridge_worker.record_activity_heartbeat(
               Bridge::Api::CoreInterface::ActivityHeartbeat.new(
                 task_token: @task_token,
-                details: ProtoUtils.convert_to_payload_array(@worker.worker.options.client.data_converter,
-                                                             input.details,
-                                                             hints: input.detail_hints)
+                details: ProtoUtils.convert_to_payload_array(@data_converter, input.details, hints: input.detail_hints)
               ).to_proto
             )
           end

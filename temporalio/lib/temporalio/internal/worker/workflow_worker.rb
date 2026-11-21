@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 require 'temporalio/api/payload_visitor'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/error'
 require 'temporalio/internal/bridge/api'
 require 'temporalio/internal/external_storage_runner'
+require 'temporalio/internal/proto_utils'
 require 'temporalio/internal/storage_operation_metrics'
 require 'temporalio/internal/worker/workflow_instance'
 require 'temporalio/scoped_logger'
@@ -102,6 +104,8 @@ module Temporalio
           # two activations of one run outstanding, so the run ID identifies the activation.
           @pending_download_metrics = {}
           @pending_download_metrics_mutex = Mutex.new
+          @pending_initial_targets = {}
+          @pending_initial_targets_mutex = Mutex.new
           unless @decode_in_background
             # Without a codec or storage, decoding only rejects references that were never retrieved. That needs no
             # I/O, so it runs inline and existing workers need no thread pool.
@@ -202,6 +206,7 @@ module Temporalio
               metrics = StorageOperationMetrics.new
               # Stored before the visit, so the completion reports what was retrieved even if decoding then fails
               @pending_download_metrics_mutex.synchronize { @pending_download_metrics[activation.run_id] = metrics }
+              remember_initial_target(activation)
             end
             payload_decoding_visitor(metrics).run(activation)
           else
@@ -223,9 +228,12 @@ module Temporalio
           download_metrics = @pending_download_metrics_mutex.synchronize do
             @pending_download_metrics.delete(activation_completion.run_id)
           end
+          initial_target = @pending_initial_targets_mutex.synchronize do
+            @pending_initial_targets.delete(activation_completion.run_id)
+          end
           upload_metrics = StorageOperationMetrics.new if @external_storage
           begin
-            payload_encoding_visitor(upload_metrics).run(activation_completion)
+            encode_completion_payloads(activation_completion, upload_metrics, initial_target)
           rescue Exception => e # rubocop:disable Lint/RescueException
             # Only the message is sent, and it is marked encoded, because encoding a failure that carries payloads
             # could fail the same way and retry forever
@@ -242,14 +250,94 @@ module Temporalio
           runner.apply_workflow_activation_complete(workflow_worker: self, activation_completion:, encoded: true)
         end
 
-        def payload_encoding_visitor(metrics)
+        def remember_initial_target(activation)
+          initialize_job = activation.jobs.find { |job| !job.initialize_workflow.nil? }&.initialize_workflow
+          return unless initialize_job
+
+          initial_target = Converters::StorageDriverWorkflowInfo.new(
+            namespace: @state.namespace, id: initialize_job.workflow_id, run_id: activation.run_id,
+            type: initialize_job.workflow_type
+          )
+          @pending_initial_targets_mutex.synchronize { @pending_initial_targets[activation.run_id] = initial_target }
+        end
+
+        def encode_completion_payloads(activation_completion, metrics, initial_target)
+          workflow_info = @state.running_workflow_info(activation_completion.run_id)
+          current_workflow_target = workflow_info ? storage_target_for_workflow(workflow_info) : initial_target
+          if activation_completion.has_successful?
+            activation_completion.successful.commands.each do |command|
+              command_target = storage_target_for_command(command, workflow_info, current_workflow_target)
+              payload_encoding_visitor(metrics, command_target).run(command)
+            end
+          end
+          return unless activation_completion.has_failed?
+
+          payload_encoding_visitor(metrics, current_workflow_target).run(activation_completion.failed)
+        end
+
+        def storage_target_for_workflow(workflow_info)
+          Converters::StorageDriverWorkflowInfo.new(
+            namespace: workflow_info.namespace, id: workflow_info.workflow_id, run_id: workflow_info.run_id,
+            type: workflow_info.workflow_type
+          )
+        end
+
+        def storage_target_for_command(command, workflow_info, current_workflow_target)
+          return current_workflow_target unless workflow_info
+
+          case command.variant
+          when :start_child_workflow_execution
+            child = command.start_child_workflow_execution
+            Converters::StorageDriverWorkflowInfo.new(
+              namespace: ProtoUtils.string_or(child.namespace, workflow_info.namespace), id: child.workflow_id,
+              type: child.workflow_type
+            )
+          when :signal_external_workflow_execution
+            storage_target_for_signaled_workflow(command.signal_external_workflow_execution, workflow_info)
+          when :continue_as_new_workflow_execution
+            Converters::StorageDriverWorkflowInfo.new(
+              namespace: workflow_info.namespace, id: workflow_info.workflow_id,
+              type: ProtoUtils.string_or(
+                command.continue_as_new_workflow_execution.workflow_type, workflow_info.workflow_type
+              )
+            )
+          when :complete_workflow_execution
+            storage_target_for_result(workflow_info, current_workflow_target)
+          else
+            current_workflow_target
+          end
+        end
+
+        def storage_target_for_signaled_workflow(signal, workflow_info)
+          case signal.target
+          when :workflow_execution
+            execution = signal.workflow_execution
+            Converters::StorageDriverWorkflowInfo.new(
+              namespace: ProtoUtils.string_or(execution.namespace, workflow_info.namespace), id: execution.workflow_id,
+              run_id: ProtoUtils.string_or(execution.run_id)
+            )
+          when :child_workflow_id
+            Converters::StorageDriverWorkflowInfo.new(namespace: workflow_info.namespace, id: signal.child_workflow_id)
+          end
+        end
+
+        def storage_target_for_result(workflow_info, current_workflow_target)
+          parent = workflow_info.parent
+          return current_workflow_target if parent.nil? || workflow_info.continued_run_id
+
+          Converters::StorageDriverWorkflowInfo.new(
+            namespace: parent.namespace, id: parent.workflow_id, run_id: parent.run_id
+          )
+        end
+
+        def payload_encoding_visitor(metrics, target)
           payload_codec = @payload_codec
           external_storage = @external_storage
           storage_runner = @storage_runner
           Api::PayloadVisitor.new(skip_search_attributes: true) do |payload_or_payloads|
             replace_payloads_on_visit(payload_or_payloads) do |payloads|
               payloads = payload_codec.encode(payloads) if payload_codec
-              payloads = storage_runner.store(payloads.to_a, metrics:) if external_storage
+              payloads = storage_runner.store(payloads.to_a, target:, metrics:) if external_storage
               payloads
             end
           end
@@ -325,6 +413,10 @@ module Temporalio
               @running_workflows_mutex.synchronize { @running_workflows[run_id] = instance }
             end
             instance
+          end
+
+          def running_workflow_info(run_id)
+            @running_workflows_mutex.synchronize { @running_workflows[run_id] }&.info
           end
 
           def evict_running_workflow(run_id, cache_remove_job)

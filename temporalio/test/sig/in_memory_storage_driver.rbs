@@ -1,9 +1,22 @@
 class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
+  class StoredPayload
+    attr_reader target: Temporalio::Converters::storageDriverTargetInfo?
+    attr_reader namespace: String?
+    attr_reader payload: Temporalio::Api::Common::V1::Payload
+
+    def initialize: (
+      target: Temporalio::Converters::storageDriverTargetInfo?,
+      namespace: String?,
+      payload: Temporalio::Api::Common::V1::Payload
+    ) -> void
+  end
+
   @name: String
   @type: String
   @mutex: Mutex
   @stored: Hash[String, String]
   @store_calls: Array[[Temporalio::Converters::StorageDriverStoreContext, Integer]]
+  @stored_payloads: Array[StoredPayload]
   @retrieve_calls: Array[Integer]
 
   attr_reader name: String
@@ -13,5 +26,9 @@ class InMemoryStorageDriver < Temporalio::Converters::StorageDriver
 
   def stored: -> Hash[String, String]
   def store_calls: -> Array[[Temporalio::Converters::StorageDriverStoreContext, Integer]]
+  def targets_of_payloads_with_data: (String data) -> Array[Temporalio::Converters::storageDriverTargetInfo?]
+  def namespaces_of_payloads_with_data: (String data) -> Array[String?]
   def retrieve_calls: -> Array[Integer]
+
+  private def stored_payloads_with_data: (String data) -> Array[StoredPayload]
 end

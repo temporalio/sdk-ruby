@@ -47,10 +47,21 @@ class Temporalio::Internal::Worker::ActivityWorker
     params(
       defn: Temporalio::Activity::Definition::Info,
       activity: Temporalio::Internal::Worker::ActivityWorker::RunningActivity,
-      input: Temporalio::Worker::Interceptor::Activity::ExecuteInput
+      input: Temporalio::Worker::Interceptor::Activity::ExecuteInput,
+      data_converter: Temporalio::Converters::DataConverter
     ).void
   end
-  def run_activity(defn, activity, input); end
+  def run_activity(defn, activity, input, data_converter); end
+
+  sig { params(start: Object).returns(Temporalio::Converters::DataConverter) }
+  def storage_data_converter(start); end
+
+  sig do
+    params(start: Object).returns(
+      T.any(Temporalio::Converters::StorageDriverWorkflowInfo, Temporalio::Converters::StorageDriverActivityInfo)
+    )
+  end
+  def storage_target_for_task(start); end
 
   sig { params(activity: String).void }
   def assert_valid_activity(activity); end
@@ -103,6 +114,12 @@ end
 class Temporalio::Internal::Worker::ActivityWorker::OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
   extend T::Sig
 
-  sig { params(worker: Temporalio::Internal::Worker::ActivityWorker, task_token: String).void }
-  def initialize(worker, task_token); end
+  sig do
+    params(
+      worker: Temporalio::Internal::Worker::ActivityWorker,
+      task_token: String,
+      data_converter: Temporalio::Converters::DataConverter
+    ).void
+  end
+  def initialize(worker, task_token, data_converter); end
 end
