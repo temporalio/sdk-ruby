@@ -30,6 +30,36 @@ class Temporalio::Internal::Client::Implementation < Temporalio::Client::Interce
   end
   def _start_workflow_request_from_with_start_options(klass, start_options); end
 
+  sig do
+    params(
+      target: T.nilable(
+        T.any(
+          Temporalio::Converters::StorageDriverWorkflowInfo,
+          Temporalio::Converters::StorageDriverActivityInfo
+        )
+      )
+    ).returns(Temporalio::Converters::DataConverter)
+  end
+  def _storage_data_converter(target); end
+
+  sig do
+    params(id: T.nilable(String), run_id: T.nilable(String), type: T.nilable(String)).returns(Temporalio::Converters::DataConverter)
+  end
+  def _workflow_storage_data_converter(id:, run_id: T.unsafe(nil), type: T.unsafe(nil)); end
+
+  sig do
+    params(id: T.nilable(String), run_id: T.nilable(String), type: T.nilable(String)).returns(Temporalio::Converters::DataConverter)
+  end
+  def _activity_storage_data_converter(id:, run_id: T.unsafe(nil), type: T.unsafe(nil)); end
+
+  sig do
+    params(ref: T.any(String, Temporalio::Client::ActivityIDReference)).returns(Temporalio::Converters::DataConverter)
+  end
+  def _async_activity_storage_data_converter(ref); end
+
+  sig { params(action: Temporalio::Client::Schedule::Action).returns(Temporalio::Converters::DataConverter) }
+  def _schedule_memo_storage_data_converter(action); end
+
   sig { params(input: Temporalio::Client::Interceptor::StartActivityInput).returns(Temporalio::Client::ActivityHandle) }
   def start_activity(input); end
 
