@@ -11,6 +11,7 @@ module Temporalio
 
       def store: (
         Array[Api::Common::V1::Payload] payloads,
+        ?target: Converters::storageDriverTargetInfo?,
         ?metrics: StorageOperationMetrics?
       ) -> Array[Api::Common::V1::Payload]
       def retrieve: (

@@ -20,7 +20,7 @@ module Temporalio
     # stored, and are returned still encoded when retrieved.
     #
     # Each driver gets one batched request per call, and requests to different drivers run one after another. The
-    # configured concurrency limits are not enforced and the driver target is always nil.
+    # configured concurrency limits are not enforced.
     #
     # @!visibility private
     class ExternalStorageRunner
@@ -39,16 +39,16 @@ module Temporalio
       end
 
       # @param payloads [Array<Api::Common::V1::Payload>] Codec-encoded payloads. Not mutated.
+      # @param target [Converters::StorageDriverWorkflowInfo, Converters::StorageDriverActivityInfo, nil] The
+      #   execution every one of these payloads is stored on behalf of, or nil when there is none.
       # @param metrics [StorageOperationMetrics, nil] Records each driver call that stores payloads.
       # @return [Array<Api::Common::V1::Payload>] Payloads with every eligible one replaced by a reference.
-      def store(payloads, metrics: nil)
+      def store(payloads, target: nil, metrics: nil)
         storage = @storage
         return payloads unless storage
 
-        # TODO: Populate the target with the workflow or activity the payloads belong to, here and in the store context.
-        # That needs callers to pass it in, which happens once storage moves to per-request passes.
         select_context = Converters::StorageDriverSelectContext.new(
-          target: nil, cancellation: Cancellation.new, namespace: @namespace
+          target:, cancellation: Cancellation.new, namespace: @namespace
         )
 
         # Driver => [[index, serialized payload], ...] for each payload that driver stores
@@ -71,7 +71,7 @@ module Temporalio
         result = payloads.dup
         payloads_by_driver.each do |driver, indexes_and_serialized|
           context = Converters::StorageDriverStoreContext.new(
-            target: nil, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER, namespace: @namespace
+            target:, cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER, namespace: @namespace
           )
           # Drivers get copies, since a driver may keep a payload after returning and the SDK modifies some payloads in
           # place

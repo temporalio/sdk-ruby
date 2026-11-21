@@ -50,7 +50,30 @@ module Temporalio
 
         def decode_activation: (MultiRunner runner, untyped activation) -> void
         def encode_activation_completion: (MultiRunner runner, untyped activation_completion) -> void
-        def payload_encoding_visitor: (StorageOperationMetrics? metrics) -> Api::PayloadVisitor
+        def remember_initial_target: (untyped activation) -> void
+        def encode_completion_payloads: (
+          untyped activation_completion,
+          StorageOperationMetrics? metrics,
+          Converters::StorageDriverWorkflowInfo? initial_target
+        ) -> void
+        def storage_target_for_workflow: (Workflow::Info workflow_info) -> Converters::StorageDriverWorkflowInfo
+        def storage_target_for_command: (
+          untyped command,
+          Workflow::Info? workflow_info,
+          Converters::StorageDriverWorkflowInfo? current_workflow_target
+        ) -> Converters::StorageDriverWorkflowInfo?
+        def storage_target_for_signaled_workflow: (
+          untyped signal,
+          Workflow::Info workflow_info
+        ) -> Converters::StorageDriverWorkflowInfo?
+        def storage_target_for_result: (
+          Workflow::Info workflow_info,
+          Converters::StorageDriverWorkflowInfo? current_workflow_target
+        ) -> Converters::StorageDriverWorkflowInfo?
+        def payload_encoding_visitor: (
+          StorageOperationMetrics? metrics,
+          Converters::StorageDriverWorkflowInfo? target
+        ) -> Api::PayloadVisitor
         def payload_decoding_visitor: (StorageOperationMetrics? metrics) -> Api::PayloadVisitor
         def replace_payloads_on_visit: (untyped payload_or_payloads) { (untyped) -> Enumerable[untyped] } -> void
 
@@ -92,6 +115,7 @@ module Temporalio
           ) -> void
 
           def get_or_create_running_workflow: [T] (String run_id) { -> T } -> T
+          def running_workflow_info: (String run_id) -> Workflow::Info?
           def evict_running_workflow: (String run_id, untyped cache_remove_job) -> void
           def evict_all: -> void
         end
