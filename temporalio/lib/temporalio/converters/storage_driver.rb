@@ -27,7 +27,8 @@ module Temporalio
       end
 
       # Identifier for this driver implementation, for example +aws.s3driver+. Unlike {#name}, this is identical across
-      # every instance of the same implementation and across SDK languages.
+      # every instance of the same implementation and across SDK languages. Reported in the worker heartbeat. Must be
+      # implemented.
       #
       # @return [String] Driver implementation identifier.
       def type
