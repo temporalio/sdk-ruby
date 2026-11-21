@@ -63,6 +63,55 @@ class WorkerExternalStorageTest < Test
     def execute: () -> untyped
   end
 
+  class HeartbeatStoreFailureActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class HeartbeatStoreFailureWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  class UnconvertibleDetail
+    def to_json: (*untyped) -> String
+  end
+
+  class HeartbeatConversionFailureActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class HeartbeatStoreFailureNoRaiseActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class CancelOnSignalWorkflow < Temporalio::Workflow::Definition
+    @cancel: bool
+
+    def self.cancel: () -> Temporalio::Workflow::Definition::Signal
+
+    def execute: (String activity) -> untyped
+    def cancel: () -> void
+  end
+
+  class BlockOnceStorageDriver < InMemoryStorageDriver
+    @block_store_containing: String?
+
+    attr_reader blocked: Queue
+
+    def initialize: (block_store_containing: String) -> void
+  end
+
+  class HeartbeatStoreBlockedActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class HeartbeatFailureThenServerCancelActivity < Temporalio::Activity::Definition
+    def execute: () -> untyped
+  end
+
+  class ReportingFailOnceStorageDriver < FailOnceStorageDriver
+    attr_reader failures: Queue
+  end
+
   class FailingWorkflow < Temporalio::Workflow::Definition
     def execute: () -> untyped
   end
@@ -114,6 +163,21 @@ class WorkerExternalStorageTest < Test
   def run_echo_workflow_capturing_completions: (
     Temporalio::Converters::StorageDriver driver
   ) -> Array[Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion]
+  def execute_workflow_capturing_activity_completions: (
+    singleton(Temporalio::Workflow::Definition) workflow,
+    *untyped args,
+    activities: Array[singleton(Temporalio::Activity::Definition)],
+    driver: Temporalio::Converters::StorageDriver
+  ) ?{ (Temporalio::Client::WorkflowHandle handle) -> void } -> [
+    untyped,
+    Array[Temporalio::Internal::Bridge::Api::CoreInterface::ActivityTaskCompletion]
+  ]
+  def first_failed_result: (
+    Array[Temporalio::Internal::Bridge::Api::CoreInterface::ActivityTaskCompletion] activity_completions
+  ) -> untyped
+  def first_canceled_result: (
+    Array[Temporalio::Internal::Bridge::Api::CoreInterface::ActivityTaskCompletion] activity_completions
+  ) -> untyped
   def assert_storage_failure_retried: (Temporalio::Converters::StorageDriver driver, String failure_message) -> void
   def client_with_storage: (
     Temporalio::Converters::StorageDriver driver,

@@ -49,7 +49,10 @@ module Temporalio
       def initialize: (Activity::CancellationDetails details) -> void
     end
 
-    class ExternalStorageNotConfiguredError < Error
+    class ExternalStorageError < Error
+    end
+
+    class ExternalStorageNotConfiguredError < ExternalStorageError
       def initialize: (?String message) -> void
     end
 

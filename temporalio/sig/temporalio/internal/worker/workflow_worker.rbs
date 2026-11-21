@@ -57,6 +57,11 @@ module Temporalio
           Converters::StorageDriverWorkflowInfo? initial_target
         ) -> void
         def storage_target_for_workflow: (Workflow::Info workflow_info) -> Converters::StorageDriverWorkflowInfo
+        def task_failed_cause: (Exception error) -> Api::Enums::V1::WorkflowTaskFailedCause::names
+        def encoding_failure_cause: (
+          Exception encoding_error,
+          untyped activation_completion
+        ) -> Api::Enums::V1::WorkflowTaskFailedCause::names
         def storage_target_for_command: (
           untyped command,
           Workflow::Info? workflow_info,

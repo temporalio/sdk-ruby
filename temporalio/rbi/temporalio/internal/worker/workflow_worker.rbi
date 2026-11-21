@@ -107,6 +107,12 @@ class Temporalio::Internal::Worker::WorkflowWorker
   sig { params(workflow_info: Temporalio::Workflow::Info).returns(Temporalio::Converters::StorageDriverWorkflowInfo) }
   def storage_target_for_workflow(workflow_info); end
 
+  sig { params(error: Exception).returns(Symbol) }
+  def task_failed_cause(error); end
+
+  sig { params(encoding_error: Exception, activation_completion: Object).returns(Symbol) }
+  def encoding_failure_cause(encoding_error, activation_completion); end
+
   sig do
     params(
       command: Object,

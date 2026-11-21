@@ -26,6 +26,7 @@ module Temporalio
           @worker = worker
           @bridge_worker = bridge_worker
           @runtime_metric_meter = worker.options.client.connection.options.runtime.metric_meter
+          @data_converter_without_storage = worker.options.client.data_converter._without_storage
 
           # Create shared logger that gives scoped activity details
           @scoped_logger = ScopedLogger.new(@worker.options.logger)
@@ -258,11 +259,7 @@ module Temporalio
             @bridge_worker.complete_activity_task(
               Bridge::Api::CoreInterface::ActivityTaskCompletion.new(
                 task_token:,
-                result: Bridge::Api::ActivityResult::ActivityExecutionResult.new(
-                  failed: Bridge::Api::ActivityResult::Failure.new(
-                    failure: storage_data_converter(start).to_failure(e)
-                  )
-                )
+                result: failed_result(e, storage_data_converter(start))
               )
             )
           rescue StandardError => e_inner
@@ -285,10 +282,14 @@ module Temporalio
             impl = @worker._activity_interceptors.reverse_each.reduce(impl) do |acc, int|
               int.intercept_activity(acc)
             end
-            impl.init(OutboundImplementation.new(self, activity.info.task_token, data_converter))
+            impl.init(OutboundImplementation.new(self, activity, data_converter))
 
             # Execute
-            result = impl.execute(input)
+            result = begin
+              impl.execute(input)
+            ensure
+              activity._mark_execution_finished
+            end
 
             # Success
             Bridge::Api::ActivityResult::ActivityExecutionResult.new(
@@ -303,6 +304,10 @@ module Temporalio
               Bridge::Api::ActivityResult::ActivityExecutionResult.new(
                 will_complete_async: Bridge::Api::ActivityResult::WillCompleteAsync.new
               )
+            elsif e.is_a?(Error::CanceledError) && (heartbeat_failure = activity._heartbeat_failure)
+              @scoped_logger.warn('Completing activity as failed because converting heartbeat details failed')
+              @scoped_logger.warn(heartbeat_failure)
+              failed_result(heartbeat_failure, data_converter)
             elsif e.is_a?(Error::CanceledError) && activity.cancellation_details&.paused?
               # Server requested pause
               @scoped_logger.debug('Completing activity as failed due to exception caused by pause')
@@ -344,11 +349,7 @@ module Temporalio
                           end
               @scoped_logger.add(log_level, 'Completing activity as failed')
               @scoped_logger.add(log_level, e)
-              Bridge::Api::ActivityResult::ActivityExecutionResult.new(
-                failed: Bridge::Api::ActivityResult::Failure.new(
-                  failure: data_converter.to_failure(e)
-                )
-              )
+              failed_result(e, data_converter)
             end
           end
 
@@ -359,6 +360,21 @@ module Temporalio
               result:
             )
           )
+        end
+
+        def failed_result(error, data_converter)
+          if error.is_a?(Error::ExternalStorageError)
+            Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+              failed: Bridge::Api::ActivityResult::Failure.new(
+                failure: @data_converter_without_storage.to_failure(error),
+                cause: :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE
+              )
+            )
+          else
+            Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+              failed: Bridge::Api::ActivityResult::Failure.new(failure: data_converter.to_failure(error))
+            )
+          end
         end
 
         def storage_data_converter(start)
@@ -395,7 +411,8 @@ module Temporalio
 
         class RunningActivity < Activity::Context
           attr_reader :info, :cancellation, :cancellation_details, :worker_shutdown_cancellation,
-                      :payload_converter, :logger, :_server_requested_cancel
+                      :payload_converter, :logger, :_server_requested_cancel, :_heartbeat_failure,
+                      :_execution_finished
           attr_accessor :instance, :_outbound_impl
 
           def initialize( # rubocop:disable Lint/MissingSuper
@@ -417,6 +434,8 @@ module Temporalio
             @runtime_metric_meter = runtime_metric_meter
             @_outbound_impl = nil
             @_server_requested_cancel = false
+            @_heartbeat_failure = nil
+            @_execution_finished = false
           end
 
           def heartbeat(*details, detail_hints: nil)
@@ -449,10 +468,23 @@ module Temporalio
             return if @cancellation_details
 
             @_server_requested_cancel = true
+            @_heartbeat_failure = nil
             # Set the cancellation details _before_ issuing the cancel itself
             @cancellation_details = details
             _, cancel_proc = cancellation
             cancel_proc.call(reason:)
+          end
+
+          def _mark_execution_finished
+            @_execution_finished = true
+          end
+
+          def _cancel_due_to_heartbeat_failure(error)
+            return if @cancellation_details || @_heartbeat_failure
+
+            @_heartbeat_failure = error
+            _, cancel_proc = cancellation
+            cancel_proc.call(reason: 'Heartbeat details conversion failed')
           end
         end
 
@@ -475,20 +507,44 @@ module Temporalio
         end
 
         class OutboundImplementation < Temporalio::Worker::Interceptor::Activity::Outbound
-          def initialize(worker, task_token, data_converter)
+          def initialize(worker, activity, data_converter)
             super(nil) # steep:ignore
             @worker = worker
-            @task_token = task_token
+            @activity = activity
             @data_converter = data_converter
           end
 
           def heartbeat(input)
+            details = ProtoUtils.convert_to_payload_array(@data_converter, input.details, hints: input.detail_hints)
+          rescue Error::CanceledError
+            raise
+          rescue StandardError => e
+            handle_heartbeat_conversion_failure(e)
+          else
             @worker.bridge_worker.record_activity_heartbeat(
               Bridge::Api::CoreInterface::ActivityHeartbeat.new(
-                task_token: @task_token,
-                details: ProtoUtils.convert_to_payload_array(@data_converter, input.details, hints: input.detail_hints)
+                task_token: @activity.info.task_token, details:
               ).to_proto
             )
+          end
+
+          private
+
+          def handle_heartbeat_conversion_failure(error)
+            if @activity._execution_finished
+              @activity.logger.warn('Failed converting heartbeat details (activity already done, cannot error)')
+              @activity.logger.warn(error)
+            else
+              @activity.logger.warn('Cancelling activity because converting heartbeat details failed')
+              @activity.logger.warn(error)
+              cancel_activity_deferring_raise_until_cancel_callbacks_run(error)
+            end
+          end
+
+          def cancel_activity_deferring_raise_until_cancel_callbacks_run(error)
+            Thread.handle_interrupt(Object => :never) do # steep:ignore UnexpectedBlockGiven
+              @activity._cancel_due_to_heartbeat_failure(error)
+            end
           end
         end
       end

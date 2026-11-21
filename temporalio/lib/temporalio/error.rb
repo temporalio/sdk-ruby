@@ -116,6 +116,15 @@ module Temporalio
       end
     end
 
+    # Error that occurs when storing payloads in, or retrieving them from, external storage fails. This is the base
+    # for every external storage failure.
+    #
+    # @note WARNING: This API is experimental and may change in the future.
+    #
+    # @!visibility private
+    class ExternalStorageError < Error
+    end
+
     # Error that occurs when a payload stored in external storage is encountered but no external storage is
     # configured to retrieve it. This usually means the client or worker reading the payload is configured
     # differently from the one that wrote it.
@@ -123,7 +132,7 @@ module Temporalio
     # @note WARNING: This API is experimental and may change in the future.
     #
     # @!visibility private
-    class ExternalStorageNotConfiguredError < Error
+    class ExternalStorageNotConfiguredError < ExternalStorageError
       # @!visibility private
       def initialize(
         message = '[TMPRL1105] Encountered a reference to a payload in external storage, but no external storage ' \
