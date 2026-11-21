@@ -14,7 +14,7 @@ class Temporalio::Converters::StorageDriverStoreContext < ::Data
       namespace: T.nilable(String)
     ).void
   end
-  def initialize(target:, cancellation:, limiter:, namespace: nil); end
+  def initialize(target:, cancellation:, limiter: T.unsafe(nil), namespace: nil); end
 
   sig do
     returns(

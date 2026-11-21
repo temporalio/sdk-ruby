@@ -12,8 +12,6 @@ module Temporalio
         # Implementations are called concurrently from multiple threads and must be thread safe.
         #
         # @note WARNING: This API is experimental and may change in the future.
-        #
-        # @!visibility private
         class S3StorageDriverClient
           # Upload data to the given bucket and key.
           #

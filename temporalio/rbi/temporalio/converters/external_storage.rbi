@@ -21,9 +21,6 @@ class Temporalio::Converters::ExternalStorage
   sig { returns(Integer) }
   attr_reader :payload_size_threshold
 
-  sig { returns(Temporalio::Converters::ExternalStorageConcurrency) }
-  attr_reader :concurrency
-
   sig do
     params(
       drivers: T::Array[Temporalio::Converters::StorageDriver],
@@ -33,15 +30,13 @@ class Temporalio::Converters::ExternalStorage
           payload: Temporalio::Api::Common::V1::Payload
         ).returns(T.nilable(Temporalio::Converters::StorageDriver))
       ),
-      payload_size_threshold: Integer,
-      concurrency: Temporalio::Converters::ExternalStorageConcurrency
+      payload_size_threshold: Integer
     ).void
   end
   def initialize(
     drivers:,
     driver_selector: T.unsafe(nil),
-    payload_size_threshold: T.unsafe(nil),
-    concurrency: T.unsafe(nil)
+    payload_size_threshold: T.unsafe(nil)
   ); end
 
   sig { params(name: String).returns(T.nilable(Temporalio::Converters::StorageDriver)) }

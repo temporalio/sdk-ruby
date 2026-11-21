@@ -2,7 +2,7 @@
 
 class Temporalio::Converters::StorageDriverRetrieveContext < ::Data
   sig { params(cancellation: Temporalio::Cancellation, limiter: Temporalio::Converters::StorageDriverLimiter).void }
-  def initialize(cancellation:, limiter:); end
+  def initialize(cancellation:, limiter: T.unsafe(nil)); end
 
   sig { returns(Temporalio::Cancellation) }
   def cancellation; end

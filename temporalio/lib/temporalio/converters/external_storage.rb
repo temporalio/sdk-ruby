@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'temporalio/converters/external_storage_concurrency'
 require 'temporalio/converters/storage_driver'
 
 module Temporalio
@@ -11,8 +10,6 @@ module Temporalio
     # the first payload large enough to offload.
     #
     # @note WARNING: This API is experimental and may change in the future.
-    #
-    # @!visibility private
     class ExternalStorage
       # Shared with every other SDK, so the same payload offloads regardless of which one wrote it.
       DEFAULT_PAYLOAD_SIZE_THRESHOLD = 256 * 1024
@@ -24,9 +21,6 @@ module Temporalio
       #   {StorageDriverSelectContext} and a payload, returning a {StorageDriver} or nil to pass the payload through.
       #   Only called for payloads that meet {#payload_size_threshold}, and must return one of {#drivers} or nil.
       attr_reader :driver_selector
-
-      # @return [ExternalStorageConcurrency] Limits on how many storage requests may be in flight at once.
-      attr_reader :concurrency
 
       # @return [Integer] Minimum encoded payload size, in bytes, that is offloaded. Payloads at or above this size are
       #   offloaded; smaller ones are left inline. Zero offloads every payload.
@@ -43,12 +37,10 @@ module Temporalio
       #   payload.
       # @param payload_size_threshold [Integer] Minimum encoded payload size, in bytes, to offload. Must be a
       #   non-negative Integer.
-      # @param concurrency [ExternalStorageConcurrency] Limits on how many storage requests may be in flight at once.
       def initialize(
         drivers:,
         driver_selector: nil,
-        payload_size_threshold: DEFAULT_PAYLOAD_SIZE_THRESHOLD,
-        concurrency: ExternalStorageConcurrency.new
+        payload_size_threshold: DEFAULT_PAYLOAD_SIZE_THRESHOLD
       )
         raise ArgumentError, 'At least one driver is required' if drivers.empty?
 
@@ -78,7 +70,6 @@ module Temporalio
         # Normalized so callers never have to distinguish the single-driver case.
         @driver_selector = driver_selector || ->(_context, _payload) { @drivers.first }
         @payload_size_threshold = payload_size_threshold
-        @concurrency = concurrency
       end
 
       # Get the driver registered under the given name.

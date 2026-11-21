@@ -9,7 +9,7 @@ module Temporalio
       def initialize: (
         target: storageDriverTargetInfo?,
         cancellation: Cancellation,
-        limiter: StorageDriverLimiter,
+        ?limiter: StorageDriverLimiter,
         ?namespace: String?
       ) -> void
     end
