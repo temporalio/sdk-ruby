@@ -20,8 +20,6 @@ module Temporalio
         # the payload is stored for, percent-encoded to S3's safe character set.
         #
         # @note WARNING: This API is experimental and may change in the future.
-        #
-        # @!visibility private
         class S3StorageDriver < Converters::StorageDriver
           # Driver type shared by every S3 driver instance across SDK languages.
           DRIVER_TYPE = 'aws.s3driver'

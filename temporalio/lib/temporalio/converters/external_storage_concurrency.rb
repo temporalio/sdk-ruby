@@ -7,8 +7,10 @@ module Temporalio
       :max_operations_per_message
     )
 
-    # Limits on how many external storage requests may be in flight at once. Set on
-    # {ExternalStorage#concurrency}.
+    # Limits on how many external storage requests may be in flight at once.
+    #
+    # {ExternalStorage} does not accept these limits yet, because the SDK does not enforce them. This class is kept to
+    # record the defaults shared with the other SDKs until enforcement is added.
     #
     # @note WARNING: This API is experimental and may change in the future.
     #
