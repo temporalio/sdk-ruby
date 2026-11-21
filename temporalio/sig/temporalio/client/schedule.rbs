@@ -20,6 +20,7 @@ module Temporalio
 
       def _to_proto: (
         Converters::DataConverter data_converter,
+        String namespace,
         ?Internal::Client::DescribedScheduleAction? described_action
       ) -> Api::Schedule::V1::Schedule
 
@@ -62,6 +63,7 @@ module Temporalio
 
         def _to_proto: (
           Converters::DataConverter data_converter,
+          String namespace,
           ?Internal::Client::DescribedScheduleAction? described
         ) -> Api::Schedule::V1::ScheduleAction
 
@@ -113,6 +115,7 @@ module Temporalio
 
           def _to_proto: (
             Converters::DataConverter data_converter,
+            String namespace,
             ?Internal::Client::DescribedScheduleAction? described
           ) -> Api::Schedule::V1::ScheduleAction
 

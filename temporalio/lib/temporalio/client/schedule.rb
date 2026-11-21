@@ -2,6 +2,7 @@
 
 require 'temporalio/api'
 require 'temporalio/converters'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/internal/client/described_schedule_action'
 require 'temporalio/internal/proto_utils'
 require 'temporalio/priority'
@@ -49,10 +50,10 @@ module Temporalio
       end
 
       # @!visibility private
-      def _to_proto(data_converter, described_action = nil)
+      def _to_proto(data_converter, namespace, described_action = nil)
         Api::Schedule::V1::Schedule.new(
           spec: spec._to_proto,
-          action: action._to_proto(data_converter, described_action),
+          action: action._to_proto(data_converter, namespace, described_action),
           policies: policy._to_proto,
           state: state._to_proto
         )
@@ -160,7 +161,7 @@ module Temporalio
         end
 
         # @!visibility private
-        def _to_proto(data_converter, described = nil)
+        def _to_proto(data_converter, namespace, described = nil)
           raise NotImplementedError
         end
 
@@ -311,8 +312,12 @@ module Temporalio
           end
 
           # @!visibility private
-          def _to_proto(data_converter, described = nil)
+          def _to_proto(data_converter, namespace, described = nil)
             raw_info = described&.raw_info
+            workflow_type = workflow #: String
+            workflow_data_converter = data_converter._with_storage_target(
+              namespace:, target: Converters::StorageDriverWorkflowInfo.new(namespace:, id:, type: workflow_type)
+            )
             Api::Schedule::V1::ScheduleAction.new(
               start_workflow: Api::Workflow::V1::NewWorkflowExecutionInfo.new(
                 workflow_id: id,
@@ -321,7 +326,7 @@ module Temporalio
                 input: if described&.unchanged?(:args, args)
                          raw_info&.input
                        else
-                         data_converter.to_payloads(args, hints: arg_hints)
+                         workflow_data_converter.to_payloads(args, hints: arg_hints)
                        end,
                 workflow_execution_timeout: Internal::ProtoUtils.seconds_to_duration(execution_timeout),
                 workflow_run_timeout: Internal::ProtoUtils.seconds_to_duration(run_timeout),
@@ -330,16 +335,16 @@ module Temporalio
                 memo: if described&.unchanged?(:memo, memo)
                         raw_info&.memo
                       else
-                        Internal::ProtoUtils.memo_to_proto(memo, data_converter)
+                        Internal::ProtoUtils.memo_to_proto(memo, workflow_data_converter)
                       end,
                 search_attributes: search_attributes&._to_proto,
                 header: if described&.unchanged?(:headers, headers)
                           raw_info&.header
                         else
-                          Internal::ProtoUtils.headers_to_proto(headers, data_converter)
+                          Internal::ProtoUtils.headers_to_proto(headers, workflow_data_converter)
                         end,
                 priority: priority._to_proto,
-                user_metadata: _user_metadata_to_proto(data_converter, described)
+                user_metadata: _user_metadata_to_proto(workflow_data_converter, described)
               )
             )
           end

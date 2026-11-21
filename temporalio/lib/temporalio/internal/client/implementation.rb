@@ -19,6 +19,8 @@ require 'temporalio/client/workflow_execution_count'
 require 'temporalio/client/workflow_handle'
 require 'temporalio/common_enums'
 require 'temporalio/converters'
+require 'temporalio/converters/storage_driver_activity_info'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/error'
 require 'temporalio/error/failure'
 require 'temporalio/internal/proto_utils'
@@ -80,13 +82,14 @@ module Temporalio
         end
 
         def start_workflow(input)
+          workflow_data_converter = _workflow_storage_data_converter(id: input.workflow_id, type: input.workflow)
           req = Api::WorkflowService::V1::StartWorkflowExecutionRequest.new(
             request_id: SecureRandom.uuid,
             namespace: @client.namespace,
             workflow_type: Api::Common::V1::WorkflowType.new(name: input.workflow),
             workflow_id: input.workflow_id,
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
-            input: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
+            input: workflow_data_converter.to_payloads(input.args, hints: input.arg_hints),
             workflow_execution_timeout: ProtoUtils.seconds_to_duration(input.execution_timeout),
             workflow_run_timeout: ProtoUtils.seconds_to_duration(input.run_timeout),
             workflow_task_timeout: ProtoUtils.seconds_to_duration(input.task_timeout),
@@ -95,14 +98,14 @@ module Temporalio
             workflow_id_conflict_policy: input.id_conflict_policy,
             retry_policy: input.retry_policy&._to_proto,
             cron_schedule: input.cron_schedule,
-            memo: ProtoUtils.memo_to_proto(input.memo, @client.data_converter),
+            memo: ProtoUtils.memo_to_proto(input.memo, workflow_data_converter),
             search_attributes: input.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(input.start_delay),
             request_eager_execution: input.request_eager_start,
             user_metadata: ProtoUtils.to_user_metadata(
-              input.static_summary, input.static_details, @client.data_converter
+              input.static_summary, input.static_details, workflow_data_converter
             ),
-            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
+            header: ProtoUtils.headers_to_proto(input.headers, workflow_data_converter),
             priority: input.priority._to_proto,
             versioning_override: input.versioning_override&._to_proto
           )
@@ -156,6 +159,7 @@ module Temporalio
           start_req = _start_workflow_request_from_with_start_options(
             Api::WorkflowService::V1::StartWorkflowExecutionRequest, start_options
           )
+          workflow_data_converter = _workflow_storage_data_converter(id: start_options.id, type: start_options.workflow)
           req = Api::WorkflowService::V1::ExecuteMultiOperationRequest.new(
             namespace: @client.namespace,
             operations: [
@@ -173,8 +177,8 @@ module Temporalio
                     ),
                     input: Api::Update::V1::Input.new(
                       name: input.update,
-                      args: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
-                      header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+                      args: workflow_data_converter.to_payloads(input.args, hints: input.arg_hints),
+                      header: Internal::ProtoUtils.headers_to_proto(input.headers, workflow_data_converter)
                     )
                   ),
                   wait_policy: Api::Update::V1::WaitPolicy.new(
@@ -297,7 +301,8 @@ module Temporalio
             Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequest, start_options
           )
           req.signal_name = input.signal
-          req.signal_input = @client.data_converter.to_payloads(input.args, hints: input.arg_hints)
+          workflow_data_converter = _workflow_storage_data_converter(id: start_options.id, type: start_options.workflow)
+          req.signal_input = workflow_data_converter.to_payloads(input.args, hints: input.arg_hints)
 
           # Send request
           begin
@@ -338,13 +343,14 @@ module Temporalio
         end
 
         def _start_workflow_request_from_with_start_options(klass, start_options)
+          workflow_data_converter = _workflow_storage_data_converter(id: start_options.id, type: start_options.workflow)
           klass.new(
             request_id: SecureRandom.uuid,
             namespace: @client.namespace,
             workflow_type: Api::Common::V1::WorkflowType.new(name: start_options.workflow),
             workflow_id: start_options.id,
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: start_options.task_queue.to_s),
-            input: @client.data_converter.to_payloads(start_options.args, hints: start_options.arg_hints),
+            input: workflow_data_converter.to_payloads(start_options.args, hints: start_options.arg_hints),
             workflow_execution_timeout: ProtoUtils.seconds_to_duration(start_options.execution_timeout),
             workflow_run_timeout: ProtoUtils.seconds_to_duration(start_options.run_timeout),
             workflow_task_timeout: ProtoUtils.seconds_to_duration(start_options.task_timeout),
@@ -353,15 +359,45 @@ module Temporalio
             workflow_id_conflict_policy: start_options.id_conflict_policy,
             retry_policy: start_options.retry_policy&._to_proto,
             cron_schedule: start_options.cron_schedule,
-            memo: ProtoUtils.memo_to_proto(start_options.memo, @client.data_converter),
+            memo: ProtoUtils.memo_to_proto(start_options.memo, workflow_data_converter),
             search_attributes: start_options.search_attributes&._to_proto,
             workflow_start_delay: ProtoUtils.seconds_to_duration(start_options.start_delay),
             user_metadata: ProtoUtils.to_user_metadata(
-              start_options.static_summary, start_options.static_details, @client.data_converter
+              start_options.static_summary, start_options.static_details, workflow_data_converter
             ),
-            header: ProtoUtils.headers_to_proto(start_options.headers, @client.data_converter),
+            header: ProtoUtils.headers_to_proto(start_options.headers, workflow_data_converter),
             priority: start_options.priority._to_proto
           )
+        end
+
+        def _storage_data_converter(target)
+          @client.data_converter._with_storage_target(namespace: @client.namespace, target:)
+        end
+
+        def _workflow_storage_data_converter(id:, run_id: nil, type: nil)
+          _storage_data_converter(
+            Converters::StorageDriverWorkflowInfo.new(namespace: @client.namespace, id:, run_id:, type:)
+          )
+        end
+
+        def _activity_storage_data_converter(id:, run_id: nil, type: nil)
+          _storage_data_converter(
+            Converters::StorageDriverActivityInfo.new(namespace: @client.namespace, id:, run_id:, type:)
+          )
+        end
+
+        def _async_activity_storage_data_converter(ref)
+          return _storage_data_converter(nil) unless ref.is_a?(Temporalio::Client::ActivityIDReference)
+          return _activity_storage_data_converter(id: ref.activity_id, run_id: ref.activity_run_id) if ref.standalone?
+
+          _workflow_storage_data_converter(id: ref.workflow_id, run_id: ref.run_id)
+        end
+
+        def _schedule_memo_storage_data_converter(action)
+          return _storage_data_converter(nil) unless action.is_a?(Temporalio::Client::Schedule::Action::StartWorkflow)
+
+          workflow_type = action.workflow #: String
+          _workflow_storage_data_converter(id: action.id, type: workflow_type)
         end
 
         def list_workflow_page(input)
@@ -443,6 +479,7 @@ module Temporalio
         end
 
         def signal_workflow(input)
+          workflow_data_converter = _workflow_storage_data_converter(id: input.workflow_id, run_id: input.run_id)
           @client.workflow_service.signal_workflow_execution(
             Api::WorkflowService::V1::SignalWorkflowExecutionRequest.new(
               namespace: @client.namespace,
@@ -451,8 +488,8 @@ module Temporalio
                 run_id: input.run_id || ''
               ),
               signal_name: input.signal,
-              input: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
-              header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
+              input: workflow_data_converter.to_payloads(input.args, hints: input.arg_hints),
+              header: Internal::ProtoUtils.headers_to_proto(input.headers, workflow_data_converter),
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid
             ),
@@ -462,6 +499,7 @@ module Temporalio
         end
 
         def query_workflow(input)
+          workflow_data_converter = _workflow_storage_data_converter(id: input.workflow_id, run_id: input.run_id)
           begin
             resp = @client.workflow_service.query_workflow(
               Api::WorkflowService::V1::QueryWorkflowRequest.new(
@@ -472,8 +510,8 @@ module Temporalio
                 ),
                 query: Api::Query::V1::WorkflowQuery.new(
                   query_type: input.query,
-                  query_args: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
-                  header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+                  query_args: workflow_data_converter.to_payloads(input.args, hints: input.arg_hints),
+                  header: Internal::ProtoUtils.headers_to_proto(input.headers, workflow_data_converter)
                 ),
                 query_reject_condition: input.reject_condition || 0
               ),
@@ -502,6 +540,7 @@ module Temporalio
             raise ArgumentError, 'ADMITTED wait stage not supported'
           end
 
+          workflow_data_converter = _workflow_storage_data_converter(id: input.workflow_id, run_id: input.run_id)
           req = Api::WorkflowService::V1::UpdateWorkflowExecutionRequest.new(
             namespace: @client.namespace,
             workflow_execution: Api::Common::V1::WorkflowExecution.new(
@@ -515,8 +554,8 @@ module Temporalio
               ),
               input: Api::Update::V1::Input.new(
                 name: input.update,
-                args: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
-                header: Internal::ProtoUtils.headers_to_proto(input.headers, @client.data_converter)
+                args: workflow_data_converter.to_payloads(input.args, hints: input.arg_hints),
+                header: Internal::ProtoUtils.headers_to_proto(input.headers, workflow_data_converter)
               )
             ),
             wait_policy: Api::Update::V1::WaitPolicy.new(
@@ -628,6 +667,7 @@ module Temporalio
         end
 
         def terminate_workflow(input)
+          workflow_data_converter = _workflow_storage_data_converter(id: input.workflow_id, run_id: input.run_id)
           @client.workflow_service.terminate_workflow_execution(
             Api::WorkflowService::V1::TerminateWorkflowExecutionRequest.new(
               namespace: @client.namespace,
@@ -637,7 +677,7 @@ module Temporalio
               ),
               reason: input.reason || '',
               first_execution_run_id: input.first_execution_run_id,
-              details: @client.data_converter.to_payloads(input.details),
+              details: workflow_data_converter.to_payloads(input.details),
               identity: @client.connection.identity
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
@@ -657,7 +697,7 @@ module Temporalio
             Api::WorkflowService::V1::CreateScheduleRequest.new(
               namespace: @client.namespace,
               schedule_id: input.id,
-              schedule: input.schedule._to_proto(@client.data_converter),
+              schedule: input.schedule._to_proto(@client.data_converter, @client.namespace),
               initial_patch: if input.trigger_immediately || !input.backfills.empty?
                                Api::Schedule::V1::SchedulePatch.new(
                                  trigger_immediately: if input.trigger_immediately
@@ -670,7 +710,7 @@ module Temporalio
                              end,
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid,
-              memo: ProtoUtils.memo_to_proto(input.memo, @client.data_converter),
+              memo: ProtoUtils.memo_to_proto(input.memo, _schedule_memo_storage_data_converter(input.schedule.action)),
               search_attributes: input.search_attributes&._to_proto
             ),
             rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
@@ -828,7 +868,7 @@ module Temporalio
             Api::WorkflowService::V1::UpdateScheduleRequest.new(
               namespace: @client.namespace,
               schedule_id: input.id,
-              schedule: update.schedule._to_proto(@client.data_converter, described_action),
+              schedule: update.schedule._to_proto(@client.data_converter, @client.namespace, described_action),
               search_attributes: update.search_attributes&._to_proto,
               identity: @client.connection.identity,
               request_id: SecureRandom.uuid
@@ -840,13 +880,14 @@ module Temporalio
 
         def heartbeat_async_activity(input)
           ref = input.task_token_or_id_reference
+          async_activity_data_converter = _async_activity_storage_data_converter(ref)
           resp = if ref.is_a?(Temporalio::Client::ActivityIDReference)
                    @client.workflow_service.record_activity_task_heartbeat_by_id(
                      Api::WorkflowService::V1::RecordActivityTaskHeartbeatByIdRequest.new(
                        **Implementation._activity_id_reference_request_fields(ref),
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
-                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                       details: async_activity_data_converter.to_payloads(input.details, hints: input.detail_hints)
                      ),
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
@@ -856,7 +897,7 @@ module Temporalio
                        task_token: ref,
                        namespace: @client.namespace,
                        identity: @client.connection.identity,
-                       details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                       details: async_activity_data_converter.to_payloads(input.details, hints: input.detail_hints)
                      ),
                      rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
                    )
@@ -872,13 +913,14 @@ module Temporalio
 
         def complete_async_activity(input)
           ref = input.task_token_or_id_reference
+          async_activity_data_converter = _async_activity_storage_data_converter(ref)
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_completed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCompletedByIdRequest.new(
                 **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint))
+                result: async_activity_data_converter.to_payloads([input.result], hints: Array(input.result_hint))
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -888,7 +930,7 @@ module Temporalio
                 task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                result: @client.data_converter.to_payloads([input.result], hints: Array(input.result_hint))
+                result: async_activity_data_converter.to_payloads([input.result], hints: Array(input.result_hint))
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -897,22 +939,23 @@ module Temporalio
         end
 
         def fail_async_activity(input)
+          ref = input.task_token_or_id_reference
+          async_activity_data_converter = _async_activity_storage_data_converter(ref)
           last_heartbeat_details = if input.last_heartbeat_details.empty?
                                      nil
                                    else
-                                     @client.data_converter.to_payloads(
+                                     async_activity_data_converter.to_payloads(
                                        input.last_heartbeat_details,
                                        hints: input.last_heartbeat_detail_hints
                                      )
                                    end
-          ref = input.task_token_or_id_reference
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_failed_by_id(
               Api::WorkflowService::V1::RespondActivityTaskFailedByIdRequest.new(
                 **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                failure: @client.data_converter.to_failure(input.error),
+                failure: async_activity_data_converter.to_failure(input.error),
                 last_heartbeat_details:
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
@@ -923,7 +966,7 @@ module Temporalio
                 task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                failure: @client.data_converter.to_failure(input.error),
+                failure: async_activity_data_converter.to_failure(input.error),
                 last_heartbeat_details:
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
@@ -934,13 +977,14 @@ module Temporalio
 
         def report_cancellation_async_activity(input)
           ref = input.task_token_or_id_reference
+          async_activity_data_converter = _async_activity_storage_data_converter(ref)
           if ref.is_a?(Temporalio::Client::ActivityIDReference)
             @client.workflow_service.respond_activity_task_canceled_by_id(
               Api::WorkflowService::V1::RespondActivityTaskCanceledByIdRequest.new(
                 **Implementation._activity_id_reference_request_fields(ref),
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                details: async_activity_data_converter.to_payloads(input.details, hints: input.detail_hints)
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -950,7 +994,7 @@ module Temporalio
                 task_token: ref,
                 namespace: @client.namespace,
                 identity: @client.connection.identity,
-                details: @client.data_converter.to_payloads(input.details, hints: input.detail_hints)
+                details: async_activity_data_converter.to_payloads(input.details, hints: input.detail_hints)
               ),
               rpc_options: Implementation.with_default_rpc_options(input.rpc_options)
             )
@@ -966,6 +1010,7 @@ module Temporalio
           end
           raise ArgumentError, 'start_delay must be non-negative' if input.start_delay&.negative?
 
+          activity_data_converter = _activity_storage_data_converter(id: input.activity_id, type: input.activity)
           req = Api::WorkflowService::V1::StartActivityExecutionRequest.new(
             namespace: @client.namespace,
             identity: @client.connection.identity,
@@ -973,7 +1018,7 @@ module Temporalio
             activity_id: input.activity_id,
             activity_type: Api::Common::V1::ActivityType.new(name: input.activity),
             task_queue: Api::TaskQueue::V1::TaskQueue.new(name: input.task_queue.to_s),
-            input: @client.data_converter.to_payloads(input.args, hints: input.arg_hints),
+            input: activity_data_converter.to_payloads(input.args, hints: input.arg_hints),
             schedule_to_close_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_close_timeout),
             schedule_to_start_timeout: ProtoUtils.seconds_to_duration(input.schedule_to_start_timeout),
             start_to_close_timeout: ProtoUtils.seconds_to_duration(input.start_to_close_timeout),
@@ -983,9 +1028,9 @@ module Temporalio
             retry_policy: input.retry_policy&._to_proto,
             search_attributes: input.search_attributes&._to_proto,
             user_metadata: ProtoUtils.to_user_metadata(
-              input.summary, input.static_details, @client.data_converter
+              input.summary, input.static_details, activity_data_converter
             ),
-            header: ProtoUtils.headers_to_proto(input.headers, @client.data_converter),
+            header: ProtoUtils.headers_to_proto(input.headers, activity_data_converter),
             priority: input.priority._to_proto,
             start_delay: ProtoUtils.seconds_to_duration(input.start_delay)
           )

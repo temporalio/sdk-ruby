@@ -14,6 +14,28 @@ module Temporalio
           untyped klass, Temporalio::Client::WithStartWorkflowOperation::Options start_options
         ) -> untyped
 
+        def _storage_data_converter: (Converters::storageDriverTargetInfo? target) -> Converters::DataConverter
+
+        def _workflow_storage_data_converter: (
+          id: String?,
+          ?run_id: String?,
+          ?type: String?
+        ) -> Converters::DataConverter
+
+        def _activity_storage_data_converter: (
+          id: String?,
+          ?run_id: String?,
+          ?type: String?
+        ) -> Converters::DataConverter
+
+        def _async_activity_storage_data_converter: (
+          String | Temporalio::Client::ActivityIDReference ref
+        ) -> Converters::DataConverter
+
+        def _schedule_memo_storage_data_converter: (
+          Temporalio::Client::Schedule::Action action
+        ) -> Converters::DataConverter
+
         def start_activity: (Temporalio::Client::Interceptor::StartActivityInput input) -> Temporalio::Client::ActivityHandle
 
         def describe_activity: (Temporalio::Client::Interceptor::DescribeActivityInput input) -> Temporalio::Client::ActivityExecution::Description
