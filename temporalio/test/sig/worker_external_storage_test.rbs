@@ -33,13 +33,17 @@ class WorkerExternalStorageTest < Test
   end
 
   class AsyncCompletionActivity < Temporalio::Activity::Definition
-    @task_token: Queue
+    @info: Queue
 
     def execute: () -> untyped
-    def wait_task_token: () -> String
+    def wait_info: () -> Temporalio::Activity::Info
   end
 
   class AsyncCompletionWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  class AsyncCancellationWorkflow < Temporalio::Workflow::Definition
     def execute: () -> untyped
   end
 
@@ -111,6 +115,24 @@ class WorkerExternalStorageTest < Test
     def execute: () -> String
   end
 
+  class ClientTargetWorkflow < Temporalio::Workflow::Definition
+    def self.notify: () -> Temporalio::Workflow::Definition::Signal
+    def self.echo_query: () -> Temporalio::Workflow::Definition::Query
+    def self.echo_update: () -> Temporalio::Workflow::Definition::Update
+
+    def execute: (untyped _input) -> untyped
+    def notify: (untyped input) -> void
+    def echo_query: (untyped input) -> String
+    def echo_update: (untyped input) -> String
+  end
+
+  class HeaderInterceptor
+    include Temporalio::Client::Interceptor
+
+    class Outbound < Temporalio::Client::Interceptor::Outbound
+    end
+  end
+
   def run_echo_workflow_capturing_completions: (
     Temporalio::Converters::StorageDriver driver
   ) -> Array[Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion]
@@ -126,6 +148,13 @@ class WorkerExternalStorageTest < Test
     InMemoryStorageDriver driver,
     String value
   ) -> Array[Temporalio::Converters::storageDriverTargetInfo?]
+  def terminate_if_running: (String workflow_id) -> void
+  def wait_until_cancellation_requested: (Temporalio::Client::AsyncActivityHandle activity_handle) -> void
+  def async_activity_handle_by_id: (
+    Temporalio::Client client,
+    Temporalio::Client::WorkflowHandle workflow_handle,
+    Temporalio::Activity::Info activity_info
+  ) -> Temporalio::Client::AsyncActivityHandle
   def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
   def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
 end
