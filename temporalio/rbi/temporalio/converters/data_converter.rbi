@@ -63,4 +63,20 @@ class Temporalio::Converters::DataConverter
 
   sig { params(failure: Temporalio::Api::Failure::V1::Failure).returns(Exception) }
   def from_failure(failure); end
+
+  private
+
+  sig do
+    params(
+      external_storage: T.nilable(Temporalio::Converters::ExternalStorage),
+      namespace: T.nilable(String),
+      target: T.nilable(
+        T.any(
+          Temporalio::Converters::StorageDriverWorkflowInfo,
+          Temporalio::Converters::StorageDriverActivityInfo
+        )
+      )
+    ).void
+  end
+  def set_storage(external_storage, namespace:, target:); end
 end

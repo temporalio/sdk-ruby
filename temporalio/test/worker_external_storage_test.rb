@@ -143,13 +143,16 @@ class WorkerExternalStorageTest < Test
   end
 
   def test_activity_reads_stored_raw_args_and_heartbeat_details
-    client = client_with_storage(InMemoryStorageDriver.new)
-    assert_equal 'activity-input heartbeat-detail', execute_workflow(
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
       HeartbeatRetryWorkflow, 'activity-input',
       activities: [HeartbeatRetryActivity],
-      client:,
+      client: client_with_storage(driver),
       workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
-    )
+    ) do |handle|
+      assert_equal 'activity-input heartbeat-detail', handle.result
+      assert_equal [workflow_target(handle)], targets_of(driver, 'heartbeat-detail')
+    end
   end
 
   # Fails once: either the first retrieve, or the first store of a payload containing the given text
@@ -518,19 +521,6 @@ class WorkerExternalStorageTest < Test
       assert_equal [workflow], targets_of(driver, 'scheduled-input')
       stored_as_activity_result_then_workflow_result = [workflow, workflow]
       assert_equal stored_as_activity_result_then_workflow_result, targets_of(driver, 'activity got scheduled-input')
-    end
-  end
-
-  def test_heartbeat_details_are_stored_for_the_workflow
-    driver = InMemoryStorageDriver.new
-    execute_workflow(
-      HeartbeatRetryWorkflow, 'activity-input',
-      activities: [HeartbeatRetryActivity],
-      client: client_with_storage(driver),
-      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
-    ) do |handle|
-      assert_equal 'activity-input heartbeat-detail', handle.result
-      assert_equal [workflow_target(handle)], targets_of(driver, 'heartbeat-detail')
     end
   end
 

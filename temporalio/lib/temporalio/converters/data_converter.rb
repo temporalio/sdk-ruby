@@ -63,12 +63,7 @@ module Temporalio
       def _with_storage_target(namespace:, target:)
         return self unless external_storage
 
-        dup.tap do |converter|
-          converter.instance_variable_set(
-            :@external_storage_runner, Internal::ExternalStorageRunner.new(external_storage, namespace:)
-          )
-          converter.instance_variable_set(:@storage_target, target)
-        end
+        dup.tap { |converter| converter.send(:set_storage, external_storage, namespace:, target:) }
       end
 
       # Convert a Ruby value to a payload and encode it.
@@ -143,6 +138,14 @@ module Temporalio
       # @return [Exception] Decoded and converted Ruby error.
       def from_failure(failure)
         failure_converter.from_failure(failure, self)
+      end
+
+      private
+
+      def set_storage(external_storage, namespace:, target:)
+        @external_storage = external_storage
+        @external_storage_runner = Internal::ExternalStorageRunner.new(external_storage, namespace:)
+        @storage_target = target
       end
     end
   end

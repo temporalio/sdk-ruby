@@ -37,6 +37,12 @@ module Temporalio
 
       def to_failure: (Exception error) -> Api::Failure::V1::Failure
       def from_failure: (Api::Failure::V1::Failure failure) -> Exception
+
+      private def set_storage: (
+        ExternalStorage? external_storage,
+        namespace: String?,
+        target: storageDriverTargetInfo?
+      ) -> void
     end
   end
 end
