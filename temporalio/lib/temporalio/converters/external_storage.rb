@@ -35,8 +35,9 @@ module Temporalio
       # Create external storage configuration.
       #
       # @param drivers [Array<StorageDriver>] Drivers available for storing and retrieving payloads. At least one is
-      #   required, and every driver must have a unique, non-empty name. Retrieval routes by the name recorded in
-      #   history, so a driver must remain configured for as long as any payload it stored can still be read.
+      #   required, every driver must have a unique, non-empty name, and every driver must have a String type.
+      #   Retrieval routes by the name recorded in history, so a driver must remain configured for as long as any
+      #   payload it stored can still be read.
       # @param driver_selector [Proc, nil] Selector choosing which driver stores each payload. Required when more than
       #   one driver is given; with a single driver it may be nil, in which case that driver stores every eligible
       #   payload.
@@ -66,6 +67,8 @@ module Temporalio
           # a non-empty String cannot be resolved on read. A Symbol in particular passes a bare empty? check.
           raise ArgumentError, 'Driver name must be a non-empty String' unless name.is_a?(String) && !name.empty?
           raise ArgumentError, "Multiple drivers given with name '#{name}'" if @drivers_by_name.key?(name)
+
+          raise ArgumentError, "Driver '#{name}' type must be a String" unless driver.type.is_a?(String)
 
           @drivers_by_name[name] = driver
         end

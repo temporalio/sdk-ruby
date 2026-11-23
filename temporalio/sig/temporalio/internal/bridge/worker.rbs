@@ -26,6 +26,7 @@ module Temporalio
           attr_accessor nondeterminism_as_workflow_fail_for_types: Array[String]
           attr_accessor deployment_options: DeploymentOptions?
           attr_accessor plugins: Array[String]
+          attr_accessor storage_drivers: Array[String]
           attr_accessor disable_payload_error_limit: bool
 
           def initialize: (
@@ -52,6 +53,7 @@ module Temporalio
             nondeterminism_as_workflow_fail_for_types: Array[String],
             deployment_options: DeploymentOptions?,
             plugins: Array[String],
+            storage_drivers: Array[String],
             disable_payload_error_limit: bool
           ) -> void
         end
