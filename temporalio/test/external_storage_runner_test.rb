@@ -2,6 +2,8 @@
 
 require 'in_memory_storage_driver'
 require 'temporalio/converters/external_storage'
+require 'temporalio/converters/storage_driver_activity_info'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
 require 'temporalio/internal/external_storage_runner'
@@ -103,6 +105,30 @@ class ExternalStorageRunnerTest < Test
 
     assert_equal ['my-namespace'], select_contexts.map(&:namespace)
     assert_equal(['my-namespace'], driver.store_calls.map { |context, _size| context.namespace })
+  end
+
+  def test_store_gives_selector_and_driver_the_target
+    driver = InMemoryStorageDriver.new
+    select_contexts = []
+    runner = Runner.new(Temporalio::Converters::ExternalStorage.new(
+                          drivers: [driver],
+                          driver_selector: lambda { |context, _payload|
+                            select_contexts << context
+                            driver
+                          },
+                          payload_size_threshold: 0
+                        ), namespace: 'my-namespace')
+    workflow_target = Temporalio::Converters::StorageDriverWorkflowInfo.new(namespace: 'my-namespace', id: 'wf')
+    activity_target = Temporalio::Converters::StorageDriverActivityInfo.new(namespace: 'my-namespace', id: 'act')
+
+    runner.store([payload('a'), payload('b')], target: workflow_target)
+    runner.store([payload('c')], target: activity_target)
+
+    assert_equal [workflow_target, workflow_target, activity_target], select_contexts.map(&:target)
+    assert_equal(
+      [[workflow_target, 2], [activity_target, 1]],
+      driver.store_calls.map { |context, payload_count| [context.target, payload_count] }
+    )
   end
 
   def test_store_keeps_payload_inline_when_selector_returns_nil

@@ -7,6 +7,7 @@ module Temporalio
       attr_reader external_storage: ExternalStorage?
 
       @external_storage_runner: Internal::ExternalStorageRunner
+      @storage_target: storageDriverTargetInfo?
 
       def self.default: -> DataConverter
 
@@ -16,6 +17,11 @@ module Temporalio
         ?payload_codec: PayloadCodec?,
         ?external_storage: ExternalStorage?
       ) -> void
+
+      def _with_storage_target: (
+        namespace: String?,
+        target: storageDriverTargetInfo?
+      ) -> DataConverter
 
       def to_payload: (Object? value, ?hint: Object?) -> Temporalio::Api::Common::V1::Payload
       def to_payloads: (
@@ -31,6 +37,12 @@ module Temporalio
 
       def to_failure: (Exception error) -> Api::Failure::V1::Failure
       def from_failure: (Api::Failure::V1::Failure failure) -> Exception
+
+      private def set_storage: (
+        ExternalStorage? external_storage,
+        namespace: String?,
+        target: storageDriverTargetInfo?
+      ) -> void
     end
   end
 end

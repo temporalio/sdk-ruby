@@ -5,6 +5,8 @@ require 'in_memory_storage_driver'
 require 'securerandom'
 require 'temporalio/client'
 require 'temporalio/converters/external_storage'
+require 'temporalio/converters/storage_driver_activity_info'
+require 'temporalio/converters/storage_driver_workflow_info'
 require 'temporalio/error'
 require 'temporalio/internal/external_storage_references'
 require 'temporalio/worker'
@@ -13,6 +15,8 @@ require 'test'
 
 class WorkerExternalStorageTest < Test
   References = Temporalio::Internal::ExternalStorageReferences
+  WorkflowTarget = Temporalio::Converters::StorageDriverWorkflowInfo
+  ActivityTarget = Temporalio::Converters::StorageDriverActivityInfo
 
   class StorageActivity < Temporalio::Activity::Definition
     def execute(input)
@@ -139,13 +143,16 @@ class WorkerExternalStorageTest < Test
   end
 
   def test_activity_reads_stored_raw_args_and_heartbeat_details
-    client = client_with_storage(InMemoryStorageDriver.new)
-    assert_equal 'activity-input heartbeat-detail', execute_workflow(
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
       HeartbeatRetryWorkflow, 'activity-input',
       activities: [HeartbeatRetryActivity],
-      client:,
+      client: client_with_storage(driver),
       workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
-    )
+    ) do |handle|
+      assert_equal 'activity-input heartbeat-detail', handle.result
+      assert_equal [workflow_target(handle)], targets_of(driver, 'heartbeat-detail')
+    end
   end
 
   # Fails once: either the first retrieve, or the first store of a payload containing the given text
@@ -482,6 +489,261 @@ class WorkerExternalStorageTest < Test
     assert_nil failed.payload_upload_metrics
   end
 
+  def test_workflow_result_is_stored_for_the_workflow
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
+      EchoWorkflow, 'start-input',
+      client: client_with_storage(driver),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'start-input done', handle.result
+      assert_equal [workflow_target(handle)], targets_of(driver, 'start-input done')
+      assert_equal [env.client.namespace], driver.namespaces_of_payloads_with_data('start-input done'.to_json)
+    end
+  end
+
+  class ScheduleActivityWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(StorageActivity, 'scheduled-input', start_to_close_timeout: 10)
+    end
+  end
+
+  def test_workflow_activity_payloads_are_stored_for_the_workflow
+    driver = InMemoryStorageDriver.new
+    execute_workflow(
+      ScheduleActivityWorkflow,
+      activities: [StorageActivity],
+      client: client_with_storage(driver),
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'activity got scheduled-input', handle.result
+      workflow = workflow_target(handle)
+      assert_equal [workflow], targets_of(driver, 'scheduled-input')
+      stored_as_activity_result_then_workflow_result = [workflow, workflow]
+      assert_equal stored_as_activity_result_then_workflow_result, targets_of(driver, 'activity got scheduled-input')
+    end
+  end
+
+  def test_standalone_activity_result_is_stored_for_the_activity
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    worker = Temporalio::Worker.new(client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [StorageActivity])
+    worker.run do
+      handle = client.start_activity(
+        StorageActivity, 'standalone-input',
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10
+      )
+      assert_equal 'activity got standalone-input', handle.result
+      expected = ActivityTarget.new(
+        namespace: client.namespace, id: handle.id, run_id: handle.run_id,
+        type: Temporalio::Activity::Definition::Info.from_activity(StorageActivity).name.to_s
+      )
+      assert_equal [expected], targets_of(driver, 'activity got standalone-input')
+      assert_equal [client.namespace], driver.namespaces_of_payloads_with_data('activity got standalone-input'.to_json)
+    end
+  end
+
+  class TargetParentWorkflow < Temporalio::Workflow::Definition
+    def execute
+      child_result = Temporalio::Workflow.execute_child_workflow(
+        ChildWorkflow, 'to-child', id: "#{Temporalio::Workflow.info.workflow_id}-child"
+      )
+      "parent got #{child_result}"
+    end
+  end
+
+  def test_child_input_is_stored_for_the_child_and_its_result_for_the_parent
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      TargetParentWorkflow,
+      more_workflows: [ChildWorkflow],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'parent got child got to-child', handle.result
+
+      child = WorkflowTarget.new(
+        namespace: client.namespace, id: "#{handle.id}-child",
+        type: Temporalio::Workflow::Definition::Info.from_class(ChildWorkflow).name
+      )
+      assert_equal [child], targets_of(driver, 'to-child')
+      parent = WorkflowTarget.new(namespace: client.namespace, id: handle.id, run_id: handle.result_run_id)
+      assert_equal [parent], targets_of(driver, 'child got to-child')
+    end
+  end
+
+  class SignalExternalWorkflow < Temporalio::Workflow::Definition
+    def execute(workflow_id, run_id)
+      Temporalio::Workflow.external_workflow_handle(workflow_id, run_id:)
+                          .signal(HandlerWorkflow.notify, 'external-signal')
+    end
+  end
+
+  def test_external_signal_is_stored_for_the_signaled_workflow
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      HandlerWorkflow,
+      more_workflows: [SignalExternalWorkflow],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle, worker|
+      client.execute_workflow(
+        SignalExternalWorkflow, handle.id, handle.result_run_id,
+        id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue
+      )
+
+      expected = WorkflowTarget.new(namespace: client.namespace, id: handle.id, run_id: handle.result_run_id)
+      assert_equal [expected], targets_of(driver, 'external-signal')
+      handle.terminate
+    end
+  end
+
+  class ContinueAsNewWorkflow < Temporalio::Workflow::Definition
+    def execute(stage)
+      case stage
+      when 'start' then raise Temporalio::Workflow::ContinueAsNewError, 'same-type'
+      when 'same-type' then raise Temporalio::Workflow::ContinueAsNewError.new('new-type', workflow: EchoWorkflow)
+      else raise "Unexpected stage #{stage}"
+      end
+    end
+  end
+
+  def test_continue_as_new_input_is_stored_for_the_next_run
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      ContinueAsNewWorkflow, 'start',
+      more_workflows: [EchoWorkflow],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'new-type done', handle.result
+
+      next_run_same_type = WorkflowTarget.new(
+        namespace: client.namespace, id: handle.id,
+        type: Temporalio::Workflow::Definition::Info.from_class(ContinueAsNewWorkflow).name
+      )
+      assert_equal [next_run_same_type], targets_of(driver, 'same-type')
+      next_run_new_type = WorkflowTarget.new(
+        namespace: client.namespace, id: handle.id,
+        type: Temporalio::Workflow::Definition::Info.from_class(EchoWorkflow).name
+      )
+      assert_equal [next_run_new_type], targets_of(driver, 'new-type')
+    end
+  end
+
+  def test_failure_of_a_run_with_no_instance_is_stored_for_the_workflow
+    driver = InMemoryStorageDriver.new
+    client = client_storing_failure_messages(driver)
+    worker = Temporalio::Worker.new(
+      client:, task_queue: "tq-#{SecureRandom.uuid}", workflows: [EchoWorkflow],
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    )
+    worker.run do
+      handle = client.start_workflow(
+        'UnregisteredWorkflow', id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue
+      )
+      assert_eventually_task_fail(handle:)
+
+      expected = WorkflowTarget.new(
+        namespace: client.namespace, id: handle.id, run_id: handle.result_run_id, type: 'UnregisteredWorkflow'
+      )
+      refute_empty driver.store_calls
+      driver.store_calls.map(&:first).each do |context|
+        assert_equal expected, context.target
+        assert_equal client.namespace, context.namespace
+      end
+      handle.terminate
+    end
+  end
+
+  def test_failure_of_an_activity_that_cannot_start_is_stored_for_the_activity
+    driver = InMemoryStorageDriver.new
+    client = client_storing_failure_messages(driver)
+    worker = Temporalio::Worker.new(client:, task_queue: "tq-#{SecureRandom.uuid}", activities: [StorageActivity])
+    worker.run do
+      handle = client.start_activity(
+        'UnregisteredActivity',
+        id: "act-#{SecureRandom.uuid}", task_queue: worker.task_queue, start_to_close_timeout: 10,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+      assert_raises(Temporalio::Error::ActivityFailedError) { handle.result }
+
+      expected = ActivityTarget.new(
+        namespace: client.namespace, id: handle.id, run_id: handle.run_id, type: 'UnregisteredActivity'
+      )
+      refute_empty driver.store_calls
+      driver.store_calls.map(&:first).each do |context|
+        assert_equal expected, context.target
+        assert_equal client.namespace, context.namespace
+      end
+    end
+  end
+
+  class SignalChildWorkflow < Temporalio::Workflow::Definition
+    def execute
+      child = Temporalio::Workflow.start_child_workflow(
+        HandlerWorkflow, id: "#{Temporalio::Workflow.info.workflow_id}-child"
+      )
+      child.signal(HandlerWorkflow.notify, 'child-signal')
+    end
+  end
+
+  def test_child_signal_is_stored_for_the_child
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      SignalChildWorkflow,
+      more_workflows: [HandlerWorkflow],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      handle.result
+
+      child_without_run_id = WorkflowTarget.new(namespace: client.namespace, id: "#{handle.id}-child")
+      assert_equal [child_without_run_id], targets_of(driver, 'child-signal')
+    end
+  end
+
+  class ContinuingChildWorkflow < Temporalio::Workflow::Definition
+    def execute(stage)
+      raise Temporalio::Workflow::ContinueAsNewError, 'continued-child' if stage == 'start'
+
+      "child finished #{stage}"
+    end
+  end
+
+  class ContinuingChildParentWorkflow < Temporalio::Workflow::Definition
+    def execute
+      child_result = Temporalio::Workflow.execute_child_workflow(
+        ContinuingChildWorkflow, 'start', id: "#{Temporalio::Workflow.info.workflow_id}-child"
+      )
+      "parent got #{child_result}"
+    end
+  end
+
+  def test_result_of_a_child_that_continued_as_new_is_stored_for_the_child
+    driver = InMemoryStorageDriver.new
+    client = client_with_storage(driver)
+    execute_workflow(
+      ContinuingChildParentWorkflow,
+      more_workflows: [ContinuingChildWorkflow],
+      client:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    ) do |handle|
+      assert_equal 'parent got child finished continued-child', handle.result
+
+      child_description = client.workflow_handle("#{handle.id}-child").describe
+      continued_child_run = WorkflowTarget.new(
+        namespace: client.namespace, id: child_description.id, run_id: child_description.run_id,
+        type: child_description.workflow_type
+      )
+      assert_equal [continued_child_run], targets_of(driver, 'child finished continued-child')
+    end
+  end
+
   private
 
   def run_echo_workflow_capturing_completions(driver)
@@ -520,12 +782,30 @@ class WorkerExternalStorageTest < Test
     end
   end
 
-  def client_with_storage(driver, payload_codec: nil)
+  def client_with_storage(driver, payload_codec: nil, failure_converter: Temporalio::Converters::FailureConverter.default)
     data_converter = Temporalio::Converters::DataConverter.new(
+      failure_converter:,
       payload_codec:,
       external_storage: Temporalio::Converters::ExternalStorage.new(drivers: [driver], payload_size_threshold: 0)
     )
     Temporalio::Client.new(**env.client.options.with(data_converter:).to_h) # steep:ignore InsufficientKeywordArguments
+  end
+
+  def workflow_target(handle)
+    WorkflowTarget.new(
+      namespace: env.client.namespace, id: handle.id, run_id: handle.result_run_id,
+      type: handle.describe.workflow_type
+    )
+  end
+
+  def client_storing_failure_messages(driver)
+    client_with_storage(
+      driver, failure_converter: Temporalio::Converters::FailureConverter.new(encode_common_attributes: true)
+    )
+  end
+
+  def targets_of(driver, value)
+    driver.targets_of_payloads_with_data(value.to_json)
   end
 
   def first_attrs(events, attrs_method)

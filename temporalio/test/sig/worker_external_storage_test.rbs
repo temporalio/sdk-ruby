@@ -80,14 +80,52 @@ class WorkerExternalStorageTest < Test
     def change: (untyped input) -> untyped
   end
 
+  WorkflowTarget: singleton(Temporalio::Converters::StorageDriverWorkflowInfo)
+  ActivityTarget: singleton(Temporalio::Converters::StorageDriverActivityInfo)
+
+  class ScheduleActivityWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> untyped
+  end
+
+  class TargetParentWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> String
+  end
+
+  class SignalExternalWorkflow < Temporalio::Workflow::Definition
+    def execute: (String workflow_id, String? run_id) -> void
+  end
+
+  class ContinueAsNewWorkflow < Temporalio::Workflow::Definition
+    def execute: (String stage) -> untyped
+  end
+
+  class SignalChildWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> void
+  end
+
+  class ContinuingChildWorkflow < Temporalio::Workflow::Definition
+    def execute: (String stage) -> String
+  end
+
+  class ContinuingChildParentWorkflow < Temporalio::Workflow::Definition
+    def execute: () -> String
+  end
+
   def run_echo_workflow_capturing_completions: (
     Temporalio::Converters::StorageDriver driver
   ) -> Array[Temporalio::Internal::Bridge::Api::WorkflowCompletion::WorkflowActivationCompletion]
   def assert_storage_failure_retried: (Temporalio::Converters::StorageDriver driver, String failure_message) -> void
   def client_with_storage: (
     Temporalio::Converters::StorageDriver driver,
-    ?payload_codec: Temporalio::Converters::PayloadCodec?
+    ?payload_codec: Temporalio::Converters::PayloadCodec?,
+    ?failure_converter: Temporalio::Converters::FailureConverter
   ) -> Temporalio::Client
+  def client_storing_failure_messages: (InMemoryStorageDriver driver) -> Temporalio::Client
+  def workflow_target: (Temporalio::Client::WorkflowHandle handle) -> Temporalio::Converters::StorageDriverWorkflowInfo
+  def targets_of: (
+    InMemoryStorageDriver driver,
+    String value
+  ) -> Array[Temporalio::Converters::storageDriverTargetInfo?]
   def first_attrs: (Enumerable[untyped] events, Symbol attrs_method) -> untyped
   def assert_reference: (Temporalio::Api::Common::V1::Payload payload) -> void
 end

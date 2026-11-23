@@ -33,6 +33,19 @@ class Temporalio::Converters::DataConverter
     external_storage: T.unsafe(nil)
   ); end
 
+  sig do
+    params(
+      namespace: T.nilable(String),
+      target: T.nilable(
+        T.any(
+          Temporalio::Converters::StorageDriverWorkflowInfo,
+          Temporalio::Converters::StorageDriverActivityInfo
+        )
+      )
+    ).returns(Temporalio::Converters::DataConverter)
+  end
+  def _with_storage_target(namespace:, target:); end
+
   sig { params(value: T.nilable(Object), hint: T.nilable(Object)).returns(Temporalio::Api::Common::V1::Payload) }
   def to_payload(value, hint: T.unsafe(nil)); end
 
@@ -50,4 +63,20 @@ class Temporalio::Converters::DataConverter
 
   sig { params(failure: Temporalio::Api::Failure::V1::Failure).returns(Exception) }
   def from_failure(failure); end
+
+  private
+
+  sig do
+    params(
+      external_storage: T.nilable(Temporalio::Converters::ExternalStorage),
+      namespace: T.nilable(String),
+      target: T.nilable(
+        T.any(
+          Temporalio::Converters::StorageDriverWorkflowInfo,
+          Temporalio::Converters::StorageDriverActivityInfo
+        )
+      )
+    ).void
+  end
+  def set_storage(external_storage, namespace:, target:); end
 end
