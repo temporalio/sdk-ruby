@@ -132,15 +132,17 @@ class ExternalStorageTest < Test
     driver_class = Class.new(Temporalio::Converters::StorageDriver) do
       def name = 'untyped'
     end
-    err = assert_raises(ArgumentError) do
+    err = assert_raises(NotImplementedError) do
       Temporalio::Converters::ExternalStorage.new(drivers: [driver_class.new])
     end
-    assert_includes err.message, "Driver 'untyped' must implement type"
+    assert_includes err.message, 'must implement #type'
   end
 
   def test_non_string_driver_type_rejected
     err = assert_raises(ArgumentError) do
-      Temporalio::Converters::ExternalStorage.new(drivers: [InMemoryStorageDriver.new(type: nil)])
+      Temporalio::Converters::ExternalStorage.new(
+        drivers: [InMemoryStorageDriver.new(type: nil)] # steep:ignore ArgumentTypeMismatch
+      )
     end
     assert_includes err.message, "Driver 'mem' type must be a String"
   end

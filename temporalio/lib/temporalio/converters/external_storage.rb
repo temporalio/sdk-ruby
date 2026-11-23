@@ -68,7 +68,7 @@ module Temporalio
           raise ArgumentError, 'Driver name must be a non-empty String' unless name.is_a?(String) && !name.empty?
           raise ArgumentError, "Multiple drivers given with name '#{name}'" if @drivers_by_name.key?(name)
 
-          validate_driver_type(driver, name)
+          raise ArgumentError, "Driver '#{name}' type must be a String" unless driver.type.is_a?(String)
 
           @drivers_by_name[name] = driver
         end
@@ -87,17 +87,6 @@ module Temporalio
       # @return [StorageDriver, nil] The driver, or nil if none is registered under that name.
       def driver(name)
         @drivers_by_name[name]
-      end
-
-      private
-
-      def validate_driver_type(driver, name)
-        type = begin
-          driver.type
-        rescue NotImplementedError
-          raise ArgumentError, "Driver '#{name}' must implement type"
-        end
-        raise ArgumentError, "Driver '#{name}' type must be a String" unless type.is_a?(String)
       end
     end
   end

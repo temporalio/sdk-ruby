@@ -20,8 +20,6 @@ module Temporalio
       ) -> void
 
       def driver: (String name) -> StorageDriver?
-
-      private def validate_driver_type: (StorageDriver driver, String name) -> void
     end
   end
 end

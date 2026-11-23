@@ -32,7 +32,7 @@ module Temporalio
       #
       # @return [String] Driver implementation identifier.
       def type
-        raise NotImplementedError
+        raise NotImplementedError, "#{self.class} must implement #type"
       end
 
       # Store the given payloads.
