@@ -112,6 +112,13 @@ class WorkerExternalStorageTest < Test
     def execute: () -> untyped
   end
 
+  class FailOnceStorageDriver < InMemoryStorageDriver
+    @fail_retrieve: bool
+    @fail_store_containing: String?
+
+    def initialize: (?fail_retrieve: bool, ?fail_store_containing: String?) -> void
+  end
+
   class ReportingFailOnceStorageDriver < FailOnceStorageDriver
     attr_reader failures: Queue
   end
