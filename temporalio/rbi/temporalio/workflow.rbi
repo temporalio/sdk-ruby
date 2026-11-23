@@ -299,18 +299,6 @@ module Temporalio::Workflow
     def update_handlers; end
 
     sig do
-      overload.params(
-        hash: T::Hash[T.any(Symbol, String), T.nilable(Object)],
-        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup])
-      ).void
-    end
-    sig do
-      overload.params(
-        event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
-        memo: T.nilable(Object)
-      ).void
-    end
-    sig do
       params(
         hash: T.nilable(T::Hash[T.any(Symbol, String), T.nilable(Object)]),
         event_groups: T.nilable(T::Array[Temporalio::Workflow::EventGroup]),
