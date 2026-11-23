@@ -608,6 +608,7 @@ module Temporalio
           nondeterminism_as_workflow_fail_for_types:,
           deployment_options: @options.deployment_options._to_bridge_options,
           plugins: (@options.client.options.plugins + @options.plugins).map(&:name).uniq.sort,
+          storage_drivers: (@options.client.data_converter.external_storage&.drivers || []).map(&:type).uniq.sort,
           disable_payload_error_limit: @options.disable_payload_error_limit
         )
       )

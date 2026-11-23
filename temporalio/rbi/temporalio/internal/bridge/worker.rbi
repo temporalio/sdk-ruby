@@ -81,7 +81,8 @@ class Temporalio::Internal::Bridge::Worker::Options < ::Struct
       nondeterminism_as_workflow_fail: T::Boolean,
       nondeterminism_as_workflow_fail_for_types: T::Array[String],
       deployment_options: T.nilable(Temporalio::Internal::Bridge::Worker::DeploymentOptions),
-      plugins: T::Array[String]
+      plugins: T::Array[String],
+      storage_drivers: T::Array[String]
     ).void
   end
   def initialize(
@@ -107,7 +108,8 @@ class Temporalio::Internal::Bridge::Worker::Options < ::Struct
     nondeterminism_as_workflow_fail,
     nondeterminism_as_workflow_fail_for_types,
     deployment_options,
-    plugins
+    plugins,
+    storage_drivers
   ); end
 end
 
