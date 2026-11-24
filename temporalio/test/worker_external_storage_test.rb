@@ -516,8 +516,7 @@ class WorkerExternalStorageTest < Test
   class HeartbeatStoreFailureActivity < Temporalio::Activity::Definition
     def execute
       Temporalio::Activity::Context.current.heartbeat('failing-heartbeat')
-      sleep(1)
-      raise 'Activity was not canceled'
+      raise 'Heartbeat did not raise'
     end
   end
 
@@ -532,7 +531,7 @@ class WorkerExternalStorageTest < Test
     end
   end
 
-  def test_heartbeat_store_failure_cancels_the_activity_and_fails_it_with_storage_cause
+  def test_heartbeat_store_failure_raises_from_heartbeat_and_fails_with_storage_cause
     driver = FailOnceStorageDriver.new(fail_store_containing: 'failing-heartbeat')
     result, completions = execute_workflow_capturing_activity_completions(
       HeartbeatStoreFailureWorkflow, activities: [HeartbeatStoreFailureActivity], driver:
@@ -556,56 +555,6 @@ class WorkerExternalStorageTest < Test
     assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
     assert_equal "External storage driver 'mem' failed to retrieve payloads: Intentional retrieve failure",
                  failed_result.failure.message
-  end
-
-  class UnconvertibleDetail
-    def to_json(*)
-      raise 'Intentional conversion failure'
-    end
-  end
-
-  class HeartbeatConversionFailureActivity < Temporalio::Activity::Definition
-    def execute
-      Temporalio::Activity::Context.current.heartbeat(UnconvertibleDetail.new)
-      sleep(1)
-      raise 'Activity was not canceled'
-    end
-  end
-
-  def test_heartbeat_conversion_failure_cancels_the_activity_and_fails_it_without_storage_cause
-    result, completions = execute_workflow_capturing_activity_completions(
-      CancelOnSignalWorkflow, 'HeartbeatConversionFailureActivity',
-      activities: [HeartbeatConversionFailureActivity], driver: InMemoryStorageDriver.new
-    )
-
-    assert_equal 'Intentional conversion failure', result
-    failed_result = first_failed_result(completions)
-    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_UNSPECIFIED, failed_result.cause
-    assert_equal 'Intentional conversion failure', failed_result.failure.message
-  end
-
-  class HeartbeatStoreFailureNoRaiseActivity < Temporalio::Activity::Definition
-    activity_cancel_raise false
-
-    def execute
-      Temporalio::Activity::Context.current.heartbeat('failing-heartbeat')
-      Temporalio::Activity::Context.current.cancellation.check!
-      raise 'Activity was not canceled'
-    end
-  end
-
-  def test_heartbeat_store_failure_is_seen_by_an_activity_that_does_not_raise_on_cancel
-    driver = FailOnceStorageDriver.new(fail_store_containing: 'failing-heartbeat')
-    result, completions = execute_workflow_capturing_activity_completions(
-      CancelOnSignalWorkflow, 'HeartbeatStoreFailureNoRaiseActivity',
-      activities: [HeartbeatStoreFailureNoRaiseActivity], driver:
-    )
-
-    message = "External storage driver 'mem' failed to store payloads: Intentional store failure"
-    assert_equal message, result
-    failed_result = first_failed_result(completions)
-    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
-    assert_equal message, failed_result.failure.message
   end
 
   class CancelOnSignalWorkflow < Temporalio::Workflow::Definition
@@ -683,57 +632,6 @@ class WorkerExternalStorageTest < Test
     refute completions.any? { |completion| completion.result.failed }, 'Expected no failed completion'
     canceled_result = first_canceled_result(completions)
     assert_equal 'Activity canceled', canceled_result.failure.message
-  end
-
-  class HeartbeatFailureThenServerCancelActivity < Temporalio::Activity::Definition
-    activity_cancel_raise false
-
-    def execute
-      context = Temporalio::Activity::Context.current
-      context.heartbeat('failing-heartbeat')
-      raise 'Heartbeat failure did not cancel' unless context.cancellation.canceled?
-
-      deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + 5
-      until context.cancellation_details
-        raise 'Server cancel never arrived' if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
-
-        context.heartbeat('ok-heartbeat')
-        sleep(0.1)
-      end
-      raise Temporalio::Error::CanceledError, 'Canceled by server'
-    end
-  end
-
-  class ReportingFailOnceStorageDriver < FailOnceStorageDriver
-    attr_reader :failures
-
-    def initialize(...)
-      super
-      @failures = Queue.new
-    end
-
-    def store(context, payloads)
-      super
-    rescue StandardError => e
-      @failures << e
-      raise
-    end
-  end
-
-  def test_server_cancel_after_heartbeat_failure_is_reported_as_canceled
-    driver = ReportingFailOnceStorageDriver.new(fail_store_containing: 'failing-heartbeat')
-    result, completions = execute_workflow_capturing_activity_completions(
-      CancelOnSignalWorkflow, 'HeartbeatFailureThenServerCancelActivity',
-      activities: [HeartbeatFailureThenServerCancelActivity], driver:
-    ) do |handle|
-      driver.failures.pop(timeout: 10) or flunk('Heartbeat store never failed')
-      handle.signal(CancelOnSignalWorkflow.cancel)
-    end
-
-    assert_equal 'canceled', result
-    refute completions.any? { |completion| completion.result.failed }, 'Expected no failed completion'
-    canceled_result = first_canceled_result(completions)
-    assert_equal 'Canceled by server', canceled_result.failure.message
   end
 
   class FailingWorkflow < Temporalio::Workflow::Definition

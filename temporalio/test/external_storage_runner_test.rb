@@ -238,6 +238,16 @@ class ExternalStorageRunnerTest < Test
     assert_includes err.message, 'instead of a Temporalio::Converters::StorageDriverClaim'
   end
 
+  def test_store_raises_when_driver_returns_nil_claim
+    driver = InMemoryStorageDriver.new
+    driver.define_singleton_method(:store) { |_context, _payloads| [nil] }
+
+    err = assert_raises(Temporalio::Error::ExternalStorageError) do
+      Runner.new(storage(driver), namespace: nil).store([payload('a')])
+    end
+    assert_includes err.message, 'returned nil instead of a Temporalio::Converters::StorageDriverClaim'
+  end
+
   def test_retrieve_raises_when_driver_returns_something_other_than_payloads
     driver = InMemoryStorageDriver.new
     runner = Runner.new(storage(driver), namespace: nil)

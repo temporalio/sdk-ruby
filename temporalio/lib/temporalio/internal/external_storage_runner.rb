@@ -167,12 +167,13 @@ module Temporalio
                 "returned #{returned.is_a?(Array) ? returned.size : returned.inspect}"
         end
 
-        invalid_item = returned.find { |item| !item.is_a?(expected_item_class) }
-        return unless invalid_item
+        returned.each do |item|
+          next if item.is_a?(expected_item_class)
 
-        raise Error::ExternalStorageError,
-              "External storage driver '#{driver.name}' #{operation} returned #{invalid_item.inspect} instead of a " \
-              "#{expected_item_class}"
+          raise Error::ExternalStorageError,
+                "External storage driver '#{driver.name}' #{operation} returned #{item.inspect} instead of a " \
+                "#{expected_item_class}"
+        end
       end
 
       # Grants every permit immediately, since concurrency limits are not enforced yet.

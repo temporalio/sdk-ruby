@@ -76,12 +76,6 @@ class Temporalio::Internal::Worker::ActivityWorker::RunningActivity < Temporalio
   sig { returns(T::Boolean) }
   attr_reader :_server_requested_cancel
 
-  sig { returns(T.nilable(Exception)) }
-  attr_reader :_heartbeat_failure
-
-  sig { returns(T::Boolean) }
-  attr_reader :_execution_finished
-
   sig { returns(T.nilable(Temporalio::Activity::Definition)) }
   attr_accessor :instance
 
@@ -111,12 +105,6 @@ class Temporalio::Internal::Worker::ActivityWorker::RunningActivity < Temporalio
 
   sig { params(reason: String, details: Temporalio::Activity::CancellationDetails).void }
   def _cancel(reason:, details:); end
-
-  sig { void }
-  def _mark_execution_finished; end
-
-  sig { params(error: Exception).void }
-  def _cancel_due_to_heartbeat_failure(error); end
 end
 
 class Temporalio::Internal::Worker::ActivityWorker::InboundImplementation < Temporalio::Worker::Interceptor::Activity::Inbound
@@ -132,17 +120,9 @@ class Temporalio::Internal::Worker::ActivityWorker::OutboundImplementation < Tem
   sig do
     params(
       worker: Temporalio::Internal::Worker::ActivityWorker,
-      activity: Temporalio::Internal::Worker::ActivityWorker::RunningActivity,
+      task_token: String,
       data_converter: Temporalio::Converters::DataConverter
     ).void
   end
-  def initialize(worker, activity, data_converter); end
-
-  private
-
-  sig { params(error: Exception).void }
-  def handle_heartbeat_conversion_failure(error); end
-
-  sig { params(error: Exception).void }
-  def cancel_activity_deferring_raise_until_cancel_callbacks_run(error); end
+  def initialize(worker, task_token, data_converter); end
 end
