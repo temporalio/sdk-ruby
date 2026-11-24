@@ -1636,17 +1636,20 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   def clear_eager_worker_deployment_options
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { void }
   def clear_time_skipping_config
   end
@@ -1666,21 +1669,24 @@ class Temporalio::Api::WorkflowService::V1::StartWorkflowExecutionRequest
   def clear_propagated_nexus_serialization_context
   end
 
-  # Time-skipping state propagated by the execution that started this workflow.
+  # Experimental.
+# Time-skipping state propagated by the execution that started this workflow.
 # This field is intended for use by the Temporal server, for example when a schedule
 # starts a workflow, and is not intended to be set by external clients.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)) }
   def time_skipping_state_propagation
   end
 
-  # Time-skipping state propagated by the execution that started this workflow.
+  # Experimental.
+# Time-skipping state propagated by the execution that started this workflow.
 # This field is intended for use by the Temporal server, for example when a schedule
 # starts a workflow, and is not intended to be set by external clients.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingStatePropagation)).void }
   def time_skipping_state_propagation=(value)
   end
 
-  # Time-skipping state propagated by the execution that started this workflow.
+  # Experimental.
+# Time-skipping state propagated by the execution that started this workflow.
 # This field is intended for use by the Temporal server, for example when a schedule
 # starts a workflow, and is not intended to be set by external clients.
   sig { void }
@@ -2535,20 +2541,17 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowTaskQueueRequest
   def clear_deployment_options
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)) }
   def poller_pool_info
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)).void }
   def poller_pool_info=(value)
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { void }
   def clear_poller_pool_info
   end
@@ -4097,20 +4100,17 @@ class Temporalio::Api::WorkflowService::V1::PollActivityTaskQueueRequest
   def clear_deployment_options
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)) }
   def poller_pool_info
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::PollerPoolInfo)).void }
   def poller_pool_info=(value)
   end
 
-  # Worker-reported poller pool state, used to spread poller scaling suggestions across
-# a fleet. Optional.
+  # Worker-reported poller pool state. Optional.
   sig { void }
   def clear_poller_pool_info
   end
@@ -7548,17 +7548,20 @@ class Temporalio::Api::WorkflowService::V1::SignalWithStartWorkflowExecutionRequ
   def clear_priority
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
-  # Time-skipping configuration. If not set, time skipping is disabled.
+  # Experimental.
+# Time-skipping configuration. If not set, time skipping is disabled.
   sig { void }
   def clear_time_skipping_config
   end
@@ -19027,28 +19030,19 @@ class Temporalio::Api::WorkflowService::V1::UpdateWorkflowExecutionOptionsRespon
   def clear_workflow_execution_options
   end
 
-  # The Workflow Execution time when the options were updated. When time skipping is
-# enabled, this is the workflow's virtual time rather than wall-clock time.
-#
-# This timestamp cannot be used for time-skipping fast-forward verification,
+  # Deprecated. Not populated by the server; for time-skipping fast-forward verification,
 # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
   def update_time
   end
 
-  # The Workflow Execution time when the options were updated. When time skipping is
-# enabled, this is the workflow's virtual time rather than wall-clock time.
-#
-# This timestamp cannot be used for time-skipping fast-forward verification,
+  # Deprecated. Not populated by the server; for time-skipping fast-forward verification,
 # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
   def update_time=(value)
   end
 
-  # The Workflow Execution time when the options were updated. When time skipping is
-# enabled, this is the workflow's virtual time rather than wall-clock time.
-#
-# This timestamp cannot be used for time-skipping fast-forward verification,
+  # Deprecated. Not populated by the server; for time-skipping fast-forward verification,
 # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
   sig { void }
   def clear_update_time
@@ -23876,7 +23870,8 @@ class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest
       update_queue_rate_limit: T.nilable(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLimitUpdate),
       update_fairness_key_rate_limit_default: T.nilable(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLimitUpdate),
       set_fairness_weight_overrides: T.nilable(T::Hash[String, Float]),
-      unset_fairness_weight_overrides: T.nilable(T::Array[String])
+      unset_fairness_weight_overrides: T.nilable(T::Array[String]),
+      update_queue_concurrency_limit: T.nilable(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate)
     ).void
   end
   def initialize(
@@ -23887,7 +23882,8 @@ class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest
     update_queue_rate_limit: nil,
     update_fairness_key_rate_limit_default: nil,
     set_fairness_weight_overrides: ::Google::Protobuf::Map.new(:string, :float),
-    unset_fairness_weight_overrides: []
+    unset_fairness_weight_overrides: [],
+    update_queue_concurrency_limit: nil
   )
   end
 
@@ -24024,6 +24020,27 @@ class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest
 # or to the default weight of 1.0.
   sig { void }
   def clear_unset_fairness_weight_overrides
+  end
+
+  # Update queue-wide concurrency limit.
+# If not set, this configuration is unchanged.
+# If the `concurrency_limit` field in the `ConcurrencyLimitUpdate` is missing, remove the existing limit.
+  sig { returns(T.nilable(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate)) }
+  def update_queue_concurrency_limit
+  end
+
+  # Update queue-wide concurrency limit.
+# If not set, this configuration is unchanged.
+# If the `concurrency_limit` field in the `ConcurrencyLimitUpdate` is missing, remove the existing limit.
+  sig { params(value: T.nilable(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate)).void }
+  def update_queue_concurrency_limit=(value)
+  end
+
+  # Update queue-wide concurrency limit.
+# If not set, this configuration is unchanged.
+# If the `concurrency_limit` field in the `ConcurrencyLimitUpdate` is missing, remove the existing limit.
+  sig { void }
+  def clear_update_queue_concurrency_limit
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -29244,6 +29261,7 @@ end
 # execution. Currently the only supported policy is waiting for completion of the fast-forward
 # identified by `fast_forward_id`; the poll also returns once anything else settles that outcome
 # (e.g. the execution ends or time skipping is disabled).
+# Experimental. Might change in the future.
 class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -29337,6 +29355,8 @@ class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingReq
   end
 end
 
+# Result of polling a workflow execution's time-skipping fast-forward.
+# Experimental. Might change in the future.
 class Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingResponse
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -31239,32 +31259,32 @@ class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLi
   )
   end
 
-  # Rate Limit to be updated
+  # Rate limit to be updated
   sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::RateLimit)) }
   def rate_limit
   end
 
-  # Rate Limit to be updated
+  # Rate limit to be updated
   sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::RateLimit)).void }
   def rate_limit=(value)
   end
 
-  # Rate Limit to be updated
+  # Rate limit to be updated
   sig { void }
   def clear_rate_limit
   end
 
-  # Reason for why the rate limit was set.
+  # Reason why the rate limit was updated
   sig { returns(String) }
   def reason
   end
 
-  # Reason for why the rate limit was set.
+  # Reason why the rate limit was updated
   sig { params(value: String).void }
   def reason=(value)
   end
 
-  # Reason for why the rate limit was set.
+  # Reason why the rate limit was updated
   sig { void }
   def clear_reason
   end
@@ -31294,6 +31314,85 @@ class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLi
   end
 
   sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLimitUpdate, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      concurrency_limit: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit),
+      reason: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    concurrency_limit: nil,
+    reason: ""
+  )
+  end
+
+  # Limit to be updated
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit)) }
+  def concurrency_limit
+  end
+
+  # Limit to be updated
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit)).void }
+  def concurrency_limit=(value)
+  end
+
+  # Limit to be updated
+  sig { void }
+  def clear_concurrency_limit
+  end
+
+  # Reason why the limit was updated
+  sig { returns(String) }
+  def reason
+  end
+
+  # Reason why the limit was updated
+  sig { params(value: String).void }
+  def reason=(value)
+  end
+
+  # Reason why the limit was updated
+  sig { void }
+  def clear_reason
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

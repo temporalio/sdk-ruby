@@ -7,6 +7,26 @@ module Temporalio::Api::Enums::V1::NamespaceState
   self::NAMESPACE_STATE_REGISTERED = T.let(1, Integer)
   self::NAMESPACE_STATE_DEPRECATED = T.let(2, Integer)
   self::NAMESPACE_STATE_DELETED = T.let(3, Integer)
+  self::NAMESPACE_STATE_SOFT_DELETED = T.let(4, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Enums::V1::NamespaceRestoreState
+  self::NAMESPACE_RESTORE_STATE_UNSPECIFIED = T.let(0, Integer)
+  self::NAMESPACE_RESTORE_STATE_RUNNING = T.let(1, Integer)
+  self::NAMESPACE_RESTORE_STATE_COMPLETED = T.let(2, Integer)
+  self::NAMESPACE_RESTORE_STATE_FAILED = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

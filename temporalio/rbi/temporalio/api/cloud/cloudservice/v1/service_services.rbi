@@ -281,6 +281,15 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
     def delete_nexus_endpoint(request)
     end
 
+    # Move a nexus endpoint to a different project within the same account
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse)
+    end
+    def move_nexus_endpoint_to_project(request)
+    end
+
     # Get all user groups
     sig do
       params(
@@ -498,6 +507,51 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
     def validate_namespace_export_sink(request)
     end
 
+    # Create a caller rate limit
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse)
+    end
+    def create_caller_rate_limit(request)
+    end
+
+    # Get a caller rate limit
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse)
+    end
+    def get_caller_rate_limit(request)
+    end
+
+    # Get caller rate limits
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse)
+    end
+    def get_caller_rate_limits(request)
+    end
+
+    # Update a caller rate limit
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse)
+    end
+    def update_caller_rate_limit(request)
+    end
+
+    # Delete a caller rate limit
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse)
+    end
+    def delete_caller_rate_limit(request)
+    end
+
     # Update the tags for a namespace
     sig do
       params(
@@ -704,6 +758,123 @@ module Temporalio::Api::Cloud::CloudService::V1::CloudService
       ).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse)
     end
     def get_user_group_namespace_assignments(request)
+    end
+
+    # Get all projects
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse)
+    end
+    def get_projects(request)
+    end
+
+    # Get a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse)
+    end
+    def get_project(request)
+    end
+
+    # Create a new project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse)
+    end
+    def create_project(request)
+    end
+
+    # Update a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse)
+    end
+    def update_project(request)
+    end
+
+    # Move a namespace to a different project within the same account
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse)
+    end
+    def move_namespace_to_project(request)
+    end
+
+    # Delete a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse)
+    end
+    def delete_project(request)
+    end
+
+    # Set a user's access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse)
+    end
+    def set_user_project_access(request)
+    end
+
+    # Set a user group's access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse)
+    end
+    def set_user_group_project_access(request)
+    end
+
+    # Set a service account's access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse)
+    end
+    def set_service_account_project_access(request)
+    end
+
+    # Get users with access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse)
+    end
+    def get_user_project_assignments(request)
+    end
+
+    # Get service accounts with access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse)
+    end
+    def get_service_account_project_assignments(request)
+    end
+
+    # Get user groups with access to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse)
+    end
+    def get_user_group_project_assignments(request)
+    end
+
+    # Get service accounts scoped to a project
+    sig do
+      params(
+        request: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest
+      ).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse)
+    end
+    def get_project_scoped_service_accounts(request)
     end
   end
 end

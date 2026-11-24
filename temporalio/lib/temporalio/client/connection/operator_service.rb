@@ -76,6 +76,51 @@ module Temporalio
           )
         end
 
+        # Calls OperatorService.SoftDeleteNamespace API call.
+        #
+        # @param request [Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse] API response.
+        def soft_delete_namespace(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'soft_delete_namespace',
+            request_class: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest,
+            response_class: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls OperatorService.RestoreNamespace API call.
+        #
+        # @param request [Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse] API response.
+        def restore_namespace(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'restore_namespace',
+            request_class: Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest,
+            response_class: Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls OperatorService.DescribeNamespaceRestore API call.
+        #
+        # @param request [Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse] API response.
+        def describe_namespace_restore(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'describe_namespace_restore',
+            request_class: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest,
+            response_class: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls OperatorService.AddOrUpdateRemoteCluster API call.
         #
         # @param request [Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest] API request.

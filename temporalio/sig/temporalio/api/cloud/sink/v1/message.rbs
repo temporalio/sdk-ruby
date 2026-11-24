@@ -115,6 +115,72 @@ module Temporalio
               | ("region" name, (::String | ::Symbol) value) -> void
           end
 
+          class AzureBlobSpec < ::Google::Protobuf::AbstractMessage
+
+            # The customer's Azure tenant ID where the storage account exists and where Temporal's app registration is consented/granted access.
+            attr_reader tenant_id(): ::String
+            attr_writer tenant_id(): ::String | ::Symbol
+            def clear_tenant_id: () -> void
+
+            # The name of the destination Azure storage account where Temporal will send data.
+            attr_reader storage_account(): ::String
+            attr_writer storage_account(): ::String | ::Symbol
+            def clear_storage_account: () -> void
+
+            # The name of the destination Azure Blob container where Temporal will send data.
+            attr_reader container_name(): ::String
+            attr_writer container_name(): ::String | ::Symbol
+            def clear_container_name: () -> void
+
+            # The region where the Azure storage account is located.
+            attr_reader region(): ::String
+            attr_writer region(): ::String | ::Symbol
+            def clear_region: () -> void
+
+            # The Azure subscription ID that contains the storage account.
+            attr_reader subscription_id(): ::String
+            attr_writer subscription_id(): ::String | ::Symbol
+            def clear_subscription_id: () -> void
+
+            # The Azure resource group that contains the storage account.
+            attr_reader resource_group(): ::String
+            attr_writer resource_group(): ::String | ::Symbol
+            def clear_resource_group: () -> void
+
+            type init_map = {
+              tenant_id: (::String | ::Symbol)?,
+              "tenant_id" => (::String | ::Symbol)?,
+              storage_account: (::String | ::Symbol)?,
+              "storage_account" => (::String | ::Symbol)?,
+              container_name: (::String | ::Symbol)?,
+              "container_name" => (::String | ::Symbol)?,
+              region: (::String | ::Symbol)?,
+              "region" => (::String | ::Symbol)?,
+              subscription_id: (::String | ::Symbol)?,
+              "subscription_id" => (::String | ::Symbol)?,
+              resource_group: (::String | ::Symbol)?,
+              "resource_group" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("tenant_id" name) -> ::String
+              | ("storage_account" name) -> ::String
+              | ("container_name" name) -> ::String
+              | ("region" name) -> ::String
+              | ("subscription_id" name) -> ::String
+              | ("resource_group" name) -> ::String
+
+            def []=:
+                ("tenant_id" name, (::String | ::Symbol) value) -> void
+              | ("storage_account" name, (::String | ::Symbol) value) -> void
+              | ("container_name" name, (::String | ::Symbol) value) -> void
+              | ("region" name, (::String | ::Symbol) value) -> void
+              | ("subscription_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_group" name, (::String | ::Symbol) value) -> void
+          end
+
           class KinesisSpec < ::Google::Protobuf::AbstractMessage
 
             # The role Temporal Cloud assumes when writing records to Kinesis

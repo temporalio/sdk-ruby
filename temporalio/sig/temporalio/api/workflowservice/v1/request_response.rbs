@@ -634,6 +634,7 @@ module Temporalio
           def has_eager_worker_deployment_options?: () -> bool
           def clear_eager_worker_deployment_options: () -> void
 
+          # Experimental.
           # Time-skipping configuration. If not set, time skipping is disabled.
           attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
@@ -644,6 +645,7 @@ module Temporalio
           def has_propagated_nexus_serialization_context?: () -> bool
           def clear_propagated_nexus_serialization_context: () -> void
 
+          # Experimental.
           # Time-skipping state propagated by the execution that started this workflow.
           # This field is intended for use by the Temporal server, for example when a schedule
           # starts a workflow, and is not intended to be set by external clients.
@@ -1108,8 +1110,7 @@ module Temporalio
           def has_deployment_options?: () -> bool
           def clear_deployment_options: () -> void
 
-          # Worker-reported poller pool state, used to spread poller scaling suggestions across
-          # a fleet. Optional.
+          # Worker-reported poller pool state. Optional.
           attr_accessor poller_pool_info(): ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
           def has_poller_pool_info?: () -> bool
           def clear_poller_pool_info: () -> void
@@ -1845,8 +1846,7 @@ module Temporalio
           def has_deployment_options?: () -> bool
           def clear_deployment_options: () -> void
 
-          # Worker-reported poller pool state, used to spread poller scaling suggestions across
-          # a fleet. Optional.
+          # Worker-reported poller pool state. Optional.
           attr_accessor poller_pool_info(): ::Temporalio::Api::TaskQueue::V1::PollerPoolInfo?
           def has_poller_pool_info?: () -> bool
           def clear_poller_pool_info: () -> void
@@ -3311,6 +3311,7 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Experimental.
           # Time-skipping configuration. If not set, time skipping is disabled.
           attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
@@ -8741,10 +8742,9 @@ module Temporalio
           def has_workflow_execution_options?: () -> bool
           def clear_workflow_execution_options: () -> void
 
-          # The Workflow Execution time when the options were updated. When time skipping is
-          # enabled, this is the workflow's virtual time rather than wall-clock time.
-          # This timestamp cannot be used for time-skipping fast-forward verification,
+          # Deprecated. Not populated by the server; for time-skipping fast-forward verification,
           # use `fast_forward_id` in `PollWorkflowExecutionTimeSkippingRequest` instead.
+          # @deprecated
           attr_reader update_time(): ::Google::Protobuf::Timestamp?
           attr_writer update_time(): (::Google::Protobuf::Timestamp | ::Time)?
           def has_update_time?: () -> bool
@@ -10784,12 +10784,12 @@ module Temporalio
         class UpdateTaskQueueConfigRequest < ::Google::Protobuf::AbstractMessage
           class RateLimitUpdate < ::Google::Protobuf::AbstractMessage
 
-            # Rate Limit to be updated
+            # Rate limit to be updated
             attr_accessor rate_limit(): ::Temporalio::Api::TaskQueue::V1::RateLimit?
             def has_rate_limit?: () -> bool
             def clear_rate_limit: () -> void
 
-            # Reason for why the rate limit was set.
+            # Reason why the rate limit was updated
             attr_reader reason(): ::String
             attr_writer reason(): ::String | ::Symbol
             def clear_reason: () -> void
@@ -10809,6 +10809,36 @@ module Temporalio
 
             def []=:
                 ("rate_limit" name, ::Temporalio::Api::TaskQueue::V1::RateLimit? value) -> void
+              | ("reason" name, (::String | ::Symbol) value) -> void
+          end
+
+          class ConcurrencyLimitUpdate < ::Google::Protobuf::AbstractMessage
+
+            # Limit to be updated
+            attr_accessor concurrency_limit(): ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit?
+            def has_concurrency_limit?: () -> bool
+            def clear_concurrency_limit: () -> void
+
+            # Reason why the limit was updated
+            attr_reader reason(): ::String
+            attr_writer reason(): ::String | ::Symbol
+            def clear_reason: () -> void
+
+            type init_map = {
+              concurrency_limit: (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit::init_map)?,
+              "concurrency_limit" => (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit::init_map)?,
+              reason: (::String | ::Symbol)?,
+              "reason" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("concurrency_limit" name) -> ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit?
+              | ("reason" name) -> ::String
+
+            def []=:
+                ("concurrency_limit" name, ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit? value) -> void
               | ("reason" name, (::String | ::Symbol) value) -> void
           end
 
@@ -10856,6 +10886,13 @@ module Temporalio
           attr_accessor unset_fairness_weight_overrides(): ::Google::Protobuf::RepeatedField
           def clear_unset_fairness_weight_overrides: () -> void
 
+          # Update queue-wide concurrency limit.
+          # If not set, this configuration is unchanged.
+          # If the `concurrency_limit` field in the `ConcurrencyLimitUpdate` is missing, remove the existing limit.
+          attr_accessor update_queue_concurrency_limit(): ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate?
+          def has_update_queue_concurrency_limit?: () -> bool
+          def clear_update_queue_concurrency_limit: () -> void
+
           type init_map = {
             namespace: (::String | ::Symbol)?,
             "namespace" => (::String | ::Symbol)?,
@@ -10873,6 +10910,8 @@ module Temporalio
             "set_fairness_weight_overrides" => ::Hash[::String | ::Symbol, ::Float | ::Integer]?,
             unset_fairness_weight_overrides: ::Array[::String | ::Symbol]?,
             "unset_fairness_weight_overrides" => ::Array[::String | ::Symbol]?,
+            update_queue_concurrency_limit: (::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate | ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate::init_map)?,
+            "update_queue_concurrency_limit" => (::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate | ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -10886,6 +10925,7 @@ module Temporalio
             | ("update_fairness_key_rate_limit_default" name) -> ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLimitUpdate?
             | ("set_fairness_weight_overrides" name) -> (::Google::Protobuf::Map[::String, ::Float])
             | ("unset_fairness_weight_overrides" name) -> (::Google::Protobuf::RepeatedField)
+            | ("update_queue_concurrency_limit" name) -> ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate?
 
           def []=:
               ("namespace" name, (::String | ::Symbol) value) -> void
@@ -10896,6 +10936,7 @@ module Temporalio
             | ("update_fairness_key_rate_limit_default" name, ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::RateLimitUpdate? value) -> void
             | ("set_fairness_weight_overrides" name, (::Google::Protobuf::Map[::String, ::Float]) value) -> void
             | ("unset_fairness_weight_overrides" name, (::Google::Protobuf::RepeatedField) value) -> void
+            | ("update_queue_concurrency_limit" name, ::Temporalio::Api::WorkflowService::V1::UpdateTaskQueueConfigRequest::ConcurrencyLimitUpdate? value) -> void
         end
 
         class UpdateTaskQueueConfigResponse < ::Google::Protobuf::AbstractMessage
@@ -13108,6 +13149,7 @@ module Temporalio
         # execution. Currently the only supported policy is waiting for completion of the fast-forward
         # identified by `fast_forward_id`; the poll also returns once anything else settles that outcome
         # (e.g. the execution ends or time skipping is disabled).
+        # Experimental. Might change in the future.
         class PollWorkflowExecutionTimeSkippingRequest < ::Google::Protobuf::AbstractMessage
 
           attr_reader namespace(): ::String
@@ -13146,6 +13188,8 @@ module Temporalio
             | ("fast_forward_id" name, (::String | ::Symbol) value) -> void
         end
 
+        # Result of polling a workflow execution's time-skipping fast-forward.
+        # Experimental. Might change in the future.
         class PollWorkflowExecutionTimeSkippingResponse < ::Google::Protobuf::AbstractMessage
 
           # The outcome of the poll for the fast-forward identified by the request's `fast_forward_id`.

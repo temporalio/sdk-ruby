@@ -451,6 +451,21 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.MoveNexusEndpointToProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse] API response.
+        def move_nexus_endpoint_to_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'move_nexus_endpoint_to_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.GetUserGroups API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest] API request.
@@ -811,6 +826,81 @@ module Temporalio
           )
         end
 
+        # Calls CloudService.CreateCallerRateLimit API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse] API response.
+        def create_caller_rate_limit(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_caller_rate_limit',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetCallerRateLimit API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse] API response.
+        def get_caller_rate_limit(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_caller_rate_limit',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetCallerRateLimits API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse] API response.
+        def get_caller_rate_limits(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_caller_rate_limits',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateCallerRateLimit API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse] API response.
+        def update_caller_rate_limit(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_caller_rate_limit',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteCallerRateLimit API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse] API response.
+        def delete_caller_rate_limit(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_caller_rate_limit',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
         # Calls CloudService.UpdateNamespaceTags API call.
         #
         # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest] API request.
@@ -1151,6 +1241,201 @@ module Temporalio
             rpc: 'get_user_group_namespace_assignments',
             request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest,
             response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetProjects API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse] API response.
+        def get_projects(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_projects',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse] API response.
+        def get_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.CreateProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse] API response.
+        def create_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'create_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.UpdateProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse] API response.
+        def update_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'update_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.MoveNamespaceToProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse] API response.
+        def move_namespace_to_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'move_namespace_to_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.DeleteProject API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse] API response.
+        def delete_project(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'delete_project',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.SetUserProjectAccess API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse] API response.
+        def set_user_project_access(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_user_project_access',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.SetUserGroupProjectAccess API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse] API response.
+        def set_user_group_project_access(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_user_group_project_access',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.SetServiceAccountProjectAccess API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse] API response.
+        def set_service_account_project_access(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'set_service_account_project_access',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUserProjectAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse] API response.
+        def get_user_project_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_user_project_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetServiceAccountProjectAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse] API response.
+        def get_service_account_project_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_service_account_project_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetUserGroupProjectAssignments API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse] API response.
+        def get_user_group_project_assignments(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_user_group_project_assignments',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse,
+            request:,
+            rpc_options:
+          )
+        end
+
+        # Calls CloudService.GetProjectScopedServiceAccounts API call.
+        #
+        # @param request [Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest] API request.
+        # @param rpc_options [RPCOptions, nil] Advanced RPC options.
+        # @return [Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse] API response.
+        def get_project_scoped_service_accounts(request, rpc_options: nil)
+          invoke_rpc(
+            rpc: 'get_project_scoped_service_accounts',
+            request_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest,
+            response_class: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse,
             request:,
             rpc_options:
           )

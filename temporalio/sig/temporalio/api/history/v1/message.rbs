@@ -284,6 +284,7 @@ module Temporalio
           def has_declined_target_version_upgrade?: () -> bool
           def clear_declined_target_version_upgrade: () -> void
 
+          # Experimental.
           # Initial time-skipping configuration for this workflow execution, recorded at start time.
           # This may have been set explicitly via the start workflow request, or propagated from a
           # parent/previous execution.
@@ -293,6 +294,7 @@ module Temporalio
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
+          # Experimental.
           # The time-skipping state propagated from a previous run of this workflow. This can be nil
           # if no time skipping has occurred or there is no previous run.
           attr_accessor time_skipping_state_propagation(): ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
@@ -2702,11 +2704,13 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Experimental.
           # The propagated time-skipping configuration for the child workflow.
           attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
+          # Experimental.
           # The time-skipping state propagated from the parent workflow. This can be nil if no time skipping
           # has occurred or there is no previous run.
           attr_accessor time_skipping_state_propagation(): ::Temporalio::Api::Common::V1::TimeSkippingStatePropagation?
@@ -3400,11 +3404,13 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Experimental.
           # TimeSkippingConfig override upserted in this event. Represents the full config.
           attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
           def has_time_skipping_config?: () -> bool
           def clear_time_skipping_config: () -> void
 
+          # Experimental.
           # Indicates the time skipping config was updated by the recent call to update
           # workflow execution options.
           attr_accessor time_skipping_config_updated(): bool
@@ -3816,6 +3822,7 @@ module Temporalio
         # Attributes for an event indicating that time skipping state changed for a workflow execution:
         # either time was advanced, or time skipping was stopped automatically due to the fast_forward completing.
         # The worker_may_ignore field in HistoryEvent should always be set true for this event.
+        # Experimental. Might change in the future.
         class WorkflowExecutionTimeSkippingTransitionedEventAttributes < ::Google::Protobuf::AbstractMessage
 
           # The virtual time point that time skipping advanced to.
@@ -4626,6 +4633,7 @@ module Temporalio
           def has_workflow_execution_unpaused_event_attributes?: () -> bool
           def clear_workflow_execution_unpaused_event_attributes: () -> void
 
+          # Experimental.
           attr_accessor workflow_execution_time_skipping_transitioned_event_attributes(): ::Temporalio::Api::History::V1::WorkflowExecutionTimeSkippingTransitionedEventAttributes?
           def has_workflow_execution_time_skipping_transitioned_event_attributes?: () -> bool
           def clear_workflow_execution_time_skipping_transitioned_event_attributes: () -> void

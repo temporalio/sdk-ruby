@@ -173,6 +173,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_create_caller_rate_limit_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_create_connectivity_rule_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
@@ -209,6 +215,12 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_create_project_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_create_service_account_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
@@ -234,6 +246,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_delete_api_key_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_delete_caller_rate_limit_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -270,6 +288,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_delete_nexus_endpoint_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_delete_project_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -317,6 +341,18 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_move_namespace_to_project_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_move_nexus_endpoint_to_project_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_remove_user_group_member_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
@@ -335,13 +371,31 @@ module Temporalio
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_set_service_account_project_access_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_set_user_group_namespace_access_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
       end
       
+      def api_cloud_cloudservice_v1_set_user_group_project_access_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
       def api_cloud_cloudservice_v1_set_user_namespace_access_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_set_user_project_access_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -360,6 +414,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_update_api_key_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_update_caller_rate_limit_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
@@ -396,6 +456,12 @@ module Temporalio
       end
       
       def api_cloud_cloudservice_v1_update_nexus_endpoint_response(value)
+        @on_enter&.call(value)
+        api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
+        @on_exit&.call(value)
+      end
+      
+      def api_cloud_cloudservice_v1_update_project_response(value)
         @on_enter&.call(value)
         api_cloud_operation_v1_async_operation(value.async_operation) if value.has_async_operation?
         @on_exit&.call(value)
