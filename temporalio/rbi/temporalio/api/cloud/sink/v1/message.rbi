@@ -245,6 +245,153 @@ class Temporalio::Api::Cloud::Sink::V1::GCSSpec
   end
 end
 
+class Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      tenant_id: T.nilable(String),
+      storage_account: T.nilable(String),
+      container_name: T.nilable(String),
+      region: T.nilable(String),
+      subscription_id: T.nilable(String),
+      resource_group: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    tenant_id: "",
+    storage_account: "",
+    container_name: "",
+    region: "",
+    subscription_id: "",
+    resource_group: ""
+  )
+  end
+
+  # The customer's Azure tenant ID where the storage account exists and where Temporal's app registration is consented/granted access.
+  sig { returns(String) }
+  def tenant_id
+  end
+
+  # The customer's Azure tenant ID where the storage account exists and where Temporal's app registration is consented/granted access.
+  sig { params(value: String).void }
+  def tenant_id=(value)
+  end
+
+  # The customer's Azure tenant ID where the storage account exists and where Temporal's app registration is consented/granted access.
+  sig { void }
+  def clear_tenant_id
+  end
+
+  # The name of the destination Azure storage account where Temporal will send data.
+  sig { returns(String) }
+  def storage_account
+  end
+
+  # The name of the destination Azure storage account where Temporal will send data.
+  sig { params(value: String).void }
+  def storage_account=(value)
+  end
+
+  # The name of the destination Azure storage account where Temporal will send data.
+  sig { void }
+  def clear_storage_account
+  end
+
+  # The name of the destination Azure Blob container where Temporal will send data.
+  sig { returns(String) }
+  def container_name
+  end
+
+  # The name of the destination Azure Blob container where Temporal will send data.
+  sig { params(value: String).void }
+  def container_name=(value)
+  end
+
+  # The name of the destination Azure Blob container where Temporal will send data.
+  sig { void }
+  def clear_container_name
+  end
+
+  # The region where the Azure storage account is located.
+  sig { returns(String) }
+  def region
+  end
+
+  # The region where the Azure storage account is located.
+  sig { params(value: String).void }
+  def region=(value)
+  end
+
+  # The region where the Azure storage account is located.
+  sig { void }
+  def clear_region
+  end
+
+  # The Azure subscription ID that contains the storage account.
+  sig { returns(String) }
+  def subscription_id
+  end
+
+  # The Azure subscription ID that contains the storage account.
+  sig { params(value: String).void }
+  def subscription_id=(value)
+  end
+
+  # The Azure subscription ID that contains the storage account.
+  sig { void }
+  def clear_subscription_id
+  end
+
+  # The Azure resource group that contains the storage account.
+  sig { returns(String) }
+  def resource_group
+  end
+
+  # The Azure resource group that contains the storage account.
+  sig { params(value: String).void }
+  def resource_group=(value)
+  end
+
+  # The Azure resource group that contains the storage account.
+  sig { void }
+  def clear_resource_group
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Sink::V1::KinesisSpec
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods

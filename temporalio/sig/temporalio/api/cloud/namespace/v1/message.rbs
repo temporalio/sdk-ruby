@@ -621,6 +621,89 @@ module Temporalio
                 ("task_queue_fairness_enabled" name, bool value) -> void
           end
 
+          # temporal:versioning:min_version=v0.23.0
+          class EncryptionValidationSpec < ::Google::Protobuf::AbstractMessage
+            module EncryptionValidationMode
+
+              ENCRYPTION_VALIDATION_MODE_UNSPECIFIED: 0
+
+              # Disables encryption validation.
+              ENCRYPTION_VALIDATION_MODE_DISABLED: 1
+
+              # Allows requests with unencrypted payloads, but emits warning metrics when validation fails.
+              ENCRYPTION_VALIDATION_MODE_WARN: 2
+
+              # Rejects requests with unencrypted payloads when validation fails.
+              ENCRYPTION_VALIDATION_MODE_DENY: 3
+
+              def self.lookup: (::Integer number) -> ::Symbol
+
+
+              def self.resolve: (::Symbol name) -> ::Integer
+
+
+              type names = :ENCRYPTION_VALIDATION_MODE_UNSPECIFIED | :ENCRYPTION_VALIDATION_MODE_DISABLED | :ENCRYPTION_VALIDATION_MODE_WARN | :ENCRYPTION_VALIDATION_MODE_DENY
+
+              type strings = "ENCRYPTION_VALIDATION_MODE_UNSPECIFIED" | "ENCRYPTION_VALIDATION_MODE_DISABLED" | "ENCRYPTION_VALIDATION_MODE_WARN" | "ENCRYPTION_VALIDATION_MODE_DENY"
+
+              type numbers = 0 | 1 | 2 | 3
+            end
+
+            # The payload encryption validation mode for this namespace.
+            attr_reader mode(): ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Integer
+            attr_writer mode(): ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::strings | ::Integer | ::Float
+            attr_reader mode_const(): ::Integer
+            def clear_mode: () -> void
+
+            # (Optional) The payload metadata key used to identify encrypted payloads.
+            # Default value is "encoding" if omitted.
+            attr_reader metadata_key(): ::String
+            attr_writer metadata_key(): ::String | ::Symbol
+            def clear_metadata_key: () -> void
+
+            # (Optional) The payload metadata values used to identify encrypted payloads.
+            # Default value is ["binary/encrypted"] if omitted.
+            attr_accessor metadata_values(): ::Google::Protobuf::RepeatedField
+            def clear_metadata_values: () -> void
+
+            # Whether workflow headers should be inspected for encryption validation.
+            attr_accessor inspect_header(): bool
+            def clear_inspect_header: () -> void
+
+            # Whether to inspect the message and stack_trace fields for Failure messages.
+            attr_accessor inspect_failure(): bool
+            def clear_inspect_failure: () -> void
+
+            type init_map = {
+              mode: (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::strings | ::Integer | ::Float)?,
+              "mode" => (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::strings | ::Integer | ::Float)?,
+              metadata_key: (::String | ::Symbol)?,
+              "metadata_key" => (::String | ::Symbol)?,
+              metadata_values: ::Array[::String | ::Symbol]?,
+              "metadata_values" => ::Array[::String | ::Symbol]?,
+              inspect_header: bool?,
+              "inspect_header" => bool?,
+              inspect_failure: bool?,
+              "inspect_failure" => bool?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("mode" name) -> (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Integer)
+              | ("metadata_key" name) -> ::String
+              | ("metadata_values" name) -> (::Google::Protobuf::RepeatedField)
+              | ("inspect_header" name) -> bool
+              | ("inspect_failure" name) -> bool
+
+            def []=:
+                ("mode" name, (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::names | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode::strings | ::Integer | ::Float) value) -> void
+              | ("metadata_key" name, (::String | ::Symbol) value) -> void
+              | ("metadata_values" name, (::Google::Protobuf::RepeatedField) value) -> void
+              | ("inspect_header" name, bool value) -> void
+              | ("inspect_failure" name, bool value) -> void
+          end
+
           class NamespaceSpec < ::Google::Protobuf::AbstractMessage
             module SearchAttributeType
 
@@ -765,6 +848,21 @@ module Temporalio
             def has_fairness?: () -> bool
             def clear_fairness: () -> void
 
+            # The payload encryption validation configuration for the namespace.
+            # If unspecified, payload encryption validation will be disabled.
+            # temporal:versioning:min_version=v0.23.0
+            attr_accessor encryption_validation(): ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec?
+            def has_encryption_validation?: () -> bool
+            def clear_encryption_validation: () -> void
+
+            # The description is a human-readable description of the namespace purpose.
+            # Must be at most 255 printable ASCII characters plus whitespace.
+            # Optional, default is empty.
+            # temporal:versioning:min_version=v0.21.0
+            attr_reader description(): ::String
+            attr_writer description(): ::String | ::Symbol
+            def clear_description: () -> void
+
             type init_map = {
               name: (::String | ::Symbol)?,
               "name" => (::String | ::Symbol)?,
@@ -794,6 +892,10 @@ module Temporalio
               "replicas" => ::Array[::Temporalio::Api::Cloud::Namespace::V1::ReplicaSpec]?,
               fairness: (::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec | ::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec::init_map)?,
               "fairness" => (::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec | ::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec::init_map)?,
+              encryption_validation: (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::init_map)?,
+              "encryption_validation" => (::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec | ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::init_map)?,
+              description: (::String | ::Symbol)?,
+              "description" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -813,6 +915,8 @@ module Temporalio
               | ("capacity_spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec?
               | ("replicas" name) -> ::Google::Protobuf::RepeatedField
               | ("fairness" name) -> ::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec?
+              | ("encryption_validation" name) -> ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec?
+              | ("description" name) -> ::String
 
             def []=:
                 ("name" name, (::String | ::Symbol) value) -> void
@@ -829,6 +933,8 @@ module Temporalio
               | ("capacity_spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CapacitySpec? value) -> void
               | ("replicas" name, ::Google::Protobuf::RepeatedField value) -> void
               | ("fairness" name, ::Temporalio::Api::Cloud::Namespace::V1::FairnessSpec? value) -> void
+              | ("encryption_validation" name, ::Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec? value) -> void
+              | ("description" name, (::String | ::Symbol) value) -> void
           end
 
           class Endpoints < ::Google::Protobuf::AbstractMessage
@@ -1049,6 +1155,11 @@ module Temporalio
             attr_accessor replicas(): ::Google::Protobuf::RepeatedField
             def clear_replicas: () -> void
 
+            # The id of the project this namespace belongs to.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               namespace: (::String | ::Symbol)?,
               "namespace" => (::String | ::Symbol)?,
@@ -1084,6 +1195,8 @@ module Temporalio
               "capacity" => (::Temporalio::Api::Cloud::Namespace::V1::Capacity | ::Temporalio::Api::Cloud::Namespace::V1::Capacity::init_map)?,
               replicas: ::Array[::Temporalio::Api::Cloud::Namespace::V1::Replica]?,
               "replicas" => ::Array[::Temporalio::Api::Cloud::Namespace::V1::Replica]?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1106,6 +1219,7 @@ module Temporalio
               | ("tags" name) -> (::Google::Protobuf::Map[::String, ::String])
               | ("capacity" name) -> ::Temporalio::Api::Cloud::Namespace::V1::Capacity?
               | ("replicas" name) -> ::Google::Protobuf::RepeatedField
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("namespace" name, (::String | ::Symbol) value) -> void
@@ -1125,6 +1239,194 @@ module Temporalio
               | ("tags" name, (::Google::Protobuf::Map[::String, ::String]) value) -> void
               | ("capacity" name, ::Temporalio::Api::Cloud::Namespace::V1::Capacity? value) -> void
               | ("replicas" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          # The caller rate limit resource.
+          # A caller rate limit sets a request per second limit for a caller making requests to a target namespace.
+          # The 'target namespace' is the namespace being protected.
+          class CallerRateLimit < ::Google::Protobuf::AbstractMessage
+
+            # The id of the caller rate limit. This is generated by the server and is immutable.
+            attr_reader id(): ::String
+            attr_writer id(): ::String | ::Symbol
+            def clear_id: () -> void
+
+            # The current version of the caller rate limit specification.
+            # The next update or delete operations must include this version.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The caller rate limit specification.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The current state of the caller rate limit.
+            attr_reader state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer
+            attr_writer state(): ::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float
+            attr_reader state_const(): ::Integer
+            def clear_state: () -> void
+
+            # The id of any ongoing operation that is creating, updating, or deleting the caller rate limit.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            # The date and time when the caller rate limit was created.
+            attr_reader created_time(): ::Google::Protobuf::Timestamp?
+            attr_writer created_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_created_time?: () -> bool
+            def clear_created_time: () -> void
+
+            # The date and time when the caller rate limit was last modified.
+            attr_reader last_modified_time(): ::Google::Protobuf::Timestamp?
+            attr_writer last_modified_time(): (::Google::Protobuf::Timestamp | ::Time)?
+            def has_last_modified_time?: () -> bool
+            def clear_last_modified_time: () -> void
+
+            # The target namespace. This is immutable.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            type init_map = {
+              id: (::String | ::Symbol)?,
+              "id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              state: (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              "state" => (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+              created_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "created_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              last_modified_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              "last_modified_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+              | ("state" name) -> (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Integer)
+              | ("async_operation_id" name) -> ::String
+              | ("created_time" name) -> ::Google::Protobuf::Timestamp?
+              | ("last_modified_time" name) -> ::Google::Protobuf::Timestamp?
+              | ("namespace" name) -> ::String
+
+            def []=:
+                ("id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec? value) -> void
+              | ("state" name, (::Temporalio::Api::Cloud::Resource::V1::ResourceState::names | ::Temporalio::Api::Cloud::Resource::V1::ResourceState::strings | ::Integer | ::Float) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+              | ("created_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("last_modified_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+              | ("namespace" name, (::String | ::Symbol) value) -> void
+          end
+
+          # The specification for a caller rate limit.
+          class CallerRateLimitSpec < ::Google::Protobuf::AbstractMessage
+
+            # The default rate limit for namespace callers that do not match a specific rule.
+            # The target namespace can have at most one namespace default limit.
+            # A default rate limit is not required, and unmatched namespaces will not have a caller rate limit.
+            attr_accessor namespace_default(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit?
+            def has_namespace_default?: () -> bool
+            def clear_namespace_default: () -> void
+
+            # A rate limit rule that matches a specific caller namespace.
+            # The target namespace can have at most one matching rule for each caller namespace.
+            attr_accessor namespace_limit(): ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit?
+            def has_namespace_limit?: () -> bool
+            def clear_namespace_limit: () -> void
+
+            # The rule for this caller rate limit.
+            # Exactly one rule must be set. The rule type is immutable.
+            attr_reader rule(): (::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit)?
+            def has_rule?: () -> bool
+            def clear_rule: () -> void
+
+            type init_map = {
+              namespace_default: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit::init_map)?,
+              "namespace_default" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit::init_map)?,
+              namespace_limit: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit::init_map)?,
+              "namespace_limit" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace_default" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit?
+              | ("namespace_limit" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit?
+
+            def []=:
+                ("namespace_default" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit? value) -> void
+              | ("namespace_limit" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit? value) -> void
+          end
+
+          # The limit for a specific calling namespace.
+          class NamespaceCallerRateLimit < ::Google::Protobuf::AbstractMessage
+
+            # The calling namespace to match exactly.
+            # Required. Immutable.
+            attr_reader namespace_id(): ::String
+            attr_writer namespace_id(): ::String | ::Symbol
+            def clear_namespace_id: () -> void
+
+            # The number of requests per second that are allowed.
+            # Must be non-negative and finite. A value of 0 denies all traffic from this caller.
+            attr_reader rps(): ::Float
+            attr_writer rps(): ::Float | ::Integer
+            def clear_rps: () -> void
+
+            type init_map = {
+              namespace_id: (::String | ::Symbol)?,
+              "namespace_id" => (::String | ::Symbol)?,
+              rps: (::Float | ::Integer)?,
+              "rps" => (::Float | ::Integer)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace_id" name) -> ::String
+              | ("rps" name) -> ::Float
+
+            def []=:
+                ("namespace_id" name, (::String | ::Symbol) value) -> void
+              | ("rps" name, (::Float | ::Integer) value) -> void
+          end
+
+          # The default limit for calling namespaces.
+          class NamespaceDefaultCallerRateLimit < ::Google::Protobuf::AbstractMessage
+
+            # The number of requests per second that are allowed.
+            # Must be non-negative and finite. A value of 0 denies all traffic.
+            attr_reader rps(): ::Float
+            attr_writer rps(): ::Float | ::Integer
+            def clear_rps: () -> void
+
+            type init_map = {
+              rps: (::Float | ::Integer)?,
+              "rps" => (::Float | ::Integer)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("rps" name) -> ::Float
+
+            def []=:
+                ("rps" name, (::Float | ::Integer) value) -> void
           end
 
           class NamespaceRegionStatus < ::Google::Protobuf::AbstractMessage
@@ -1201,6 +1503,25 @@ module Temporalio
           end
 
           class ExportSinkSpec < ::Google::Protobuf::AbstractMessage
+            class SinkFilter < ::Google::Protobuf::AbstractMessage
+
+              # Whether to disable export of standalone activity events.
+              attr_accessor disable_standalone_activity_export(): bool
+              def clear_disable_standalone_activity_export: () -> void
+
+              type init_map = {
+                disable_standalone_activity_export: bool?,
+                "disable_standalone_activity_export" => bool?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("disable_standalone_activity_export" name) -> bool
+
+              def []=:
+                  ("disable_standalone_activity_export" name, bool value) -> void
+            end
 
             # The unique name of the export sink, it can't be changed once set.
             attr_reader name(): ::String
@@ -1216,11 +1537,22 @@ module Temporalio
             def has_s3?: () -> bool
             def clear_s3: () -> void
 
-            # This is a feature under development. We will allow GCS sink support for GCP Namespaces.
             # The GCS configuration details when destination_type is GCS.
             attr_accessor gcs(): ::Temporalio::Api::Cloud::Sink::V1::GCSSpec?
             def has_gcs?: () -> bool
             def clear_gcs: () -> void
+
+            # The Azure Blob configuration details when destination_type is Azure Blob.
+            # temporal:versioning:min_version=v0.19.1
+            attr_accessor azure_blob(): ::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec?
+            def has_azure_blob?: () -> bool
+            def clear_azure_blob: () -> void
+
+            # The filter configuration for controlling which events are exported.
+            # temporal:versioning:min_version=v0.25.0
+            attr_accessor filter(): ::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter?
+            def has_filter?: () -> bool
+            def clear_filter: () -> void
 
             type init_map = {
               name: (::String | ::Symbol)?,
@@ -1231,6 +1563,10 @@ module Temporalio
               "s3" => (::Temporalio::Api::Cloud::Sink::V1::S3Spec | ::Temporalio::Api::Cloud::Sink::V1::S3Spec::init_map)?,
               gcs: (::Temporalio::Api::Cloud::Sink::V1::GCSSpec | ::Temporalio::Api::Cloud::Sink::V1::GCSSpec::init_map)?,
               "gcs" => (::Temporalio::Api::Cloud::Sink::V1::GCSSpec | ::Temporalio::Api::Cloud::Sink::V1::GCSSpec::init_map)?,
+              azure_blob: (::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec | ::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec::init_map)?,
+              "azure_blob" => (::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec | ::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec::init_map)?,
+              filter: (::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter | ::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter::init_map)?,
+              "filter" => (::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter | ::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1240,12 +1576,16 @@ module Temporalio
               | ("enabled" name) -> bool
               | ("s3" name) -> ::Temporalio::Api::Cloud::Sink::V1::S3Spec?
               | ("gcs" name) -> ::Temporalio::Api::Cloud::Sink::V1::GCSSpec?
+              | ("azure_blob" name) -> ::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec?
+              | ("filter" name) -> ::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter?
 
             def []=:
                 ("name" name, (::String | ::Symbol) value) -> void
               | ("enabled" name, bool value) -> void
               | ("s3" name, ::Temporalio::Api::Cloud::Sink::V1::S3Spec? value) -> void
               | ("gcs" name, ::Temporalio::Api::Cloud::Sink::V1::GCSSpec? value) -> void
+              | ("azure_blob" name, ::Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec? value) -> void
+              | ("filter" name, ::Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter? value) -> void
           end
 
           class ExportSink < ::Google::Protobuf::AbstractMessage
@@ -1505,7 +1845,6 @@ module Temporalio
             def clear_namespace: () -> void
 
             # Whether the namespace's APS limit was set by Temporal Support.
-            # When true, adjusting the namespace's capacity will reset this limit.
             attr_accessor has_legacy_limits(): bool
             def clear_has_legacy_limits: () -> void
 

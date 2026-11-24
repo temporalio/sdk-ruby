@@ -1033,6 +1033,143 @@ class Temporalio::Api::Cloud::Namespace::V1::FairnessSpec
   end
 end
 
+# temporal:versioning:min_version=v0.23.0
+class Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      mode: T.nilable(T.any(Symbol, String, Integer)),
+      metadata_key: T.nilable(String),
+      metadata_values: T.nilable(T::Array[String]),
+      inspect_header: T.nilable(T::Boolean),
+      inspect_failure: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    mode: :ENCRYPTION_VALIDATION_MODE_UNSPECIFIED,
+    metadata_key: "",
+    metadata_values: [],
+    inspect_header: false,
+    inspect_failure: false
+  )
+  end
+
+  # The payload encryption validation mode for this namespace.
+  sig { returns(T.any(Symbol, Integer)) }
+  def mode
+  end
+
+  # The payload encryption validation mode for this namespace.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def mode=(value)
+  end
+
+  # The payload encryption validation mode for this namespace.
+  sig { void }
+  def clear_mode
+  end
+
+  # (Optional) The payload metadata key used to identify encrypted payloads.
+# Default value is "encoding" if omitted.
+  sig { returns(String) }
+  def metadata_key
+  end
+
+  # (Optional) The payload metadata key used to identify encrypted payloads.
+# Default value is "encoding" if omitted.
+  sig { params(value: String).void }
+  def metadata_key=(value)
+  end
+
+  # (Optional) The payload metadata key used to identify encrypted payloads.
+# Default value is "encoding" if omitted.
+  sig { void }
+  def clear_metadata_key
+  end
+
+  # (Optional) The payload metadata values used to identify encrypted payloads.
+# Default value is ["binary/encrypted"] if omitted.
+  sig { returns(T::Array[String]) }
+  def metadata_values
+  end
+
+  # (Optional) The payload metadata values used to identify encrypted payloads.
+# Default value is ["binary/encrypted"] if omitted.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def metadata_values=(value)
+  end
+
+  # (Optional) The payload metadata values used to identify encrypted payloads.
+# Default value is ["binary/encrypted"] if omitted.
+  sig { void }
+  def clear_metadata_values
+  end
+
+  # Whether workflow headers should be inspected for encryption validation.
+  sig { returns(T::Boolean) }
+  def inspect_header
+  end
+
+  # Whether workflow headers should be inspected for encryption validation.
+  sig { params(value: T::Boolean).void }
+  def inspect_header=(value)
+  end
+
+  # Whether workflow headers should be inspected for encryption validation.
+  sig { void }
+  def clear_inspect_header
+  end
+
+  # Whether to inspect the message and stack_trace fields for Failure messages.
+  sig { returns(T::Boolean) }
+  def inspect_failure
+  end
+
+  # Whether to inspect the message and stack_trace fields for Failure messages.
+  sig { params(value: T::Boolean).void }
+  def inspect_failure=(value)
+  end
+
+  # Whether to inspect the message and stack_trace fields for Failure messages.
+  sig { void }
+  def clear_inspect_failure
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -1052,7 +1189,9 @@ class Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec
       connectivity_rule_ids: T.nilable(T::Array[String]),
       capacity_spec: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CapacitySpec),
       replicas: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Namespace::V1::ReplicaSpec)]),
-      fairness: T.nilable(Temporalio::Api::Cloud::Namespace::V1::FairnessSpec)
+      fairness: T.nilable(Temporalio::Api::Cloud::Namespace::V1::FairnessSpec),
+      encryption_validation: T.nilable(Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec),
+      description: T.nilable(String)
     ).void
   end
   def initialize(
@@ -1069,7 +1208,9 @@ class Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec
     connectivity_rule_ids: [],
     capacity_spec: nil,
     replicas: [],
-    fairness: nil
+    fairness: nil,
+    encryption_validation: nil,
+    description: ""
   )
   end
 
@@ -1416,6 +1557,51 @@ class Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec
 # temporal:versioning:min_version=v0.14.0
   sig { void }
   def clear_fairness
+  end
+
+  # The payload encryption validation configuration for the namespace.
+# If unspecified, payload encryption validation will be disabled.
+# temporal:versioning:min_version=v0.23.0
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec)) }
+  def encryption_validation
+  end
+
+  # The payload encryption validation configuration for the namespace.
+# If unspecified, payload encryption validation will be disabled.
+# temporal:versioning:min_version=v0.23.0
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec)).void }
+  def encryption_validation=(value)
+  end
+
+  # The payload encryption validation configuration for the namespace.
+# If unspecified, payload encryption validation will be disabled.
+# temporal:versioning:min_version=v0.23.0
+  sig { void }
+  def clear_encryption_validation
+  end
+
+  # The description is a human-readable description of the namespace purpose.
+# Must be at most 255 printable ASCII characters plus whitespace.
+# Optional, default is empty.
+# temporal:versioning:min_version=v0.21.0
+  sig { returns(String) }
+  def description
+  end
+
+  # The description is a human-readable description of the namespace purpose.
+# Must be at most 255 printable ASCII characters plus whitespace.
+# Optional, default is empty.
+# temporal:versioning:min_version=v0.21.0
+  sig { params(value: String).void }
+  def description=(value)
+  end
+
+  # The description is a human-readable description of the namespace purpose.
+# Must be at most 255 printable ASCII characters plus whitespace.
+# Optional, default is empty.
+# temporal:versioning:min_version=v0.21.0
+  sig { void }
+  def clear_description
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1795,7 +1981,8 @@ class Temporalio::Api::Cloud::Namespace::V1::Namespace
       connectivity_rules: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRule)]),
       tags: T.nilable(T::Hash[String, String]),
       capacity: T.nilable(Temporalio::Api::Cloud::Namespace::V1::Capacity),
-      replicas: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Namespace::V1::Replica)])
+      replicas: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Namespace::V1::Replica)]),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -1815,7 +2002,8 @@ class Temporalio::Api::Cloud::Namespace::V1::Namespace
     connectivity_rules: [],
     tags: ::Google::Protobuf::Map.new(:string, :string),
     capacity: nil,
-    replicas: []
+    replicas: [],
+    project_id: ""
   )
   end
 
@@ -2107,6 +2295,21 @@ class Temporalio::Api::Cloud::Namespace::V1::Namespace
   def clear_replicas
   end
 
+  # The id of the project this namespace belongs to.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project this namespace belongs to.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project this namespace belongs to.
+  sig { void }
+  def clear_project_id
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -2132,6 +2335,438 @@ class Temporalio::Api::Cloud::Namespace::V1::Namespace
   end
 
   sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::Namespace, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The caller rate limit resource.
+# A caller rate limit sets a request per second limit for a caller making requests to a target namespace.
+# The 'target namespace' is the namespace being protected.
+class Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      id: T.nilable(String),
+      resource_version: T.nilable(String),
+      spec: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec),
+      state: T.nilable(T.any(Symbol, String, Integer)),
+      async_operation_id: T.nilable(String),
+      created_time: T.nilable(Google::Protobuf::Timestamp),
+      last_modified_time: T.nilable(Google::Protobuf::Timestamp),
+      namespace: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    id: "",
+    resource_version: "",
+    spec: nil,
+    state: :RESOURCE_STATE_UNSPECIFIED,
+    async_operation_id: "",
+    created_time: nil,
+    last_modified_time: nil,
+    namespace: ""
+  )
+  end
+
+  # The id of the caller rate limit. This is generated by the server and is immutable.
+  sig { returns(String) }
+  def id
+  end
+
+  # The id of the caller rate limit. This is generated by the server and is immutable.
+  sig { params(value: String).void }
+  def id=(value)
+  end
+
+  # The id of the caller rate limit. This is generated by the server and is immutable.
+  sig { void }
+  def clear_id
+  end
+
+  # The current version of the caller rate limit specification.
+# The next update or delete operations must include this version.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The current version of the caller rate limit specification.
+# The next update or delete operations must include this version.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The current version of the caller rate limit specification.
+# The next update or delete operations must include this version.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The caller rate limit specification.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)) }
+  def spec
+  end
+
+  # The caller rate limit specification.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)).void }
+  def spec=(value)
+  end
+
+  # The caller rate limit specification.
+  sig { void }
+  def clear_spec
+  end
+
+  # The current state of the caller rate limit.
+  sig { returns(T.any(Symbol, Integer)) }
+  def state
+  end
+
+  # The current state of the caller rate limit.
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def state=(value)
+  end
+
+  # The current state of the caller rate limit.
+  sig { void }
+  def clear_state
+  end
+
+  # The id of any ongoing operation that is creating, updating, or deleting the caller rate limit.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id of any ongoing operation that is creating, updating, or deleting the caller rate limit.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id of any ongoing operation that is creating, updating, or deleting the caller rate limit.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  # The date and time when the caller rate limit was created.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def created_time
+  end
+
+  # The date and time when the caller rate limit was created.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def created_time=(value)
+  end
+
+  # The date and time when the caller rate limit was created.
+  sig { void }
+  def clear_created_time
+  end
+
+  # The date and time when the caller rate limit was last modified.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def last_modified_time
+  end
+
+  # The date and time when the caller rate limit was last modified.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def last_modified_time=(value)
+  end
+
+  # The date and time when the caller rate limit was last modified.
+  sig { void }
+  def clear_last_modified_time
+  end
+
+  # The target namespace. This is immutable.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace. This is immutable.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace. This is immutable.
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The specification for a caller rate limit.
+class Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace_default: T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit),
+      namespace_limit: T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit)
+    ).void
+  end
+  def initialize(
+    namespace_default: nil,
+    namespace_limit: nil
+  )
+  end
+
+  # The default rate limit for namespace callers that do not match a specific rule.
+# The target namespace can have at most one namespace default limit.
+# A default rate limit is not required, and unmatched namespaces will not have a caller rate limit.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit)) }
+  def namespace_default
+  end
+
+  # The default rate limit for namespace callers that do not match a specific rule.
+# The target namespace can have at most one namespace default limit.
+# A default rate limit is not required, and unmatched namespaces will not have a caller rate limit.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit)).void }
+  def namespace_default=(value)
+  end
+
+  # The default rate limit for namespace callers that do not match a specific rule.
+# The target namespace can have at most one namespace default limit.
+# A default rate limit is not required, and unmatched namespaces will not have a caller rate limit.
+  sig { void }
+  def clear_namespace_default
+  end
+
+  # A rate limit rule that matches a specific caller namespace.
+# The target namespace can have at most one matching rule for each caller namespace.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit)) }
+  def namespace_limit
+  end
+
+  # A rate limit rule that matches a specific caller namespace.
+# The target namespace can have at most one matching rule for each caller namespace.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit)).void }
+  def namespace_limit=(value)
+  end
+
+  # A rate limit rule that matches a specific caller namespace.
+# The target namespace can have at most one matching rule for each caller namespace.
+  sig { void }
+  def clear_namespace_limit
+  end
+
+  sig { returns(T.nilable(Symbol)) }
+  def rule
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The limit for a specific calling namespace.
+class Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace_id: T.nilable(String),
+      rps: T.nilable(Float)
+    ).void
+  end
+  def initialize(
+    namespace_id: "",
+    rps: 0.0
+  )
+  end
+
+  # The calling namespace to match exactly.
+# Required. Immutable.
+  sig { returns(String) }
+  def namespace_id
+  end
+
+  # The calling namespace to match exactly.
+# Required. Immutable.
+  sig { params(value: String).void }
+  def namespace_id=(value)
+  end
+
+  # The calling namespace to match exactly.
+# Required. Immutable.
+  sig { void }
+  def clear_namespace_id
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic from this caller.
+  sig { returns(Float) }
+  def rps
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic from this caller.
+  sig { params(value: Float).void }
+  def rps=(value)
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic from this caller.
+  sig { void }
+  def clear_rps
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::NamespaceCallerRateLimit, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The default limit for calling namespaces.
+class Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      rps: T.nilable(Float)
+    ).void
+  end
+  def initialize(
+    rps: 0.0
+  )
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic.
+  sig { returns(Float) }
+  def rps
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic.
+  sig { params(value: Float).void }
+  def rps=(value)
+  end
+
+  # The number of requests per second that are allowed.
+# Must be non-negative and finite. A value of 0 denies all traffic.
+  sig { void }
+  def clear_rps
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::NamespaceDefaultCallerRateLimit, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -2263,14 +2898,18 @@ class Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec
       name: T.nilable(String),
       enabled: T.nilable(T::Boolean),
       s3: T.nilable(Temporalio::Api::Cloud::Sink::V1::S3Spec),
-      gcs: T.nilable(Temporalio::Api::Cloud::Sink::V1::GCSSpec)
+      gcs: T.nilable(Temporalio::Api::Cloud::Sink::V1::GCSSpec),
+      azure_blob: T.nilable(Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec),
+      filter: T.nilable(Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter)
     ).void
   end
   def initialize(
     name: "",
     enabled: false,
     s3: nil,
-    gcs: nil
+    gcs: nil,
+    azure_blob: nil,
+    filter: nil
   )
   end
 
@@ -2319,22 +2958,55 @@ class Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec
   def clear_s3
   end
 
-  # This is a feature under development. We will allow GCS sink support for GCP Namespaces.
-# The GCS configuration details when destination_type is GCS.
+  # The GCS configuration details when destination_type is GCS.
   sig { returns(T.nilable(Temporalio::Api::Cloud::Sink::V1::GCSSpec)) }
   def gcs
   end
 
-  # This is a feature under development. We will allow GCS sink support for GCP Namespaces.
-# The GCS configuration details when destination_type is GCS.
+  # The GCS configuration details when destination_type is GCS.
   sig { params(value: T.nilable(Temporalio::Api::Cloud::Sink::V1::GCSSpec)).void }
   def gcs=(value)
   end
 
-  # This is a feature under development. We will allow GCS sink support for GCP Namespaces.
-# The GCS configuration details when destination_type is GCS.
+  # The GCS configuration details when destination_type is GCS.
   sig { void }
   def clear_gcs
+  end
+
+  # The Azure Blob configuration details when destination_type is Azure Blob.
+# temporal:versioning:min_version=v0.19.1
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec)) }
+  def azure_blob
+  end
+
+  # The Azure Blob configuration details when destination_type is Azure Blob.
+# temporal:versioning:min_version=v0.19.1
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Sink::V1::AzureBlobSpec)).void }
+  def azure_blob=(value)
+  end
+
+  # The Azure Blob configuration details when destination_type is Azure Blob.
+# temporal:versioning:min_version=v0.19.1
+  sig { void }
+  def clear_azure_blob
+  end
+
+  # The filter configuration for controlling which events are exported.
+# temporal:versioning:min_version=v0.25.0
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter)) }
+  def filter
+  end
+
+  # The filter configuration for controlling which events are exported.
+# temporal:versioning:min_version=v0.25.0
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter)).void }
+  def filter=(value)
+  end
+
+  # The filter configuration for controlling which events are exported.
+# temporal:versioning:min_version=v0.25.0
+  sig { void }
+  def clear_filter
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2590,19 +3262,16 @@ class Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo
   end
 
   # Whether the namespace's APS limit was set by Temporal Support.
-# When true, adjusting the namespace's capacity will reset this limit.
   sig { returns(T::Boolean) }
   def has_legacy_limits
   end
 
   # Whether the namespace's APS limit was set by Temporal Support.
-# When true, adjusting the namespace's capacity will reset this limit.
   sig { params(value: T::Boolean).void }
   def has_legacy_limits=(value)
   end
 
   # Whether the namespace's APS limit was set by Temporal Support.
-# When true, adjusting the namespace's capacity will reset this limit.
   sig { void }
   def clear_has_legacy_limits
   end
@@ -3175,6 +3844,68 @@ class Temporalio::Api::Cloud::Namespace::V1::Capacity::Request
   end
 end
 
+class Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      disable_standalone_activity_export: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    disable_standalone_activity_export: false
+  )
+  end
+
+  # Whether to disable export of standalone activity events.
+  sig { returns(T::Boolean) }
+  def disable_standalone_activity_export
+  end
+
+  # Whether to disable export of standalone activity events.
+  sig { params(value: T::Boolean).void }
+  def disable_standalone_activity_export=(value)
+  end
+
+  # Whether to disable export of standalone activity events.
+  sig { void }
+  def clear_disable_standalone_activity_export
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Namespace::V1::ExportSinkSpec::SinkFilter, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Namespace::V1::NamespaceCapacityInfo::CapacityModeOptions
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -3581,6 +4312,25 @@ module Temporalio::Api::Cloud::Namespace::V1::Capacity::Request::State
   self::STATE_CAPACITY_REQUEST_COMPLETED = T.let(1, Integer)
   self::STATE_CAPACITY_REQUEST_IN_PROGRESS = T.let(2, Integer)
   self::STATE_CAPACITY_REQUEST_FAILED = T.let(3, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Cloud::Namespace::V1::EncryptionValidationSpec::EncryptionValidationMode
+  self::ENCRYPTION_VALIDATION_MODE_UNSPECIFIED = T.let(0, Integer)
+  self::ENCRYPTION_VALIDATION_MODE_DISABLED = T.let(1, Integer)
+  self::ENCRYPTION_VALIDATION_MODE_WARN = T.let(2, Integer)
+  self::ENCRYPTION_VALIDATION_MODE_DENY = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

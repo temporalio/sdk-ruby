@@ -21,6 +21,15 @@ class Temporalio::Client::Connection::OperatorService < ::Temporalio::Client::Co
   sig { params(request: Temporalio::Api::OperatorService::V1::DeleteNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse) }
   def delete_namespace(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse) }
+  def soft_delete_namespace(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse) }
+  def restore_namespace(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse) }
+  def describe_namespace_restore(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterResponse) }
   def add_or_update_remote_cluster(request, rpc_options: T.unsafe(nil)); end
 

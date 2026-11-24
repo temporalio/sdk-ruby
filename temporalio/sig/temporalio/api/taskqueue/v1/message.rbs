@@ -74,12 +74,11 @@ module Temporalio
               ("max_tasks_per_second" name, ::Google::Protobuf::DoubleValue? value) -> void
         end
 
-        # Worker-reported state about the poller pool issuing a poll, used by the server to spread
-        # poller scaling suggestions across a fleet.
+        # Worker-reported state about the poller pool issuing a poll.
         class PollerPoolInfo < ::Google::Protobuf::AbstractMessage
 
-          # Number of concurrent poll requests this worker is currently targeting for this task
-          # queue and task type. 0 if unknown, such as a poller pool of fixed size.
+          # Number of pollers this worker is targeting for this task queue and task type.
+          # 0 if unknown, such as a poller pool of fixed size.
           attr_reader target_pollers(): ::Integer
           attr_writer target_pollers(): ::Integer | ::Float
           def clear_target_pollers: () -> void
@@ -961,6 +960,31 @@ module Temporalio
               ("requests_per_second" name, (::Float | ::Integer) value) -> void
         end
 
+        class ConcurrencyLimit < ::Google::Protobuf::AbstractMessage
+
+          # Maximum number of concurrent tasks that may be running at a time across the scope of the
+          # limit. e.g. in TaskQueueConfig, the scope is the whole task queue.
+          # Note that in situations like network partitions, the server's idea of what is running on
+          # workers may be out of date, and this limit could be exceeded from the point of view of
+          # workers.
+          attr_reader concurrent_tasks(): ::Integer
+          attr_writer concurrent_tasks(): ::Integer | ::Float
+          def clear_concurrent_tasks: () -> void
+
+          type init_map = {
+            concurrent_tasks: (::Integer | ::Float)?,
+            "concurrent_tasks" => (::Integer | ::Float)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("concurrent_tasks" name) -> ::Integer
+
+          def []=:
+              ("concurrent_tasks" name, (::Integer | ::Float) value) -> void
+        end
+
         class ConfigMetadata < ::Google::Protobuf::AbstractMessage
 
           # Reason for why the config was set.
@@ -1030,9 +1054,37 @@ module Temporalio
             | ("metadata" name, ::Temporalio::Api::TaskQueue::V1::ConfigMetadata? value) -> void
         end
 
+        class ConcurrencyLimitConfig < ::Google::Protobuf::AbstractMessage
+
+          attr_accessor concurrency_limit(): ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit?
+          def has_concurrency_limit?: () -> bool
+          def clear_concurrency_limit: () -> void
+
+          attr_accessor metadata(): ::Temporalio::Api::TaskQueue::V1::ConfigMetadata?
+          def has_metadata?: () -> bool
+          def clear_metadata: () -> void
+
+          type init_map = {
+            concurrency_limit: (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit::init_map)?,
+            "concurrency_limit" => (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit::init_map)?,
+            metadata: (::Temporalio::Api::TaskQueue::V1::ConfigMetadata | ::Temporalio::Api::TaskQueue::V1::ConfigMetadata::init_map)?,
+            "metadata" => (::Temporalio::Api::TaskQueue::V1::ConfigMetadata | ::Temporalio::Api::TaskQueue::V1::ConfigMetadata::init_map)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("concurrency_limit" name) -> ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit?
+            | ("metadata" name) -> ::Temporalio::Api::TaskQueue::V1::ConfigMetadata?
+
+          def []=:
+              ("concurrency_limit" name, ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimit? value) -> void
+            | ("metadata" name, ::Temporalio::Api::TaskQueue::V1::ConfigMetadata? value) -> void
+        end
+
         class TaskQueueConfig < ::Google::Protobuf::AbstractMessage
 
-          # Unless modified, this is the system-defined rate limit.
+          # Rate limit for the whole queue.
           attr_accessor queue_rate_limit(): ::Temporalio::Api::TaskQueue::V1::RateLimitConfig?
           def has_queue_rate_limit?: () -> bool
           def clear_queue_rate_limit: () -> void
@@ -1046,6 +1098,11 @@ module Temporalio
           attr_accessor fairness_weight_overrides(): ::Google::Protobuf::Map[::String, ::Float]
           def clear_fairness_weight_overrides: () -> void
 
+          # Concurrency limit for the whole queue.
+          attr_accessor queue_concurrency_limit(): ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig?
+          def has_queue_concurrency_limit?: () -> bool
+          def clear_queue_concurrency_limit: () -> void
+
           type init_map = {
             queue_rate_limit: (::Temporalio::Api::TaskQueue::V1::RateLimitConfig | ::Temporalio::Api::TaskQueue::V1::RateLimitConfig::init_map)?,
             "queue_rate_limit" => (::Temporalio::Api::TaskQueue::V1::RateLimitConfig | ::Temporalio::Api::TaskQueue::V1::RateLimitConfig::init_map)?,
@@ -1053,6 +1110,8 @@ module Temporalio
             "fairness_keys_rate_limit_default" => (::Temporalio::Api::TaskQueue::V1::RateLimitConfig | ::Temporalio::Api::TaskQueue::V1::RateLimitConfig::init_map)?,
             fairness_weight_overrides: ::Hash[::String | ::Symbol, ::Float | ::Integer]?,
             "fairness_weight_overrides" => ::Hash[::String | ::Symbol, ::Float | ::Integer]?,
+            queue_concurrency_limit: (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig::init_map)?,
+            "queue_concurrency_limit" => (::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig | ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig::init_map)?,
           }
 
           def initialize: (?init_map initial_value) -> void
@@ -1061,11 +1120,13 @@ module Temporalio
               ("queue_rate_limit" name) -> ::Temporalio::Api::TaskQueue::V1::RateLimitConfig?
             | ("fairness_keys_rate_limit_default" name) -> ::Temporalio::Api::TaskQueue::V1::RateLimitConfig?
             | ("fairness_weight_overrides" name) -> (::Google::Protobuf::Map[::String, ::Float])
+            | ("queue_concurrency_limit" name) -> ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig?
 
           def []=:
               ("queue_rate_limit" name, ::Temporalio::Api::TaskQueue::V1::RateLimitConfig? value) -> void
             | ("fairness_keys_rate_limit_default" name, ::Temporalio::Api::TaskQueue::V1::RateLimitConfig? value) -> void
             | ("fairness_weight_overrides" name, (::Google::Protobuf::Map[::String, ::Float]) value) -> void
+            | ("queue_concurrency_limit" name, ::Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig? value) -> void
         end
       end
     end

@@ -31,6 +31,26 @@ module Temporalio
                 ("accepted_client_ca" name, ::String value) -> void
           end
 
+          class AuthenticationSettings < ::Google::Protobuf::AbstractMessage
+
+            # Restricts Cloud web UI session lifetimes for users in this account.
+            attr_accessor restrict_session_lifetimes(): bool
+            def clear_restrict_session_lifetimes: () -> void
+
+            type init_map = {
+              restrict_session_lifetimes: bool?,
+              "restrict_session_lifetimes" => bool?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("restrict_session_lifetimes" name) -> bool
+
+            def []=:
+                ("restrict_session_lifetimes" name, bool value) -> void
+          end
+
           class AccountSpec < ::Google::Protobuf::AbstractMessage
 
             # The metrics specification for this account.
@@ -39,18 +59,28 @@ module Temporalio
             def has_metrics?: () -> bool
             def clear_metrics: () -> void
 
+            # Authentication settings for this account.
+            # temporal:versioning:min_version=v0.20.0
+            attr_accessor authentication_settings(): ::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings?
+            def has_authentication_settings?: () -> bool
+            def clear_authentication_settings: () -> void
+
             type init_map = {
               metrics: (::Temporalio::Api::Cloud::Account::V1::MetricsSpec | ::Temporalio::Api::Cloud::Account::V1::MetricsSpec::init_map)?,
               "metrics" => (::Temporalio::Api::Cloud::Account::V1::MetricsSpec | ::Temporalio::Api::Cloud::Account::V1::MetricsSpec::init_map)?,
+              authentication_settings: (::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings | ::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings::init_map)?,
+              "authentication_settings" => (::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings | ::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings::init_map)?,
             }
 
             def initialize: (?init_map initial_value) -> void
 
             def []:
                 ("metrics" name) -> ::Temporalio::Api::Cloud::Account::V1::MetricsSpec?
+              | ("authentication_settings" name) -> ::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings?
 
             def []=:
                 ("metrics" name, ::Temporalio::Api::Cloud::Account::V1::MetricsSpec? value) -> void
+              | ("authentication_settings" name, ::Temporalio::Api::Cloud::Account::V1::AuthenticationSettings? value) -> void
           end
 
           class Metrics < ::Google::Protobuf::AbstractMessage

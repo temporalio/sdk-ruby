@@ -21,6 +21,18 @@ module Temporalio
           Temporalio::Api::OperatorService::V1::DeleteNamespaceRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse
+        def soft_delete_namespace: (
+          Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse
+        def restore_namespace: (
+          Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse
+        def describe_namespace_restore: (
+          Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse
         def add_or_update_remote_cluster: (
           Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest request,
           ?rpc_options: RPCOptions?

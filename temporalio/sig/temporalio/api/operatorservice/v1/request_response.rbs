@@ -198,6 +198,194 @@ module Temporalio
               ("deleted_namespace" name, (::String | ::Symbol) value) -> void
         end
 
+        class SoftDeleteNamespaceRequest < ::Google::Protobuf::AbstractMessage
+
+          # Only one of namespace or namespace_id must be specified to identify namespace.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          attr_reader namespace_id(): ::String
+          attr_writer namespace_id(): ::String | ::Symbol
+          def clear_namespace_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            namespace_id: (::String | ::Symbol)?,
+            "namespace_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("namespace_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("namespace_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class SoftDeleteNamespaceResponse < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
+
+        class RestoreNamespaceRequest < ::Google::Protobuf::AbstractMessage
+
+          # Only one of namespace or namespace_id must be specified to identify namespace.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          attr_reader namespace_id(): ::String
+          attr_writer namespace_id(): ::String | ::Symbol
+          def clear_namespace_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            namespace_id: (::String | ::Symbol)?,
+            "namespace_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("namespace_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("namespace_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class RestoreNamespaceResponse < ::Google::Protobuf::AbstractMessage
+
+          type init_map = {
+          }
+
+          def initialize: (?init_map initial_value) -> void
+        end
+
+        class DescribeNamespaceRestoreRequest < ::Google::Protobuf::AbstractMessage
+
+          # Only one of namespace or namespace_id must be specified to identify namespace.
+          attr_reader namespace(): ::String
+          attr_writer namespace(): ::String | ::Symbol
+          def clear_namespace: () -> void
+
+          attr_reader namespace_id(): ::String
+          attr_writer namespace_id(): ::String | ::Symbol
+          def clear_namespace_id: () -> void
+
+          type init_map = {
+            namespace: (::String | ::Symbol)?,
+            "namespace" => (::String | ::Symbol)?,
+            namespace_id: (::String | ::Symbol)?,
+            "namespace_id" => (::String | ::Symbol)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("namespace" name) -> ::String
+            | ("namespace_id" name) -> ::String
+
+          def []=:
+              ("namespace" name, (::String | ::Symbol) value) -> void
+            | ("namespace_id" name, (::String | ::Symbol) value) -> void
+        end
+
+        class DescribeNamespaceRestoreResponse < ::Google::Protobuf::AbstractMessage
+
+          attr_reader state(): ::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Integer
+          attr_writer state(): ::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Temporalio::Api::Enums::V1::NamespaceRestoreState::strings | ::Integer | ::Float
+          attr_reader state_const(): ::Integer
+          def clear_state: () -> void
+
+          # Cluster that runs the restore job.
+          attr_reader host_cluster(): ::String
+          attr_writer host_cluster(): ::String | ::Symbol
+          def clear_host_cluster: () -> void
+
+          attr_reader start_time(): ::Google::Protobuf::Timestamp?
+          attr_writer start_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_start_time?: () -> bool
+          def clear_start_time: () -> void
+
+          # Unset while the restore is running.
+          attr_reader close_time(): ::Google::Protobuf::Timestamp?
+          attr_writer close_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_close_time?: () -> bool
+          def clear_close_time: () -> void
+
+          # Run ID of the restore job.
+          attr_reader run_id(): ::String
+          attr_writer run_id(): ::String | ::Symbol
+          def clear_run_id: () -> void
+
+          # Estimated when the refresh starts.
+          attr_reader total_execution_count(): ::Integer
+          attr_writer total_execution_count(): ::Integer | ::Float
+          def clear_total_execution_count: () -> void
+
+          # Executions processed on every cluster.
+          attr_reader processed_execution_count(): ::Integer
+          attr_writer processed_execution_count(): ::Integer | ::Float
+          def clear_processed_execution_count: () -> void
+
+          attr_reader estimated_completion_time(): ::Google::Protobuf::Timestamp?
+          attr_writer estimated_completion_time(): (::Google::Protobuf::Timestamp | ::Time)?
+          def has_estimated_completion_time?: () -> bool
+          def clear_estimated_completion_time: () -> void
+
+          type init_map = {
+            state: (::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Temporalio::Api::Enums::V1::NamespaceRestoreState::strings | ::Integer | ::Float)?,
+            "state" => (::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Temporalio::Api::Enums::V1::NamespaceRestoreState::strings | ::Integer | ::Float)?,
+            host_cluster: (::String | ::Symbol)?,
+            "host_cluster" => (::String | ::Symbol)?,
+            start_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "start_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            close_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "close_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            run_id: (::String | ::Symbol)?,
+            "run_id" => (::String | ::Symbol)?,
+            total_execution_count: (::Integer | ::Float)?,
+            "total_execution_count" => (::Integer | ::Float)?,
+            processed_execution_count: (::Integer | ::Float)?,
+            "processed_execution_count" => (::Integer | ::Float)?,
+            estimated_completion_time: (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+            "estimated_completion_time" => (::Google::Protobuf::Timestamp | ::Google::Protobuf::Timestamp)?,
+          }
+
+          def initialize: (?init_map initial_value) -> void
+
+          def []:
+              ("state" name) -> (::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Integer)
+            | ("host_cluster" name) -> ::String
+            | ("start_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("close_time" name) -> ::Google::Protobuf::Timestamp?
+            | ("run_id" name) -> ::String
+            | ("total_execution_count" name) -> ::Integer
+            | ("processed_execution_count" name) -> ::Integer
+            | ("estimated_completion_time" name) -> ::Google::Protobuf::Timestamp?
+
+          def []=:
+              ("state" name, (::Temporalio::Api::Enums::V1::NamespaceRestoreState::names | ::Temporalio::Api::Enums::V1::NamespaceRestoreState::strings | ::Integer | ::Float) value) -> void
+            | ("host_cluster" name, (::String | ::Symbol) value) -> void
+            | ("start_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("close_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+            | ("run_id" name, (::String | ::Symbol) value) -> void
+            | ("total_execution_count" name, (::Integer | ::Float) value) -> void
+            | ("processed_execution_count" name, (::Integer | ::Float) value) -> void
+            | ("estimated_completion_time" name, ((::Google::Protobuf::Timestamp | ::Time)?) value) -> void
+        end
+
         class AddOrUpdateRemoteClusterRequest < ::Google::Protobuf::AbstractMessage
 
           # Frontend Address is a cross cluster accessible address for gRPC traffic. This field is required.

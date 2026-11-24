@@ -1709,19 +1709,22 @@ class Temporalio::Api::Schedule::V1::SchedulePatch
   def clear_unpause
   end
 
-  # If set, applies the specified time-skipping configuration to this schedule,
+  # Experimental.
+# If set, applies the specified time-skipping configuration to this schedule,
 # replacing any existing time-skipping configuration.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)) }
   def time_skipping_config
   end
 
-  # If set, applies the specified time-skipping configuration to this schedule,
+  # Experimental.
+# If set, applies the specified time-skipping configuration to this schedule,
 # replacing any existing time-skipping configuration.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingConfig)).void }
   def time_skipping_config=(value)
   end
 
-  # If set, applies the specified time-skipping configuration to this schedule,
+  # Experimental.
+# If set, applies the specified time-skipping configuration to this schedule,
 # replacing any existing time-skipping configuration.
   sig { void }
   def clear_time_skipping_config
@@ -1993,19 +1996,22 @@ class Temporalio::Api::Schedule::V1::ScheduleInfo
   def clear_state_size_bytes
   end
 
-  # Information about time skipping for this schedule.
+  # Experimental.
+# Information about time skipping for this schedule.
 # If the schedule has never enabled time skipping, this will be unset.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)) }
   def time_skipping_info
   end
 
-  # Information about time skipping for this schedule.
+  # Experimental.
+# Information about time skipping for this schedule.
 # If the schedule has never enabled time skipping, this will be unset.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)).void }
   def time_skipping_info=(value)
   end
 
-  # Information about time skipping for this schedule.
+  # Experimental.
+# Information about time skipping for this schedule.
 # If the schedule has never enabled time skipping, this will be unset.
   sig { void }
   def clear_time_skipping_info

@@ -547,6 +547,486 @@ class Temporalio::Api::OperatorService::V1::DeleteNamespaceResponse
   end
 end
 
+class Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      namespace_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    namespace_id: ""
+  )
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(String) }
+  def namespace_id
+  end
+
+  sig { params(value: String).void }
+  def namespace_id=(value)
+  end
+
+  sig { void }
+  def clear_namespace_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      namespace_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    namespace_id: ""
+  )
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(String) }
+  def namespace_id
+  end
+
+  sig { params(value: String).void }
+  def namespace_id=(value)
+  end
+
+  sig { void }
+  def clear_namespace_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      namespace_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    namespace_id: ""
+  )
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # Only one of namespace or namespace_id must be specified to identify namespace.
+  sig { void }
+  def clear_namespace
+  end
+
+  sig { returns(String) }
+  def namespace_id
+  end
+
+  sig { params(value: String).void }
+  def namespace_id=(value)
+  end
+
+  sig { void }
+  def clear_namespace_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      state: T.nilable(T.any(Symbol, String, Integer)),
+      host_cluster: T.nilable(String),
+      start_time: T.nilable(Google::Protobuf::Timestamp),
+      close_time: T.nilable(Google::Protobuf::Timestamp),
+      run_id: T.nilable(String),
+      total_execution_count: T.nilable(Integer),
+      processed_execution_count: T.nilable(Integer),
+      estimated_completion_time: T.nilable(Google::Protobuf::Timestamp)
+    ).void
+  end
+  def initialize(
+    state: :NAMESPACE_RESTORE_STATE_UNSPECIFIED,
+    host_cluster: "",
+    start_time: nil,
+    close_time: nil,
+    run_id: "",
+    total_execution_count: 0,
+    processed_execution_count: 0,
+    estimated_completion_time: nil
+  )
+  end
+
+  sig { returns(T.any(Symbol, Integer)) }
+  def state
+  end
+
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def state=(value)
+  end
+
+  sig { void }
+  def clear_state
+  end
+
+  # Cluster that runs the restore job.
+  sig { returns(String) }
+  def host_cluster
+  end
+
+  # Cluster that runs the restore job.
+  sig { params(value: String).void }
+  def host_cluster=(value)
+  end
+
+  # Cluster that runs the restore job.
+  sig { void }
+  def clear_host_cluster
+  end
+
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def start_time
+  end
+
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def start_time=(value)
+  end
+
+  sig { void }
+  def clear_start_time
+  end
+
+  # Unset while the restore is running.
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def close_time
+  end
+
+  # Unset while the restore is running.
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def close_time=(value)
+  end
+
+  # Unset while the restore is running.
+  sig { void }
+  def clear_close_time
+  end
+
+  # Run ID of the restore job.
+  sig { returns(String) }
+  def run_id
+  end
+
+  # Run ID of the restore job.
+  sig { params(value: String).void }
+  def run_id=(value)
+  end
+
+  # Run ID of the restore job.
+  sig { void }
+  def clear_run_id
+  end
+
+  # Estimated when the refresh starts.
+  sig { returns(Integer) }
+  def total_execution_count
+  end
+
+  # Estimated when the refresh starts.
+  sig { params(value: Integer).void }
+  def total_execution_count=(value)
+  end
+
+  # Estimated when the refresh starts.
+  sig { void }
+  def clear_total_execution_count
+  end
+
+  # Executions processed on every cluster.
+  sig { returns(Integer) }
+  def processed_execution_count
+  end
+
+  # Executions processed on every cluster.
+  sig { params(value: Integer).void }
+  def processed_execution_count=(value)
+  end
+
+  # Executions processed on every cluster.
+  sig { void }
+  def clear_processed_execution_count
+  end
+
+  sig { returns(T.nilable(Google::Protobuf::Timestamp)) }
+  def estimated_completion_time
+  end
+
+  sig { params(value: T.nilable(Google::Protobuf::Timestamp)).void }
+  def estimated_completion_time=(value)
+  end
+
+  sig { void }
+  def clear_estimated_completion_time
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::OperatorService::V1::AddOrUpdateRemoteClusterRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods

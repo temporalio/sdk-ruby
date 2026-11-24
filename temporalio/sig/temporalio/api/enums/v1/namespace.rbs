@@ -19,15 +19,43 @@ module Temporalio
 
           NAMESPACE_STATE_DELETED: 3
 
+          # Set by OperatorService.SoftDeleteNamespace. Executions make no progress, but no data is
+          # removed until the namespace is restored or deleted.
+          NAMESPACE_STATE_SOFT_DELETED: 4
+
           def self.lookup: (::Integer number) -> ::Symbol
 
 
           def self.resolve: (::Symbol name) -> ::Integer
 
 
-          type names = :NAMESPACE_STATE_UNSPECIFIED | :NAMESPACE_STATE_REGISTERED | :NAMESPACE_STATE_DEPRECATED | :NAMESPACE_STATE_DELETED
+          type names = :NAMESPACE_STATE_UNSPECIFIED | :NAMESPACE_STATE_REGISTERED | :NAMESPACE_STATE_DEPRECATED | :NAMESPACE_STATE_DELETED | :NAMESPACE_STATE_SOFT_DELETED
 
-          type strings = "NAMESPACE_STATE_UNSPECIFIED" | "NAMESPACE_STATE_REGISTERED" | "NAMESPACE_STATE_DEPRECATED" | "NAMESPACE_STATE_DELETED"
+          type strings = "NAMESPACE_STATE_UNSPECIFIED" | "NAMESPACE_STATE_REGISTERED" | "NAMESPACE_STATE_DEPRECATED" | "NAMESPACE_STATE_DELETED" | "NAMESPACE_STATE_SOFT_DELETED"
+
+          type numbers = 0 | 1 | 2 | 3 | 4
+        end
+
+        # State of a restore started by OperatorService.RestoreNamespace.
+        module NamespaceRestoreState
+
+          NAMESPACE_RESTORE_STATE_UNSPECIFIED: 0
+
+          NAMESPACE_RESTORE_STATE_RUNNING: 1
+
+          NAMESPACE_RESTORE_STATE_COMPLETED: 2
+
+          NAMESPACE_RESTORE_STATE_FAILED: 3
+
+          def self.lookup: (::Integer number) -> ::Symbol
+
+
+          def self.resolve: (::Symbol name) -> ::Integer
+
+
+          type names = :NAMESPACE_RESTORE_STATE_UNSPECIFIED | :NAMESPACE_RESTORE_STATE_RUNNING | :NAMESPACE_RESTORE_STATE_COMPLETED | :NAMESPACE_RESTORE_STATE_FAILED
+
+          type strings = "NAMESPACE_RESTORE_STATE_UNSPECIFIED" | "NAMESPACE_RESTORE_STATE_RUNNING" | "NAMESPACE_RESTORE_STATE_COMPLETED" | "NAMESPACE_RESTORE_STATE_FAILED"
 
           type numbers = 0 | 1 | 2 | 3
         end

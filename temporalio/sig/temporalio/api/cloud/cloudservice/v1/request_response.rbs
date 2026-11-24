@@ -85,6 +85,11 @@ module Temporalio
             attr_writer namespace(): ::String | ::Symbol
             def clear_namespace: () -> void
 
+            # Whether to include each user's group memberships in the response - optional.
+            # Defaults to false.
+            attr_accessor include_group_memberships(): bool
+            def clear_include_group_memberships: () -> void
+
             type init_map = {
               page_size: (::Integer | ::Float)?,
               "page_size" => (::Integer | ::Float)?,
@@ -94,6 +99,8 @@ module Temporalio
               "email" => (::String | ::Symbol)?,
               namespace: (::String | ::Symbol)?,
               "namespace" => (::String | ::Symbol)?,
+              include_group_memberships: bool?,
+              "include_group_memberships" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -103,12 +110,14 @@ module Temporalio
               | ("page_token" name) -> ::String
               | ("email" name) -> ::String
               | ("namespace" name) -> ::String
+              | ("include_group_memberships" name) -> bool
 
             def []=:
                 ("page_size" name, (::Integer | ::Float) value) -> void
               | ("page_token" name, (::String | ::Symbol) value) -> void
               | ("email" name, (::String | ::Symbol) value) -> void
               | ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("include_group_memberships" name, bool value) -> void
           end
 
           class GetUsersResponse < ::Google::Protobuf::AbstractMessage
@@ -147,18 +156,27 @@ module Temporalio
             attr_writer user_id(): ::String | ::Symbol
             def clear_user_id: () -> void
 
+            # Whether to include the user's group memberships in the response - optional.
+            # Defaults to false.
+            attr_accessor include_group_memberships(): bool
+            def clear_include_group_memberships: () -> void
+
             type init_map = {
               user_id: (::String | ::Symbol)?,
               "user_id" => (::String | ::Symbol)?,
+              include_group_memberships: bool?,
+              "include_group_memberships" => bool?,
             }
 
             def initialize: (?init_map initial_value) -> void
 
             def []:
                 ("user_id" name) -> ::String
+              | ("include_group_memberships" name) -> bool
 
             def []=:
                 ("user_id" name, (::String | ::Symbol) value) -> void
+              | ("include_group_memberships" name, bool value) -> void
           end
 
           class GetUserResponse < ::Google::Protobuf::AbstractMessage
@@ -512,6 +530,12 @@ module Temporalio
             attr_accessor tags(): ::Google::Protobuf::Map[::String, ::String]
             def clear_tags: () -> void
 
+            # The id of the project to create the namespace in - optional.
+            # If not set, the namespace will be created in the account's default project.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               spec: (::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec::init_map)?,
               "spec" => (::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec | ::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec::init_map)?,
@@ -519,6 +543,8 @@ module Temporalio
               "async_operation_id" => (::String | ::Symbol)?,
               tags: ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
               "tags" => ::Hash[::String | ::Symbol, ::String | ::Symbol]?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -527,11 +553,13 @@ module Temporalio
                 ("spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec?
               | ("async_operation_id" name) -> ::String
               | ("tags" name) -> (::Google::Protobuf::Map[::String, ::String])
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("spec" name, ::Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec? value) -> void
               | ("async_operation_id" name, (::String | ::Symbol) value) -> void
               | ("tags" name, (::Google::Protobuf::Map[::String, ::String]) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class CreateNamespaceResponse < ::Google::Protobuf::AbstractMessage
@@ -585,6 +613,11 @@ module Temporalio
             attr_writer name(): ::String | ::Symbol
             def clear_name: () -> void
 
+            # Filter namespaces by project id - optional.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               page_size: (::Integer | ::Float)?,
               "page_size" => (::Integer | ::Float)?,
@@ -592,6 +625,8 @@ module Temporalio
               "page_token" => (::String | ::Symbol)?,
               name: (::String | ::Symbol)?,
               "name" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -600,11 +635,13 @@ module Temporalio
                 ("page_size" name) -> ::Integer
               | ("page_token" name) -> ::String
               | ("name" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("page_size" name, (::Integer | ::Float) value) -> void
               | ("page_token" name, (::String | ::Symbol) value) -> void
               | ("name" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class GetNamespacesResponse < ::Google::Protobuf::AbstractMessage
@@ -1531,6 +1568,11 @@ module Temporalio
             attr_writer name(): ::String | ::Symbol
             def clear_name: () -> void
 
+            # Filter endpoints by their project id - optional.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               page_size: (::Integer | ::Float)?,
               "page_size" => (::Integer | ::Float)?,
@@ -1542,6 +1584,8 @@ module Temporalio
               "target_task_queue" => (::String | ::Symbol)?,
               name: (::String | ::Symbol)?,
               "name" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1552,6 +1596,7 @@ module Temporalio
               | ("target_namespace_id" name) -> ::String
               | ("target_task_queue" name) -> ::String
               | ("name" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("page_size" name, (::Integer | ::Float) value) -> void
@@ -1559,6 +1604,7 @@ module Temporalio
               | ("target_namespace_id" name, (::String | ::Symbol) value) -> void
               | ("target_task_queue" name, (::String | ::Symbol) value) -> void
               | ("name" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class GetNexusEndpointsResponse < ::Google::Protobuf::AbstractMessage
@@ -1644,11 +1690,19 @@ module Temporalio
             attr_writer async_operation_id(): ::String | ::Symbol
             def clear_async_operation_id: () -> void
 
+            # The id of the project to associate this endpoint with - optional.
+            # If not set, the endpoint will be created in the account's default project.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               spec: (::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec | ::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec::init_map)?,
               "spec" => (::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec | ::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec::init_map)?,
               async_operation_id: (::String | ::Symbol)?,
               "async_operation_id" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -1656,10 +1710,12 @@ module Temporalio
             def []:
                 ("spec" name) -> ::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec?
               | ("async_operation_id" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("spec" name, ::Temporalio::Api::Cloud::Nexus::V1::EndpointSpec? value) -> void
               | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class CreateNexusEndpointResponse < ::Google::Protobuf::AbstractMessage
@@ -1803,6 +1859,85 @@ module Temporalio
           end
 
           class DeleteNexusEndpointResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class MoveNexusEndpointToProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the nexus endpoint to move.
+            attr_reader endpoint_id(): ::String
+            attr_writer endpoint_id(): ::String | ::Symbol
+            def clear_endpoint_id: () -> void
+
+            # The id of the project to move the endpoint to.
+            attr_reader destination_project_id(): ::String
+            attr_writer destination_project_id(): ::String | ::Symbol
+            def clear_destination_project_id: () -> void
+
+            # The id of the project the caller expects the endpoint to currently belong to.
+            attr_reader expected_source_project_id(): ::String
+            attr_writer expected_source_project_id(): ::String | ::Symbol
+            def clear_expected_source_project_id: () -> void
+
+            # The version of the endpoint for which this move is intended for.
+            # The latest version can be found in the GetNexusEndpoint operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              endpoint_id: (::String | ::Symbol)?,
+              "endpoint_id" => (::String | ::Symbol)?,
+              destination_project_id: (::String | ::Symbol)?,
+              "destination_project_id" => (::String | ::Symbol)?,
+              expected_source_project_id: (::String | ::Symbol)?,
+              "expected_source_project_id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("endpoint_id" name) -> ::String
+              | ("destination_project_id" name) -> ::String
+              | ("expected_source_project_id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("endpoint_id" name, (::String | ::Symbol) value) -> void
+              | ("destination_project_id" name, (::String | ::Symbol) value) -> void
+              | ("expected_source_project_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class MoveNexusEndpointToProjectResponse < ::Google::Protobuf::AbstractMessage
 
             # The async operation
             attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
@@ -2628,6 +2763,75 @@ module Temporalio
               | ("next_page_token" name, (::String | ::Symbol) value) -> void
           end
 
+          class GetProjectScopedServiceAccountsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The project to list project scoped service accounts for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetProjectScopedServiceAccountsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of project scoped service accounts in ascending ID order.
+            attr_accessor service_accounts(): ::Google::Protobuf::RepeatedField
+            def clear_service_accounts: () -> void
+
+            # The next page token, set if there is another page.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              service_accounts: ::Array[::Temporalio::Api::Cloud::Identity::V1::ServiceAccount]?,
+              "service_accounts" => ::Array[::Temporalio::Api::Cloud::Identity::V1::ServiceAccount]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("service_accounts" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("service_accounts" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
           class UpdateServiceAccountRequest < ::Google::Protobuf::AbstractMessage
 
             # The ID of the service account to update.
@@ -3375,6 +3579,415 @@ module Temporalio
             def initialize: (?init_map initial_value) -> void
           end
 
+          class CreateCallerRateLimitRequest < ::Google::Protobuf::AbstractMessage
+
+            # The target namespace for this caller rate limit.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The caller rate limit specification.
+            # Required.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec? value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class CreateCallerRateLimitResponse < ::Google::Protobuf::AbstractMessage
+
+            # The target namespace for this caller rate limit.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The id of the created caller rate limit.
+            attr_reader caller_rate_limit_id(): ::String
+            attr_writer caller_rate_limit_id(): ::String | ::Symbol
+            def clear_caller_rate_limit_id: () -> void
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              caller_rate_limit_id: (::String | ::Symbol)?,
+              "caller_rate_limit_id" => (::String | ::Symbol)?,
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("caller_rate_limit_id" name) -> ::String
+              | ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("caller_rate_limit_id" name, (::String | ::Symbol) value) -> void
+              | ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class GetCallerRateLimitRequest < ::Google::Protobuf::AbstractMessage
+
+            # The target namespace for the caller rate limit.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The id of the caller rate limit.
+            # Required.
+            attr_reader caller_rate_limit_id(): ::String
+            attr_writer caller_rate_limit_id(): ::String | ::Symbol
+            def clear_caller_rate_limit_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              caller_rate_limit_id: (::String | ::Symbol)?,
+              "caller_rate_limit_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("caller_rate_limit_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("caller_rate_limit_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetCallerRateLimitResponse < ::Google::Protobuf::AbstractMessage
+
+            # The caller rate limit retrieved.
+            attr_accessor caller_rate_limit(): ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit?
+            def has_caller_rate_limit?: () -> bool
+            def clear_caller_rate_limit: () -> void
+
+            type init_map = {
+              caller_rate_limit: (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit::init_map)?,
+              "caller_rate_limit" => (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("caller_rate_limit" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit?
+
+            def []=:
+                ("caller_rate_limit" name, ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit? value) -> void
+          end
+
+          class GetCallerRateLimitsRequest < ::Google::Protobuf::AbstractMessage
+            class CallerFilter < ::Google::Protobuf::AbstractMessage
+
+              # The type of caller to filter on.
+              # Required when caller_filter is set. Accepted values are "namespace".
+              attr_reader caller_type(): ::String
+              attr_writer caller_type(): ::String | ::Symbol
+              def clear_caller_type: () -> void
+
+              # Optional, list the default rate limit for the type.
+              attr_accessor default(): bool
+              def clear_default: () -> void
+
+              # Optional, list the rate limit for a specific caller.
+              attr_reader caller(): ::String
+              attr_writer caller(): ::String | ::Symbol
+              def clear_caller: () -> void
+
+              type init_map = {
+                caller_type: (::String | ::Symbol)?,
+                "caller_type" => (::String | ::Symbol)?,
+                default: bool?,
+                "default" => bool?,
+                caller: (::String | ::Symbol)?,
+                "caller" => (::String | ::Symbol)?,
+              }
+
+              def initialize: (?init_map initial_value) -> void
+
+              def []:
+                  ("caller_type" name) -> ::String
+                | ("default" name) -> bool
+                | ("caller" name) -> ::String
+
+              def []=:
+                  ("caller_type" name, (::String | ::Symbol) value) -> void
+                | ("default" name, bool value) -> void
+                | ("caller" name, (::String | ::Symbol) value) -> void
+            end
+
+            # The target namespace for the caller rate limits.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The size of the page to retrieve.
+            # Optional, defaults to 100. Cannot exceed 1000.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # Optional. The page token when continuing from another response.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            # Optional. Filter the caller rate limits by caller.
+            attr_accessor caller_filter(): ::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter?
+            def has_caller_filter?: () -> bool
+            def clear_caller_filter: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+              caller_filter: (::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter | ::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter::init_map)?,
+              "caller_filter" => (::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter | ::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+              | ("caller_filter" name) -> ::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter?
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+              | ("caller_filter" name, ::Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter? value) -> void
+          end
+
+          class GetCallerRateLimitsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of caller rate limits.
+            attr_accessor caller_rate_limits(): ::Google::Protobuf::RepeatedField
+            def clear_caller_rate_limits: () -> void
+
+            # The page token to list the next page of rate limits.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              caller_rate_limits: ::Array[::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit]?,
+              "caller_rate_limits" => ::Array[::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("caller_rate_limits" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("caller_rate_limits" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateCallerRateLimitRequest < ::Google::Protobuf::AbstractMessage
+
+            # The target namespace for the caller rate limit.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The id of the caller rate limit.
+            # Required.
+            attr_reader caller_rate_limit_id(): ::String
+            attr_writer caller_rate_limit_id(): ::String | ::Symbol
+            def clear_caller_rate_limit_id: () -> void
+
+            # The updated caller rate limit specification.
+            # Required.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The version of the caller rate limit spec being updated.
+            # The latest version can be found in the GetCallerRateLimit operation response.
+            # Required.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              caller_rate_limit_id: (::String | ::Symbol)?,
+              "caller_rate_limit_id" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec | ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("caller_rate_limit_id" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("caller_rate_limit_id" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateCallerRateLimitResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class DeleteCallerRateLimitRequest < ::Google::Protobuf::AbstractMessage
+
+            # The target namespace for the caller rate limit.
+            # Required.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The id of the caller rate limit.
+            # Required.
+            attr_reader caller_rate_limit_id(): ::String
+            attr_writer caller_rate_limit_id(): ::String | ::Symbol
+            def clear_caller_rate_limit_id: () -> void
+
+            # The version of the caller rate limit spec being deleted.
+            # The latest version can be found in the GetCallerRateLimit operation response.
+            # Required.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              caller_rate_limit_id: (::String | ::Symbol)?,
+              "caller_rate_limit_id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("caller_rate_limit_id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("caller_rate_limit_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class DeleteCallerRateLimitResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
           class UpdateNamespaceTagsRequest < ::Google::Protobuf::AbstractMessage
 
             # The namespace to set tags for.
@@ -3459,11 +4072,19 @@ module Temporalio
             attr_writer async_operation_id(): ::String | ::Symbol
             def clear_async_operation_id: () -> void
 
+            # The ID of the project this connectivity rule belongs to - optional.
+            # If not set, the connectivity rule will be created in the account's default project.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               spec: (::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec | ::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec::init_map)?,
               "spec" => (::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec | ::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec::init_map)?,
               async_operation_id: (::String | ::Symbol)?,
               "async_operation_id" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -3471,10 +4092,12 @@ module Temporalio
             def []:
                 ("spec" name) -> ::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec?
               | ("async_operation_id" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("spec" name, ::Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec? value) -> void
               | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class CreateConnectivityRuleResponse < ::Google::Protobuf::AbstractMessage
@@ -3567,6 +4190,11 @@ module Temporalio
             attr_writer namespace(): ::String | ::Symbol
             def clear_namespace: () -> void
 
+            # Filter connectivity rules by project id - optional.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               page_size: (::Integer | ::Float)?,
               "page_size" => (::Integer | ::Float)?,
@@ -3574,6 +4202,8 @@ module Temporalio
               "page_token" => (::String | ::Symbol)?,
               namespace: (::String | ::Symbol)?,
               "namespace" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -3582,11 +4212,13 @@ module Temporalio
                 ("page_size" name) -> ::Integer
               | ("page_token" name) -> ::String
               | ("namespace" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("page_size" name, (::Integer | ::Float) value) -> void
               | ("page_token" name, (::String | ::Symbol) value) -> void
               | ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class GetConnectivityRulesResponse < ::Google::Protobuf::AbstractMessage
@@ -4222,11 +4854,19 @@ module Temporalio
             attr_writer page_token(): ::String | ::Symbol
             def clear_page_token: () -> void
 
+            # Filter to only the custom roles scoped to this project - optional.
+            # If unset, only account-scoped custom roles are returned.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
             type init_map = {
               page_size: (::Integer | ::Float)?,
               "page_size" => (::Integer | ::Float)?,
               page_token: (::String | ::Symbol)?,
               "page_token" => (::String | ::Symbol)?,
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
             }
 
             def initialize: (?init_map initial_value) -> void
@@ -4234,10 +4874,12 @@ module Temporalio
             def []:
                 ("page_size" name) -> ::Integer
               | ("page_token" name) -> ::String
+              | ("project_id" name) -> ::String
 
             def []=:
                 ("page_size" name, (::Integer | ::Float) value) -> void
               | ("page_token" name, (::String | ::Symbol) value) -> void
+              | ("project_id" name, (::String | ::Symbol) value) -> void
           end
 
           class GetCustomRolesResponse < ::Google::Protobuf::AbstractMessage
@@ -4505,6 +5147,213 @@ module Temporalio
                 ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
           end
 
+          class GetUserProjectAssignmentsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to get users for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetUserProjectAssignmentsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of users with access to the project.
+            attr_accessor users(): ::Google::Protobuf::RepeatedField
+            def clear_users: () -> void
+
+            # The next page's token.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              users: ::Array[::Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment]?,
+              "users" => ::Array[::Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("users" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("users" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetServiceAccountProjectAssignmentsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to get service accounts for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetServiceAccountProjectAssignmentsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of service accounts with access to the project.
+            attr_accessor service_accounts(): ::Google::Protobuf::RepeatedField
+            def clear_service_accounts: () -> void
+
+            # The next page's token.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              service_accounts: ::Array[::Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment]?,
+              "service_accounts" => ::Array[::Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("service_accounts" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("service_accounts" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetUserGroupProjectAssignmentsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to get user groups for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetUserGroupProjectAssignmentsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of user groups with access to the project.
+            attr_accessor groups(): ::Google::Protobuf::RepeatedField
+            def clear_groups: () -> void
+
+            # The next page's token.
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              groups: ::Array[::Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment]?,
+              "groups" => ::Array[::Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("groups" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("groups" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
           class GetUserNamespaceAssignmentsRequest < ::Google::Protobuf::AbstractMessage
 
             # The namespace to get users for.
@@ -4710,6 +5559,678 @@ module Temporalio
             def []=:
                 ("groups" name, ::Google::Protobuf::RepeatedField value) -> void
               | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetProjectsRequest < ::Google::Protobuf::AbstractMessage
+
+            # The requested size of the page to retrieve - optional.
+            # Cannot exceed 1000. Defaults to 100.
+            attr_reader page_size(): ::Integer
+            attr_writer page_size(): ::Integer | ::Float
+            def clear_page_size: () -> void
+
+            # The page token if this is continuing from another response - optional.
+            attr_reader page_token(): ::String
+            attr_writer page_token(): ::String | ::Symbol
+            def clear_page_token: () -> void
+
+            # Filter by project IDs - optional.
+            attr_accessor project_ids(): ::Google::Protobuf::RepeatedField
+            def clear_project_ids: () -> void
+
+            type init_map = {
+              page_size: (::Integer | ::Float)?,
+              "page_size" => (::Integer | ::Float)?,
+              page_token: (::String | ::Symbol)?,
+              "page_token" => (::String | ::Symbol)?,
+              project_ids: ::Array[::String | ::Symbol]?,
+              "project_ids" => ::Array[::String | ::Symbol]?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("page_size" name) -> ::Integer
+              | ("page_token" name) -> ::String
+              | ("project_ids" name) -> (::Google::Protobuf::RepeatedField)
+
+            def []=:
+                ("page_size" name, (::Integer | ::Float) value) -> void
+              | ("page_token" name, (::String | ::Symbol) value) -> void
+              | ("project_ids" name, (::Google::Protobuf::RepeatedField) value) -> void
+          end
+
+          class GetProjectsResponse < ::Google::Protobuf::AbstractMessage
+
+            # The list of projects in ascending ids order
+            attr_accessor projects(): ::Google::Protobuf::RepeatedField
+            def clear_projects: () -> void
+
+            # The next page's token
+            attr_reader next_page_token(): ::String
+            attr_writer next_page_token(): ::String | ::Symbol
+            def clear_next_page_token: () -> void
+
+            type init_map = {
+              projects: ::Array[::Temporalio::Api::Cloud::Project::V1::Project]?,
+              "projects" => ::Array[::Temporalio::Api::Cloud::Project::V1::Project]?,
+              next_page_token: (::String | ::Symbol)?,
+              "next_page_token" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("projects" name) -> ::Google::Protobuf::RepeatedField
+              | ("next_page_token" name) -> ::String
+
+            def []=:
+                ("projects" name, ::Google::Protobuf::RepeatedField value) -> void
+              | ("next_page_token" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to get
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class GetProjectResponse < ::Google::Protobuf::AbstractMessage
+
+            # The project
+            attr_accessor project(): ::Temporalio::Api::Cloud::Project::V1::Project?
+            def has_project?: () -> bool
+            def clear_project: () -> void
+
+            type init_map = {
+              project: (::Temporalio::Api::Cloud::Project::V1::Project | ::Temporalio::Api::Cloud::Project::V1::Project::init_map)?,
+              "project" => (::Temporalio::Api::Cloud::Project::V1::Project | ::Temporalio::Api::Cloud::Project::V1::Project::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project" name) -> ::Temporalio::Api::Cloud::Project::V1::Project?
+
+            def []=:
+                ("project" name, ::Temporalio::Api::Cloud::Project::V1::Project? value) -> void
+          end
+
+          class CreateProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The spec for the project to create.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Project::V1::ProjectSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              spec: (::Temporalio::Api::Cloud::Project::V1::ProjectSpec | ::Temporalio::Api::Cloud::Project::V1::ProjectSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Project::V1::ProjectSpec | ::Temporalio::Api::Cloud::Project::V1::ProjectSpec::init_map)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("spec" name) -> ::Temporalio::Api::Cloud::Project::V1::ProjectSpec?
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("spec" name, ::Temporalio::Api::Cloud::Project::V1::ProjectSpec? value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class CreateProjectResponse < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project that was created.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class UpdateProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to update.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The new project specification.
+            attr_accessor spec(): ::Temporalio::Api::Cloud::Project::V1::ProjectSpec?
+            def has_spec?: () -> bool
+            def clear_spec: () -> void
+
+            # The version of the project for which this update is intended for.
+            # The latest version can be found in the GetProject operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              spec: (::Temporalio::Api::Cloud::Project::V1::ProjectSpec | ::Temporalio::Api::Cloud::Project::V1::ProjectSpec::init_map)?,
+              "spec" => (::Temporalio::Api::Cloud::Project::V1::ProjectSpec | ::Temporalio::Api::Cloud::Project::V1::ProjectSpec::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("spec" name) -> ::Temporalio::Api::Cloud::Project::V1::ProjectSpec?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("spec" name, ::Temporalio::Api::Cloud::Project::V1::ProjectSpec? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class UpdateProjectResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          # The full set of connectivity rules a namespace should carry after a move.
+          class ConnectivityRuleIDs < ::Google::Protobuf::AbstractMessage
+
+            # One or more rule ids to attach in the destination project.
+            attr_accessor connectivity_rule_ids(): ::Google::Protobuf::RepeatedField
+            def clear_connectivity_rule_ids: () -> void
+
+            type init_map = {
+              connectivity_rule_ids: ::Array[::String | ::Symbol]?,
+              "connectivity_rule_ids" => ::Array[::String | ::Symbol]?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("connectivity_rule_ids" name) -> (::Google::Protobuf::RepeatedField)
+
+            def []=:
+                ("connectivity_rule_ids" name, (::Google::Protobuf::RepeatedField) value) -> void
+          end
+
+          class NoConnectivityRules < ::Google::Protobuf::AbstractMessage
+
+            type init_map = {
+            }
+
+            def initialize: (?init_map initial_value) -> void
+          end
+
+          class MoveNamespaceToProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The namespace to move.
+            attr_reader namespace(): ::String
+            attr_writer namespace(): ::String | ::Symbol
+            def clear_namespace: () -> void
+
+            # The project to move the namespace to.
+            attr_reader destination_project_id(): ::String
+            attr_writer destination_project_id(): ::String | ::Symbol
+            def clear_destination_project_id: () -> void
+
+            # The project the caller expects the namespace to currently belong to.
+            attr_reader expected_source_project_id(): ::String
+            attr_writer expected_source_project_id(): ::String | ::Symbol
+            def clear_expected_source_project_id: () -> void
+
+            # The version of the namespace for which this move is intended for.
+            # The latest version can be found in the GetNamespace operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            attr_accessor rule_ids(): ::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs?
+            def has_rule_ids?: () -> bool
+            def clear_rule_ids: () -> void
+
+            attr_accessor unrestricted(): ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules?
+            def has_unrestricted?: () -> bool
+            def clear_unrestricted: () -> void
+
+            # The connectivity rules the namespace should have in the destination project.
+            # Leave unset only when the namespace has no connectivity rules today.
+            attr_reader destination_connectivity_rules(): (::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs | ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules)?
+            def has_destination_connectivity_rules?: () -> bool
+            def clear_destination_connectivity_rules: () -> void
+
+            type init_map = {
+              namespace: (::String | ::Symbol)?,
+              "namespace" => (::String | ::Symbol)?,
+              destination_project_id: (::String | ::Symbol)?,
+              "destination_project_id" => (::String | ::Symbol)?,
+              expected_source_project_id: (::String | ::Symbol)?,
+              "expected_source_project_id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+              rule_ids: (::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs | ::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs::init_map)?,
+              "rule_ids" => (::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs | ::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs::init_map)?,
+              unrestricted: (::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules | ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules::init_map)?,
+              "unrestricted" => (::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules | ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("namespace" name) -> ::String
+              | ("destination_project_id" name) -> ::String
+              | ("expected_source_project_id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+              | ("rule_ids" name) -> ::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs?
+              | ("unrestricted" name) -> ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules?
+
+            def []=:
+                ("namespace" name, (::String | ::Symbol) value) -> void
+              | ("destination_project_id" name, (::String | ::Symbol) value) -> void
+              | ("expected_source_project_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+              | ("rule_ids" name, ::Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs? value) -> void
+              | ("unrestricted" name, ::Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules? value) -> void
+          end
+
+          class MoveNamespaceToProjectResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class DeleteProjectRequest < ::Google::Protobuf::AbstractMessage
+
+            # The id of the project to delete.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The version of the project for which this delete is intended for.
+            # The latest version can be found in the GetProject operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation.
+            # Optional, if not provided a random id will be generated.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class DeleteProjectResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class SetUserProjectAccessRequest < ::Google::Protobuf::AbstractMessage
+
+            # The project to set permissions for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The id of the user to set permissions for.
+            attr_reader user_id(): ::String
+            attr_writer user_id(): ::String | ::Symbol
+            def clear_user_id: () -> void
+
+            # The project access to assign the user. If left empty, the user will be removed from the project access.
+            attr_accessor access(): ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+            def has_access?: () -> bool
+            def clear_access: () -> void
+
+            # The version of the user for which this update is intended for.
+            # The latest version can be found in the GetUser operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              user_id: (::String | ::Symbol)?,
+              "user_id" => (::String | ::Symbol)?,
+              access: (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              "access" => (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("user_id" name) -> ::String
+              | ("access" name) -> ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("user_id" name, (::String | ::Symbol) value) -> void
+              | ("access" name, ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class SetUserProjectAccessResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class SetUserGroupProjectAccessRequest < ::Google::Protobuf::AbstractMessage
+
+            # The project to set permissions for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The id of the group to set permissions for.
+            attr_reader group_id(): ::String
+            attr_writer group_id(): ::String | ::Symbol
+            def clear_group_id: () -> void
+
+            # The project access to assign the group. If left empty, the group will be removed from the project access.
+            attr_accessor access(): ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+            def has_access?: () -> bool
+            def clear_access: () -> void
+
+            # The version of the group for which this update is intended for.
+            # The latest version can be found in the GetGroup operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              group_id: (::String | ::Symbol)?,
+              "group_id" => (::String | ::Symbol)?,
+              access: (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              "access" => (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("group_id" name) -> ::String
+              | ("access" name) -> ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("group_id" name, (::String | ::Symbol) value) -> void
+              | ("access" name, ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class SetUserGroupProjectAccessResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
+          end
+
+          class SetServiceAccountProjectAccessRequest < ::Google::Protobuf::AbstractMessage
+
+            # The project to set permissions for.
+            attr_reader project_id(): ::String
+            attr_writer project_id(): ::String | ::Symbol
+            def clear_project_id: () -> void
+
+            # The id of the service account to set permissions for.
+            attr_reader service_account_id(): ::String
+            attr_writer service_account_id(): ::String | ::Symbol
+            def clear_service_account_id: () -> void
+
+            # The project access to assign the service account. If left empty, the service account will be removed from the project access.
+            attr_accessor access(): ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+            def has_access?: () -> bool
+            def clear_access: () -> void
+
+            # The version of the service account for which this update is intended for.
+            # The latest version can be found in the GetServiceAccount operation response.
+            attr_reader resource_version(): ::String
+            attr_writer resource_version(): ::String | ::Symbol
+            def clear_resource_version: () -> void
+
+            # The id to use for this async operation - optional.
+            attr_reader async_operation_id(): ::String
+            attr_writer async_operation_id(): ::String | ::Symbol
+            def clear_async_operation_id: () -> void
+
+            type init_map = {
+              project_id: (::String | ::Symbol)?,
+              "project_id" => (::String | ::Symbol)?,
+              service_account_id: (::String | ::Symbol)?,
+              "service_account_id" => (::String | ::Symbol)?,
+              access: (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              "access" => (::Temporalio::Api::Cloud::Identity::V1::ProjectAccess | ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess::init_map)?,
+              resource_version: (::String | ::Symbol)?,
+              "resource_version" => (::String | ::Symbol)?,
+              async_operation_id: (::String | ::Symbol)?,
+              "async_operation_id" => (::String | ::Symbol)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("project_id" name) -> ::String
+              | ("service_account_id" name) -> ::String
+              | ("access" name) -> ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess?
+              | ("resource_version" name) -> ::String
+              | ("async_operation_id" name) -> ::String
+
+            def []=:
+                ("project_id" name, (::String | ::Symbol) value) -> void
+              | ("service_account_id" name, (::String | ::Symbol) value) -> void
+              | ("access" name, ::Temporalio::Api::Cloud::Identity::V1::ProjectAccess? value) -> void
+              | ("resource_version" name, (::String | ::Symbol) value) -> void
+              | ("async_operation_id" name, (::String | ::Symbol) value) -> void
+          end
+
+          class SetServiceAccountProjectAccessResponse < ::Google::Protobuf::AbstractMessage
+
+            # The async operation.
+            attr_accessor async_operation(): ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+            def has_async_operation?: () -> bool
+            def clear_async_operation: () -> void
+
+            type init_map = {
+              async_operation: (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+              "async_operation" => (::Temporalio::Api::Cloud::Operation::V1::AsyncOperation | ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation::init_map)?,
+            }
+
+            def initialize: (?init_map initial_value) -> void
+
+            def []:
+                ("async_operation" name) -> ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation?
+
+            def []=:
+                ("async_operation" name, ::Temporalio::Api::Cloud::Operation::V1::AsyncOperation? value) -> void
           end
         end
       end
