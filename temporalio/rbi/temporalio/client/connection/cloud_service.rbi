@@ -96,6 +96,9 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse) }
   def delete_nexus_endpoint(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse) }
+  def move_nexus_endpoint_to_project(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsResponse) }
   def get_user_groups(request, rpc_options: T.unsafe(nil)); end
 
@@ -168,6 +171,21 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse) }
   def validate_namespace_export_sink(request, rpc_options: T.unsafe(nil)); end
 
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse) }
+  def create_caller_rate_limit(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse) }
+  def get_caller_rate_limit(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse) }
+  def get_caller_rate_limits(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse) }
+  def update_caller_rate_limit(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse) }
+  def delete_caller_rate_limit(request, rpc_options: T.unsafe(nil)); end
+
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsResponse) }
   def update_namespace_tags(request, rpc_options: T.unsafe(nil)); end
 
@@ -236,4 +254,43 @@ class Temporalio::Client::Connection::CloudService < ::Temporalio::Client::Conne
 
   sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse) }
   def get_user_group_namespace_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse) }
+  def get_projects(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse) }
+  def get_project(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse) }
+  def create_project(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse) }
+  def update_project(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse) }
+  def move_namespace_to_project(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse) }
+  def delete_project(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse) }
+  def set_user_project_access(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse) }
+  def set_user_group_project_access(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse) }
+  def set_service_account_project_access(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse) }
+  def get_user_project_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse) }
+  def get_service_account_project_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse) }
+  def get_user_group_project_assignments(request, rpc_options: T.unsafe(nil)); end
+
+  sig { params(request: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest, rpc_options: T.nilable(Temporalio::Client::RPCOptions)).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse) }
+  def get_project_scoped_service_accounts(request, rpc_options: T.unsafe(nil)); end
 end

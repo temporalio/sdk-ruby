@@ -59,6 +59,38 @@ module Temporalio::Api::OperatorService::V1::OperatorService
     def delete_namespace(request)
     end
 
+    # SoftDeleteNamespace moves a namespace to NAMESPACE_STATE_SOFT_DELETED on every cluster in its
+# replication config. Executions stop making progress, but no data is removed. A running restore
+# is marked failed. Idempotent.
+    sig do
+      params(
+        request: Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceRequest
+      ).returns(Temporalio::Api::OperatorService::V1::SoftDeleteNamespaceResponse)
+    end
+    def soft_delete_namespace(request)
+    end
+
+    # RestoreNamespace moves a soft-deleted namespace back to NAMESPACE_STATE_REGISTERED on every
+# cluster in its replication config, then starts a job that refreshes every execution so they
+# resume. Returns UNAVAILABLE until every cluster has the new state; retry until it succeeds.
+# Idempotent.
+    sig do
+      params(
+        request: Temporalio::Api::OperatorService::V1::RestoreNamespaceRequest
+      ).returns(Temporalio::Api::OperatorService::V1::RestoreNamespaceResponse)
+    end
+    def restore_namespace(request)
+    end
+
+    # DescribeNamespaceRestore reports the state and progress of the namespace's most recent restore.
+    sig do
+      params(
+        request: Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreRequest
+      ).returns(Temporalio::Api::OperatorService::V1::DescribeNamespaceRestoreResponse)
+    end
+    def describe_namespace_restore(request)
+    end
+
     # AddOrUpdateRemoteCluster adds or updates remote cluster.
     sig do
       params(

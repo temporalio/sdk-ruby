@@ -64,20 +64,20 @@ class Temporalio::Api::Worker::V1::WorkerPollerInfo
   def clear_is_autoscaling
   end
 
-  # Number of concurrent poll requests this poller pool is currently targeting, which may
-# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this poller pool is currently targeting, which may differ from current_pollers.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { returns(Integer) }
   def target_pollers
   end
 
-  # Number of concurrent poll requests this poller pool is currently targeting, which may
-# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this poller pool is currently targeting, which may differ from current_pollers.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { params(value: Integer).void }
   def target_pollers=(value)
   end
 
-  # Number of concurrent poll requests this poller pool is currently targeting, which may
-# differ from current_pollers. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this poller pool is currently targeting, which may differ from current_pollers.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { void }
   def clear_target_pollers
   end

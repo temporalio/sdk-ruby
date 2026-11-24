@@ -1345,6 +1345,7 @@ module Temporalio
         # but a parent's fast_forward won't affect its child's execution. A flag is provided to disable propagation of the
         # "enabled" flag to child workflows; regardless of that flag, a child workflow inherits the virtual time from the
         # parent execution as its start time.
+        # Experimental. Might change in the future.
         class TimeSkippingConfig < ::Google::Protobuf::AbstractMessage
 
           # Enables or disables time skipping for this workflow execution.
@@ -1401,6 +1402,8 @@ module Temporalio
             | ("max_session_skip_count" name, (::Integer | ::Float) value) -> void
         end
 
+        # Controls a time-skipping fast-forward for an execution.
+        # Experimental. Might change in the future.
         class FastForwardConfig < ::Google::Protobuf::AbstractMessage
 
           # A client-supplied ID, required field, set alongside `duration`. It is used to poll for
@@ -1443,6 +1446,7 @@ module Temporalio
 
         # The time-skipping state that needs to be propagated from one execution to another, or through a chain of runs
         # within the same execution.
+        # Experimental. Might change in the future.
         class TimeSkippingStatePropagation < ::Google::Protobuf::AbstractMessage
 
           # The time skipped by the previous run. It is propagated both to executions started by the
@@ -1486,6 +1490,7 @@ module Temporalio
         end
 
         # Describes the current time-skipping state of a workflow execution.
+        # Experimental. Might change in the future.
         class TimeSkippingInfo < ::Google::Protobuf::AbstractMessage
 
           # Current virtual time of the execution. If the execution hasn't skipped
@@ -1541,6 +1546,7 @@ module Temporalio
         end
 
         # TimeSkippingFastForwardInfo describes the current time-skipping fast-forward on an execution.
+        # Experimental. Might change in the future.
         class TimeSkippingFastForwardInfo < ::Google::Protobuf::AbstractMessage
 
           # The client-supplied `fast_forward` duration.

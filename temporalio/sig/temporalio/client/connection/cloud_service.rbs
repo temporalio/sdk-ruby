@@ -121,6 +121,10 @@ module Temporalio
           Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse
+        def move_nexus_endpoint_to_project: (
+          Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse
         def get_user_groups: (
           Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest request,
           ?rpc_options: RPCOptions?
@@ -217,6 +221,26 @@ module Temporalio
           Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkResponse
+        def create_caller_rate_limit: (
+          Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse
+        def get_caller_rate_limit: (
+          Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse
+        def get_caller_rate_limits: (
+          Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse
+        def update_caller_rate_limit: (
+          Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse
+        def delete_caller_rate_limit: (
+          Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse
         def update_namespace_tags: (
           Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest request,
           ?rpc_options: RPCOptions?
@@ -309,6 +333,58 @@ module Temporalio
           Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsRequest request,
           ?rpc_options: RPCOptions?
         ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignmentsResponse
+        def get_projects: (
+          Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse
+        def get_project: (
+          Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse
+        def create_project: (
+          Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse
+        def update_project: (
+          Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse
+        def move_namespace_to_project: (
+          Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse
+        def delete_project: (
+          Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse
+        def set_user_project_access: (
+          Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse
+        def set_user_group_project_access: (
+          Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse
+        def set_service_account_project_access: (
+          Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse
+        def get_user_project_assignments: (
+          Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse
+        def get_service_account_project_assignments: (
+          Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse
+        def get_user_group_project_assignments: (
+          Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse
+        def get_project_scoped_service_accounts: (
+          Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest request,
+          ?rpc_options: RPCOptions?
+        ) -> Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse
       end
     end
   end

@@ -13,7 +13,8 @@ class Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRule
       resource_version: T.nilable(String),
       state: T.nilable(T.any(Symbol, String, Integer)),
       async_operation_id: T.nilable(String),
-      created_time: T.nilable(Google::Protobuf::Timestamp)
+      created_time: T.nilable(Google::Protobuf::Timestamp),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -22,7 +23,8 @@ class Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRule
     resource_version: "",
     state: :RESOURCE_STATE_UNSPECIFIED,
     async_operation_id: "",
-    created_time: nil
+    created_time: nil,
+    project_id: ""
   )
   end
 
@@ -114,6 +116,21 @@ class Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRule
   # The date and time when the connectivity rule was created.
   sig { void }
   def clear_created_time
+  end
+
+  # The ID of the project this connectivity rule belongs to.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The ID of the project this connectivity rule belongs to.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The ID of the project this connectivity rule belongs to.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -308,65 +325,103 @@ class Temporalio::Api::Cloud::ConnectivityRule::V1::PrivateConnectivityRule
     params(
       connection_id: T.nilable(String),
       gcp_project_id: T.nilable(String),
-      region: T.nilable(String)
+      region: T.nilable(String),
+      azure_pe_resource_id: T.nilable(String)
     ).void
   end
   def initialize(
     connection_id: "",
     gcp_project_id: "",
-    region: ""
+    region: "",
+    azure_pe_resource_id: ""
   )
   end
 
-  # Connection id provided to enforce the private connectivity. This is required both by AWS and GCP.
+  # Connection id provided by user to enforce the private connectivity.
+# For AWS: VPC endpoint ID (e.g. "vpce-0123456789abcdef0").
+# For GCP: PSC connection ID (numeric string).
+# For Azure: not set by the customer; populated internally with the PPv2 LinkID
+# returned by the infra plane during Private Endpoint connection approval.
   sig { returns(String) }
   def connection_id
   end
 
-  # Connection id provided to enforce the private connectivity. This is required both by AWS and GCP.
+  # Connection id provided by user to enforce the private connectivity.
+# For AWS: VPC endpoint ID (e.g. "vpce-0123456789abcdef0").
+# For GCP: PSC connection ID (numeric string).
+# For Azure: not set by the customer; populated internally with the PPv2 LinkID
+# returned by the infra plane during Private Endpoint connection approval.
   sig { params(value: String).void }
   def connection_id=(value)
   end
 
-  # Connection id provided to enforce the private connectivity. This is required both by AWS and GCP.
+  # Connection id provided by user to enforce the private connectivity.
+# For AWS: VPC endpoint ID (e.g. "vpce-0123456789abcdef0").
+# For GCP: PSC connection ID (numeric string).
+# For Azure: not set by the customer; populated internally with the PPv2 LinkID
+# returned by the infra plane during Private Endpoint connection approval.
   sig { void }
   def clear_connection_id
   end
 
-  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs
-# AWS only needs the connection_id
+  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs.
+# AWS only needs the connection_id.
   sig { returns(String) }
   def gcp_project_id
   end
 
-  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs
-# AWS only needs the connection_id
+  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs.
+# AWS only needs the connection_id.
   sig { params(value: String).void }
   def gcp_project_id=(value)
   end
 
-  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs
-# AWS only needs the connection_id
+  # For GCP private connectivity service, GCP needs both GCP project id and the Private Service Connect Connection IDs.
+# AWS only needs the connection_id.
   sig { void }
   def clear_gcp_project_id
   end
 
   # The region of the connectivity rule. This should align with the namespace.
-# Example: "aws-us-west-2"
+# Example: "aws-us-west-2", "gcp-us-central1", "azure-eastus"
   sig { returns(String) }
   def region
   end
 
   # The region of the connectivity rule. This should align with the namespace.
-# Example: "aws-us-west-2"
+# Example: "aws-us-west-2", "gcp-us-central1", "azure-eastus"
   sig { params(value: String).void }
   def region=(value)
   end
 
   # The region of the connectivity rule. This should align with the namespace.
-# Example: "aws-us-west-2"
+# Example: "aws-us-west-2", "gcp-us-central1", "azure-eastus"
   sig { void }
   def clear_region
+  end
+
+  # azure_pe_resource_id is the ARM resource ID of the customer's Azure Private Endpoint.
+# Required for Azure private connectivity rules.
+# Example: "/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Network/privateEndpoints/{name}"
+# temporal:versioning:min_version=v0.18.0
+  sig { returns(String) }
+  def azure_pe_resource_id
+  end
+
+  # azure_pe_resource_id is the ARM resource ID of the customer's Azure Private Endpoint.
+# Required for Azure private connectivity rules.
+# Example: "/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Network/privateEndpoints/{name}"
+# temporal:versioning:min_version=v0.18.0
+  sig { params(value: String).void }
+  def azure_pe_resource_id=(value)
+  end
+
+  # azure_pe_resource_id is the ARM resource ID of the customer's Azure Private Endpoint.
+# Required for Azure private connectivity rules.
+# Example: "/subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.Network/privateEndpoints/{name}"
+# temporal:versioning:min_version=v0.18.0
+  sig { void }
+  def clear_azure_pe_resource_id
   end
 
   sig { params(field: String).returns(T.untyped) }

@@ -30,23 +30,27 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_api_key_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_billing_report_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_create_caller_rate_limit_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_connectivity_rule_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_namespace_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_nexus_endpoint_request: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_nexus_endpoint_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_create_project_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_service_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_user_group_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_create_user_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_api_key_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_delete_caller_rate_limit_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_connectivity_rule_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_region_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_namespace_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_nexus_endpoint_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_delete_project_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_service_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_user_group_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_delete_user_response: (untyped value) -> void
@@ -54,20 +58,27 @@ def api_activity_v1_activity_execution_info: (untyped value) -> void
       def api_cloud_cloudservice_v1_get_async_operation_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_get_nexus_endpoint_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_get_nexus_endpoints_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_move_namespace_to_project_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_move_nexus_endpoint_to_project_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_remove_user_group_member_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_rename_custom_search_attribute_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_service_account_namespace_access_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_set_service_account_project_access_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_user_group_namespace_access_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_set_user_group_project_access_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_set_user_namespace_access_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_set_user_project_access_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_account_audit_log_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_api_key_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_update_caller_rate_limit_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_custom_role_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_export_sink_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_namespace_tags_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_nexus_endpoint_request: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_nexus_endpoint_response: (untyped value) -> void
+      def api_cloud_cloudservice_v1_update_project_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_service_account_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_user_group_response: (untyped value) -> void
       def api_cloud_cloudservice_v1_update_user_response: (untyped value) -> void

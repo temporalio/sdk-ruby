@@ -151,14 +151,16 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest
       page_size: T.nilable(Integer),
       page_token: T.nilable(String),
       email: T.nilable(String),
-      namespace: T.nilable(String)
+      namespace: T.nilable(String),
+      include_group_memberships: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
     page_size: 0,
     page_token: "",
     email: "",
-    namespace: ""
+    namespace: "",
+    include_group_memberships: false
   )
   end
 
@@ -223,6 +225,24 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUsersRequest
   # Filter users by the namespace they have access to - optional.
   sig { void }
   def clear_namespace
+  end
+
+  # Whether to include each user's group memberships in the response - optional.
+# Defaults to false.
+  sig { returns(T::Boolean) }
+  def include_group_memberships
+  end
+
+  # Whether to include each user's group memberships in the response - optional.
+# Defaults to false.
+  sig { params(value: T::Boolean).void }
+  def include_group_memberships=(value)
+  end
+
+  # Whether to include each user's group memberships in the response - optional.
+# Defaults to false.
+  sig { void }
+  def clear_include_group_memberships
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -343,11 +363,13 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUserRequest
 
   sig do
     params(
-      user_id: T.nilable(String)
+      user_id: T.nilable(String),
+      include_group_memberships: T.nilable(T::Boolean)
     ).void
   end
   def initialize(
-    user_id: ""
+    user_id: "",
+    include_group_memberships: false
   )
   end
 
@@ -364,6 +386,24 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUserRequest
   # The id of the user to get
   sig { void }
   def clear_user_id
+  end
+
+  # Whether to include the user's group memberships in the response - optional.
+# Defaults to false.
+  sig { returns(T::Boolean) }
+  def include_group_memberships
+  end
+
+  # Whether to include the user's group memberships in the response - optional.
+# Defaults to false.
+  sig { params(value: T::Boolean).void }
+  def include_group_memberships=(value)
+  end
+
+  # Whether to include the user's group memberships in the response - optional.
+# Defaults to false.
+  sig { void }
+  def clear_include_group_memberships
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1285,13 +1325,15 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest
     params(
       spec: T.nilable(Temporalio::Api::Cloud::Namespace::V1::NamespaceSpec),
       async_operation_id: T.nilable(String),
-      tags: T.nilable(T::Hash[String, String])
+      tags: T.nilable(T::Hash[String, String]),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     spec: nil,
     async_operation_id: "",
-    tags: ::Google::Protobuf::Map.new(:string, :string)
+    tags: ::Google::Protobuf::Map.new(:string, :string),
+    project_id: ""
   )
   end
 
@@ -1344,6 +1386,24 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateNamespaceRequest
 # Note: This field can be set by global admins or account owners only.
   sig { void }
   def clear_tags
+  end
+
+  # The id of the project to create the namespace in - optional.
+# If not set, the namespace will be created in the account's default project.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to create the namespace in - optional.
+# If not set, the namespace will be created in the account's default project.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to create the namespace in - optional.
+# If not set, the namespace will be created in the account's default project.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -1466,13 +1526,15 @@ class Temporalio::Api::Cloud::CloudService::V1::GetNamespacesRequest
     params(
       page_size: T.nilable(Integer),
       page_token: T.nilable(String),
-      name: T.nilable(String)
+      name: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     page_size: 0,
     page_token: "",
-    name: ""
+    name: "",
+    project_id: ""
   )
   end
 
@@ -1531,6 +1593,21 @@ class Temporalio::Api::Cloud::CloudService::V1::GetNamespacesRequest
 # Optional, defaults to empty.
   sig { void }
   def clear_name
+  end
+
+  # Filter namespaces by project id - optional.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # Filter namespaces by project id - optional.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # Filter namespaces by project id - optional.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -3945,7 +4022,8 @@ class Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest
       page_token: T.nilable(String),
       target_namespace_id: T.nilable(String),
       target_task_queue: T.nilable(String),
-      name: T.nilable(String)
+      name: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -3953,7 +4031,8 @@ class Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest
     page_token: "",
     target_namespace_id: "",
     target_task_queue: "",
-    name: ""
+    name: "",
+    project_id: ""
   )
   end
 
@@ -4033,6 +4112,21 @@ class Temporalio::Api::Cloud::CloudService::V1::GetNexusEndpointsRequest
   # Filter endpoints by their name - optional, treated as an AND if specified. Specifying this will result in zero or one results.
   sig { void }
   def clear_name
+  end
+
+  # Filter endpoints by their project id - optional.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # Filter endpoints by their project id - optional.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # Filter endpoints by their project id - optional.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -4278,12 +4372,14 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointRequest
   sig do
     params(
       spec: T.nilable(Temporalio::Api::Cloud::Nexus::V1::EndpointSpec),
-      async_operation_id: T.nilable(String)
+      async_operation_id: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     spec: nil,
-    async_operation_id: ""
+    async_operation_id: "",
+    project_id: ""
   )
   end
 
@@ -4315,6 +4411,24 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateNexusEndpointRequest
   # The id to use for this async operation - optional.
   sig { void }
   def clear_async_operation_id
+  end
+
+  # The id of the project to associate this endpoint with - optional.
+# If not set, the endpoint will be created in the account's default project.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to associate this endpoint with - optional.
+# If not set, the endpoint will be created in the account's default project.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to associate this endpoint with - optional.
+# If not set, the endpoint will be created in the account's default project.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -4760,6 +4874,201 @@ class Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse
   end
 
   sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteNexusEndpointResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      endpoint_id: T.nilable(String),
+      destination_project_id: T.nilable(String),
+      expected_source_project_id: T.nilable(String),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    endpoint_id: "",
+    destination_project_id: "",
+    expected_source_project_id: "",
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The id of the nexus endpoint to move.
+  sig { returns(String) }
+  def endpoint_id
+  end
+
+  # The id of the nexus endpoint to move.
+  sig { params(value: String).void }
+  def endpoint_id=(value)
+  end
+
+  # The id of the nexus endpoint to move.
+  sig { void }
+  def clear_endpoint_id
+  end
+
+  # The id of the project to move the endpoint to.
+  sig { returns(String) }
+  def destination_project_id
+  end
+
+  # The id of the project to move the endpoint to.
+  sig { params(value: String).void }
+  def destination_project_id=(value)
+  end
+
+  # The id of the project to move the endpoint to.
+  sig { void }
+  def clear_destination_project_id
+  end
+
+  # The id of the project the caller expects the endpoint to currently belong to.
+  sig { returns(String) }
+  def expected_source_project_id
+  end
+
+  # The id of the project the caller expects the endpoint to currently belong to.
+  sig { params(value: String).void }
+  def expected_source_project_id=(value)
+  end
+
+  # The id of the project the caller expects the endpoint to currently belong to.
+  sig { void }
+  def clear_expected_source_project_id
+  end
+
+  # The version of the endpoint for which this move is intended for.
+# The latest version can be found in the GetNexusEndpoint operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the endpoint for which this move is intended for.
+# The latest version can be found in the GetNexusEndpoint operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the endpoint for which this move is intended for.
+# The latest version can be found in the GetNexusEndpoint operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation - optional.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation - optional.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation - optional.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNexusEndpointToProjectResponse, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -6765,6 +7074,184 @@ class Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountsResponse
   end
 end
 
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The project to list project scoped service accounts for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The project to list project scoped service accounts for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The project to list project scoped service accounts for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      service_accounts: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccount)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    service_accounts: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of project scoped service accounts in ascending ID order.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccount)]) }
+  def service_accounts
+  end
+
+  # The list of project scoped service accounts in ascending ID order.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def service_accounts=(value)
+  end
+
+  # The list of project scoped service accounts in ascending ID order.
+  sig { void }
+  def clear_service_accounts
+  end
+
+  # The next page token, set if there is another page.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page token, set if there is another page.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page token, set if there is another page.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectScopedServiceAccountsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::CloudService::V1::UpdateServiceAccountRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -8736,6 +9223,952 @@ class Temporalio::Api::Cloud::CloudService::V1::ValidateNamespaceExportSinkRespo
   end
 end
 
+class Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      spec: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    spec: nil,
+    async_operation_id: ""
+  )
+  end
+
+  # The target namespace for this caller rate limit.
+# Required.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for this caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for this caller rate limit.
+# Required.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The caller rate limit specification.
+# Required.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)) }
+  def spec
+  end
+
+  # The caller rate limit specification.
+# Required.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)).void }
+  def spec=(value)
+  end
+
+  # The caller rate limit specification.
+# Required.
+  sig { void }
+  def clear_spec
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      caller_rate_limit_id: T.nilable(String),
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    caller_rate_limit_id: "",
+    async_operation: nil
+  )
+  end
+
+  # The target namespace for this caller rate limit.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for this caller rate limit.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for this caller rate limit.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The id of the created caller rate limit.
+  sig { returns(String) }
+  def caller_rate_limit_id
+  end
+
+  # The id of the created caller rate limit.
+  sig { params(value: String).void }
+  def caller_rate_limit_id=(value)
+  end
+
+  # The id of the created caller rate limit.
+  sig { void }
+  def clear_caller_rate_limit_id
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateCallerRateLimitResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      caller_rate_limit_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    caller_rate_limit_id: ""
+  )
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def caller_rate_limit_id
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def caller_rate_limit_id=(value)
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { void }
+  def clear_caller_rate_limit_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      caller_rate_limit: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit)
+    ).void
+  end
+  def initialize(
+    caller_rate_limit: nil
+  )
+  end
+
+  # The caller rate limit retrieved.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit)) }
+  def caller_rate_limit
+  end
+
+  # The caller rate limit retrieved.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit)).void }
+  def caller_rate_limit=(value)
+  end
+
+  # The caller rate limit retrieved.
+  sig { void }
+  def clear_caller_rate_limit
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String),
+      caller_filter: T.nilable(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    page_size: 0,
+    page_token: "",
+    caller_filter: nil
+  )
+  end
+
+  # The target namespace for the caller rate limits.
+# Required.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for the caller rate limits.
+# Required.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for the caller rate limits.
+# Required.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The size of the page to retrieve.
+# Optional, defaults to 100. Cannot exceed 1000.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The size of the page to retrieve.
+# Optional, defaults to 100. Cannot exceed 1000.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The size of the page to retrieve.
+# Optional, defaults to 100. Cannot exceed 1000.
+  sig { void }
+  def clear_page_size
+  end
+
+  # Optional. The page token when continuing from another response.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # Optional. The page token when continuing from another response.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # Optional. The page token when continuing from another response.
+  sig { void }
+  def clear_page_token
+  end
+
+  # Optional. Filter the caller rate limits by caller.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter)) }
+  def caller_filter
+  end
+
+  # Optional. Filter the caller rate limits by caller.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter)).void }
+  def caller_filter=(value)
+  end
+
+  # Optional. Filter the caller rate limits by caller.
+  sig { void }
+  def clear_caller_filter
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      caller_rate_limits: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    caller_rate_limits: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of caller rate limits.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimit)]) }
+  def caller_rate_limits
+  end
+
+  # The list of caller rate limits.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def caller_rate_limits=(value)
+  end
+
+  # The list of caller rate limits.
+  sig { void }
+  def clear_caller_rate_limits
+  end
+
+  # The page token to list the next page of rate limits.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The page token to list the next page of rate limits.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The page token to list the next page of rate limits.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      caller_rate_limit_id: T.nilable(String),
+      spec: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    caller_rate_limit_id: "",
+    spec: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def caller_rate_limit_id
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def caller_rate_limit_id=(value)
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { void }
+  def clear_caller_rate_limit_id
+  end
+
+  # The updated caller rate limit specification.
+# Required.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)) }
+  def spec
+  end
+
+  # The updated caller rate limit specification.
+# Required.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Namespace::V1::CallerRateLimitSpec)).void }
+  def spec=(value)
+  end
+
+  # The updated caller rate limit specification.
+# Required.
+  sig { void }
+  def clear_spec
+  end
+
+  # The version of the caller rate limit spec being updated.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the caller rate limit spec being updated.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the caller rate limit spec being updated.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateCallerRateLimitResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      caller_rate_limit_id: T.nilable(String),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    caller_rate_limit_id: "",
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The target namespace for the caller rate limit.
+# Required.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { returns(String) }
+  def caller_rate_limit_id
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { params(value: String).void }
+  def caller_rate_limit_id=(value)
+  end
+
+  # The id of the caller rate limit.
+# Required.
+  sig { void }
+  def clear_caller_rate_limit_id
+  end
+
+  # The version of the caller rate limit spec being deleted.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the caller rate limit spec being deleted.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the caller rate limit spec being deleted.
+# The latest version can be found in the GetCallerRateLimit operation response.
+# Required.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteCallerRateLimitResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::CloudService::V1::UpdateNamespaceTagsRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -8930,12 +10363,14 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest
   sig do
     params(
       spec: T.nilable(Temporalio::Api::Cloud::ConnectivityRule::V1::ConnectivityRuleSpec),
-      async_operation_id: T.nilable(String)
+      async_operation_id: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     spec: nil,
-    async_operation_id: ""
+    async_operation_id: "",
+    project_id: ""
   )
   end
 
@@ -8970,6 +10405,24 @@ class Temporalio::Api::Cloud::CloudService::V1::CreateConnectivityRuleRequest
 # Optional, if not provided a random id will be generated.
   sig { void }
   def clear_async_operation_id
+  end
+
+  # The ID of the project this connectivity rule belongs to - optional.
+# If not set, the connectivity rule will be created in the account's default project.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The ID of the project this connectivity rule belongs to - optional.
+# If not set, the connectivity rule will be created in the account's default project.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The ID of the project this connectivity rule belongs to - optional.
+# If not set, the connectivity rule will be created in the account's default project.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -9213,13 +10666,15 @@ class Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest
     params(
       page_size: T.nilable(Integer),
       page_token: T.nilable(String),
-      namespace: T.nilable(String)
+      namespace: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     page_size: 0,
     page_token: "",
-    namespace: ""
+    namespace: "",
+    project_id: ""
   )
   end
 
@@ -9272,6 +10727,21 @@ class Temporalio::Api::Cloud::CloudService::V1::GetConnectivityRulesRequest
   # Filter connectivity rule by the namespace id.
   sig { void }
   def clear_namespace
+  end
+
+  # Filter connectivity rules by project id - optional.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # Filter connectivity rules by project id - optional.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # Filter connectivity rules by project id - optional.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -11011,12 +12481,14 @@ class Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest
   sig do
     params(
       page_size: T.nilable(Integer),
-      page_token: T.nilable(String)
+      page_token: T.nilable(String),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     page_size: 0,
-    page_token: ""
+    page_token: "",
+    project_id: ""
   )
   end
 
@@ -11051,6 +12523,24 @@ class Temporalio::Api::Cloud::CloudService::V1::GetCustomRolesRequest
   # The page token if this is continuing from another response.
   sig { void }
   def clear_page_token
+  end
+
+  # Filter to only the custom roles scoped to this project - optional.
+# If unset, only account-scoped custom roles are returned.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # Filter to only the custom roles scoped to this project - optional.
+# If unset, only account-scoped custom roles are returned.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # Filter to only the custom roles scoped to this project - optional.
+# If unset, only account-scoped custom roles are returned.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -11795,6 +13285,540 @@ class Temporalio::Api::Cloud::CloudService::V1::DeleteCustomRoleResponse
   end
 end
 
+class Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The id of the project to get users for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to get users for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to get users for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      users: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    users: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of users with access to the project.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment)]) }
+  def users
+  end
+
+  # The list of users with access to the project.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def users=(value)
+  end
+
+  # The list of users with access to the project.
+  sig { void }
+  def clear_users
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserProjectAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The id of the project to get service accounts for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to get service accounts for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to get service accounts for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      service_accounts: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    service_accounts: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of service accounts with access to the project.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment)]) }
+  def service_accounts
+  end
+
+  # The list of service accounts with access to the project.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def service_accounts=(value)
+  end
+
+  # The list of service accounts with access to the project.
+  sig { void }
+  def clear_service_accounts
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetServiceAccountProjectAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    page_size: 0,
+    page_token: ""
+  )
+  end
+
+  # The id of the project to get user groups for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to get user groups for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to get user groups for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      groups: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    groups: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of user groups with access to the project.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment)]) }
+  def groups
+  end
+
+  # The list of user groups with access to the project.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def groups=(value)
+  end
+
+  # The list of user groups with access to the project.
+  sig { void }
+  def clear_groups
+  end
+
+  # The next page's token.
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token.
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token.
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupProjectAssignmentsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::CloudService::V1::GetUserNamespaceAssignmentsRequest
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -12329,6 +14353,1732 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupNamespaceAssignments
   end
 end
 
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      page_size: T.nilable(Integer),
+      page_token: T.nilable(String),
+      project_ids: T.nilable(T::Array[String])
+    ).void
+  end
+  def initialize(
+    page_size: 0,
+    page_token: "",
+    project_ids: []
+  )
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { returns(Integer) }
+  def page_size
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { params(value: Integer).void }
+  def page_size=(value)
+  end
+
+  # The requested size of the page to retrieve - optional.
+# Cannot exceed 1000. Defaults to 100.
+  sig { void }
+  def clear_page_size
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { returns(String) }
+  def page_token
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { params(value: String).void }
+  def page_token=(value)
+  end
+
+  # The page token if this is continuing from another response - optional.
+  sig { void }
+  def clear_page_token
+  end
+
+  # Filter by project IDs - optional.
+  sig { returns(T::Array[String]) }
+  def project_ids
+  end
+
+  # Filter by project IDs - optional.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def project_ids=(value)
+  end
+
+  # Filter by project IDs - optional.
+  sig { void }
+  def clear_project_ids
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectsRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      projects: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Project::V1::Project)]),
+      next_page_token: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    projects: [],
+    next_page_token: ""
+  )
+  end
+
+  # The list of projects in ascending ids order
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Project::V1::Project)]) }
+  def projects
+  end
+
+  # The list of projects in ascending ids order
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def projects=(value)
+  end
+
+  # The list of projects in ascending ids order
+  sig { void }
+  def clear_projects
+  end
+
+  # The next page's token
+  sig { returns(String) }
+  def next_page_token
+  end
+
+  # The next page's token
+  sig { params(value: String).void }
+  def next_page_token=(value)
+  end
+
+  # The next page's token
+  sig { void }
+  def clear_next_page_token
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectsResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: ""
+  )
+  end
+
+  # The id of the project to get
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to get
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to get
+  sig { void }
+  def clear_project_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project: T.nilable(Temporalio::Api::Cloud::Project::V1::Project)
+    ).void
+  end
+  def initialize(
+    project: nil
+  )
+  end
+
+  # The project
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Project::V1::Project)) }
+  def project
+  end
+
+  # The project
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Project::V1::Project)).void }
+  def project=(value)
+  end
+
+  # The project
+  sig { void }
+  def clear_project
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetProjectResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      spec: T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    spec: nil,
+    async_operation_id: ""
+  )
+  end
+
+  # The spec for the project to create.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec)) }
+  def spec
+  end
+
+  # The spec for the project to create.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec)).void }
+  def spec=(value)
+  end
+
+  # The spec for the project to create.
+  sig { void }
+  def clear_spec
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    async_operation: nil
+  )
+  end
+
+  # The id of the project that was created.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project that was created.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project that was created.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::CreateProjectResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      spec: T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    spec: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The id of the project to update.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to update.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to update.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The new project specification.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec)) }
+  def spec
+  end
+
+  # The new project specification.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Project::V1::ProjectSpec)).void }
+  def spec=(value)
+  end
+
+  # The new project specification.
+  sig { void }
+  def clear_spec
+  end
+
+  # The version of the project for which this update is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the project for which this update is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the project for which this update is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::UpdateProjectResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# The full set of connectivity rules a namespace should carry after a move.
+class Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      connectivity_rule_ids: T.nilable(T::Array[String])
+    ).void
+  end
+  def initialize(
+    connectivity_rule_ids: []
+  )
+  end
+
+  # One or more rule ids to attach in the destination project.
+  sig { returns(T::Array[String]) }
+  def connectivity_rule_ids
+  end
+
+  # One or more rule ids to attach in the destination project.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def connectivity_rule_ids=(value)
+  end
+
+  # One or more rule ids to attach in the destination project.
+  sig { void }
+  def clear_connectivity_rule_ids
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig {void}
+  def initialize; end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      namespace: T.nilable(String),
+      destination_project_id: T.nilable(String),
+      expected_source_project_id: T.nilable(String),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String),
+      rule_ids: T.nilable(Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs),
+      unrestricted: T.nilable(Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules)
+    ).void
+  end
+  def initialize(
+    namespace: "",
+    destination_project_id: "",
+    expected_source_project_id: "",
+    resource_version: "",
+    async_operation_id: "",
+    rule_ids: nil,
+    unrestricted: nil
+  )
+  end
+
+  # The namespace to move.
+  sig { returns(String) }
+  def namespace
+  end
+
+  # The namespace to move.
+  sig { params(value: String).void }
+  def namespace=(value)
+  end
+
+  # The namespace to move.
+  sig { void }
+  def clear_namespace
+  end
+
+  # The project to move the namespace to.
+  sig { returns(String) }
+  def destination_project_id
+  end
+
+  # The project to move the namespace to.
+  sig { params(value: String).void }
+  def destination_project_id=(value)
+  end
+
+  # The project to move the namespace to.
+  sig { void }
+  def clear_destination_project_id
+  end
+
+  # The project the caller expects the namespace to currently belong to.
+  sig { returns(String) }
+  def expected_source_project_id
+  end
+
+  # The project the caller expects the namespace to currently belong to.
+  sig { params(value: String).void }
+  def expected_source_project_id=(value)
+  end
+
+  # The project the caller expects the namespace to currently belong to.
+  sig { void }
+  def clear_expected_source_project_id
+  end
+
+  # The version of the namespace for which this move is intended for.
+# The latest version can be found in the GetNamespace operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the namespace for which this move is intended for.
+# The latest version can be found in the GetNamespace operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the namespace for which this move is intended for.
+# The latest version can be found in the GetNamespace operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs)) }
+  def rule_ids
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::CloudService::V1::ConnectivityRuleIDs)).void }
+  def rule_ids=(value)
+  end
+
+  sig { void }
+  def clear_rule_ids
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules)) }
+  def unrestricted
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::CloudService::V1::NoConnectivityRules)).void }
+  def unrestricted=(value)
+  end
+
+  sig { void }
+  def clear_unrestricted
+  end
+
+  sig { returns(T.nilable(Symbol)) }
+  def destination_connectivity_rules
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::MoveNamespaceToProjectResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The id of the project to delete.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project to delete.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project to delete.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The version of the project for which this delete is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the project for which this delete is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the project for which this delete is intended for.
+# The latest version can be found in the GetProject operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation.
+# Optional, if not provided a random id will be generated.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::DeleteProjectResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      user_id: T.nilable(String),
+      access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    user_id: "",
+    access: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The project to set permissions for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The project to set permissions for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The project to set permissions for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The id of the user to set permissions for.
+  sig { returns(String) }
+  def user_id
+  end
+
+  # The id of the user to set permissions for.
+  sig { params(value: String).void }
+  def user_id=(value)
+  end
+
+  # The id of the user to set permissions for.
+  sig { void }
+  def clear_user_id
+  end
+
+  # The project access to assign the user. If left empty, the user will be removed from the project access.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def access
+  end
+
+  # The project access to assign the user. If left empty, the user will be removed from the project access.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def access=(value)
+  end
+
+  # The project access to assign the user. If left empty, the user will be removed from the project access.
+  sig { void }
+  def clear_access
+  end
+
+  # The version of the user for which this update is intended for.
+# The latest version can be found in the GetUser operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the user for which this update is intended for.
+# The latest version can be found in the GetUser operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the user for which this update is intended for.
+# The latest version can be found in the GetUser operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation - optional.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation - optional.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation - optional.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserProjectAccessResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      group_id: T.nilable(String),
+      access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    group_id: "",
+    access: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The project to set permissions for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The project to set permissions for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The project to set permissions for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The id of the group to set permissions for.
+  sig { returns(String) }
+  def group_id
+  end
+
+  # The id of the group to set permissions for.
+  sig { params(value: String).void }
+  def group_id=(value)
+  end
+
+  # The id of the group to set permissions for.
+  sig { void }
+  def clear_group_id
+  end
+
+  # The project access to assign the group. If left empty, the group will be removed from the project access.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def access
+  end
+
+  # The project access to assign the group. If left empty, the group will be removed from the project access.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def access=(value)
+  end
+
+  # The project access to assign the group. If left empty, the group will be removed from the project access.
+  sig { void }
+  def clear_access
+  end
+
+  # The version of the group for which this update is intended for.
+# The latest version can be found in the GetGroup operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the group for which this update is intended for.
+# The latest version can be found in the GetGroup operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the group for which this update is intended for.
+# The latest version can be found in the GetGroup operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation - optional.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation - optional.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation - optional.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetUserGroupProjectAccessResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      service_account_id: T.nilable(String),
+      access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      resource_version: T.nilable(String),
+      async_operation_id: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    service_account_id: "",
+    access: nil,
+    resource_version: "",
+    async_operation_id: ""
+  )
+  end
+
+  # The project to set permissions for.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The project to set permissions for.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The project to set permissions for.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The id of the service account to set permissions for.
+  sig { returns(String) }
+  def service_account_id
+  end
+
+  # The id of the service account to set permissions for.
+  sig { params(value: String).void }
+  def service_account_id=(value)
+  end
+
+  # The id of the service account to set permissions for.
+  sig { void }
+  def clear_service_account_id
+  end
+
+  # The project access to assign the service account. If left empty, the service account will be removed from the project access.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def access
+  end
+
+  # The project access to assign the service account. If left empty, the service account will be removed from the project access.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def access=(value)
+  end
+
+  # The project access to assign the service account. If left empty, the service account will be removed from the project access.
+  sig { void }
+  def clear_access
+  end
+
+  # The version of the service account for which this update is intended for.
+# The latest version can be found in the GetServiceAccount operation response.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The version of the service account for which this update is intended for.
+# The latest version can be found in the GetServiceAccount operation response.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The version of the service account for which this update is intended for.
+# The latest version can be found in the GetServiceAccount operation response.
+  sig { void }
+  def clear_resource_version
+  end
+
+  # The id to use for this async operation - optional.
+  sig { returns(String) }
+  def async_operation_id
+  end
+
+  # The id to use for this async operation - optional.
+  sig { params(value: String).void }
+  def async_operation_id=(value)
+  end
+
+  # The id to use for this async operation - optional.
+  sig { void }
+  def clear_async_operation_id
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessRequest, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      async_operation: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)
+    ).void
+  end
+  def initialize(
+    async_operation: nil
+  )
+  end
+
+  # The async operation.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)) }
+  def async_operation
+  end
+
+  # The async operation.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Operation::V1::AsyncOperation)).void }
+  def async_operation=(value)
+  end
+
+  # The async operation.
+  sig { void }
+  def clear_async_operation
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::SetServiceAccountProjectAccessResponse, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest::GoogleGroupFilter
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -12445,6 +16195,105 @@ class Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest::SCIMGroupF
   end
 
   sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetUserGroupsRequest::SCIMGroupFilter, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      caller_type: T.nilable(String),
+      default: T.nilable(T::Boolean),
+      caller: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    caller_type: "",
+    default: false,
+    caller: ""
+  )
+  end
+
+  # The type of caller to filter on.
+# Required when caller_filter is set. Accepted values are "namespace".
+  sig { returns(String) }
+  def caller_type
+  end
+
+  # The type of caller to filter on.
+# Required when caller_filter is set. Accepted values are "namespace".
+  sig { params(value: String).void }
+  def caller_type=(value)
+  end
+
+  # The type of caller to filter on.
+# Required when caller_filter is set. Accepted values are "namespace".
+  sig { void }
+  def clear_caller_type
+  end
+
+  # Optional, list the default rate limit for the type.
+  sig { returns(T::Boolean) }
+  def default
+  end
+
+  # Optional, list the default rate limit for the type.
+  sig { params(value: T::Boolean).void }
+  def default=(value)
+  end
+
+  # Optional, list the default rate limit for the type.
+  sig { void }
+  def clear_default
+  end
+
+  # Optional, list the rate limit for a specific caller.
+  sig { returns(String) }
+  def caller
+  end
+
+  # Optional, list the rate limit for a specific caller.
+  sig { params(value: String).void }
+  def caller=(value)
+  end
+
+  # Optional, list the rate limit for a specific caller.
+  sig { void }
+  def clear_caller
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::CloudService::V1::GetCallerRateLimitsRequest::CallerFilter, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 

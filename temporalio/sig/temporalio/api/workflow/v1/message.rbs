@@ -331,6 +331,7 @@ module Temporalio
           def has_pause_info?: () -> bool
           def clear_pause_info: () -> void
 
+          # Experimental.
           # Information about time skipping of the workflow execution.
           # If the execution has never enabled time skipping, it will be nil.
           attr_accessor time_skipping_info(): ::Temporalio::Api::Common::V1::TimeSkippingInfo?
@@ -1876,6 +1877,7 @@ module Temporalio
           def has_priority?: () -> bool
           def clear_priority: () -> void
 
+          # Experimental.
           # The time-skipping configuration for this workflow execution.
           # When `fast_forward` is set, time will be fast-forwarded to a future point relative
           # to the current workflow timestamp. Each call takes effect, even if

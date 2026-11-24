@@ -20,17 +20,19 @@ module Temporalio
 
               CLOUD_PROVIDER_GCP: 2
 
+              CLOUD_PROVIDER_AZURE: 3
+
               def self.lookup: (::Integer number) -> ::Symbol
 
 
               def self.resolve: (::Symbol name) -> ::Integer
 
 
-              type names = :CLOUD_PROVIDER_UNSPECIFIED | :CLOUD_PROVIDER_AWS | :CLOUD_PROVIDER_GCP
+              type names = :CLOUD_PROVIDER_UNSPECIFIED | :CLOUD_PROVIDER_AWS | :CLOUD_PROVIDER_GCP | :CLOUD_PROVIDER_AZURE
 
-              type strings = "CLOUD_PROVIDER_UNSPECIFIED" | "CLOUD_PROVIDER_AWS" | "CLOUD_PROVIDER_GCP"
+              type strings = "CLOUD_PROVIDER_UNSPECIFIED" | "CLOUD_PROVIDER_AWS" | "CLOUD_PROVIDER_GCP" | "CLOUD_PROVIDER_AZURE"
 
-              type numbers = 0 | 1 | 2
+              type numbers = 0 | 1 | 2 | 3
             end
 
             # The id of the temporal cloud region.

@@ -738,6 +738,7 @@ module Temporalio
           attr_writer unpause(): ::String | ::Symbol
           def clear_unpause: () -> void
 
+          # Experimental.
           # If set, applies the specified time-skipping configuration to this schedule,
           # replacing any existing time-skipping configuration.
           attr_accessor time_skipping_config(): ::Temporalio::Api::Common::V1::TimeSkippingConfig?
@@ -841,6 +842,7 @@ module Temporalio
           attr_writer state_size_bytes(): ::Integer | ::Float
           def clear_state_size_bytes: () -> void
 
+          # Experimental.
           # Information about time skipping for this schedule.
           # If the schedule has never enabled time skipping, this will be unset.
           attr_accessor time_skipping_info(): ::Temporalio::Api::Common::V1::TimeSkippingInfo?

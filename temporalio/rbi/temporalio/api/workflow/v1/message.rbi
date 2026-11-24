@@ -710,19 +710,22 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionExtendedInfo
   def clear_pause_info
   end
 
-  # Information about time skipping of the workflow execution.
+  # Experimental.
+# Information about time skipping of the workflow execution.
 # If the execution has never enabled time skipping, it will be nil.
   sig { returns(T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)) }
   def time_skipping_info
   end
 
-  # Information about time skipping of the workflow execution.
+  # Experimental.
+# Information about time skipping of the workflow execution.
 # If the execution has never enabled time skipping, it will be nil.
   sig { params(value: T.nilable(Temporalio::Api::Common::V1::TimeSkippingInfo)).void }
   def time_skipping_info=(value)
   end
 
-  # Information about time skipping of the workflow execution.
+  # Experimental.
+# Information about time skipping of the workflow execution.
 # If the execution has never enabled time skipping, it will be nil.
   sig { void }
   def clear_time_skipping_info
@@ -3562,7 +3565,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
   def clear_priority
   end
 
-  # The time-skipping configuration for this workflow execution.
+  # Experimental.
+# The time-skipping configuration for this workflow execution.
 # When `fast_forward` is set, time will be fast-forwarded to a future point relative
 # to the current workflow timestamp. Each call takes effect, even if
 # `fast_forward` is set to the same duration, since the target time is recalculated
@@ -3575,7 +3579,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
   def time_skipping_config
   end
 
-  # The time-skipping configuration for this workflow execution.
+  # Experimental.
+# The time-skipping configuration for this workflow execution.
 # When `fast_forward` is set, time will be fast-forwarded to a future point relative
 # to the current workflow timestamp. Each call takes effect, even if
 # `fast_forward` is set to the same duration, since the target time is recalculated
@@ -3588,7 +3593,8 @@ class Temporalio::Api::Workflow::V1::WorkflowExecutionOptions
   def time_skipping_config=(value)
   end
 
-  # The time-skipping configuration for this workflow execution.
+  # Experimental.
+# The time-skipping configuration for this workflow execution.
 # When `fast_forward` is set, time will be fast-forwarded to a future point relative
 # to the current workflow timestamp. Each call takes effect, even if
 # `fast_forward` is set to the same duration, since the target time is recalculated

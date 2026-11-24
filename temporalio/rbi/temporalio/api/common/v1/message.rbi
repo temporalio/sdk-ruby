@@ -2159,6 +2159,7 @@ end
 # but a parent's fast_forward won't affect its child's execution. A flag is provided to disable propagation of the
 # "enabled" flag to child workflows; regardless of that flag, a child workflow inherits the virtual time from the
 # parent execution as its start time.
+# Experimental. Might change in the future.
 class Temporalio::Api::Common::V1::TimeSkippingConfig
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2308,6 +2309,8 @@ class Temporalio::Api::Common::V1::TimeSkippingConfig
   end
 end
 
+# Controls a time-skipping fast-forward for an execution.
+# Experimental. Might change in the future.
 class Temporalio::Api::Common::V1::FastForwardConfig
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2419,6 +2422,7 @@ end
 
 # The time-skipping state that needs to be propagated from one execution to another, or through a chain of runs
 # within the same execution.
+# Experimental. Might change in the future.
 class Temporalio::Api::Common::V1::TimeSkippingStatePropagation
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2519,6 +2523,7 @@ class Temporalio::Api::Common::V1::TimeSkippingStatePropagation
 end
 
 # Describes the current time-skipping state of a workflow execution.
+# Experimental. Might change in the future.
 class Temporalio::Api::Common::V1::TimeSkippingInfo
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2648,6 +2653,7 @@ class Temporalio::Api::Common::V1::TimeSkippingInfo
 end
 
 # TimeSkippingFastForwardInfo describes the current time-skipping fast-forward on an execution.
+# Experimental. Might change in the future.
 class Temporalio::Api::Common::V1::TimeSkippingFastForwardInfo
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods

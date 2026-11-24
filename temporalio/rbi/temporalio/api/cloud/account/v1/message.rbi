@@ -67,17 +67,81 @@ class Temporalio::Api::Cloud::Account::V1::MetricsSpec
   end
 end
 
+class Temporalio::Api::Cloud::Account::V1::AuthenticationSettings
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      restrict_session_lifetimes: T.nilable(T::Boolean)
+    ).void
+  end
+  def initialize(
+    restrict_session_lifetimes: false
+  )
+  end
+
+  # Restricts Cloud web UI session lifetimes for users in this account.
+  sig { returns(T::Boolean) }
+  def restrict_session_lifetimes
+  end
+
+  # Restricts Cloud web UI session lifetimes for users in this account.
+  sig { params(value: T::Boolean).void }
+  def restrict_session_lifetimes=(value)
+  end
+
+  # Restricts Cloud web UI session lifetimes for users in this account.
+  sig { void }
+  def clear_restrict_session_lifetimes
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Account::V1::AuthenticationSettings) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Account::V1::AuthenticationSettings).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Account::V1::AuthenticationSettings) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Account::V1::AuthenticationSettings, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Account::V1::AccountSpec
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
 
   sig do
     params(
-      metrics: T.nilable(Temporalio::Api::Cloud::Account::V1::MetricsSpec)
+      metrics: T.nilable(Temporalio::Api::Cloud::Account::V1::MetricsSpec),
+      authentication_settings: T.nilable(Temporalio::Api::Cloud::Account::V1::AuthenticationSettings)
     ).void
   end
   def initialize(
-    metrics: nil
+    metrics: nil,
+    authentication_settings: nil
   )
   end
 
@@ -97,6 +161,24 @@ class Temporalio::Api::Cloud::Account::V1::AccountSpec
 # If not specified, metrics will not be enabled.
   sig { void }
   def clear_metrics
+  end
+
+  # Authentication settings for this account.
+# temporal:versioning:min_version=v0.20.0
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Account::V1::AuthenticationSettings)) }
+  def authentication_settings
+  end
+
+  # Authentication settings for this account.
+# temporal:versioning:min_version=v0.20.0
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Account::V1::AuthenticationSettings)).void }
+  def authentication_settings=(value)
+  end
+
+  # Authentication settings for this account.
+# temporal:versioning:min_version=v0.20.0
+  sig { void }
+  def clear_authentication_settings
   end
 
   sig { params(field: String).returns(T.untyped) }

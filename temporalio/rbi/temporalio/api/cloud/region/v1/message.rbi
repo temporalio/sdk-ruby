@@ -151,6 +151,7 @@ module Temporalio::Api::Cloud::Region::V1::Region::CloudProvider
   self::CLOUD_PROVIDER_UNSPECIFIED = T.let(0, Integer)
   self::CLOUD_PROVIDER_AWS = T.let(1, Integer)
   self::CLOUD_PROVIDER_GCP = T.let(2, Integer)
+  self::CLOUD_PROVIDER_AZURE = T.let(3, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

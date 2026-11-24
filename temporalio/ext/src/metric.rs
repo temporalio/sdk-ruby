@@ -399,9 +399,9 @@ fn convert_metric_event(
             )?;
             // Put on lazy ref
             populate_into
-                .set(Arc::new(BufferedMetricRef {
+                .set(BufferedMetricRef {
                     value: Arc::new(ThreadSafeBoxValue::new(val)),
-                }))
+                })
                 .map_err(|_| error!("Failed setting metric ref"))?;
             Ok(None)
         }

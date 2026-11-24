@@ -231,6 +231,85 @@ class Temporalio::Api::Cloud::Identity::V1::NamespaceAccess
   end
 end
 
+class Temporalio::Api::Cloud::Identity::V1::ProjectAccess
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      role: T.nilable(T.any(Symbol, String, Integer)),
+      custom_roles: T.nilable(T::Array[String])
+    ).void
+  end
+  def initialize(
+    role: :PROJECT_ROLE_UNSPECIFIED,
+    custom_roles: []
+  )
+  end
+
+  sig { returns(T.any(Symbol, Integer)) }
+  def role
+  end
+
+  sig { params(value: T.any(Symbol, String, Integer)).void }
+  def role=(value)
+  end
+
+  sig { void }
+  def clear_role
+  end
+
+  # List of project-scoped custom role IDs assigned to the principal for this project.
+# temporal:versioning:min_version=v0.27.0
+  sig { returns(T::Array[String]) }
+  def custom_roles
+  end
+
+  # List of project-scoped custom role IDs assigned to the principal for this project.
+# temporal:versioning:min_version=v0.27.0
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def custom_roles=(value)
+  end
+
+  # List of project-scoped custom role IDs assigned to the principal for this project.
+# temporal:versioning:min_version=v0.27.0
+  sig { void }
+  def clear_custom_roles
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::ProjectAccess) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ProjectAccess).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::ProjectAccess) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ProjectAccess, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Identity::V1::Access
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -239,12 +318,14 @@ class Temporalio::Api::Cloud::Identity::V1::Access
     params(
       account_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::AccountAccess),
       namespace_accesses: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Cloud::Identity::V1::NamespaceAccess)]),
+      project_accesses: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)]),
       custom_roles_deprecated: T.nilable(T::Array[String])
     ).void
   end
   def initialize(
     account_access: nil,
     namespace_accesses: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Cloud::Identity::V1::NamespaceAccess),
+    project_accesses: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
     custom_roles_deprecated: []
   )
   end
@@ -280,6 +361,27 @@ class Temporalio::Api::Cloud::Identity::V1::Access
 # The key is the namespace name and the value is the access to the namespace
   sig { void }
   def clear_namespace_accesses
+  end
+
+  # The map of project accesses
+# The key is the project ID and the value is the access to the project
+# temporal:versioning:min_version=v0.18.0
+  sig { returns(T::Hash[String, T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)]) }
+  def project_accesses
+  end
+
+  # The map of project accesses
+# The key is the project ID and the value is the access to the project
+# temporal:versioning:min_version=v0.18.0
+  sig { params(value: ::Google::Protobuf::Map).void }
+  def project_accesses=(value)
+  end
+
+  # The map of project accesses
+# The key is the project ID and the value is the access to the project
+# temporal:versioning:min_version=v0.18.0
+  sig { void }
+  def clear_project_accesses
   end
 
   # List of custom role IDs assigned to the user or service account.
@@ -407,6 +509,105 @@ class Temporalio::Api::Cloud::Identity::V1::NamespaceScopedAccess
   end
 
   sig { params(msg: Temporalio::Api::Cloud::Identity::V1::NamespaceScopedAccess, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      project_id: T.nilable(String),
+      access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      namespace_accesses: T.nilable(T::Hash[String, T.nilable(Temporalio::Api::Cloud::Identity::V1::NamespaceAccess)])
+    ).void
+  end
+  def initialize(
+    project_id: "",
+    access: nil,
+    namespace_accesses: ::Google::Protobuf::Map.new(:string, :message, Temporalio::Api::Cloud::Identity::V1::NamespaceAccess)
+  )
+  end
+
+  # The ID of the project the service account is assigned to - immutable.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The ID of the project the service account is assigned to - immutable.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The ID of the project the service account is assigned to - immutable.
+  sig { void }
+  def clear_project_id
+  end
+
+  # The project access assigned to the service account - mutable.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def access
+  end
+
+  # The project access assigned to the service account - mutable.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def access=(value)
+  end
+
+  # The project access assigned to the service account - mutable.
+  sig { void }
+  def clear_access
+  end
+
+  # The map of namespace accesses - mutable.
+# The key is the namespace name and the value is the access to the namespace.
+  sig { returns(T::Hash[String, T.nilable(Temporalio::Api::Cloud::Identity::V1::NamespaceAccess)]) }
+  def namespace_accesses
+  end
+
+  # The map of namespace accesses - mutable.
+# The key is the namespace name and the value is the access to the namespace.
+  sig { params(value: ::Google::Protobuf::Map).void }
+  def namespace_accesses=(value)
+  end
+
+  # The map of namespace accesses - mutable.
+# The key is the namespace name and the value is the access to the namespace.
+  sig { void }
+  def clear_namespace_accesses
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -587,7 +788,8 @@ class Temporalio::Api::Cloud::Identity::V1::User
       async_operation_id: T.nilable(String),
       invitation: T.nilable(Temporalio::Api::Cloud::Identity::V1::Invitation),
       created_time: T.nilable(Google::Protobuf::Timestamp),
-      last_modified_time: T.nilable(Google::Protobuf::Timestamp)
+      last_modified_time: T.nilable(Google::Protobuf::Timestamp),
+      group_memberships: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupMembership)])
     ).void
   end
   def initialize(
@@ -599,7 +801,8 @@ class Temporalio::Api::Cloud::Identity::V1::User
     async_operation_id: "",
     invitation: nil,
     created_time: nil,
-    last_modified_time: nil
+    last_modified_time: nil,
+    group_memberships: []
   )
   end
 
@@ -759,6 +962,27 @@ class Temporalio::Api::Cloud::Identity::V1::User
   def clear_last_modified_time
   end
 
+  # The SCIM and Cloud groups the user is a member of, without their access or roles.
+# This field is only set if include_group_memberships in the GetUser or GetUsers request is true
+# and the caller has access to the user's full identity information.
+  sig { returns(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::UserGroupMembership)]) }
+  def group_memberships
+  end
+
+  # The SCIM and Cloud groups the user is a member of, without their access or roles.
+# This field is only set if include_group_memberships in the GetUser or GetUsers request is true
+# and the caller has access to the user's full identity information.
+  sig { params(value: ::Google::Protobuf::RepeatedField).void }
+  def group_memberships=(value)
+  end
+
+  # The SCIM and Cloud groups the user is a member of, without their access or roles.
+# This field is only set if include_group_memberships in the GetUser or GetUsers request is true
+# and the caller has access to the user's full identity information.
+  sig { void }
+  def clear_group_memberships
+  end
+
   sig { params(field: String).returns(T.untyped) }
   def [](field)
   end
@@ -784,6 +1008,86 @@ class Temporalio::Api::Cloud::Identity::V1::User
   end
 
   sig { params(msg: Temporalio::Api::Cloud::Identity::V1::User, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+# A group the user is a member of.
+class Temporalio::Api::Cloud::Identity::V1::UserGroupMembership
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      group_id: T.nilable(String),
+      display_name: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    group_id: "",
+    display_name: ""
+  )
+  end
+
+  # The id of the group.
+  sig { returns(String) }
+  def group_id
+  end
+
+  # The id of the group.
+  sig { params(value: String).void }
+  def group_id=(value)
+  end
+
+  # The id of the group.
+  sig { void }
+  def clear_group_id
+  end
+
+  # The display name of the group.
+  sig { returns(String) }
+  def display_name
+  end
+
+  # The display name of the group.
+  sig { params(value: String).void }
+  def display_name=(value)
+  end
+
+  # The display name of the group.
+  sig { void }
+  def clear_display_name
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::UserGroupMembership) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserGroupMembership).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::UserGroupMembership) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserGroupMembership, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -1654,6 +1958,7 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
       name: T.nilable(String),
       access: T.nilable(Temporalio::Api::Cloud::Identity::V1::Access),
       namespace_scoped_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::NamespaceScopedAccess),
+      project_scoped_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess),
       description: T.nilable(String)
     ).void
   end
@@ -1661,6 +1966,7 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
     name: "",
     access: nil,
     namespace_scoped_access: nil,
+    project_scoped_access: nil,
     description: ""
   )
   end
@@ -1683,7 +1989,7 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
   def clear_name
   end
 
-  # Note: one of `Access` or `NamespaceScopedAccess` must be provided, but not both.
+  # Note: one of `Access`, `ProjectScopedAccess`, or `NamespaceScopedAccess` must be provided.
 # The access assigned to the service account.
 # If set, creates an account scoped service account.
 # The access is mutable.
@@ -1691,7 +1997,7 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
   def access
   end
 
-  # Note: one of `Access` or `NamespaceScopedAccess` must be provided, but not both.
+  # Note: one of `Access`, `ProjectScopedAccess`, or `NamespaceScopedAccess` must be provided.
 # The access assigned to the service account.
 # If set, creates an account scoped service account.
 # The access is mutable.
@@ -1699,7 +2005,7 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
   def access=(value)
   end
 
-  # Note: one of `Access` or `NamespaceScopedAccess` must be provided, but not both.
+  # Note: one of `Access`, `ProjectScopedAccess`, or `NamespaceScopedAccess` must be provided.
 # The access assigned to the service account.
 # If set, creates an account scoped service account.
 # The access is mutable.
@@ -1729,6 +2035,24 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountSpec
 # Refer to `NamespaceScopedAccess` for details.
   sig { void }
   def clear_namespace_scoped_access
+  end
+
+  # The project scoped access assigned to the service account.
+# If set, creates a project scoped service account (limited to a single project).
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess)) }
+  def project_scoped_access
+  end
+
+  # The project scoped access assigned to the service account.
+# If set, creates a project scoped service account (limited to a single project).
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectScopedAccess)).void }
+  def project_scoped_access=(value)
+  end
+
+  # The project scoped access assigned to the service account.
+# If set, creates a project scoped service account (limited to a single project).
+  sig { void }
+  def clear_project_scoped_access
   end
 
   # The description associated with the service account - optional.
@@ -2186,13 +2510,15 @@ class Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec
     params(
       name: T.nilable(String),
       description: T.nilable(String),
-      permissions: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Permission)])
+      permissions: T.nilable(T::Array[T.nilable(Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec::Permission)]),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
     name: "",
     description: "",
-    permissions: []
+    permissions: [],
+    project_id: ""
   )
   end
 
@@ -2239,6 +2565,39 @@ class Temporalio::Api::Cloud::Identity::V1::CustomRoleSpec
   # The permissions assigned to the custom role.
   sig { void }
   def clear_permissions
+  end
+
+  # The id of the project this custom role is scoped to - optional.
+# If unset, the custom role is scoped to the account: it can reference resources anywhere in the
+# account and can be assigned to principals at the account level.
+# If set, the custom role is scoped to the project: its resources must belong to that project, it
+# is not shared across projects, and it can only be assigned to principals within that project.
+# Immutable once the custom role is created - it cannot be changed via UpdateCustomRole.
+# temporal:versioning:min_version=v0.27.0
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project this custom role is scoped to - optional.
+# If unset, the custom role is scoped to the account: it can reference resources anywhere in the
+# account and can be assigned to principals at the account level.
+# If set, the custom role is scoped to the project: its resources must belong to that project, it
+# is not shared across projects, and it can only be assigned to principals within that project.
+# Immutable once the custom role is created - it cannot be changed via UpdateCustomRole.
+# temporal:versioning:min_version=v0.27.0
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project this custom role is scoped to - optional.
+# If unset, the custom role is scoped to the account: it can reference resources anywhere in the
+# account and can be assigned to principals at the account level.
+# If set, the custom role is scoped to the project: its resources must belong to that project, it
+# is not shared across projects, and it can only be assigned to principals within that project.
+# Immutable once the custom role is created - it cannot be changed via UpdateCustomRole.
+# temporal:versioning:min_version=v0.27.0
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }
@@ -2447,6 +2806,136 @@ class Temporalio::Api::Cloud::Identity::V1::CustomRole
   end
 end
 
+class Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      id: T.nilable(String),
+      email: T.nilable(String),
+      project_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      inherited_access: T.nilable(T::Boolean),
+      resource_version: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    id: "",
+    email: "",
+    project_access: nil,
+    inherited_access: false,
+    resource_version: ""
+  )
+  end
+
+  # The id of the user
+  sig { returns(String) }
+  def id
+  end
+
+  # The id of the user
+  sig { params(value: String).void }
+  def id=(value)
+  end
+
+  # The id of the user
+  sig { void }
+  def clear_id
+  end
+
+  # The email of the user
+  sig { returns(String) }
+  def email
+  end
+
+  # The email of the user
+  sig { params(value: String).void }
+  def email=(value)
+  end
+
+  # The email of the user
+  sig { void }
+  def clear_email
+  end
+
+  # The access assigned to the user at the project level.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def project_access
+  end
+
+  # The access assigned to the user at the project level.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def project_access=(value)
+  end
+
+  # The access assigned to the user at the project level.
+  sig { void }
+  def clear_project_access
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { returns(T::Boolean) }
+  def inherited_access
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { params(value: T::Boolean).void }
+  def inherited_access=(value)
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { void }
+  def clear_inherited_access
+  end
+
+  # The current resource version of the user.
+  sig { returns(String) }
+  def resource_version
+  end
+
+  # The current resource version of the user.
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  # The current resource version of the user.
+  sig { void }
+  def clear_resource_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserProjectAssignment, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Identity::V1::UserNamespaceAssignment
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2577,6 +3066,133 @@ class Temporalio::Api::Cloud::Identity::V1::UserNamespaceAssignment
   end
 end
 
+class Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      id: T.nilable(String),
+      name: T.nilable(String),
+      project_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      inherited_access: T.nilable(T::Boolean),
+      resource_version: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    id: "",
+    name: "",
+    project_access: nil,
+    inherited_access: false,
+    resource_version: ""
+  )
+  end
+
+  # The id of the service account.
+  sig { returns(String) }
+  def id
+  end
+
+  # The id of the service account.
+  sig { params(value: String).void }
+  def id=(value)
+  end
+
+  # The id of the service account.
+  sig { void }
+  def clear_id
+  end
+
+  # The name of the service account.
+  sig { returns(String) }
+  def name
+  end
+
+  # The name of the service account.
+  sig { params(value: String).void }
+  def name=(value)
+  end
+
+  # The name of the service account.
+  sig { void }
+  def clear_name
+  end
+
+  # The access assigned to the service account at the project level.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def project_access
+  end
+
+  # The access assigned to the service account at the project level.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def project_access=(value)
+  end
+
+  # The access assigned to the service account at the project level.
+  sig { void }
+  def clear_project_access
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { returns(T::Boolean) }
+  def inherited_access
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { params(value: T::Boolean).void }
+  def inherited_access=(value)
+  end
+
+  # True if the user has inherited access to the project through an account role
+  sig { void }
+  def clear_inherited_access
+  end
+
+  sig { returns(String) }
+  def resource_version
+  end
+
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  sig { void }
+  def clear_resource_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ServiceAccountProjectAssignment, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::Cloud::Identity::V1::ServiceAccountNamespaceAssignment
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2699,6 +3315,133 @@ class Temporalio::Api::Cloud::Identity::V1::ServiceAccountNamespaceAssignment
   end
 
   sig { params(msg: Temporalio::Api::Cloud::Identity::V1::ServiceAccountNamespaceAssignment, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
+class Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      id: T.nilable(String),
+      display_name: T.nilable(String),
+      project_access: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess),
+      inherited_access: T.nilable(T::Boolean),
+      resource_version: T.nilable(String)
+    ).void
+  end
+  def initialize(
+    id: "",
+    display_name: "",
+    project_access: nil,
+    inherited_access: false,
+    resource_version: ""
+  )
+  end
+
+  # The id of the group
+  sig { returns(String) }
+  def id
+  end
+
+  # The id of the group
+  sig { params(value: String).void }
+  def id=(value)
+  end
+
+  # The id of the group
+  sig { void }
+  def clear_id
+  end
+
+  # The display name of the group
+  sig { returns(String) }
+  def display_name
+  end
+
+  # The display name of the group
+  sig { params(value: String).void }
+  def display_name=(value)
+  end
+
+  # The display name of the group
+  sig { void }
+  def clear_display_name
+  end
+
+  # The access assigned to the group at the project level.
+  sig { returns(T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)) }
+  def project_access
+  end
+
+  # The access assigned to the group at the project level.
+  sig { params(value: T.nilable(Temporalio::Api::Cloud::Identity::V1::ProjectAccess)).void }
+  def project_access=(value)
+  end
+
+  # The access assigned to the group at the project level.
+  sig { void }
+  def clear_project_access
+  end
+
+  # True if the group has inherited access to the project through an account role
+  sig { returns(T::Boolean) }
+  def inherited_access
+  end
+
+  # True if the group has inherited access to the project through an account role
+  sig { params(value: T::Boolean).void }
+  def inherited_access=(value)
+  end
+
+  # True if the group has inherited access to the project through an account role
+  sig { void }
+  def clear_inherited_access
+  end
+
+  sig { returns(String) }
+  def resource_version
+  end
+
+  sig { params(value: String).void }
+  def resource_version=(value)
+  end
+
+  sig { void }
+  def clear_resource_version
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::Cloud::Identity::V1::UserGroupProjectAssignment, kw: T.untyped).returns(String) }
   def self.encode_json(msg, **kw)
   end
 
@@ -3057,6 +3800,29 @@ module Temporalio::Api::Cloud::Identity::V1::NamespaceAccess::Permission
   self::PERMISSION_ADMIN = T.let(1, Integer)
   self::PERMISSION_WRITE = T.let(2, Integer)
   self::PERMISSION_READ = T.let(3, Integer)
+
+  sig { params(value: Integer).returns(T.nilable(Symbol)) }
+  def self.lookup(value)
+  end
+
+  sig { params(value: Symbol).returns(T.nilable(Integer)) }
+  def self.resolve(value)
+  end
+
+  sig { returns(::Google::Protobuf::EnumDescriptor) }
+  def self.descriptor
+  end
+end
+
+module Temporalio::Api::Cloud::Identity::V1::ProjectAccess::ProjectRole
+  self::PROJECT_ROLE_UNSPECIFIED = T.let(0, Integer)
+  self::PROJECT_ROLE_ADMIN = T.let(1, Integer)
+  self::PROJECT_ROLE_WRITE = T.let(2, Integer)
+  self::PROJECT_ROLE_READ = T.let(3, Integer)
+  self::PROJECT_ROLE_LIST = T.let(4, Integer)
+  self::PROJECT_ROLE_CONTRIBUTE = T.let(5, Integer)
+  self::PROJECT_ROLE_MEMBER = T.let(6, Integer)
+  self::PROJECT_ROLE_DEVELOPER = T.let(7, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

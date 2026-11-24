@@ -146,6 +146,8 @@ module Temporalio::Api::Enums::V1::ResourceExhaustedCause
   self::RESOURCE_EXHAUSTED_CAUSE_OPS_LIMIT = T.let(9, Integer)
   self::RESOURCE_EXHAUSTED_CAUSE_WORKER_DEPLOYMENT_LIMITS = T.let(10, Integer)
   self::RESOURCE_EXHAUSTED_CAUSE_BANDWIDTH_LIMIT = T.let(11, Integer)
+  self::RESOURCE_EXHAUSTED_CAUSE_CALLER_RPS_LIMIT = T.let(12, Integer)
+  self::RESOURCE_EXHAUSTED_CAUSE_SHARD_PERSISTENCE_LIMIT = T.let(13, Integer)
 
   sig { params(value: Integer).returns(T.nilable(Symbol)) }
   def self.lookup(value)

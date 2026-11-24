@@ -1555,6 +1555,9 @@ module Temporalio::Api::WorkflowService::V1::WorkflowService
     def delete_nexus_operation_execution(request)
     end
 
+    # PollWorkflowExecutionTimeSkipping waits for a fast-forward outcome for a workflow execution.
+#
+# Experimental. Might change in the future.
     sig do
       params(
         request: Temporalio::Api::WorkflowService::V1::PollWorkflowExecutionTimeSkippingRequest

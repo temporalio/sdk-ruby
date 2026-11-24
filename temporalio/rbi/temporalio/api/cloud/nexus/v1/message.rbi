@@ -436,7 +436,8 @@ class Temporalio::Api::Cloud::Nexus::V1::Endpoint
       state: T.nilable(T.any(Symbol, String, Integer)),
       async_operation_id: T.nilable(String),
       created_time: T.nilable(Google::Protobuf::Timestamp),
-      last_modified_time: T.nilable(Google::Protobuf::Timestamp)
+      last_modified_time: T.nilable(Google::Protobuf::Timestamp),
+      project_id: T.nilable(String)
     ).void
   end
   def initialize(
@@ -446,7 +447,8 @@ class Temporalio::Api::Cloud::Nexus::V1::Endpoint
     state: :RESOURCE_STATE_UNSPECIFIED,
     async_operation_id: "",
     created_time: nil,
-    last_modified_time: nil
+    last_modified_time: nil,
+    project_id: ""
   )
   end
 
@@ -559,6 +561,21 @@ class Temporalio::Api::Cloud::Nexus::V1::Endpoint
   # The date and time when the endpoint was last modified.
   sig { void }
   def clear_last_modified_time
+  end
+
+  # The id of the project this endpoint belongs to.
+  sig { returns(String) }
+  def project_id
+  end
+
+  # The id of the project this endpoint belongs to.
+  sig { params(value: String).void }
+  def project_id=(value)
+  end
+
+  # The id of the project this endpoint belongs to.
+  sig { void }
+  def clear_project_id
   end
 
   sig { params(field: String).returns(T.untyped) }

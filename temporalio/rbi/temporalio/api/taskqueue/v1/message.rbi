@@ -162,8 +162,7 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueMetadata
   end
 end
 
-# Worker-reported state about the poller pool issuing a poll, used by the server to spread
-# poller scaling suggestions across a fleet.
+# Worker-reported state about the poller pool issuing a poll.
 class Temporalio::Api::TaskQueue::V1::PollerPoolInfo
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -178,20 +177,20 @@ class Temporalio::Api::TaskQueue::V1::PollerPoolInfo
   )
   end
 
-  # Number of concurrent poll requests this worker is currently targeting for this task
-# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this worker is targeting for this task queue and task type.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { returns(Integer) }
   def target_pollers
   end
 
-  # Number of concurrent poll requests this worker is currently targeting for this task
-# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this worker is targeting for this task queue and task type.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { params(value: Integer).void }
   def target_pollers=(value)
   end
 
-  # Number of concurrent poll requests this worker is currently targeting for this task
-# queue and task type. 0 if unknown, such as a poller pool of fixed size.
+  # Number of pollers this worker is targeting for this task queue and task type.
+# 0 if unknown, such as a poller pool of fixed size.
   sig { void }
   def clear_target_pollers
   end
@@ -2369,6 +2368,83 @@ class Temporalio::Api::TaskQueue::V1::RateLimit
   end
 end
 
+class Temporalio::Api::TaskQueue::V1::ConcurrencyLimit
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      concurrent_tasks: T.nilable(Integer)
+    ).void
+  end
+  def initialize(
+    concurrent_tasks: 0
+  )
+  end
+
+  # Maximum number of concurrent tasks that may be running at a time across the scope of the
+# limit. e.g. in TaskQueueConfig, the scope is the whole task queue.
+#
+# Note that in situations like network partitions, the server's idea of what is running on
+# workers may be out of date, and this limit could be exceeded from the point of view of
+# workers.
+  sig { returns(Integer) }
+  def concurrent_tasks
+  end
+
+  # Maximum number of concurrent tasks that may be running at a time across the scope of the
+# limit. e.g. in TaskQueueConfig, the scope is the whole task queue.
+#
+# Note that in situations like network partitions, the server's idea of what is running on
+# workers may be out of date, and this limit could be exceeded from the point of view of
+# workers.
+  sig { params(value: Integer).void }
+  def concurrent_tasks=(value)
+  end
+
+  # Maximum number of concurrent tasks that may be running at a time across the scope of the
+# limit. e.g. in TaskQueueConfig, the scope is the whole task queue.
+#
+# Note that in situations like network partitions, the server's idea of what is running on
+# workers may be out of date, and this limit could be exceeded from the point of view of
+# workers.
+  sig { void }
+  def clear_concurrent_tasks
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::ConcurrencyLimit).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::ConcurrencyLimit, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::TaskQueue::V1::ConfigMetadata
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2541,6 +2617,79 @@ class Temporalio::Api::TaskQueue::V1::RateLimitConfig
   end
 end
 
+class Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig
+  include ::Google::Protobuf::MessageExts
+  extend ::Google::Protobuf::MessageExts::ClassMethods
+
+  sig do
+    params(
+      concurrency_limit: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit),
+      metadata: T.nilable(Temporalio::Api::TaskQueue::V1::ConfigMetadata)
+    ).void
+  end
+  def initialize(
+    concurrency_limit: nil,
+    metadata: nil
+  )
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit)) }
+  def concurrency_limit
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimit)).void }
+  def concurrency_limit=(value)
+  end
+
+  sig { void }
+  def clear_concurrency_limit
+  end
+
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::ConfigMetadata)) }
+  def metadata
+  end
+
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::ConfigMetadata)).void }
+  def metadata=(value)
+  end
+
+  sig { void }
+  def clear_metadata
+  end
+
+  sig { params(field: String).returns(T.untyped) }
+  def [](field)
+  end
+
+  sig { params(field: String, value: T.untyped).void }
+  def []=(field, value)
+  end
+
+  sig { returns(T::Hash[Symbol, T.untyped]) }
+  def to_h
+  end
+
+  sig { params(str: String).returns(Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig) }
+  def self.decode(str)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig).returns(String) }
+  def self.encode(msg)
+  end
+
+  sig { params(str: String, kw: T.untyped).returns(Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig) }
+  def self.decode_json(str, **kw)
+  end
+
+  sig { params(msg: Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig, kw: T.untyped).returns(String) }
+  def self.encode_json(msg, **kw)
+  end
+
+  sig { returns(::Google::Protobuf::Descriptor) }
+  def self.descriptor
+  end
+end
+
 class Temporalio::Api::TaskQueue::V1::TaskQueueConfig
   include ::Google::Protobuf::MessageExts
   extend ::Google::Protobuf::MessageExts::ClassMethods
@@ -2549,27 +2698,29 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueConfig
     params(
       queue_rate_limit: T.nilable(Temporalio::Api::TaskQueue::V1::RateLimitConfig),
       fairness_keys_rate_limit_default: T.nilable(Temporalio::Api::TaskQueue::V1::RateLimitConfig),
-      fairness_weight_overrides: T.nilable(T::Hash[String, Float])
+      fairness_weight_overrides: T.nilable(T::Hash[String, Float]),
+      queue_concurrency_limit: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig)
     ).void
   end
   def initialize(
     queue_rate_limit: nil,
     fairness_keys_rate_limit_default: nil,
-    fairness_weight_overrides: ::Google::Protobuf::Map.new(:string, :float)
+    fairness_weight_overrides: ::Google::Protobuf::Map.new(:string, :float),
+    queue_concurrency_limit: nil
   )
   end
 
-  # Unless modified, this is the system-defined rate limit.
+  # Rate limit for the whole queue.
   sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::RateLimitConfig)) }
   def queue_rate_limit
   end
 
-  # Unless modified, this is the system-defined rate limit.
+  # Rate limit for the whole queue.
   sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::RateLimitConfig)).void }
   def queue_rate_limit=(value)
   end
 
-  # Unless modified, this is the system-defined rate limit.
+  # Rate limit for the whole queue.
   sig { void }
   def clear_queue_rate_limit
   end
@@ -2602,6 +2753,21 @@ class Temporalio::Api::TaskQueue::V1::TaskQueueConfig
   # If set, overrides the fairness weights for the corresponding fairness keys.
   sig { void }
   def clear_fairness_weight_overrides
+  end
+
+  # Concurrency limit for the whole queue.
+  sig { returns(T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig)) }
+  def queue_concurrency_limit
+  end
+
+  # Concurrency limit for the whole queue.
+  sig { params(value: T.nilable(Temporalio::Api::TaskQueue::V1::ConcurrencyLimitConfig)).void }
+  def queue_concurrency_limit=(value)
+  end
+
+  # Concurrency limit for the whole queue.
+  sig { void }
+  def clear_queue_concurrency_limit
   end
 
   sig { params(field: String).returns(T.untyped) }
