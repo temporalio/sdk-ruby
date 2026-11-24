@@ -72,13 +72,7 @@ module Temporalio
       #
       # @!visibility private
       def _without_storage
-        dup.tap do |converter|
-          converter.instance_variable_set(:@external_storage, nil)
-          converter.instance_variable_set(
-            :@external_storage_runner, Internal::ExternalStorageRunner.new(nil, namespace: nil)
-          )
-          converter.instance_variable_set(:@storage_target, nil)
-        end
+        dup.tap { |converter| converter.send(:set_storage, nil, namespace: nil, target: nil) }
       end
 
       # Convert a Ruby value to a payload and encode it.
