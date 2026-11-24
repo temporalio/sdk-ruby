@@ -57,12 +57,15 @@ module Temporalio
           serialized = payload.to_proto
           next if serialized.bytesize < storage.payload_size_threshold
 
-          driver = storage.driver_selector.call(select_context, payload)
+          driver = raise_as_storage_error('External storage driver selector failed') do
+            storage.driver_selector.call(select_context, payload)
+          end
           next unless driver
 
           # Checked by identity, so a driver built to look like a registered one is rejected.
           unless storage.driver(driver.name).equal?(driver)
-            raise Error, "External storage driver selector returned a driver that is not registered: #{driver.inspect}"
+            raise Error::ExternalStorageError,
+                  "External storage driver selector returned a driver that is not registered: #{driver.inspect}"
           end
 
           payloads_by_driver[driver] << [index, serialized]
@@ -77,9 +80,11 @@ module Temporalio
           # place
           copies = indexes_and_serialized.map { |_index, serialized| Api::Common::V1::Payload.decode(serialized) }
           start_time = @clock.call
-          claims = driver.store(context, copies)
+          claims = raise_as_storage_error("External storage driver '#{driver.name}' failed to store payloads") do
+            driver.store(context, copies)
+          end
           end_time = @clock.call
-          check_result_count(driver, 'store', indexes_and_serialized.size, claims)
+          check_driver_result(driver, 'store', indexes_and_serialized.size, claims, Converters::StorageDriverClaim)
           metrics&.record(
             driver_name: driver.name,
             payload_count: claims.size,
@@ -101,6 +106,7 @@ module Temporalio
       # @param metrics [StorageOperationMetrics, nil] Records each driver call that retrieves payloads.
       # @return [Array<Api::Common::V1::Payload>] Payloads with every reference replaced by what it points at.
       # @raise [Error::ExternalStorageNotConfiguredError] If there is a reference but no storage is configured.
+      # @raise [Error::ExternalStorageError] If a reference cannot be read or retrieved.
       def retrieve(payloads, metrics: nil)
         storage = @storage
         # Driver => [[index, claim], ...] for each reference that driver stored. Every driver is looked up here, so an
@@ -112,7 +118,10 @@ module Temporalio
           raise Error::ExternalStorageNotConfiguredError unless storage
 
           driver = storage.driver(reference.driver_name)
-          raise Error, "No external storage driver registered with name '#{reference.driver_name}'" unless driver
+          unless driver
+            raise Error::ExternalStorageError,
+                  "No external storage driver registered with name '#{reference.driver_name}'"
+          end
 
           claims_by_driver[driver] << [index, Converters::StorageDriverClaim.new(claim_data: reference.claim_data.to_h)]
         end
@@ -123,9 +132,11 @@ module Temporalio
             cancellation: Cancellation.new, limiter: UNBOUNDED_LIMITER
           )
           start_time = @clock.call
-          retrieved = driver.retrieve(context, indexes_and_claims.map { |_index, claim| claim })
+          retrieved = raise_as_storage_error("External storage driver '#{driver.name}' failed to retrieve payloads") do
+            driver.retrieve(context, indexes_and_claims.map { |_index, claim| claim })
+          end
           end_time = @clock.call
-          check_result_count(driver, 'retrieve', indexes_and_claims.size, retrieved)
+          check_driver_result(driver, 'retrieve', indexes_and_claims.size, retrieved, Api::Common::V1::Payload)
           metrics&.record(
             driver_name: driver.name,
             payload_count: retrieved.size,
@@ -141,11 +152,28 @@ module Temporalio
 
       private
 
-      def check_result_count(driver, operation, requested, returned)
-        return if returned.is_a?(Array) && returned.size == requested
+      def raise_as_storage_error(failure_message)
+        yield
+      rescue Error::ExternalStorageError, Error::CanceledError
+        raise
+      rescue StandardError => e
+        raise Error::ExternalStorageError, "#{failure_message}: #{e.message}"
+      end
 
-        raise Error, "External storage driver '#{driver.name}' #{operation} was given #{requested} item(s) but " \
-                     "returned #{returned.is_a?(Array) ? returned.size : returned.inspect}"
+      def check_driver_result(driver, operation, requested, returned, expected_item_class)
+        unless returned.is_a?(Array) && returned.size == requested
+          raise Error::ExternalStorageError,
+                "External storage driver '#{driver.name}' #{operation} was given #{requested} item(s) but " \
+                "returned #{returned.is_a?(Array) ? returned.size : returned.inspect}"
+        end
+
+        returned.each do |item|
+          next if item.is_a?(expected_item_class)
+
+          raise Error::ExternalStorageError,
+                "External storage driver '#{driver.name}' #{operation} returned #{item.inspect} instead of a " \
+                "#{expected_item_class}"
+        end
       end
 
       # Grants every permit immediately, since concurrency limits are not enforced yet.

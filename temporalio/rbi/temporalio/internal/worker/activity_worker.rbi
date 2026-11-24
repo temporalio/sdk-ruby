@@ -63,6 +63,9 @@ class Temporalio::Internal::Worker::ActivityWorker
   end
   def storage_target_for_task(start); end
 
+  sig { params(error: Exception, data_converter: Temporalio::Converters::DataConverter).returns(Object) }
+  def failed_result(error, data_converter); end
+
   sig { params(activity: String).void }
   def assert_valid_activity(activity); end
 end

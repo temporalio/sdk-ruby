@@ -26,6 +26,7 @@ module Temporalio
           @worker = worker
           @bridge_worker = bridge_worker
           @runtime_metric_meter = worker.options.client.connection.options.runtime.metric_meter
+          @data_converter_without_storage = worker.options.client.data_converter._without_storage
 
           # Create shared logger that gives scoped activity details
           @scoped_logger = ScopedLogger.new(@worker.options.logger)
@@ -258,11 +259,7 @@ module Temporalio
             @bridge_worker.complete_activity_task(
               Bridge::Api::CoreInterface::ActivityTaskCompletion.new(
                 task_token:,
-                result: Bridge::Api::ActivityResult::ActivityExecutionResult.new(
-                  failed: Bridge::Api::ActivityResult::Failure.new(
-                    failure: storage_data_converter(start).to_failure(e)
-                  )
-                )
+                result: failed_result(e, storage_data_converter(start))
               )
             )
           rescue StandardError => e_inner
@@ -344,11 +341,7 @@ module Temporalio
                           end
               @scoped_logger.add(log_level, 'Completing activity as failed')
               @scoped_logger.add(log_level, e)
-              Bridge::Api::ActivityResult::ActivityExecutionResult.new(
-                failed: Bridge::Api::ActivityResult::Failure.new(
-                  failure: data_converter.to_failure(e)
-                )
-              )
+              failed_result(e, data_converter)
             end
           end
 
@@ -359,6 +352,21 @@ module Temporalio
               result:
             )
           )
+        end
+
+        def failed_result(error, data_converter)
+          if error.is_a?(Error::ExternalStorageError)
+            Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+              failed: Bridge::Api::ActivityResult::Failure.new(
+                failure: @data_converter_without_storage.to_failure(error),
+                cause: :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE
+              )
+            )
+          else
+            Bridge::Api::ActivityResult::ActivityExecutionResult.new(
+              failed: Bridge::Api::ActivityResult::Failure.new(failure: data_converter.to_failure(error))
+            )
+          end
         end
 
         def storage_data_converter(start)

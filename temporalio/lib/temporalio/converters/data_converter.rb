@@ -66,6 +66,15 @@ module Temporalio
         dup.tap { |converter| converter.send(:set_storage, external_storage, namespace:, target:) }
       end
 
+      # Copy of this converter that never stores or retrieves payloads. Converters and codec are kept.
+      #
+      # @return [DataConverter] The copy.
+      #
+      # @!visibility private
+      def _without_storage
+        dup.tap { |converter| converter.send(:set_storage, nil, namespace: nil, target: nil) }
+      end
+
       # Convert a Ruby value to a payload and encode it.
       #
       # @param value [Object] Ruby value.

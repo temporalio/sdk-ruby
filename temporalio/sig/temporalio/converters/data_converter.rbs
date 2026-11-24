@@ -23,6 +23,8 @@ module Temporalio
         target: storageDriverTargetInfo?
       ) -> DataConverter
 
+      def _without_storage: -> DataConverter
+
       def to_payload: (Object? value, ?hint: Object?) -> Temporalio::Api::Common::V1::Payload
       def to_payloads: (
         Array[Object?] values,

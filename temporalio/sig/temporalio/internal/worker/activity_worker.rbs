@@ -32,6 +32,11 @@ module Temporalio
         def storage_data_converter: (untyped start) -> Converters::DataConverter
         def storage_target_for_task: (untyped start) -> Converters::storageDriverTargetInfo
 
+        def failed_result: (
+          Exception error,
+          Converters::DataConverter data_converter
+        ) -> Bridge::Api::ActivityResult::ActivityExecutionResult
+
         def assert_valid_activity: (String activity) -> void
 
         class RunningActivity < Activity::Context

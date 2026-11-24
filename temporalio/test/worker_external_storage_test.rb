@@ -208,12 +208,16 @@ class WorkerExternalStorageTest < Test
   end
 
   def test_worker_retrieve_failure_fails_the_task_and_is_retried
-    assert_storage_failure_retried(FailOnceStorageDriver.new(fail_retrieve: true), 'Intentional retrieve failure')
+    assert_storage_failure_retried(
+      FailOnceStorageDriver.new(fail_retrieve: true),
+      "External storage driver 'mem' failed to retrieve payloads: Intentional retrieve failure"
+    )
   end
 
   def test_worker_store_failure_fails_the_task_and_is_retried
     assert_storage_failure_retried(
-      FailOnceStorageDriver.new(fail_store_containing: 'done'), 'Failed encoding completion: Intentional store failure'
+      FailOnceStorageDriver.new(fail_store_containing: 'done'),
+      "Failed encoding completion: External storage driver 'mem' failed to store payloads: Intentional store failure"
     )
   end
 
@@ -226,6 +230,7 @@ class WorkerExternalStorageTest < Test
         failure = handle.fetch_history_events.filter_map(&:workflow_task_failed_event_attributes).first
         refute_nil failure
         assert_includes failure.failure.message, 'TMPRL1105'
+        assert_equal :WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failure.cause
       end
     end
   end
@@ -395,10 +400,10 @@ class WorkerExternalStorageTest < Test
   def test_driver_store_failure_surfaces_to_the_client
     client = client_with_storage(FailOnceStorageDriver.new(fail_store_containing: 'start-input'))
 
-    error = assert_raises(RuntimeError) do
+    error = assert_raises(Temporalio::Error::ExternalStorageError) do
       client.start_workflow(EchoWorkflow, 'start-input', id: "wf-#{SecureRandom.uuid}", task_queue: 'unused')
     end
-    assert_equal 'Intentional store failure', error.message
+    assert_equal 'Intentional store failure', error.cause&.message
   end
 
   class ChildWorkflow < Temporalio::Workflow::Definition
@@ -479,6 +484,154 @@ class WorkerExternalStorageTest < Test
       assert_equal 'Activity failed', failure.message
       assert_reference failure.application_failure_info.details.payloads.first
     end
+  end
+
+  def test_activity_result_store_failure_fails_with_storage_cause_and_is_retried
+    driver = FailOnceStorageDriver.new(fail_store_containing: 'activity got')
+    result, completions = execute_workflow_capturing_activity_completions(
+      ScheduleActivityWorkflow, activities: [StorageActivity], driver:
+    )
+
+    assert_equal 'activity got scheduled-input', result
+    failed_result = first_failed_result(completions)
+    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
+    assert_equal "External storage driver 'mem' failed to store payloads: Intentional store failure",
+                 failed_result.failure.message
+  end
+
+  def test_activity_failure_store_failure_is_reported_without_storing
+    driver = FailOnceStorageDriver.new(fail_store_containing: 'activity-detail')
+    result, completions = execute_workflow_capturing_activity_completions(
+      ActivityFailureWorkflow, activities: [FailingActivity], driver:
+    )
+
+    assert_equal 'activity-detail', result
+    failed_result = first_failed_result(completions)
+    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
+    activity_failure = failed_result.failure.cause&.cause or flunk('No activity failure in the cause chain')
+    assert_equal 'Activity failed', activity_failure.message
+    refute References.reference?(activity_failure.application_failure_info.details.payloads.first)
+  end
+
+  class HeartbeatStoreFailureActivity < Temporalio::Activity::Definition
+    def execute
+      Temporalio::Activity::Context.current.heartbeat('failing-heartbeat')
+      raise 'Heartbeat did not raise'
+    end
+  end
+
+  class HeartbeatStoreFailureWorkflow < Temporalio::Workflow::Definition
+    def execute
+      Temporalio::Workflow.execute_activity(
+        HeartbeatStoreFailureActivity,
+        start_to_close_timeout: 5, retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+    rescue Temporalio::Error::ActivityError => e
+      e.cause&.message
+    end
+  end
+
+  def test_heartbeat_store_failure_raises_from_heartbeat_and_fails_with_storage_cause
+    driver = FailOnceStorageDriver.new(fail_store_containing: 'failing-heartbeat')
+    result, completions = execute_workflow_capturing_activity_completions(
+      HeartbeatStoreFailureWorkflow, activities: [HeartbeatStoreFailureActivity], driver:
+    )
+
+    message = "External storage driver 'mem' failed to store payloads: Intentional store failure"
+    assert_equal message, result
+    failed_result = first_failed_result(completions)
+    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
+    assert_equal message, failed_result.failure.message
+  end
+
+  def test_activity_input_retrieve_failure_fails_with_storage_cause_and_is_retried
+    driver = FailOnceStorageDriver.new(fail_retrieve: true)
+    result, completions = execute_workflow_capturing_activity_completions(
+      ScheduleActivityWorkflow, activities: [StorageActivity], driver:
+    )
+
+    assert_equal 'activity got scheduled-input', result
+    failed_result = first_failed_result(completions)
+    assert_equal :ACTIVITY_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, failed_result.cause
+    assert_equal "External storage driver 'mem' failed to retrieve payloads: Intentional retrieve failure",
+                 failed_result.failure.message
+  end
+
+  class CancelOnSignalWorkflow < Temporalio::Workflow::Definition
+    def execute(activity)
+      cancellation, cancel_proc = Temporalio::Cancellation.new
+      Temporalio::Workflow::Future.new do
+        Temporalio::Workflow.wait_condition { @cancel }
+        cancel_proc.call
+      end
+      Temporalio::Workflow.execute_activity(
+        activity,
+        start_to_close_timeout: 10, heartbeat_timeout: 1, cancellation:,
+        cancellation_type: Temporalio::Workflow::ActivityCancellationType::WAIT_CANCELLATION_COMPLETED,
+        retry_policy: Temporalio::RetryPolicy.new(max_attempts: 1)
+      )
+    rescue Temporalio::Error::ActivityError => e
+      e.cause.is_a?(Temporalio::Error::CanceledError) ? 'canceled' : e.cause&.message
+    end
+
+    workflow_signal
+    def cancel
+      @cancel = true
+    end
+  end
+
+  class BlockOnceStorageDriver < InMemoryStorageDriver
+    attr_reader :blocked
+
+    def initialize(block_store_containing:)
+      super()
+      @block_store_containing = block_store_containing
+      @blocked = Queue.new
+    end
+
+    def store(context, payloads)
+      block_text = @block_store_containing
+      if block_text && payloads.any? { |payload| payload.data.include?(block_text) }
+        @block_store_containing = nil
+        @blocked << true
+        sleep(5)
+      end
+      super
+    end
+  end
+
+  class HeartbeatStoreBlockedActivity < Temporalio::Activity::Definition
+    def execute
+      context = Temporalio::Activity::Context.current
+      heartbeater = Thread.new do
+        loop do
+          context.heartbeat('background-heartbeat')
+          sleep(0.1)
+        end
+      end
+      begin
+        context.heartbeat('blocked-heartbeat')
+        raise 'Activity was not canceled'
+      ensure
+        heartbeater.kill
+      end
+    end
+  end
+
+  def test_cancel_while_storing_a_heartbeat_is_reported_as_canceled
+    driver = BlockOnceStorageDriver.new(block_store_containing: 'blocked-heartbeat')
+    result, completions = execute_workflow_capturing_activity_completions(
+      CancelOnSignalWorkflow, 'HeartbeatStoreBlockedActivity',
+      activities: [HeartbeatStoreBlockedActivity], driver:
+    ) do |handle|
+      driver.blocked.pop(timeout: 10) or flunk('Heartbeat store never started')
+      handle.signal(CancelOnSignalWorkflow.cancel)
+    end
+
+    assert_equal 'canceled', result
+    refute completions.any? { |completion| completion.result.failed }, 'Expected no failed completion'
+    canceled_result = first_canceled_result(completions)
+    assert_equal 'Activity canceled', canceled_result.failure.message
   end
 
   class FailingWorkflow < Temporalio::Workflow::Definition
@@ -1015,6 +1168,31 @@ class WorkerExternalStorageTest < Test
     Array.new(completions.size) { completions.pop }
   end
 
+  def execute_workflow_capturing_activity_completions(workflow, *args, activities:, driver:)
+    client = client_with_storage(driver)
+    worker = Temporalio::Worker.new(
+      client:,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [workflow],
+      activities:,
+      workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
+    )
+    completions = Queue.new
+    bridge_worker = worker._bridge_worker
+    original_complete_activity_task = bridge_worker.method(:async_complete_activity_task)
+    bridge_worker.define_singleton_method(:async_complete_activity_task) do |proto, queue|
+      completions << Temporalio::Internal::Bridge::Api::CoreInterface::ActivityTaskCompletion.decode(proto)
+      original_complete_activity_task.call(proto, queue)
+    end
+    result = nil
+    worker.run do
+      handle = client.start_workflow(workflow, *args, id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue)
+      yield handle if block_given?
+      result = handle.result
+    end
+    [result, Array.new(completions.size) { completions.pop }]
+  end
+
   def assert_storage_failure_retried(driver, failure_message)
     execute_workflow(
       EchoWorkflow, 'start-input',
@@ -1022,8 +1200,9 @@ class WorkerExternalStorageTest < Test
       workflow_payload_codec_thread_pool: Temporalio::Worker::ThreadPool.default
     ) do |handle|
       assert_equal 'start-input done', handle.result
-      failure = first_attrs(handle.fetch_history_events, :workflow_task_failed_event_attributes).failure
-      assert_equal failure_message, failure.message
+      task_failed_attrs = first_attrs(handle.fetch_history_events, :workflow_task_failed_event_attributes)
+      assert_equal failure_message, task_failed_attrs.failure.message
+      assert_equal :WORKFLOW_TASK_FAILED_CAUSE_EXTERNAL_STORAGE_FAILURE, task_failed_attrs.cause
     end
   end
 
@@ -1071,6 +1250,14 @@ class WorkerExternalStorageTest < Test
         workflow_id: workflow_handle.id, run_id: activity_info.workflow_run_id, activity_id: activity_info.activity_id
       )
     )
+  end
+
+  def first_failed_result(activity_completions)
+    activity_completions.filter_map { |completion| completion.result.failed }.first || flunk('No failed completion')
+  end
+
+  def first_canceled_result(activity_completions)
+    activity_completions.filter_map { |completion| completion.result.cancelled }.first || flunk('Not canceled')
   end
 
   def first_attrs(events, attrs_method)
