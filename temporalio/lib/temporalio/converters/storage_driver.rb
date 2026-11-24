@@ -14,8 +14,6 @@ module Temporalio
     # pool instead of a fiber scheduler. {Temporalio::Worker::ThreadPool} can be used to bound that fan out.
     #
     # @note WARNING: This API is experimental and may change in the future.
-    #
-    # @!visibility private
     class StorageDriver
       # Name of this driver instance, unique among the drivers registered on one {ExternalStorage}. This is written
       # into history alongside every payload the driver stores and is used to route retrieval back to the same driver.

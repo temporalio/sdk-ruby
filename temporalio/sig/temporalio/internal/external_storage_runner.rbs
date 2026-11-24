@@ -27,11 +27,6 @@ module Temporalio
         untyped returned,
         Class expected_item_class
       ) -> void
-
-      class UnboundedLimiter < Converters::StorageDriverLimiter
-      end
-
-      UNBOUNDED_LIMITER: UnboundedLimiter
     end
   end
 end

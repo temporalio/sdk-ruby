@@ -13,6 +13,22 @@ module Temporalio
     #
     # @!visibility private
     class StorageDriverLimiter
+      # Limiter that grants every permit immediately. {StorageDriverStoreContext} and {StorageDriverRetrieveContext}
+      # use it by default, because the SDK does not enforce concurrency limits yet.
+      #
+      # @!visibility private
+      class Unbounded < StorageDriverLimiter
+        # (see StorageDriverLimiter#permit)
+        def permit(_item)
+          yield
+        end
+      end
+
+      # Shared instance of {Unbounded}.
+      #
+      # @!visibility private
+      UNBOUNDED = Unbounded.new
+
       # Hold a permit for the duration of the given block, waiting for one to be available before the block runs
       # and releasing it when the block returns or raises.
       #

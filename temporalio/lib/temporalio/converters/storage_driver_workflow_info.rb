@@ -23,8 +23,6 @@ module Temporalio
     #     workflow or continuing as new.
     # @!attribute [r] type
     #   @return [String, nil] Workflow type name, if known.
-    #
-    # @!visibility private
     class StorageDriverWorkflowInfo
       # Create workflow target information.
       #
