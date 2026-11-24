@@ -1,0 +1,63 @@
+module Temporalio
+  module Contrib
+    module Aws
+      class LambdaWorker
+        interface _Context
+          def get_remaining_time_in_millis: -> Numeric
+          def aws_request_id: -> String
+          def invoked_function_arn: -> String
+        end
+
+        type activity = Activity::Definition | singleton(Activity::Definition) | Activity::Definition::Info
+        type workflow = singleton(Workflow::Definition) | Workflow::Definition::Info
+        type plugin = Client::Plugin | Worker::Plugin
+        type hook = ^(Float) -> void
+        type configure = ^(Options, _Context) -> Options
+        type handler = ^(*untyped, **untyped) -> void
+
+        class Options < Data
+          attr_reader task_queue: String?
+          attr_reader activities: Array[activity]
+          attr_reader workflows: Array[workflow]
+          attr_reader client_options: Hash[Symbol, untyped]
+          attr_reader worker_options: Hash[Symbol, untyped]
+          attr_reader default_versioning_behavior: VersioningBehavior::enum
+          attr_reader shutdown_buffer: Numeric
+          attr_reader shutdown_hooks: Array[hook]
+          attr_reader plugins: Array[plugin]
+
+          def initialize: (
+            ?task_queue: String?, ?activities: Array[activity], ?workflows: Array[workflow],
+            ?client_options: Hash[Symbol, untyped], ?worker_options: Hash[Symbol, untyped],
+            ?default_versioning_behavior: VersioningBehavior::enum, ?shutdown_buffer: Numeric,
+            ?shutdown_hooks: Array[hook], ?plugins: Array[plugin]
+          ) -> void
+          def to_h: -> Hash[Symbol, untyped]
+          def with: (**untyped) -> Options
+        end
+
+        class EnforcementPlugin < SimplePlugin
+          @deployment: Worker::DeploymentOptions
+          @identity: String
+          @cancellation: Cancellation
+          def initialize: (WorkerDeploymentVersion, VersioningBehavior::enum, String, Cancellation) -> void
+        end
+
+        def self.define: (WorkerDeploymentVersion, ?options: Options) ?{ (Options, _Context) -> Options } -> handler
+        def self._define: (
+          WorkerDeploymentVersion, options: Options, dependencies: Hash[Symbol, untyped]
+        ) ?{ (Options, _Context) -> Options } -> handler
+        def self._immutable_copy: (untyped) -> untyped
+        %a{implicitly-returns-nil}
+        def self._invoke: (
+          WorkerDeploymentVersion, Options, _Context, dependencies: Hash[Symbol, untyped]
+        ) ?{ (Options, _Context) -> Options } -> void
+        def self._plugins: (Array[plugin]) -> [Array[Client::Plugin], Array[Worker::Plugin]]
+        def self._client_options: (Options, dependencies: Hash[Symbol, untyped]) -> [[String, String], Hash[Symbol, untyped]]
+        def self._worker_options: (Options) -> Hash[Symbol, untyped]
+        def self._cleanup: (Logger, String) { () -> untyped } -> untyped
+        def self._default_dependencies: -> Hash[Symbol, untyped]
+      end
+    end
+  end
+end

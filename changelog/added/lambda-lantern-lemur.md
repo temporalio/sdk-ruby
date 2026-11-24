@@ -1,0 +1,1 @@
+Add experimental AWS Lambda workers with per-invocation clients and workers, deadline-aware graceful shutdown, enforced deployment versioning with a PINNED default, and application-defined shutdown hooks.

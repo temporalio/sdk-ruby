@@ -1,0 +1,52 @@
+module Contrib
+  module Aws
+    class LambdaWorkerTest < Test
+      @clock: Float
+      @timer: Timer
+      @client: Client
+      @worker: Worker
+      @client_options: Array[Hash[Symbol, untyped]]
+      @worker_options: Array[Hash[Symbol, untyped]]
+      @delays: Array[Float]
+      @cancel: untyped
+      @getenv: Hash[String, String]
+      @dependencies: Hash[Symbol, untyped]
+      def handler: (**untyped) ?{ (Temporalio::Contrib::Aws::LambdaWorker::Options, Context) -> Temporalio::Contrib::Aws::LambdaWorker::Options } -> untyped
+      def context: (?String, ?remaining: Numeric) -> Context
+
+      class Context
+        @remaining_millis: Numeric
+        attr_accessor aws_request_id: String
+        attr_accessor invoked_function_arn: String
+        def initialize: (String, String, Numeric) -> void
+        def get_remaining_time_in_millis: -> Numeric
+      end
+
+      class Timer
+        attr_reader killed: bool?
+        attr_reader joined: bool?
+        def kill: -> void
+        def join: -> void
+      end
+
+      class Connection
+        attr_reader closed: bool?
+        def _close: -> void
+      end
+
+      class Client
+        attr_accessor connection: Connection
+        def initialize: (Connection) -> void
+      end
+
+      class Worker
+        @wait_for_cancellation: bool?
+        attr_writer wait_for_cancellation: bool?
+        attr_reader closed: bool?
+        attr_reader cancellation: Temporalio::Cancellation?
+        def run: (cancellation: Temporalio::Cancellation, shutdown_signals: Array[untyped]) -> void
+        def _close: -> void
+      end
+    end
+  end
+end

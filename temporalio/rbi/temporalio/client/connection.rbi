@@ -1,6 +1,9 @@
 # typed: true
 
 class Temporalio::Client::Connection
+  sig { void }
+  def _close; end
+
   sig do
     params(
       target_host: String,

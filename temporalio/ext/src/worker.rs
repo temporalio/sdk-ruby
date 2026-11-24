@@ -74,6 +74,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     )?;
     class.define_method("replace_client", method!(Worker::replace_client, 1))?;
     class.define_method("initiate_shutdown", method!(Worker::initiate_shutdown, 0))?;
+    class.define_method("finalized?", method!(Worker::finalized, 0))?;
 
     let inner_class = class.define_class("WorkflowReplayer", ruby.class_object())?;
     inner_class.define_singleton_method("new", function!(WorkflowReplayer::new, 2))?;
@@ -125,12 +126,9 @@ impl Worker {
             config.task_types.enable_local_activities || config.task_types.enable_remote_activities;
         let workflow = config.task_types.enable_workflows;
 
-        let worker = temporalio_sdk_core::init_worker(
-            &client.runtime_handle.core,
-            config,
-            client.core.clone(),
-        )
-        .map_err(|err| error!("Failed creating worker: {}", err))?;
+        let worker =
+            temporalio_sdk_core::init_worker(&client.runtime_handle.core, config, client.core()?)
+                .map_err(|err| error!("Failed creating worker: {}", err))?;
 
         Ok(Worker {
             core: RefCell::new(Some(Arc::new(worker))),
@@ -402,7 +400,7 @@ impl Worker {
         enter_sync!(self.runtime_handle);
         let worker = self.core.borrow().as_ref().unwrap().clone();
         worker
-            .replace_client(client.core.clone())
+            .replace_client(client.core()?)
             .map_err(|err| error!("Failed replacing client: {}", err))
     }
 
@@ -411,6 +409,10 @@ impl Worker {
         let worker = self.core.borrow().as_ref().unwrap().clone();
         worker.initiate_shutdown();
         Ok(())
+    }
+
+    pub fn finalized(&self) -> bool {
+        self.core.borrow().is_none()
     }
 }
 

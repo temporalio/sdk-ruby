@@ -3,6 +3,9 @@
 class Temporalio::Worker
   extend T::Sig
 
+  sig { void }
+  def _close; end
+
   sig { returns(Options) }
   attr_reader :options
 

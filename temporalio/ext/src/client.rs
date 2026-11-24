@@ -1,4 +1,6 @@
-use std::{collections::HashMap, future::Future, marker::PhantomData, time::Duration};
+use std::{
+    cell::RefCell, collections::HashMap, future::Future, marker::PhantomData, time::Duration,
+};
 
 use temporalio_client::{
     ClientKeepAliveOptions, ClientTlsOptions, Connection, ConnectionOptions,
@@ -41,6 +43,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
     class.define_method("async_invoke_rpc", method!(Client::async_invoke_rpc, -1))?;
     class.define_method("update_metadata", method!(Client::update_metadata, 1))?;
     class.define_method("update_api_key", method!(Client::update_api_key, 1))?;
+    class.define_method("close", method!(Client::close, 0))?;
 
     let inner_class = class.define_error("RPCFailure", ruby.get_inner(&ROOT_ERR))?;
     inner_class.define_method("code", method!(RpcFailure::code, 0))?;
@@ -56,7 +59,7 @@ pub fn init(ruby: &Ruby) -> Result<(), Error> {
 #[derive(TypedData)]
 #[magnus(class = "Temporalio::Internal::Bridge::Client", free_immediately)]
 pub struct Client {
-    pub(crate) core: Connection,
+    core: RefCell<Option<Connection>>,
     pub(crate) runtime_handle: RuntimeHandle,
 }
 
@@ -73,13 +76,13 @@ macro_rules! rpc_call {
     ($client:ident, $callback:ident, $call:ident, $trait:tt, $service_method:ident, $call_name:ident) => {{
         let cancel_token = $call.cancel_token.clone();
         if $call.retry {
-            let mut connection = $client.core.clone();
+            let mut connection = $client.core()?;
             let req = $call.into_request()?;
             $crate::client::rpc_resp($client, $callback, cancel_token, async move {
                 $trait::$call_name(&mut connection, req).await
             })
         } else {
-            let connection = $client.core.clone();
+            let connection = $client.core()?;
             let req = $call.into_request()?;
             $crate::client::rpc_resp($client, $callback, cancel_token, async move {
                 connection.$service_method().$call_name(req).await
@@ -248,7 +251,7 @@ impl Client {
                 Ok(core) => callback.push(
                     &ruby,
                     Client {
-                        core,
+                        core: RefCell::new(Some(core)),
                         runtime_handle,
                     },
                 ),
@@ -313,17 +316,30 @@ impl Client {
     pub fn update_metadata(&self, headers: RHash) -> Result<(), Error> {
         let ruby = Ruby::get().expect("Ruby not available");
         let headers = partition_grpc_headers(&ruby, headers)?;
-        self.core
-            .set_headers(headers.headers)
+        let core = self.core()?;
+        core.set_headers(headers.headers)
             .map_err(|err| error!("Invalid headers: {}", err))?;
-        self.core
-            .set_binary_headers(headers.binary_headers)
+        core.set_binary_headers(headers.binary_headers)
             .map_err(|err| error!("Invalid headers: {}", err))?;
         Ok(())
     }
 
-    pub fn update_api_key(&self, api_key: Option<String>) {
-        self.core.set_api_key(api_key);
+    pub fn update_api_key(&self, api_key: Option<String>) -> Result<(), Error> {
+        self.core()?.set_api_key(api_key);
+        Ok(())
+    }
+
+    pub fn close(&self) -> Result<(), Error> {
+        self.runtime_handle.fork_check("close client")?;
+        self.core.borrow_mut().take();
+        Ok(())
+    }
+
+    pub(crate) fn core(&self) -> Result<Connection, Error> {
+        self.core
+            .borrow()
+            .clone()
+            .ok_or_else(|| error!("Client is closed"))
     }
 }
 

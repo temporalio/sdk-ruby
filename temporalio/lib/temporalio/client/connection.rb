@@ -352,6 +352,14 @@ module Temporalio
         end
       end
 
+      # @!visibility private
+      def _close
+        @core_client_mutex.synchronize do
+          @core_client&.close
+          @core_client = nil
+        end
+      end
+
       private
 
       def new_core_client
