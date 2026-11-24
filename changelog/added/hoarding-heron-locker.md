@@ -1,1 +1,0 @@
-Added experimental external storage, which stores large payloads outside workflow history through `Converters::StorageDriver`s set on `Converters::DataConverter#external_storage`. Includes an Amazon S3 driver in `Contrib::Aws::S3Driver`. See the README "External Storage" section.
