@@ -5,10 +5,8 @@
 ### Added
 
 - Added experimental external storage, which stores large payloads outside workflow history through `Converters::StorageDriver`s set on `Converters::DataConverter#external_storage`. Includes an Amazon S3 driver in `Contrib::Aws::S3Driver`. See the README "External Storage" section.
-
 - Core: Low-level Operator Service calls support namespace soft deletion, restoration, and restore progress queries.
 - Core: Cloud API bindings support v0.27.0, including user group memberships, projects, project-scoped custom roles, and caller rate limit operations.
-- Core: SDK bridges can opt in at build time to preserving workflow task boundaries during replay, for new workflows only. The mode is recorded on the first successful task completion and defaults to off. Core handles tasks with no activation jobs internally, without polling workflow routines; see [Disabling chunking](../../arch_docs/workflow_task_chunking.md#disabling-chunking).
 
 ### Changed
 
@@ -17,7 +15,6 @@
 ### Fixed
 
 - Fixed the `Workflow.upsert_memo` RBI signature so `srb tc` no longer rejects it with `Malformed sig` (srb.help/5003).
-
 - Core: Nexus operations cancelled or timed out before starting retain their cancellation or timeout failure type even when the corresponding history event omits its failure.
 - Core: A Nexus operation cancelled with the `ABANDON` cancellation type that later completes, fails, or times out no longer fails workflow tasks with a nondeterminism error.
 - Core: Cancelling a Nexus operation with `ABANDON` or `TRY_CANCEL` before it starts now resolves it with a failed `ResolveNexusOperationStart` carrying a cancelled failure, instead of a `ResolveNexusOperation`. Core no longer sends a second resolution when the server later records the operation's start or outcome, which lang SDKs rejected as an unknown sequence number.
