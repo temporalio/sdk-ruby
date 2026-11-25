@@ -46,6 +46,9 @@ class Temporalio::Internal::Bridge::Worker
 
   sig { void }
   def initiate_shutdown; end
+
+  sig { returns(T::Boolean) }
+  def finalized?; end
 end
 
 class Temporalio::Internal::Bridge::Worker::Options < ::Struct

@@ -1,0 +1,43 @@
+module Contrib
+  module Aws
+    class LambdaWorkerIntegrationTest < Test
+      class Context < Struct[untyped]
+        attr_accessor aws_request_id: String
+        attr_accessor invoked_function_arn: String
+        def initialize: (String, String) -> void
+        def get_remaining_time_in_millis: -> Numeric
+      end
+      class GreetingActivity < Temporalio::Activity::Definition
+        def execute: (String) -> String
+      end
+      class WaitingWorkflow < Temporalio::Workflow::Definition
+        @ready: bool
+        @finish: bool
+        def self.ready: -> Symbol
+        def execute: (String) -> untyped
+        def finish: -> void
+      end
+      class OverridePlugin < Temporalio::SimplePlugin
+        def initialize: -> void
+      end
+      class WorkerOnlyPlugin
+        include Temporalio::Worker::Plugin
+      end
+      class RetryingActivity < Temporalio::Activity::Definition
+        @attempts: Thread::Queue[Integer]
+        def initialize: (Thread::Queue[Integer]) -> void
+        def execute: (String) -> String
+      end
+      class RetryingWorkflow < Temporalio::Workflow::Definition
+        def execute: (String) -> untyped
+      end
+      def assert_warm_resume: (
+        Temporalio::VersioningBehavior::enum,
+        ?plugins: Array[Temporalio::Client::Plugin | Temporalio::Worker::Plugin],
+        ?shutdown_hooks: Array[^(Float) -> void]
+      ) -> void
+      def wait_deployment: (Temporalio::WorkerDeploymentVersion) -> void
+      def invoke: (untyped, Thread::Queue[untyped]) { (?Numeric) -> untyped } -> void
+    end
+  end
+end

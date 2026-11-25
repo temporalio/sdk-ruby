@@ -655,6 +655,21 @@ module Temporalio
 
       # Mutex needed for accessing and replacing a client
       @client_mutex = Mutex.new
+    rescue StandardError
+      if @bridge_worker && !@bridge_worker.finalized?
+        # Core registers the worker before Ruby initialization finishes, so a failed constructor must drain it too.
+        @worker_shutdown_cancellation ||= Cancellation.new
+        begin
+          _close
+        rescue StandardError => cleanup_error
+          begin
+            @options.logger.error("Worker cleanup failed after initialization error: #{cleanup_error}")
+          rescue StandardError
+            nil
+          end
+        end
+      end
+      raise
     end
 
     # @return [String] Task queue set on the worker options.
@@ -722,6 +737,21 @@ module Temporalio
     # @!visibility private
     def _wait_all_complete
       @activity_worker&.wait_all_complete
+    end
+
+    # @!visibility private
+    def _close
+      return if _bridge_worker.finalized?
+
+      # A run plugin can fail before starting pollers; Core still needs them to observe shutdown before finalization.
+      _initiate_shutdown
+      Worker._run_all_root(
+        self,
+        cancellation: Cancellation.new,
+        shutdown_signals: [],
+        raise_in_block_on_shutdown: nil,
+        wait_block_complete: true
+      )
     end
 
     # @!visibility private

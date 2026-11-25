@@ -164,6 +164,7 @@ module Temporalio
     def _worker_shutdown_cancellation: -> Cancellation
     def _initiate_shutdown: -> void
     def _wait_all_complete: -> void
+    def _close: -> void
     def _bridge_worker: -> Internal::Bridge::Worker
     def _activity_interceptors: -> Array[Interceptor::Activity]
     def _on_poll_bytes: (Internal::Worker::MultiRunner runner, Symbol worker_type, String bytes) -> void
