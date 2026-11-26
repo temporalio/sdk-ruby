@@ -34,7 +34,6 @@ jobs:
             rubyVersion: "4.0"
             fips: false
             checkTarget: true
-            docsTarget: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -105,14 +104,6 @@ jobs:
           TEMPORAL_SORBET_RUNTIME_CHECK: "1"
 
         run: bundle exec rake test TESTOPTS="--verbose"
-
-      - name: Deploy docs
-        # Only deploy on main merge, not in PRs
-        if: ${{ github.ref == 'refs/heads/main' && matrix.docsTarget }}
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        run: npx vercel deploy temporalio/doc --token ${{ secrets.VERCEL_TOKEN }} --prod --yes
 
   cloud-test:
     # Secrets are unavailable to workflows from forks.
