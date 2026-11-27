@@ -11,7 +11,7 @@ use crate::{
     client::Client,
     enter_sync, error, id, lazy_id, new_error,
     runtime::{AsyncCommand, Runtime, RuntimeHandle},
-    util::{AsyncCallback, SendSyncBoxValue, Struct},
+    util::{AsyncCallback, SendSyncBoxValue, Struct, without_gvl},
 };
 use futures::{StreamExt, stream::BoxStream};
 use futures::{future, stream};
@@ -363,7 +363,13 @@ impl Worker {
         let heartbeat = ActivityHeartbeat::decode(unsafe { proto.as_slice() })
             .map_err(|err| error!("Invalid proto: {}", err))?;
         let worker = self.core.borrow().as_ref().unwrap().clone();
-        worker.record_activity_heartbeat(heartbeat);
+        // Core may hold its activity mutex while waiting for a Ruby custom-slot
+        // callback. Keeping the GVL while acquiring that mutex deadlocks both.
+        let mut heartbeat = Some(heartbeat);
+        without_gvl(
+            || worker.record_activity_heartbeat(heartbeat.take().unwrap()),
+            || {},
+        );
         Ok(())
     }
 

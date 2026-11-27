@@ -360,6 +360,45 @@ class WorkerTest < Test
     )
   end
 
+  class HeartbeatingSlotActivity < Temporalio::Activity::Definition
+    def execute(value)
+      3.times do
+        GC.start
+        Temporalio::Activity::Context.current.heartbeat(value)
+      end
+      value
+    end
+  end
+
+  class HeartbeatingSlotWorkflow < Temporalio::Workflow::Definition
+    def execute(value)
+      Temporalio::Workflow.execute_activity(HeartbeatingSlotActivity, value,
+                                            start_to_close_timeout: 10, heartbeat_timeout: 5)
+    end
+  end
+
+  def test_custom_slot_supplier_heartbeat_contention
+    supplier = TrackingSlotSupplier.new
+    worker = Temporalio::Worker.new(
+      client: env.client,
+      task_queue: "tq-#{SecureRandom.uuid}",
+      workflows: [HeartbeatingSlotWorkflow],
+      activities: [HeartbeatingSlotActivity],
+      tuner: Temporalio::Worker::Tuner.new(
+        workflow_slot_supplier: supplier,
+        activity_slot_supplier: supplier,
+        local_activity_slot_supplier: supplier
+      )
+    )
+    worker.run do
+      handles = 16.times.map do |value|
+        env.client.start_workflow(HeartbeatingSlotWorkflow, value,
+                                  id: "wf-#{SecureRandom.uuid}", task_queue: worker.task_queue)
+      end
+      handles.each_with_index { |handle, value| assert_equal value, handle.result }
+    end
+  end
+
   class BlockingSlotSupplier < Temporalio::Worker::Tuner::SlotSupplier::Custom
     attr_reader :canceled_contexts
 
